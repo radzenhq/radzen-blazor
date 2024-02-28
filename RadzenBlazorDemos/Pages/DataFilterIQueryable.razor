@@ -30,7 +30,8 @@
             <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
             <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date">
                 <FilterTemplate>
-                    <RadzenDatePicker @bind-Value="@context.FilterValue" Style="width:100%" ShowTime=false DateFormat="d" />
+                    <RadzenDatePicker @bind-Value="@context.FilterValue" Style="width:100%" ShowTime=false DateFormat="d"
+                                      Change="@ApplyOrderDateFilter" />
                 </FilterTemplate>
             </MyCustomDataFilterProperty>
             <RadzenDataFilterProperty TItem="Order" Property="Freight" Title="Freight" />
@@ -120,6 +121,14 @@
         finalSelectedIds = selectedIds;
         finalSelectedProductIds = selectedProductIds;
         await dataFilter.Filter();
+    }
+
+    async Task ApplyOrderDateFilter()
+    { 
+        if (auto) 
+        { 
+            await dataFilter.Filter();
+        }
     }
 
     protected override async Task OnInitializedAsync()
