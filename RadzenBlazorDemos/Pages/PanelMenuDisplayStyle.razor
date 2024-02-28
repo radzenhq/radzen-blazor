@@ -6,9 +6,13 @@
 
         <RadzenCheckBox @bind-Value=@isShowArrow Name="CheckBox2" TValue="bool" />
         <RadzenLabel Text="Show Arrow" Component="CheckBox2" />
+        <RadzenCheckBox @bind-Value=@changeOnOver Name="CheckBox3" TValue="bool" />
+        <RadzenLabel Text="Change style on mouse over" Component="CheckBox3" />
     </RadzenStack>
 
-    <RadzenPanelMenu DisplayStyle="@DisplayStyle" ShowArrow="@isShowArrow" Multiple=false>
+    <RadzenPanelMenu DisplayStyle="@DisplayStyle" ShowArrow="@isShowArrow" Multiple=false
+                     @onmouseover="@(args => { if(changeOnOver) { DisplayStyle = MenuItemDisplayStyle.IconAndText; } })"
+                     @onmouseout="@(args => { if(changeOnOver) { DisplayStyle = MenuItemDisplayStyle.Icon; } })">
         <RadzenPanelMenuItem Text="General" Icon="home">
             <RadzenPanelMenuItem Text="Buttons" Path="buttons" Icon="account_circle"></RadzenPanelMenuItem>
             <RadzenPanelMenuItem Text="Menu" Path="menu" Icon="line_weight"></RadzenPanelMenuItem>
@@ -46,4 +50,5 @@
     MenuItemDisplayStyle DisplayStyle = MenuItemDisplayStyle.IconAndText;
 
     bool isShowArrow = true;
+    bool changeOnOver;
 }
