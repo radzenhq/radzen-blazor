@@ -158,6 +158,8 @@ namespace Radzen.Blazor
         {
             selectedIndex = IndexOf(tab);
 
+            SetFocusedIndex();
+
             if (raiseChange)
             {
                 await Change.InvokeAsync(selectedIndex);
@@ -205,6 +207,14 @@ namespace Radzen.Blazor
             base.OnInitialized();
         }
 
+        void SetFocusedIndex()
+        {
+            if (focusedIndex != selectedIndex)
+            {
+                focusedIndex = selectedIndex;
+            }
+        }
+
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
@@ -213,10 +223,7 @@ namespace Radzen.Blazor
                 selectedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
             }
 
-            if (focusedIndex != selectedIndex)
-            {
-                focusedIndex = selectedIndex;
-            }
+            SetFocusedIndex();
 
             await base.SetParametersAsync(parameters);
         }
@@ -250,6 +257,8 @@ namespace Radzen.Blazor
             if (index != selectedIndex)
             {
                 selectedIndex = index;
+
+                SetFocusedIndex();
 
                 await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
 
