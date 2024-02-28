@@ -1028,6 +1028,19 @@ namespace Radzen.Blazor
                     || GetFilterOperator() == FilterOperator.IsNotEmpty;
         }
 
+        internal bool HasCustomFilter()
+        {
+            return GetFilterOperator() == FilterOperator.Custom && GetCustomFilterExpression() != null;
+        }
+
+        internal bool HasActiveFilter()
+        {
+            return GetFilterValue() != null
+            || GetSecondFilterValue() != null
+            || CanSetFilterValue()
+            || HasCustomFilter();
+        }
+
         /// <summary>
         /// Get custom filter linq.
         /// </summary>
