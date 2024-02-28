@@ -248,6 +248,8 @@ namespace Radzen.Blazor
                         builder.AddAttribute(7, nameof(RadzenDataGridRow<TItem>.EditContext), editContexts[item]);
                     }
 
+                    builder.SetKey(item);
+
                     builder.CloseComponent();
                     i++;
                 }
