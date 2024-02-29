@@ -152,14 +152,7 @@ namespace Radzen
         /// <returns>System.String.</returns>
         public static string ToFilterString<T>(this IEnumerable<RadzenDataGridColumn<T>> columns)
         {
-            Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
-               (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty) || c.GetFilterOperator() == FilterOperator.IsNotNull
-                   || c.GetFilterOperator() == FilterOperator.IsNull || c.GetFilterOperator() == FilterOperator.IsEmpty
-                   || c.GetFilterOperator() == FilterOperator.IsNotEmpty
-                   || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
-               && c.GetFilterProperty() != null;
-
-            var columnsWithFilter = columns.Where(canFilter).ToList();
+            var columnsWithFilter = GetFilterableColumns(columns);
 
             if (columnsWithFilter.Any())
             {
@@ -776,13 +769,15 @@ namespace Radzen
             Func<RadzenGridColumn<T>, bool> canFilter = (c) => c.Filterable && !string.IsNullOrEmpty(c.Type) &&
                 !(c.FilterValue == null || c.FilterValue as string == string.Empty) && c.GetFilterProperty() != null;
 
-            if (columns.Where(canFilter).Any())
+            var columnsWithFilter = columns.Where(canFilter).ToList();
+
+            if (columnsWithFilter.Any())
             {
                 var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
                 var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
 
                 var whereList = new List<string>();
-                foreach (var column in columns.Where(canFilter))
+                foreach (var column in columnsWithFilter)
                 {
                     var property = column.GetFilterProperty().Replace('.', '/');
 
@@ -827,20 +822,15 @@ namespace Radzen
         /// <returns>System.String.</returns>
         public static string ToODataFilterString<T>(this IEnumerable<RadzenDataGridColumn<T>> columns)
         {
-            Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
-               (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty)
-                || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
-                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty
-                || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
-               && c.GetFilterProperty() != null;
+            var columnsWithFilter = GetFilterableColumns(columns);
 
-            if (columns.Where(canFilter).Any())
+            if (columnsWithFilter.Any())
             {
                 var gridLogicalFilterOperator = columns.FirstOrDefault()?.Grid?.LogicalFilterOperator;
                 var gridBooleanOperator = gridLogicalFilterOperator == LogicalFilterOperator.And ? "and" : "or";
 
                 var whereList = new List<string>();
-                foreach (var column in columns.Where(canFilter))
+                foreach (var column in columnsWithFilter)
                 {
                     var property = column.GetFilterProperty().Replace('.', '/');
 
@@ -1442,6 +1432,18 @@ namespace Radzen
                 return result;
             }
             return result.Concat(result.SelectManyRecursive(selector));
+        }
+
+        private static List<RadzenDataGridColumn<T>> GetFilterableColumns<T>(IEnumerable<RadzenDataGridColumn<T>> columns)
+        {
+            return columns
+                .Where(c => c.Filterable
+                    && c.FilterPropertyType != null
+                    && (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty)
+                        || c.CanSetFilterValue()
+                        || c.HasCustomFilter())
+                    && c.GetFilterProperty() != null)
+                .ToList();
         }
     }
 }
