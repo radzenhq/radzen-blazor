@@ -1070,7 +1070,7 @@ namespace Radzen.Blazor
             FilterOperator = FilterOperator == FilterOperator.Custom
                 ? FilterOperator.Custom
                 : typeof(System.Collections.IEnumerable).IsAssignableFrom(FilterPropertyType)
-                    ? FilterOperator.Contains
+                    ? !string.IsNullOrEmpty(FilterProperty) && FilterProperty != Property ? FilterOperator.In : FilterOperator.Contains
                     : default(FilterOperator);
             SecondFilterOperator = default(FilterOperator);
             LogicalFilterOperator = default(LogicalFilterOperator);
