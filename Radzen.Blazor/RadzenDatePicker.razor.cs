@@ -1210,7 +1210,15 @@ namespace Radzen.Blazor
         /// <inheritdoc/>
         public async ValueTask FocusAsync()
         {
-            await input.FocusAsync();
+           try
+           {
+               if(input != null)
+               {
+                  await input.FocusAsync();
+               }
+            }
+            catch
+            {}
         }
 #endif
     }
