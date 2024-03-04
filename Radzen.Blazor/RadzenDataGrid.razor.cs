@@ -3292,7 +3292,8 @@ namespace Radzen.Blazor
                         FilterOperator = c.GetFilterOperator(),
                         SecondFilterValue = c.GetSecondFilterValue(),
                         SecondFilterOperator = c.GetSecondFilterOperator(),
-                        LogicalFilterOperator = c.GetLogicalFilterOperator()
+                        LogicalFilterOperator = c.GetLogicalFilterOperator(),
+                        CustomFilterExpression = c.GetCustomFilterExpression(),
                     }).ToList(),
                     CurrentPage = CurrentPage,
                     PageSize = PageSize,
@@ -3308,141 +3309,159 @@ namespace Radzen.Blazor
         /// </summary>
         internal async Task LoadSettingsInternal(DataGridSettings settings)
         {
-            if (SettingsChanged.HasDelegate)
+            if (SettingsChanged.HasDelegate == false)
             {
-                var shouldUpdateState = false;
-                var hasFilter = settings.Columns != null && settings.Columns.Any(c => 
-                    c.FilterValue != null || c.SecondFilterValue != null || 
-                    c.FilterOperator == FilterOperator.IsNull || c.FilterOperator == FilterOperator.IsNotNull ||
-                    c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty ||
-                    c.SecondFilterOperator == FilterOperator.IsNull || c.SecondFilterOperator == FilterOperator.IsNotNull ||
-                    c.SecondFilterOperator == FilterOperator.IsEmpty || c.SecondFilterOperator == FilterOperator.IsNotEmpty);
+                return;
+            }
 
-                if (settings.Columns != null)
+            var shouldUpdateState = false;
+            var hasFilter = settings.Columns.Any(c => 
+                c.FilterValue != null || c.SecondFilterValue != null || 
+                c.FilterOperator == FilterOperator.IsNull || c.FilterOperator == FilterOperator.IsNotNull ||
+                c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty ||
+                c.SecondFilterOperator == FilterOperator.IsNull || c.SecondFilterOperator == FilterOperator.IsNotNull ||
+                c.SecondFilterOperator == FilterOperator.IsEmpty || c.SecondFilterOperator == FilterOperator.IsNotEmpty);
+
+            foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
+            {
+                var gridColumn = GetColumnByPropertyAndUniqueIdOrDefault(column);
+                if (gridColumn == null)
                 {
-                    foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
-                    {
-                        var gridColumn = ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
-                                ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
-                        if (gridColumn != null)
-                        {
-                            // Sorting
-                            if (gridColumn.GetSortOrder() != column.SortOrder)
-                            {
-                                gridColumn.SetSortOrder(column.SortOrder);
-                                shouldUpdateState = true;
-                            }
-                        }
-                    }
-
-                    foreach (var column in settings.Columns)
-                    {
-                        var gridColumn = ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
-                                ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
-                        if (gridColumn != null)
-                        {
-                            // Visibility
-                            if (gridColumn.GetVisible() != column.Visible)
-                            {
-                                gridColumn.SetVisible(column.Visible);
-                                shouldUpdateState = true;
-                            }
-
-                            // Width
-                            if (gridColumn.GetWidth() != column.Width)
-                            {
-                                gridColumn.SetWidth(column.Width);
-                                shouldUpdateState = true;
-                            }
-
-                            // OrderIndex
-                            if (gridColumn.GetOrderIndex() != column.OrderIndex)
-                            {
-                                gridColumn.SetOrderIndex(column.OrderIndex);
-                                shouldUpdateState = true;
-                            }
-
-                            // Filtering
-                            if (!AreObjectsEqual(gridColumn.GetFilterValue(), GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType)))
-                            {
-                                gridColumn.SetFilterValue(GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType));
-                                shouldUpdateState = true;
-                            }
-
-                            if (gridColumn.GetFilterOperator() != column.FilterOperator)
-                            {
-                                gridColumn.SetFilterOperator(column.FilterOperator);
-                                shouldUpdateState = true;
-                            }
-
-                            if (!AreObjectsEqual(gridColumn.GetSecondFilterValue(), GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType)))
-                            {
-                                gridColumn.SetFilterValue(GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType), false);
-                                shouldUpdateState = true;
-                            }
-
-                            if (gridColumn.GetSecondFilterOperator() != column.SecondFilterOperator)
-                            {
-                                gridColumn.SetSecondFilterOperator(column.SecondFilterOperator);
-                                shouldUpdateState = true;
-                            }
-
-                            if (gridColumn.GetLogicalFilterOperator() != column.LogicalFilterOperator)
-                            {
-                                gridColumn.SetLogicalFilterOperator(column.LogicalFilterOperator);
-                                shouldUpdateState = true;
-                            }
-                        }
-                    }
+                    continue;
                 }
 
-                if (settings.Groups != null && !settings.Groups.SequenceEqual(Groups))
+                // Sorting
+                if (gridColumn.GetSortOrder() != column.SortOrder)
                 {
-                    groups.CollectionChanged -= GroupsCollectionChanged;
-                    Groups.Clear();
-                    settings.Groups.ToList().ForEach(Groups.Add);
+                    gridColumn.SetSortOrder(column.SortOrder);
                     shouldUpdateState = true;
-                    groups.CollectionChanged += GroupsCollectionChanged;
+                }
+            }
+
+            foreach (var column in settings.Columns)
+            {
+                var gridColumn = GetColumnByPropertyAndUniqueIdOrDefault(column);
+                if (gridColumn == null)
+                {
+                    continue;
                 }
 
-                if (settings.CurrentPage != null && settings.CurrentPage != CurrentPage)
+                // Visibility
+                if (gridColumn.GetVisible() != column.Visible)
                 {
-                    CurrentPage = settings.CurrentPage.Value;
+                    gridColumn.SetVisible(column.Visible);
                     shouldUpdateState = true;
                 }
 
-                if (settings.PageSize != null && settings.PageSize != GetPageSize())
+                // Width
+                if (gridColumn.GetWidth() != column.Width)
                 {
-                    SetPageSize(settings.PageSize.Value);
+                    gridColumn.SetWidth(column.Width);
                     shouldUpdateState = true;
                 }
 
-                if (View.Any() == false && Query.Top == null)
+                // OrderIndex
+                if (gridColumn.GetOrderIndex() != column.OrderIndex)
                 {
+                    gridColumn.SetOrderIndex(column.OrderIndex);
                     shouldUpdateState = true;
                 }
 
-                if (shouldUpdateState)
+                // Filtering
+                var filterValue = GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType);
+                if (!AreObjectsEqual(gridColumn.GetFilterValue(), filterValue))
                 {
-                    skip = CurrentPage * GetPageSize();
+                    gridColumn.SetFilterValue(filterValue);
+                    shouldUpdateState = true;
+                }
 
-                    if (hasFilter && View.Any() ? skip <= View.Count() : true)
-                    {
-                        CalculatePager();
-                        UpdateColumnsOrder();
-                        await Reload();
-                    }
+                if (gridColumn.GetFilterOperator() != column.FilterOperator)
+                {
+                    gridColumn.SetFilterOperator(column.FilterOperator);
+                    shouldUpdateState = true;
+                }
+
+                var secondFilterValue = GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType);
+                if (!AreObjectsEqual(gridColumn.GetSecondFilterValue(), secondFilterValue))
+                {
+                    gridColumn.SetFilterValue(secondFilterValue, false);
+                    shouldUpdateState = true;
+                }
+
+                if (gridColumn.GetSecondFilterOperator() != column.SecondFilterOperator)
+                {
+                    gridColumn.SetSecondFilterOperator(column.SecondFilterOperator);
+                    shouldUpdateState = true;
+                }
+
+                if (gridColumn.GetLogicalFilterOperator() != column.LogicalFilterOperator)
+                {
+                    gridColumn.SetLogicalFilterOperator(column.LogicalFilterOperator);
+                    shouldUpdateState = true;
+                }
+
+                if (gridColumn.GetCustomFilterExpression() != column.CustomFilterExpression)
+                {
+                    gridColumn.SetCustomFilterExpression(column.CustomFilterExpression);
+                    shouldUpdateState = true;
+                }
+            }
+
+            if (settings.Groups != null && !settings.Groups.SequenceEqual(Groups))
+            {
+                groups.CollectionChanged -= GroupsCollectionChanged;
+                Groups.Clear();
+                settings.Groups.ToList().ForEach(Groups.Add);
+                shouldUpdateState = true;
+                groups.CollectionChanged += GroupsCollectionChanged;
+            }
+
+            if (settings.CurrentPage != null && settings.CurrentPage != CurrentPage)
+            {
+                CurrentPage = settings.CurrentPage.Value;
+                shouldUpdateState = true;
+            }
+
+            if (settings.PageSize != null && settings.PageSize != GetPageSize())
+            {
+                SetPageSize(settings.PageSize.Value);
+                shouldUpdateState = true;
+            }
+
+            if (View.Any() == false && Query.Top == null)
+            {
+                shouldUpdateState = true;
+            }
+
+            if (shouldUpdateState)
+            {
+                skip = CurrentPage * GetPageSize();
+
+                if (hasFilter && View.Any() ? skip <= View.Count() : true)
+                {
+                    CalculatePager();
+                    UpdateColumnsOrder();
+                    await Reload();
                 }
             }
         }
 
-		/// <summary>
-		/// Compares two objects for equality.
-		/// </summary>
-		/// <param name="object1">The first object to compare.</param>
-		/// <param name="object2">The second object to compare.</param>
-		/// <returns>True if the objects are equal, false otherwise.</returns>
-		private static bool AreObjectsEqual(object object1, object object2)
+        private RadzenDataGridColumn<TItem> GetColumnByPropertyAndUniqueIdOrDefault(DataGridColumnSettings dataGridColumnSettings)
+        {
+            return ColumnsCollection
+                .Where(c => !string.IsNullOrEmpty(dataGridColumnSettings.Property) && c.Property == dataGridColumnSettings.Property)
+                .FirstOrDefault() ?? ColumnsCollection
+                    .Where(c => !string.IsNullOrEmpty(dataGridColumnSettings.UniqueID) && c.UniqueID == dataGridColumnSettings.UniqueID)
+                    .FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Compares two objects for equality.
+        /// </summary>
+        /// <param name="object1">The first object to compare.</param>
+        /// <param name="object2">The second object to compare.</param>
+        /// <returns>True if the objects are equal, false otherwise.</returns>
+        private static bool AreObjectsEqual(object object1, object object2)
 		{
 			// If both objects are null, they are considered equal
 			if (object1 == null && object2 == null)
@@ -3473,9 +3492,8 @@ namespace Radzen.Blazor
 
 		object GetFilterValue(object value, Type type)
         {
-            if (value != null && value is JsonElement)
+            if (value != null && value is JsonElement element)
             {
-                var element = (JsonElement)value;
                 if (type == typeof(Int16) || type == typeof(Int16?))
                 {
                     return element.GetInt16();

@@ -373,7 +373,7 @@ namespace Radzen
         /// <summary>
         /// Columns.
         /// </summary>
-        public IEnumerable<DataGridColumnSettings> Columns { get; set; }
+        public IEnumerable<DataGridColumnSettings> Columns { get; set; } = Enumerable.Empty<DataGridColumnSettings>();
         /// <summary>
         /// Groups.
         /// </summary>
@@ -443,6 +443,11 @@ namespace Radzen
         /// LogicalFilterOperator.
         /// </summary>
         public LogicalFilterOperator LogicalFilterOperator { get; set; }
+
+        /// <summary>
+        /// CustomFilterExpression.
+        /// </summary>
+        public string CustomFilterExpression { get; set; }
     }
 #if NET7_0_OR_GREATER
 #else
