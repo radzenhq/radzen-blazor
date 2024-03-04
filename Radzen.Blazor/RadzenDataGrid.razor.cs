@@ -3400,7 +3400,9 @@ namespace Radzen.Blazor
                     shouldUpdateState = true;
                 }
 
-                if (gridColumn.GetCustomFilterExpression() != column.CustomFilterExpression)
+                if (gridColumn.GetCustomFilterExpression() != column.CustomFilterExpression &&
+                    !string.IsNullOrEmpty(column.CustomFilterExpression) &&
+                    gridColumn.FilterOperator == FilterOperator.Custom)
                 {
                     gridColumn.SetCustomFilterExpression(column.CustomFilterExpression);
                     shouldUpdateState = true;
