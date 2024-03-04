@@ -935,7 +935,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Сlear filter on the specified column
         /// </summary>
-        public async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false)
+        public async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false, bool shouldReload = true)
         {
             if (closePopup)
             {
@@ -966,7 +966,7 @@ namespace Radzen.Blazor
                 LogicalFilterOperator = column.GetLogicalFilterOperator()
             });
 
-            if (LoadData.HasDelegate && IsVirtualizationAllowed())
+            if (LoadData.HasDelegate && IsVirtualizationAllowed() && shouldReload)
             {
                 Data = null;
 #if NET5_0_OR_GREATER
@@ -979,7 +979,10 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{column.GetFilterProperty()}");
             }
 
-            await InvokeAsync(ReloadInternal);
+            if (shouldReload)
+            {
+                await InvokeAsync(ReloadInternal);
+            }
         }
 
         /// <summary>
@@ -1965,7 +1968,7 @@ namespace Radzen.Blazor
             {
                 allColumns.ToList().ForEach(c => 
                 { 
-                    c.ClearFilters(); 
+                    c.ClearFilters();
                     c.ResetSortOrder();
                     c.SetOrderIndex(null);
                     c.SetWidth(null);
