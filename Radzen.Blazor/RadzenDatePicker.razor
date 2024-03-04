@@ -58,7 +58,7 @@
                                     <tr>
                                         @if (ShowCalendarWeek)
                                         {
-                                            <th scope="col">
+                                            <th scope="col" class="rz-datepicker-week-number">
                                                 <span>@CalendarWeekTitle</span>
                                             </th>
                                         }
@@ -79,7 +79,7 @@
                                         <tr>
                                             @if (ShowCalendarWeek)
                                             {
-                                                <td class="rz-datepicker-other-month">@Culture.Calendar.GetWeekOfYear(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
+                                                <td class="rz-datepicker-week-number">@Culture.Calendar.GetWeekOfYear(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
                                             }
                                             @for (int j = 0; j < 7; j++)
                                             {
