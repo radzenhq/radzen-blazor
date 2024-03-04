@@ -1212,10 +1212,7 @@ namespace Radzen.Blazor
         {
            try
            {
-               if(input != null)
-               {
-                  await input.FocusAsync();
-               }
+               await input.FocusAsync();
             }
             catch
             {}
