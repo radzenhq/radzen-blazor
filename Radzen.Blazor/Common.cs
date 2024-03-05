@@ -471,7 +471,8 @@ namespace Radzen
                 FilterOperator = column.GetFilterOperator(),
                 SecondFilterValue = column.GetSecondFilterValue(),
                 SecondFilterOperator = column.GetSecondFilterOperator(),
-                LogicalFilterOperator = column.GetLogicalFilterOperator()
+                LogicalFilterOperator = column.GetLogicalFilterOperator(),
+                CustomFilterExpression = column.GetCustomFilterExpression(),
             };
         }
     }
