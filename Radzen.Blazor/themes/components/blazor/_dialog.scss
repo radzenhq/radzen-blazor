@@ -144,7 +144,7 @@ $dialog-zindex: 1001 !default;
   height: 100%;
   top: 0;
   left: 0;
-
+  pointer-events: none;
   background-color: var(--rz-dialog-mask-background-color);
   opacity: 0.5;
 }
