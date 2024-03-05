@@ -2356,7 +2356,7 @@ namespace Radzen.Blazor
 
             if (Visible)
             {
-                if (settings != null)
+                if (settings != null && settingsChanged)
                 {
                     await LoadSettingsInternal(settings);
                 }
