@@ -900,16 +900,20 @@ namespace Radzen.Blazor
         /// </summary>
         public void Close()
         {
-            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
+            if (Disabled || ReadOnly || Inline)
+                return;
+
+            if (PopupRenderMode == PopupRenderMode.OnDemand)
             {
                 InvokeAsync(() => popup.CloseAsync(Element));
             }
-
-            if (!Disabled)
+            else
             {
-                contentStyle = "display:none;";
-                StateHasChanged();
+                JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
+
+            contentStyle = "display:none;";
+            StateHasChanged();
         }
 
         private string PopupStyle
