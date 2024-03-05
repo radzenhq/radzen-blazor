@@ -15,19 +15,26 @@
     string value;
     int count;
 
-    void LoadData(LoadDataArgs args)
+    string lastfilter;
+    async Task LoadData(LoadDataArgs args)
     {
+        await Task.Yield();
+
         var query = dbContext.Customers.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter) && lastfilter != args.Filter)
+        {
+            args.Skip = 0;
+        }
 
         if (!string.IsNullOrEmpty(args.Filter))
         {
+            lastfilter = args.Filter;
             query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
         }
 
-        count = query.Count();
+        count = await Task.FromResult(query.Count());
 
-        customers = query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : 10).ToList();
-
-        InvokeAsync(StateHasChanged);
+        customers = await Task.FromResult(query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : 10).ToList());
     }
 }
