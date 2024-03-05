@@ -8,7 +8,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
@@ -397,11 +396,14 @@ namespace Radzen
         /// Property.
         /// </summary>
         public string UniqueID { get; set; }
-
         /// <summary>
         /// Property.
         /// </summary>
         public string Property { get; set; }
+        /// <summary>
+        /// Columns.
+        /// </summary>
+        public IEnumerable<DataGridColumnSettings> Columns { get; set; }
         /// <summary>
         /// Visible.
         /// </summary>
@@ -448,6 +450,30 @@ namespace Radzen
         /// CustomFilterExpression.
         /// </summary>
         public string CustomFilterExpression { get; set; }
+
+        internal static DataGridColumnSettings FromRadzenDataGridColumn<TItem>(RadzenDataGridColumn<TItem> column)
+        {
+            return new DataGridColumnSettings()
+            {
+                Columns = column.ColumnsCollection
+                    .ToList()
+                    .Where(c => c.CanBeSavedToDataGridSettings())
+                    .Select(c => FromRadzenDataGridColumn(c))
+                    .ToList(),
+                UniqueID = column.UniqueID,
+                Property = column.Property,
+                Width = column.GetWidth(),
+                Visible = column.GetVisible(),
+                OrderIndex = column.GetOrderIndex(),
+                SortOrder = column.GetSortOrder(),
+                SortIndex = column.getSortIndex(),
+                FilterValue = column.GetFilterValue(),
+                FilterOperator = column.GetFilterOperator(),
+                SecondFilterValue = column.GetSecondFilterValue(),
+                SecondFilterOperator = column.GetSecondFilterOperator(),
+                LogicalFilterOperator = column.GetLogicalFilterOperator()
+            };
+        }
     }
 #if NET7_0_OR_GREATER
 #else

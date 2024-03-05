@@ -1008,6 +1008,11 @@ namespace Radzen.Blazor
             }
         }
 
+        internal bool CanBeSavedToDataGridSettings()
+        {
+            return !string.IsNullOrEmpty(Property) || !string.IsNullOrEmpty(UniqueID);
+        }
+
         /// <summary>
         /// Set column filter value and reload grid.
         /// </summary>

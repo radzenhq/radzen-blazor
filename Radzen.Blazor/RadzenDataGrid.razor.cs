@@ -2246,6 +2246,7 @@ namespace Radzen.Blazor
             return new Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
         }
 
+        private bool settingsChanged = false;
         private bool visibleChanged = false;
         internal bool firstRender = true;
 
@@ -2264,6 +2265,9 @@ namespace Radzen.Blazor
 
                     case nameof(Visible):
                         visibleChanged = HasChanged(parameter.Value, Visible); break;
+
+                    case nameof(Settings):
+                        settingsChanged = HasChanged(parameter.Value, Settings); break;
 
                     case nameof(AllGroupsExpanded):
                         allGroupsExpandedChanged = HasChanged(parameter.Value, AllGroupsExpanded);
@@ -3279,22 +3283,11 @@ namespace Radzen.Blazor
             {
                 settings = new DataGridSettings()
                 {
-                    Columns = ColumnsCollection.ToList().Where(c => !string.IsNullOrEmpty(c.Property) || !string.IsNullOrEmpty(c.UniqueID)).Select(c => new DataGridColumnSettings()
-                    {
-                        UniqueID = c.UniqueID,
-                        Property = c.Property,
-                        Width = c.GetWidth(),
-                        Visible = c.GetVisible(),
-                        OrderIndex = c.GetOrderIndex(),
-                        SortOrder = c.GetSortOrder(),
-                        SortIndex = c.getSortIndex(),
-                        FilterValue = c.GetFilterValue(),
-                        FilterOperator = c.GetFilterOperator(),
-                        SecondFilterValue = c.GetSecondFilterValue(),
-                        SecondFilterOperator = c.GetSecondFilterOperator(),
-                        LogicalFilterOperator = c.GetLogicalFilterOperator(),
-                        CustomFilterExpression = c.GetCustomFilterExpression()
-                    }).ToList(),
+                    Columns = ColumnsCollection
+                        .ToList()
+                        .Where(c => c.CanBeSavedToDataGridSettings())
+                        .Select(c => DataGridColumnSettings.FromRadzenDataGridColumn(c))
+                        .ToList(),
                     CurrentPage = CurrentPage,
                     PageSize = PageSize,
                     Groups = Groups
@@ -3319,12 +3312,15 @@ namespace Radzen.Blazor
                     c.SecondFilterOperator == FilterOperator.IsNull || c.SecondFilterOperator == FilterOperator.IsNotNull ||
                     c.SecondFilterOperator == FilterOperator.IsEmpty || c.SecondFilterOperator == FilterOperator.IsNotEmpty);
 
+                var allColumnSettings = GetAllColumnSettings(settings.Columns, new List<DataGridColumnSettings>());
+                var allColumns = GetAllColumns(ColumnsCollection, new List<RadzenDataGridColumn<TItem>>());
+
                 if (settings.Columns != null)
                 {
-                    foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
+                    foreach (var column in allColumnSettings.OrderBy(c => c.SortIndex))
                     {
-                        var gridColumn = ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
-                                ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
+                        var gridColumn = allColumns.FirstOrDefault(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property) ??
+                                allColumns.FirstOrDefault(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID);
                         if (gridColumn != null)
                         {
                             // Sorting
@@ -3336,10 +3332,10 @@ namespace Radzen.Blazor
                         }
                     }
 
-                    foreach (var column in settings.Columns)
+                    foreach (var column in allColumnSettings)
                     {
-                        var gridColumn = ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
-                                ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
+                        var gridColumn = allColumns.FirstOrDefault(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property) ??
+                                allColumns.FirstOrDefault(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID);
                         if (gridColumn != null)
                         {
                             // Visibility
@@ -3443,15 +3439,43 @@ namespace Radzen.Blazor
                     }
                 }
             }
+
+            settingsChanged = false;
         }
 
-		/// <summary>
-		/// Compares two objects for equality.
-		/// </summary>
-		/// <param name="object1">The first object to compare.</param>
-		/// <param name="object2">The second object to compare.</param>
-		/// <returns>True if the objects are equal, false otherwise.</returns>
-		private static bool AreObjectsEqual(object object1, object object2)
+        private List<DataGridColumnSettings> GetAllColumnSettings(IEnumerable<DataGridColumnSettings> columns, List<DataGridColumnSettings> allColumns)
+        {
+            if (columns == null || columns.Any() == false)
+            {
+                return allColumns;
+            }
+
+            allColumns.AddRange(columns);
+            GetAllColumnSettings(columns.SelectMany(c => c.Columns), allColumns);
+
+            return allColumns;
+        }
+
+        private List<RadzenDataGridColumn<TItem>> GetAllColumns(IEnumerable<RadzenDataGridColumn<TItem>> columns, List<RadzenDataGridColumn<TItem>> allColumns)
+        {
+            if (columns == null || columns.Any() == false)
+            {
+                return allColumns;
+            }
+
+            allColumns.AddRange(columns);
+            GetAllColumns(columns.SelectMany(c => c.ColumnsCollection), allColumns);
+
+            return allColumns;
+        }
+
+        /// <summary>
+        /// Compares two objects for equality.
+        /// </summary>
+        /// <param name="object1">The first object to compare.</param>
+        /// <param name="object2">The second object to compare.</param>
+        /// <returns>True if the objects are equal, false otherwise.</returns>
+        private static bool AreObjectsEqual(object object1, object object2)
 		{
 			// If both objects are null, they are considered equal
 			if (object1 == null && object2 == null)
