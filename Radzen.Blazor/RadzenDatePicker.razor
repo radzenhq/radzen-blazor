@@ -79,7 +79,7 @@
                                         <tr>
                                             @if (ShowCalendarWeek)
                                             {
-                                                <td class="rz-datepicker-week-number">@Culture.Calendar.GetWeekOfYear(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
+                                                <td class="rz-datepicker-other-month rz-datepicker-week-number">@Culture.Calendar.GetWeekOfYear(new DateTime(CurrentDate.Year, CurrentDate.Month, 1).AddDays(i * 7), Culture.DateTimeFormat.CalendarWeekRule, Culture.DateTimeFormat.FirstDayOfWeek)</td>
                                             }
                                             @for (int j = 0; j < 7; j++)
                                             {
@@ -87,7 +87,7 @@
                                                 {
                                                     break;
                                                 }
-                                                
+
                                                 DateTime date = StartDate.AddDays(dayNumber++);
                                                 var dateArgs = DateAttributes(date);
 
@@ -113,7 +113,7 @@
                 @if (ShowTime)
                 {
                 <div class="rz-timepicker" @onmousedown:stopPropagation>
-                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "hour" }})" TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)" 
+                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "hour" }})" TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)"
                            Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" TValue="double" Step="@HoursStep"
                            Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput Format="@(PadHours ? "00" : "")" Name="@($"{UniqueID}-h")" />
                         <div class="rz-separator">
@@ -152,6 +152,6 @@
                     </div>
                 }
         </Popup>
-        
+
     </div>
 }

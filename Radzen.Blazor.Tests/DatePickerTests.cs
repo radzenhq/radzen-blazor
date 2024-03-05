@@ -667,6 +667,9 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rz-datepicker-week-number", component.Markup);
             Assert.Equal(8, component.FindAll(".rz-datepicker-calendar th").Count());
+            // check header and week number column
+            Assert.Single(component.FindAll("th.rz-datepicker-week-number"));
+            Assert.Equal(6, component.FindAll("td.rz-datepicker-week-number").Count());
         }
 
         [Fact]
