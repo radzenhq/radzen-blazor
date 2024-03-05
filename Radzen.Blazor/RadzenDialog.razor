@@ -3,7 +3,7 @@
 @using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime
 
-@foreach (var dialog in dialogs)
+@foreach (var dialog in dialogs.ToList())
 {
     <DialogContainer @key=@dialog Dialog=@dialog ShowMask=@(dialog==dialogs.LastOrDefault()) />
 }
