@@ -347,8 +347,12 @@ $timepicker-border: none !default;
   .rz-state-disabled {
     opacity: 0.5;
   }
-  
+
   .rz-datepicker-other-month {
+    opacity: 0.5;
+  }
+
+  .rz-datepicker-week-number {
     opacity: 0.5;
   }
 }
