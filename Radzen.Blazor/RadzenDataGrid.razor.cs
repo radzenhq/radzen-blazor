@@ -3292,7 +3292,8 @@ namespace Radzen.Blazor
                         FilterOperator = c.GetFilterOperator(),
                         SecondFilterValue = c.GetSecondFilterValue(),
                         SecondFilterOperator = c.GetSecondFilterOperator(),
-                        LogicalFilterOperator = c.GetLogicalFilterOperator()
+                        LogicalFilterOperator = c.GetLogicalFilterOperator(),
+                        CustomFilterExpression = c.GetCustomFilterExpression()
                     }).ToList(),
                     CurrentPage = CurrentPage,
                     PageSize = PageSize,
@@ -3390,6 +3391,14 @@ namespace Radzen.Blazor
                             if (gridColumn.GetLogicalFilterOperator() != column.LogicalFilterOperator)
                             {
                                 gridColumn.SetLogicalFilterOperator(column.LogicalFilterOperator);
+                                shouldUpdateState = true;
+                            }
+
+                            if (gridColumn.GetCustomFilterExpression() != column.CustomFilterExpression &&
+                                !string.IsNullOrEmpty(column.CustomFilterExpression) &&
+                                gridColumn.FilterOperator == FilterOperator.Custom)
+                            {
+                                gridColumn.SetCustomFilterExpression(column.CustomFilterExpression);
                                 shouldUpdateState = true;
                             }
                         }
