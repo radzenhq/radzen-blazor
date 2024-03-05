@@ -30,7 +30,7 @@
         if (!string.IsNullOrEmpty(args.Filter))
         {
             lastfilter = args.Filter;
-            query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()));
+            query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()) || c.CompanyName.ToLower().Contains(args.Filter.ToLower()));
         }
 
         count = await Task.FromResult(query.Count());
