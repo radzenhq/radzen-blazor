@@ -1930,7 +1930,7 @@ namespace Radzen.Blazor
                 keyPropertyGetter = PropertyAccess.Getter<TItem, object>(KeyProperty);
             }
 
-            Reset(!IsOData() && !LoadData.HasDelegate);
+            Reset(!IsOData() && !LoadData.HasDelegate && !AllowColumnPicking && !AllowColumnReorder && !AllowColumnResize);
 
             if (!IsOData() && !LoadData.HasDelegate && !Page.HasDelegate)
             {
