@@ -656,7 +656,7 @@ namespace Radzen
                     //
                 }
             }
-            else if (key == "Enter")
+            else if (key == "Enter" || key == "NumpadEnter")
             {
                 preventKeydown = true;
 
