@@ -427,13 +427,20 @@ namespace Radzen.Blazor
             return type == typeof(string);
         }
 
+        string prevSearch;
         int? skip;
         async Task OnLoadData(LoadDataArgs args)
         {
+            skip = args.Skip;
+
+            if (prevSearch != searchText)
+            {
+                prevSearch = searchText;
+                skip = 0;
+            }
+
             if (!LoadData.HasDelegate)
             {
-                skip = args.Skip;
-
                 var query = Query;
 
                 if (query == null)
@@ -488,15 +495,15 @@ namespace Radzen.Blazor
                     query = query.OrderBy(args.OrderBy);
                 }
 
+                count = await Task.FromResult(query.Count());
+
+                pagedData = await Task.FromResult(QueryableExtension.ToList(query.Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>());
+
                 _internalView = query;
-
-                count = query.Count();
-
-                pagedData = QueryableExtension.ToList(query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>();
             }
             else
             {
-                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = args.Skip, Top = args.Top, OrderBy = args.OrderBy, Filter = searchText });
+                await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = args.Top, OrderBy = args.OrderBy, Filter = searchText });
             }
         }
 
