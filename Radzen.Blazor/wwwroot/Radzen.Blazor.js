@@ -579,7 +579,7 @@ window.Radzen = {
 
             if (!cell.classList.contains('rz-state-focused')) {
                 cell.classList.add('rz-state-focused');
-                if (!isVirtual) {
+                if (!isVirtual && table.parentElement.scrollWidth > table.parentElement.clientWidth) {
                     Radzen.scrollIntoViewIfNeeded(cell);
                 }
             }
@@ -599,7 +599,7 @@ window.Radzen = {
 
             if (!row.classList.contains('rz-state-focused')) {
                 row.classList.add('rz-state-focused');
-                if (!isVirtual) {
+                if (!isVirtual && table.parentElement.scrollHeight > table.parentElement.clientHeight) {
                     Radzen.scrollIntoViewIfNeeded(row);
                 }
             }
