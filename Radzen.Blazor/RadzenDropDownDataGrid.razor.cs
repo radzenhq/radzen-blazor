@@ -672,7 +672,7 @@ namespace Radzen.Blazor
                     await grid.NextPage();
                 }
             }
-            else if (key == "Enter")
+            else if (key == "Enter" || key == "NumpadEnter")
             {
                 preventKeydown = false;
 
