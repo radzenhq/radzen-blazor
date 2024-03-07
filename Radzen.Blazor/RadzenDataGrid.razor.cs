@@ -2246,7 +2246,8 @@ namespace Radzen.Blazor
             return new Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
         }
 
-        private bool visibleChanged = false;
+        bool settingsChanged = false;
+        bool visibleChanged = false;
         internal bool firstRender = true;
 
         /// <inheritdoc />
@@ -2264,6 +2265,9 @@ namespace Radzen.Blazor
 
                     case nameof(Visible):
                         visibleChanged = HasChanged(parameter.Value, Visible); break;
+
+                    case nameof(Settings):
+                        settingsChanged = HasChanged(parameter.Value, Settings); break;
 
                     case nameof(AllGroupsExpanded):
                         allGroupsExpandedChanged = HasChanged(parameter.Value, AllGroupsExpanded);
@@ -2352,7 +2356,7 @@ namespace Radzen.Blazor
 
             if (Visible)
             {
-                if (settings != null)
+                if (settings != null && settingsChanged)
                 {
                     await LoadSettingsInternal(settings);
                 }
@@ -3277,9 +3281,12 @@ namespace Radzen.Blazor
         {
             if (SettingsChanged.HasDelegate && canSaveSettings)
             {
+                var allColumns = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection))
+                    .Where(c => !string.IsNullOrEmpty(c.Property) || !string.IsNullOrEmpty(c.UniqueID)).ToList();
+
                 settings = new DataGridSettings()
                 {
-                    Columns = ColumnsCollection.ToList().Where(c => !string.IsNullOrEmpty(c.Property) || !string.IsNullOrEmpty(c.UniqueID)).Select(c => new DataGridColumnSettings()
+                    Columns = allColumns.Select(c => new DataGridColumnSettings()
                     {
                         UniqueID = c.UniqueID,
                         Property = c.Property,
@@ -3321,10 +3328,12 @@ namespace Radzen.Blazor
 
                 if (settings.Columns != null)
                 {
+                    var allColumns = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection));
+
                     foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
                     {
-                        var gridColumn = ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
-                                ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
+                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
+                                allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
                         if (gridColumn != null)
                         {
                             // Sorting
@@ -3338,8 +3347,8 @@ namespace Radzen.Blazor
 
                     foreach (var column in settings.Columns)
                     {
-                        var gridColumn = ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
-                                ColumnsCollection.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
+                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
+                                allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
                         if (gridColumn != null)
                         {
                             // Visibility
