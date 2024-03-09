@@ -2827,8 +2827,6 @@ namespace Radzen.Blazor
             }
             else
             {
-                int hash = item.GetHashCode();
-
                 if (editedItems.Keys.Any(i => ItemEquals(i, item)))
                 {
                     editedItems.Remove(item);
