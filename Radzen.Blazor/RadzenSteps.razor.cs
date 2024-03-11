@@ -407,13 +407,6 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        /// <inheritdoc />
-        public override void Dispose()
-        {
-            base.Dispose();
-            steps.Clear();
-        }
-
         bool preventKeyPress = false;
         async Task OnKeyPress(KeyboardEventArgs args, Task task)
         {
