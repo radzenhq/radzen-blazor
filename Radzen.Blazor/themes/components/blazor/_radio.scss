@@ -2,8 +2,10 @@ $radio-width: 1.25rem !default;
 $radio-height: $radio-width !default;
 $radio-border-radius: 50% !default;
 $radio-border-width: inherit !default;
-$radio-label-margin: 0 1rem 0 0.5rem !default;
-$radio-margin: 1rem 0 !default;
+$radio-label-margin-block: 0 !default;
+$radio-label-margin-inline: 0.5rem 1rem !default;
+$radio-margin-block: 1rem !default;
+$radio-margin-inline: 0 !default;
 $radio-focus-outline: var(--rz-outline-focus) !default;
 $radio-focus-outline-offset: var(--rz-outline-offset) !default;
 
@@ -31,8 +33,10 @@ $radio-checked-border: var(--rz-input-border) !default;
   --rz-radio-height: #{$radio-height};
   --rz-radio-border-radius: #{$radio-border-radius};
   --rz-radio-border-width: #{$radio-border-width};
-  --rz-radio-label-margin: #{$radio-label-margin};
-  --rz-radio-margin: #{$radio-margin};
+  --rz-radio-label-margin-block: #{$radio-label-margin-block};
+  --rz-radio-label-margin-inline: #{$radio-label-margin-inline};
+  --rz-radio-margin-block: #{$radio-margin-block};
+  --rz-radio-margin-inline: #{$radio-margin-inline};
   --rz-radio-focus-outline: #{$radio-focus-outline};
   --rz-radio-focus-outline-offset: #{$radio-focus-outline-offset};
 
@@ -57,7 +61,8 @@ $radio-checked-border: var(--rz-input-border) !default;
 .rz-radio-button-list-vertical {
   .rz-radio-btn {
     display: flex;
-    margin: var(--rz-radio-margin);
+    margin-block: var(--rz-radio-margin-block);
+    margin-inline: var(--rz-radio-margin-inline);
     align-items: center;
   }
 }
@@ -75,7 +80,8 @@ $radio-checked-border: var(--rz-input-border) !default;
 
 .rz-radiobutton-label,
 .rz-radiobutton-template {
-  margin: var(--rz-radio-label-margin);
+  margin-block: var(--rz-radio-label-margin-block);
+  margin-inline: var(--rz-radio-label-margin-inline);
 }
 
 .rz-radiobutton {
@@ -100,10 +106,7 @@ $radio-checked-border: var(--rz-input-border) !default;
 
 .rz-radiobutton-box {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
