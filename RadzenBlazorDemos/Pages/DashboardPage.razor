@@ -174,7 +174,7 @@
                             <Template Context="issue">
                                 @foreach(var label in issue.Labels)
                                 {
-                                    <span Class="rz-badge rz-badge-pill rz-mr-1 rz-mb-1" Style="background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
+                                    <span Class="rz-badge rz-badge-pill rz-me-1 rz-mb-1" Style="background-color: #@label.Color">@Regex.Replace(label.Name, ":\\w+:", "")</span>
                                 }
                             </Template>
                         </RadzenDataGridColumn>
