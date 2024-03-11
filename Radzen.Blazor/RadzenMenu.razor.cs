@@ -84,6 +84,11 @@ namespace Radzen.Blazor
         {
             var key = args.Code != null ? args.Code : args.Key;
 
+            if (currentItems == null)
+            {
+                currentItems = items.Where(i => i.Visible && !i.Disabled).ToList();
+            }
+
             if (key == "ArrowUp" || key == "ArrowDown")
             {
                 preventKeyPress = true;
