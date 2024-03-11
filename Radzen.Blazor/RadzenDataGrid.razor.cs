@@ -513,7 +513,7 @@ namespace Radzen.Blazor
                             selectedItems.Clear();
                         }
 
-                        await SelectRow(itemToSelect, false);
+                        await SelectRow(itemToSelect, true);
                     }
                 }
             }
