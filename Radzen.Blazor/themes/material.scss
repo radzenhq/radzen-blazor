@@ -535,7 +535,7 @@ $steps-number-color: var(--rz-text-contrast-color) !default;
 // Checkbox
 $checkbox-width: 1.125rem !default;
 $checkbox-border-width: 2px !default;
-$checkbox-label-margin: 0 1rem !default;
+$checkbox-label-margin-inline: 1rem !default;
 $checkbox-checked-background-color: var(--rz-primary) !default;
 $checkbox-checked-color: var(--rz-on-primary) !default;
 $checkbox-checked-hover-background-color: var(--rz-primary-light) !default;
@@ -620,7 +620,7 @@ $radio-width: 1.25rem !default;
 $radio-height: $radio-width !default;
 $radio-border-radius: 50% !default;
 $radio-border-width: 2px !default;
-$radio-label-margin: 0 1rem !default;
+$radio-label-margin-inline: 1rem !default;
 $radio-active-background-color: var(--rz-base-background-color) !default;
 $radio-active-shadow: none !default;
 $radio-checked-background-color: var(--rz-base-background-color) !default;
@@ -1187,7 +1187,8 @@ $tabs-tab-line-height: 1.5rem !default;
 $tabs-tab-font-weight: 500 !default;
 $tabs-tab-text-transform: uppercase !default;
 $tabs-tab-letter-spacing: 1.25px !default;
-$tabs-tab-padding: 0.75rem 1rem !default;
+$tabs-tab-padding-block: 0.75rem !default;
+$tabs-tab-padding-inline: 1rem !default;
 $tabs-tab-background-color: transparent !default;
 $tabs-tab-color: var(--rz-text-secondary-color) !default;
 $tabs-tab-selected-color: var(--rz-primary) !default;
@@ -1199,7 +1200,7 @@ $tabs-tab-focus-background-color: var(--rz-base-200) !default;
 $tabs-tab-focus-color: var(--rz-text-title-color) !default;
 $tabs-tab-panels-border: var(--rz-border-base-300) !default;
 $tabs-icon-font-size: var(--rz-icon-size) !default;
-$tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
+$tabs-icon-margin-inline: -0.25rem 0.25rem !default;
 
 .rz-tabview-nav > li > a {
   @include rz-ripple($pseudo: true);
