@@ -3433,7 +3433,7 @@ namespace Radzen.Blazor
                     shouldUpdateState = true;
                 }
 
-                if (View.Any() == false && Query.Top == null)
+                if (!IsVirtualizationAllowed() && !View.Any() && Query.Top == null)
                 {
                     shouldUpdateState = true;
                 }
