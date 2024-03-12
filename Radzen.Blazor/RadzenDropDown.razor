@@ -103,7 +103,7 @@
             @if (AllowFiltering && !Multiple)
             {
                 <div class="rz-dropdown-filter-container">
-                    <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext   " autocomplete="off" type="text"
+                    <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext" autocomplete="off" aria-autocomplete="none" type="text"
                            @onchange="@((ChangeEventArgs args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText"
                             @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
                     <span class="rz-dropdown-filter-icon rzi rzi-search"></span>
