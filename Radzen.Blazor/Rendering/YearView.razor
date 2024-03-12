@@ -56,7 +56,7 @@
                                 var day = date.AddDays((row * 7) + col);
                                 var appointments = AppointmentsInSlot(day, day.AddDays(1));
                                 var excessCount = appointments.Count();
-                                string classname = $"rz-slot-title {(day.Month != month ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")} {(day == CurrentDate && month == CurrentMonth ? " rz-state-focused" : "")}".Trim();
+                                string classname = $"rz-slot-title {(day.Month != offSetMonth ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")} {(day == CurrentDate && month == CurrentMonth ? " rz-state-focused" : "")}".Trim();
 
                                     <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
                                         <div class="@classname">
