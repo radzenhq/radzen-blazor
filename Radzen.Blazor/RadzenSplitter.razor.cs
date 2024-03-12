@@ -128,6 +128,8 @@ namespace Radzen.Blazor
         {
             IsResizing = true;
 
+            StateHasChanged();
+
             await Task.CompletedTask;
         }
 

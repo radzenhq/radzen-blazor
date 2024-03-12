@@ -6,6 +6,10 @@
 {
     <div id="@GetId()" @attributes="Attributes" class="@GetComponentCssClass()" style="flex-basis: @Size; @Style" data-index="@Index">
         @ChildContent
+        @if (Splitter.IsResizing)
+        {
+            <div class="rz-splitter-mask" />
+        }
     </div>
 
 
