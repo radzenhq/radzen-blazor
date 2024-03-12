@@ -9,9 +9,11 @@ $listbox-padding: 0 !default;
 $listbox-item-padding: var(--rz-dropdown-item-padding) !default;
 $listbox-item-margin: 0 !default;
 
-$listbox-checkbox-margin: 0 0.5rem 0 0 !default;
+$listbox-checkbox-margin-block: 0 !default;
+$listbox-checkbox-margin-inline: 0 0.5rem !default;
 
-$listbox-header-padding: 0.5rem !default;
+$listbox-header-padding-block: 0.5rem !default;
+$listbox-header-padding-inline: 0.5rem !default;
 $listbox-header-icon-width: var(--rz-icon-size) !default;
 $listbox-header-icon-height: $listbox-header-icon-width !default;
 $listbox-header-icon-margin: 0 !default;
@@ -30,9 +32,11 @@ $listbox-header-icon-margin: 0 !default;
   --rz-listbox-item-padding: #{$listbox-item-padding};
   --rz-listbox-item-margin: #{$listbox-item-margin};
 
-  --rz-listbox-checkbox-margin: #{$listbox-checkbox-margin};
+  --rz-listbox-checkbox-margin-block: #{$listbox-checkbox-margin-block};
+  --rz-listbox-checkbox-margin-inline: #{$listbox-checkbox-margin-inline};
 
-  --rz-listbox-header-padding: #{$listbox-header-padding};
+  --rz-listbox-header-padding-block: #{$listbox-header-padding-block};
+  --rz-listbox-header-padding-inline: #{$listbox-header-padding-inline};
   --rz-listbox-header-icon-width: #{$listbox-header-icon-width};
   --rz-listbox-header-icon-height: #{$listbox-header-icon-height};
   --rz-listbox-header-icon-margin: #{$listbox-header-icon-margin};
@@ -48,7 +52,8 @@ $listbox-header-icon-margin: 0 !default;
   text-align: start;
 
   .rz-chkbox {
-    margin: var(--rz-listbox-checkbox-margin);
+    margin-block: var(--rz-listbox-checkbox-margin-block);
+    margin-inline: var(--rz-listbox-checkbox-margin-inline);
   }
 
   &.rz-state-disabled {
@@ -87,7 +92,8 @@ $listbox-header-icon-margin: 0 !default;
 .rz-listbox-header {
   display: flex;
   align-items: center;
-  padding: var(--rz-listbox-header-padding);
+  padding-block: var(--rz-listbox-header-padding-block);
+  padding-inline: var(--rz-listbox-header-padding-inline);
   border-bottom: var(--rz-listbox-filter-border);
 }
 

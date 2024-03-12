@@ -721,8 +721,10 @@ $multiselect-checkbox-margin-inline: 0 1rem !default;
 
 // ListBox
 $listbox-filter-border: var(--rz-border-base-200) !default;
-$listbox-checkbox-margin: 0 1rem 0 0 !default;
-$listbox-header-padding: 0.75rem 1rem !default;
+$listbox-checkbox-margin-block: 0 !default;
+$listbox-checkbox-margin-inline: 0 1rem !default;
+$listbox-header-padding-block: 0.75rem !default;
+$listbox-header-padding-inline: 1rem !default;
 
 // SplitButton
 $splitbutton-padding:  0 1rem !default;
