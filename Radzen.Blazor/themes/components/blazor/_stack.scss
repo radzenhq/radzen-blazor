@@ -100,7 +100,7 @@ $rz-offset-map: map-merge(
 // Offsets
 @each $offset, $offset-margin in $rz-offset-map {
   .rz-offset-#{$offset} {
-    margin-left: #{$offset-margin};
+    margin-inline-start: #{$offset-margin};
   }
 }
 
@@ -109,7 +109,7 @@ $rz-offset-map: map-merge(
   @media (min-width: #{$breakpoint-value}) {
     @each $offset, $offset-margin in $rz-offset-map {
       .rz-offset-#{$breakpoint}-#{$offset} {
-        margin-left: #{$offset-margin};
+        margin-inline-start: #{$offset-margin};
       }
     }
   }
