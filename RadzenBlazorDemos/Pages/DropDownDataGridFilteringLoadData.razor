@@ -5,12 +5,12 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-12 rz-text-align-center">
-    <RadzenLabel Text="Select Value" Component="DropDownDataGridFilteringLoadData" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-12">
+    <RadzenLabel Text="Select Value" Component="DropDownDataGridFilteringLoadData" />
     <RadzenDropDownDataGrid AllowClear="true" @bind-Value=value
                     LoadData=@LoadData AllowFiltering="true"
                     Data=@customers Count=@count TextProperty="CompanyName" ValueProperty="CustomerID" Name="DropDownDataGridFilteringLoadData" />
-</div>
+</RadzenStack>
 
 
 @code {
