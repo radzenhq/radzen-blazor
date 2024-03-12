@@ -2,11 +2,11 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenLabel Text="Select Values" Component="DropDownMultipleChips" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+    <RadzenLabel Text="Select Values" Component="DropDownMultipleChips" />
     <RadzenDropDown @bind-Value=@values Data=@products TextProperty="ProductName" ValueProperty="ProductID" Name="DropDownMultipleChips"
         Multiple=true AllowClear=true Placeholder="Select products" Chips=true Style="width: 100%; max-width: 400px;" />
-</div>
+</RadzenStack>
 
 @code {
     IList<int> values = new int[] { 1, 2 };

@@ -5,15 +5,15 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenLabel Text="Select Value" Component="DropDownGrouping" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+    <RadzenLabel Text="Select Value" Component="DropDownGrouping" />
     <RadzenDropDown @bind-Value=value AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Name="DropDownGrouping"
                     Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID" Style="width: 100%; max-width: 400px;">
         <Template>
             @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
         </Template>
     </RadzenDropDown>
-</div>
+</RadzenStack>
 
 @code {
     int? value;

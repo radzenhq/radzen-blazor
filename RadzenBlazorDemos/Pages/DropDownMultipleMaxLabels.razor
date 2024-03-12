@@ -2,12 +2,12 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenLabel Text="Select Values" Component="DropDownMultipleMaxLabels" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+    <RadzenLabel Text="Select Values" Component="DropDownMultipleMaxLabels" />
     <RadzenDropDown @bind-Value=@values Data=@products TextProperty="ProductName" ValueProperty="ProductID" Name="DropDownMultipleMaxLabels"
                     Multiple=true AllowClear=true Placeholder="Select products" 
                     MaxSelectedLabels="2" SelectAllText="Select all items" SelectedItemsText="are now selected" Style="width: 100%; max-width: 400px;" />
-</div>
+</RadzenStack>
 
 @code {
     IEnumerable<int> values = new int[] { 1, 2 };

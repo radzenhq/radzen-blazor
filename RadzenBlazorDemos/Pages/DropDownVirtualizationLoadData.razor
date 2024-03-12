@@ -4,11 +4,11 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenLabel Text="Select Value" Component="DropDownVirtualizationLoadData" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+    <RadzenLabel Text="Select Value" Component="DropDownVirtualizationLoadData" />
     <RadzenDropDown @bind-Value=value Data=@customers LoadData=@LoadData Count="@count" AllowVirtualization="true" AllowClear="true" Name="DropDownVirtualizationLoadData"
                     AllowFiltering="true" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 100%; max-width: 400px;" />
-</div>
+</RadzenStack>
 
 @code {
     IEnumerable<Customer> customers;

@@ -2,8 +2,8 @@
 
 @inherits DbContextPage
 
-<div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenLabel Text="Select Value" Component="DropDownTemplate" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+    <RadzenLabel Text="Select Value" Component="DropDownTemplate" />
     <RadzenDropDown @bind-Value=@value Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 400px;" Name="DropDownTemplate">
         <Template>
             Company: @((context as Customer).CompanyName)
@@ -12,7 +12,7 @@
             Company: @((context as Customer).CompanyName)
         </ValueTemplate>
     </RadzenDropDown>
-</div>
+</RadzenStack>
 
 @code {
     string value = "AROUT";
