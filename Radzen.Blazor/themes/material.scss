@@ -319,7 +319,8 @@ $button-sizes: (
 $badge-font-weight: 500 !default;
 
 // Chip
-$chip-padding: 0.125rem 0.125rem 0.125rem 0.75rem !default;
+$chip-padding-block: 0.125rem !default;
+$chip-padding-inline: 0.75rem 0.125rem !default;
 $chip-border-radius: calc(4 * var(--rz-border-radius)) !default;
 
 // Input
@@ -706,7 +707,6 @@ $dropdown-item-selected-color: var(--rz-on-primary-lighter) !default;
 $dropdown-item-selected-hover-background-color: var(--rz-primary-lighter) !default;
 $dropdown-item-selected-hover-color: var(--rz-on-primary-lighter) !default;
 $dropdown-item-transition: none !default;
-$multiselect-checkbox-margin: 0 1rem 0 0 !default;
 $dropdown-filter-border: var(--rz-border-base-200) !default;
 $dropdown-filter-padding: 1rem 0 0.5rem !default;
 $dropdown-open-background-color: var(--rz-base-background-color) !default;
@@ -715,6 +715,9 @@ $dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
 $dropdown-panel-border: none !default;
 $dropdown-panel-shadow: var(--rz-shadow-4) !default;
 $dropdown-chips-padding: 0.4375rem 0.9375rem 0.4375rem 0.4375rem !default;
+
+$multiselect-checkbox-margin-block: 0 !default;
+$multiselect-checkbox-margin-inline: 0 1rem !default;
 
 // ListBox
 $listbox-filter-border: var(--rz-border-base-200) !default;
