@@ -116,6 +116,22 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Value indicating if the splitter is resizing.
+        /// </summary>
+        public bool IsResizing { get; private set; }
+
+        /// <summary>
+        /// Called on pane resizing.
+        /// </summary>
+        [JSInvokable("RadzenSplitter.OnPaneResizing")]
+        public async Task OnPaneResizing()
+        {
+            IsResizing = true;
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
         /// Called when pane resized.
         /// </summary>
         /// <param name="paneIndex">Index of the pane.</param>
@@ -125,6 +141,8 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenSplitter.OnPaneResized")]
         public async Task OnPaneResized(int paneIndex, double sizeNew, int? paneNextIndex, double? sizeNextNew)
         {
+            IsResizing = false;
+
             var pane = Panes[paneIndex];
 
             if (Resize.HasDelegate)

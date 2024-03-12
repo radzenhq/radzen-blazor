@@ -1961,6 +1961,10 @@ window.Radzen = {
             mouseMoveHandler: function(e) {
                 if (Radzen[el]) {
 
+                    splitter.invokeMethodAsync(
+                        'RadzenSplitter.OnPaneResizing'
+                    );
+
                     var spacePerc = Radzen[el].panePerc + Radzen[el].paneNextPerc;
                     var spaceLength = Radzen[el].paneLength + Radzen[el].paneNextLength;
 
