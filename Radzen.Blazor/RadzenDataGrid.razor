@@ -24,7 +24,7 @@
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
                 @if (@HeaderTemplate != null)
                 {
-                    <div class="rz-custom-header">
+                    <div class="rz-custom-header" @onkeydown:stopPropagation>
                         @HeaderTemplate
                     </div>
                 }
@@ -71,7 +71,7 @@
             @if (@HeaderTemplate != null)
             {
                 <div class="rz-group-header">
-                    <div class="rz-custom-header">
+                    <div class="rz-custom-header" @onkeydown:stopPropagation>
                         @HeaderTemplate
                     </div>
                 </div>
