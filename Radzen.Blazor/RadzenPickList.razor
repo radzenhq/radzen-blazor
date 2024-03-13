@@ -30,15 +30,15 @@
                         Disabled=@(Source == null || (Source != null && !Source.Any()))/>
                 }
             </RadzenStack>
-            <RadzenStack JustifyContent="JustifyContent.End" Gap="@ButtonsGap">
+            <RadzenStack JustifyContent="JustifyContent.End" Gap="@ButtonGap">
                 <RadzenButton Icon="last_page" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Source == null || (Source != null && !Source.Any()))
-                        ButtonStyle="@ButtonsStyle" Size="@ButtonsSize" Variant="@ButtonsVariant" Shade="@ButtonsShade" />
+                        ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
                 <RadzenButton Icon="navigate_next" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (selectedSourceItems != null && !selectedSourceItems.Any()))
-                        ButtonStyle="@ButtonsStyle" Size="@ButtonsSize" Variant="@ButtonsVariant" Shade="@ButtonsShade" />
+                        ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
                 <RadzenButton Icon="navigate_before" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(selectedTargetItems == null || (selectedTargetItems != null && !selectedTargetItems.Any()))
-                        ButtonStyle="@ButtonsStyle" Size="@ButtonsSize" Variant="@ButtonsVariant" Shade="@ButtonsShade"/>
+                        ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
                 <RadzenButton Icon="first_page" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Target == null|| (Target != null && !Target.Any()))
-                        ButtonStyle="@ButtonsStyle" Size="@ButtonsSize" Variant="@ButtonsVariant" Shade="@ButtonsShade"/>
+                        ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
             </RadzenStack>
             <RadzenStack JustifyContent="JustifyContent.End">
                 @if (TargetHeader != null)

@@ -53,35 +53,35 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The buttons spacing.</value>
         [Parameter]
-        public string ButtonsGap { get; set; }
+        public string ButtonGap { get; set; }
 
         /// <summary>
         /// Gets or sets the buttons style
         /// </summary>
         /// <value>The buttons style.</value>
         [Parameter]
-        public ButtonStyle ButtonsStyle { get; set; } = ButtonStyle.Primary;
+        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Primary;
 
         /// <summary>
         /// Gets or sets the design variant of the buttons.
         /// </summary>
         /// <value>The variant of the buttons.</value>
         [Parameter]
-        public Variant ButtonsVariant { get; set; } = Variant.Filled;
+        public Variant ButtonVariant { get; set; } = Variant.Filled;
 
         /// <summary>
         /// Gets or sets the color shade of the buttons.
         /// </summary>
         /// <value>The color shade of the buttons.</value>
         [Parameter]
-        public Shade ButtonsShade { get; set; } = Shade.Default;
+        public Shade ButtonShade { get; set; } = Shade.Default;
 
         /// <summary>
         /// Gets or sets the buttons size.
         /// </summary>
         /// <value>The buttons size.</value>
         [Parameter]
-        public ButtonSize ButtonsSize { get; set; } = ButtonSize.Medium;
+        public ButtonSize ButtonSize { get; set; } = ButtonSize.Medium;
 
         /// <summary>
         /// Gets or sets the source to target title
