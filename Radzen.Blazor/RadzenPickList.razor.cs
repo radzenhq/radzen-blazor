@@ -14,6 +14,13 @@ namespace Radzen.Blazor
     public partial class RadzenPickList<TItem> : RadzenComponent
     {
         /// <summary>
+        /// Gets or sets a value indicating whether multiple selection is allowed.
+        /// </summary>
+        /// <value><c>true</c> if multiple selection is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Multiple { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the source header
         /// </summary>
         /// <value>The source header.</value>
@@ -67,7 +74,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The variant of the buttons.</value>
         [Parameter]
-        public Variant ButtonVariant { get; set; } = Variant.Filled;
+        public Variant ButtonVariant { get; set; } = Variant.Text;
 
         /// <summary>
         /// Gets or sets the color shade of the buttons.

@@ -13,7 +13,7 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="true" @bind-SearchText=@sourceSearchText
+                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{SourceStyle}")"
                         Disabled=@(Source == null || (Source != null && !Source.Any()))>
@@ -24,7 +24,7 @@
                 }
                 else
                 {
-                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="true" @bind-SearchText=@sourceSearchText
+                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{SourceStyle}")"
                         Disabled=@(Source == null || (Source != null && !Source.Any()))/>
@@ -47,7 +47,7 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="true" @bind-SearchText=@targetSearchText
+                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{TargetStyle}")"
                         Disabled=@(Target == null|| (Target != null && !Target.Any()))>
@@ -58,7 +58,7 @@
                 }
                 else
                 {
-                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="true" @bind-SearchText=@targetSearchText
+                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{TargetStyle}")"
                         Disabled=@(Target == null|| (Target != null && !Target.Any())) />
