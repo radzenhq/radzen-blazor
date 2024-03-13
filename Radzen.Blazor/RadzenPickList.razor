@@ -1,0 +1,69 @@
+﻿@inherits RadzenComponent
+
+@typeparam TItem
+
+@if (Visible)
+{
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@GetStyle()" id="@GetId()">
+        <RadzenStack Orientation="Orientation.Horizontal" Style="height:100%">
+            <RadzenStack JustifyContent="JustifyContent.End">
+                @if (SourceHeader != null)
+                {
+                    @SourceHeader
+                }
+                @if (Template != null)
+                {
+                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="true" @bind-SearchText=@sourceSearchText
+                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{SourceStyle}")"
+                        Disabled=@(Source == null || (Source != null && !Source.Any()))>
+                        <Template>
+                            @Template(context)
+                        </Template>
+                    </RadzenListBox>
+                }
+                else
+                {
+                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="true" @bind-SearchText=@sourceSearchText
+                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{SourceStyle}")"
+                        Disabled=@(Source == null || (Source != null && !Source.Any()))/>
+                }
+            </RadzenStack>
+            <RadzenStack JustifyContent="JustifyContent.End" Gap="@ButtonsGap">
+                <RadzenButton Icon="last_page" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Source == null || (Source != null && !Source.Any()))
+                        ButtonStyle="@ButtonsStyle" Size="@ButtonsSize" Variant="@ButtonsVariant" Shade="@ButtonsShade" />
+                <RadzenButton Icon="navigate_next" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (selectedSourceItems != null && !selectedSourceItems.Any()))
+                        ButtonStyle="@ButtonsStyle" Size="@ButtonsSize" Variant="@ButtonsVariant" Shade="@ButtonsShade" />
+                <RadzenButton Icon="navigate_before" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(selectedTargetItems == null || (selectedTargetItems != null && !selectedTargetItems.Any()))
+                        ButtonStyle="@ButtonsStyle" Size="@ButtonsSize" Variant="@ButtonsVariant" Shade="@ButtonsShade"/>
+                <RadzenButton Icon="first_page" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Target == null|| (Target != null && !Target.Any()))
+                        ButtonStyle="@ButtonsStyle" Size="@ButtonsSize" Variant="@ButtonsVariant" Shade="@ButtonsShade"/>
+            </RadzenStack>
+            <RadzenStack JustifyContent="JustifyContent.End">
+                @if (TargetHeader != null)
+                {
+                    @TargetHeader
+                }
+                @if (Template != null)
+                {
+                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="true" @bind-SearchText=@targetSearchText
+                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{TargetStyle}")"
+                        Disabled=@(Target == null|| (Target != null && !Target.Any()))>
+                        <Template>
+                            @Template(context)
+                        </Template>
+                    </RadzenListBox>
+                }
+                else
+                {
+                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="true" @bind-SearchText=@targetSearchText
+                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{TargetStyle}")"
+                        Disabled=@(Target == null|| (Target != null && !Target.Any())) />
+                }
+            </RadzenStack>
+        </RadzenStack>
+    </div>
+}

@@ -776,6 +776,14 @@ namespace RadzenBlazorDemos
                         }
                     }
                 },
+                new Example()
+                {
+                    Name = "PickList",
+                    Path = "picklist",
+                    Description = "Demonstration and configuration of the Radzen Blazor PickList component.",
+                    Icon = "&#xe0b8",
+                    Tags = new[] { "picklist", "list" }
+                },
             }
 },
         new Example()
