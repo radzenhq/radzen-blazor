@@ -216,6 +216,12 @@ namespace Radzen.Blazor
                 target = parameters.GetValueOrDefault<IEnumerable<TItem>>(nameof(Target));
             }
 
+            if (parameters.DidParameterChange(nameof(Multiple), Multiple))
+            {
+                selectedSourceItems = null;
+                selectedTargetItems = null;
+            }
+
             await base.SetParametersAsync(parameters);
         }
 
