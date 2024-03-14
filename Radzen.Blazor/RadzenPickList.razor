@@ -31,13 +31,13 @@
                 }
             </RadzenStack>
             <RadzenStack JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap">
-                <RadzenButton Icon="last_page" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Source == null || (Source != null && !Source.Any()))
+                <RadzenButton Icon="keyboard_arrow_right" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (Multiple && selectedSourceItems != null && !((IEnumerable<TItem>)selectedSourceItems).Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
-                <RadzenButton Icon="navigate_next" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (Multiple && selectedSourceItems != null && !((IEnumerable<TItem>)selectedSourceItems).Any()))
-                        ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
-                <RadzenButton Icon="navigate_before" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(selectedTargetItems == null || (Multiple && selectedTargetItems != null && !((IEnumerable<TItem>)selectedTargetItems).Any()))
+                <RadzenButton Icon="keyboard_arrow_left" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(selectedTargetItems == null || (Multiple && selectedTargetItems != null && !((IEnumerable<TItem>)selectedTargetItems).Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
-                <RadzenButton Icon="first_page" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Target == null|| (Target != null && !Target.Any()))
+                <RadzenButton Icon="keyboard_double_arrow_right" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Source == null || (Source != null && !Source.Any()))
+                        ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
+                <RadzenButton Icon="keyboard_double_arrow_left" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Target == null|| (Target != null && !Target.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
             </RadzenStack>
             <RadzenStack JustifyContent="JustifyContent.End" style="width:100%;width:100%;">
