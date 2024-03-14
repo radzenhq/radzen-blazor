@@ -28,6 +28,13 @@ namespace Radzen.Blazor
         public bool AutoComplete { get; set; } = true;
 
         /// <summary>
+        /// Allows to input a custom value for the autocomplete attribute.
+        /// Only used when AutoComplete is set to <c>true</c>. and AutoCompleteType is set to <see cref="AutoCompleteType.CustomValue" />.
+        /// </summary>
+        [Parameter]
+        public string AutoCompleteCustomValue { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets or sets a value indicating the type of built-in autocomplete
         /// the browser should use.
         /// <see cref="Blazor.AutoCompleteType" />
@@ -88,7 +95,9 @@ namespace Radzen.Blazor
         /// AutoCompleteType parameter is "off". When the AutoComplete
         /// parameter is true, the value is <c>on</c> or, if set, the value of
         /// AutoCompleteType.</value>
-        public string AutoCompleteAttribute { get => !AutoComplete ? "off" :
-                AutoCompleteType.GetAutoCompleteValue(); }
+        public string AutoCompleteAttribute
+                => !AutoComplete ? "off" :
+                    AutoCompleteType == AutoCompleteType.CustomValue ? AutoCompleteCustomValue :
+                    AutoCompleteType.GetAutoCompleteValue();
     }
 }

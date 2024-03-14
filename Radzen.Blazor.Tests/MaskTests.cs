@@ -157,6 +157,23 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Mask_Renders_CustomAutoCompleteParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenNumeric<double>>(parameters => parameters
+                .Add(p => p.AutoComplete, true)
+                .Add(p => p.AutoCompleteType, AutoCompleteType.CustomValue)
+                .Add(p => p.AutoCompleteCustomValue, "Not-A-defaultValue"));
+
+            Assert.Contains(@$"autocomplete=""Not-A-defaultValue""", component.Markup);
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+
+            Assert.Contains(@$"autocomplete=""off""", component.Markup);
+        }
+
+        [Fact]
         public void Mask_Renders_MaxLengthParameter()
         {
             using var ctx = new TestContext();

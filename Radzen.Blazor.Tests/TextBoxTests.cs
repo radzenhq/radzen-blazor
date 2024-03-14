@@ -181,7 +181,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
-        
+
         [Fact]
         public void TextBox_Raises_ChangedEvent()
         {
@@ -218,6 +218,44 @@ namespace Radzen.Blazor.Tests
 
             Assert.True(raised);
             Assert.True(object.Equals(value, newValue));
+        }
+
+        [Theory]
+        [InlineData(false, AutoCompleteType.On, "", "off")]
+        [InlineData(true, AutoCompleteType.On, "", "on")]
+        [InlineData(true, AutoCompleteType.Organization, "", "organization")]
+        [InlineData(true, AutoCompleteType.CustomValue, "CustomValue", "CustomValue")]
+        [InlineData(false, AutoCompleteType.CustomValue, "CustomValue", "off")]
+        public void TextBox_Renders_AutoComplete_AttributeCorrectlySet(bool autoComplete, AutoCompleteType autoCompleteType, string customText, string expectedAutoCompleteValue)
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters => parameters
+                .Add(p => p.AutoComplete, autoComplete)
+                .Add(p => p.AutoCompleteType, autoCompleteType)
+                .Add(p => p.AutoCompleteCustomValue, customText));
+
+            Assert.Contains(@$"autocomplete=""{expectedAutoCompleteValue}""", component.Markup);
+
+        }
+
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void TextBox_Renders_AriaAutoCompleteCorrectly(bool autoComplete, bool expectAriaAutoComplete)
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters => parameters.Add(p => p.AutoComplete, autoComplete));
+
+            if(expectAriaAutoComplete)
+            {
+                Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
+            }
+            else
+            {
+                Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
+            }
         }
     }
 }

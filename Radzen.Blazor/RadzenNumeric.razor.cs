@@ -228,6 +228,13 @@ namespace Radzen.Blazor
         public AutoCompleteType AutoCompleteType { get; set; } = AutoCompleteType.On;
 
         /// <summary>
+        /// Allows to input a custom value for the autocomplete attribute.
+        /// Only used when AutoComplete is set to <c>true</c>. and AutoCompleteType is set to <see cref="AutoCompleteType.CustomValue" />.
+        /// </summary>
+        [Parameter]
+        public string AutoCompleteCustomValue { get; set; } = string.Empty;
+
+        /// <summary>
         /// Gets the autocomplete attribute's string value.
         /// </summary>
         /// <value>
@@ -236,9 +243,9 @@ namespace Radzen.Blazor
         /// parameter is true, the value is <c>on</c> or, if set, the value of
         /// AutoCompleteType.</value>
         public string AutoCompleteAttribute
-        {
-            get => !AutoComplete ? "off" : AutoCompleteType.GetAutoCompleteValue();
-        }
+                => !AutoComplete ? "off" :
+                    AutoCompleteType == AutoCompleteType.CustomValue ? AutoCompleteCustomValue :
+                    AutoCompleteType.GetAutoCompleteValue();
 
         /// <summary>
         /// Gets or sets a value indicating whether up down buttons are shown.
@@ -274,7 +281,7 @@ namespace Radzen.Blazor
             if (!string.IsNullOrEmpty(Format))
             {
                 string formattedStringWithoutPlaceholder = Format.Replace("#", "").Trim();
-                
+
                 if (valueStr.Contains(Format))
                 {
                     string currencyDecimalSeparator = Culture.NumberFormat.CurrencyDecimalSeparator;
@@ -284,7 +291,7 @@ namespace Radzen.Blazor
                     int lengthDifference = splitValueString[0].Length - splitFormatString[0].Length;
                     formattedStringWithoutPlaceholder = formattedStringWithoutPlaceholder.PadLeft(formattedStringWithoutPlaceholder.Length + lengthDifference, '0');
                 }
-                
+
                 valueStr = valueStr.Replace(formattedStringWithoutPlaceholder, "");
             }
 
@@ -338,7 +345,7 @@ namespace Radzen.Blazor
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
         }
-        
+
         private TValue ApplyMinMax(TValue newValue)
         {
             if (Max == null && Min == null || newValue == null)
@@ -385,7 +392,7 @@ namespace Radzen.Blazor
             var converter = TypeDescriptor.GetConverter(typeof(TValue));
             if (converter.CanConvertTo(typeof(decimal)))
                 return (decimal)converter.ConvertTo(null, Culture, input, typeof(decimal));
-            
+
             return (decimal)ConvertType.ChangeType(input, typeof(decimal));
         }
 
@@ -399,7 +406,7 @@ namespace Radzen.Blazor
             {
                 return (TValue)converter.ConvertFrom(null, Culture, input);
             }
-            
+
             return (TValue)ConvertType.ChangeType(input, typeof(TValue));
         }
 

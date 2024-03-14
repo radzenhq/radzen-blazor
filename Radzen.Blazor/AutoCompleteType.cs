@@ -134,5 +134,7 @@
         MiddleName,
         /// <summary>Last name.</summary>
         LastName,
+        /// <summary>Ability to set a custom name in the auto complete attribute.</summary>
+        CustomValue,
     }
 }
