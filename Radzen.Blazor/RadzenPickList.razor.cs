@@ -193,8 +193,8 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<IEnumerable<TItem>> TargetChanged { get; set; }
 
-        IEnumerable<TItem> selectedSourceItems;
-        IEnumerable<TItem> selectedTargetItems;
+        object selectedSourceItems;
+        object selectedTargetItems;
 
         string sourceSearchText;
         string targetSearchText;
@@ -253,7 +253,7 @@ namespace Radzen.Blazor
 
         async Task SelectedSourceToTarget()
         {
-            await Update(true, selectedSourceItems);
+            await Update(true, Multiple ? (IEnumerable<TItem>)selectedSourceItems : new List<TItem>() { (TItem)selectedSourceItems } );
         }
 
         async Task TargetToSource()
@@ -263,7 +263,7 @@ namespace Radzen.Blazor
 
         async Task SelectedTargetToSource()
         {
-            await Update(false, selectedTargetItems);
+            await Update(false, Multiple ? (IEnumerable<TItem>)selectedTargetItems : new List<TItem>() { (TItem)selectedTargetItems });
         }
     }
 }

@@ -33,9 +33,9 @@
             <RadzenStack JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap">
                 <RadzenButton Icon="last_page" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Source == null || (Source != null && !Source.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
-                <RadzenButton Icon="navigate_next" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (selectedSourceItems != null && !selectedSourceItems.Any()))
+                <RadzenButton Icon="navigate_next" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (Multiple && selectedSourceItems != null && !((IEnumerable<TItem>)selectedSourceItems).Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
-                <RadzenButton Icon="navigate_before" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(selectedTargetItems == null || (selectedTargetItems != null && !selectedTargetItems.Any()))
+                <RadzenButton Icon="navigate_before" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(selectedTargetItems == null || (Multiple && selectedTargetItems != null && !((IEnumerable<TItem>)selectedTargetItems).Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
                 <RadzenButton Icon="first_page" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Target == null|| (Target != null && !Target.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
