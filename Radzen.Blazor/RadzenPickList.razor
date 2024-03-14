@@ -7,7 +7,7 @@
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@GetStyle()" id="@GetId()">
         <RadzenStack Orientation="Orientation.Horizontal" Style="height:100%">
             <RadzenStack JustifyContent="JustifyContent.End">
-                @if (SourceHeader != null)
+                @if (ShowHeader && SourceHeader != null)
                 {
                     @SourceHeader
                 }
@@ -41,7 +41,7 @@
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
             </RadzenStack>
             <RadzenStack JustifyContent="JustifyContent.End">
-                @if (TargetHeader != null)
+                @if (ShowHeader && TargetHeader != null)
                 {
                     @TargetHeader
                 }

@@ -56,6 +56,13 @@ namespace Radzen.Blazor
         public bool AllowFiltering { get; set; }
 
         /// <summary>
+        /// Gets or sets value if headers are shown.
+        /// </summary>
+        /// <value>If headers are shown value.</value>
+        [Parameter]
+        public bool ShowHeader { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the buttons spacing
         /// </summary>
         /// <value>The buttons spacing.</value>
