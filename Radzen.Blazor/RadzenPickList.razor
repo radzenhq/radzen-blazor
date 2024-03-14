@@ -13,10 +13,10 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
+                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="height:100%;width:100%;"
-                        Disabled=@(Source == null || (Source != null && !Source.Any()))>
+                        Disabled=@(source == null || (source != null && !source.Any()))>
                         <Template>
                             @Template(context)
                         </Template>
@@ -24,10 +24,10 @@
                 }
                 else
                 {
-                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
+                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="height:100%;width:100%;"
-                        Disabled=@(Source == null || (Source != null && !Source.Any()))/>
+                        Disabled=@(source == null || (source != null && !source.Any()))/>
                 }
             </RadzenStack>
             <RadzenStack JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap">
@@ -35,9 +35,9 @@
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
                 <RadzenButton Icon="keyboard_arrow_left" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(selectedTargetItems == null || (Multiple && selectedTargetItems != null && !((IEnumerable<TItem>)selectedTargetItems).Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
-                <RadzenButton Icon="keyboard_double_arrow_right" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Source == null || (Source != null && !Source.Any()))
+                <RadzenButton Icon="keyboard_double_arrow_right" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(source == null || (source != null && !source.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
-                <RadzenButton Icon="keyboard_double_arrow_left" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Target == null|| (Target != null && !Target.Any()))
+                <RadzenButton Icon="keyboard_double_arrow_left" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(target == null|| (target != null && !target.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
             </RadzenStack>
             <RadzenStack JustifyContent="JustifyContent.End" style="width:100%;width:100%;">
@@ -47,10 +47,10 @@
                 }
                 @if (Template != null)
                 {
-                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
+                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="height:100%;width:100%;"
-                        Disabled=@(Target == null|| (Target != null && !Target.Any()))>
+                        Disabled=@(target == null|| (target != null && !target.Any()))>
                         <Template>
                             @Template(context)
                         </Template>
@@ -58,10 +58,10 @@
                 }
                 else
                 {
-                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
+                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                         TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="height:100%;width:100%;"
-                        Disabled=@(Target == null|| (Target != null && !Target.Any())) />
+                        Disabled=@(target == null|| (target != null && !target.Any())) />
                 }
             </RadzenStack>
         </RadzenStack>

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -158,6 +159,8 @@ namespace Radzen.Blazor
         [Parameter]
         public IEnumerable<TItem> Source { get; set; }
 
+        IEnumerable<TItem> source;
+
         /// <summary>
         /// Gets or sets the source changed.
         /// </summary>
@@ -172,6 +175,8 @@ namespace Radzen.Blazor
         [Parameter]
         public IEnumerable<TItem> Target { get; set; }
 
+        IEnumerable<TItem> target;
+
         /// <summary>
         /// Gets or sets the target changed.
         /// </summary>
@@ -185,40 +190,62 @@ namespace Radzen.Blazor
         string sourceSearchText;
         string targetSearchText;
 
+        /// <summary>
+        /// Set parameters as an asynchronous operation.
+        /// </summary>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A Task representing the asynchronous operation.</returns>
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            var sourceChanged = parameters.DidParameterChange(nameof(Source), Source);
+            if (sourceChanged)
+            {
+                source = parameters.GetValueOrDefault<IEnumerable<TItem>>(nameof(Source));
+            }
+
+            var targetChanged = parameters.DidParameterChange(nameof(Target), Target);
+            if (targetChanged)
+            {
+                target = parameters.GetValueOrDefault<IEnumerable<TItem>>(nameof(Target));
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
+
         async Task Update(bool sourceToTarget, IEnumerable<TItem> items)
         {
             if (sourceToTarget)
             {
                 if (items != null)
                 {
-                    Target = (Target ?? Enumerable.Empty<TItem>()).Concat(items);
-                    Source = (Source ?? Enumerable.Empty<TItem>()).Except(items);
+                    target = (target ?? Enumerable.Empty<TItem>()).Concat(items);
+                    source = (source ?? Enumerable.Empty<TItem>()).Except(items);
                 }
                 else
                 {
-                    Target = (Target ?? Enumerable.Empty<TItem>()).Concat(Source);
-                    Source = null;
+                    target = (target ?? Enumerable.Empty<TItem>()).Concat(source);
+                    source = null;
                 }
             }
             else
             {
                 if (items != null)
                 {
-                    Source = (Source ?? Enumerable.Empty<TItem>()).Concat(items);
-                    Target = (Target ?? Enumerable.Empty<TItem>()).Except(items);
+                    source = (source ?? Enumerable.Empty<TItem>()).Concat(items);
+                    target = (target ?? Enumerable.Empty<TItem>()).Except(items);
                 }
                 else
                 {
-                    Source = (Source ?? Enumerable.Empty<TItem>()).Concat(Target);
-                    Target = null;
+                    source = (source ?? Enumerable.Empty<TItem>()).Concat(target);
+                    target = null;
                 }
             }
 
-            Source = Source?.Any() == true ? Source : null;
-            Target = Target?.Any() == true ? Target : null;
+            source = source?.Any() == true ? source : null;
+            target = target?.Any() == true ? target : null;
 
-            await SourceChanged.InvokeAsync(Source);
-            await TargetChanged.InvokeAsync(Target);
+            await SourceChanged.InvokeAsync(source);
+            await TargetChanged.InvokeAsync(target);
 
             selectedSourceItems = null;
             selectedTargetItems = null;
