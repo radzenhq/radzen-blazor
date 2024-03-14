@@ -779,10 +779,11 @@ namespace RadzenBlazorDemos
                 new Example()
                 {
                     Name = "PickList",
+                    New = true,
+                    Description = "Use Radzen Blazor PickList component to transfer items between two collections.",
                     Path = "picklist",
-                    Description = "Demonstration and configuration of the Radzen Blazor PickList component.",
                     Icon = "&#xe0b8",
-                    Tags = new[] { "picklist", "list" }
+                    Tags = new[] { "picklist", "list", "listbox" }
                 },
             }
 },
