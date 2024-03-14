@@ -18,7 +18,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if multiple selection is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Multiple { get; set; } = true;
+        public bool Multiple { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the source header
