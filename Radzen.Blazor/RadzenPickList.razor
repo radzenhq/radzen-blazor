@@ -5,7 +5,7 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@GetStyle()" id="@GetId()">
-        <RadzenStack Orientation="Orientation.Horizontal" Style="height:100%;width:100%;" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" Style="height:100%;width:100%;">
             <RadzenStack JustifyContent="JustifyContent.End" style="width:100%;width:100%;">
                 @if (ShowHeader && SourceHeader != null)
                 {
