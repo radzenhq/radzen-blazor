@@ -145,20 +145,6 @@ namespace Radzen.Blazor
             return Style;
         }
 
-        /// <summary>
-        /// Gets or sets the inline CSS style for the source list.
-        /// </summary>
-        /// <value>The inline CSS style for the source list.</value>
-        [Parameter]
-        public string SourceStyle { get; set; }
-
-        /// <summary>
-        /// Gets or sets the inline CSS style for the target list.
-        /// </summary>
-        /// <value>The inline CSS style for the target list.</value>
-        [Parameter]
-        public string TargetStyle { get; set; }
-
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {

@@ -5,8 +5,8 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@GetStyle()" id="@GetId()">
-        <RadzenStack Orientation="Orientation.Horizontal" Style="height:100%">
-            <RadzenStack JustifyContent="JustifyContent.End">
+        <RadzenStack Orientation="Orientation.Horizontal" Style="height:100%;width:100%;">
+            <RadzenStack JustifyContent="JustifyContent.End" style="width:100%;width:100%;">
                 @if (ShowHeader && SourceHeader != null)
                 {
                     @SourceHeader
@@ -15,7 +15,7 @@
                 {
                     <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{SourceStyle}")"
+                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="height:100%;width:100%;"
                         Disabled=@(Source == null || (Source != null && !Source.Any()))>
                         <Template>
                             @Template(context)
@@ -26,7 +26,7 @@
                 {
                     <RadzenListBox @bind-Value=@selectedSourceItems Data="@Source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{SourceStyle}")"
+                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="height:100%;width:100%;"
                         Disabled=@(Source == null || (Source != null && !Source.Any()))/>
                 }
             </RadzenStack>
@@ -40,7 +40,7 @@
                 <RadzenButton Icon="first_page" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(Target == null|| (Target != null && !Target.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
             </RadzenStack>
-            <RadzenStack JustifyContent="JustifyContent.End">
+            <RadzenStack JustifyContent="JustifyContent.End" style="width:100%;width:100%;">
                 @if (ShowHeader && TargetHeader != null)
                 {
                     @TargetHeader
@@ -49,7 +49,7 @@
                 {
                     <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{TargetStyle}")"
+                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="height:100%;width:100%;"
                         Disabled=@(Target == null|| (Target != null && !Target.Any()))>
                         <Template>
                             @Template(context)
@@ -60,7 +60,7 @@
                 {
                     <RadzenListBox @bind-Value=@selectedTargetItems Data="@Target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
                         FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="@($"height:100%;{TargetStyle}")"
+                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering Style="height:100%;width:100%;"
                         Disabled=@(Target == null|| (Target != null && !Target.Any())) />
                 }
             </RadzenStack>

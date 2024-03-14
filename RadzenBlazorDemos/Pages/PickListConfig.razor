@@ -48,9 +48,8 @@
     </RadzenStack>
 </RadzenCard>
 <RadzenCard class="my-4">
-    <RadzenPickList @bind-Source="@Source" @bind-Target="@Target" 
+    <RadzenPickList @bind-Source="@Source" @bind-Target="@Target" Style="height:300px;width:100%;" 
         TextProperty="@nameof(Customer.CompanyName)" AllowFiltering="@allowFilter" Multiple="@multiple" ShowHeader="@showHeader"
-        Style="height:300px" SourceStyle="width:400px" TargetStyle="width:400px" 
         ButtonGap="@gap" ButtonJustifyContent="@justifyContent" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant">
         <SourceHeader>
             Customers:
