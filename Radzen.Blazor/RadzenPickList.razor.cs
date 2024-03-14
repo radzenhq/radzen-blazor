@@ -71,6 +71,13 @@ namespace Radzen.Blazor
         public string ButtonGap { get; set; }
 
         /// <summary>
+        /// Gets or sets the orientation
+        /// </summary>
+        /// <value>The orientation.</value>
+        [Parameter]
+        public Orientation Orientation { get; set; } = Orientation.Horizontal;
+
+        /// <summary>
         /// Gets or sets the buttons style
         /// </summary>
         /// <value>The buttons style.</value>
