@@ -1,0 +1,51 @@
+.rz-picklist-wrapper {
+  flex-direction: row !important;
+  width: 100%;
+  height: 100%;
+  --rz-gap: 1rem;
+}
+
+.rz-picklist-source-wrapper,
+.rz-picklist-target-wrapper {
+  flex: 1;
+  height: 100%;
+  --rz-gap: 0.5rem;
+}
+
+.rz-picklist-source-wrapper,
+.rz-picklist-target-wrapper,
+.rz-picklist-source-wrapper .rz-listbox,
+.rz-picklist-target-wrapper .rz-listbox {
+  width: 100%;
+  height: 100%;
+}
+
+.rz-picklist-buttons {
+  flex-direction: column !important;
+}
+
+// Responsive Styles
+
+@media (max-width: 576px) {
+
+  .rz-picklist {
+    height: 100% !important;
+  }
+
+  .rz-picklist-wrapper {
+    flex-direction: column !important;
+  }
+
+  .rz-picklist-source-wrapper .rz-listbox,
+  .rz-picklist-target-wrapper .rz-listbox {
+    height: 300px;
+  }
+
+  .rz-picklist-buttons {
+    flex-direction: row !important;
+  }
+
+  .rz-picklist-buttons .rzi {
+    transform: rotate(90deg);
+  }
+}
