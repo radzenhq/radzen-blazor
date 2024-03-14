@@ -6,7 +6,7 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@GetStyle()" id="@GetId()">
         <RadzenStack Class="rz-picklist-wrapper" Orientation="@Orientation">
-            <RadzenStack JustifyContent="JustifyContent.End" Class="rz-picklist-source-wrapper">
+            <RadzenStack Class="rz-picklist-source-wrapper">
                 @if (ShowHeader && SourceHeader != null)
                 {
                     @SourceHeader
@@ -41,7 +41,7 @@
                 <RadzenButton Icon="keyboard_double_arrow_left" title="@TargetToSourceTitle" Click="@TargetToSource" Disabled=@(target == null|| (target != null && !target.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"/>
             </RadzenStack>
-            <RadzenStack JustifyContent="JustifyContent.End" Class="rz-picklist-target-wrapper">
+            <RadzenStack Class="rz-picklist-target-wrapper">
                 @if (ShowHeader && TargetHeader != null)
                 {
                     @TargetHeader
