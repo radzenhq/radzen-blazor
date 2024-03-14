@@ -31,7 +31,7 @@
 
                 }
             </RadzenStack>
-            <RadzenStack JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap" Class="rz-picklist-buttons">
+            <RadzenStack Orientation="@(Orientation == Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical)" JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap" Class="rz-picklist-buttons">
                 <RadzenButton Icon="keyboard_arrow_right" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (Multiple && selectedSourceItems != null && !((IEnumerable<TItem>)selectedSourceItems).Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
                 <RadzenButton Icon="keyboard_arrow_left" title="@SelectedTargetToSourceTitle" Click="@SelectedTargetToSource" Disabled=@(selectedTargetItems == null || (Multiple && selectedTargetItems != null && !((IEnumerable<TItem>)selectedTargetItems).Any()))
