@@ -177,6 +177,8 @@ namespace Radzen.Blazor
 
                 paneNext.SizeRuntine = sizeNextNew.Value.ToString("0.##", CultureInfo.InvariantCulture) + "%";
             }
+
+            StateHasChanged();
         }
 
         internal async Task OnCollapse(int paneIndex)
