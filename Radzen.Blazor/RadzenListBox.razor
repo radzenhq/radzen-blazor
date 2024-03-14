@@ -11,7 +11,7 @@
         <div class="rz-helper-hidden-accessible">
             <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" @attributes=@InputAttributes />
         </div>
-        @if (AllowFiltering || (Multiple && AllowSelectAll))
+        @if (View != null && (AllowFiltering || (Multiple && AllowSelectAll)))
         {
             <div class=" rz-listbox-header rz-helper-clearfix rz-listbox-header-w-checkbox">
                 @if (Multiple)

@@ -1,0 +1,128 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Orientation
+                <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "orientation" }})"
+                            Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons JustifyContent
+                <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons justify content" }})"
+                            Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Style
+                <RadzenDropDown @bind-Value="@style" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons style" }})"
+                            Data="@(Enum.GetValues(typeof(ButtonStyle)).Cast<ButtonStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Variant
+                <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons variant" }})"
+                            Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Shade
+                <RadzenDropDown @bind-Value="@shade" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons shade" }})"
+                            Data="@(Enum.GetValues(typeof(Shade)).Cast<Shade>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Size
+                <RadzenDropDown @bind-Value="@size" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons size" }})"
+                            Data="@(Enum.GetValues(typeof(ButtonSize)).Cast<ButtonSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Gap
+                <RadzenTextBox @bind-Value="@gap" aria-label="gap" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Allow filtering
+                <RadzenSwitch @bind-Value="@allowFilter" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow filtering" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Multiple selection
+                <RadzenSwitch @bind-Value="@multiple" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enable multiple selection" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Show header
+                <RadzenSwitch @bind-Value="@showHeader" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "show header" }})" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenCard>
+        <RadzenPickList @bind-Source="@Source" @bind-Target="@Target" Style="height:500px; width:100%;" Orientation="@orientation"
+            TextProperty="@nameof(Customer.CompanyName)" AllowFiltering="@allowFilter" Multiple="@multiple" ShowHeader="@showHeader"
+            ButtonGap="@gap" ButtonJustifyContent="@justifyContent" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant">
+            <SourceHeader>
+                Customers:
+            </SourceHeader>
+            <TargetHeader>
+                Selected Customers:
+            </TargetHeader>
+            <Template>
+                Company: @context.CompanyName
+            </Template>
+        </RadzenPickList>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    JustifyContent justifyContent = JustifyContent.Center;
+    Variant variant = Variant.Outlined;
+    ButtonStyle style = ButtonStyle.Secondary;
+    Shade shade = Shade.Default;
+    ButtonSize size = ButtonSize.Medium;
+    Orientation orientation = Orientation.Horizontal;
+
+    string gap = "12px";
+    bool allowFilter = true;
+    bool multiple = false;
+    bool showHeader = true;
+
+    IEnumerable<Customer> _source;
+    IEnumerable<Customer> Source
+    { 
+        get
+        {
+            return _source;
+        }
+        set
+        {
+            if (_source != value)
+            {
+                _source = value;
+
+                Console.WriteLine("Source updated");
+            }
+        }
+    }
+
+    IEnumerable<Customer> _target;
+    IEnumerable<Customer> Target
+    {
+        get
+        {
+            return _target;
+        }
+        set
+        {
+            if (_target != value)
+            {
+                _target = value;
+
+                Console.WriteLine("Target updated");
+            }
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        Source = dbContext.Customers;
+    }
+}
