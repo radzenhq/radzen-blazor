@@ -303,6 +303,79 @@ window.Radzen = {
       delete Radzen[id].instance;
     }
   },
+  destroySecurityCode: function (id, el) {
+    if (!Radzen[id]) return;
+
+    var inputs = el.getElementsByTagName('input');
+
+    if (Radzen[id].keyPress && Radzen[id].paste) {
+        for (var i = 0; i < inputs.length; i++) {
+            delete inputs[i].index;
+            inputs[i].removeEventListener('keypress', Radzen[id].keyPress);
+            inputs[i].removeEventListener('paste', Radzen[id].paste);
+        }
+        delete Radzen[id].keyPress;
+        delete Radzen[id].paste;
+    }
+
+    Radzen[id] = null;
+  },
+  createSecurityCode: function (id, ref, el, isNumber) {
+      if (!el || !ref) return;
+
+      var inputs = [...el.getElementsByTagName('input')];
+
+      Radzen[id] = {};
+
+      Radzen[id].paste = function (e) {
+          if (e.clipboardData) {
+              var value = e.clipboardData.getData('text');
+
+              if (value) {
+                  for (var i = 0; i < value.length; i++) {
+                      if (isNumber && isNaN(+value[i])) {
+                          continue;
+                      }
+                      inputs[i].value = value[i];
+                  }
+                  inputs[inputs.length - 1].focus();
+              }
+
+              e.preventDefault();
+          }
+      }
+      Radzen[id].keyPress = function (e) {
+          var ch = String.fromCharCode(e.charCode);
+
+          if (e.metaKey ||
+              e.ctrlKey ||
+              e.keyCode == 9 ||
+              e.keyCode == 8 ||
+              e.keyCode == 13
+          ) {
+              return;
+          }
+
+          if (isNumber && (e.which < 48 || e.which > 57)) {
+              e.preventDefault();
+              return;
+          }
+
+          inputs[e.currentTarget.index].value = ch;
+
+          ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', inputs.map(i => i.value).join(''));
+
+          if (e.currentTarget.index < inputs.length - 1) {
+              inputs[e.currentTarget.index + 1].focus();
+          }
+      }
+
+      for (var i = 0; i < inputs.length; i++) {
+          inputs[i].index = i;
+          inputs[i].addEventListener('keypress', Radzen[id].keyPress);
+          inputs[i].addEventListener('paste', Radzen[id].paste);
+      }
+  },
   createSlider: function (
     id,
     slider,

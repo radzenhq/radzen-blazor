@@ -1,0 +1,22 @@
+﻿@using System.Linq
+@using Microsoft.AspNetCore.Components.Forms
+@using Radzen
+@inherits FormComponent<string>
+@if (Visible)
+{
+    <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="@Gap" Class="rz-security-code-wrapper">
+            @foreach (var index in Enumerable.Range(1, Count))
+            {
+                @if (Type == SecurityCodeType.Password)
+                {
+                    <RadzenPassword Value="@ElementAt(index - 1)" Disabled="@Disabled" AutoComplete="false" MaxLength="1" Class="rz-security-code-input" />
+                }
+                else
+                {
+                    <RadzenTextBox Value="@ElementAt(index - 1)" Disabled="@Disabled" AutoComplete="false" MaxLength="1" Class="rz-security-code-input" />
+                }
+            }
+        </RadzenStack>
+    </div>
+}
