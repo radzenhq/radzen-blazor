@@ -30,7 +30,7 @@
                         Disabled=@(Source == null || (Source != null && !Source.Any()))/>
                 }
             </RadzenStack>
-            <RadzenStack JustifyContent="JustifyContent.End" Gap="@ButtonGap">
+            <RadzenStack JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap">
                 <RadzenButton Icon="last_page" title="@SourceToTargetTitle" Click="@SourceToTarget" Disabled=@(Source == null || (Source != null && !Source.Any()))
                         ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
                 <RadzenButton Icon="navigate_next" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (selectedSourceItems != null && !selectedSourceItems.Any()))
