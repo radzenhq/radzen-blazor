@@ -341,7 +341,7 @@ namespace Radzen.Blazor
 
             var classList = ClassList.Create(className)
                                      .Add(Attributes)
-                                     .Add(alignClassName);
+                                     .Add(alignClassName, TextAlign != TextAlign.Left);
 
             if (Visible)
             {
