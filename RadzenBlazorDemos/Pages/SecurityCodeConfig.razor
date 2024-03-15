@@ -27,11 +27,16 @@
         <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Password SecurityCode</RadzenText>
         <RadzenSecurityCode @bind-Value=@passwordValue Type="SecurityCodeType.Password" Count="@count" Disabled="@disabled" Gap="@gap" />
     </RadzenCard>
+    <RadzenCard>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Bind SecurityCode value</RadzenText>
+        <RadzenSecurityCode @bind-Value=@valueBind Count="@count" Disabled="@disabled" Gap="@gap" />
+    </RadzenCard>
 </RadzenStack>
 @code{
     string value;
     string numbersOnlyValue;
     string passwordValue;
+    string valueBind = "sa4f";
 
     string gap;
     bool disabled;
