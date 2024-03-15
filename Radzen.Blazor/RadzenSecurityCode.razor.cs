@@ -128,7 +128,12 @@ namespace Radzen.Blazor
         {
             var ch = $"{Value}".ElementAtOrDefault(index);
 
-            return ch != default(char) ? ch.ToString() : "";
+            if (Type == SecurityCodeType.Numeric && !Char.IsNumber(ch))
+            {
+                return " ";
+            }
+
+            return ch != default(char) ? ch.ToString() : " ";
         }
     }
 }
