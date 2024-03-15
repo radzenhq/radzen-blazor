@@ -13,10 +13,10 @@
         <div class="col-sm-6">
             <h4>Auto-size bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenBarSeries>
-                <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                <RadzenBarSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenBarSeries>
                 <RadzenValueAxis Formatter="@FormatAsUSD">
@@ -29,10 +29,10 @@
         <div class="col-sm-6">
             <h4>Custom size bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenBarSeries>
-                <RadzenBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                <RadzenBarSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenBarSeries>
                 <RadzenValueAxis Formatter="@FormatAsUSD">
@@ -67,7 +67,7 @@
         return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
     }
 
-    DataItem[] revenue2019 = new DataItem[]
+    DataItem[] revenue2023 = new DataItem[]
     {
     new DataItem
     {
@@ -91,7 +91,7 @@
     },
     };
 
-    DataItem[] revenue2020 = new DataItem[] {
+    DataItem[] revenue2024 = new DataItem[] {
     new DataItem
     {
     Quarter = "Q1",

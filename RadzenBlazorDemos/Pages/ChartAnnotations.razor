@@ -8,11 +8,11 @@
                 <RadzenLabel Text="Annotation" Component="annotation" Style="margin-left: 8px; vertical-align: middle;" />
             </RadzenCard>
             <RadzenChart>
-                <RadzenLineSeries Smooth="true" Data="@revenue2019" CategoryProperty="Date" Title="2019" ValueProperty="Revenue" RenderingOrder="1">
-                    <RadzenSeriesAnnotation Visible="@annotation" TItem="DataItem" Data="@revenue2019[7]" OffsetY="-16" Text="Acquisition" />
+                <RadzenLineSeries Smooth="true" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
+                    <RadzenSeriesAnnotation Visible="@annotation" TItem="DataItem" Data="@revenue2023[7]" OffsetY="-16" Text="Acquisition" />
                     <RadzenMarkers MarkerType="MarkerType.Circle" />
                 </RadzenLineSeries>
-                <RadzenCategoryAxis Padding="20" Formatter="@FormatAsMonth" />
+                <RadzenCategoryAxis Padding="20" />
                 <RadzenValueAxis Formatter="@FormatAsUSD">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
@@ -36,75 +36,65 @@
         return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
     }
 
-    string FormatAsMonth(object value)
-    {
-        if (value != null)
-        {
-            return Convert.ToDateTime(value).ToString("MMM");
-        }
-
-        return string.Empty;
-    }
-
-    DataItem[] revenue2019 = new DataItem[] {
+    DataItem[] revenue2023 = new DataItem[] {
         new DataItem
         {
-            Date = ("2019-01-01"),
+            Date = "Jan",
             Revenue = 234000
         },
         new DataItem
         {
-            Date = ("2019-02-01"),
+            Date = "Feb",
             Revenue = 269000
         },
         new DataItem
         {
-            Date = ("2019-03-01"),
+            Date = "Mar",
             Revenue = 233000
         },
         new DataItem
         {
-            Date = ("2019-04-01"),
+            Date = "Apr",
             Revenue = 244000
         },
         new DataItem
         {
-            Date = ("2019-05-01"),
+            Date = "May",
             Revenue = 214000
         },
         new DataItem
         {
-            Date = ("2019-06-01"),
+            Date = "Jun",
             Revenue = 253000
         },
         new DataItem
         {
-            Date = ("2019-07-01"),
+            Date = "Jul",
             Revenue = 274000
         },
         new DataItem
         {
-            Date = ("2019-08-01"),
+            Date = "Aug",
             Revenue = 284000
         },
         new DataItem
         {
-            Date = ("2019-09-01"),
+            Date = "Sept",
             Revenue = 273000
         },
         new DataItem
         {
-            Date = ("2019-10-01"),
+            Date = "Oct",
             Revenue = 282000
         },
         new DataItem
         {
-            Date = ("2019-11-01"),
+            Date = "Nov",
             Revenue = 289000
         },
         new DataItem
         {
-            Date = ("2019-12-01"),
+            Date = "Dec",
             Revenue = 294000
         }
     };

@@ -9,10 +9,10 @@
             </RadzenCard>
             <h4>Auto-size stacked column series</h4>
             <RadzenChart>
-                <RadzenStackedColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenStackedColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenStackedColumnSeries>
-                <RadzenStackedColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                <RadzenStackedColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenStackedColumnSeries>
                 <RadzenColumnOptions Radius="5" />
@@ -23,8 +23,8 @@
             </RadzenChart>
             <h4>Custom size stacked column series</h4>
             <RadzenChart>
-                <RadzenStackedColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                <RadzenStackedColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
+                <RadzenStackedColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
+                <RadzenStackedColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue" />
                 <RadzenColumnOptions Radius="5" Width="20" />
                 <RadzenCategoryAxis Padding="20" />
                 <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
@@ -50,7 +50,7 @@
         return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
     }
 
-    DataItem[] revenue2019 = new DataItem[] {
+    DataItem[] revenue2023 = new DataItem[] {
         new DataItem
         {
             Quarter = "Q1",
@@ -73,7 +73,7 @@
         },
     };
 
-    DataItem[] revenue2020 = new DataItem[] {
+    DataItem[] revenue2024 = new DataItem[] {
         new DataItem
         {
             Quarter = "Q1",

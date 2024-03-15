@@ -9,10 +9,10 @@
             </RadzenCard>
             <h4>Auto-size column series</h4>
             <RadzenChart>
-                <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                <RadzenColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" />
@@ -23,10 +23,10 @@
             </RadzenChart>
             <h4>Custom size column series</h4>
             <RadzenChart>
-                <RadzenColumnSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenColumnSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                <RadzenColumnSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" Width="20" />
@@ -38,10 +38,10 @@
             </RadzenChart>
             <h4>Range fills column series</h4>
             <RadzenChart>
-                <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenColumnSeries>
-                <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                <RadzenColumnSeries FillRange="@fillRange" Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenColumnSeries>
                 <RadzenColumnOptions Radius="5" />
@@ -76,7 +76,7 @@
         new SeriesColorRange() {Min = 324000, Max = 10000000, Color = "#06cd06"},
     };
 
-    DataItem[] revenue2019 = new DataItem[] {
+    DataItem[] revenue2023 = new DataItem[] {
         new DataItem
         {
             Quarter = "Q1",
@@ -99,7 +99,7 @@
         },
     };
 
-    DataItem[] revenue2020 = new DataItem[] {
+    DataItem[] revenue2024 = new DataItem[] {
         new DataItem
         {
             Quarter = "Q1",

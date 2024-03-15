@@ -12,7 +12,7 @@
     <div class="row my-5">
         <div class="col-sm-12 col-lg-8">
             <RadzenChart ColorScheme="@colorScheme">
-                @for (var year = 2013; year <= 2020; year++)
+                @for (var year = 2017; year <= 2024; year++)
                 {
                     var currentYearRevenue = revenue.Where(r => r.Year == year).ToList();
                     <RadzenColumnSeries Data="@currentYearRevenue" CategoryProperty="Quarter" Title="@year.ToString()" ValueProperty="Revenue" />
@@ -74,7 +74,7 @@
     {
         var random = new Random();
 
-        for (var year = 2013; year <= 2020; year++)
+        for (var year = 2017; year <= 2024; year++)
         {
             for (var quarter = 1; quarter <= 4; quarter++)
             {

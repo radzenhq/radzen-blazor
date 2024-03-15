@@ -9,10 +9,10 @@
             </RadzenCard>
             <h4>Auto-size stacked bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenStackedBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue">
+                <RadzenStackedBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenStackedBarSeries>
-                <RadzenStackedBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue">
+                <RadzenStackedBarSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenStackedBarSeries>
                 <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
@@ -23,8 +23,8 @@
             </RadzenChart>
             <h4>Custom size stacked bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
-                <RadzenStackedBarSeries Data="@revenue2020" CategoryProperty="Quarter" Title="2020" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                <RadzenStackedBarSeries Data="@revenue2019" CategoryProperty="Quarter" Title="2019" ValueProperty="Revenue" />
+                <RadzenStackedBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
+                <RadzenStackedBarSeries Data="@revenue2023" CategoryProperty="Quarter" Title="2023" ValueProperty="Revenue" />
                 <RadzenValueAxis Formatter="@FormatAsUSD" Min="0" Max="800000" Step="100000">
                     <RadzenGridLines Visible="true" />
                     <RadzenAxisTitle Text="Revenue in USD" />
@@ -59,7 +59,7 @@
         return num.ToString("$0K");
     }
 
-    DataItem[] revenue2019 = new DataItem[]
+    DataItem[] revenue2023 = new DataItem[]
     {
     new DataItem
     {
@@ -83,7 +83,7 @@
     },
     };
 
-    DataItem[] revenue2020 = new DataItem[] {
+    DataItem[] revenue2024 = new DataItem[] {
     new DataItem
     {
     Quarter = "Q1",
