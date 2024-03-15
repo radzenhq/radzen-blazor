@@ -1,7 +1,7 @@
 @using Radzen
 @using System.Text.Json
 @inject IJSRuntime JSRuntime
-<RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" Class="rz-mt-4 rz-p-4 rz-border-radius-1" @attributes=@Attributes Style="border: var(--rz-grid-cell-border)">
+<RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" Class="rz-mt-4 rz-p-4 rz-border-radius-1" @attributes=@Attributes Style="width: 100%; border: var(--rz-grid-cell-border);">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
         <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">Console log</RadzenText>
         <RadzenButton Click=@OnClearClick Text="Clear console" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Small" />

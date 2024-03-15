@@ -2,35 +2,38 @@
 @inherits DbContextPage
 @inject NotificationService NotificationService
 
-<div class="container my-4">
-    <div class="row">
-        <div class="col-lg-6 offset-lg-3">
-            <RadzenTemplateForm TItem="Model" Data=@model Submit="@OnSubmit" InvalidSubmit="@OnIvalidSubmit">
-                <RadzenFieldset Text="Category and products">
-                    <div class="row mb-5">
-                        <div class="col-md-4">
-                            <RadzenLabel Text="Category" />
-                        </div>
-                        <div class="col">
-                            <RadzenDropDown style="display: block" Name="Category" Change="@CategoryChange" @bind-Value=@model.CategoryName Data="@categories" TextProperty="CategoryName" ValueProperty="CategoryName" Placeholder="Select category" class="w-100" />
-                            <RadzenRequiredValidator Component="Category" Text="Category is required" Style="position: absolute"/>
-                        </div>
-                    </div>
-                    <div class="row mb-5">
-                        <div class="col-md-4">
-                            <RadzenLabel Text="Products" />
-                        </div>
-                        <div class="col">
-                            <RadzenDropDown MaxSelectedLabels="2" style="display: block" Multiple="true" Name="Products" @bind-Value=@model.Products Data="@products" TextProperty="ProductName" ValueProperty="ProductName" Placeholder="Select products" class="w-100" />
-                            <RadzenRequiredValidator Component="Products" Text="Products are required" Style="position: absolute"/>
-                        </div>
-                    </div>
-                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
-                </RadzenFieldset>
-            </RadzenTemplateForm>
-        </div>
-    </div>
-</div>
+<RadzenStack Class="rz-p-0 rz-p-md-12">
+    <RadzenTemplateForm TItem="Model" Data=@model Submit="@OnSubmit" InvalidSubmit="@OnIvalidSubmit">
+        <RadzenFieldset Text="Category and products">
+            <RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12">
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Category" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenDropDown Name="Category" Change="@CategoryChange" @bind-Value=@model.CategoryName Data="@categories" TextProperty="CategoryName" ValueProperty="CategoryName" Placeholder="Select category" Style="display: block; width: 100%;" />
+                        <RadzenRequiredValidator Component="Category" Text="Category is required" Style="position: absolute"/>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Last Name" Component="LastName" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenDropDown MaxSelectedLabels="2" Multiple="true" Name="Products" @bind-Value=@model.Products Data="@products" TextProperty="ProductName" ValueProperty="ProductName" Placeholder="Select products" Style="display: block; width: 100%;" />
+                        <RadzenRequiredValidator Component="Products" Text="Products are required" Style="position: absolute"/>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                    <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+</RadzenStack>
+
 @code {
     class Model
     {
