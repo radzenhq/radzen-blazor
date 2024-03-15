@@ -310,7 +310,6 @@ window.Radzen = {
 
     if (Radzen[id].keyPress && Radzen[id].paste) {
         for (var i = 0; i < inputs.length; i++) {
-            delete inputs[i].index;
             inputs[i].removeEventListener('keypress', Radzen[id].keyPress);
             inputs[i].removeEventListener('paste', Radzen[id].paste);
         }
@@ -361,17 +360,17 @@ window.Radzen = {
               return;
           }
 
-          inputs[e.currentTarget.index].value = ch;
+          e.currentTarget.value = ch;
 
           ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', inputs.map(i => i.value).join(''));
 
-          if (e.currentTarget.index < inputs.length - 1) {
-              inputs[e.currentTarget.index + 1].focus();
+          var index = inputs.indexOf(e.currentTarget);
+          if (index < inputs.length - 1) {
+              inputs[index + 1].focus();
           }
       }
 
       for (var i = 0; i < inputs.length; i++) {
-          inputs[i].index = i;
           inputs[i].addEventListener('keypress', Radzen[id].keyPress);
           inputs[i].addEventListener('paste', Radzen[id].paste);
       }
