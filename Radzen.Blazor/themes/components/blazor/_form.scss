@@ -46,8 +46,7 @@ $validator-transform: translateY(12px) !default;
     border: var(--rz-validator-pointer-size) solid transparent;
     border-bottom-color: var(--rz-validator-background-color);
     position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate(var(--rz-validator-pointer-size), -100%);
+    inset-block-start: calc(-2 * var(--rz-validator-pointer-size));
+    inset-inline-start: calc(var(--rz-border-radius) + (var(--rz-validator-pointer-size) / 2));
   }
 }
