@@ -25,7 +25,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool AutoComplete { get; set; } = true;
+        public dynamic AutoComplete { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating the type of built-in autocomplete
@@ -106,7 +106,7 @@ namespace Radzen.Blazor
         /// AutoCompleteType.</value>
         public string AutoCompleteAttribute
         {
-            get => !AutoComplete ? "off" : AutoCompleteType.GetAutoCompleteValue();
+            get => object.Equals(AutoComplete, false) ? "off" : AutoComplete is string ? AutoComplete : AutoCompleteType.GetAutoCompleteValue();
         }
     }
 }

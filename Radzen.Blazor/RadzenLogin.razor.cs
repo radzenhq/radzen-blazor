@@ -40,7 +40,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if automatic complete of inputs is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool AutoComplete { get; set; } = true;
+        public dynamic AutoComplete { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating the type of built-in autocomplete
