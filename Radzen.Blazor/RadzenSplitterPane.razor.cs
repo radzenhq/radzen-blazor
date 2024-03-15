@@ -203,6 +203,11 @@ namespace Radzen.Blazor
                 collapsed = parameters.GetValueOrDefault<bool>(nameof(Collapsed));
             }
 
+            if (parameters.DidParameterChange(nameof(Size), Size))
+            {
+                SizeRuntine = parameters.GetValueOrDefault<string>(nameof(Size));
+            }
+
             await base.SetParametersAsync(parameters);
         }
 
