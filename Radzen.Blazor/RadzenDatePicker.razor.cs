@@ -189,7 +189,7 @@ namespace Radzen.Blazor
                 await popup.CloseAsync(Element);
             }
 
-            if(Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value)
+            if (Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value)
             {
                 return;
             }
@@ -416,7 +416,7 @@ namespace Radzen.Blazor
                         }
                         else if (value is TimeOnly timeOnly)
                         {
-                            DateTimeValue = new DateTime(1,1,0001, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
+                            DateTimeValue = new DateTime(1, 1, 0001, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
                         }
 #endif
                         else
@@ -995,14 +995,16 @@ namespace Radzen.Blazor
             CurrentDate = newValue;
         }
 
-        private string getOpenPopup()
+        private async Task OpenPopupForButton()
         {
-            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}', false, null, null, true, true)" : "";
+            if (PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline)
+                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, false, null, null, true, true);
         }
 
-        private string getOpenPopupForInput()
+        private async Task OpenPopupForInput()
         {
-            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline && (!AllowInput || !ShowButton) ? $"Radzen.togglePopup(this.parentNode, '{PopupID}', false, null, null, true, true)" : "";
+            if (PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline && (!AllowInput || !ShowButton))
+                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, false, null, null, true, true);
         }
 
         /// <summary>
@@ -1165,7 +1167,7 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                if(key == "Enter")
+                if (key == "Enter")
                 {
                     await SetDay(FocusedDate);
                 }
@@ -1214,12 +1216,12 @@ namespace Radzen.Blazor
         /// <inheritdoc/>
         public async ValueTask FocusAsync()
         {
-           try
-           {
-               await input.FocusAsync();
+            try
+            {
+                await input.FocusAsync();
             }
             catch
-            {}
+            { }
         }
 #endif
     }
