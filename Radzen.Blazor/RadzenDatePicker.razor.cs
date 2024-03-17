@@ -1006,7 +1006,10 @@ namespace Radzen.Blazor
             if (PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline && (!AllowInput || !ShowButton))
                 await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, false, null, null, true, true);
         }
-
+        private async Task ClosePopUp()
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+        }
         /// <summary>
         /// Gets or sets the edit context.
         /// </summary>
