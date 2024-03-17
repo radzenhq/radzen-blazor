@@ -187,6 +187,12 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if the create button is shown; otherwise, <c>false</c>.</value>
         [Parameter]
+        public bool EnableEscapeOrTab { get; set; } = true;
+        /// <summary>
+        /// Gets or sets a value indicating whether the create button is shown.
+        /// </summary>
+        /// <value><c>true</c> if the create button is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
         public bool ShowAdd { get; set; } = false;
 
         /// <summary>
@@ -655,7 +661,7 @@ namespace Radzen.Blazor
             {
                 await OpenPopup(key, isFilter);
             }
-            else if (key == "Escape" || key == "Tab")
+            else if (EnableEscapeOrTab && (key == "Escape" || key == "Tab"))
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
