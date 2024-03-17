@@ -183,9 +183,9 @@ namespace Radzen.Blazor
         public EventCallback<MouseEventArgs> Add { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the create button is shown.
+        /// Gets or sets a value indicating if you want enable escape key or tab key.
         /// </summary>
-        /// <value><c>true</c> if the create button is shown; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if you want enable escape key or tab key; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool EnableEscapeOrTab { get; set; } = true;
         /// <summary>
