@@ -1873,7 +1873,24 @@ window.Radzen = {
       document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true })
       document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
   },
-      startSplitterResize: function(id,
+  stopColumnResize: function (id, grid, columnIndex) {
+        var el = document.getElementById(id + '-resizer');
+        var cell = el.parentNode.parentNode;
+        if (Radzen[el]) {
+            grid.invokeMethodAsync(
+                'RadzenGrid.OnColumnResized',
+                columnIndex,
+                cell.getBoundingClientRect().width
+            );
+            el.style.width = null;
+            document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
+            document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
+            document.removeEventListener('touchmove', Radzen[el].touchMoveHandler)
+            document.removeEventListener('touchend', Radzen[el].mouseUpHandler);
+            Radzen[el] = null;
+        }
+  },
+  startSplitterResize: function(id,
         splitter,
         paneId,
         paneNextId,
