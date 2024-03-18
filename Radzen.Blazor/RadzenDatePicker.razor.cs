@@ -184,10 +184,7 @@ namespace Radzen.Blazor
 
         async Task OkClick()
         {
-            if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
-            {
-                await popup.CloseAsync(Element);
-            }
+            Close();
 
             if(Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value)
             {
@@ -995,16 +992,6 @@ namespace Radzen.Blazor
             CurrentDate = newValue;
         }
 
-        private string getOpenPopup()
-        {
-            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline ? $"Radzen.togglePopup(this.parentNode, '{PopupID}', false, null, null, true, true)" : "";
-        }
-
-        private string getOpenPopupForInput()
-        {
-            return PopupRenderMode == PopupRenderMode.Initial && !Disabled && !ReadOnly && !Inline && (!AllowInput || !ShowButton) ? $"Radzen.togglePopup(this.parentNode, '{PopupID}', false, null, null, true, true)" : "";
-        }
-
         /// <summary>
         /// Gets or sets the edit context.
         /// </summary>
@@ -1028,25 +1015,28 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
+            readOnlyChanged = parameters.DidParameterChange(nameof(ReadOnly), ReadOnly);
+            inlineChanged = parameters.DidParameterChange(nameof(Inline), Inline);
+            visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+            popupRenderModeChanged = parameters.DidParameterChange(nameof(PopupRenderMode), PopupRenderMode);
+
             if (parameters.DidParameterChange(nameof(Min), Min) || parameters.DidParameterChange(nameof(Max), Max))
             {
                 var min = parameters.GetValueOrDefault<DateTime?>(nameof(Min));
                 var max = parameters.GetValueOrDefault<DateTime?>(nameof(Max));
                 UpdateYearsAndMonths(min, max);
             }
-            var shouldClose = false;
-
-            if (parameters.DidParameterChange(nameof(Visible), Visible))
-            {
-                var visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
-                shouldClose = !visible;
-            }
 
             await base.SetParametersAsync(parameters);
 
-            if (shouldClose && !firstRender)
+            if ((disabledChanged || readOnlyChanged || inlineChanged || visibleChanged || popupRenderModeChanged) && !firstRender)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+                if (IsJSRuntimeAvailable)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+                    await JSRuntime.InvokeVoidAsync("Radzen.destroyDatePicker", GetId());
+                }
             }
 
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
@@ -1054,6 +1044,56 @@ namespace Radzen.Blazor
                 FieldIdentifier = FieldIdentifier.Create(ValueExpression);
                 EditContext.OnValidationStateChanged -= ValidationStateChanged;
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
+            }
+        }
+
+        bool firstRender;
+        bool visibleChanged;
+        bool disabledChanged;
+        bool readOnlyChanged;
+        bool inlineChanged;
+        bool popupRenderModeChanged;
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+
+            this.firstRender = firstRender;
+
+            if (firstRender || visibleChanged || disabledChanged || readOnlyChanged || inlineChanged || popupRenderModeChanged)
+            {
+                if (visibleChanged)
+                {
+                    visibleChanged = false;
+                }
+
+                if (disabledChanged)
+                {
+                    disabledChanged = false;
+                }
+
+                if (readOnlyChanged)
+                {
+                    readOnlyChanged = false;
+                }
+
+                if (inlineChanged)
+                {
+                    inlineChanged = false;
+                }
+
+                if (popupRenderModeChanged)
+                {
+                    popupRenderModeChanged = false;
+                }
+
+                if (Visible && !Disabled && !ReadOnly && !Inline && PopupRenderMode == PopupRenderMode.Initial)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.createDatePicker", Element, PopupID);
+
+                    StateHasChanged();
+                }
             }
         }
 
@@ -1077,6 +1117,7 @@ namespace Radzen.Blazor
             if (IsJSRuntimeAvailable)
             {
                 JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+                JSRuntime.InvokeVoidAsync("Radzen.destroyDatePicker", UniqueID, Element);
             }
         }
 
@@ -1095,20 +1136,6 @@ namespace Radzen.Blazor
             {
                 return $"popup{UniqueID}";
             }
-        }
-
-        private bool firstRender = true;
-
-        /// <summary>
-        /// Called when [after render asynchronous].
-        /// </summary>
-        /// <param name="firstRender">if set to <c>true</c> [first render].</param>
-        /// <returns>Task.</returns>
-        protected override Task OnAfterRenderAsync(bool firstRender)
-        {
-            this.firstRender = firstRender;
-
-            return base.OnAfterRenderAsync(firstRender);
         }
 
         Popup popup;

@@ -853,6 +853,34 @@ window.Radzen = {
         clearTimeout(Radzen[id + 'duration']);
     }
   },
+  destroyDatePicker(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+
+      var button = el.querySelector('.rz-datepicker-trigger');
+      if (button) {
+          button.onclick = null
+      }
+
+      var input = el.querySelector('.rz-inputtext');
+      if (input) {
+          input.onclick = null
+      }
+  },
+  createDatePicker(el, popupId) {
+      var toggle = function (e) {
+          Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, true);
+      };
+      var button = el.querySelector('.rz-datepicker-trigger');
+      if (button) {
+          button.onclick = toggle
+      }
+
+      var input = el.querySelector('.rz-inputtext');
+      if (input) {
+          input.onclick = toggle
+      }
+  },
   findPopup: function (id) {
     var popups = [];
     for (var i = 0; i < document.body.children.length; i++) {
