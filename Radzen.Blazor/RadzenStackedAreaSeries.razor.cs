@@ -89,7 +89,7 @@ namespace Radzen.Blazor
             var category = ComposeCategory(Chart.CategoryScale);
             var value = ComposeValue(Chart.ValueScale);
 
-            var points = GetPoints(category, value, Chart.ValueScale).ToArray();
+            var points = GetTopPoints(category, value, Chart.ValueScale).ToArray();
 
             var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
             var axisY = Chart.ValueScale.Scale(Math.Max(0, valueTicks.Start));
@@ -138,17 +138,41 @@ namespace Radzen.Blazor
             return false;
         }
 
-        private IEnumerable<Point<TItem>> GetPoints(Func<TItem, double> category, Func<TItem, double> value, ScaleBase valueScale)
+        private IEnumerable<Point<TItem>> GetTopPoints(Func<TItem, double> category, Func<TItem, double> value, ScaleBase valueScale)
         {
             var allSeries = StackedAreaSeries;
             var index = allSeries.IndexOf(this);
 
+            return GetPointsAt(index, category, value, valueScale);
+        }
+
+        private IEnumerable<Point<TItem>> GetPointsAt(int index, Func<TItem, double> category, Func<TItem, double> value, ScaleBase valueScale)
+        {
+            var allSeries = StackedAreaSeries;
             return Items.Select(item =>
             {
                 var x = category(item);
-                //var y = value(item);
                 var sum = allSeries.Take(index + 1).SelectMany(series => series.ValuesForCategory(x)).DefaultIfEmpty(value(item)).Sum();
                 var y = valueScale.Scale(sum);
+
+                return new Point<TItem> { X = x, Y = y, Data = item };
+            }).ToList();
+        }
+
+        private IEnumerable<Point<TItem>> GetBottomPoints(Func<TItem, double> category, Func<TItem, double> value, ScaleBase valueScale)
+        {
+            var allSeries = StackedAreaSeries;
+            var index = allSeries.IndexOf(this);
+
+            if (index > 0)
+            {
+                return GetPointsAt(index - 1, category, value, valueScale).Reverse();
+            }
+
+            return Items.Select(item =>
+            {
+                var x = category(item);
+                var y = valueScale.Scale(valueScale.Input.Start);
 
                 return new Point<TItem> { X = x, Y = y, Data = item };
             }).ToList();
@@ -197,12 +221,20 @@ namespace Radzen.Blazor
             if (Items.Any())
             {
                 var stackedAreaSeries = StackedAreaSeries;
-                var count = stackedAreaSeries.Max(series => series.Count);
-                var sums = Enumerable.Range(0, count).Select(i => stackedAreaSeries.Sum(series => series.ValueAt(i)));
-                var max = sums.Max();
-                var min = Items.Min(Value);
 
-                scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+                if (stackedAreaSeries.Count > 0)
+                {
+                    var count = stackedAreaSeries.Max(series => series.Count);
+                    var sums = Enumerable.Range(0, count).Select(i => stackedAreaSeries.Sum(series => series.ValueAt(i)));
+                    var max = sums.Max();
+                    var min = Items.Min(Value);
+
+                    scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+                }
+                else
+                {
+                    return base.TransformValueScale(scale);
+                }
             }
 
             return scale;

@@ -18,7 +18,8 @@
 
     var index = Chart.Series.IndexOf(this);
 
-    var data = GetPoints(category, value, valueScale);
+    var topPoints = GetTopPoints(category, value, valueScale);
+    var bottomPoints = GetBottomPoints(category, value, valueScale);
 
     var className = $"rz-area-series rz-series-{index}";
 
@@ -32,14 +33,15 @@
         var start = Math.Max(0, valueTicks.Start);
         var y = Chart.ValueScale.Scale(start).ToInvariantString();
         var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
-        var path = pathGenerator.Path(data);
-        var area = $"M {x1} {y} {path} L {x2} {y}";
-        var line = $"M {path}";
+        var topPath = pathGenerator.Path(topPoints);
+        var bottomPath = pathGenerator.Path(bottomPoints);
+        var area = $"M {x1} {y} {topPath} L {x2} {y} {bottomPath}";
+        var line = $"M {topPath}";
 
         <path @key="@area" style="@style" d="@area" fill="@Fill" stroke="none"></path>
         <Path @key="@line" D="@line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" Style="@style" Fill="none" />
       }
-      <Markers Visible="@Markers.Visible" Series="@this" Data="@data" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
+      <Markers Visible="@Markers.Visible" Series="@this" Data="@topPoints" MarkerType="@MarkerType" Stroke="@Markers.Stroke" Fill="@(Markers.Fill ?? Stroke)" StrokeWidth="@Markers.StrokeWidth" Size="@Markers.Size" />
     </g>;
   }
 }
