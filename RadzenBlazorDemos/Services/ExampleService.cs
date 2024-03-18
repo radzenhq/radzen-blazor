@@ -1202,6 +1202,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "SecurityCode",
+                    Path = "security-code",
+                    Description = "Demonstration and configuration of the Radzen Blazor SecurityCode component.",
+                    Icon = "&#xf045",
+                    New = true,
+                    Tags = new [] { "security", "code", "input" }
+                },
+                new Example()
+                {
                     Name = "SelectBar",
                     Path = "selectbar",
                     Description = "Demonstration and configuration of the Radzen Blazor SelectBar component.",

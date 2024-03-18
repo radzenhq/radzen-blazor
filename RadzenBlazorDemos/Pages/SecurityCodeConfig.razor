@@ -1,0 +1,44 @@
+﻿<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Count
+                <RadzenNumeric @bind-Value="@count" aria-label="count" Min="1" Max="8" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Gap
+                <RadzenTextBox @bind-Value="@gap" aria-label="gap" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Disabled
+                <RadzenSwitch @bind-Value="@disabled" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "disabled" }})" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenCard>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Default SecurityCode</RadzenText>
+        <RadzenSecurityCode @bind-Value=@value Count="@count" Disabled="@disabled" Gap="@gap" />
+    </RadzenCard>
+    <RadzenCard>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Numeric SecurityCode</RadzenText>
+        <RadzenSecurityCode @bind-Value=@numbersOnlyValue Type="SecurityCodeType.Numeric" Count="@count" Disabled="@disabled" Gap="@gap" />
+    </RadzenCard>
+    <RadzenCard>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Password SecurityCode</RadzenText>
+        <RadzenSecurityCode @bind-Value=@passwordValue Type="SecurityCodeType.Password" Count="@count" Disabled="@disabled" Gap="@gap" />
+    </RadzenCard>
+    <RadzenCard>
+        <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Bind SecurityCode value</RadzenText>
+        <RadzenSecurityCode @bind-Value=@valueBind Count="@count" Disabled="@disabled" Gap="@gap" />
+    </RadzenCard>
+</RadzenStack>
+@code{
+    string value;
+    string numbersOnlyValue;
+    string passwordValue;
+    string valueBind = "sa4f";
+
+    string gap = "0.5rem";
+    bool disabled;
+    int count = 4;
+}
