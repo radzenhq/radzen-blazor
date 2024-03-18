@@ -1912,6 +1912,25 @@ window.Radzen = {
       document.removeEventListener('mousemove', Radzen[id + 'move']);
       document.addEventListener('mousemove', Radzen[id + 'move']);
   },
+  stopColumnResize: function (id, grid, columnIndex) {
+    var el = document.getElementById(id + '-resizer');
+    if(!el) return;
+    var cell = el.parentNode.parentNode;
+    if (!cell) return;
+    if (Radzen[el]) {
+        grid.invokeMethodAsync(
+            'RadzenGrid.OnColumnResized',
+            columnIndex,
+            cell.getBoundingClientRect().width
+        );
+        el.style.width = null;
+        document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
+        document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
+        document.removeEventListener('touchmove', Radzen[el].touchMoveHandler)
+        document.removeEventListener('touchend', Radzen[el].mouseUpHandler);
+        Radzen[el] = null;
+    }
+  },
   startColumnResize: function(id, grid, columnIndex, clientX) {
       var el = document.getElementById(id + '-resizer');
       var cell = el.parentNode.parentNode;

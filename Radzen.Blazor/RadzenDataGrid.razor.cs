@@ -1539,6 +1539,11 @@ namespace Radzen.Blazor
             await JSRuntime.InvokeVoidAsync("Radzen.startColumnResize", getColumnUniqueId(columnIndex), Reference, columnIndex, args.ClientX);
         }
 
+        internal async Task StopColumnResize(MouseEventArgs args, int columnIndex)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.stopColumnResize", getColumnUniqueId(columnIndex), Reference, columnIndex);
+        }
+
         int? indexOfColumnToReoder;
 
         internal async Task StartColumnReorder(MouseEventArgs args, int columnIndex)
