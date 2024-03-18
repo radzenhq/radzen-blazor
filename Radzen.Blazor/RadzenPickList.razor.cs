@@ -82,7 +82,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The buttons style.</value>
         [Parameter]
-        public JustifyContent ButtonJustifyContent { get; set; } = JustifyContent.End;
+        public JustifyContent ButtonJustifyContent { get; set; } = JustifyContent.Center;
 
         /// <summary>
         /// Gets or sets the buttons style
