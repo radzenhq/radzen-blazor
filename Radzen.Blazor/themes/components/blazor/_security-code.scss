@@ -1,5 +1,5 @@
-$rz-security-code-input-width: var(--rz-input-height) !default;
-$rz-security-code-input-height: var(--rz-input-height) !default;
+$rz-security-code-input-min-width: var(--rz-input-height) !default;
+$rz-security-code-input-min-height: var(--rz-input-height) !default;
 $rz-security-code-input-padding: 0.125rem !default;
 $rz-security-code-input-font-size: 1.25rem !default;
 $rz-security-code-input-font-weight: 600 !default;
@@ -9,8 +9,8 @@ $rz-security-code-input-line-height: 1 !default;
 // SecurityCode CSS variables
 
 :root {
-  --rz-security-code-input-width: #{$rz-security-code-input-width};
-  --rz-security-code-input-height: #{$rz-security-code-input-height};
+  --rz-security-code-input-min-width: #{$rz-security-code-input-min-width};
+  --rz-security-code-input-min-height: #{$rz-security-code-input-min-height};
   --rz-security-code-input-padding: #{$rz-security-code-input-padding};
   --rz-security-code-input-font-size: #{$rz-security-code-input-font-size};
   --rz-security-code-input-font-weight: #{$rz-security-code-input-font-weight};
@@ -18,18 +18,20 @@ $rz-security-code-input-line-height: 1 !default;
 }
 
 .rz-security-code {
-  display: inline-block;
+  display: inline-flex;
 }
 
 .rz-security-code-wrapper {
-  width: 100%;
+  flex: 1;
   --rz-gap: 0.5rem;
 }
 
 .rz-security-code-input {
   text-align: center;
-  width: var(--rz-security-code-input-width);
-  height: var(--rz-security-code-input-height);
+  min-width: var(--rz-security-code-input-min-width);
+  min-height: var(--rz-security-code-input-min-height);
+  width: 100%;
+  height: 100%;
   padding: var(--rz-security-code-input-padding);
   font-size: var(--rz-security-code-input-font-size);
   font-weight: var(--rz-security-code-input-font-weight);

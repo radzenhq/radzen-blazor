@@ -5,7 +5,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <RadzenStack Orientation="Orientation.Horizontal" Gap="@Gap" Class="rz-security-code-wrapper">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="@Gap" Class="rz-security-code-wrapper">
             @foreach (var index in Enumerable.Range(1, Count))
             {
                 @if (Type == SecurityCodeType.Password)
