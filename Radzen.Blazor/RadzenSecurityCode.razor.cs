@@ -93,7 +93,7 @@ namespace Radzen.Blazor
 
                 if (Visible && !Disabled)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.createSecurityCode", UniqueID, Reference, Element,
+                    await JSRuntime.InvokeVoidAsync("Radzen.createSecurityCode", GetId(), Reference, Element,
                         Type == SecurityCodeType.Numeric ? true : false);
 
                     StateHasChanged();
@@ -108,7 +108,7 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroySecurityCode", UniqueID, Element);
+                JSRuntime.InvokeVoidAsync("Radzen.destroySecurityCode", GetId(), Element);
             }
         }
 
@@ -119,6 +119,8 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenSecurityCode.OnValueChange")]
         public async Task OnValueChange(string value)
         {
+            await JSRuntime.InvokeVoidAsync("Radzen.updateSecurityCode", Element, Type == SecurityCodeType.Numeric, value);
+
             await ValueChanged.InvokeAsync(value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(value);
