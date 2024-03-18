@@ -704,11 +704,20 @@ namespace Radzen.Blazor
 
                 await OpenPopup(key, isFilter);
             }
-            else if (key == "Escape" || key == "Tab")
+            else if (key == "Escape")
             {
                 preventKeydown = false;
 
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+            }
+            else if (key == "Tab")
+            {
+                preventKeydown = false;
+
+                if (!ShowSearch && !ShowAdd)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                }
             }
             else if (key == "Delete" && AllowClear)
             {
@@ -746,6 +755,15 @@ namespace Radzen.Blazor
                 _view = null;
 
                 await InvokeAsync(RefreshAfterFilter);
+            }
+        }
+
+        async Task CloseOnEscape(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key; 
+            if (key == "Escape") 
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID); 
             }
         }
 
