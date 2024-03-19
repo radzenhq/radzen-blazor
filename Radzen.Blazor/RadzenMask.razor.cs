@@ -11,7 +11,7 @@ namespace Radzen.Blazor
     /// &lt;RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" @bind-Value=@phone Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
     /// </code>
     /// </example>
-    public partial class RadzenMask : FormComponent<string>
+    public partial class RadzenMask : FormComponentWithAutoComplete<string>
     {
         /// <summary>
         /// Gets or sets a value indicating whether is read only.
@@ -19,24 +19,6 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether input automatic complete is enabled.
-        /// </summary>
-        /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
-        [Parameter]
-        public dynamic AutoComplete { get; set; } = true;
-
-        /// <summary>
-        /// Gets or sets a value indicating the type of built-in autocomplete
-        /// the browser should use.
-        /// <see cref="Blazor.AutoCompleteType" />
-        /// </summary>
-        /// <value>
-        /// The type of built-in autocomplete.
-        /// </value>
-        [Parameter]
-        public AutoCompleteType AutoCompleteType { get; set; } = AutoCompleteType.On;
 
         /// <summary>
         /// Gets or sets the maximum length.
@@ -94,19 +76,6 @@ namespace Radzen.Blazor
             {
                 JSRuntime.InvokeVoidAsync("eval", $"Radzen.mask('{GetId()}', '{Mask}', '{Pattern}', '{CharacterPattern}')");
             }
-        }
-
-        /// <summary>
-        /// Gets the autocomplete attribute's string value.
-        /// </summary>
-        /// <value>
-        /// <c>off</c> if the AutoComplete parameter is false or the
-        /// AutoCompleteType parameter is "off". When the AutoComplete
-        /// parameter is true, the value is <c>on</c> or, if set, the value of
-        /// AutoCompleteType.</value>
-        public string AutoCompleteAttribute
-        {
-            get => object.Equals(AutoComplete, false) ? "off" : AutoComplete is string ? AutoComplete : AutoCompleteType.GetAutoCompleteValue();
         }
     }
 }

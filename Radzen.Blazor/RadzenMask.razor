@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @using System.Linq.Dynamic.Core;
-@inherits FormComponent<string>
+@inherits FormComponentWithAutoComplete<string>
 @if (Visible)
 {
     <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"

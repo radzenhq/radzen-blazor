@@ -1,4 +1,4 @@
-﻿@inherits FormComponent<string>
+﻿@inherits FormComponentWithAutoComplete<string>
 @if (Visible)
 {
     <input @ref="@Element" id="@(Name ?? GetId())" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"

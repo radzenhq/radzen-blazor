@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -10,6 +11,62 @@ using Radzen.Blazor.Rendering;
 
 namespace Radzen
 {
+    /// <summary>
+    /// Class FormComponentWithAutoComplete.
+    /// </summary>
+    public class FormComponentWithAutoComplete<T> : FormComponent<T>
+    {
+        /// <summary>
+        /// Gets or sets a value indicating the browser built-in autocomplete is enabled.
+        /// </summary>
+        /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public virtual bool AutoComplete { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating the type of built-in autocomplete
+        /// the browser should use.
+        /// <see cref="Blazor.AutoCompleteType" />
+        /// </summary>
+        /// <value>
+        /// The type of built-in autocomplete.
+        /// </value>
+        [Parameter]
+        public virtual AutoCompleteType AutoCompleteType { get; set; } = AutoCompleteType.On;
+
+        /// <summary>
+        /// Gets the autocomplete attribute's string value.
+        /// </summary>
+        /// <value>
+        /// <c>off</c> if the AutoComplete parameter is false or the
+        /// AutoCompleteType parameter is "off". When the AutoComplete
+        /// parameter is true, the value is <c>on</c> or, if set, the value of
+        /// AutoCompleteType.</value>
+        public virtual string AutoCompleteAttribute
+        {
+            get => !AutoComplete ? DefaultAutoCompleteAttribute :
+                autoComplete as string ?? AutoCompleteType.GetAutoCompleteValue();
+        }
+
+        /// <summary>
+        /// Gets the default autocomplete attribute's string value.
+        /// </summary>
+        /// <value>
+        public virtual string DefaultAutoCompleteAttribute { get; set; } = "off";
+
+        object autoComplete;
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            await base.SetParametersAsync(parameters.TryGetValue(nameof(AutoComplete).ToLower(), out autoComplete) ?
+                ParameterView.FromDictionary(parameters
+                    .ToDictionary().Where(i => i.Key != nameof(AutoComplete).ToLower()).ToDictionary(i => i.Key, i => i.Value)
+                    .ToDictionary(i => i.Key, i => i.Value))
+                : parameters);
+        }
+    }
+
     /// <summary>
     /// Class FormComponent.
     /// Implements the <see cref="Radzen.RadzenComponent" />
