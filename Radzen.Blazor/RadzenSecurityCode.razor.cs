@@ -119,8 +119,6 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenSecurityCode.OnValueChange")]
         public async Task OnValueChange(string value)
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.updateSecurityCode", Element, Type == SecurityCodeType.Numeric, value);
-
             await ValueChanged.InvokeAsync(value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(value);

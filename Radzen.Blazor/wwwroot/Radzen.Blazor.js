@@ -319,13 +319,6 @@ window.Radzen = {
 
     Radzen[id] = null;
   },
-  updateSecurityCode: function (el, isNumber, value) {
-      if (!el) return;
-      var inputs = [...el.getElementsByTagName('input')];
-      for (var i = 0; i < inputs.length; i++) {
-          inputs[i].value = isNumber && isNaN(+value[i]) || !value[i] ? '' : value[i];
-      }
-  },
   createSecurityCode: function (id, ref, el, isNumber) {
       if (!el || !ref) return;
 
