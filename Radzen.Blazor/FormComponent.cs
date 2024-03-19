@@ -49,9 +49,8 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets the default autocomplete attribute's string value.
+        /// Gets or sets the default autocomplete attribute's string value.
         /// </summary>
-        /// <value>
         public virtual string DefaultAutoCompleteAttribute { get; set; } = "off";
 
         object autoComplete;
