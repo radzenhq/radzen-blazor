@@ -367,6 +367,10 @@ window.Radzen = {
               return;
           }
 
+          if (e.currentTarget.value == ch) {
+              return;
+          }
+
           e.currentTarget.value = ch;
 
           ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', inputs.map(i => i.value).join('').trim());
