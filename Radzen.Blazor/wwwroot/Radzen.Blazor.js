@@ -322,7 +322,8 @@ window.Radzen = {
   createSecurityCode: function (id, ref, el, isNumber) {
       if (!el || !ref) return;
 
-      var inputs = [...el.getElementsByTagName('input')];
+      var hidden = el.querySelector('input[type="hidden"]');
+      var inputs = [...el.getElementsByTagName('input')].filter(i => i.type == 'text');
 
       Radzen[id] = {};
 
@@ -366,7 +367,10 @@ window.Radzen = {
 
           e.currentTarget.value = ch;
 
-          ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', inputs.map(i => i.value).join('').trim());
+          var value = inputs.map(i => i.value).join('').trim();
+          hidden.value = value;
+
+          ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value);
 
           var index = inputs.indexOf(e.currentTarget);
           if (index < inputs.length - 1) {

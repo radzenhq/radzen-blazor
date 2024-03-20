@@ -5,6 +5,9 @@
 @if (Visible)
 {
     <div @ref="@Element" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <div class="rz-helper-hidden-accessible">
+            <input disabled="@Disabled" type="hidden" name="@Name">
+        </div>
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="@Gap" Class="rz-security-code-wrapper">
             @foreach (var index in Enumerable.Range(1, Count))
             {
