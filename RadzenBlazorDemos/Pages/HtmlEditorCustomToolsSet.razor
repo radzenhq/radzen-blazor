@@ -42,7 +42,7 @@
     </p>
     <h2>4. Include Radzen.Blazor.js</h2>
     <p>
-        Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include this snippet <code>&lt;script src=""_content/Radzen.Blazor/Radzen.Blazor.js""&gt;&lt;/script&gt;</code>
+        Open the <code>_Host.cshtml</code> file (server-side Blazor) or <code>wwwroot/index.html</code> (client-side WebAssembly Blazor) and include this snippet <code>&lt;script src=""_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)""&gt;&lt;/script&gt;</code>
     </p>
     <h2>5. Use a component</h2>
     <p>

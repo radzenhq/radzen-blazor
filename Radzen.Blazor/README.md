@@ -74,7 +74,7 @@ To include a different theme (i.e. Standard) just change the name of the CSS fil
 Open `Pages\_Layout.cshtml` (Blazor Server .NET 6), `Pages\_Host.cshtml` (Blazor Server .NET 7) or `wwwroot/index.html` (Blazor WebAssembly) and include this snippet:
 
 ```html
-<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
+<script src="_content/Radzen.Blazor/Radzen.Blazor.js?v=@(typeof(Radzen.Colors).Assembly.GetName().Version)"></script>
 ```
 
 ### 5. Use a component
