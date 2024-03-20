@@ -323,7 +323,7 @@ window.Radzen = {
       if (!el || !ref) return;
 
       var hidden = el.querySelector('input[type="hidden"]');
-      var inputs = [...el.getElementsByTagName('input')].filter(i => i.type == 'text');
+      var inputs = [...el.querySelectorAll('.rz-security-code-input')];
 
       Radzen[id] = {};
 
