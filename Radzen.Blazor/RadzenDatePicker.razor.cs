@@ -461,6 +461,7 @@ namespace Radzen.Blazor
             set
             {
                 _currentDate = value;
+                FocusedDate = value;
                 CurrentDateChanged.InvokeAsync(value);
             }
         }
