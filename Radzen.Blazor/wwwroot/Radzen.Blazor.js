@@ -338,6 +338,12 @@ window.Radzen = {
                       }
                       inputs[i].value = value[i];
                   }
+
+                  var code = inputs.map(i => i.value).join('').trim();
+                  hidden.value = code;
+
+                  ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', code);
+
                   inputs[inputs.length - 1].focus();
               }
 
