@@ -11,25 +11,12 @@
                 {
                     @SourceHeader
                 }
-                @if (Template != null)
-                {
-                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
-                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering 
-                        Disabled=@(Source == null || (Source != null && !Source.Any()))>
-                        <Template>
-                            @Template(context)
-                        </Template>
-                    </RadzenListBox>
-                }
-                else
-                {
-                    <RadzenListBox @bind-Value=@selectedSourceItems Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
-                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering 
-                        Disabled=@(Source == null || (Source != null && !Source.Any()))/>
-
-                }
+                <RadzenListBox @bind-Value=@selectedSourceItems Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
+                    FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                    TextProperty="@TextProperty" AllowFiltering=@AllowFiltering
+                    Template=@ListBoxTemplate
+                    Disabled=@(Source == null || (Source != null && !Source.Any()))
+                />
             </RadzenStack>
             <RadzenStack Orientation="@(Orientation == Orientation.Vertical ? Orientation.Horizontal : Orientation.Vertical)" JustifyContent="@ButtonJustifyContent" Gap="@ButtonGap" Class="rz-picklist-buttons">
                 <RadzenButton Icon="keyboard_arrow_right" title="@SelectedSourceToTargetTitle" Click="@SelectedSourceToTarget" Disabled=@(selectedSourceItems == null || (Multiple && selectedSourceItems != null && !((IEnumerable<TItem>)selectedSourceItems).Any()))
@@ -46,24 +33,12 @@
                 {
                     @TargetHeader
                 }
-                @if (Template != null)
-                {
-                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
-                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering 
-                        Disabled=@(Target == null|| (Target != null && !Target.Any()))>
-                        <Template>
-                            @Template(context)
-                        </Template>
-                    </RadzenListBox>
-                }
-                else
-                {
-                    <RadzenListBox @bind-Value=@selectedTargetItems Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
-                        FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                        TextProperty="@TextProperty" AllowFiltering=@AllowFiltering 
-                        Disabled=@(Target == null|| (Target != null && !Target.Any())) />
-                }
+                <RadzenListBox @bind-Value=@selectedTargetItems Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
+                    FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                    TextProperty="@TextProperty" AllowFiltering=@AllowFiltering
+                    Template=@ListBoxTemplate
+                    Disabled=@(Target == null|| (Target != null && !Target.Any()))
+                />
             </RadzenStack>
         </RadzenStack>
     </div>
