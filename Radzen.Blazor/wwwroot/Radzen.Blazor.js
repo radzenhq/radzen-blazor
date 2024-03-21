@@ -303,6 +303,13 @@ window.Radzen = {
       delete Radzen[id].instance;
     }
   },
+ focusSecurityCode: function (el) {
+    if (!el) return;
+    var firstInput = el.querySelector('.rz-security-code-input');
+    if (firstInput) {
+        setTimeout(function () { firstInput.focus() }, 500);
+    }
+ },
   destroySecurityCode: function (id, el) {
     if (!Radzen[id]) return;
 
