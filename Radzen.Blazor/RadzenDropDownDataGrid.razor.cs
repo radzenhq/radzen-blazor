@@ -939,5 +939,13 @@ namespace Radzen.Blazor
                 return grid;
             }
         }
+
+        /// <summary>
+        /// Resets component and deselects row
+        /// </summary>
+        public new async Task Reset() {
+            base.Reset();
+            await grid.SelectRow(null);
+        }
     }
 }
