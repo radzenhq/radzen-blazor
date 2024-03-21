@@ -47,6 +47,12 @@ namespace Radzen.Blazor
         [Parameter]
         public string MoreText { get; set; } = "+ {0} more";
 
+        /// <summary>
+        /// Specifies the text displayed when the user clicks on a day with no events in the year view
+        /// </summary>
+        [Parameter]
+        public string NoDayEventsText { get; set; } = "There are no scheduled events taking place on this day";
+
         /// <inheritdoc />
         public override DateTime StartDate
         {

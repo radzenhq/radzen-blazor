@@ -11,7 +11,8 @@
         var maxAppointmentsInSlot = 0;
 
         return @<CascadingValue Value=@Scheduler>
-                <YearView StartDate=@StartDate EndDate=@EndDate StartMonth=@StartMonth MaxAppointmentsInSlot=@maxAppointmentsInSlot MoreText=@MoreText Appointments=@appointments />
+                <YearView StartDate=@StartDate EndDate=@EndDate StartMonth=@StartMonth MaxAppointmentsInSlot=@maxAppointmentsInSlot MoreText=@MoreText
+                          NoDayEventsText=@NoDayEventsText Appointments=@appointments />
                 </CascadingValue>;
     }
 }
