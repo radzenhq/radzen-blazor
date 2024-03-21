@@ -95,6 +95,9 @@
 
     [Parameter]
     public string MoreText { get; set; }
+    
+    [Parameter]
+    public string NoDayEventsText  { get; set; }
 
     [CascadingParameter]
     public IScheduler Scheduler { get; set; }
@@ -148,7 +151,7 @@
         {
             await DialogService.OpenAsync(date.ToShortDateString(), ds =>
     @<div class="rz-event-list">
-        There are no scheduled events taking place on this day
+        @(NoDayEventsText)
     </div>
     );
 
