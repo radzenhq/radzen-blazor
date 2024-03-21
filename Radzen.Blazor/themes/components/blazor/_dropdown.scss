@@ -292,6 +292,10 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
     align-items: center;
 }
 
+.rz-multiselect-item-content {
+  flex: 1;
+}
+
 .rz-multiselect-label-container,
 .rz-dropdown-label {
   display: block;
