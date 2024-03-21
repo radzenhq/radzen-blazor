@@ -17,7 +17,7 @@ namespace Radzen.Blazor.Rendering
         /// <value>The appointment move event callback.</value>
         [Parameter]
         public EventCallback<SchedulerAppointmentMoveEventArgs> AppointmentMove { get; set; }
-        
+
         /// <summary>
         /// Handles on slot drop.
         /// </summary>
@@ -25,12 +25,15 @@ namespace Radzen.Blazor.Rendering
         /// <returns>Task</returns>
         public async Task OnDrop(DateTime slotDate)
         {
-            if(draggedAppointment != null)
+            if (draggedAppointment != null)
             {
                 TimeSpan timespan = slotDate - draggedAppointment.Start;
-                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs() { Appointment = draggedAppointment, TimeSpan = timespan });
+
+                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { Appointment = draggedAppointment, TimeSpan = timespan });
+
                 draggedAppointment = null;
             }
+
             dragStarted = false;
         }
 

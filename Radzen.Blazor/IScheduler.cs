@@ -102,14 +102,17 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="reference"></param>
         /// <param name="data"></param>
-        /// <returns></returns>
         Task MouseEnterAppointment(ElementReference reference, AppointmentData data);
 
         /// <summary>
         /// Returns true if the scheduler has a mouse enter appointment listener.
         /// </summary>
-        /// <returns></returns>
         bool HasMouseEnterAppointmentDelegate();
+
+        /// <summary>
+        /// Returns true if the scheduler has an AppointmentMove listener.
+        /// </summary>
+        bool HasAppointmentMoveDelegate();
 
         /// <summary>
         /// Notifies the scheduler that the user has moved the mouse out of the specified appointment.

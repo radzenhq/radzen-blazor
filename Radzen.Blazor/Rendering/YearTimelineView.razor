@@ -110,7 +110,7 @@
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @ontouchend=@(args => @OnDrop(dayOfWeek))>
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
                             <div class="rz-slot-title">
                                 @dayOfWeek.Day
                             </div>
@@ -118,7 +118,7 @@
                     }
                     else
                     {
-                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @ontouchend=@(args => @OnDrop(dayOfWeek))>
+                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
                             <div class="rz-slot-title">
                             </div>
                         </div>
@@ -246,7 +246,7 @@
         {
             CurrentDate = StartDate.AddDays(1);
         }
-        
+
         var key = args.Code != null ? args.Code : args.Key;
 
         if (key == "ArrowLeft" || key == "ArrowRight")
@@ -259,7 +259,7 @@
             if(newDate < firstDate)
             {
                 CurrentDate = firstDate;
-            } 
+            }
             else if(newDate > lastDate)
             {
                 CurrentDate = lastDate;

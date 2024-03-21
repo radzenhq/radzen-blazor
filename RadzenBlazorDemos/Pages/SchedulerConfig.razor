@@ -97,13 +97,16 @@
         }
     }
 
-    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs moved)
+    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
     {
-        var draggedAppointment = appointments.SingleOrDefault(x => x == (Appointment)moved.Appointment.Data);
-        if(draggedAppointment!=null)
+        var draggedAppointment = appointments.FirstOrDefault(x => x == args.Appointment.Data);
+
+        if (draggedAppointment != null)
         {
-            draggedAppointment.Start = draggedAppointment.Start + moved.TimeSpan;
-            draggedAppointment.End = draggedAppointment.End + moved.TimeSpan;
+            draggedAppointment.Start = draggedAppointment.Start + args.TimeSpan;
+
+            draggedAppointment.End = draggedAppointment.End + args.TimeSpan;
+
             await scheduler.Reload();
         }
     }

@@ -16,7 +16,7 @@
             @for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
             {
                 var slotDate = date;
-                <div @onclick=@(args => OnSlotClick(slotDate)) @attributes=@Attributes(date) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @ontouchend='@(args => @OnDrop(slotDate))'></div>
+                    <div @onclick=@(args => OnSlotClick(slotDate)) @attributes=@Attributes(date) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate))></div>
             }
         </div>
     </div>
@@ -121,4 +121,4 @@
             preventKeyPress = false;
         }
     }
-} 
+}

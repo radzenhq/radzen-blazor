@@ -636,5 +636,10 @@ namespace Radzen.Blazor
         {
             return AppointmentMouseEnter.HasDelegate;
         }
+
+        bool IScheduler.HasAppointmentMoveDelegate()
+        {
+            return AppointmentMove.HasDelegate;
+        }
     }
 }
