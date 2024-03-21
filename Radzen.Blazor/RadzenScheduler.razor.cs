@@ -235,6 +235,32 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<SchedulerLoadDataEventArgs> LoadData { get; set; }
 
+        /// <summary>
+        /// A callback that will be invoked when an appointment is being dragged and then dropped on a different slot.
+        /// Commonly used to change it to a different timeslot.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments AppointmentMove=@OnAppointmentMove&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        ///   async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs moved)
+        ///   {
+        ///     var draggedAppointment = appointments.SingleOrDefault(x => x == (Appointment)moved.Appointment.Data);
+        ///     if (draggedAppointment != null)
+        ///     {
+        ///         draggedAppointment.Start = draggedAppointment.Start + moved.TimeSpan;
+        ///         draggedAppointment.End = draggedAppointment.End + moved.TimeSpan;
+        ///         await scheduler.Reload();
+        ///     }
+        ///   }
+        /// }
+        /// </code>
+        /// </example>
+        /// <value></value>
+        [Parameter]
+        public EventCallback<SchedulerAppointmentMoveEventArgs> AppointmentMove { get; set; }
+
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
         /// <summary>
@@ -609,6 +635,11 @@ namespace Radzen.Blazor
         bool IScheduler.HasMouseEnterAppointmentDelegate()
         {
             return AppointmentMouseEnter.HasDelegate;
+        }
+
+        bool IScheduler.HasAppointmentMoveDelegate()
+        {
+            return AppointmentMove.HasDelegate;
         }
     }
 }

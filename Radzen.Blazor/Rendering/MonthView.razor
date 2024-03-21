@@ -2,17 +2,19 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inject DialogService DialogService
+@inherits DropableViewBase
 
- <div class="rz-view rz-month-view">
-        <div class="rz-view-header">
-            @for(var date = StartDate; date <= StartDate.EndOfWeek(); date = date.AddDays(1))
-            {
-                <div class="rz-slot-header">
-                    @date.ToString("ddd", Scheduler.Culture)
-                </div>
-            }
-        </div>
-    @{ 
+
+<div class="rz-view rz-month-view">
+    <div class="rz-view-header">
+        @for (var date = StartDate; date <= StartDate.EndOfWeek(); date = date.AddDays(1))
+        {
+            <div class="rz-slot-header">
+                @date.ToString("ddd", Scheduler.Culture)
+            </div>
+        }
+    </div>
+    @{
         var days = 0;
         var points = new Dictionary<AppointmentData, double>();
     }
@@ -49,7 +51,8 @@
                         @if (item.Start >= start && item.Start <= end)
                         {
                             <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
-                                CssClass="@(CurrentDate >= start && CurrentDate <= end && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")" />
+                                CssClass="@(CurrentDate >= start && CurrentDate <= end && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")" 
+                                DragStart=@OnAppointmentDragStart />
                         }
                         else if (start == date)
                         {
@@ -58,7 +61,8 @@
                             width = length * slotWidth;
 
                             <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
-                                CssClass="@(CurrentDate == date && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")"/>
+                                CssClass="@(CurrentDate == date && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")"
+                                DragStart=@OnAppointmentDragStart />
                         }
                     }
 
@@ -77,7 +81,7 @@
             @for (var day = 0; day < 7; day ++)
             {
                 var dayOfWeek = StartDate.AddDays(days++);
-                <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek)>
+                <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
                     <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")">
                         @dayOfWeek.Day
                     </div>
@@ -112,6 +116,7 @@
     {
         var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1));
         attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
+        attributes["dropzone"] = "move";
         return attributes;
     }
 
@@ -173,16 +178,16 @@
 
         if (!preventDefault)
         {
-     await DialogService.OpenAsync(date.ToShortDateString(), ds =>
-        @<div class="rz-event-list">
-        <CascadingValue Value=@Scheduler>
-        @foreach(var item in appointments)
-        {
-            <Appointment Data=@item Click="OnListEventClick" />
-        }
-        </CascadingValue>
-        </div>
-           );
+            await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+                @<div class="rz-event-list">
+                    <CascadingValue Value=@Scheduler>
+                        @foreach(var item in appointments)
+                        {
+                            <Appointment Data=@item Click="OnListEventClick" />
+                        }
+                    </CascadingValue>
+                </div>
+            );
         }
     }
 

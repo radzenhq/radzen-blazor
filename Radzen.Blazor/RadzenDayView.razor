@@ -8,10 +8,11 @@
     {
         var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate).ToList();
 
-        return 
+        return
     @<CascadingValue Value=@Scheduler>
         <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments
-        TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot />
+            TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot
+            AppointmentMove=OnAppointmentMove />
     </CascadingValue>
     ;
     }

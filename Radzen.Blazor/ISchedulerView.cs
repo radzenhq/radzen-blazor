@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
@@ -49,5 +50,11 @@ namespace Radzen.Blazor
         /// Gets the end date.
         /// </summary>
         DateTime EndDate { get; }
+        /// <summary>
+        /// Handles appointent move event.
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs data);
     }
 }

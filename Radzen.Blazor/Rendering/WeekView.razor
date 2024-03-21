@@ -1,5 +1,6 @@
 @using Radzen.Blazor
 @using Microsoft.JSInterop
+@inherits DropableViewBase
 @inject IJSRuntime JSRuntime
 
 <div class="rz-view rz-week-view">
@@ -20,12 +21,12 @@
         {
             var start = day.Add(StartTime);
             var end = day.Add(EndTime);
-                <div class="rz-slots @(day == CurrentDate ? " rz-state-focused" : "")">
-                <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@start EndDate=@end Appointments=@Appointments CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment"/>
+            <div class="rz-slots @(day == CurrentDate ? " rz-state-focused" : "")">
+                <DaySlotEvents MinutesPerSlot=@MinutesPerSlot StartDate=@start EndDate=@end Appointments=@Appointments CurrentDate="@CurrentDate" CurrentAppointment="@currentAppointment"AppointmentDragStart=@OnAppointmentDragStart/>
                 @for (var date = start; date < end; date = date.AddMinutes(MinutesPerSlot))
                 {
                     var slotDate = date;
-                    <div @onclick=@(args => OnSlotClick(slotDate)) @attributes=@Attributes(date)></div>
+                    <div @onclick=@(args => OnSlotClick(slotDate)) @attributes=@Attributes(date) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate))></div>
                 }
             </div>
         }
@@ -81,6 +82,7 @@
     {
         var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot));
         attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add(attributes).ToString();
+        attributes["dropzone"] = "move";
         return attributes;
     }
 

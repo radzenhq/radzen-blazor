@@ -1,6 +1,7 @@
 @using Radzen
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
+@inherits DropableViewBase
 @inject DialogService DialogService
 
 @{
@@ -66,7 +67,7 @@
 
                             @if (item.Start >= realstart && item.Start <= end)
                             {
-                                <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick ShowAppointmentContent=false />
+                                <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick ShowAppointmentContent=false DragStart=@OnAppointmentDragStart />
                             }
                             else if (realstart == start)
                             {
@@ -74,7 +75,7 @@
                                 length = Math.Max(1, Math.Min(daysinmonth, Math.Ceiling(item.End.Subtract(date).TotalDays - (startSlotIndex - 1))));
                                 width = length * slotWidth;
 
-                                <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick ShowAppointmentContent=false />
+                                <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick ShowAppointmentContent=false DragStart=@OnAppointmentDragStart />
                             }
                         }
 
@@ -109,7 +110,7 @@
 
                     @if (slotInMonth)
                     {
-                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth)>
+                        <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType} {(CurrentDate.Date == dayOfWeek.Date ? "rz-state-focused" : "")}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
                             <div class="rz-slot-title">
                                 @dayOfWeek.Day
                             </div>
@@ -117,7 +118,7 @@
                     }
                     else
                     {
-                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth)>
+                        <div @attributes=@Attributes(dayOfWeek, ($"rz-slot {dayType}"), slotInMonth) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
                             <div class="rz-slot-title">
                             </div>
                         </div>
@@ -162,6 +163,7 @@
     {
         var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1));
         attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
+        attributes["dropzone"] = "move";
         if (!slotInMonth)
         {
             attributes.Remove("style");
@@ -264,7 +266,7 @@
             if(newDate < firstDate)
             {
                 CurrentDate = firstDate;
-            } 
+            }
             else if(newDate > lastDate)
             {
                 CurrentDate = lastDate;

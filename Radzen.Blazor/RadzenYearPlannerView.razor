@@ -3,7 +3,7 @@
 
 @inherits SchedulerViewBase
 
-@code {    
+@code {
     public override RenderFragment Render()
     {
         var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate);
@@ -21,12 +21,13 @@
         }
 
         return @<CascadingValue Value=@Scheduler>
-                    <YearPlannerView StartDate=@StartDate 
-                        EndDate=@EndDate 
+                    <YearPlannerView StartDate=@StartDate
+                        EndDate=@EndDate
                         StartMonth=@StartMonth
-                        MaxAppointmentsInSlot=@maxAppointmentsInSlot 
-                        MoreText=@MoreText 
-                        Appointments=@appointments />
+                        MaxAppointmentsInSlot=@maxAppointmentsInSlot
+                        MoreText=@MoreText
+                        Appointments=@appointments
+                        AppointmentMove=OnAppointmentMove />
                 </CascadingValue>;
     }
 }
