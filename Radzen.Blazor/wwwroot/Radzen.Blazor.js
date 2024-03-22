@@ -962,7 +962,7 @@ window.Radzen = {
   },
   createDatePicker(el, popupId) {
       var toggle = function (e) {
-          Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, true);
+          Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, e.currentTarget == button);
       };
       var button = el.querySelector('.rz-datepicker-trigger');
       if (button) {
