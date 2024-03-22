@@ -1189,19 +1189,31 @@ namespace Radzen.Blazor
                 FocusedDate = FocusedDate.AddDays(key == "ArrowUp" ? -7 : 7);
                 CurrentDate = FocusedDate;
             }
-            else if (key == "Escape" || key == "Enter")
+            else if (key == "Enter")
             {
                 preventKeyPress = true;
 
-                if(key == "Enter")
-                {
-                    await SetDay(FocusedDate);
-                }
+                await SetDay(FocusedDate);
 
-                await TogglePopup();
+                await ClosePopup();
 #if NET5_0_OR_GREATER
                 await FocusAsync();
 #endif
+            }
+            else if (key == "Escape")
+            {
+                preventKeyPress = false;
+
+                await ClosePopup();
+#if NET5_0_OR_GREATER
+                await FocusAsync();
+#endif
+            }
+            else if (key == "Tab")
+            {
+                preventKeyPress = false;
+
+                await ClosePopup();
             }
             else
             {
@@ -1209,15 +1221,52 @@ namespace Radzen.Blazor
             }
         }
 
+        async Task OnPopupKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if(key == "Escape")
+            {
+                preventKeyPress = false;
+
+                await ClosePopup();
+#if NET5_0_OR_GREATER
+                await FocusAsync();
+#endif
+            }
+        }
+
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "Escape" || key == "Enter")
+            if (args.AltKey && key == "ArrowDown")
+            {
+                preventKeyPress = true;
+
+                if (PopupRenderMode == PopupRenderMode.Initial)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.openPopup", Element, PopupID, false, null, null, null, null, null, true, true);
+                }
+                else
+                {
+                    await popup.CloseAsync(Element);
+                    await popup.ToggleAsync(Element);
+                }
+            }
+            else if (key == "Enter")
             {
                 preventKeyPress = true;
 
                 await TogglePopup();
+            }
+            else if (key == "Escape")
+            {
+                preventKeyPress = false;
+
+                await ClosePopup();
+#if NET5_0_OR_GREATER
+                await FocusAsync();
+#endif
             }
             else
             {
@@ -1234,6 +1283,18 @@ namespace Radzen.Blazor
             else
             {
                 await popup.ToggleAsync(Element);
+            }
+        }
+
+        async Task ClosePopup()
+        {
+            if (PopupRenderMode == PopupRenderMode.Initial)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+            }
+            else
+            {
+                await popup.CloseAsync(Element);
             }
         }
 

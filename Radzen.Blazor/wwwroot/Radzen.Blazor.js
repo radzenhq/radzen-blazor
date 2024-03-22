@@ -954,24 +954,14 @@ window.Radzen = {
       if (button) {
           button.onclick = null
       }
-
-      var input = el.querySelector('.rz-inputtext');
-      if (input) {
-          input.onclick = null
-      }
   },
   createDatePicker(el, popupId) {
       var toggle = function (e) {
-          Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, e.currentTarget == button);
+          Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, false);
       };
       var button = el.querySelector('.rz-datepicker-trigger');
       if (button) {
           button.onclick = toggle
-      }
-
-      var input = el.querySelector('.rz-inputtext');
-      if (input) {
-          input.onclick = toggle
       }
   },
   findPopup: function (id) {
