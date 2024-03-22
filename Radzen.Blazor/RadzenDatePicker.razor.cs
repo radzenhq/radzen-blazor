@@ -1214,6 +1214,9 @@ namespace Radzen.Blazor
                 preventKeyPress = false;
 
                 await ClosePopup();
+#if NET5_0_OR_GREATER
+                await FocusAsync();
+#endif
             }
             else
             {
