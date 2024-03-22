@@ -370,5 +370,24 @@ namespace Radzen.Blazor
         {
             return "rz-fileupload";
         }
+
+#if NET5_0_OR_GREATER
+        async Task OnInputChange(Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs args)
+        {
+            if (Disabled)
+            {
+                return;
+            }
+
+            var files = Multiple ? args.GetMultipleFiles().Select(f => new FileInfo(f))
+                : new FileInfo[] { new FileInfo (args.File) };
+
+            this.files = files.Select(f => new PreviewFileInfo() { Name = f.Name, Size = f.Size  }).ToList();
+
+            await Change.InvokeAsync(new UploadChangeEventArgs() { Files = files });
+
+            await InvokeAsync(StateHasChanged);
+        }
+#endif
     }
 }

@@ -70,6 +70,13 @@
                 <RadzenUpload Url="upload/specific" ParameterName="myName" Progress=@(args => OnProgress(args, "Upload with specified parameter name")) class="w-100" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
             </RadzenCard>
         </div>
+        <div class="col-md-4 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload client-side without Url</RadzenText>
+                <RadzenUpload Multiple="true" Change=@OnClientChange class="w-100" 
+                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+            </RadzenCard>
+        </div>
     </div>
 </div>
 
@@ -143,5 +150,27 @@
     void OnComplete(UploadCompleteEventArgs args)
     {
         console.Log($"Server response: {args.RawResponse}");
+    }
+
+    void OnClientChange(UploadChangeEventArgs args)
+    {
+        console.Log($"Client-side upload changed");
+
+        foreach (var file in args.Files)
+        {
+            console.Log($"File: {file.Name} / {file.Size} bytes");
+
+            try
+            {
+                long maxFileSize = 10 * 1024 * 1024;
+                // read file
+                var stream = file.OpenReadStream(maxFileSize);
+                stream.Close();
+            }
+            catch (Exception ex)
+            { 
+                console.Log($"Client-side file read error: {ex.Message}");
+            }
+        }
     }
 }
