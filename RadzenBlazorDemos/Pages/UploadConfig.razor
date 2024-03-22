@@ -162,8 +162,9 @@
 
             try
             {
+                long maxFileSize = 10 * 1024 * 1024;
                 // read file
-                var stream = file.OpenReadStream();
+                var stream = file.OpenReadStream(maxFileSize);
             }
             catch (Exception ex)
             { 
