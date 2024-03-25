@@ -1029,15 +1029,19 @@ namespace Radzen.Blazor
                 UpdateYearsAndMonths(min, max);
             }
 
+            var shouldClose = false;
+
+            if (parameters.DidParameterChange(nameof(Visible), Visible))
+            {
+                var visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
+                shouldClose = !visible;
+            }
+
             await base.SetParametersAsync(parameters);
 
-            if ((disabledChanged || readOnlyChanged || inlineChanged || visibleChanged || popupRenderModeChanged) && !firstRender)
+            if (shouldClose && !firstRender)
             {
-                if (IsJSRuntimeAvailable)
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
-                    await JSRuntime.InvokeVoidAsync("Radzen.destroyDatePicker", GetId());
-                }
+                await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
             }
 
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
