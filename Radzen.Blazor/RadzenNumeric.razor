@@ -10,7 +10,7 @@
     <span @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         <input @ref="@input" @attributes="InputAttributes" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
                class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
-               placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@(AutoCompleteAttribute == "off" ? "none" : null)" value="@FormattedValue" @onchange="@OnChange"
+               placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@(!AutoComplete ? "none" : null)" value="@FormattedValue" @onchange="@OnChange"
                onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator')"
                onblur="@getOnInput()" onpaste="@getOnPaste()"
                @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />

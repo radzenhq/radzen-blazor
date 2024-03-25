@@ -219,14 +219,23 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
+            Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
 
             Assert.Contains(@$"autocomplete=""on""", component.Markup);
+            Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.AddUnmatched("autocomplete", "custom"));
 
             Assert.Contains(@$"autocomplete=""custom""", component.Markup);
+            Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
+
+            component.Instance.DefaultAutoCompleteAttribute = "autocomplete-custom";
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.AutoComplete, false));
+
+            Assert.Contains(@$"autocomplete=""autocomplete-custom""", component.Markup);
+            Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
         }
 
         [Fact]
@@ -414,14 +423,14 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
         }
-        
+
         public static TheoryData<decimal, decimal> NumericFormatterPreservesLeadingZerosData =>
             new()
             {
                 { 10.000m, 100.000m },
                 { 100.000m, 10.000m }
             };
-        
+
         [Theory]
         [MemberData(nameof(NumericFormatterPreservesLeadingZerosData))]
         public void Numeric_Formatter_PreservesLeadingZeros(decimal oldValue, decimal newValue)
@@ -438,11 +447,11 @@ namespace Radzen.Blazor.Tests
             );
 
             component.Render();
-            
+
             Assert.Contains($" value=\"{oldValue.ToString(format)}\"", component.Markup);
 
             component.Find("input").Change(newValue);
-            
+
             Assert.Contains($" value=\"{newValue.ToString(format)}\"", component.Markup);
         }
 
@@ -461,7 +470,7 @@ namespace Radzen.Blazor.Tests
             );
 
             component.Render();
-            
+
             Assert.Contains($" value=\"{value.ToString()}\"", component.Markup);
 
             var newValue = new Dollars(13.53m);
@@ -507,7 +516,7 @@ namespace Radzen.Blazor.Tests
                     parameters.Add(p => p.Max, maxValue);
                 });
             });
-            
+
             component.Find("input").Change("13.53");
 
             var maxDollars = new Dollars(2);

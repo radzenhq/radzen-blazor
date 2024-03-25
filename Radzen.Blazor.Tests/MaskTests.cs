@@ -122,14 +122,23 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
+            Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
 
             Assert.Contains(@$"autocomplete=""on""", component.Markup);
+            Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.AddUnmatched("autocomplete", "custom"));
 
             Assert.Contains(@$"autocomplete=""custom""", component.Markup);
+            Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
+
+            component.Instance.DefaultAutoCompleteAttribute = "autocomplete-custom";
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.AutoComplete, false));
+
+            Assert.Contains(@$"autocomplete=""autocomplete-custom""", component.Markup);
+            Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
         }
 
         [Fact]
@@ -185,7 +194,7 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
-        
+
         [Fact]
         public void Mask_Raises_ChangedEvent()
         {
