@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
 
 namespace Radzen.Blazor
 {
@@ -8,6 +9,13 @@ namespace Radzen.Blazor
     /// <typeparam name="TValue">The type of the value.</typeparam>
     public class RadzenRadioButtonListItem<TValue> : RadzenComponent
     {
+        /// <summary>
+        /// Specifies additional custom attributes that will be rendered by the input.
+        /// </summary>
+        /// <value>The attributes.</value>
+        [Parameter]
+        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
         private string _text;
 
         /// <summary>
