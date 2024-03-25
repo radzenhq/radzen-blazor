@@ -136,14 +136,19 @@ namespace Radzen.Blazor
         {
             if (!Disabled)
             {
-                if (Tabs.RenderMode == TabRenderMode.Server)
-                {
-                    await Tabs.SelectTab(this, true);
-                }
-                else
-                {
-                    await Tabs.SelectTabOnClient(this);
-                }
+                await SelectTab(this);
+            }
+        }
+
+        async Task SelectTab(RadzenTabsItem item)
+        {
+            if (Tabs.RenderMode == TabRenderMode.Server)
+            {
+                await Tabs.SelectTab(this, true);
+            }
+            else
+            {
+                await Tabs.SelectTabOnClient(this);
             }
         }
 
@@ -165,15 +170,10 @@ namespace Radzen.Blazor
 
             if (visibleChanged && IsSelected)
             {
-                Tabs?.SelectTab(this);
-            }
-
-            if (visibleChanged && Tabs?.RenderMode == TabRenderMode.Client)
-            {
                 var firstTab = Tabs?.FirstVisibleTab();
                 if (firstTab != null)
                 {
-                    await Tabs.SelectTabOnClient(firstTab);
+                    await SelectTab(firstTab);
                 }
             }
         }
