@@ -54,16 +54,39 @@ namespace Radzen
         public virtual string DefaultAutoCompleteAttribute { get; set; } = "off";
 
         object autoComplete;
+        object ariaAutoComplete;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            await base.SetParametersAsync(parameters.TryGetValue(nameof(AutoComplete).ToLower(), out autoComplete) ?
+            parameters = parameters.TryGetValue(nameof(AutoComplete).ToLower(), out autoComplete) ?
                 ParameterView.FromDictionary(parameters
                     .ToDictionary().Where(i => i.Key != nameof(AutoComplete).ToLower()).ToDictionary(i => i.Key, i => i.Value)
                     .ToDictionary(i => i.Key, i => i.Value))
-                : parameters);
+                : parameters;
+
+            parameters = parameters.TryGetValue("aria-autocomplete", out ariaAutoComplete) ?
+                ParameterView.FromDictionary(parameters
+                    .ToDictionary().Where(i => i.Key != "aria-autocomplete").ToDictionary(i => i.Key, i => i.Value)
+                    .ToDictionary(i => i.Key, i => i.Value))
+                : parameters;
+
+            await base.SetParametersAsync(parameters);
         }
+
+        /// <summary>
+        /// Gets or sets the default aria-autocomplete attribute's string value.
+        /// </summary>
+        public virtual string DefaultAriaAutoCompleteAttribute { get; set; } = "none";
+
+        /// <summary>
+        /// Gets the aria-autocomplete attribute's string value.
+        /// </summary>
+        public virtual string AriaAutoCompleteAttribute
+        {
+            get => AutoCompleteAttribute == DefaultAutoCompleteAttribute ? DefaultAriaAutoCompleteAttribute : ariaAutoComplete as string;
+        }
+
     }
 
     /// <summary>
