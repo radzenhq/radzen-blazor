@@ -18,6 +18,7 @@ $tabs-tab-letter-spacing: 0 !default;
 $tabs-tab-padding: 0.5rem 1rem !default;
 $tabs-tab-background-color: var(--rz-base-200) !default;
 $tabs-tab-color: var(--rz-secondary) !default;
+$tabs-tab-selected-background-color: var(--rz-tabs-background-color) !default;
 $tabs-tab-selected-color: $tabs-selected-tab-color !default;
 $tabs-tab-selected-top-border-color: var(--rz-secondary) !default;
 $tabs-tab-hover-background-color: $tabs-hover-background-color !default;
@@ -47,6 +48,7 @@ $tabs-transition: var(--rz-transition-all) !default;
   --rz-tabs-tab-padding: #{$tabs-tab-padding};
   --rz-tabs-tab-background-color: #{$tabs-tab-background-color};
   --rz-tabs-tab-color: #{$tabs-tab-color};
+  --rz-tabs-tab-selected-background-color: #{$tabs-tab-selected-background-color};
   --rz-tabs-tab-selected-color: #{$tabs-tab-selected-color};
   --rz-tabs-tab-selected-top-border-color: #{$tabs-tab-selected-top-border-color};
   --rz-tabs-tab-hover-background-color: #{$tabs-tab-hover-background-color};
@@ -116,18 +118,15 @@ $tabs-transition: var(--rz-transition-all) !default;
 
   li {
     border: var(--rz-tabs-border);
-    background-color: var(--rz-tabs-tab-background-color);;
+    background-color: var(--rz-tabs-tab-background-color);
+    color: var(--rz-tabs-tab-color);
     transition: var(--rz-tabs-transition);
 
     &:hover {
       &:not(.rz-tabview-selected) {
         &:not(.rz-state-disabled) {
           background-color: var(--rz-tabs-tab-hover-background-color);
-
-          a,
-          a:not([href]):not([class]) {
-            color: var(--rz-tabs-tab-hover-color);
-          }
+          color: var(--rz-tabs-tab-hover-color);
         }
       }
     }
@@ -136,7 +135,7 @@ $tabs-transition: var(--rz-transition-all) !default;
     a:not([href]):not([class]) {
       display: flex;
       align-items: center;
-      color: var(--rz-tabs-tab-color);
+      color: inherit;
       padding: var(--rz-tabs-tab-padding);
       font-size: var(--rz-tabs-tab-font-size);
       line-height: var(--rz-tabs-tab-line-height);
@@ -161,23 +160,15 @@ $tabs-transition: var(--rz-transition-all) !default;
       &:not(.rz-state-disabled) {
         background-color: var(--rz-tabs-tab-focus-background-color);
         border-color: var(--rz-tabs-tab-focus-background-color);
-
-        a,
-        a:not([href]):not([class]) {
-          color: var(--rz-tabs-tab-focus-color);
-        }
+        color: var(--rz-tabs-tab-focus-color);
       }
     }
   }
 
   .rz-tabview-selected {
-    background-color: var(--rz-tabs-background-color);
+    background-color: var(--rz-tabs-tab-selected-background-color);
+    color: var(--rz-tabs-tab-selected-color);
     position: relative;
-
-    a,
-    a:not([href]):not([class]) {
-      color: var(--rz-tabs-tab-selected-color);
-    }
   }
 
   .rz-tabview-top > & {
