@@ -956,12 +956,13 @@ window.Radzen = {
       }
   },
   createDatePicker(el, popupId) {
-      var toggle = function (e) {
-          Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, false);
-      };
       var button = el.querySelector('.rz-datepicker-trigger');
       if (button) {
-          button.onclick = toggle
+          button.onclick = function (e) {
+              if (!e.currentTarget.classList.contains('rz-state-disabled')) {
+                  Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, false);
+              }
+          };
       }
   },
   findPopup: function (id) {
