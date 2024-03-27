@@ -94,17 +94,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            if (parameters.DidParameterChange(nameof(Value), Value))
-            {
-                Value = parameters.GetValueOrDefault<object>(nameof(Value));
-                var component = Form?.FindComponent(Component);
-                if (component != null)
-                {
-                    ValidateModel(this, ValidationRequestedEventArgs.Empty);
-                }
-            }
+            var shouldValidate = parameters.DidParameterChange(nameof(Value), Value);
 
             await base.SetParametersAsync(parameters);
+
+            if (shouldValidate)
+            {
+                EditContext.Validate();
+            }
         }
 
         /// <inheritdoc />

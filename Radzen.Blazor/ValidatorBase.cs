@@ -111,7 +111,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal void ValidateModel(object sender, ValidationRequestedEventArgs args)
+        private void ValidateModel(object sender, ValidationRequestedEventArgs args)
         {
             var component = Form.FindComponent(Component);
 
