@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -252,7 +251,7 @@ namespace Radzen.Blazor
                         else
                         {
                             builder.AddAttribute(7, "ChildContent", (RenderFragment)null);
-						}
+                        }
                     }
 
                     builder.CloseComponent();
@@ -422,7 +421,7 @@ namespace Radzen.Blazor
                 if (focusedIndex >= 0 && focusedIndex < CurrentItems.Count)
                 {
                     await SelectItem(CurrentItems[focusedIndex]);
-                    
+
                     if (AllowCheckBoxes)
                     {
                         await CurrentItems[focusedIndex].CheckedChange(!CurrentItems[focusedIndex].IsChecked());
@@ -442,7 +441,10 @@ namespace Radzen.Blazor
 
         internal void InsertInCurrentItems(int index, RadzenTreeItem item)
         {
-            CurrentItems.Insert(index, item);
+            if (index <= CurrentItems.Count)
+            {
+                CurrentItems.Insert(index, item);
+            }
         }
 
         internal void RemoveFromCurrentItems(int index, int count)
@@ -462,8 +464,8 @@ namespace Radzen.Blazor
         internal List<RadzenTreeItem> CurrentItems
         {
             get
-            { 
-                if(_currentItems == null)
+            {
+                if (_currentItems == null)
                 {
                     _currentItems = items;
                 }
