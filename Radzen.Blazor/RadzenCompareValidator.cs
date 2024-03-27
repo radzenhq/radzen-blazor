@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
 
 namespace Radzen.Blazor
 {
@@ -88,6 +90,23 @@ namespace Radzen.Blazor
                     return 0;
             }
         }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            if (parameters.DidParameterChange(nameof(Value), Value))
+            {
+                Value = parameters.GetValueOrDefault<object>(nameof(Value));
+                var component = Form?.FindComponent(Component);
+                if (component != null)
+                {
+                    ValidateModel(this, ValidationRequestedEventArgs.Empty);
+                }
+            }
+
+            await base.SetParametersAsync(parameters);
+        }
+
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
