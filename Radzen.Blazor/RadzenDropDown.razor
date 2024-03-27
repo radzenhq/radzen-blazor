@@ -42,7 +42,11 @@
                 {
                     <div class="rz-chip">
                         <span class="rz-chip-text" @onkeydown:stopPropagation>
-                            @if(Template != null)
+                            @if(ValueTemplate != null)
+                            {
+                                @ValueTemplate(item)
+                            }
+                            else if(Template != null)
                             {
                                 @Template(item)
                             }
@@ -61,7 +65,7 @@
             <span class="rz-dropdown-label rz-inputtext" @onkeydown:stopPropagation>
                 @if (selectedItems.Count < MaxSelectedLabels)
                 {
-                    @if (Template == null)
+                    @if (Template == null && ValueTemplate == null)
                     {
                         @(string.Join(Separator, selectedItems.Select(i => GetItemOrValueFromProperty(i, TextProperty))))
                     }
@@ -71,7 +75,15 @@
 
                         foreach (var item in selectedItems)
                         {
-                            @Template(item)@(item != last ? Separator : "")
+                            if (ValueTemplate != null)
+                            {
+                                @ValueTemplate(item)
+                            }
+                            else if (Template != null)
+                            {
+                                @Template(item)
+                            }
+                            @(item != last ? Separator : "")
                         }
                     }
                 }
@@ -150,7 +162,7 @@
                         {
                             @RenderItems()
                         }
-                    </ul>   
+                    </ul>
                 }
                 else
                 {
