@@ -98,10 +98,18 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (shouldValidate)
+            if (shouldValidate && !firstRender)
             {
                 EditContext.Validate();
             }
+        }
+
+        bool firstRender;
+        /// <inheritdoc />
+        protected override void OnAfterRender(bool firstRender)
+        {
+            this.firstRender = firstRender;
+            base.OnAfterRender(firstRender);
         }
 
         /// <inheritdoc />
