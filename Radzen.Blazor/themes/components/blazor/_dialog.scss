@@ -81,6 +81,7 @@ $dialog-zindex: 1001 !default;
   font-weight: var(--rz-dialog-title-font-weight);
   letter-spacing: var(--rz-dialog-title-letter-spacing);
   color: var(--rz-dialog-title-color);
+  user-select: none;
 }
 
 .rz-dialog-titlebar-close {
