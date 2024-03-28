@@ -470,17 +470,17 @@ namespace Radzen
         {
             if (item != null)
             {
-                if (property == TextProperty && textPropertyGetter != null)
+                if (property == TextProperty)
                 {
-                    return textPropertyGetter(item);
+                    return textPropertyGetter != null ? textPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
                 }
-                else if (property == ValueProperty && valuePropertyGetter != null)
+                else if (property == ValueProperty)
                 {
-                    return valuePropertyGetter(item);
+                    return valuePropertyGetter != null ? valuePropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
                 }
-                else if (property == DisabledProperty && disabledPropertyGetter != null)
+                else if (property == DisabledProperty)
                 {
-                    return disabledPropertyGetter(item);
+                    return disabledPropertyGetter != null ? disabledPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
                 }
 
                 var enumValue = item as Enum;
