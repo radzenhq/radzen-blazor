@@ -115,6 +115,24 @@ namespace Radzen.Blazor
         public EventCallback<TreeEventArgs> Collapse { get; set; }
 
         /// <summary>
+        /// A callback that will be invoked when item is rendered.
+        /// </summary>
+        [Parameter]
+        public Action<TreeItemRenderEventArgs> ItemRender { get; set; }
+
+        internal Tuple<Radzen.TreeItemRenderEventArgs, IReadOnlyDictionary<string, object>> ItemAttributes(RadzenTreeItem item)
+        {
+            var args = new TreeItemRenderEventArgs() { Data = item.GetAllChildValues(), Value = item.Value };
+
+            if (ItemRender != null)
+            {
+                ItemRender(args);
+            }
+
+            return new Tuple<TreeItemRenderEventArgs, IReadOnlyDictionary<string, object>>(args, new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(args.Attributes));
+        }
+
+        /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>

@@ -7,7 +7,8 @@
     <div class="row my-5">
         <div class="col-lg-6 offset-lg-3">
             <RadzenCard>
-                <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories>
+                <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories
+                    ItemRender="@TreeItemRender">
                     <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
                     <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
                 </RadzenTree>
@@ -57,5 +58,15 @@
         await base.OnInitializedAsync();
 
         categories = dbContext.Categories.Include(c => c.Products);
+
+        checkedValues = dbContext.Products.Where(p => p.ProductName.StartsWith("C"));
+    }
+
+    void TreeItemRender(TreeItemRenderEventArgs args)
+    {
+        if (args.Value == categories.FirstOrDefault() && !args.Data.Cast<object>().Any())
+        {
+            args.Checked = null;
+        }
     }
 }

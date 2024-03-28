@@ -361,7 +361,7 @@ namespace Radzen.Blazor
             return Tree.CheckedValues != null ? Tree.CheckedValues : Enumerable.Empty<object>();
         }
 
-        IEnumerable<object> GetAllChildValues(Func<object, bool> predicate = null)
+        internal IEnumerable<object> GetAllChildValues(Func<object, bool> predicate = null)
         {
             var children = items.Concat(items.SelectManyRecursive(i => i.items)).Select(i => i.Value);
 
