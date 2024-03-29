@@ -53,18 +53,22 @@
 
     EventConsole console;
 
+    Category firstCategory;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        categories = dbContext.Categories.Include(c => c.Products);
+        categories = await Task.FromResult(dbContext.Categories.Include(c => c.Products));
 
-        checkedValues = dbContext.Products.Where(p => p.ProductName.StartsWith("C"));
+        firstCategory = await Task.FromResult(categories.FirstOrDefault());
+
+        checkedValues = await Task.FromResult(firstCategory.Products.Where(p => p.ProductName.StartsWith("C")));
     }
 
     void TreeItemRender(TreeItemRenderEventArgs args)
     {
-        if (args.Value == categories.FirstOrDefault() && !args.Data.Cast<object>().Any())
+        if (args.Value == firstCategory && !args.Data.Cast<object>().Any())
         {
             args.Checked = null;
         }
