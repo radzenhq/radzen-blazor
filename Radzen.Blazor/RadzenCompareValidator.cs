@@ -53,7 +53,7 @@ namespace Radzen.Blazor
     ///      public string Password { get; set; }
     ///      public double Value { get; set; }
     ///      public string RepeatPassword { get; set; }
-    ///    } 
+    ///    }
     ///    Model model = new Model();
     /// }
     /// </code>
@@ -104,7 +104,7 @@ namespace Radzen.Blazor
             }
         }
 
-        bool firstRender;
+        bool firstRender = true;
         /// <inheritdoc />
         protected override void OnAfterRender(bool firstRender)
         {
