@@ -470,6 +470,12 @@ namespace Radzen
         {
             if (item != null)
             {
+                var enumValue = item as Enum;
+                if (enumValue != null)
+                {
+                    return Radzen.Blazor.EnumExtensions.GetDisplayDescription(enumValue);
+                }
+
                 if (property == TextProperty)
                 {
                     return textPropertyGetter != null ? textPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
@@ -481,12 +487,6 @@ namespace Radzen
                 else if (property == DisabledProperty)
                 {
                     return disabledPropertyGetter != null ? disabledPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
-                }
-
-                var enumValue = item as Enum;
-                if (enumValue != null)
-                {
-                    return Radzen.Blazor.EnumExtensions.GetDisplayDescription(enumValue);
                 }
             }
 
