@@ -952,16 +952,30 @@ window.Radzen = {
 
       var button = el.querySelector('.rz-datepicker-trigger');
       if (button) {
-          button.onclick = null
+          button.onclick = null;
+      }
+      var input = el.querySelector('.rz-inputtext');
+      if (input) {
+          input.onclick = null;
       }
   },
   createDatePicker(el, popupId) {
+      var handler = function (e, condition) {
+          if (condition) {
+              Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, false);
+          }
+      };
+
       var button = el.querySelector('.rz-datepicker-trigger');
       if (button) {
           button.onclick = function (e) {
-              if (!e.currentTarget.classList.contains('rz-state-disabled')) {
-                  Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, false);
-              }
+              handler(e, !e.currentTarget.classList.contains('rz-state-disabled'));
+          };
+      }
+      var input = el.querySelector('.rz-inputtext');
+      if (input) {
+          input.onclick = function (e) {
+              handler(e, e.currentTarget.classList.contains('rz-readonly'));
           };
       }
   },
