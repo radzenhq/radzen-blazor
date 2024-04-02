@@ -769,6 +769,12 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
       width: auto;
     }
   }
+
+  .rz-view-header {
+    .rz-slot-hour-header {
+      width: 2.5rem;
+    }
+  }
 }
 
 @media (max-width: 1399px) {
