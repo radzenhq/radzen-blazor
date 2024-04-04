@@ -2354,6 +2354,7 @@ namespace Radzen.Blazor
                 if (args.Settings != settings)
                 {
                     settings = args.Settings;
+                    settingsChanged = true;
                 }
             }
 
