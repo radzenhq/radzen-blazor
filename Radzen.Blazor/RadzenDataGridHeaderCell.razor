@@ -311,6 +311,7 @@ else
         if (key == "Escape")
         {
             await CloseFilter();
+            await ClearFilter();
             await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.focusElement", Grid.GridId());
         }
     }

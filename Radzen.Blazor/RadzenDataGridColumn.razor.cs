@@ -331,7 +331,7 @@ namespace Radzen.Blazor
         {
             return FilterPlaceholder ?? string.Empty;
         }
-        
+
         /// <summary>
         /// Gets or sets the second filter value.
         /// </summary>
@@ -915,7 +915,7 @@ namespace Radzen.Blazor
                     return;
                 }
             }
-            
+
             if (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator))
             {
                 filterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
@@ -998,13 +998,31 @@ namespace Radzen.Blazor
                 value = offset;
             }
 
-            if (isFirst)
+            if ((filterOperator != FilterOperator.IsNull || filterOperator != FilterOperator.IsNotNull
+                || filterOperator != FilterOperator.IsEmpty || filterOperator != FilterOperator.IsNotEmpty) &&
+                string.IsNullOrEmpty(value?.ToString()))
             {
-                filterValue = value;
+                if (isFirst)
+                {
+                    filterValue = null;
+                }
+                else
+                {
+                    filterValue = null;
+                }
+
+                return;
             }
             else
             {
-                secondFilterValue = value;
+                if (isFirst)
+                {
+                    filterValue = value;
+                }
+                else
+                {
+                    secondFilterValue = value;
+                }
             }
         }
 
@@ -1198,7 +1216,7 @@ namespace Radzen.Blazor
                 var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
 
-                if ((FilterPropertyType == typeof(string) || !QueryableExtension.IsEnumerable(FilterPropertyType)) && 
+                if ((FilterPropertyType == typeof(string) || !QueryableExtension.IsEnumerable(FilterPropertyType)) &&
                     (o == FilterOperator.In || o == FilterOperator.NotIn)) return false;
 
                 return FilterPropertyType == typeof(string) || QueryableExtension.IsEnumerable(FilterPropertyType) ? isStringOperator
