@@ -125,6 +125,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AlwaysOpenPopup { get; set; }
 
+        /// <summary>
+        /// Gets or sets the value indication behaviour to hide arrow.
+        /// </summary>
+        /// <value><c>true</c> to hide arrow; othersie, <c>false</c>. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool HideArrow { get; set; } = false;
+
 
         /// <summary>
         /// Gets or sets the open button aria-label attribute.
