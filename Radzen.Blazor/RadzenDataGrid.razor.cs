@@ -1982,11 +1982,6 @@ namespace Radzen.Blazor
                 selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
                 sorts.Clear();
            }
-
-            if (!LoadData.HasDelegate)
-            {
-                SaveSettings();
-            }
         }
 
         /// <summary>
