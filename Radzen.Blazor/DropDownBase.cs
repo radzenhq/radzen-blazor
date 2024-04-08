@@ -648,7 +648,11 @@ namespace Radzen
 
                     if (!Multiple && !popupOpened && shouldSelectOnChange != false)
                     {
-                        await OnSelectItem(items.ElementAt(selectedIndex), true);
+                        var itemToSelect = items.ElementAtOrDefault(selectedIndex);
+                        if (itemToSelect != null)
+                        {
+                            await OnSelectItem(itemToSelect, true);
+                        }
                     }
                 }
                 catch (Exception)
@@ -663,7 +667,11 @@ namespace Radzen
                 if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
                 {
                     await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, $"{searchText}".Trim());
-                    await OnSelectItem(items.ElementAt(selectedIndex), true);
+                    var itemToSelect = items.ElementAtOrDefault(selectedIndex);
+                    if (itemToSelect != null)
+                    {
+                        await OnSelectItem(itemToSelect, true);
+                    }
                 }
 
                 var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
