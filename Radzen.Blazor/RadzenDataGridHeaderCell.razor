@@ -79,7 +79,7 @@
                                 } 
                                 else if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
                                 {
-                                    <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object"
+                                    <RadzenDropDown Disabled="@(!Column.CanSetFilterValue())" AllowClear="false" AllowFiltering="false" TValue="@object"
                                                     Value=@Column.GetFilterValue() Multiple="false" Placeholder="@Grid.EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType, Grid.EnumFilterTranslationFunc)
                                                     Change="@(args => Column.SetFilterValue(args))"
                                                     InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})" />
@@ -90,18 +90,18 @@
                                 }
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
-                                    <RadzenDatePicker  TValue="@object" ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
+                                    <RadzenDatePicker Disabled="@(!Column.CanSetFilterValue())" TValue="@object" ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
                                                       Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args.Value))" AllowInput=@(Grid.AllowFilterDateInput)
                                                       InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})" />
 
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
                                 {
-                                    <RadzenCheckBox InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})" TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => { Column.SetFilterValue(null); Column.SetFilterValue(args); Grid.SaveSettings(); InvokeAsync(() => Grid.Reload()); })" />
+                                    <RadzenCheckBox Disabled="@(!Column.CanSetFilterValue())" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})" TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => { Column.SetFilterValue(null); Column.SetFilterValue(args); Grid.SaveSettings(); InvokeAsync(() => Grid.Reload()); })" />
                                 }
                                 else
                                 {
-                                    <RadzenTextBox id="@($"{getColumnPopupID()}-sf")" aria-label=@(Column.Title + Grid.FilterValueArialLabel + Column.GetFilterValue()) Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
+                                    <RadzenTextBox Disabled="@(!Column.CanSetFilterValue())" id="@($"{getColumnPopupID()}-sf")" aria-label=@(Column.Title + Grid.FilterValueArialLabel + Column.GetFilterValue()) Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
                                 }
 
                                 <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.LogicalOperatorArialLabel + (Column.LogicalFilterOperator == LogicalFilterOperator.And ? Grid.AndOperatorText : Grid.OrOperatorText) }})"
@@ -114,7 +114,7 @@
                                 } 
                                 else if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
                                 {
-                                    <RadzenDropDown AllowClear="false" AllowFiltering="false" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.SecondFilterValueArialLabel }})"
+                                    <RadzenDropDown Disabled="@(!Column.CanSetFilterValue(false))" AllowClear="false" AllowFiltering="false" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.SecondFilterValueArialLabel }})"
                                                     Value=@Column.GetSecondFilterValue() Multiple="false" Placeholder="@Grid.EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data=@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType)
                                                     Change="@(args => Column.SetFilterValue(args,false))" />
                                 }
@@ -124,18 +124,18 @@
                                 }
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
-                                    <RadzenDatePicker TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title +  Grid.SecondFilterValueArialLabel + Column.GetSecondFilterValue() }})"
+                                    <RadzenDatePicker Disabled="@(!Column.CanSetFilterValue(false))" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title +  Grid.SecondFilterValueArialLabel + Column.GetSecondFilterValue() }})"
                                                 ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
                                                       Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args.Value, false))" AllowInput=@(Grid.AllowFilterDateInput) />
 
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
                                 {
-                                    <RadzenCheckBox InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title +  Grid.SecondFilterValueArialLabel  + Column.GetSecondFilterValue() }})" TriState="true" TValue="@object" Value="@Column.GetSecondFilterValue()" Change="@(args => { Column.SetFilterValue(args, false); Grid.SaveSettings(); })" />
+                                    <RadzenCheckBox Disabled="@(!Column.CanSetFilterValue(false))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title +  Grid.SecondFilterValueArialLabel  + Column.GetSecondFilterValue() }})" TriState="true" TValue="@object" Value="@Column.GetSecondFilterValue()" Change="@(args => { Column.SetFilterValue(args, false); Grid.SaveSettings(); })" />
                                 }
                                 else
                                 {
-                                    <RadzenTextBox id="@($"{getColumnPopupID()}-sf2")" aria-label=@(Column.Title + Grid.SecondFilterValueArialLabel + Column.GetSecondFilterValue()) Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
+                                    <RadzenTextBox Disabled="@(!Column.CanSetFilterValue(false))" id="@($"{getColumnPopupID()}-sf2")" aria-label=@(Column.Title + Grid.SecondFilterValueArialLabel + Column.GetSecondFilterValue()) Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
                                 }
                                 </form>
                             }
@@ -311,6 +311,7 @@ else
         if (key == "Escape")
         {
             await CloseFilter();
+            await ClearFilter();
             await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.focusElement", Grid.GridId());
         }
     }

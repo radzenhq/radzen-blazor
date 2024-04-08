@@ -1440,7 +1440,7 @@ namespace Radzen
                 .Where(c => c.Filterable
                     && c.FilterPropertyType != null
                     && (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty)
-                        || c.CanSetFilterValue()
+                        || !c.CanSetFilterValue()
                         || c.HasCustomFilter())
                     && c.GetFilterProperty() != null)
                 .ToList();

@@ -798,10 +798,11 @@ namespace Radzen.Blazor
                         column.SetFilterValue(filterValue, isFirst);
                         SaveSettings();
                     }));
+                    builder.AddAttribute(5, "Disabled", !column.CanSetFilterValue());
                 }
                 else if (FilterMode == FilterMode.SimpleWithMenu)
                 {
-                    builder.AddAttribute(4, "Disabled", column.CanSetFilterValue());
+                    builder.AddAttribute(4, "Disabled", !column.CanSetFilterValue());
                 }
 
                 builder.CloseComponent();
