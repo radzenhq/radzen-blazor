@@ -3,35 +3,34 @@
 <RadzenCard>
     <RadzenDataGrid Data="@Items" TItem="GridItem" class="mt-4 w-100">
         <HeaderTemplate>
-            <div class="row d-flex w-100">
-                <div class="col-auto p-2 justify-content-end bd-highlight">
-                    <RadzenSelectBar class="bg-white rounded-pill my-auto" TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedAnimal">
+            <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0px">
+                <RadzenColumn Size="12">
+                    <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@SelectedAnimal">
                         <Items>
                             <RadzenSelectBarItem Value="1" Text="Cat " Disabled="@_disableCat" />
                             <RadzenSelectBarItem Value="2" Text="Birds" />
                         </Items>
                     </RadzenSelectBar>
-                </div>
-            </div>
+                </RadzenColumn>
+            </RadzenRow>
         </HeaderTemplate>
         <Columns>
             <RadzenDataGridColumn Title="Name" Property="Name" TItem="GridItem" />
             <RadzenDataGridColumn Title="Action" TItem="GridItem">
                 <Template Context="data">
-                    <div class="d-flex justify-content-center">
-                        <RadzenSelectBar class="bg-white rounded-pill my-auto" TValue="int" Size="ButtonSize.Small" @bind-Value="@data.Action" Change="() => CheckHeader()">
+                    <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
+                        <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@data.Action" Change="() => CheckHeader()">
                             <Items>
                                 <RadzenSelectBarItem Value="1" Text="Eats food" />
                                 <RadzenSelectBarItem Value="2" Text="drinks water" />
                                 <RadzenSelectBarItem Value="3" Text="flaps wings" />
                             </Items>
                         </RadzenSelectBar>
-                    </div>
+                    </RadzenStack>
                 </Template>
             </RadzenDataGridColumn>
         </Columns>
     </RadzenDataGrid>
-
 </RadzenCard>
 
 @code {
