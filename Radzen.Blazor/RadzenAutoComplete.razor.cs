@@ -79,6 +79,7 @@ namespace Radzen.Blazor
         /// Gets or sets the underlying max length.
         /// </summary>
         /// <value>The max length value.</value>
+        [Parameter]
         public long? MaxLength { get; set; }
 
         /// <summary>
