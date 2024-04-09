@@ -178,7 +178,8 @@ $timepicker-border: none !default;
     border: none;
     box-shadow: none;
     cursor: initial;
-    opacity: 0.4;
+    opacity: 1;
+    color: var(--rz-input-disabled-color);
   }
 
   color: var(--rz-datepicker-trigger-icon-color);
