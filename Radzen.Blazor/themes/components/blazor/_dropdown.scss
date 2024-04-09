@@ -150,7 +150,8 @@ $multiselect-checkbox-margin: 0 0.5rem 0 0 !default;
     content: 'close';
   }
 
-  &:hover {
+  div:not(.rz-state-disabled) > &:hover,
+  span:not(.rz-state-disabled) > &:hover {
     opacity: 1;
   }
 }

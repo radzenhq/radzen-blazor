@@ -1,7 +1,7 @@
 $datepicker-trigger-icon-width: var(--rz-icon-size) !default;
 $datepicker-trigger-icon-height: $datepicker-trigger-icon-width !default;
-$datepicker-trigger-icon-color: var(--rz-text-secondary-color) !default;
-$datepicker-trigger-icon-hover-color: var(--rz-secondary) !default;
+$datepicker-trigger-icon-color: var(--rz-input-value-color) !default;
+$datepicker-trigger-icon-hover-color: var(--rz-input-value-color) !default;
 $datepicker-line-height: 1.25rem !default;
 
 $datepicker-panel-border: var(--rz-border-normal) !default;
@@ -146,7 +146,15 @@ $timepicker-border: none !default;
 
   &.rz-state-disabled {
     .rz-inputtext {
-      @extend %input-disabled;
+      color: var(--rz-input-disabled-color);
+      box-shadow: var(--rz-input-disabled-shadow);
+      background-color: var(--rz-input-disabled-background-color);
+      border: var(--rz-input-disabled-border);
+      opacity: var(--rz-input-disabled-opacity);
+
+      &::placeholder {
+        color: var(--rz-input-disabled-placeholder-color);
+      }
     }
   }
 }
@@ -170,6 +178,7 @@ $timepicker-border: none !default;
     border: none;
     box-shadow: none;
     cursor: initial;
+    opacity: 0.4;
   }
 
   color: var(--rz-datepicker-trigger-icon-color);
