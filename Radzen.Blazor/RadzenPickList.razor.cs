@@ -281,7 +281,7 @@ namespace Radzen.Blazor
 
         async Task SelectedSourceToTarget()
         {
-            await Update(true, Multiple ? (IEnumerable<TItem>)selectedSourceItems : new List<TItem>() { (TItem)selectedSourceItems } );
+            await Update(true, Multiple ? (selectedSourceItems as IEnumerable)?.Cast<TItem>() : new List<TItem>() { (TItem)selectedSourceItems } );
         }
 
         async Task TargetToSource()
@@ -291,7 +291,7 @@ namespace Radzen.Blazor
 
         async Task SelectedTargetToSource()
         {
-            await Update(false, Multiple ? (IEnumerable<TItem>)selectedTargetItems : new List<TItem>() { (TItem)selectedTargetItems });
+            await Update(false, Multiple ? (selectedTargetItems as IEnumerable)?.Cast<TItem>() : new List<TItem>() { (TItem)selectedTargetItems });
         }
     }
 }
