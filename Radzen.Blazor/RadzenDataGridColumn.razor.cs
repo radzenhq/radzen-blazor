@@ -1000,11 +1000,11 @@ namespace Radzen.Blazor
 
             if (isFirst)
             {
-                filterValue = CanSetFilterValue() ? value : null;
+                filterValue = CanSetCurrentValue(value) ? value : null;
             }
             else
             {
-                secondFilterValue = CanSetFilterValue() ? value : null;
+                secondFilterValue = CanSetCurrentValue(value, false) ? value : null;
             }
         }
 
@@ -1027,6 +1027,11 @@ namespace Radzen.Blazor
                     && fo != FilterOperator.IsNotNull
                     && fo != FilterOperator.IsEmpty
                     && fo != FilterOperator.IsNotEmpty;
+        }
+
+        internal bool CanSetCurrentValue(object value, bool isFirst = true)
+        {
+            return CanSetFilterValue(isFirst) ? !string.IsNullOrEmpty(value?.ToString()) : false;
         }
 
         internal bool HasCustomFilter()
