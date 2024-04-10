@@ -58,5 +58,11 @@ namespace Radzen.Blazor
         {
             return GetClassList("rz-textarea").ToString();
         }
+
+        /// <inheritdoc />
+        protected override string GetId()
+        {
+            return Name ?? base.GetId();
+        }
     }
 }

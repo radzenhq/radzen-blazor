@@ -1,6 +1,6 @@
 ﻿@inherits FormComponentWithAutoComplete<string>
 @if (Visible)
 {
-    <input @ref="@Element" id="@(Name ?? GetId())" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+    <input @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" @onchange="@OnChange" />
 }

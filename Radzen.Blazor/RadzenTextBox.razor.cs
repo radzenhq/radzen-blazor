@@ -61,6 +61,12 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return GetClassList("rz-textbox").ToString();
-        }        
+        }
+
+        /// <inheritdoc />
+        protected override string GetId()
+        {
+            return Name ?? base.GetId();
+        }
     }
 }

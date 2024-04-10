@@ -40,5 +40,11 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         public override string DefaultAutoCompleteAttribute { get; set; } = "new-password";
+
+        /// <inheritdoc />
+        protected override string GetId()
+        {
+            return Name ?? base.GetId();
+        }
     }
 }
