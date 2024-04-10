@@ -337,6 +337,8 @@ namespace Radzen
             await Change.InvokeAsync(internalValue);
 
             StateHasChanged();
+
+            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId());
         }
 
         internal bool IsAllSelected()
