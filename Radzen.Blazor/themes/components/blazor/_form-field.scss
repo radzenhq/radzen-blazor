@@ -75,7 +75,8 @@ $form-field-helper-padding: 0 0.5rem !default;
     & > *,
     & > .rz-autocomplete, 
     & input,
-    & .rz-inputtext {
+    & .rz-inputtext,
+    & .rz-calendar.rz-state-disabled .rz-inputtext {
         @extend %input-blank;
 
         flex: 1;
@@ -131,6 +132,10 @@ $form-field-helper-padding: 0 0.5rem !default;
         :not(.rz-button):disabled {
             color: var(--rz-input-disabled-color);
             opacity: 1;
+
+            &::placeholder {
+                color: var(--rz-input-disabled-placeholder-color);
+            }
         }
     }
 
