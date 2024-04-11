@@ -127,8 +127,8 @@ $form-field-helper-padding: 0 0.5rem !default;
             }
         }
 
-        .rz-state-disabled,
-        :disabled {
+        :not(.rz-button).rz-state-disabled,
+        :not(.rz-button):disabled {
             color: var(--rz-input-disabled-color);
             opacity: 1;
         }

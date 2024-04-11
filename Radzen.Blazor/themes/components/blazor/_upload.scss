@@ -53,10 +53,6 @@ $upload-button-background-color: var(--rz-primary) !default;
     @extend %button-sm;
     vertical-align: middle;
     -webkit-appearance: none !important;
-
-    &[disabled] {
-      opacity: 0.5;
-    }
   }
 }
 
@@ -75,6 +71,12 @@ $upload-button-background-color: var(--rz-primary) !default;
     opacity: 0;
     min-height: 100%;
     cursor: pointer;
+  }
+
+  &.rz-state-disabled {
+    input[type='file'] {
+      cursor: default;
+    }
   }
 
   &:not(.rz-state-disabled) {
