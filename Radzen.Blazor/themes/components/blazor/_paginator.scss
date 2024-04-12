@@ -91,6 +91,7 @@ $paginator-button-size: "%button-md" !default;
   &:focus {
     outline: var(--rz-outline-normal);
   }
+
   &:focus-visible {
     .rz-paginator-element,
     .rz-paginator-page {
@@ -162,11 +163,6 @@ $paginator-button-size: "%button-md" !default;
 .rz-paginator-element,
 .rz-paginator-page {
   &:hover {
-    background-color: var(--rz-paginator-numeric-button-hover-background-color);
-    color: var(--rz-paginator-numeric-button-hover-color);
-  }
-
-  &.rz-state-focused {
     background-color: var(--rz-paginator-numeric-button-hover-background-color);
     color: var(--rz-paginator-numeric-button-hover-color);
   }
