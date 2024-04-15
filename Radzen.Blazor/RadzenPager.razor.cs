@@ -462,7 +462,7 @@ namespace Radzen.Blazor
                 }
                 else 
                 {
-                    await GoToPage(focusedIndex);
+                    await GoToPage(focusedIndex + startPage);
                     shouldFocus = true;
                 }
 
