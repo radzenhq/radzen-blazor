@@ -452,7 +452,8 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   }
 
   .rz-view-header {
-    padding-right: 15px;
+    overflow-y: scroll;
+    scrollbar-width: auto;
   }
 }
 
@@ -494,7 +495,8 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   }
 
   .rz-view-header {
-    padding-right: 15px;
+    overflow-y: scroll;
+    scrollbar-width: auto;
   }
   
 }
