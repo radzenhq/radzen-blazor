@@ -106,7 +106,7 @@ namespace Radzen.Blazor
                 top = PageSize;
             }
 
-            var filter = isOData == true ? 
+            var filter = isOData == true ?
                     allColumns.ToList().ToODataFilterString<TItem>() : allColumns.ToList().ToFilterString<TItem>();
             var loadDataArgs = $"{request.StartIndex}|{top}{GetOrderBy()}{filter}";
 
@@ -175,7 +175,7 @@ namespace Radzen.Blazor
                     {
                         builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
                         builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<TItem>(LoadItems));
-                    
+
                         builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
                         {
                             return (RenderFragment)((b) =>
@@ -299,7 +299,7 @@ namespace Radzen.Blazor
         public bool Responsive { get; set; }
 
         /// <summary>
-        /// Allows to define a custom function for enums DisplayAttribute Description property value translation in datagrid 
+        /// Allows to define a custom function for enums DisplayAttribute Description property value translation in datagrid
         /// Enum filters.
         /// </summary>
         [Parameter]
@@ -330,7 +330,7 @@ namespace Radzen.Blazor
 
         internal async Task RemoveGroupAsync(GroupDescriptor gd)
         {
-            Groups.Remove(gd); 
+            Groups.Remove(gd);
             _groupedPagedView = null;
 
             var column = columns.Where(c => c.GetGroupProperty() == gd.Property).FirstOrDefault();
@@ -372,7 +372,7 @@ namespace Radzen.Blazor
             // https://stackoverflow.com/questions/25308823/targeting-positionsticky-elements-that-are-currently-in-a-stuck-state
             // https://codepen.io/TomAnthony/pen/qBqgErK
             // It seemed too complicated, so left + right frozen columns problme has been solved by following css classes:
-            // - rz-frozen-cell-left            all of the "left frozen columns" get this class 
+            // - rz-frozen-cell-left            all of the "left frozen columns" get this class
             // - rz-frozen-cell-left-end        the most right column of the "left frozen columns" get this class to draw the shadow for it
             // - rz-frozen-cell-left-inner      all of the "left inner frozen columns" get this class
             // - rz-frozen-cell-right           all of the "right frozen columns" get this class
@@ -572,7 +572,7 @@ namespace Radzen.Blazor
         /// Gives the grid a custom header, allowing the adding of components to create custom tool bars in addtion to column grouping and column picker
         /// </summary>
         [Parameter]
-        public RenderFragment HeaderTemplate { get; set; } 
+        public RenderFragment HeaderTemplate { get; set; }
 
         /// <summary>
         /// Gives the grid a custom footer, allowing the adding of components to create custom tool bars or custom pagination
@@ -662,7 +662,7 @@ namespace Radzen.Blazor
                     columnsList.Add(column);
                 }
             }
-            else 
+            else
             {
                 if (columnsList.Contains(column))
                 {
@@ -960,9 +960,9 @@ namespace Radzen.Blazor
 
             SaveSettings();
 
-            await FilterCleared.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>() 
-            { 
-                Column = column, 
+            await FilterCleared.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
+            {
+                Column = column,
                 FilterValue = column.GetFilterValue(),
                 SecondFilterValue = column.GetSecondFilterValue(),
                 FilterOperator = column.GetFilterOperator(),
@@ -1235,14 +1235,14 @@ namespace Radzen.Blazor
         /// <value>The null text.</value>
         [Parameter]
         public string IsNullText { get; set; } = "Is null";
-        
+
         /// <summary>
         /// Gets or sets the is empty text.
         /// </summary>
         /// <value>The empty text.</value>
         [Parameter]
         public string IsEmptyText { get; set; } = "Is empty";
-        
+
         /// <summary>
         /// Gets or sets the is not empty text.
         /// </summary>
@@ -1975,8 +1975,8 @@ namespace Radzen.Blazor
 
             if (resetColumnState)
             {
-                allColumns.ToList().ForEach(c => 
-                { 
+                allColumns.ToList().ForEach(c =>
+                {
                     c.ClearFilters();
                     c.ResetSortOrder();
                     c.SetOrderIndex(null);
@@ -2153,7 +2153,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets a value indicating whether all groups should be expanded when DataGrid is grouped.
         /// </summary>
-        /// <value><c>true</c> if groups are expanded; otherwise, <c>false</c>.</value> 
+        /// <value><c>true</c> if groups are expanded; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool? AllGroupsExpanded { get; set; }
 
@@ -2433,6 +2433,19 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Collapse all rows that are expanded
+        /// </summary>
+        /// <returns></returns>
+        public async System.Threading.Tasks.Task CollapseAll()
+        {
+            foreach(var item in expandedItems.Keys.ToList())
+            {
+                await CollapseItem(item);
+            }
+        }
+
+
+        /// <summary>
         /// Collapse a range of rows.
         /// </summary>
         /// <param name="items">The range of rows.</param>
@@ -2441,21 +2454,23 @@ namespace Radzen.Blazor
             // Only allow the functionality when multiple row expand is allowed
             if (this.ExpandMode != DataGridExpandMode.Multiple) return;
 
-            foreach (TItem item in items)
+            foreach (TItem item in items.Where(x=> expandedItems.Keys.Any(i => ItemEquals(i, x))))
             {
-                if (expandedItems.Keys.Any(i => ItemEquals(i, item)))
-                {
-                    expandedItems.Remove(item);
-                    await RowCollapse.InvokeAsync(item);
-
-                    if (childData.ContainsKey(item))
-                    {
-                        childData.Remove(item);
-                        _view = null;
-                    }
-                }
+                await CollapseItem(item);
             }
             await InvokeAsync(StateHasChanged);
+        }
+
+        private async Task CollapseItem(TItem item)
+        {
+            expandedItems.Remove(item);
+            await RowCollapse.InvokeAsync(item);
+
+            if (childData.ContainsKey(item))
+            {
+                childData.Remove(item);
+                _view = null;
+            }
         }
 
         internal async System.Threading.Tasks.Task ExpandItem(TItem item)
@@ -2492,14 +2507,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                expandedItems.Remove(item);
-                await RowCollapse.InvokeAsync(item);
-
-                if (childData.ContainsKey(item))
-                {
-                    childData.Remove(item);
-                    _view = null;
-                }
+                await CollapseItem(item);
             }
 
             await InvokeAsync(StateHasChanged);
@@ -3020,8 +3028,8 @@ namespace Radzen.Blazor
         /// Gets or sets the group descriptors.
         /// </summary>
         /// <value>The groups.</value>
-        public ObservableCollection<GroupDescriptor> Groups 
-        { 
+        public ObservableCollection<GroupDescriptor> Groups
+        {
             get
             {
                 if (groups == null)
@@ -3049,9 +3057,9 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
 
                 RadzenDataGridColumn<TItem> column;
-                
+
                 column = columns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
-               
+
                 //may be its a child column
                 if (column == null)
                     column = allColumns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
@@ -3075,7 +3083,7 @@ namespace Radzen.Blazor
                 }
 
                 indexOfColumnToReoder = null;
-            }  
+            }
         }
 
         /// <summary>
@@ -3322,8 +3330,8 @@ namespace Radzen.Blazor
             if (SettingsChanged.HasDelegate)
             {
                 var shouldUpdateState = false;
-                var hasFilter = settings.Columns != null && settings.Columns.Any(c => 
-                    c.FilterValue != null || c.SecondFilterValue != null || 
+                var hasFilter = settings.Columns != null && settings.Columns.Any(c =>
+                    c.FilterValue != null || c.SecondFilterValue != null ||
                     c.FilterOperator == FilterOperator.IsNull || c.FilterOperator == FilterOperator.IsNotNull ||
                     c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty ||
                     c.SecondFilterOperator == FilterOperator.IsNull || c.SecondFilterOperator == FilterOperator.IsNotNull ||
