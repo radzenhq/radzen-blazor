@@ -11,18 +11,18 @@
     <RadzenCheckBox @bind-Value=@showPagerSummary Name="CheckBox1" Style="margin-left: 5px;" />
     <RadzenLabel Text="Show pager summary" Component="CheckBox1" Style="margin-left: 5px;" />
 </div>
-<RadzenDataGrid @ref=@dataGrid Data="@orderDetails" TItem="OrderDetail" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" AllowSorting="true" 
+<RadzenDataGrid @ref=@dataGrid Data="@orderDetails" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" AllowSorting="true" 
 PageSizeOptions="@pageSizeOptions" ShowPagingSummary="@showPagerSummary" PagingSummaryFormat="@pagingSummaryFormat" Page="@OnPage">
     <Columns>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+        <RadzenDataGridColumn Property="OrderID" Title="OrderID" />
+        <RadzenDataGridColumn Property="ProductID" Title="ProductID" />
+        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
             <Template Context="detail">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
+        <RadzenDataGridColumn Property="Discount" Title="Discount">
             <Template Context="detail">
                 @String.Format("{0}%", detail.Discount * 100)
             </Template>

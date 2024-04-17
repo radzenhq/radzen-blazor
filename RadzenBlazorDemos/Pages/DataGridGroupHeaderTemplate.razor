@@ -9,22 +9,22 @@
     <RadzenLabel Text="All groups expanded" Component="CheckBox1" />
 </RadzenCard>
 <RadzenDataGrid @ref="ordersGrid" ColumnWidth="220px" AllowGrouping="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-        Data="@orders" TItem="Order" Render="@OnRender" GroupRowRender="OnGroupRowRender" class="m-4">
+        Data="@orders" Render="@OnRender" GroupRowRender="OnGroupRowRender" class="m-4">
     <GroupHeaderTemplate>
         @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
     </GroupHeaderTemplate>
     <Columns>
-        <RadzenDataGridColumn Width="80px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn Width="80px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
             <Template>
                 @(orders.IndexOf(context) + 1)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID">
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID">
             <FooterTemplate>
                 Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
+        <RadzenDataGridColumn Property="Freight" Title="Freight">
             <Template Context="order">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
             </Template>
@@ -32,13 +32,13 @@
                 Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}">
+        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}">
             <FooterTemplate>
                 Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
-        <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+        <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 @order.Employee?.FirstName @order.Employee?.LastName
             </Template>

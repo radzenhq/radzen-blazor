@@ -27,12 +27,12 @@
                             SelectionMode="DataGridSelectionMode.Multiple"
                             AllowRowSelectOnRowClick="true" >
                 <Columns>
-                    <RadzenDataGridColumn TItem="Hobby" Context="hobby">
+                    <RadzenDataGridColumn Context="hobby">
                          <Template>
                             <RadzenCheckBox Value="selectedHobbies.Contains(hobby)" TValue="bool"/>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Hobby" Title="Hobby" Property="@nameof(Hobby.HobbyName)" />
+                    <RadzenDataGridColumn Title="Hobby" Property="@nameof(Hobby.HobbyName)" />
                 </Columns>
             </RadzenDataGrid>
             <RadzenButton Text="Save" Click="@SaveHobbies" />

@@ -30,23 +30,23 @@
     </div>
 </div>
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
-    FilterMode="FilterMode.SimpleWithMenu" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders" TItem="Order" ColumnWidth="300px" 
+    FilterMode="FilterMode.SimpleWithMenu" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders" ColumnWidth="300px" 
     FilterCaseSensitivity="@filterCaseSensitivity"
     LogicalFilterOperator="@logicalFilterOperator">
     <Columns>
-        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" />
-        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-        <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 @order.Employee?.FirstName @order.Employee?.LastName
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Order" Property="RequiredDate" Title="Required Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Order" Property="ShippedDate" Title="Shipped Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
-        <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="Ship Country" />
+        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="RequiredDate" Title="Required Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="ShippedDate" Title="Shipped Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
+        <RadzenDataGridColumn Property="ShipCountry" Title="Ship Country" />
     </Columns>
 </RadzenDataGrid>
 

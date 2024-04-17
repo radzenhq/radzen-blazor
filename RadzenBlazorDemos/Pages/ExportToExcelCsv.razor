@@ -6,17 +6,17 @@
 @inject NorthwindService service
 
 <RadzenButton Text="Export XLS" Icon="grid_on" Click="@(args => Export("excel"))" class="mb-4 me-2" /><RadzenButton Text="Export CSV" Icon="wrap_text" Click="@(args => Export("csv"))" class="mb-4" />
-<RadzenDataGrid @ref="grid" AllowColumnPicking="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@orderDetails" TItem="OrderDetail">
+<RadzenDataGrid @ref="grid" AllowColumnPicking="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@orderDetails">
     <Columns>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Order.OrderDate" Title="Order" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+        <RadzenDataGridColumn Property="Order.OrderDate" Title="Order" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
             <Template Context="detail">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount   " FormatString="{0:P}" />
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
+        <RadzenDataGridColumn Property="Discount" Title="Discount   " FormatString="{0:P}" />
     </Columns>
 </RadzenDataGrid>
 

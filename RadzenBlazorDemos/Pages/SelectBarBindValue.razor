@@ -15,8 +15,8 @@
             </RadzenRow>
         </HeaderTemplate>
         <Columns>
-            <RadzenDataGridColumn Title="Name" Property="Name" TItem="GridItem" />
-            <RadzenDataGridColumn Title="Action" TItem="GridItem">
+            <RadzenDataGridColumn Title="Name" Property="Name" />
+            <RadzenDataGridColumn Title="Action">
                 <Template Context="data">
                     <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center">
                         <RadzenSelectBar TValue="int" Size="ButtonSize.Small" @bind-Value="@data.Action" Change="() => CheckHeader()">

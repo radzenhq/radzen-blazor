@@ -13,29 +13,29 @@
     <RadzenButton Text="Collapse all groups" Click="@(args => ToggleGroups(false))" Disabled=@(allGroupsExpanded == false) />
 </div>
 <RadzenDataGrid @ref=grid AllowGrouping="true" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" 
-    Data="@employees" TItem="Employee" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender" 
+        Data="@employees" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or" Render="@OnRender"  TItem="Employee"
         HideGroupedColumn="true" GroupRowRender="OnGroupRowRender" GroupRowExpand="OnGroupRowExpand" GroupRowCollapse="OnGroupRowCollapse" Group="@OnGroup"
         @bind-AllGroupsExpanded="@allGroupsExpanded" ShowGroupExpandColumn=@showGroupExpandColumn>
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="80px" TextAlign="TextAlign.Center" >
+        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Frozen="true" Groupable="false" Width="80px" TextAlign="TextAlign.Center" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
-        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name"/>
-        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" Width="200px" />
-        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
-        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
-        <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
-        <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
-        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
-        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
-        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
-        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Width="400px" />
+        <RadzenDataGridColumn Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn Property="LastName" Title="Last Name"/>
+        <RadzenDataGridColumn Property="Title" Title="Title" Width="200px" />
+        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="Address" Title="Address" Width="200px" />
+        <RadzenDataGridColumn Property="City" Title="City" />
+        <RadzenDataGridColumn Property="Region" Title="Region" />
+        <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" />
+        <RadzenDataGridColumn Property="Country" Title="Country" />
+        <RadzenDataGridColumn Property="HomePhone" Title="Home Phone" />
+        <RadzenDataGridColumn Property="Extension" Title="Extension" />
+        <RadzenDataGridColumn Property="Notes" Title="Notes" Width="400px" />
     </Columns>
 </RadzenDataGrid>
 

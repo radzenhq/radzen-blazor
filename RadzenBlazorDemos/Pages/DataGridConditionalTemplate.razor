@@ -6,23 +6,23 @@
 
 <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">Order Details</RadzenText>
 <RadzenDataGrid AllowFiltering="false" AllowPaging="true" AllowSorting="false" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-            Data="@orderDetails" TItem="OrderDetail" ColumnWidth="200px" 
+            Data="@orderDetails" ColumnWidth="200px" 
             RowRender="@RowRender" CellRender="@CellRender" HeaderCellRender="@HeaderFooterCellRender" FooterCellRender="@HeaderFooterCellRender">
     <Columns>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID">
+        <RadzenDataGridColumn Property="OrderID" Title="OrderID">
             <FooterTemplate>
                 Total records: <b>@orderDetails.Count()</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID/ProductName" 
+        <RadzenDataGridColumn Property="ProductID" Title="ProductID/ProductName" 
             SortProperty="Product.ProductName" FilterProperty="Product.ProductName">
             <FooterTemplate>
                 Most ordered product: <b>@orderDetails.GroupBy(o => o.Product.ProductName).OrderBy(g => g.Count()).Select(g => g.Key).FirstOrDefault()</b>,
                 Least ordered product: <b>@orderDetails.GroupBy(o => o.Product.ProductName).OrderByDescending(g => g.Count()).Select(g => g.Key).FirstOrDefault()</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity">
+        <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity">
             <Template Context="data">
                 @if (data.Quantity > 20)
                 {
@@ -37,7 +37,7 @@
                 Total quantity: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orderDetails.Sum(o => o.Quantity))</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}">
+        <RadzenDataGridColumn Property="Discount" Title="Discount" FormatString="{0:P}">
             <FooterTemplate>
                 Average discount: <b>@String.Format("{0:P}", orderDetails.Average(o => o.Discount))</b>
             </FooterTemplate>

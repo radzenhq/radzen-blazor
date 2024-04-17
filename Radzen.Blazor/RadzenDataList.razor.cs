@@ -27,6 +27,9 @@ namespace Radzen.Blazor
     /// &lt;/RadzenDataList&gt;
     /// </code>
     /// </example>
+#if NET6_0_OR_GREATER
+    [CascadingTypeParameter(nameof(TItem))]
+#endif
     public partial class RadzenDataList<TItem> : PagedDataBoundComponent<TItem>
     {
         /// <inheritdoc />

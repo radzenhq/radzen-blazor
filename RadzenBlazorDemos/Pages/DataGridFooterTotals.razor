@@ -8,7 +8,7 @@
 <RadzenDataGrid @ref="ordersGrid" AllowFiltering="true" AllowPaging="true" PageSize="3" AllowSorting="true" ColumnWidth="220px" AllowColumnResize=true
                 Data="@orders" TItem="Order" Sort="@(args => ResetIndex(true))" Page="@(args => ResetIndex(true))" Filter="@(args => ResetIndex(true))">
     <Columns>
-        <RadzenDataGridColumn Width="60px" TItem="Order" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn Width="60px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
             <Template>
                 <RenderOnceComponent CanRender=@(!(index >= ordersGrid.PageSize))>
                 @{
@@ -18,22 +18,22 @@
                 </RenderOnceComponent>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID">
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID">
             <FooterTemplate>
                 Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn  Width="160px" TItem="Order" Property="Employee.LastName" Title="Employee">
+        <RadzenDataGridColumn  Width="160px" Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 @order.Employee?.FirstName @order.Employee?.LastName
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}">
+        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}">
             <FooterTemplate>
                 Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
+        <RadzenDataGridColumn Property="Freight" Title="Freight">
             <Template Context="order">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
             </Template>

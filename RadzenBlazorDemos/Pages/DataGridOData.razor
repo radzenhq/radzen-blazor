@@ -4,9 +4,9 @@
 <RadzenDataGrid @ref="grid" @bind-Value=@selectedEmployees SelectionMode="DataGridSelectionMode.Multiple" KeyProperty="EmployeeID" IsLoading="@isLoading" Count="@count" Data="@employees" 
     LoadData="@LoadData" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
     FilterMode="FilterMode.Advanced" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" 
-    PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
+    PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Width="60px" Sortable="false" Filterable="false">
+        <RadzenDataGridColumn Width="60px" Sortable="false" Filterable="false">
             <HeaderTemplate>
                 <RadzenCheckBox TriState="false" TValue="bool?" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select all items" }})"
                                 Value="@(selectedEmployees == null || selectedEmployees?.Any() != true ? false : !employees.All(i => selectedEmployees.Select(e => e.EmployeeID).Contains(i.EmployeeID)) ? null : employees.Any(i => selectedEmployees.Select(e => e.EmployeeID).Contains(i.EmployeeID)))"
@@ -17,21 +17,21 @@
                                 TValue="bool" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name">
+        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="FirstName" Title="First Name">
                 <EditTemplate Context="employee">
                     <RadzenTextBox @bind-Value="employee.FirstName" />
                 </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
-        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" 
+        <RadzenDataGridColumn Property="LastName" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn Property="Title" Title="Title" 
             Type="typeof(IEnumerable<string>)" FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains">
             <FilterTemplate>
                 <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select title" }})"
                     Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Title="Customers" Property="Orders" FilterProperty="Customer/CustomerID" Sortable=false
+        <RadzenDataGridColumn Title="Customers" Property="Orders" FilterProperty="Customer/CustomerID" Sortable=false
                                   Type="typeof(IEnumerable<Customer>)" FilterValue="@selectedCustomers" FilterOperator="FilterOperator.In">
             <FilterTemplate>
                 <RadzenDropDown @bind-Value=@selectedCustomers Style="width:100%" TextProperty="CompanyName" ValueProperty="CustomerID" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select company" }})"
@@ -41,18 +41,18 @@
                     @(string.Join(',', context.Orders != null ? context.Orders.Select(i => i.Customer.CompanyName) : Enumerable.Empty<string>()))
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" />
-        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" />
-        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
-        <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" />
-        <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" />
-        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
-        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" />
-        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
-        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
-            <RadzenDataGridColumn TItem="Employee" Context="employee" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
+        <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="Address" Title="Address" />
+        <RadzenDataGridColumn Property="City" Title="City" />
+        <RadzenDataGridColumn Property="Region" Title="Region" />
+        <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" />
+        <RadzenDataGridColumn Property="Country" Title="Country" />
+        <RadzenDataGridColumn Property="HomePhone" Title="Home Phone" />
+        <RadzenDataGridColumn Property="Extension" Title="Extension" />
+        <RadzenDataGridColumn Property="Notes" Title="Notes" />
+            <RadzenDataGridColumn Context="employee" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Width="156px">
                 <Template Context="employee">
                     <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" 
                         Click="@(args => grid.EditRow(employee))" @onclick:stopPropagation="true">

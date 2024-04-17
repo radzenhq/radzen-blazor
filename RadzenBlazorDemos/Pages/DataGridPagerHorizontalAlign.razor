@@ -8,17 +8,17 @@
 <div style="white-space:nowrap; margin-right: 16px">Pager Horizontal Align:</div>
 <RadzenDropDown @bind-Value="@pagerHorizontalAlign" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(HorizontalAlign)).Cast<HorizontalAlign>().Select(t => new { Text = $"{t}", Value = t }))" />
 </div>
-<RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" PagerHorizontalAlign="@pagerHorizontalAlign" AllowPaging="true" AllowSorting="true">
+<RadzenDataGrid Data="@orderDetails" PagerHorizontalAlign="@pagerHorizontalAlign" AllowPaging="true" AllowSorting="true">
     <Columns>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+        <RadzenDataGridColumn Property="OrderID" Title="OrderID" />
+        <RadzenDataGridColumn Property="ProductID" Title="ProductID" />
+        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
             <Template Context="detail">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
+        <RadzenDataGridColumn Property="Discount" Title="Discount">
             <Template Context="detail">
                 @String.Format("{0}%", detail.Discount * 100)
             </Template>

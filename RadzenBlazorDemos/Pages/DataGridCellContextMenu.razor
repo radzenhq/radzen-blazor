@@ -8,20 +8,20 @@
 
 <p>Right click on a table cell to open the context menu.</p>
 <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
-            AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="200px"
-            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees CellContextMenu="@OnCellContextMenu">
+            AllowSorting="true" Data="@employees" ColumnWidth="200px"
+            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees  TItem="Employee" CellContextMenu="@OnCellContextMenu">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="Photo" Title="Employee" Sortable="false" Filterable="false">
+        <RadzenDataGridColumn Property="Photo" Title="Employee" Sortable="false" Filterable="false">
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
                 @data.FirstName @data.LastName
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Title" />
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Title="Employee ID" />
-        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" />
-        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
+        <RadzenDataGridColumn Property="Title" Title="Title" />
+        <RadzenDataGridColumn Property="EmployeeID" Title="Employee ID" />
+        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="City" Title="City" />
+        <RadzenDataGridColumn Property="Country" Title="Country" />
     </Columns>
 </RadzenDataGrid>
 

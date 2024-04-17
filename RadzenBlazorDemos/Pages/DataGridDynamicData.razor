@@ -5,7 +5,7 @@
         <Columns>
             @foreach(var column in columns)
             {
-                <RadzenDataGridColumn TItem="IDictionary<string, object>" Title="@column.Key" Type="column.Value"
+                <RadzenDataGridColumn Title="@column.Key" Type="column.Value"
                         Property="@GetColumnPropertyExpression(column.Key, column.Value)" >
                     <Template>
                         @context[@column.Key]

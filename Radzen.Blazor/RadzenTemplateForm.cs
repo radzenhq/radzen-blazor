@@ -29,6 +29,9 @@ namespace Radzen.Blazor
     /// }
     /// </code>
     /// </example>
+#if NET6_0_OR_GREATER
+    [CascadingTypeParameter(nameof(TItem))]
+#endif
     public class RadzenTemplateForm<TItem> : RadzenComponent, IRadzenForm
     {
         /// <summary>

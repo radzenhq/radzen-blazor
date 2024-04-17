@@ -1,12 +1,12 @@
 ﻿@using System.Linq.Dynamic.Core
 @using System.ComponentModel.DataAnnotations
     
-<RadzenDataGrid LoadData="LoadData" IsLoading=@isLoading Count="count" Data=@employees FilterMode="FilterMode.Advanced" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+<RadzenDataGrid LoadData="LoadData" IsLoading=@isLoading Count="count" Data=@employees FilterMode="FilterMode.Advanced" AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" />
-        <RadzenDataGridColumn TItem="Employee" Property="Gender" Title="Gender" />
-        <RadzenDataGridColumn TItem="Employee" Property="Status" Title="Nullable Status" />
-        <RadzenDataGridColumn TItem="Employee" Property="Color" Title="Favorite Color (Display Attribute in Filter)" />
+        <RadzenDataGridColumn Property="ID" Title="ID" />
+        <RadzenDataGridColumn Property="Gender" Title="Gender" />
+        <RadzenDataGridColumn Property="Status" Title="Nullable Status" />
+        <RadzenDataGridColumn Property="Color" Title="Favorite Color (Display Attribute in Filter)" />
     </Columns>
 </RadzenDataGrid>
 

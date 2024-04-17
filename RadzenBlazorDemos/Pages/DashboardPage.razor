@@ -124,7 +124,7 @@
                 <RadzenText TextStyle="TextStyle.H6">Issue List</RadzenText>
                 <RadzenDataGrid Data=@filteredIssues Style="height: 500px" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowSorting="true">
                     <Columns>
-                        <RadzenDataGridColumn TItem="Issue" Title="User" Width="200px" Property="User.Login" FilterValue="@selectedUser?.Login">
+                        <RadzenDataGridColumn Title="User" Width="200px" Property="User.Login" FilterValue="@selectedUser?.Login">
                             <FilterTemplate>
                                 <RadzenDropDown AllowClear="true" AllowFiltering="true" Data=@users TextProperty="Login" @bind-Value="selectedUser" Change=@FilterIssues>
                                     <Template Context="user">
@@ -138,12 +138,12 @@
                                 <img Style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl alt="User avatar" /><b>@issue.User.Login</b>
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Issue" Property="Title" Title="Title" Width="400px">
+                        <RadzenDataGridColumn Property="Title" Title="Title" Width="400px">
                             <Template Context="issue">
                                 <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Issue" Property="State" Title="State" Width="120px">
+                        <RadzenDataGridColumn Property="State" Title="State" Width="120px">
                             <FilterTemplate>
                                 <RadzenDropDown Style="width: 100%" Data=@issueStates @bind-Value="selectedState" Change=@FilterIssues>
                                     <Template Context="issueState">
@@ -162,7 +162,7 @@
                                 }
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Issue" Title="Labels" Sortable="false">
+                        <RadzenDataGridColumn Title="Labels" Sortable="false">
                             <FilterTemplate>
                                 <RadzenDropDown Style="width: 100%" AllowClear="true" AllowFiltering="true" Multiple="true" Data=@labels @bind-Value="selectedLabels" Change=@FilterIssues>
                                     <Template Context="label">

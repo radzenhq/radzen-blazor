@@ -8,16 +8,16 @@ else
 {
     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="my-4">Custom filtering template with Custom Command</RadzenText>
     <RadzenDataGrid Render="@OnRender" Style="height:400px;" AllowVirtualization="true" @ref="grid" Data=@employees FilterMode="FilterMode.Advanced"
-                    AllowFiltering="true" AllowPaging="false" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+                    AllowFiltering="true" AllowPaging="false" AllowSorting="true" ColumnWidth="200px">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" FilterValue="@idValue">
+            <RadzenDataGridColumn Property="ID" Title="ID" FilterValue="@idValue">
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="Customer" Property="CompanyName">
+            <RadzenDataGridColumn Title="Customer" Property="CompanyName">
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="Hire Date" Property="HireDate.Date" FormatString="{0:d}"
+            <RadzenDataGridColumn Title="Hire Date" Property="HireDate.Date" FormatString="{0:d}"
                                   FilterValue="@hireDate?.Date">
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="Work Status" Property="WorkStatus" Type="typeof(IEnumerable<string>)" Sortable=true
+            <RadzenDataGridColumn Title="Work Status" Property="WorkStatus" Type="typeof(IEnumerable<string>)" Sortable=true
                                   FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.Custom" LogicalFilterOperator="@workStatusOperator">
                 <FilterTemplate Context="column">
                     <div class="rz-grid-filter">
@@ -39,7 +39,7 @@ else
                     </div>
                 </FilterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
+            <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title Of Courtesy" 
                 FilterValue="@currentTOC">
                 <FilterTemplate>
                     <RadzenListBox @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by title of courtesy" }})"

@@ -7,27 +7,27 @@
 else
 {
     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="my-4">Custom filtering template with IQueryable binding</RadzenText>
-        <RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" TItem="Employee" ColumnWidth="200px">
+        <RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.Simple" AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
         <Columns>
-            <RadzenDataGridColumn TItem="Employee" Property="ID" Title="ID" FilterValue="@idValue">
+            <RadzenDataGridColumn Property="ID" Title="ID" FilterValue="@idValue">
                 <FilterTemplate>
                     <RadzenNumeric @bind-Value=idValue ShowUpDown=false Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by ID" }})" />
                 </FilterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" 
+            <RadzenDataGridColumn Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" 
                     FilterValue="@selectedCompanyNames" FilterOperator="FilterOperator.Contains" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedCompanyNames Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Company" }})"
                         Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="Hire Date" Property="HireDate.Date" FormatString="{0:d}"
+            <RadzenDataGridColumn Title="Hire Date" Property="HireDate.Date" FormatString="{0:d}"
                                   FilterValue="@hireDate?.Date">
                 <FilterTemplate>
                     <RadzenDatePicker @bind-Value=@hireDate Style="width:100%;" AllowClear="true" DateFormat="d" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Hire Date" }})" />
                 </FilterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="WorkStatus" Property="WorkStatus" Type="typeof(IEnumerable<WorkStatus>)" Sortable=false
+            <RadzenDataGridColumn Title="WorkStatus" Property="WorkStatus" Type="typeof(IEnumerable<WorkStatus>)" Sortable=false
                                   FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=false Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by WorkStatus" }})"
@@ -37,7 +37,7 @@ else
                     @(string.Join(',', context.WorkStatus.Select(i => Enum.GetName((WorkStatus)i))))
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Title="WorkStatus (as Model)" Property="WorkStatuses" Type="typeof(IEnumerable<string>)" Sortable=false
+            <RadzenDataGridColumn Title="WorkStatus (as Model)" Property="WorkStatuses" Type="typeof(IEnumerable<string>)" Sortable=false
                                   FilterValue="@selectedWorkStatuses" FilterOperator="FilterOperator.In" FilterProperty="Name" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedWorkStatuses Multiple="true" AllowSelectAll=false Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by WorkStatus from model" }})"
@@ -47,7 +47,7 @@ else
                     @(string.Join(',', context.WorkStatuses.Select(s => s.Name)))
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title Of Courtesy" 
+            <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title Of Courtesy" 
                 FilterValue="@currentTOC">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by title of courtesy" }})"

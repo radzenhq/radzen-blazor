@@ -9,37 +9,37 @@
     <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" />
 </RadzenCard>
 <RadzenDataGrid @ref="grid" AllowGrouping=true AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"  FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
-    Data="@employees" TItem="Employee" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" class="m-4" HideGroupedColumn="false" >
+    Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" class="m-4" HideGroupedColumn="false" >
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
+        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Title="Title" Property="TitleOfCourtesy" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells Width="820px">
+        <RadzenDataGridColumn Title="Title" Property="TitleOfCourtesy" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells Width="820px">
             <Columns>
-                <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="FirstName" Width="480px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
+                <RadzenDataGridColumn Property="FirstName" Title="FirstName" Width="480px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
                     <Columns>
-                        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="200px" />
-                        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px" />
-                        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px" />
+                        <RadzenDataGridColumn Property="Title" Title="Job Title" Width="200px" />
+                        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="140px" />
+                        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="140px" />
                     </Columns>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="LastName" Width="200px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
+                <RadzenDataGridColumn Property="LastName" Title="LastName" Width="200px" Filterable=@allowCompositeDataCells Sortable=@allowCompositeDataCells>
                     <Columns>
-                        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
+                        <RadzenDataGridColumn Property="Address" Title="Address" Width="200px" />
                     </Columns>
                 </RadzenDataGridColumn>
-                <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="140px" />
+                <RadzenDataGridColumn Property="City" Title="City" Width="140px" />
             </Columns>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" Width="140px" />
-        <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" Width="140px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" Width="140px" />
-        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Width="140px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" Width="140px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Width="300px" />
+        <RadzenDataGridColumn Property="Region" Title="Region" Width="140px" />
+        <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" Width="140px" />
+        <RadzenDataGridColumn Property="Country" Title="Country" Width="140px" />
+        <RadzenDataGridColumn Property="HomePhone" Title="Home Phone" Width="140px" />
+        <RadzenDataGridColumn Property="Extension" Title="Extension" Width="140px" />
+        <RadzenDataGridColumn Property="Notes" Title="Notes" Width="300px" />
     </Columns>
 </RadzenDataGrid>
 

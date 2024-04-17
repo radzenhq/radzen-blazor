@@ -22,13 +22,13 @@
 <RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="@editMode"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
     <Columns>
-        <RadzenDataGridColumn TItem="Order" Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
-        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="280px">
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="280px">
             <EditTemplate Context="order">
                 <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee" Width="220px">
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="220px">
             <Template Context="order">
                 <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 @order.Employee?.FirstName @order.Employee?.LastName
@@ -42,7 +42,7 @@
                 </RadzenDropDown>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Width="200px">
+        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" Width="200px">
             <Template Context="order">
                 @String.Format("{0:d}", order.OrderDate)
             </Template>
@@ -50,7 +50,7 @@
                 <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
+        <RadzenDataGridColumn Property="Freight" Title="Freight">
             <Template Context="order">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
             </Template>
@@ -58,25 +58,25 @@
                 <RadzenNumeric @bind-Value="order.Freight" Style="width:100%" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name">
+        <RadzenDataGridColumn Property="ShipName" Title="Ship Name">
             <EditTemplate Context="order">
                 <RadzenTextBox @bind-Value="order.ShipName" Style="width:200px; display: block" Name="ShipName" />
                 <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="ShipCountry">
+        <RadzenDataGridColumn Property="ShipCountry" Title="ShipCountry">
             <EditTemplate Context="order">
                 <RadzenTextBox @bind-Value="order.ShipCountry" Style="width:200px; display: block" Name="ShipCountry" />
                 <RadzenRequiredValidator Text="ShipCountry is required" Component="ShipCountry" Popup="true" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Property="ShipCity" Title="ShipCity">
+        <RadzenDataGridColumn Property="ShipCity" Title="ShipCity">
             <EditTemplate Context="order">
                 <RadzenTextBox @bind-Value="order.ShipCity" Style="width:200px; display: block" Name="ShipCity" />
                 <RadzenRequiredValidator Text="ShipCity is required" Component="ShipCity" Popup="true" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Order" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+        <RadzenDataGridColumn Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
             <Template Context="order">
                 <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
                 </RadzenButton>

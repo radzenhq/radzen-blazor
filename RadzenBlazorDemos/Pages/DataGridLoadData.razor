@@ -5,34 +5,34 @@
 @inherits DbContextPage
 
 <RadzenButton Text="Reset" Click="@Reset" Style="margin-bottom: 20px;" />
-<RadzenDataGrid style="height: 335px" @ref="grid" IsLoading=@isLoading Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" TItem="Employee" ColumnWidth="200px">
+<RadzenDataGrid style="height: 335px" @ref="grid" IsLoading=@isLoading Count="@count" Data="@employees" LoadData="@LoadData" AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="4" PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn TItem="Employee" Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
+        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" Frozen="true" Width="160px"/>
-        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="160px"/>
-        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" 
+        <RadzenDataGridColumn Property="FirstName" Title="First Name" Frozen="true" Width="160px"/>
+        <RadzenDataGridColumn Property="LastName" Title="Last Name" Width="160px"/>
+        <RadzenDataGridColumn Property="Title" Title="Job Title" 
             Type="typeof(IEnumerable<string>)" FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains" Width="200px">
             <FilterTemplate>
                 <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select title" }})"
                     Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="TitleOfCourtesy" Title="Title" Width="120px" />
-        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Address" Title="Address" Width="200px" />
-        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Region" Title="Region" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="PostalCode" Title="Postal Code" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" Width="300px" />
+        <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title" Width="120px" />
+        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="Address" Title="Address" Width="200px" />
+        <RadzenDataGridColumn Property="City" Title="City" Width="160px" />
+        <RadzenDataGridColumn Property="Region" Title="Region" Width="160px" />
+        <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" Width="160px" />
+        <RadzenDataGridColumn Property="Country" Title="Country" Width="160px" />
+        <RadzenDataGridColumn Property="HomePhone" Title="Home Phone" Width="160px" />
+        <RadzenDataGridColumn Property="Extension" Title="Extension" Width="160px" />
+        <RadzenDataGridColumn Property="Notes" Title="Notes" Width="300px" />
     </Columns>
 </RadzenDataGrid>
 

@@ -10,6 +10,9 @@ namespace Radzen.Blazor
     /// RadzenDataFilter component.
     /// </summary>
     /// <typeparam name="TItem">The type of the item.</typeparam>
+#if NET6_0_OR_GREATER
+    [CascadingTypeParameter(nameof(TItem))]
+#endif
     public partial class RadzenDataFilter<TItem> : RadzenComponent
     {
         /// <inheritdoc />

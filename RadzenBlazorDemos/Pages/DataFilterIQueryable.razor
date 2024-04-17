@@ -13,51 +13,51 @@
 
     <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => filteredOrders = view)>
         <Properties>
-            <RadzenDataFilterProperty TItem="Order" Property="OrderID" Title="Order ID" FilterValue="@finalSelectedIds" 
+            <RadzenDataFilterProperty Property="OrderID" Title="Order ID" FilterValue="@finalSelectedIds" 
                 Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
                 <FilterTemplate>
                         <RadzenDropDown @bind-Value=@selectedIds Style="width:100%;"
                         Change=@OnSelectedIdsChange Data="@(orderIds)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </RadzenDataFilterProperty>
-            <RadzenDataFilterProperty TItem="Order" Property="ProductIds" Title="ProductIds" FilterValue="@finalSelectedProductIds"
+            <RadzenDataFilterProperty Property="ProductIds" Title="ProductIds" FilterValue="@finalSelectedProductIds"
                                       Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.In">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedProductIds Style="width:100%;"
                                     Change=@OnSelectedProductIdsChange Data="@(productIds)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </RadzenDataFilterProperty>
-            <RadzenDataFilterProperty TItem="Order" Property="Employee.LastName" Title="Employee Last Name" />
-            <MyCustomDataFilterProperty TItem="Order" Property="OrderDate" Title="Order Date">
+            <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
+            <MyCustomDataFilterProperty Property="OrderDate" Title="Order Date">
                 <FilterTemplate>
                     <RadzenDatePicker @bind-Value="@context.FilterValue" Style="width:100%" ShowTime=false DateFormat="d"
                                       Change="@ApplyOrderDateFilter" />
                 </FilterTemplate>
             </MyCustomDataFilterProperty>
-            <RadzenDataFilterProperty TItem="Order" Property="Freight" Title="Freight" />
+            <RadzenDataFilterProperty Property="Freight" Title="Freight" />
         </Properties>
     </RadzenDataFilter>
 
-    <RadzenDataGrid @ref="ordersGrid" AllowPaging="true" AllowSorting="true" Data="@(filteredOrders ?? orders)" TItem="Order"
+    <RadzenDataGrid @ref="ordersGrid" AllowPaging="true" AllowSorting="true" Data="@(filteredOrders ?? orders)"
         ColumnWidth="200px" PageSize="20" Style="height: 500px">
         <Columns>
-            <RadzenDataGridColumn Width="200px" TItem="Order" Property="OrderID" Title="Order ID">
+            <RadzenDataGridColumn Width="200px" Property="OrderID" Title="Order ID">
                 <FooterTemplate>
                     Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
                 </FooterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Width="200px" TItem="Order" Property="Customer.CompanyName" Title="Customer" />
-            <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee">
+            <RadzenDataGridColumn Width="200px" Property="Customer.CompanyName" Title="Customer" />
+            <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
                 <Template Context="order">
                     @order.Employee?.FirstName @order.Employee?.LastName
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}">
+            <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}">
                 <FooterTemplate>
                     Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
                 </FooterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight">
+            <RadzenDataGridColumn Property="Freight" Title="Freight">
                 <Template Context="order">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                 </Template>
@@ -65,7 +65,7 @@
                     Total amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", orders.Sum(o => o.Freight))</b>
                 </FooterTemplate>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" />
+            <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
         </Columns>
     </RadzenDataGrid>
 </RadzenStack>

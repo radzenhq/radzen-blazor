@@ -9,17 +9,17 @@
     <RadzenSelectBar @bind-Value="@Density" TextProperty="Text" ValueProperty="Value"
                         Data="@(Enum.GetValues(typeof(Density)).Cast<Density>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
 </RadzenCard>
-<RadzenDataGrid Data="@orderDetails" TItem="OrderDetail" Density="@Density" AllowPaging="true" AllowSorting="true">
+<RadzenDataGrid Data="@orderDetails" Density="@Density" AllowPaging="true" AllowSorting="true">
     <Columns>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="OrderID" Title="OrderID" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="ProductID" Title="ProductID" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="UnitPrice" Title="Unit Price">
+        <RadzenDataGridColumn Property="OrderID" Title="OrderID" />
+        <RadzenDataGridColumn Property="ProductID" Title="ProductID" />
+        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
             <Template Context="detail">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount">
+        <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
+        <RadzenDataGridColumn Property="Discount" Title="Discount">
             <Template Context="detail">
                 @String.Format("{0}%", detail.Discount * 100)
             </Template>

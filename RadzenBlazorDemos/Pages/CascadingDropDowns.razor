@@ -30,11 +30,11 @@
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Order Details</RadzenText>
                 <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowPaging="true" AllowSorting="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-                            Data="@(orderDetails)" TItem="OrderDetail" ColumnWidth="200px">
+                            Data="@(orderDetails)" ColumnWidth="200px">
                     <Columns>
-                        <RadzenDataGridColumn TItem="OrderDetail" Property="Product.ProductName" Title="Product" />
-                        <RadzenDataGridColumn TItem="OrderDetail" Property="Quantity" Title="Quantity" />
-                        <RadzenDataGridColumn TItem="OrderDetail" Property="Discount" Title="Discount" FormatString="{0:P}" />
+                        <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
+                        <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
+                        <RadzenDataGridColumn Property="Discount" Title="Discount" FormatString="{0:P}" />
                     </Columns>
                 </RadzenDataGrid>
             </RadzenCard>

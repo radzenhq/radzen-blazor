@@ -5,20 +5,20 @@
 @inherits DbContextPage
 
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowSorting="true" AllowColumnResize="true"
-                Data="@employees" TItem="Employee" RowRender="@RowRender" LoadChildData="@LoadChildData" 
+                Data="@employees" RowRender="@RowRender" LoadChildData="@LoadChildData" TItem="Employee"
                 RowCollapse="@(args => grid.ColumnsCollection.ToList().ForEach(c => c.ClearFilters()))">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Title="Employee" Frozen="true" Sortable="false" Filterable="false" Width="300px">
+        <RadzenDataGridColumn Title="Employee" Frozen="true" Sortable="false" Filterable="false" Width="300px">
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar me-1" AlternateText="@(data.FirstName + " " + data.LastName)" />
                 <strong>@data.TitleOfCourtesy @data.FirstName @data.LastName</strong>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="Title" Title="Job Title" Width="240px" />
-        <RadzenDataGridColumn TItem="Employee" Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="160px" />
-        <RadzenDataGridColumn TItem="Employee" Property="City" Title="City" Width="200px" />
-        <RadzenDataGridColumn TItem="Employee" Property="HomePhone" Title="Home Phone" Width="200px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Extension" Title="Extension" />
+        <RadzenDataGridColumn Property="Title" Title="Job Title" Width="240px" />
+        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="City" Title="City" Width="200px" />
+        <RadzenDataGridColumn Property="HomePhone" Title="Home Phone" Width="200px" />
+        <RadzenDataGridColumn Property="Extension" Title="Extension" />
     </Columns>
 </RadzenDataGrid>
 

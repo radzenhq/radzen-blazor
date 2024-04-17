@@ -29,6 +29,9 @@ namespace Radzen.Blazor
     /// &lt;/RadzenDataGrid&gt;
     /// </code>
     /// </example>
+#if NET6_0_OR_GREATER
+    [CascadingTypeParameter(nameof(TItem))]
+#endif
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
 #if NET5_0_OR_GREATER

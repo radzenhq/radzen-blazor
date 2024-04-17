@@ -11,7 +11,7 @@
 <Popup @ref=popup Lazy=true Open="@OnOpen"
     Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
     <RadzenTextBox id="search" Placeholder="Type to search..." Style="width:100%;" @oninput=@(args => searchString = $"{args.Value}") Value="@searchString" />
-    <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" TItem="Order" Style="height:100%;overflow:auto;">
+    <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" Style="height:100%;overflow:auto;">
         <Template Context="order">
             <RadzenCard Style="width:100%">
                 <RadzenRow>

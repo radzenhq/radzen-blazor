@@ -13,20 +13,20 @@
                     Data="@(Enum.GetValues(typeof(FilterCaseSensitivity)).Cast<FilterCaseSensitivity>().Select(t => new { Text = $"{t}", Value = t }))" />
 </div>
 <RadzenDataGrid @ref=grid AllowFiltering="true" AllowColumnResize="true" 
-    FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="300px"
+    FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="300px"
     FilterCaseSensitivity="@filterCaseSensitivity" LogicalFilterOperator="@logicalFilterOperator">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn TItem="Employee" Title="Photo" Sortable="false" Filterable="false" Width="200px" >
+        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="200px" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" />
-        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px"/>
-        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" />
-        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+        <RadzenDataGridColumn Property="FirstName" Title="First Name" />
+        <RadzenDataGridColumn Property="LastName" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="Country" Title="Country" />
+        <RadzenDataGridColumn Property="Notes" Title="Notes" />
     </Columns>
 </RadzenDataGrid>
 

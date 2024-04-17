@@ -10,13 +10,13 @@
 </RadzenStack>
 
 <RadzenDataGrid @ref="grid" AllowColumnResize="true" PageSize="5" AllowPaging="true" GotoFirstPageOnSort="@resetPaging"
-    AllowSorting="true" Data="@employees" TItem="Employee" ColumnWidth="400px" Sort="@OnSort">
+                AllowSorting="true" Data="@employees" ColumnWidth="400px" Sort="@OnSort" TItem="Employee">
     <Columns>
-        <RadzenDataGridColumn TItem="Employee" Property="FirstName" Title="First Name" SortOrder="SortOrder.Descending" Width="150px" />
-        <RadzenDataGridColumn TItem="Employee" Property="LastName" Title="Last Name" Width="150px" />
-        <RadzenDataGridColumn TItem="Employee" Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="150px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Country" Title="Country" Width="150px" />
-        <RadzenDataGridColumn TItem="Employee" Property="Notes" Title="Notes" />
+        <RadzenDataGridColumn Property="FirstName" Title="First Name" SortOrder="SortOrder.Descending" Width="150px" />
+        <RadzenDataGridColumn Property="LastName" Title="Last Name" Width="150px" />
+        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" Width="150px" />
+        <RadzenDataGridColumn Property="Country" Title="Country" Width="150px" />
+        <RadzenDataGridColumn Property="Notes" Title="Notes" />
     </Columns>
 </RadzenDataGrid>
 
