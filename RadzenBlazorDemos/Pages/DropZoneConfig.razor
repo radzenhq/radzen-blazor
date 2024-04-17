@@ -1,0 +1,110 @@
+<RadzenDropZoneContainer TItem="MyTask" Data="data"
+                         ItemSelector="@ItemSelector"
+                         ItemRender="@OnItemRender"
+                         CanDrop="@CanDrop"
+                         Drop="@OnDrop">
+    <ChildContent>
+        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenCard Style="width:100%;">
+                <RadzenDropZone Value="Status.NotStarted">
+                    <RadzenText Text="Not started" TextStyle="TextStyle.H5" />
+                </RadzenDropZone>
+            </RadzenCard>
+            <RadzenCard Style="width:100%;">
+                <RadzenDropZone Value="Status.Started">
+                    <RadzenText Text="Started" TextStyle="TextStyle.H5" />
+                </RadzenDropZone>
+            </RadzenCard>
+            <RadzenCard Style="width:100%;">
+                <RadzenDropZone Value="Status.Completed">
+                    <RadzenText Text="Completed" TextStyle="TextStyle.H5" />
+                </RadzenDropZone>
+            </RadzenCard>
+            <RadzenCard Style="width:100%;">
+                <RadzenDropZone Value="Status.Deleted">
+                    <RadzenText Text="Drop here to delete" TextStyle="TextStyle.H5" />
+                </RadzenDropZone>
+            </RadzenCard>
+        </RadzenStack>
+    </ChildContent>
+    <Template>
+        <RadzenCard Style="margin: 1rem;">
+            <strong>@context.Name</strong>
+        </RadzenCard>
+    </Template>
+</RadzenDropZoneContainer>
+
+@code {
+    // Filter items by zone value
+    Func<MyTask, RadzenDropZone<MyTask>, bool> ItemSelector = (item, zone) => item.Status == (Status)zone.Value && item.Status != Status.Deleted;
+
+    Func<RadzenDropZoneItemEventArgs<MyTask>, bool> CanDrop = request =>
+    {
+        // Allow item drop only in the same zone, in "Deleted" zone or in the next/previous zone.
+        return request.FromZone == request.ToZone || (Status)request.ToZone.Value == Status.Deleted ||
+            Math.Abs((int)request.Item.Status - (int)request.ToZone.Value) == 1;
+    };
+
+    void OnItemRender(RadzenDropZoneItemRenderEventArgs<MyTask> args)
+    {
+        // Customize item appearance
+        if (args.Item.Name == "Task2")
+        {
+            args.Attributes["draggable"] = "false";
+            args.Attributes["style"] = "color:gray;";
+        }
+        else
+        {
+            args.Attributes["style"] = "cursor:grab";
+        }
+
+        // Do not render item if deleted
+        args.Visible = args.Item.Status != Status.Deleted;
+    }
+
+    void OnDrop(RadzenDropZoneItemEventArgs<MyTask> args)
+    {
+        if (args.FromZone != args.ToZone)
+        {
+            // update item zone
+            args.Item.Status = (Status)args.ToZone.Value;
+        }
+
+        if (args.ToItem != null && args.ToItem != args.Item)
+        {
+            // reorder items in same zone or place the item at specific index in new zone
+            data.Remove(args.Item);
+            data.Insert(data.IndexOf(args.ToItem), args.Item);
+        }
+    }
+
+    IList<MyTask> data;
+
+    protected override void OnInitialized()
+    {
+        data = Enumerable.Range(0, 5)
+            .Select(i => 
+                new MyTask() 
+                { 
+                    Id = i, 
+                    Name = $"Task{i}", 
+                    Status = i < 3 ? Status.NotStarted : Status.Started 
+                })
+            .ToList();
+    }
+
+    public class MyTask
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public Status Status { get; set; } = Status.NotStarted;
+    }
+
+    public enum Status
+    {
+        NotStarted,
+        Started,
+        Completed,
+        Deleted
+    }
+}

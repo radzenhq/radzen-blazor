@@ -896,6 +896,15 @@ namespace RadzenBlazorDemos
                     Path = "popup",
                     Icon = "&#xe0cb",
                     Tags = new [] { "popup", "dropdown"}
+                },
+                new Example()
+                {
+                    New = true,
+                    Name = "DropZone",
+                    Description = "Demonstration and configuration of the Radzen Blazor DropZone component.",
+                    Path = "dropzone",
+                    Icon = "&#xe945",
+                    Tags = new [] { "dropzone", "drag", "drop" }
                 }
             }
         },

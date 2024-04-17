@@ -1,0 +1,18 @@
+@page "/dropzone"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor DropZone
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>DropZone</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Drag/Drop tasks between zones to update task status and order or in the same zone to reorder. 
+    Moving tasks between <strong>"Not started"</strong> and <strong>"Completed"</strong> zones is disallowed using <code>CanDrop</code> callback.
+    Use <code>ItemSelector</code> callback to define which item in which zone will appear, <code>Drop</code> callback to customize the drop logic and 
+    <code>ItemRender</code> callback to customize if the item can be dragged, appearance, etc.
+</RadzenText>
+<RadzenExample ComponentName="DropZone" Example="DropZoneConfig">
+    <DropZoneConfig />
+</RadzenExample>
