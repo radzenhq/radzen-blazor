@@ -88,15 +88,13 @@ namespace Radzen.Blazor
 
             var popupLastState = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
 
-            await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true);
+            await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true, DotNetObjectReference.Create<RadzenDropDown<TValue>>(this));
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
 
             if (list != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
             }
-
-            await CheckAndTriggerPopupStateChange(popupLastState);
         }
 
         internal override void RenderItem(RenderTreeBuilder builder, object item)

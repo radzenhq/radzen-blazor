@@ -1013,6 +1013,8 @@ window.Radzen = {
     var popup = document.getElementById(id);
     if (!popup) return;
 
+    var oldPopupStateIsOpen = popup.style.display == "block";
+
     Radzen.activeElement = document.activeElement;
 
     var parentRect = parent ? parent.getBoundingClientRect() : { top: y || 0, bottom: 0, left: x || 0, right: 0, width: 0, height: 0 };
@@ -1178,7 +1180,11 @@ window.Radzen = {
                 firstFocusable.focus();
             }
         }, 500);
-    }
+      }
+
+      if (instance) {
+          instance.invokeMethodAsync("CheckAndTriggerPopupStateChange", oldPopupStateIsOpen)
+      }
   },
   closeAllPopups: function (e, id) {
     if (!Radzen.popups) return;
@@ -1198,7 +1204,10 @@ window.Radzen = {
   },
   closePopup: function (id, instance, callback, e) {
     var popup = document.getElementById(id);
-    if (!popup) return;
+    if (!popup) return; 
+
+    var oldPopupStateIsOpen = popup.style.display == "block";
+
     if (popup.style.display == 'none') {
         var popups = Radzen.findPopup(id);
         if (popups.length > 1) {
@@ -1230,8 +1239,8 @@ window.Radzen = {
     window.removeEventListener('resize', Radzen[id]);
     Radzen[id] = null;
 
-    if (instance) {
-      instance.invokeMethodAsync(callback);
+    if (instance && callback) {
+        instance.invokeMethodAsync(callback);
     }
     Radzen.popups = (Radzen.popups || []).filter(function (obj) {
         return obj.id !== id;
@@ -1250,7 +1259,11 @@ window.Radzen = {
             }
             Radzen.activeElement = null;
         }, 100);
-    }
+      } 
+
+      if (instance) {
+          instance.invokeMethodAsync("CheckAndTriggerPopupStateChange", oldPopupStateIsOpen)
+      }
   },
   popupOpened: function (id) { 
     var popup = document.getElementById(id);

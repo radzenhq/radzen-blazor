@@ -591,8 +591,6 @@ namespace Radzen
             if (Disabled)
                 return;
 
-            var popupLastState = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
-
             await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, true);
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
 
@@ -601,7 +599,6 @@ namespace Radzen
                 await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
             }
 
-            await CheckAndTriggerPopupStateChange(popupLastState);
         }
 
         internal bool preventKeydown = false;
@@ -690,8 +687,7 @@ namespace Radzen
                 {
                     if (!Multiple)
                     {
-                        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-                        await CheckAndTriggerPopupStateChange(popupOpened);
+                        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, DotNetObjectReference.Create<DropDownBase<T>>(this));
                     }
                 }
             }
@@ -703,10 +699,7 @@ namespace Radzen
             }
             else if (key == "Escape" || key == "Tab")
             {
-                var popupLastState = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
-
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-                await CheckAndTriggerPopupStateChange(popupLastState);
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, DotNetObjectReference.Create<DropDownBase<T>>(this));
             }
             else if (key == "Delete" && AllowClear)
             {
@@ -1049,14 +1042,15 @@ namespace Radzen
         /// If the popup is currently open and was previously closed, it invokes the OnOpenPopup action.
         /// If the popup is currently closed and was previously open, it invokes the OnClosePopup action.
         /// </summary>
-        /// <param name="lastStateIsOpen">A boolean value indicating whether the popup was previously open.</param>
-        internal async Task CheckAndTriggerPopupStateChange(bool lastStateIsOpen)
+        /// <param name="oldStateIsOpen">A boolean value indicating whether the popup was previously open.</param>
+        [JSInvokable]
+        public async Task CheckAndTriggerPopupStateChange(bool oldStateIsOpen)
         {
             var isOpen = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
 
-            if (isOpen && !lastStateIsOpen)
+            if (isOpen && !oldStateIsOpen)
                 OnOpenPopup?.Invoke();
-            else if (isOpen is false && lastStateIsOpen)
+            else if (isOpen is false && oldStateIsOpen)
                 OnClosePopup?.Invoke();
         }
 
