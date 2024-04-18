@@ -972,6 +972,18 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Método que se dispara al abrir el popup
+        /// </summary>
+        [Parameter]
+        public Action OnOpenPopup { get; set; }
+
+        /// <summary>
+        /// Método que se dispara al cerrar el popup
+        /// </summary>
+        [Parameter]
+        public Action OnClosePopup { get; set; }
+
+        /// <summary>
         /// Determines whether the specified item is selected.
         /// </summary>
         /// <param name="item">The item.</param>
