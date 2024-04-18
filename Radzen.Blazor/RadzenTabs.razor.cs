@@ -257,7 +257,7 @@ namespace Radzen.Blazor
             if (index != selectedIndex)
             {
                 selectedIndex = index;
-
+                previousSelectedIndex = selectedIndex;
                 SetFocusedIndex();
 
                 await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
