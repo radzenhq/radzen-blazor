@@ -591,6 +591,8 @@ namespace Radzen
             if (Disabled)
                 return;
 
+            var popupLastState = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
             await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, true);
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
 
@@ -598,6 +600,8 @@ namespace Radzen
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
             }
+
+            await CheckAndTriggerPopupStateChange(popupLastState);
         }
 
         internal bool preventKeydown = false;
@@ -687,6 +691,7 @@ namespace Radzen
                     if (!Multiple)
                     {
                         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                        await CheckAndTriggerPopupStateChange(popupOpened);
                     }
                 }
             }
@@ -698,7 +703,10 @@ namespace Radzen
             }
             else if (key == "Escape" || key == "Tab")
             {
+                var popupLastState = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                await CheckAndTriggerPopupStateChange(popupLastState);
             }
             else if (key == "Delete" && AllowClear)
             {
@@ -972,16 +980,17 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Método que se dispara al abrir el popup
+        /// Method that is triggered when the popup opens.
         /// </summary>
         [Parameter]
         public Action OnOpenPopup { get; set; }
 
         /// <summary>
-        /// Método que se dispara al cerrar el popup
+        /// Method that is triggered when the popup closes.
         /// </summary>
         [Parameter]
         public Action OnClosePopup { get; set; }
+
 
         /// <summary>
         /// Determines whether the specified item is selected.
@@ -1033,6 +1042,24 @@ namespace Radzen
         /// <value>Item separator</value>
         [Parameter]
         public string Separator { get; set; } = ",";
+
+
+        /// <summary>
+        /// Checks the current state of the popup by invoking a JavaScript function and triggers the appropriate action.
+        /// If the popup is currently open and was previously closed, it invokes the OnOpenPopup action.
+        /// If the popup is currently closed and was previously open, it invokes the OnClosePopup action.
+        /// </summary>
+        /// <param name="lastStateIsOpen">A boolean value indicating whether the popup was previously open.</param>
+        internal async Task CheckAndTriggerPopupStateChange(bool lastStateIsOpen)
+        {
+            var isOpen = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+            if (isOpen && !lastStateIsOpen)
+                OnOpenPopup?.Invoke();
+            else if (isOpen is false && lastStateIsOpen)
+                OnClosePopup?.Invoke();
+        }
+
 
         /// <summary>
         /// Gets the items.
@@ -1389,7 +1416,7 @@ namespace Radzen
                 default:
                     return object.Equals(internalValue, v);
             }
-        }
+        }  
 
         /// <inheritdoc />
         public override void Dispose()
