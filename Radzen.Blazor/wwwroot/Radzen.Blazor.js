@@ -1864,7 +1864,7 @@ window.Radzen = {
     };
     document.addEventListener('mousemove', ref.mouseMoveHandler);
     document.addEventListener('mouseup', ref.mouseUpHandler);
-    document.addEventListener('touchmove', ref.touchMoveHandler, { passive: true })
+    document.addEventListener('touchmove', ref.touchMoveHandler, { passive: true, capture: true })
     document.addEventListener('touchend', ref.mouseUpHandler, { passive: true });
     return Radzen.clientRect(ref);
   },
