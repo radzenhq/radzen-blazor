@@ -555,7 +555,7 @@ namespace Radzen.Blazor
                     {
                         SelectedItem = internalValue;
                     }
-                    SelectedItemChanged?.Invoke(SelectedItem);
+                    SelectedItemChanged.InvokeAsync(SelectedItem);
                     selectedItems.Clear();
                     selectedItems.Add(SelectedItem);
                 }

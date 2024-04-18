@@ -269,7 +269,7 @@ namespace Radzen
         /// </summary>
         /// <value>The selected item changed.</value>
         [Parameter]
-        public Action<object> SelectedItemChanged { get; set; }
+        public EventCallback<object> SelectedItemChanged { get; set; }
 
         /// <summary>
         /// The selected items
@@ -1179,7 +1179,7 @@ namespace Radzen
 
                 SetSelectedIndexFromSelectedItem();
 
-                SelectedItemChanged?.Invoke(selectedItem);
+                await SelectedItemChanged.InvokeAsync(selectedItem);
             }
             else
             {
@@ -1322,7 +1322,7 @@ namespace Radzen
 
                     SetSelectedIndexFromSelectedItem();
 
-                    SelectedItemChanged?.Invoke(selectedItem);
+                    SelectedItemChanged.InvokeAsync(selectedItem);
                 }
                 else
                 {
