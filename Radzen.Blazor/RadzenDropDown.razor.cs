@@ -223,7 +223,7 @@ namespace Radzen.Blazor
             {
                 if (!Multiple && !isFromKey)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, DotNetObjectReference.Create<RadzenDropDown<TValue>>(this));
                 }
 
                 if (ClearSearchAfterSelection)
@@ -278,7 +278,7 @@ namespace Radzen.Blazor
 
         internal async Task ClosePopup()
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, DotNetObjectReference.Create<RadzenDropDown<TValue>>(this));
         }
     }
 }
