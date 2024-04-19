@@ -14,13 +14,7 @@
         return operators;
     }
 
-    public override bool ShowTimeForDateTimeFilter()
-    {
-        return false;
-    }
+    public override bool ShowTimeForDateTimeFilter { get; set; } = false;
 
-    public override bool ShowUpDownForNumericFilter()
-    {
-        return false;
-    }
+    public override bool ShowUpDownForNumericFilter { get; set; } = false;
 }

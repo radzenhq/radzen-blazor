@@ -331,7 +331,7 @@ namespace Radzen.Blazor
         {
             return FilterPlaceholder ?? string.Empty;
         }
-        
+
         /// <summary>
         /// Gets or sets the second filter value.
         /// </summary>
@@ -520,6 +520,18 @@ namespace Radzen.Blazor
         /// <value>The data type.</value>
         [Parameter]
         public Type Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether time should be shown for DateTime filter.
+        /// </summary>
+        [Parameter]
+        public virtual bool ShowTimeForDateTimeFilter { get; set; } = true;
+
+        /// <summary>
+        /// gets or sets a value indicating whether up down buttons should be shown for numeric filter.
+        /// </summary>
+        [Parameter]
+        public virtual bool ShowUpDownForNumericFilter { get; set; } = true;
 
         Func<TItem, object> propertyValueGetter;
 
@@ -915,7 +927,7 @@ namespace Radzen.Blazor
                     return;
                 }
             }
-            
+
             if (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator))
             {
                 filterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
@@ -1204,7 +1216,7 @@ namespace Radzen.Blazor
                 var isStringOperator = o == FilterOperator.Contains || o == FilterOperator.DoesNotContain
                     || o == FilterOperator.StartsWith || o == FilterOperator.EndsWith || o == FilterOperator.IsEmpty || o == FilterOperator.IsNotEmpty;
 
-                if ((FilterPropertyType == typeof(string) || !QueryableExtension.IsEnumerable(FilterPropertyType)) && 
+                if ((FilterPropertyType == typeof(string) || !QueryableExtension.IsEnumerable(FilterPropertyType)) &&
                     (o == FilterOperator.In || o == FilterOperator.NotIn)) return false;
 
                 return FilterPropertyType == typeof(string) || QueryableExtension.IsEnumerable(FilterPropertyType) ? isStringOperator
@@ -1290,22 +1302,6 @@ namespace Radzen.Blazor
                 default:
                     return $"{filterOperator}";
             }
-        }
-
-        /// <summary>
-        /// Gets value indicating if the user can specify time in DateTime column filter.
-        /// </summary>
-        public virtual bool ShowTimeForDateTimeFilter()
-        {
-            return true;
-        }
-
-        /// <summary>
-        /// Gets value indicating if up and down buttons are displayed in numeric column filter.
-        /// </summary>
-        public virtual bool ShowUpDownForNumericFilter()
-        {
-            return true;
         }
 
         /// <summary>

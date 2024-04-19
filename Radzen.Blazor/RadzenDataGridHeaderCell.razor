@@ -76,7 +76,7 @@
                                 @if (Column.FilterValueTemplate != null)
                                 {
                                     @Column.FilterValueTemplate(Column)
-                                } 
+                                }
                                 else if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
                                 {
                                     <RadzenDropDown Disabled="@(!Column.CanSetFilterValue())" AllowClear="false" AllowFiltering="false" TValue="@object"
@@ -90,7 +90,7 @@
                                 }
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
-                                    <RadzenDatePicker Disabled="@(!Column.CanSetFilterValue())" TValue="@object" ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
+                                    <RadzenDatePicker Disabled="@(!Column.CanSetFilterValue())" TValue="@object" ShowTime="@Column.ShowTimeForDateTimeFilter" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
                                                       Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args.Value))" AllowInput=@(Grid.AllowFilterDateInput)
                                                       InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})" />
 
@@ -111,7 +111,7 @@
                                 @if (Column.SecondFilterValueTemplate != null)
                                 {
                                     @Column.SecondFilterValueTemplate(Column)
-                                } 
+                                }
                                 else if (PropertyAccess.IsNullableEnum(Column.FilterPropertyType) || PropertyAccess.IsEnum(Column.FilterPropertyType))
                                 {
                                     <RadzenDropDown Disabled="@(!Column.CanSetFilterValue(false))" AllowClear="false" AllowFiltering="false" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.SecondFilterValueArialLabel }})"
@@ -125,7 +125,7 @@
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
                                     <RadzenDatePicker Disabled="@(!Column.CanSetFilterValue(false))" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title +  Grid.SecondFilterValueArialLabel + Column.GetSecondFilterValue() }})"
-                                                ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
+                                                ShowTime="@Column.ShowTimeForDateTimeFilter" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
                                                       Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args.Value, false))" AllowInput=@(Grid.AllowFilterDateInput) />
 
                                 }
@@ -279,8 +279,8 @@ else
 
     async Task StartColumnResize(MouseEventArgs args)
     {
-        if(args.Button == 0) 
-        { 
+        if(args.Button == 0)
+        {
             await Grid.StartColumnResize(args, ColumnIndex);
         }
     }
