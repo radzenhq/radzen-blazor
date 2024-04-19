@@ -1048,10 +1048,10 @@ namespace Radzen
         {
             var isOpen = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
 
-            if (isOpen && !oldStateIsOpen)
-                OpenPopupCallback?.Invoke();
-            else if (isOpen is false && oldStateIsOpen)
-                ClosePopupCallback?.Invoke();
+            if (isOpen && !oldStateIsOpen && OpenPopupCallback.HasDelegate)
+                await OpenPopupCallback.InvokeAsync(null);
+            else if (isOpen is false && oldStateIsOpen && ClosePopupCallback.HasDelegate)
+                await ClosePopupCallback.InvokeAsync(null);
         }
 
 
