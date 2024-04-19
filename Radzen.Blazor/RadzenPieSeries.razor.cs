@@ -111,22 +111,7 @@ namespace Radzen.Blazor
         /// Stores Data filtered to items greater than zero as an IList of <typeparamref name="TItem"/>.
         /// </summary>
         /// <value>The items.</value>
-        protected IList<TItem> PositiveItems { get; set; }
-
-        /// <inheritdoc />
-        public override async Task SetParametersAsync(ParameterView parameters)
-        {
-            await base.SetParametersAsync(parameters);
-
-            if (Items != null)
-            {
-                PositiveItems = Items.Where(e => Value(e) > 0).ToList();
-            }
-            else
-            {
-                PositiveItems = new List<TItem>();
-            }
-        }
+        protected IList<TItem> PositiveItems => Items != null ? Items.Where(e => Value(e) > 0).ToList() : new List<TItem>();
 
         /// <inheritdoc />
         public override double MeasureLegend()
@@ -256,11 +241,12 @@ namespace Radzen.Blazor
 
         private double TooltipAngle(TItem item)
         {
-            var sum = PositiveItems.Sum(Value);
+            var items = PositiveItems;
+            var sum = items.Sum(Value);
             var startAngle = StartAngle;
             var endAngle = 0d;
 
-            foreach (var data in PositiveItems)
+            foreach (var data in items)
             {
                 var value = Value(data);
                 var sweepAngle = value / sum * TotalAngle;

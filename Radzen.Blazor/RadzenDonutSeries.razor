@@ -36,15 +36,16 @@
         var y = CenterY;
         var radius = CurrentRadius;
         var innerRadius = InnerRadius ?? radius / 2;
+        var items = PositiveItems;
         return
         @<g>
             <g class="@className">
-                @if (PositiveItems.Any())
+                @if (items.Any())
                 {
-                    var sum = PositiveItems.Sum(Value);
+                    var sum = items.Sum(Value);
                     var startAngle = StartAngle;
 
-                    @foreach (var data in PositiveItems)
+                    @foreach (var data in items)
                     {
                         var value = Value(data);
                         var sweepAngle = (value / sum) * TotalAngle;
