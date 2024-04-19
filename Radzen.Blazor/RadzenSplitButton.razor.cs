@@ -29,6 +29,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets the child content.
+        /// </summary>
+        /// <value>The child content.</value>
+        [Parameter]
+        public RenderFragment ButtonContent { get; set; }
+
+        /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>

@@ -4,33 +4,40 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-        tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+         tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         <button tabindex="-1" disabled="@IsDisabled" class="@getButtonCss()" type="button" @onclick="@OnClick">
-            @if (IsBusy)
+            @if (ButtonContent != null)
             {
-                <RadzenIcon Icon="refresh" Style="animation: rotation 700ms linear infinite" />
-                @if (!string.IsNullOrEmpty(BusyText))
-                {
-                    <span class="rz-button-text">@BusyText</span>
-                }
+                @ButtonContent
             }
             else
             {
-                @if (!string.IsNullOrEmpty(@Icon))
+                @if (IsBusy)
                 {
-                    <i class="rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
-                }
-                @if (!string.IsNullOrEmpty(Image))
-                {
-                    <img class="rz-button-icon-left rzi" src="@Image" alt=@ImageAlternateText />
-                }
-                @if (!string.IsNullOrEmpty(Text))
-                {
-                    <span class="rz-button-text">@Text</span>
+                    <RadzenIcon Icon="refresh" Style="animation: rotation 700ms linear infinite" />
+                    @if (!string.IsNullOrEmpty(BusyText))
+                    {
+                        <span class="rz-button-text">@BusyText</span>
+                    }
                 }
                 else
                 {
-                    <span class="rz-button-text">&nbsp;</span>
+                    @if (!string.IsNullOrEmpty(@Icon))
+                    {
+                        <i class="rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+                    }
+                    @if (!string.IsNullOrEmpty(Image))
+                    {
+                        <img class="rz-button-icon-left rzi" src="@Image" alt=@ImageAlternateText />
+                    }
+                    @if (!string.IsNullOrEmpty(Text))
+                    {
+                        <span class="rz-button-text">@Text</span>
+                    }
+                    else
+                    {
+                        <span class="rz-button-text">&nbsp;</span>
+                    }
                 }
             }
         </button><button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class="@getPopupButtonCss()" type="button" aria-label="@OpenAriaLabel">
