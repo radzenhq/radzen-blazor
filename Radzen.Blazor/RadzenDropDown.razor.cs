@@ -71,7 +71,7 @@ namespace Radzen.Blazor
         {
             if (OpenOnFocus)
             {
-                await OpenPopup("Enter", false);
+                await TogglePopup("Enter", false);
             }
         }
 
@@ -81,7 +81,7 @@ namespace Radzen.Blazor
         /// <param name="key">The key.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
-        protected override async Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+        protected override async Task TogglePopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
                 return;

@@ -581,12 +581,12 @@ namespace Radzen
         protected int selectedIndex = -1;
 
         /// <summary>
-        /// Opens the popup.
+        /// Open or close instace popup 
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
-        protected virtual async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+        protected virtual async System.Threading.Tasks.Task TogglePopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
                 return;
@@ -681,7 +681,7 @@ namespace Radzen
 
                 if (!popupOpened)
                 {
-                    await OpenPopup(key, isFilter);
+                    await TogglePopup(key, isFilter);
                 }
                 else
                 {
@@ -695,7 +695,7 @@ namespace Radzen
             {
                 preventKeydown = true;
 
-                await OpenPopup(key, isFilter);
+                await TogglePopup(key, isFilter);
             }
             else if (key == "Escape" || key == "Tab")
             {
@@ -976,13 +976,13 @@ namespace Radzen
         /// Method that is triggered when the popup opens.
         /// </summary>
         [Parameter]
-        public EventCallback OpenPopupCallback { get; set; }
+        public EventCallback OpenPopup { get; set; }
 
         /// <summary>
         /// Method that is triggered when the popup closes.
         /// </summary>
         [Parameter]
-        public EventCallback ClosePopupCallback { get; set; }
+        public EventCallback ClosePopup { get; set; }
 
 
         /// <summary>
@@ -1048,10 +1048,10 @@ namespace Radzen
         {
             var isOpen = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
 
-            if (isOpen && !oldStateIsOpen && OpenPopupCallback.HasDelegate)
-                await OpenPopupCallback.InvokeAsync(null);
-            else if (isOpen is false && oldStateIsOpen && ClosePopupCallback.HasDelegate)
-                await ClosePopupCallback.InvokeAsync(null);
+            if (isOpen && !oldStateIsOpen && OpenPopup.HasDelegate)
+                await OpenPopup.InvokeAsync(null);
+            else if (isOpen is false && oldStateIsOpen && ClosePopup.HasDelegate)
+                await ClosePopup.InvokeAsync(null);
         }
 
 
