@@ -976,13 +976,13 @@ namespace Radzen
         /// Method that is triggered when the popup opens.
         /// </summary>
         [Parameter]
-        public Action OnOpenPopup { get; set; }
+        public EventCallback OpenPopupCallback { get; set; }
 
         /// <summary>
         /// Method that is triggered when the popup closes.
         /// </summary>
         [Parameter]
-        public Action OnClosePopup { get; set; }
+        public EventCallback ClosePopupCallback { get; set; }
 
 
         /// <summary>
@@ -1039,8 +1039,8 @@ namespace Radzen
 
         /// <summary>
         /// Checks the current state of the popup by invoking a JavaScript function and triggers the appropriate action.
-        /// If the popup is currently open and was previously closed, it invokes the OnOpenPopup action.
-        /// If the popup is currently closed and was previously open, it invokes the OnClosePopup action.
+        /// If the popup is currently open and was previously closed, it invokes the OpenPopup action.
+        /// If the popup is currently closed and was previously open, it invokes the ClosePopup action.
         /// </summary>
         /// <param name="oldStateIsOpen">A boolean value indicating whether the popup was previously open.</param>
         [JSInvokable]
@@ -1049,9 +1049,9 @@ namespace Radzen
             var isOpen = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
 
             if (isOpen && !oldStateIsOpen)
-                OnOpenPopup?.Invoke();
+                OpenPopupCallback?.Invoke();
             else if (isOpen is false && oldStateIsOpen)
-                OnClosePopup?.Invoke();
+                ClosePopupCallback?.Invoke();
         }
 
 
