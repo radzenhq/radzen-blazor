@@ -654,7 +654,7 @@ window.Radzen = {
         table.nextSelectedIndex = rows.length - 1;
     } else if (isVirtual && (key == 'PageUp' || key == 'Home')) {
         table.nextSelectedIndex = 1;
-    } 
+    }
 
     if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
         var highlightedCells = rows[table.nextSelectedIndex].querySelectorAll('.rz-state-focused');
@@ -697,7 +697,7 @@ window.Radzen = {
                 }
             }
         }
-    } 
+    }
 
     return [table.nextSelectedIndex, table.nextSelectedCellIndex];
   },
@@ -1252,7 +1252,7 @@ window.Radzen = {
         }, 100);
     }
   },
-  popupOpened: function (id) { 
+  popupOpened: function (id) {
     var popup = document.getElementById(id);
     if (popup) {
         return popup.style.display != 'none';
@@ -1725,6 +1725,12 @@ window.Radzen = {
       }
     };
 
+    ref.clickListener = function (e) {
+      if (e.target && e.target.matches('a,button')) {
+        e.preventDefault();
+      }
+    }
+
     ref.selectionChangeListener = function () {
       if (document.activeElement == ref) {
         instance.invokeMethodAsync('OnSelectionChange');
@@ -1779,6 +1785,7 @@ window.Radzen = {
     ref.addEventListener('input', ref.inputListener);
     ref.addEventListener('paste', ref.pasteListener);
     ref.addEventListener('keydown', ref.keydownListener);
+    ref.addEventListener('click', ref.clickListener);
     document.addEventListener('selectionchange', ref.selectionChangeListener);
     document.execCommand('styleWithCSS', false, true);
   },
@@ -1844,6 +1851,7 @@ window.Radzen = {
       ref.removeEventListener('input', ref.inputListener);
       ref.removeEventListener('paste', ref.pasteListener);
       ref.removeEventListener('keydown', ref.keydownListener);
+      ref.removeEventListener('click', ref.clickListener);
       document.removeEventListener('selectionchange', ref.selectionChangeListener);
     }
   },
