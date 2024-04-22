@@ -1,6 +1,7 @@
 @typeparam TItem
 @using Microsoft.JSInterop
 @using Radzen.Blazor.Rendering
+@using System.Globalization
 @if (RowIndex == Column.GetLevel())
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>
@@ -147,7 +148,11 @@
                                                    Change="@(args => Column.SetFilterValue(args))" 
                                                    AllowFiltering="@(PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty()) == typeof(string))"
                                                    Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                                   InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})" />
+                                                   InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})">
+                                        <Template>
+                                            @(!string.IsNullOrEmpty(Column.FormatString) ? string.Format(Grid?.Culture ?? CultureInfo.CurrentCulture, Column.FormatString, context) : Convert.ToString(context, Grid?.Culture ?? CultureInfo.CurrentCulture))
+                                        </Template>
+                                    </RadzenListBox>
                                 }
                             </form>
                             }
