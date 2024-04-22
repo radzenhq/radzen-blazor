@@ -216,12 +216,12 @@ namespace Radzen.Blazor
 
                 if (monthDropDown != null)
                 {
-                    await monthDropDown.ClosePopup();
+                    await monthDropDown.PopupClose();
                 }
 
                 if (yearDropDown != null)
                 {
-                    await yearDropDown.ClosePopup();
+                    await yearDropDown.PopupClose();
                 }
             }
         }
