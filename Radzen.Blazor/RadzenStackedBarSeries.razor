@@ -32,9 +32,15 @@
                 var itemValue = Value(data);
                 var radius = Chart.BarOptions.Radius;
 
-                if (radius > height / 2 || barIndex < barSeries.Count - 1)
+                if (radius > 0)
                 {
-                    radius = 0;
+                    var items = barSeries.SelectMany(series => series.ItemsForCategory(category(data))).ToList();
+                    var index = items.IndexOf(data);
+
+                    if (radius > height / 2 || index < items.Count - 1)
+                    {
+                        radius = 0;
+                    }
                 }
                 var x0 = GetBarLeft(data, barIndex, category, barSeries);
 

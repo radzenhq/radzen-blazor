@@ -28,9 +28,14 @@
                 var itemValue = Value(data);
                 var radius = Chart.ColumnOptions.Radius;
 
-                if (radius > width / 2 || columnIndex < stackedColumnSeries.Count - 1)
+                if (radius > 0)
                 {
-                    radius = 0;
+                    var items = stackedColumnSeries.SelectMany(series => series.ItemsForCategory(category(data))).ToList();
+                    var index = items.IndexOf(data);
+                    if (radius > width / 2 || index < items.Count - 1)
+                    {
+                        radius = 0;
+                    }
                 }
 
                 var y0 = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);

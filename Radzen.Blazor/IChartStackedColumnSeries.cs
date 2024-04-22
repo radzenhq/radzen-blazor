@@ -19,6 +19,13 @@ namespace Radzen.Blazor
         IEnumerable<double> ValuesForCategory(double category);
 
         /// <summary>
+        /// Gets the items for category.
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        IEnumerable<object> ItemsForCategory(double category);
+
+        /// <summary>
         /// Gets the value at the specified index.
         /// </summary>
         double ValueAt(int index);

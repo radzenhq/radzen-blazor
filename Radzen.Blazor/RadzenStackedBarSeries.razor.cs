@@ -216,6 +216,18 @@ namespace Radzen.Blazor
             return Items.Where(item => category(item) == value).Select(Value);
         }
 
+        IEnumerable<object> IChartStackedBarSeries.ItemsForCategory(double value)
+        {
+            if (Items == null)
+            {
+                return Enumerable.Empty<object>();
+            }
+
+            var category = ComposeCategory(Chart.ValueScale);
+
+            return Items.Where(item => category(item) == value).Cast<object>();
+        }
+
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
