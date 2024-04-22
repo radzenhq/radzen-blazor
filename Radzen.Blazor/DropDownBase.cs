@@ -581,12 +581,12 @@ namespace Radzen
         protected int selectedIndex = -1;
 
         /// <summary>
-        /// Opens the popup.
+        /// Open or close instace popup 
         /// </summary>
         /// <param name="key">The key.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
-        protected virtual async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+        protected virtual async System.Threading.Tasks.Task TogglePopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
                 return;
@@ -598,6 +598,7 @@ namespace Radzen
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
             }
+
         }
 
         internal bool preventKeydown = false;
@@ -680,13 +681,13 @@ namespace Radzen
 
                 if (!popupOpened)
                 {
-                    await OpenPopup(key, isFilter);
+                    await TogglePopup(key, isFilter);
                 }
                 else
                 {
                     if (!Multiple)
                     {
-                        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, DotNetObjectReference.Create<DropDownBase<T>>(this));
                     }
                 }
             }
@@ -694,11 +695,11 @@ namespace Radzen
             {
                 preventKeydown = true;
 
-                await OpenPopup(key, isFilter);
+                await TogglePopup(key, isFilter);
             }
             else if (key == "Escape" || key == "Tab")
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, DotNetObjectReference.Create<DropDownBase<T>>(this));
             }
             else if (key == "Delete" && AllowClear)
             {
@@ -972,6 +973,19 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Method that is triggered when the popup opens.
+        /// </summary>
+        [Parameter]
+        public EventCallback OpenPopup { get; set; }
+
+        /// <summary>
+        /// Method that is triggered when the popup closes.
+        /// </summary>
+        [Parameter]
+        public EventCallback ClosePopup { get; set; }
+
+
+        /// <summary>
         /// Determines whether the specified item is selected.
         /// </summary>
         /// <param name="item">The item.</param>
@@ -1021,6 +1035,25 @@ namespace Radzen
         /// <value>Item separator</value>
         [Parameter]
         public string Separator { get; set; } = ",";
+
+
+        /// <summary>
+        /// Checks the current state of the popup by invoking a JavaScript function and triggers the appropriate action.
+        /// If the popup is currently open and was previously closed, it invokes the OpenPopup action.
+        /// If the popup is currently closed and was previously open, it invokes the ClosePopup action.
+        /// </summary>
+        /// <param name="oldStateIsOpen">A boolean value indicating whether the popup was previously open.</param>
+        [JSInvokable]
+        public async Task CheckAndTriggerPopupStateChange(bool oldStateIsOpen)
+        {
+            var isOpen = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+            if (isOpen && !oldStateIsOpen && OpenPopup.HasDelegate)
+                await OpenPopup.InvokeAsync(null);
+            else if (isOpen is false && oldStateIsOpen && ClosePopup.HasDelegate)
+                await ClosePopup.InvokeAsync(null);
+        }
+
 
         /// <summary>
         /// Gets the items.
@@ -1377,7 +1410,7 @@ namespace Radzen
                 default:
                     return object.Equals(internalValue, v);
             }
-        }
+        }  
 
         /// <inheritdoc />
         public override void Dispose()

@@ -88,7 +88,7 @@ namespace Radzen.Blazor
         {
             if (OpenOnFocus)
             {
-                await OpenPopup("Enter", false);
+                await TogglePopup("Enter", false);
             }
         }
 
@@ -98,7 +98,7 @@ namespace Radzen.Blazor
         /// <param name="key">The key.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
-        protected override async System.Threading.Tasks.Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+        protected override async System.Threading.Tasks.Task TogglePopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
                 return;
@@ -680,7 +680,7 @@ namespace Radzen.Blazor
 
                 if (!popupOpened)
                 {
-                    await OpenPopup(key, isFilter);
+                    await TogglePopup(key, isFilter);
                 }
                 else
                 {
@@ -702,7 +702,7 @@ namespace Radzen.Blazor
             {
                 preventKeydown = true;
 
-                await OpenPopup(key, isFilter);
+                await TogglePopup(key, isFilter);
             }
             else if (key == "Escape")
             {
