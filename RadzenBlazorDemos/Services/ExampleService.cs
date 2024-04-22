@@ -325,6 +325,15 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             New = true,
+                            Name = "CheckBoxList (Excel like)",
+                            Path = "datagrid-checkboxlist-filter",
+                            Title = "Blazor DataGrid Component - Excel like filtering | Free UI Components by Radzen",
+                            Description = "RadzenDataGrid Excel like filtering.",
+                            Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list" }
+                        },
+                        new Example
+                        {
+                            New = true,
                             Name = "Enum filtering",
                             Path = "datagrid-enum-filter",
                             Title = "Blazor DataGrid Component - Enum Filtering | Free UI Components by Radzen",

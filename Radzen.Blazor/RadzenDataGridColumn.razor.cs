@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -122,6 +123,12 @@ namespace Radzen.Blazor
             {
                 Grid.AddColumn(this);
 
+                if (Grid.FilterMode == FilterMode.CheckBoxList)
+                {
+                    _filterPropertyType = typeof(IEnumerable<object>);
+                    SetFilterOperator(FilterOperator.Contains);
+                }
+
                 var property = GetFilterProperty();
 
                 if (!string.IsNullOrEmpty(property))
@@ -129,7 +136,7 @@ namespace Radzen.Blazor
                     _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                 }
 
-                if (!string.IsNullOrEmpty(property) && Type == null)
+                if (!string.IsNullOrEmpty(property) && Type == null && Grid.FilterMode != FilterMode.CheckBoxList)
                 {
                     _filterPropertyType = _propertyType;
                 }
@@ -145,7 +152,7 @@ namespace Radzen.Blazor
 
                 if (_filterPropertyType == typeof(string))
                 {
-                    FilterOperator = FilterOperator.Contains;
+                    SetFilterOperator(FilterOperator.Contains);
                 }
             }
         }
@@ -953,6 +960,19 @@ namespace Radzen.Blazor
         public object GetFilterValue()
         {
             return filterValue ?? FilterValue;
+        }
+
+        IEnumerable filterValues;
+        internal IEnumerable GetFilterValues()
+        {
+            if (filterValues == null)
+            {
+                filterValues = Grid.Data != null && !string.IsNullOrEmpty(GetFilterProperty()) ?
+                    Grid.Data.AsQueryable().Select($"np({GetFilterProperty()})").Distinct().Cast(PropertyAccess.GetPropertyType(typeof(TItem), GetFilterProperty())) 
+                        : Enumerable.Empty<object>();
+            }
+
+            return filterValues;
         }
 
         /// <summary>
