@@ -71,7 +71,7 @@ namespace Radzen.Blazor
         {
             if (OpenOnFocus)
             {
-                await TogglePopup("Enter", false);
+                await OpenPopup("Enter", false);
             }
         }
 
@@ -81,14 +81,12 @@ namespace Radzen.Blazor
         /// <param name="key">The key.</param>
         /// <param name="isFilter">if set to <c>true</c> [is filter].</param>
         /// <param name="isFromClick">if set to <c>true</c> [is from click].</param>
-        protected override async Task TogglePopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
+        protected override async Task OpenPopup(string key = "ArrowDown", bool isFilter = false, bool isFromClick = false)
         {
             if (Disabled)
                 return;
 
-            var popupLastState = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
-
-            await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true, DotNetObjectReference.Create<RadzenDropDown<TValue>>(this));
+            await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true);
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
 
             if (list != null)
@@ -223,7 +221,7 @@ namespace Radzen.Blazor
             {
                 if (!Multiple && !isFromKey)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, DotNetObjectReference.Create<RadzenDropDown<TValue>>(this));
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                 }
 
                 if (ClearSearchAfterSelection)
@@ -278,7 +276,7 @@ namespace Radzen.Blazor
 
         internal async Task PopupClose()
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, DotNetObjectReference.Create<RadzenDropDown<TValue>>(this));
+            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
         }
     }
 }
