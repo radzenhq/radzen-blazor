@@ -169,10 +169,13 @@ namespace Radzen.Blazor
                 return GetPointsAt(index - 1, category, value, valueScale).Reverse();
             }
 
+            var valueTicks = valueScale.Ticks(Chart.ValueAxis.TickDistance);
+            var start = Math.Max(0, valueTicks.Start);
+
             return Items.Select(item =>
             {
                 var x = category(item);
-                var y = valueScale.Scale(valueScale.Input.Start);
+                var y = valueScale.Scale(start);
 
                 return new Point<TItem> { X = x, Y = y, Data = item };
             }).ToList();
