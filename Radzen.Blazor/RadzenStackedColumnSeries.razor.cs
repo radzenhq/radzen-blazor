@@ -192,7 +192,7 @@ namespace Radzen.Blazor
 
             var sum = Sum(columnIndex, stackedColumnSeries, category(item));
 
-            return Chart.ValueScale.Scale(Math.Max(0, Math.Max(ticks.Start, sum)));
+            return Chart.ValueScale.Scale(Math.Max(ticks.Start, sum));
         }
 
         int ColumnIndex => VisibleColumnSeries.IndexOf(this);

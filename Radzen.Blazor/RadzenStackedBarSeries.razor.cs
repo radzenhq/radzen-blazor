@@ -184,7 +184,7 @@ namespace Radzen.Blazor
 
             var sum = Sum(barIndex, stackedBarSeries, category(item));
 
-            return Chart.CategoryScale.Scale(Math.Max(0, Math.Max(ticks.Start, sum)));
+            return Chart.CategoryScale.Scale(Math.Max(ticks.Start, sum));
         }
 
         int IChartBarSeries.Count
