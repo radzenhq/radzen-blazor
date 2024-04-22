@@ -965,11 +965,22 @@ namespace Radzen.Blazor
         IEnumerable filterValues;
         internal IEnumerable GetFilterValues()
         {
-            if (filterValues == null)
+            if (filterValues == null && Grid.Data != null && !string.IsNullOrEmpty(GetFilterProperty()))
             {
-                filterValues = Grid.Data != null && !string.IsNullOrEmpty(GetFilterProperty()) ?
-                    Grid.Data.AsQueryable().Select($"np({GetFilterProperty()})").Distinct().Cast(PropertyAccess.GetPropertyType(typeof(TItem), GetFilterProperty())) 
-                        : Enumerable.Empty<object>();
+                var property = GetFilterProperty();
+                var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), GetFilterProperty());
+
+                if (property.IndexOf(".") != -1)
+                {
+                    property = $"np({property})";
+                }
+
+                if (propertyType == typeof(string))
+                {
+                    property = $@"({property} == null ? """" : {property})";
+                }
+
+                filterValues = Grid.Data.AsQueryable().Select(property).Distinct().Cast(propertyType);
             }
 
             return filterValues;
