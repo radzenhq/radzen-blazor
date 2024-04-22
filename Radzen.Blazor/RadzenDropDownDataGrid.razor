@@ -10,7 +10,7 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onfocus="@((args) => OnFocus(args))"
-         style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()" @onclick="@(args => TogglePopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation
+         style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown">
         <div class="rz-helper-hidden-accessible">
             <input tabindex="-1" disabled="@Disabled" style="width:100%" aria-haspopup="listbox" readonly="" type="text" id="@Name"
