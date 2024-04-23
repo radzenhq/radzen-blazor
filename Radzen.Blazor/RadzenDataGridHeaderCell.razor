@@ -94,7 +94,7 @@
                                 else if (PropertyAccess.IsDate(Column.FilterPropertyType))
                                 {
                                     <RadzenDatePicker Disabled="@(!Column.CanSetFilterValue())" TValue="@object" ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
-                                                      Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(args.Value))" AllowInput=@(Grid.AllowFilterDateInput)
+                                                      Value="@Column.GetFilterValue()" Change="@(args => Column.SetFilterValue(PropertyAccess.IsDateOnly(Column.FilterPropertyType) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value))" AllowInput=@(Grid.AllowFilterDateInput)
                                                       InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})" />
 
                                 }
@@ -129,7 +129,7 @@
                                 {
                                     <RadzenDatePicker Disabled="@(!Column.CanSetFilterValue(false))" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title +  Grid.SecondFilterValueArialLabel + Column.GetSecondFilterValue() }})"
                                                 ShowTime="@Column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="true" DateFormat="@Grid.getFilterDateFormat(Column)"
-                                                      Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(args.Value, false))" AllowInput=@(Grid.AllowFilterDateInput) />
+                                                      Value="@Column.GetSecondFilterValue()" Change="@(args => Column.SetFilterValue(PropertyAccess.IsDateOnly(Column.FilterPropertyType) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value, false))" AllowInput=@(Grid.AllowFilterDateInput) />
 
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))

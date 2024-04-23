@@ -220,6 +220,13 @@
                             Type = "string";
                             Format = "date-time-offset";
                         }
+#if NET6_0_OR_GREATER
+                        else if (_filterPropertyType == typeof(DateOnly) || _filterPropertyType == typeof(DateOnly?))
+                        {
+                            Type = "string";
+                            Format = "date-only";
+                        }
+#endif
                         else if (_filterPropertyType == typeof(Guid) || _filterPropertyType == typeof(Guid?))
                         {
                             Type = "string";

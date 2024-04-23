@@ -27,6 +27,7 @@ else
                     <RadzenDatePicker @bind-Value=@hireDate Style="width:100%;" AllowClear="true" DateFormat="d" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Hire Date" }})" />
                 </FilterTemplate>
             </RadzenDataGridColumn>
+            <RadzenDataGridColumn Title="Leave Date" Property="LeaveDate" FormatString="{0:d}" />
             <RadzenDataGridColumn Title="WorkStatus" Property="WorkStatus" Type="typeof(IEnumerable<WorkStatus>)" Sortable=false
                                   FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" LogicalFilterOperator="LogicalFilterOperator.Or">
                 <FilterTemplate>
@@ -98,6 +99,7 @@ else
         public int ID { get; set; }
         public string CompanyName { get; set; }
         public DateTime HireDate { get; set; }
+        public DateOnly LeaveDate { get; set; }
         public TitleOfCourtesy TitleOfCourtesy { get; set; }
         public IEnumerable<WorkStatus> WorkStatus { get; set; }
         public IEnumerable<WorkStatusModel> WorkStatuses { get; set; }
@@ -148,6 +150,7 @@ else
                 ID = i,
                 CompanyName = i < 4 ? companyNames[0] : companyNames[i - 4],
                 HireDate = DateTime.Now.AddMonths(-i),
+                    LeaveDate = DateOnly.FromDateTime(DateTime.Now.AddMonths(+i)),
                 TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
                     WorkStatus = i < 3 ?
                             new WorkStatus[] { WorkStatus.Office } :
