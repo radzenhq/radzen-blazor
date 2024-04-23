@@ -32,7 +32,7 @@ namespace Radzen.Blazor
             }
         }
 
-        bool CanDrop()
+        internal bool CanDrop()
         {
             if (Container.Payload != null)
             {
@@ -48,13 +48,21 @@ namespace Radzen.Blazor
 
         internal void OnDragEnter(DragEventArgs args)
         {
-            args.DataTransfer.DropEffect = CanDrop() ? "move" : "none";
+            var canDrop = CanDrop();
+            args.DataTransfer.DropEffect = canDrop ? "move" : "none";
+            cssClass = canDrop ? "rz-can-drop" : "rz-no-drop";
+        }
+
+        void OnDragLeave(DragEventArgs args)
+        {
+            cssClass = "";
         }
 
         async Task OnDrop(DragEventArgs args)
         {
             if (!Items.Any())
             {
+                cssClass = "";
                 await OnDropInternal();
             }
         }
@@ -78,10 +86,12 @@ namespace Radzen.Blazor
             }
         }
 
+        string cssClass;
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-dropzone";
+            return $"rz-dropzone {cssClass}".Trim();
         }
 
         Tuple<RadzenDropZoneItemRenderEventArgs<TItem>, IReadOnlyDictionary<string, object>> ItemAttributes(TItem item)

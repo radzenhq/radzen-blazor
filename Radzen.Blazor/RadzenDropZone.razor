@@ -2,7 +2,7 @@
 @typeparam TItem
 @if(Visible)
 {
-<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" @ondrop="OnDrop" @ondragenter="OnDragEnter">
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" @ondrop="OnDrop" @ondragenter="OnDragEnter" @ondragleave="OnDragLeave">
     @ChildContent
     @foreach (var item in Items)
     {
