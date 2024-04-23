@@ -4,31 +4,26 @@
                          CanDrop="@CanDrop"
                          Drop="@OnDrop">
     <ChildContent>
-        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
-            <RadzenCard Style="width:100%;">
-                <RadzenDropZone Value="Status.NotStarted">
-                    <RadzenText Text="Not started" TextStyle="TextStyle.H5" />
-                </RadzenDropZone>
-            </RadzenCard>
-            <RadzenCard Style="width:100%;">
-                <RadzenDropZone Value="Status.Started">
-                    <RadzenText Text="Started" TextStyle="TextStyle.H5" />
-                </RadzenDropZone>
-            </RadzenCard>
-            <RadzenCard Style="width:100%;">
-                <RadzenDropZone Value="Status.Completed">
-                    <RadzenText Text="Completed" TextStyle="TextStyle.H5" />
-                </RadzenDropZone>
-            </RadzenCard>
-            <RadzenCard Style="width:100%;">
-                <RadzenDropZone Value="Status.Deleted">
-                    <RadzenText Text="Drop here to delete" TextStyle="TextStyle.H5" />
-                </RadzenDropZone>
-            </RadzenCard>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap" Class="rz-p-12">
+            <RadzenDropZone Value="Status.NotStarted" Class="rz-display-flex rz-flex-column rz-border-base-500 rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem;">
+                <RadzenText Text="Not started" TextStyle="TextStyle.Subtitle2" />
+            </RadzenDropZone>
+
+            <RadzenDropZone Value="Status.Started" Class="rz-display-flex rz-flex-column rz-border-base-500 rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem;">
+                <RadzenText Text="Started" TextStyle="TextStyle.Subtitle2" />
+            </RadzenDropZone>
+
+            <RadzenDropZone Value="Status.Completed" Class="rz-display-flex rz-flex-column rz-border-base-500 rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem;">
+                <RadzenText Text="Completed" TextStyle="TextStyle.Subtitle2" />
+            </RadzenDropZone>
+
+            <RadzenDropZone Value="Status.Deleted" Class="rz-display-flex rz-flex-column rz-border-base-500 rz-border-radius-2 rz-p-4" Style="flex: 1; gap: 1rem;">
+                <RadzenText Text="Drop here to delete" TextStyle="TextStyle.Subtitle2" />
+            </RadzenDropZone>
         </RadzenStack>
     </ChildContent>
     <Template>
-        <RadzenCard Style="margin: 1rem;">
+        <RadzenCard Variant="Variant.Flat" Class="rz-background-color-primary-lighter rz-color-on-primary-lighter">
             <strong>@context.Name</strong>
         </RadzenCard>
     </Template>
