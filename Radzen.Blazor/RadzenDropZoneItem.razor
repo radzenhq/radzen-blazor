@@ -4,7 +4,7 @@
 {
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" 
         draggable="@(Attributes.ContainsKey("draggable") ? Attributes["draggable"] : "true")" 
-        @ondragstart="@OnDragStart" @ondragenter="OnDragEnter" @ondragleave="OnDragLeave" @ondrop="OnDrop">
+        @ondragstart="@OnDragStart" @ondragenter="OnDragEnter" @ondragleave="OnDragLeave" @ondragend="OnDragEnd" @ondrop="OnDrop">
     @if (Container.Template != null)
     {
         @Container.Template(Item)

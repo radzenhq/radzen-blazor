@@ -20,6 +20,7 @@ namespace Radzen.Blazor
 
         void OnDragStart()
         {
+            dragCssClass = "rz-dragging";
             Container.Payload = new RadzenDropZoneItemEventArgs<TItem>()
             {
                 FromZone = Zone,
@@ -43,6 +44,11 @@ namespace Radzen.Blazor
             cssClass = "";
         }
 
+        void OnDragEnd(DragEventArgs args)
+        {
+            dragCssClass = "";
+        }
+
         async Task OnDrop(DragEventArgs args)
         {
             cssClass = "";
@@ -51,11 +57,12 @@ namespace Radzen.Blazor
         }
 
         string cssClass;
+        string dragCssClass;
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-dropzone-item {cssClass}".Trim();
+            return $"rz-dropzone-item {cssClass} {dragCssClass}".Trim();
         }
     }
 }

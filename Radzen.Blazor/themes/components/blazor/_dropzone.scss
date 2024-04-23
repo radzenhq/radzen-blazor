@@ -7,7 +7,9 @@
 }
 
 .rz-dropzone-item {
-  user-select: none;
+    list-style: none;
+    user-select:none;
+    cursor: grab;
 }
 
 .rz-can-drop {
@@ -16,4 +18,8 @@
 
 .rz-no-drop {
 
+}
+
+.rz-dragging {
+    cursor: grabbing;
 }
