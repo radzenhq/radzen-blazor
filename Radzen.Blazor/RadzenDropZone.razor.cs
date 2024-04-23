@@ -67,8 +67,6 @@ namespace Radzen.Blazor
             }
         }
 
-        ElementReference itemsElement;
-
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
@@ -76,7 +74,7 @@ namespace Radzen.Blazor
 
             if (Visible)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.prepareDrag", itemsElement);
+                await JSRuntime.InvokeVoidAsync("Radzen.prepareDrag", Element);
             }
         }
 

@@ -2,19 +2,17 @@
 @typeparam TItem
 @if(Visible)
 {
-<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" @ondrop="OnDrop" @ondragenter="OnDragEnter">
     @ChildContent
-    <ul @ref="@itemsElement" @ondrop="OnDrop" @ondragenter="OnDragEnter">
-        @foreach (var item in Items)
-        {
-            var result = ItemAttributes(item);
+    @foreach (var item in Items)
+    {
+        var result = ItemAttributes(item);
 
-             <CascadingValue Value=@item>
-                <CascadingValue Value=this>
-                    <RadzenDropZoneItem TItem="TItem" Visible="@result.Item1.Visible" Attributes="@result.Item2" />
-                </CascadingValue>
+        <CascadingValue Value=@item>
+            <CascadingValue Value=this>
+                <RadzenDropZoneItem TItem="TItem" Visible="@result.Item1.Visible" Attributes="@result.Item2" />
             </CascadingValue>
-        }
-    </ul>
+        </CascadingValue>
+    }
 </div>
 }

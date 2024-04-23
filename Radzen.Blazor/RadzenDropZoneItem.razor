@@ -2,7 +2,7 @@
 @typeparam TItem
 @if(Visible)
 {
-<li @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" 
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" 
         draggable="@(Attributes.ContainsKey("draggable") ? Attributes["draggable"] : "true")" 
         @ondragstart="@OnDragStart" @ondragenter="OnDragEnter" @ondrop="OnDrop">
     @if (Container.Template != null)
@@ -13,5 +13,5 @@
     {
         @Item
     }
-</li>
+</div>
 }
