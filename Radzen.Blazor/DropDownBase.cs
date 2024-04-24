@@ -1321,8 +1321,6 @@ namespace Radzen
                     }
 
                     SetSelectedIndexFromSelectedItem();
-
-                    SelectedItemChanged.InvokeAsync(selectedItem);
                 }
                 else
                 {
