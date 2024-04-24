@@ -874,19 +874,20 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    New = true,
+                    Name = "DropZone",
+                    Description = "Demonstration and configuration of the Radzen Blazor DropZone component.",
+                    Path = "dropzone",
+                    Icon = "&#xe945",
+                    Tags = new [] { "dropzone", "drag", "drop" }
+                },
+                new Example()
+                {
                     Name = "Panel",
                     Description = "Demonstration and configuration of the Blazor RadzenPanel component.",
                     Path = "panel",
                     Icon = "&#xe14f",
                     Tags = new [] { "container" }
-                },
-                new Example()
-                {
-                    Name = "Splitter",
-                    Description = "Demonstration and configuration of the Blazor RadzenSplitter component.",
-                    Path = "splitter",
-                    Icon = "&#xe94f",
-                    Tags = new [] { "splitter", "layout"}
                 },
                 new Example()
                 {
@@ -899,12 +900,11 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
-                    New = true,
-                    Name = "DropZone",
-                    Description = "Demonstration and configuration of the Radzen Blazor DropZone component.",
-                    Path = "dropzone",
-                    Icon = "&#xe945",
-                    Tags = new [] { "dropzone", "drag", "drop" }
+                    Name = "Splitter",
+                    Description = "Demonstration and configuration of the Blazor RadzenSplitter component.",
+                    Path = "splitter",
+                    Icon = "&#xe94f",
+                    Tags = new [] { "splitter", "layout"}
                 }
             }
         },
