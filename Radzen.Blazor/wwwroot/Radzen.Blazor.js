@@ -1863,7 +1863,7 @@ window.Radzen = {
       instance.invokeMethodAsync(handler, { clientX: e.clientX, clientY: e.clientY });
     };
     ref.touchMoveHandler = function (e) {
-      if (e.targetTouches[0]) {
+      if (e.targetTouches[0] && ref.contains(e.targetTouches[0].target)) {
         instance.invokeMethodAsync(handler, { clientX: e.targetTouches[0].clientX, clientY: e.targetTouches[0].clientY });
       }
     };
