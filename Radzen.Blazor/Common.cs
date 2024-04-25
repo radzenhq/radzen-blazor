@@ -2846,7 +2846,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Determines whether the specified type is a <see cref="DateOnly" />.
+        /// Determines whether the specified type is a DateOnly.
         /// </summary>
         /// <param name="source">The source.</param>
         /// <returns><c>true</c> if the specified type is a DateOnly instance or nullable DateOnly; otherwise, <c>false</c>.</returns>
@@ -2865,7 +2865,7 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Determines whether the specified type is a <see cref="DateOnly" />.
+        /// Determines whether the specified type is a DateOnly.
         /// </summary>
         /// <param name="source">The source.</param>
         /// <returns><c>true</c> if the specified type is a DateOnly instance or nullable DateOnly; otherwise, <c>false</c>.</returns>
