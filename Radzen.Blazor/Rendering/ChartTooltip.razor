@@ -1,4 +1,8 @@
-<div class="rz-chart-tooltip @Class" style="left: @(X.ToInvariantString())px; top: @(Y.ToInvariantString())px">
+@using Microsoft.JSInterop
+
+@inject IJSRuntime JSRuntime
+
+<div @ref="@chartTooltipElement" class="rz-chart-tooltip rz-chart-tooltip-top-center @Class" style="left: @(X.ToInvariantString())px; top: @(Y.ToInvariantString())px">
     <div class="rz-chart-tooltip-content" style="@Style">
     @if (ChildContent != null)
     {
@@ -38,4 +42,20 @@
 
     [Parameter]
     public string Class { get; set; }
+
+    [CascadingParameter]
+    public RadzenChart Chart { get; set; }
+
+    ElementReference? chartTooltipElement;
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        
+        if (chartTooltipElement != null)
+        {
+            await JSRuntime.InvokeAsync<string>("Radzen.setChartTooltipCssClass", chartTooltipElement, Chart.Element, X, Y);
+        }
+    }
 }

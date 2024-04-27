@@ -2275,5 +2275,53 @@ window.Radzen = {
         } else {
             start();
         }
+    },
+    setChartTooltipCssClass: function (chartTooltip, chart, x, y) {
+        var chartRect = Radzen.clientRect(chart);
+        var left = chartRect.left + x;
+        var top = chartRect.top + y;
+        if (!Radzen.isPointOfElementInForeground(chart, left, top)) {
+            chartTooltip.style.display = 'none';
+            return;
+        }
+
+        var chartTooltipRect = Radzen.clientRect(chartTooltip);
+        var marginY = 0;
+        var verticalPosition = "top";
+        if (!Radzen.isPointOfElementInForeground(chart, left, top - chartTooltipRect.height - 1)) {
+            verticalPosition = "bottom";
+            marginY = chartTooltipRect.height;
+        }
+        var horizontalPosition = "center";
+        if (!Radzen.isPointOfElementInForeground(chart, left + chartTooltipRect.width / 2 + 1, top + marginY)) {
+            horizontalPosition = "left";
+        } else if (!Radzen.isPointOfElementInForeground(chart, left - chartTooltipRect.width / 2 - 1, top + marginY)) {
+            horizontalPosition = "right";
+        }
+
+        var currentCssClass;
+        chartTooltip.classList.forEach(function(value) {
+            if (value.startsWith("rz-chart-tooltip-")) {
+                currentCssClass = value;
+            }
+        });
+        var cssClass = `rz-chart-tooltip-${verticalPosition}-${horizontalPosition}`;
+        if (!currentCssClass || currentCssClass != cssClass) {
+            chartTooltip.classList.add(cssClass);
+        }
+        if (currentCssClass && currentCssClass != cssClass) {
+            chartTooltip.classList.remove(currentCssClass);
+        }
+    },
+    isPointOfElementInForeground: function(element, x, y) {
+        var p = document.elementFromPoint(x, y);
+        while (p && p != document.body) {
+            if (p == element) {
+                return true;
+                break;
+            }
+            p = p.parentElement;
+        }
+        return false;
     }
 };
