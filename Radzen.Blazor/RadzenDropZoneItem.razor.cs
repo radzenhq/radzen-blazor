@@ -28,7 +28,7 @@ namespace Radzen.Blazor
             };
         }
 
-        void OnDragEnter(DragEventArgs args)
+        void OnDragOver(DragEventArgs args)
         {
             Container.Payload.ToItem = Item;
 
@@ -36,7 +36,7 @@ namespace Radzen.Blazor
             args.DataTransfer.DropEffect = canDrop ? "move" : "none";
             cssClass = canDrop ? "rz-can-drop" : "rz-no-drop";
 
-            Zone.OnDragEnter(args);
+            Zone.OnDragOver(args);
         }
 
         void OnDragLeave(DragEventArgs args)

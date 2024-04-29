@@ -46,7 +46,7 @@ namespace Radzen.Blazor
             return canDrop;
         }
 
-        internal void OnDragEnter(DragEventArgs args)
+        internal void OnDragOver(DragEventArgs args)
         {
             var canDrop = CanDrop();
             args.DataTransfer.DropEffect = canDrop ? "move" : "none";
