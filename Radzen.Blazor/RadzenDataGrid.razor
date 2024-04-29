@@ -85,9 +85,12 @@
         <div class="rz-data-grid-data" tabindex="-1">
             <table class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "") @(getGridLinesCSSClass())">
                 <colgroup>
-                    @foreach (var g in Groups)
+                    @if (ShowGroupExpandColumn)
                     {
-                        <col>
+                        @foreach (var g in Groups)
+                        {
+                            <col>
+                        }
                     }
                     @if (Template != null && ShowExpandColumn)
                     {
