@@ -50,11 +50,11 @@
         if (args.Item.Name == "Task2")
         {
             args.Attributes["draggable"] = "false";
+            args.Attributes["style"] = "cursor:not-allowed";
             args.Attributes["class"] = "rz-card rz-variant-flat rz-background-color-primary-lighter rz-color-on-primary-lighter";
         }
         else
         {
-            args.Attributes["style"] = "cursor:grab";
             args.Attributes["class"] = "rz-card rz-variant-filled rz-background-color-primary-light rz-color-on-primary-light";
         }
 
