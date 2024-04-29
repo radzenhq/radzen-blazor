@@ -1029,6 +1029,11 @@ namespace Radzen.Blazor
                 value = offset;
             }
 
+            if (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType) && value != null))
+            {
+                value = (int)value;
+            }
+
             if (isFirst)
             {
                 filterValue = CanSetCurrentValue(value) ? value : null;
