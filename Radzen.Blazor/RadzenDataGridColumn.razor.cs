@@ -980,7 +980,7 @@ namespace Radzen.Blazor
                     property = $@"({property} == null ? """" : {property})";
                 }
 
-                filterValues = Grid.Data.AsQueryable().Select(property).Distinct().Cast(propertyType);
+                filterValues = Grid.Data.AsQueryable().Select(property).Distinct().Cast(propertyType ?? typeof(object));
             }
 
             return filterValues;
