@@ -65,15 +65,23 @@
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Upload client-side without Url</RadzenText>
-                <RadzenUpload Multiple="true" Change=@OnClientChange class="w-100" 
-                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+                <RadzenUpload Multiple="true" Change=@OnClientChange class="w-100"
+                              InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+            </RadzenCard>
+        </div>
+        <div class="col-md-6 p-3">
+            <RadzenCard>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Drag and drop files to upload</RadzenText>
+                <RadzenUpload id="ddUpload" @ref="uploadDD" ChooseText="Drag and drop here or click to choose files" Auto="false" Multiple="true" Url="upload/multiple" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+                              Progress=@(args => OnProgress(args, "Drag and drop files to upload")) class="w-100" />
+                <RadzenButton Text="Upload" Click=@(args => uploadDD.Upload()) class="d-block mt-4" />
             </RadzenCard>
         </div>
         <div class="col-md-6 p-3">
             <RadzenCard>
                 <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Manual Upload</RadzenText>
                 <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" Change=@(args => OnChange(args, "Manual Upload")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
-                        Progress=@(args => OnProgress(args, "Manual Upload")) class="w-100" />
+                              Progress=@(args => OnProgress(args, "Manual Upload")) class="w-100" />
                 <RadzenButton Text="Upload" Click=@(args => upload.Upload()) class="d-block mt-4" />
             </RadzenCard>
         </div>
@@ -82,10 +90,21 @@
 
 <EventConsole @ref=@console />
 
+<style>
+    #ddUpload .rz-fileupload-buttonbar .rz-fileupload-choose {
+        width: 100%;
+        text-align: center;
+        font-size: 16px;
+        padding: 100px 0;
+        border-radius: 0;
+    }
+</style>
+
 @code {
     EventConsole console;
 
     RadzenUpload upload;
+    RadzenUpload uploadDD;
 
     int progress;
     bool showProgress;
@@ -168,7 +187,7 @@
                 stream.Close();
             }
             catch (Exception ex)
-            { 
+            {
                 console.Log($"Client-side file read error: {ex.Message}");
             }
         }
