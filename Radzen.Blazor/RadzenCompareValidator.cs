@@ -78,6 +78,13 @@ namespace Radzen.Blazor
         [Parameter]
         public CompareOperator Operator { get; set; } = CompareOperator.Equal;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenCompareValidator"/> should be validated on value change of the specified Component.
+        /// </summary>
+        /// <value><c>true</c> if should be validated; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public virtual bool ValidateOnComponentValueChange { get; set; } = true;
+
         private int Compare(object componentValue)
         {
             switch (componentValue)
@@ -94,13 +101,26 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            var shouldValidate = parameters.DidParameterChange(nameof(Value), Value);
+            var valueChanged = parameters.DidParameterChange(nameof(Value), Value);
 
             await base.SetParametersAsync(parameters);
 
-            if (shouldValidate && !firstRender)
+            if (ValidateOnComponentValueChange && valueChanged && !firstRender)
             {
-                EditContext.Validate();
+                var component = Form.FindComponent(Component);
+                if (component != null && component.FieldIdentifier.FieldName != null)
+                {
+                    IsValid = Validate(component);
+
+                    messages.Clear(component.FieldIdentifier);
+
+                    if (!IsValid)
+                    {
+                        messages.Add(component.FieldIdentifier, Text);
+                    }
+
+                    EditContext?.NotifyValidationStateChanged();
+                }
             }
         }
 
