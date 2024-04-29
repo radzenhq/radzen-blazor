@@ -60,11 +60,8 @@ namespace Radzen.Blazor
 
         async Task OnDrop(DragEventArgs args)
         {
-            if (!Items.Any())
-            {
-                cssClass = "";
-                await OnDropInternal();
-            }
+            cssClass = "";
+            await OnDropInternal();
         }
 
         internal async Task OnDropInternal()
