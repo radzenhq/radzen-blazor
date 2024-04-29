@@ -46,6 +46,9 @@
 
     void OnItemRender(RadzenDropZoneItemRenderEventArgs<MyTask> args)
     {
+        args.Attributes["style"] = "cursor:grab";
+        args.Attributes["class"] = "rz-card rz-variant-filled rz-background-color-primary-light rz-color-on-primary-light";
+
         // Do not render item if deleted
         args.Visible = args.Item.Status != Status.Deleted;
     }
