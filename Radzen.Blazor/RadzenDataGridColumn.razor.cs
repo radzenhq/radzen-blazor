@@ -1029,9 +1029,9 @@ namespace Radzen.Blazor
                 value = offset;
             }
 
-            if (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType) && value != null))
+            if (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType)))
             {
-                value = (int)value;
+                value = value is not null ? (int)value : null;
             }
 
             if (isFirst)
