@@ -86,7 +86,7 @@ namespace Radzen.Blazor
 
         async Task OnSubmit()
         {
-            if (FileUpload.HasValue)
+            if (FileUpload?.HasValue == true)
             {
                 await FileUpload.Upload();
             }

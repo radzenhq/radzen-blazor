@@ -19,6 +19,8 @@
     @<div class="rz-html-editor-dialog">
         <div class="rz-html-editor-dialog-item">
             <label>@SelectText</label>
+            @if (Editor.UploadUrl != null)
+            {
                 <RadzenUpload ChooseText=@UploadChooseText @ref=@FileUpload Url=@Editor.UploadUrl Auto="false" Accept="image/*"
                     style="width: 100%" Complete="OnUploadComplete" Error="OnUploadError">
                     @foreach (var header in uploadHeaders)
@@ -26,6 +28,9 @@
                         <RadzenUploadHeader Name=@header.Key Value=@header.Value />
                     }
                     </RadzenUpload>
+            } else {
+                <RadzenFileInput Accept="image/*" ChooseText=@UploadChooseText @bind-Value=@Attributes.Src style="width: 100%" />
+            }
                 </div>
                 <div class="rz-html-editor-dialog-item">
                     <label>@WidthText</label>
