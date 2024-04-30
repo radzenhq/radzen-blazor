@@ -1,0 +1,102 @@
+﻿@inherits DbContextPage
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenLabel Text="Select Value" Component="DropDownDataGridBindValue" Style="margin-right: 8px; vertical-align: middle;" />
+    <RadzenDropDownDataGrid @ref=grid Data="@data" ColumnWidth="200px" TValue="IDictionary<string, object>"
+                            AllowFiltering="true" AllowSorting="true" Value="@selectedItem" Change="@OnChange">
+        <ValueTemplate>
+            @string.Join(", ", columns.Where(c => c.Value == typeof(string)).Take(grid.MaxSelectedLabels).Select(c => context[c.Key]))
+        </ValueTemplate>
+        <Columns>
+            @foreach (var column in columns)
+            {
+                <RadzenDropDownDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+                                              Property="@GetColumnPropertyExpression(column.Key, column.Value)">
+                    <Template>
+                        @context[@column.Key]
+                    </Template>
+                </RadzenDropDownDataGridColumn>
+            }
+        </Columns>
+    </RadzenDropDownDataGrid>
+</div>
+
+@code {
+    RadzenDropDownDataGrid<IDictionary<string, object>> grid;
+    IDictionary<string, object> selectedItem;
+
+    public IEnumerable<IDictionary<string, object>> data { get; set; }
+
+    public IDictionary<string, Type> columns { get; set; }
+
+    public enum EnumTest
+    {
+        EnumValue1,
+        EnumValue2
+    }
+
+    void OnChange(object value)
+    {
+        selectedItem = (IDictionary<string, object>)value;
+    }
+
+    public string GetColumnPropertyExpression(string name, Type type)
+    {
+        var expression = $@"it[""{name}""].ToString()";
+
+        if (type == typeof(int))
+        {
+            return $"int.Parse({expression})";
+        }
+        else if (type == typeof(DateTime))
+        {
+            return $"DateTime.Parse({expression})";
+        }
+        else if (type.IsEnum)
+        {
+            return $@"Int32(Enum.Parse(it[""{name}""].GetType(), {expression}))";
+        }
+
+        return expression;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        columns = new Dictionary<string, Type>()
+        {
+            { "EmployeeID", typeof(int) },
+            { "MyColumn", typeof(EnumTest) },
+            { "FirstName", typeof(string) },
+            { "LastName", typeof(string) },
+            { "HireDate", typeof(DateTime) },
+        };
+
+        foreach (var i in Enumerable.Range(0, 50))
+        {
+            columns.Add($"Column{i}", typeof(string));
+        }
+
+        data = Enumerable.Range(0, 100).Select(i =>
+        {
+            var row = new Dictionary<string, object>();
+
+            foreach (var column in columns)
+            {
+                row.Add(
+                    column.Key,
+                    column.Value == typeof(EnumTest)
+                        ? (i % 2 == 0 ? EnumTest.EnumValue1 : EnumTest.EnumValue2)
+                        : column.Value == typeof(int)
+                            ? i
+                            : column.Value == typeof(DateTime)
+                                ? DateTime.Now.AddMonths(i)
+                                : $"{column.Key}{i}"
+                );
+            }
+
+            return row;
+        });
+    }
+}
