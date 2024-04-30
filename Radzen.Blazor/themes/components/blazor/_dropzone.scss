@@ -1,0 +1,18 @@
+.rz-dropzone-container {}
+
+.rz-dropzone {
+  user-select:none;
+}
+
+.rz-dropzone-item {
+  user-select:none;
+  cursor: grab;
+}
+
+.rz-dragging {
+  cursor: grabbing;
+}
+
+.rz-can-drop {}
+
+.rz-no-drop {}

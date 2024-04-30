@@ -1,0 +1,10 @@
+﻿@typeparam TItem
+@inherits RadzenComponentWithChildren
+@if(Visible)
+{
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+    <CascadingValue Value="this">
+        @ChildContent
+    </CascadingValue>
+</div>
+}

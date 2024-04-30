@@ -1,0 +1,17 @@
+﻿@inherits RadzenComponent
+@typeparam TItem
+@if(Visible)
+{
+<div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" 
+        draggable="@(Attributes.ContainsKey("draggable") ? Attributes["draggable"] : "true")" 
+        @ondragstart="@OnDragStart" @ondragover="OnDragOver" @ondragleave="OnDragLeave" @ondragend="OnDragEnd" @ondrop="OnDrop">
+    @if (Container.Template != null)
+    {
+        @Container.Template(Item)
+    }
+    else
+    {
+        @Item
+    }
+</div>
+}

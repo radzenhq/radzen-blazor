@@ -503,6 +503,12 @@ window.Radzen = {
 
     Radzen[id] = null;
   },
+  prepareDrag: function (el) {
+    if (el) {
+        el.ondragover = function (e) { e.preventDefault(); };
+        el.ondragstart = function (e) { e.dataTransfer.setData('', e.target.id); };
+    }
+  },
   focusElement: function (elementId) {
     var el = document.getElementById(elementId);
     if (el) {
