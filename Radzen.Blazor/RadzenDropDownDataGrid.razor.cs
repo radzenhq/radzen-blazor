@@ -594,6 +594,10 @@ namespace Radzen.Blazor
             {
                 selectedItem = null;
                 selectedItems.Clear();
+                if (grid != null)
+                {
+                    InvokeAsync(() => grid.SelectRow(null));
+                }
             }
         }
 
