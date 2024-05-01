@@ -18,7 +18,7 @@
         <div class="@GetComponentBarCssClass()"
              @onclick:preventDefault="true"
              @onclick:stopPropagation="true"
-             @onmousedown=@(args => Splitter.StartResize(args, Index))>
+             @onpointerdown=@(args => Splitter.StartResize(args, Index))>
 
             @if (IsCollapsible)
             {

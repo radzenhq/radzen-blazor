@@ -94,7 +94,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal Task StartResize(MouseEventArgs args, int paneIndex)
+        internal Task StartResize(PointerEventArgs args, int paneIndex)
         {
             var pane = Panes[paneIndex];
             if (!pane.Resizable)
