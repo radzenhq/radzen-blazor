@@ -2,8 +2,9 @@
 
 <div class="rz-p-12 rz-text-align-center">
     <RadzenLabel Text="Select Value" Component="DropDownDataGridBindValue" Style="margin-right: 8px; vertical-align: middle;" />
-    <RadzenDropDownDataGrid @ref=grid Data="@data" ColumnWidth="200px" TValue="IDictionary<string, object>"
-                            AllowFiltering="true" AllowSorting="true" Value="@selectedItem" Change="@OnChange">
+    <RadzenDropDownDataGrid @ref=grid Data="@data" ColumnWidth="200px" TValue="IDictionary<string, object>" 
+                            AllowFiltering="true" AllowSorting="true" Value="@selectedItem" Change="@OnChange"
+                            TextProperty="@(GetColumnPropertyExpression("LastName", typeof(string)))">
         <ValueTemplate>
             @string.Join(", ", columns.Where(c => c.Value == typeof(string)).Take(grid.MaxSelectedLabels).Select(c => context[c.Key]))
         </ValueTemplate>
