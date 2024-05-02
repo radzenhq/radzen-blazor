@@ -260,7 +260,7 @@ namespace Radzen.Blazor
 
                 var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", GetId() + "-resize");
 
-                await Splitter.StartResize(new MouseEventArgs()
+                await Splitter.StartResize(new PointerEventArgs()
                 {
                     ClientX = rect.Left,
                     ClientY = rect.Top

@@ -2111,10 +2111,10 @@ window.Radzen = {
                         paneNext ? parseInt(paneNext.getAttribute('data-index')) : null,
                         paneNext ? parseFloat(paneNext.style.flexBasis) : null
                     );
-                    document.removeEventListener('mousemove', Radzen[el].mouseMoveHandler);
-                    document.removeEventListener('mouseup', Radzen[el].mouseUpHandler);
-                    document.removeEventListener('touchmove', Radzen[el].touchMoveHandler);
-                    document.removeEventListener('touchend', Radzen[el].mouseUpHandler);
+
+                    document.removeEventListener('pointerup', Radzen[el].mouseUpHandler);
+                    document.removeEventListener('pointermove', Radzen[el].mouseMoveHandler);
+                    el.removeEventListener('touchmove', preventDefaultAndStopPropagation);
                     Radzen[el] = null;
                 }
             },
@@ -2166,11 +2166,15 @@ window.Radzen = {
                     Radzen[el].mouseMoveHandler(e.targetTouches[0]);
                 }
             }
+          };
+
+        const preventDefaultAndStopPropagation = (ev) => {
+            ev.preventDefault();
+            ev.stopPropagation();
         };
-        document.addEventListener('mousemove', Radzen[el].mouseMoveHandler);
-        document.addEventListener('mouseup', Radzen[el].mouseUpHandler);
-        document.addEventListener('touchmove', Radzen[el].touchMoveHandler, { passive: true });
-        document.addEventListener('touchend', Radzen[el].mouseUpHandler, { passive: true });
+          document.addEventListener('pointerup', Radzen[el].mouseUpHandler);
+          document.addEventListener('pointermove', Radzen[el].mouseMoveHandler);
+          el.addEventListener('touchmove', preventDefaultAndStopPropagation, { passive: false });
     },
     resizeSplitter(id, e) {
         var el = document.getElementById(id);
