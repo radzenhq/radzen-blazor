@@ -420,6 +420,8 @@ namespace Radzen.Blazor
 
         private bool IsColumnFilterPropertyTypeString(RadzenDataGridColumn<object> column)
         {
+            if (column.Type == typeof(string)) return true;
+
             var property = column.GetFilterProperty();
             var itemType = Data != null ? Data.AsQueryable().ElementType : typeof(object);
             var type = PropertyAccess.GetPropertyType(itemType, property);
