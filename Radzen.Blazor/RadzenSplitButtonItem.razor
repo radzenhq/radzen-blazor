@@ -2,7 +2,7 @@
 @if (Visible)
 {
     <li class=@ItemClassList role="menuitem" @onclick="@OnClick" @attributes="Attributes" style="@Style">
-        <a class="rz-menuitem-link">
+        <a id="@(SplitButton.SplitButtonId() + GetHashCode())" class="rz-menuitem-link">
             @if (!string.IsNullOrEmpty(Icon))
             {
                 <span class="rz-menuitem-icon">@((MarkupString)Icon)</span>

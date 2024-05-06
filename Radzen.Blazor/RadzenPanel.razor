@@ -19,7 +19,7 @@
             @HeaderTemplate
             @if (AllowCollapse)
             {
-                <a @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
+                <a id="@(GetId() + "expc")" @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
                    @onclick:preventDefault="true" role="button" aria-controls="rz-panel-0-content"
                    aria-expanded="@(collapsed ? "false" : "true")" aria-label="@(collapsed ? ExpandAriaLabel : CollapseAriaLabel)" title="@(collapsed ? ExpandTitle : CollapseTitle)"
                    tabindex="0" @onkeypress="@(args => OnKeyPress(args, Toggle(new MouseEventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>

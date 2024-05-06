@@ -296,5 +296,10 @@ namespace Radzen.Blazor
                 StateHasChanged();
             }
         }
+
+        internal string SplitButtonId()
+        {
+            return GetId();
+        }
     }
 }

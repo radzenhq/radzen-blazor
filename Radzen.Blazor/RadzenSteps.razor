@@ -22,7 +22,7 @@
             @if (step.Visible)
             {
                     <li class="@step.GetItemCssClass()" @attributes="step.Attributes" style="@step.Style" tabindex="@(step.Disabled ? -1 : 0)" @onkeypress="@(args => OnKeyPress(args, SelectStep(step, true)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
-                    <a title="@step.Title" aria-label="@step.AriaLabel"
+                    <a id="@(GetId() + i.ToString() + "s")" title="@step.Title" aria-label="@step.AriaLabel"
                        @onclick="@(async (args) => { if (!step.Disabled) { await SelectStep(step, true); } })"
                        @onclick:preventDefault="true" class="rz-menuitem-link">
                         <span class="rz-steps-number">@(steps.Where(s => s.Visible).ToList().IndexOf(step) + 1)</span>
@@ -59,11 +59,11 @@
     @if(ShowStepsButtons)
     {
     <div class="rz-steps-buttons">
-        <a title="@PreviousTitle" arial-label="@PreviousAriaLabel" tabindex="@(IsFirstVisibleStep() ? -1 : 0)"
+        <a id="@(GetId() + "prev")" title="@PreviousTitle" arial-label="@PreviousAriaLabel" tabindex="@(IsFirstVisibleStep() ? -1 : 0)"
            class='@($"rz-steps-prev {(IsFirstVisibleStep() ?  "rz-state-disabled" : "")}")'
                    @onkeypress="@(args => OnKeyPress(args, PrevStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
            @onclick="@PrevStep" @onclick:preventDefault="true"><i class="rzi">navigate_before</i>@PreviousText</a>
-        <a title="@NextTitle" arial-label="@NextAriaLabel" tabindex="@(IsLastVisibleStep() ? -1 : 0)"
+        <a id="@(GetId() + "next")" title="@NextTitle" arial-label="@NextAriaLabel" tabindex="@(IsLastVisibleStep() ? -1 : 0)"
            class='@($"rz-steps-next {(IsLastVisibleStep() ?  "rz-state-disabled" : "")}")' 
                    @onkeypress="@(args => OnKeyPress(args, NextStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
            @onclick="@NextStep" @onclick:preventDefault="true">@NextText<i class="rzi">navigate_next</i></a>

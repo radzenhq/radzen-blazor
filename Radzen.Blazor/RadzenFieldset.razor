@@ -9,7 +9,7 @@
 
             @if (AllowCollapse)
             {
-                <a title="@TitleAttribute()" aria-label="@AriaLabelAttribute()" @onclick:preventDefault="true"
+                <a id="@(GetId() + "expc")" title="@TitleAttribute()" aria-label="@AriaLabelAttribute()" @onclick:preventDefault="true"
                    aria-controls="rz-fieldset-0-content" aria-expanded="@(collapsed ? "false" : "true")" @onclick=@Toggle
                        tabindex="0" @onkeypress="@(args => OnKeyPress(args, Toggle(new EventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
                 @if (collapsed)

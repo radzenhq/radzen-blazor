@@ -35,10 +35,10 @@
                     @if (!TimeOnly)
                     {
                         <div class="rz-datepicker-header">
-                            <a tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                            <a id="@(GetId() + "pm")" tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
                                 <span class="rz-datepicker-prev-icon rzi rzi-chevron-left"></span>
                             </a>
-                            <a tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                            <a id="@(GetId() + "nm")" tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-datepicker-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
                                 <span class="rz-datepicker-next-icon rzi rzi-chevron-right"></span>
                             </a>
                             <div class="rz-datepicker-title">
@@ -132,11 +132,11 @@
                         @if (HourFormat == "12")
                         {
                             <div class="rz-ampm-picker">
-                                <a tabindex="@(Disabled ? "-1" : $"{TabIndex}")"aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
+                                <a id="@(GetId() + "ampmup")" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-up"></span>
                                 </a>
                                 <span>@CurrentDate.ToString("tt")</span>
-                                <a tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
+                                <a id="@(GetId() + "ampmdown")" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
                                     <span class="rzi rzi-chevron-down"></span>
                                 </a>
                             </div>

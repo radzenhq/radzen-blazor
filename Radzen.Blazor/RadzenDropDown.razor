@@ -149,7 +149,7 @@
                             <span class="rz-multiselect-filter-icon rzi rzi-search"></span>
                         </div>
                     }
-                    <a class="rz-multiselect-close " @onclick="@ClearAll" @onclick:stopPropagation="true">
+                    <a id="@(GetId() + "clear")" class="rz-multiselect-close " @onclick="@ClearAll" @onclick:stopPropagation="true">
                         <span class="rzi rzi-times"></span>
                     </a>
                 </div>

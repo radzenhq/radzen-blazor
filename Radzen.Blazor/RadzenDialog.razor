@@ -22,7 +22,7 @@
                 <div class="rz-dialog-side-title" style="display: inline" id="rz-dialog-side-label">@((MarkupString)sideDialogOptions.Title)</div>
                 @if (sideDialogOptions.ShowClose)
                 {
-                    <a aria-label="@CloseSideDialogAriaLabel" @onclick:preventDefault="true" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service.CloseSide(null))" role="button" tabindex="@sideDialogOptions.CloseTabIndex">
+                    <a id="@(sideDialogOptions.GetHashCode() + "cl")" aria-label="@CloseSideDialogAriaLabel" @onclick:preventDefault="true" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service.CloseSide(null))" role="button" tabindex="@sideDialogOptions.CloseTabIndex">
                         <span class="rzi rzi-times"></span>
                     </a>
                 }
