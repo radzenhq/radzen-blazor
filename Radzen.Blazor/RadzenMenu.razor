@@ -8,7 +8,7 @@
         @if (Responsive)
         {
         <li class="rz-menu-toggle-item">
-            <button class="rz-menu-toggle" @onclick=@OnToggle>
+            <button aria-label=@ToggleAriaLabel class="rz-menu-toggle" @onclick=@OnToggle>
                 @if (IsOpen)
                 {
                     <i class="rzi">close</i>

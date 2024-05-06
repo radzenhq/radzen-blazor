@@ -436,6 +436,18 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Gets or sets the up button aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string UpAriaLabel { get; set; } = "Up";
+
+        /// <summary>
+        /// Gets or sets the down button aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string DownAriaLabel { get; set; } = "Down";
+
 #if NET5_0_OR_GREATER
         /// <summary>
         /// Sets the focus on the input element.

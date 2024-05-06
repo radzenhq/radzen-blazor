@@ -19,7 +19,7 @@
                        class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "")" id="@Name" placeholder="@Placeholder" />
                 @if (ShowButton)
                 {
-	                <button @onmousedown=@OnToggle class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
+                    <button aria-label="@ToggleAriaLabel" @onmousedown=@OnToggle class="@($"rz-datepicker-trigger rz-calendar-button rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")}")" tabindex="-1" type="button">
 		                <span aria-hidden="true" class="@ButtonClasses"></span><span class="rz-button-text"></span>
 	                </button>
                 }
@@ -143,7 +143,7 @@
                         }
                         @if (ShowTimeOkButton)
                         {
-                            <button type="button" class="rz-button rz-button-md rz-secondary" tabindex="0" @onclick="@OkClick">
+                            <button aria-label="@OkAriaLabel" type="button" class="rz-button rz-button-md rz-secondary" tabindex="0" @onclick="@OkClick">
                                 <span class="rz-button-text">Ok</span>
                             </button>
                         }

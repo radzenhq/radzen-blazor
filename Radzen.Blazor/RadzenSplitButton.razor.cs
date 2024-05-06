@@ -301,5 +301,11 @@ namespace Radzen.Blazor
         {
             return GetId();
         }
+
+        /// <summary>
+        /// Gets or sets the add button aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string ButtonAriaLabel { get; set; } = "Button";
     }
 }

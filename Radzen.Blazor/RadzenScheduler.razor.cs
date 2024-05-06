@@ -102,6 +102,20 @@ namespace Radzen.Blazor
         public string TodayText { get; set; } = "Today";
 
         /// <summary>
+        /// Gets or sets the text of the next button. Set to <c>Next</c> by default.
+        /// </summary>
+        /// <value>The next text.</value>
+        [Parameter]
+        public string NextText { get; set; } = "Next";
+
+        /// <summary>
+        /// Gets or sets the text of the previous button. Set to <c>Previous</c> by default.
+        /// </summary>
+        /// <value>The previous text.</value>
+        [Parameter]
+        public string PrevText { get; set; } = "Previous";
+
+        /// <summary>
         /// Gets or sets the initial date displayed by the selected view. Set to <c>DateTime.Today</c> by default.
         /// </summary>
         /// <value>The date.</value>

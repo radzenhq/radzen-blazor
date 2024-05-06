@@ -291,6 +291,12 @@ namespace Radzen.Blazor
         public string SearchTextPlaceholder { get; set; } = "Search...";
 
         /// <summary>
+        /// Gets or sets the add button aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string AddAriaLabel { get; set; } = "Add";
+
+        /// <summary>
         /// Gets or sets the selected value.
         /// </summary>
         /// <value>The selected value.</value>

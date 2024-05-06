@@ -219,5 +219,11 @@ namespace Radzen.Blazor
                 StateHasChanged();
             }
         }
+
+        /// <summary>
+        /// Gets or sets the add button aria-label attribute.
+        /// </summary>
+        [Parameter]
+        public string ToggleAriaLabel { get; set; } = "Toggle";
     }
 }

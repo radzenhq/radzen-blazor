@@ -11,7 +11,7 @@
             <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
         }
         <div class="rz-colorpicker-value" style="background-color: @Value" ></div>
-        <button type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="rzi" /></button>
+        <button aria-label="@ToggleAriaLabel" type="button" tabindex="-1" class="rz-colorpicker-trigger" disabled=@Disabled @onclick:preventDefault><i class="rzi" /></button>
         <Popup Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@Popup class="rz-colorpicker-popup" Close=@OnClosePopup Open=@Open>
             @if (ShowHSV)
             {

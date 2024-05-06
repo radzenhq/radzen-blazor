@@ -75,6 +75,13 @@ namespace Radzen.Blazor
         public string ChooseText { get; set; } = "Choose";
 
         /// <summary>
+        /// Gets or sets the choose button text.
+        /// </summary>
+        /// <value>The choose button text.</value>
+        [Parameter]
+        public string DeleteText { get; set; } = "Delete";
+
+        /// <summary>
         /// Gets or sets the URL.
         /// </summary>
         /// <value>The URL.</value>

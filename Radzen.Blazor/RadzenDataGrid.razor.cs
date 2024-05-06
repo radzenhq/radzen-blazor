@@ -298,6 +298,13 @@ namespace Radzen.Blazor
         public string ExpandGroupAriaLabel { get; set; } = "Expand group";
 
         /// <summary>
+        /// Gets or sets the date simple filter toggle aria label text.
+        /// </summary>
+        /// <value>The date simple filter toggle aria label text.</value>
+        [Parameter]
+        public string FilterToggleAriaLabel { get; set; } = "Toggle";
+
+        /// <summary>
         /// Gets or sets a value indicating whether DataGrid data cells will follow the header cells structure in composite columns.
         /// </summary>
         /// <value><c>true</c> if DataGrid data cells will follow the header cells structure in composite columns; otherwise, <c>false</c>.</value>

@@ -32,7 +32,7 @@
                     <div>@file.Name</div>
                     <div>@(file.Size / 1024) KB</div>
                     <div>
-                        <button tabindex="0" disabled="@Disabled" @onclick="@(args => OnRemove(file))" type="button" class="@ButtonClassList"><span class="rz-icon-trash" style="display:block"></span></button>
+                        <button title=@DeleteText tabindex="0" disabled="@Disabled" @onclick="@(args => OnRemove(file))" type="button" class="@ButtonClassList"><span class="rz-icon-trash" style="display:block"></span></button>
                     </div>
                 </div>
                 }

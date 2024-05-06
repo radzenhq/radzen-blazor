@@ -1,7 +1,7 @@
 ﻿@inherits RadzenComponent
 @if (Visible)
 {
-    <button tabindex="0" @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" @onclick="@OnClick" id="@GetId()">
+    <button aria-label="@ToggleAriaLabel" tabindex="0" @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" @onclick="@OnClick" id="@GetId()">
         <i class="rzi rz-display-flex rz-align-items-center">@(!string.IsNullOrWhiteSpace(Icon) ? $"{(MarkupString)Icon}" : "menu")</i>
     </button>
 }

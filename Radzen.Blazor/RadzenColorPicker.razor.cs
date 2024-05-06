@@ -19,6 +19,13 @@ namespace Radzen.Blazor
     public partial class RadzenColorPicker : FormComponent<string>
     {
         /// <summary>
+        /// Gets or sets the toggle popup aria label text.
+        /// </summary>
+        /// <value>The toggle popup aria label text.</value>
+        [Parameter]
+        public string ToggleAriaLabel { get; set; } = "Toggle";
+
+        /// <summary>
         /// Gets or sets the open callback.
         /// </summary>
         /// <value>The open callback.</value>

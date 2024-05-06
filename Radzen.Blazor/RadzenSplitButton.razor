@@ -5,7 +5,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
-        <button tabindex="-1" disabled="@IsDisabled" class="@getButtonCss()" type="button" @onclick="@OnClick">
+        <button aria-label="@(ButtonAriaLabel ?? Text)" tabindex="-1" disabled="@IsDisabled" class="@getButtonCss()" type="button" @onclick="@OnClick">
             @if (ButtonContent != null)
             {
                 @ButtonContent
