@@ -145,7 +145,7 @@ namespace Radzen.Blazor
                 {
                     _filterPropertyType = Type;
                 }
-                else
+                else if(!string.IsNullOrEmpty(Property))
                 {
                     propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
                 }
