@@ -9,7 +9,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@OnKeyDown" id="@GetId()">
         <div class="rz-helper-hidden-accessible">
-            <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" @attributes=@InputAttributes />
+            <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes=@InputAttributes />
         </div>
         @if (View != null && (AllowFiltering || (Multiple && AllowSelectAll)))
         {

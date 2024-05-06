@@ -265,6 +265,13 @@ namespace Radzen
         public string SearchAriaLabel { get; set; } = "Search";
 
         /// <summary>
+        /// Gets or sets the empty value aria label text.
+        /// </summary>
+        /// <value>The empty value aria label text.</value>
+        [Parameter]
+        public string EmptyAriaLabel { get; set; } = "Empty";
+
+        /// <summary>
         /// Gets or sets the selected item changed.
         /// </summary>
         /// <value>The selected item changed.</value>
