@@ -124,6 +124,13 @@ namespace Radzen.Blazor
         public string IconColor { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum number of files.
+        /// </summary>
+        /// <value>The maximum number of files.</value>
+        [Parameter]
+        public int MaxFileCount { get; set; } = 100;
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> is disabled.
         /// </summary>
         /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
@@ -386,7 +393,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            var files = Multiple ? args.GetMultipleFiles().Select(f => new FileInfo(f))
+            var files = Multiple ? args.GetMultipleFiles(MaxFileCount).Select(f => new FileInfo(f))
                 : new FileInfo[] { new FileInfo (args.File) };
 
             this.files = files.Select(f => new PreviewFileInfo() { Name = f.Name, Size = f.Size  }).ToList();
