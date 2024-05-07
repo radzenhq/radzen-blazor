@@ -128,7 +128,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The maximum number of files.</value>
         [Parameter]
-        public int MaxFileCount { get; set; } = 100;
+        public int MaxFileCount { get; set; } = 10;
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> is disabled.
