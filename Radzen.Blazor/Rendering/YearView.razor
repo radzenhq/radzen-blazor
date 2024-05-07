@@ -30,10 +30,10 @@
         <div class="rz-year-month rz-display-flex rz-flex-column rz-col-12 rz-col-sm-6 rz-col-md-4 rz-col-lg-3"
                  tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
                  @onfocus=@(args => {CurrentDate = currentDate; CurrentMonth = currentMonth; })>
-        
+
             <div class="rz-slot-header rz-pb-2">
                 <span class="rz-text-subtitle1">
-                    @realstart.ToString("MMMM yyyy")
+                    @realstart.ToString("MMMM yyyy", Scheduler.Culture)
                 </span>
             </div>
 
@@ -95,7 +95,7 @@
 
     [Parameter]
     public string MoreText { get; set; }
-    
+
     [Parameter]
     public string NoDayEventsText  { get; set; }
 
