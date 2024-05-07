@@ -51,7 +51,7 @@
                         @if (item.Start >= start && item.Start <= end)
                         {
                             <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
-                                CssClass="@(CurrentDate >= start && CurrentDate <= end && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")" 
+                                CssClass="@(CurrentDate >= start && CurrentDate <= end && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")"
                                 DragStart=@OnAppointmentDragStart />
                         }
                         else if (start == date)
@@ -178,7 +178,7 @@
 
         if (!preventDefault)
         {
-            await DialogService.OpenAsync(date.ToShortDateString(), ds =>
+            await DialogService.OpenAsync(date.ToString("d", Scheduler.Culture), ds =>
                 @<div class="rz-event-list">
                     <CascadingValue Value=@Scheduler>
                         @foreach(var item in appointments)
