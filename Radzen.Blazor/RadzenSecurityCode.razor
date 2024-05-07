@@ -15,6 +15,10 @@
                 {
                     <RadzenPassword Value="@ElementAt(index - 1)" Disabled="@Disabled" AutoComplete="false" MaxLength="1" size="1" Class="rz-security-code-input" />
                 }
+                else if (Type == SecurityCodeType.Numeric)
+                {
+                    <RadzenTextBox inputmode="numeric" pattern="[0-9]*" Value="@ElementAt(index - 1)" Disabled="@Disabled" AutoComplete="false" MaxLength="1" size="1" Class="rz-security-code-input" />
+                }
                 else
                 {
                     <RadzenTextBox Value="@ElementAt(index - 1)" Disabled="@Disabled" AutoComplete="false" MaxLength="1" size="1" Class="rz-security-code-input" />
