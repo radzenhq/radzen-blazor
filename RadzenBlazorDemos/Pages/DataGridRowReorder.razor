@@ -56,8 +56,10 @@
         args.Attributes.Add("ondragstart", EventCallback.Factory.Create<DragEventArgs>(this, () => draggedItem = args.Data));
         args.Attributes.Add("ondrop", EventCallback.Factory.Create<DragEventArgs>(this, () =>
         {
+            var draggedIndex = employees.IndexOf(draggedItem);
+            var droppedIndex = employees.IndexOf(args.Data);
             employees.Remove(draggedItem);
-            employees.Insert(employees.IndexOf(args.Data), draggedItem);
+            employees.Insert(draggedIndex <= droppedIndex ? droppedIndex++ : droppedIndex, draggedItem);
         }));
     }
 }
