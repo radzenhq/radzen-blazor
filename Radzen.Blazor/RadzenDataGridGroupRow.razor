@@ -3,6 +3,14 @@
 @using System.Globalization
 @{
     var rowArgs = Grid?.GroupRowAttributes(this);
+
+    if (Grid != null)
+    {
+        if (rowArgs.Item1.Expanded == true && Grid.collapsedGroupItems.ContainsKey(this))
+        {
+            Grid.collapsedGroupItems.Remove(this);
+        }
+    }
 }
 <tr class="rz-group-row" @attributes="@rowArgs.Item2">
      @if (Grid.ShowGroupExpandColumn)
