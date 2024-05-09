@@ -653,8 +653,7 @@ namespace RadzenBlazorDemos
                     Description = "This example demonstrates Blazor DataGrid without data.",
                     Icon = "&#xe661",
                     Tags = new [] { "datagrid", "databinding" }
-                }
-                ,
+                },
                 new Example()
                 {
                     Name = "Rows reorder",
@@ -663,6 +662,15 @@ namespace RadzenBlazorDemos
                     Description = "This example demonstrates custom DataGrid rows reoder.",
                     Icon = "&#xe945",
                     Tags = new [] { "datagrid", "reorder", "row" }
+                },
+                new Example()
+                {
+                    Name = "Drag row between two DataGrids",
+                    Path = "/datagrid-rowdragbetween",
+                    Title = "Blazor DataGrid Component - Drag rows between two DataGrids | Free UI Components by Radzen",
+                    Description = "This example demonstrates drag and drop rows between two DataGrid components.",
+                    Icon = "&#xe25d",
+                    Tags = new [] { "datagrid", "drag", "row", "between" }
                 }
             }
         },
