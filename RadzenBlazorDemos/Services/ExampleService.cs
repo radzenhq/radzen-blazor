@@ -800,6 +800,14 @@ namespace RadzenBlazorDemos
                             Description = "This example demonstrates tri-state checkboxes in RadzenTree.",
                             Path = "tree-checkboxes",
                             Tags = new [] { "tree", "treeview", "nodes", "check" },
+                        },
+                        new Example
+                        {
+                            Name = "Drag & Drop",
+                            Title = "Blazor Tree Component - Drag & Drop items | Free UI Components by Radzen",
+                            Description = "This example demonstrates custom drag & drop logic in RadzenTree.",
+                            Path = "tree-dragdrop",
+                            Tags = new [] { "tree", "treeview", "nodes", "drag", "drop" },
                         }
                     }
                 },
