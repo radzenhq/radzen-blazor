@@ -16,7 +16,8 @@
     {
         await base.OnInitializedAsync();
 
-        employees = dbContext.Employees.Include(e => e.Employees1).Where(e => e.ReportsTo == null);
+        var allEmployees = dbContext.Employees.Include(e => e.Employees1).ToList();
+        employees = allEmployees.Where(e => e.ReportsTo == null);
     }
 
     Employee draggedItem;
