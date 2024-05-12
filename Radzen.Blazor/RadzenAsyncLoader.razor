@@ -1,0 +1,10 @@
+﻿@typeparam TData
+
+@if (IsLoading && LoadingTemplate != null)
+{
+    @LoadingTemplate()
+}
+@if (Data != null)
+{
+    @Template(Data)
+}
