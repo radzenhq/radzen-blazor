@@ -318,6 +318,7 @@ window.Radzen = {
     if (Radzen[id].keyPress && Radzen[id].paste) {
         for (var i = 0; i < inputs.length; i++) {
             inputs[i].removeEventListener('keypress', Radzen[id].keyPress);
+            inputs[i].removeEventListener('keydown', Radzen[id].keyDown);
             inputs[i].removeEventListener('paste', Radzen[id].paste);
         }
         delete Radzen[id].keyPress;
@@ -392,8 +393,26 @@ window.Radzen = {
           }
       }
 
+      Radzen[id].keyDown = function (e) {
+          var keyCode = e.data ? e.data.charCodeAt(0) : e.which;
+          if (keyCode == 8) {
+              e.currentTarget.value = '';
+
+              var value = inputs.map(i => i.value).join('').trim();
+              hidden.value = value;
+
+              ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value);
+
+              var index = inputs.indexOf(e.currentTarget);
+              if (index > 0) {
+                  inputs[index - 1].focus();
+              }
+          }
+      }
+
       for (var i = 0; i < inputs.length; i++) {
           inputs[i].addEventListener(navigator.userAgent.match(/Android/i) ? 'textInput' : 'keypress', Radzen[id].keyPress);
+          inputs[i].addEventListener(navigator.userAgent.match(/Android/i) ? 'textInput' : 'keydown', Radzen[id].keyDown);
           inputs[i].addEventListener('paste', Radzen[id].paste);
       }
   },
