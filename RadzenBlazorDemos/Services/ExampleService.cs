@@ -182,6 +182,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Crosstab data",
+                            Path = "datagrid-crosstab",
+                            Title = "Blazor DataGrid Component - Crosstab Data | Free UI Components by Radzen",
+                            Description = "Blazor Data Grid supports crosstab data sources.",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "crosstab", "rows", "columns" }
+                        },
+                        new Example
+                        {
                             Name = "Performance",
                             Path = "datagrid-performance",
                             Title = "Blazor DataGrid Component - Performance | Free UI Components by Radzen",

@@ -1,0 +1,99 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
+<RadzenDataGrid Data="@data">
+    <Columns>
+        <RadzenDataGridColumn Title="Year" Width="120px">
+            <Template>
+                <strong>@(context.Values.All(v => v is string) ? "Company" : "Amount")</strong>
+            </Template>
+        </RadzenDataGridColumn>
+        @foreach (var column in columns)
+        {
+            <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+                                  Property="@GetColumnPropertyExpression(column.Key, column.Value)">
+                <Template>
+                    @(context.Values.All(v => v is string) ? context[column.Key] : String.Format("{0:C}", context[column.Key]))
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    public IEnumerable<IDictionary<string, object>> data { get; set; }
+
+    public IDictionary<string, Type> columns { get; set; } = new Dictionary<string, Type>();
+
+    public string GetColumnPropertyExpression(string name, Type type)
+    {
+        var expression = $@"it[""{name}""].ToString()";
+
+        if (type == typeof(int))
+        {
+            return $"int.Parse({expression})";
+        }
+        else if (type == typeof(DateTime))
+        {
+            return $"DateTime.Parse({expression})";
+        }
+        else if (type.IsEnum)
+        {
+            return $@"Int32(Enum.Parse(it[""{name}""].GetType(), {expression}))";
+        }
+
+        return expression;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var rnd = new Random();
+
+        // crosstab query
+        var query = (from o in dbContext.Orders
+                     from c in dbContext.Customers.Where(c => c.CustomerID == o.CustomerID).DefaultIfEmpty()
+                     from d in dbContext.OrderDetails.Where(d => d.OrderID == o.OrderID).DefaultIfEmpty()
+                     group new { o, c, d } by new { o.OrderDate.Value.Year, c.CompanyName } into g
+                     select new
+                     {
+                         Company = g.Key.CompanyName,
+                         OrderYear = g.Key.Year - rnd.Next(10),
+                         Amount = g.Sum(e => e.d.UnitPrice * e.d.Quantity)
+                     }).ToList().DistinctBy(i => i.OrderYear).OrderBy(i => i.OrderYear);
+
+        // Add dynamic columns
+        foreach (var i in query)
+        {
+            columns.Add(i.OrderYear.ToString(), typeof(int));
+        }
+
+        // Transpose crosstab data to "rows as columns" collection
+        data = Enumerable.Range(0, 2).Select(i =>
+        {
+            var row = new Dictionary<string, object>();
+
+            foreach (var column in columns)
+            {
+                var dataRow = query.Where(d => d.OrderYear.ToString() == column.Key).FirstOrDefault();
+
+                row.Add(
+                    column.Key,
+                    i == 0 ? dataRow.Company : dataRow.Amount
+                );
+            }
+
+            return row;
+        });
+    }
+}
