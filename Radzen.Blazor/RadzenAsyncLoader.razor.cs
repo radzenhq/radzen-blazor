@@ -6,76 +6,67 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Component for asynchronously loading data with optional loading and data templates.
+    /// A generic component for asynchronously loading data and rendering templates based on the loading state.
     /// </summary>
-    /// <typeparam name="TData">The type of the data to be loaded.</typeparam>
-    public partial class RadzenAsyncLoader<TData> : RadzenComponent
+    public partial class RadzenAsyncLoader<TData> : ComponentBase
     {
         /// <summary>
-        /// Gets or sets the template for rendering the loaded data.
+        /// The template to render when data is loaded.
         /// </summary>
         [Parameter]
         public RenderFragment<TData> Template { get; set; }
 
         /// <summary>
-        /// Gets or sets the template for rendering while data is loading.
+        /// The template to render while data is loading.
         /// </summary>
         [Parameter]
         public RenderFragment LoadingTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets the task that loads the data.
+        /// The asynchronous task that fetches the data.
         /// </summary>
         [Parameter]
         public Task<TData> DataTask { get; set; }
 
         /// <summary>
-        /// Gets or sets the action to handle errors during data loading.
+        /// A callback action invoked when an error occurs during data loading.
         /// </summary>
         [Parameter]
         public Action<Exception> OnError { get; set; }
 
+        /// <summary>
+        /// Indicates whether the component is in a loading state.
+        /// </summary>
         private bool IsLoading { get; set; } = true;
 
-        public TData Data { get; set; }
+        /// <summary>
+        /// The loaded data result.
+        /// </summary>
+        private TData Result { get; set; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Initializes the component and asynchronously loads data.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         protected override async Task OnInitializedAsync()
         {
             try
             {
-                Data = await DataTask;
+                Result = await DataTask;
+                IsLoading = false;
             }
             catch (Exception ex)
             {
+                IsLoading = false;
                 if (OnError != null)
                 {
                     OnError(ex);
                 }
-                else
-                {
-                    throw;
-                }
             }
             finally
             {
-                IsLoading = false;
+                // Ensure UI updates after loading completes or encounters an error.
                 StateHasChanged();
-            }
-        }
-
-        /// <inheritdoc/>
-        protected override void BuildRenderTree(RenderTreeBuilder builder)
-        {
-            base.BuildRenderTree(builder);
-
-            if (IsLoading && LoadingTemplate != null)
-            {
-                builder.AddContent(0, LoadingTemplate);
-            }
-            else if (Data != null)
-            {
-                builder.AddContent(1, Template(Data));
             }
         }
     }

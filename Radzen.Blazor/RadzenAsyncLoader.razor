@@ -2,9 +2,9 @@
 
 @if (IsLoading && LoadingTemplate != null)
 {
-    @LoadingTemplate()
+    @LoadingTemplate
 }
-@if (Data != null)
+else if (Result != null)
 {
-    @Template(Data)
+    @Template(Result)
 }
