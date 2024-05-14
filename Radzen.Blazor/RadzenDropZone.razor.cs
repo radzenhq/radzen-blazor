@@ -26,7 +26,7 @@ namespace Radzen.Blazor
         /// The Footer Template is rendered below the items in the <see cref="RadzenDropZone{TItem}" />
         /// </summary>
         [Parameter]
-        public RenderFragment FooterTemplate { get; set; }
+        public RenderFragment Footer { get; set; }
 
         [CascadingParameter]
         RadzenDropZoneContainer<TItem> Container { get; set; }
