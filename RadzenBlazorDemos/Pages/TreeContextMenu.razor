@@ -1,0 +1,42 @@
+@using Microsoft.EntityFrameworkCore
+@using RadzenBlazorDemos.Models.Northwind
+@inject ContextMenuService ContextMenuService
+@inherits DbContextPage
+
+<RadzenTree Data=@employees Style="height: 300px" ItemContextMenu="ItemContextMenu">
+    <RadzenTreeLevel TextProperty="LastName" ChildrenProperty="Employees1"
+                     Expanded=@(i => true)
+                     HasChildren=@(i => ((Employee)i).Employees1?.Any() == true) />
+</RadzenTree>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    IEnumerable<Employee> employees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var allEmployees = dbContext.Employees.Include(e => e.Employees1).ToList();
+        employees = allEmployees.Where(e => e.ReportsTo == null);
+    }
+
+    Employee draggedItem;
+
+    void ItemContextMenu(TreeItemContextMenuEventArgs args)
+    { 
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Context menu item 1", Value = 1, Icon = "home" },
+                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2, Icon = "search" },
+                new ContextMenuItem(){ Text = "Context menu item 3", Value = 3, Icon = "info" },
+                },
+            (e) =>
+            {
+                console.Log($"Menu item with Value={e.Value} clicked. Tree item: {args.Text}, EmployeeID: {((Employee)args.Value).EmployeeID}");
+            }
+         );
+    }
+}

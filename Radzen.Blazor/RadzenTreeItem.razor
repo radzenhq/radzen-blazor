@@ -2,7 +2,8 @@
 @using Radzen.Blazor.Rendering
 @implements IDisposable
 @{var itemArgs = Tree?.ItemAttributes(this); }
-<li class="rz-treenode" @attributes="@(itemArgs.Item1.Attributes.Any() ? itemArgs.Item1.Attributes : Attributes)">
+<li class="rz-treenode" @attributes="@(itemArgs.Item1.Attributes.Any() ? itemArgs.Item1.Attributes : Attributes)" 
+    @oncontextmenu="OnContextMenu" @oncontextmenu:preventDefault="@Tree.ItemContextMenu.HasDelegate" @oncontextmenu:stopPropagation>
     <div class=@ContentClassList @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {

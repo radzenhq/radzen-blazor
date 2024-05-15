@@ -816,6 +816,14 @@ namespace RadzenBlazorDemos
                             Description = "This example demonstrates custom drag & drop logic in RadzenTree.",
                             Path = "tree-dragdrop",
                             Tags = new [] { "tree", "treeview", "nodes", "drag", "drop" },
+                        },
+                        new Example
+                        {
+                            Name = "Context menu",
+                            Title = "Blazor Tree Component - Context menu | Free UI Components by Radzen",
+                            Description = "This example demonstrates context menu in RadzenTree.",
+                            Path = "tree-contextmenu",
+                            Tags = new [] { "tree", "treeview", "nodes", "context", "menu" },
                         }
                     }
                 },
