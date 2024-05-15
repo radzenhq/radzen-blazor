@@ -20,6 +20,13 @@ namespace Radzen.Blazor
         /// <value>The zone value used to compare items in container Selector function.</value>
         [Parameter]
         public object Value { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the Footer Templated
+        /// The Footer Template is rendered below the items in the <see cref="RadzenDropZone{TItem}" />
+        /// </summary>
+        [Parameter]
+        public RenderFragment Footer { get; set; }
 
         [CascadingParameter]
         RadzenDropZoneContainer<TItem> Container { get; set; }
