@@ -365,7 +365,7 @@ namespace Radzen.Blazor
             return Tree.CheckedValues != null ? Tree.CheckedValues : Enumerable.Empty<object>();
         }
 
-        internal IEnumerable<object> GetAllChildValues(Func<object, bool> predicate = null)
+        internal IEnumerable<object> GetAllChildValues(Func<object, bool> predicate = null) 
         {
             IEnumerable<object> children = [];
             if (string.IsNullOrEmpty(ChildrenProperty))
@@ -374,13 +374,32 @@ namespace Radzen.Blazor
             }
             else
             {
-                children = (PropertyAccess.GetValue(Value, ChildrenProperty) as IEnumerable<object>)
-                    .SelectManyRecursive(x => PropertyAccess.GetValue(x, ChildrenProperty) as IEnumerable<object>);
+                // children = (PropertyAccess.GetValue(Value, ChildrenProperty) as IEnumerable<object>)
+                //     .SelectManyRecursive(x => PropertyAccess.GetValue(x, ChildrenProperty) as IEnumerable<object>);
+                children = GetChildrenRecusvie(Value);
             }
 
             return predicate != null ? children.Where(predicate) : children;
         }
 
+        public IEnumerable<object> GetChildrenRecusvie(object value)
+        {
+            IEnumerable<object> children = PropertyAccess.GetValue(value, ChildrenProperty) as IEnumerable<object>;
+            if (children is not null && children.Any())
+            {
+                foreach (object child in children)
+                {
+                    IEnumerable<object> grandChildren = GetChildrenRecusvie(child);
+                    if (grandChildren is not null && grandChildren.Any())
+                    {
+                        children = children.Concat(grandChildren);
+                    }
+                }
+            }
+
+            return children;
+        }
+        
         IEnumerable<object> GetValueAndAllChildValues()
         {
             return new object[] { Value }.Concat(GetAllChildValues());
