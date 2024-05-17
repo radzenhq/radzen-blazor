@@ -2062,7 +2062,8 @@ window.Radzen = {
         minValue,
         maxValue,
         minNextValue,
-        maxNextValue) {
+        maxNextValue,
+        clientToServerInvocationsOnPaneResize) {
 
         var el = document.getElementById(id);
         var pane = document.getElementById(paneId);
@@ -2124,13 +2125,15 @@ window.Radzen = {
             paneNextLength: isFinite(paneNextLength) ? paneNextLength : 0,
             mouseUpHandler: function(e) {
                 if (Radzen[el]) {
-                    splitter.invokeMethodAsync(
-                        'RadzenSplitter.OnPaneResized',
-                        parseInt(pane.getAttribute('data-index')),
-                        parseFloat(pane.style.flexBasis),
-                        paneNext ? parseInt(paneNext.getAttribute('data-index')) : null,
-                        paneNext ? parseFloat(paneNext.style.flexBasis) : null
-                    );
+                    if (clientToServerInvocationsOnPaneResize) {
+                      splitter.invokeMethodAsync(
+                          'RadzenSplitter.OnPaneResized',
+                          parseInt(pane.getAttribute('data-index')),
+                          parseFloat(pane.style.flexBasis),
+                          paneNext ? parseInt(paneNext.getAttribute('data-index')) : null,
+                          paneNext ? parseFloat(paneNext.style.flexBasis) : null
+                      );
+                    }
 
                     document.removeEventListener('pointerup', Radzen[el].mouseUpHandler);
                     document.removeEventListener('pointermove', Radzen[el].mouseMoveHandler);
@@ -2141,9 +2144,11 @@ window.Radzen = {
             mouseMoveHandler: function(e) {
                 if (Radzen[el]) {
 
-                    splitter.invokeMethodAsync(
-                        'RadzenSplitter.OnPaneResizing'
-                    );
+                    if (clientToServerInvocationsOnPaneResize) {
+                        splitter.invokeMethodAsync(
+                            'RadzenSplitter.OnPaneResizing'
+                        );
+                    }
 
                     var spacePerc = Radzen[el].panePerc + Radzen[el].paneNextPerc;
                     var spaceLength = Radzen[el].paneLength + Radzen[el].paneNextLength;
@@ -2188,10 +2193,10 @@ window.Radzen = {
             }
           };
 
-        const preventDefaultAndStopPropagation = (ev) => {
-            ev.preventDefault();
-            ev.stopPropagation();
-        };
+          const preventDefaultAndStopPropagation = (ev) => {
+              ev.preventDefault();
+              ev.stopPropagation();
+          };
           document.addEventListener('pointerup', Radzen[el].mouseUpHandler);
           document.addEventListener('pointermove', Radzen[el].mouseMoveHandler);
           el.addEventListener('touchmove', preventDefaultAndStopPropagation, { passive: false });

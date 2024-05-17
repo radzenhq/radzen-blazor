@@ -30,6 +30,13 @@ namespace Radzen.Blazor
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
+        /// <summary>
+        /// Gets or sets whether server side <see cref="JSInvokableAttribute">JSInvokable</see>s should be invoked by the client on pane resizing events or not. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if should be invoked; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ClientToServerInvocationsOnPaneResize { get; set; } = true;
+
         internal List<RadzenSplitterPane> Panes = new List<RadzenSplitterPane>();
 
         /// <summary>
@@ -112,7 +119,8 @@ namespace Radzen.Blazor
                 pane.Min,
                 pane.Max,
                 paneNextResizable?.Min,
-                paneNextResizable?.Max).AsTask();
+                paneNextResizable?.Max,
+                ClientToServerInvocationsOnPaneResize).AsTask();
         }
 
         /// <summary>
