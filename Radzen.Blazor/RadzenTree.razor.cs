@@ -233,7 +233,7 @@ namespace Radzen.Blazor
         public EventCallback<IEnumerable<object>> CheckedValuesChanged { get; set; }
 
         void RenderTreeItem(RenderTreeBuilder builder, object data, RenderFragment<RadzenTreeItem> template, Func<object, string> text,
-            Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected, IEnumerable children = null)
+            Func<object, bool> hasChildren, Func<object, bool> expanded, Func<object, bool> selected, IEnumerable children = null, string childrenProperty = null)
         {
             builder.OpenComponent<RadzenTreeItem>(0);
             builder.AddAttribute(1, nameof(RadzenTreeItem.Text), text(data));
@@ -242,6 +242,7 @@ namespace Radzen.Blazor
             builder.AddAttribute(4, nameof(RadzenTreeItem.Template), template);
             builder.AddAttribute(5, nameof(RadzenTreeItem.Expanded), expanded(data));
             builder.AddAttribute(6, nameof(RadzenTreeItem.Selected), Value == data || selected(data));
+            builder.AddAttribute(7, nameof(RadzenTreeItem.ChildrenProperty), childrenProperty);
             builder.SetKey(data);
         }
 
@@ -260,7 +261,7 @@ namespace Radzen.Blazor
                         text = level.Text ?? Getter<string>(data, level.TextProperty);
                     }
 
-                    RenderTreeItem(builder, data, level.Template, text, level.HasChildren, level.Expanded, level.Selected);
+                    RenderTreeItem(builder, data, level.Template, text, level.HasChildren, level.Expanded, level.Selected, null, level.ChildrenProperty);
 
                     var hasChildren = level.HasChildren(data);
 
@@ -270,12 +271,12 @@ namespace Radzen.Blazor
 
                         if (grandChildren != null && hasChildren)
                         {
-                            builder.AddAttribute(7, "ChildContent", RenderChildren(grandChildren, depth + 1));
-                            builder.AddAttribute(8, nameof(RadzenTreeItem.Data), grandChildren);
+                            builder.AddAttribute(8, "ChildContent", RenderChildren(grandChildren, depth + 1));
+                            builder.AddAttribute(9, nameof(RadzenTreeItem.Data), grandChildren);
                         }
                         else
                         {
-                            builder.AddAttribute(7, "ChildContent", (RenderFragment)null);
+                            builder.AddAttribute(8, "ChildContent", (RenderFragment)null);
                         }
                     }
 

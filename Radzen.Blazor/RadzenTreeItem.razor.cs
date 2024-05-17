@@ -92,6 +92,9 @@ namespace Radzen.Blazor
         [Parameter]
         public IEnumerable Data { get; set; }
 
+        [Parameter]
+        public string ChildrenProperty { get; set; }
+        
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
         internal void AddItem(RadzenTreeItem item)
@@ -364,7 +367,16 @@ namespace Radzen.Blazor
 
         internal IEnumerable<object> GetAllChildValues(Func<object, bool> predicate = null)
         {
-            var children = items.Concat(items.SelectManyRecursive(i => i.items)).Select(i => i.Value);
+            IEnumerable<object> children = [];
+            if (string.IsNullOrEmpty(ChildrenProperty))
+            {
+                children = items.Concat(items.SelectManyRecursive(i => i.items)).Select(i => i.Value);
+            }
+            else
+            {
+                children = (PropertyAccess.GetValue(Value, ChildrenProperty) as IEnumerable<object>)
+                    .SelectManyRecursive(x => PropertyAccess.GetValue(x, ChildrenProperty) as IEnumerable<object>);
+            }
 
             return predicate != null ? children.Where(predicate) : children;
         }
