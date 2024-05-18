@@ -175,6 +175,15 @@
         }
     }
 
+    string ContentCssClass
+    {
+        get
+        {
+            var baseCss = "rz-dialog-content";
+            return string.IsNullOrEmpty(Dialog.Options.ContentCssClass) ? baseCss : $"{baseCss} {Dialog.Options.ContentCssClass}";
+        }
+    }
+
     string Style
     {
         get

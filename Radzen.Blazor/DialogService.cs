@@ -401,6 +401,7 @@ namespace Radzen
                 CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                 CssClass = options != null ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert",
                 WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
+                ContentCssClass = options != null ? $"rz-dialog-content {options.ContentCssClass}" : "rz-dialog-content",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
             };
 
@@ -476,7 +477,12 @@ namespace Radzen
         /// Gets or sets the CSS classes added to the dialog's wrapper element.
         /// </summary>
         public string WrapperCssClass { get; set; }
-        
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the dialog's content element.
+        /// </summary>
+        public string ContentCssClass { get; set; }
+
         /// <summary>
         /// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.
         /// </summary>
