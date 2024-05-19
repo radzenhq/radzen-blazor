@@ -31,7 +31,7 @@
             }
             else
             {
-                <div class="@ContentCssClass">
+                <div class="rz-dialog-titlebar">
                     <div class="rz-dialog-title" style="display: inline" id="rz-dialog-0-label">
                         @if (Dialog.Options.TitleContent != null)
                         {
@@ -51,7 +51,7 @@
                 </div>
             }
         }
-        <div class="rz-dialog-content">
+        <div class="@ContentCssClass">
             @if (Dialog.Options.ChildContent != null)
             {
                 @Dialog.Options.ChildContent(Service)
