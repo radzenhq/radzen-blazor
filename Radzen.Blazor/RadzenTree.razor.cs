@@ -257,7 +257,9 @@ namespace Radzen.Blazor
                 {
                     if (text == null)
                     {
-                        text = level.Text ?? Getter<string>(data, level.TextProperty);
+                        text = level.Text ?? 
+                            (!string.IsNullOrEmpty(level.TextProperty) ? Getter<string>(data, level.TextProperty) : null) ??
+                            (o => "");
                     }
 
                     RenderTreeItem(builder, data, level.Template, text, level.HasChildren, level.Expanded, level.Selected);
