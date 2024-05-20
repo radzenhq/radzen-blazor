@@ -51,7 +51,7 @@
                 </div>
             }
         }
-        <div class="rz-dialog-content">
+        <div class="@ContentCssClass">
             @if (Dialog.Options.ChildContent != null)
             {
                 @Dialog.Options.ChildContent(Service)
@@ -172,6 +172,15 @@
         {
             var baseCss = "rz-dialog-wrapper";
             return string.IsNullOrWhiteSpace(Dialog.Options.WrapperCssClass) ? baseCss : $"{baseCss} {Dialog.Options.WrapperCssClass}";
+        }
+    }
+
+    string ContentCssClass
+    {
+        get
+        {
+            var baseCss = "rz-dialog-content";
+            return string.IsNullOrEmpty(Dialog.Options.ContentCssClass) ? baseCss : $"{baseCss} {Dialog.Options.ContentCssClass}";
         }
     }
 
