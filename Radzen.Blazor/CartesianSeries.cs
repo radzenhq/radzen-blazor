@@ -5,8 +5,6 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
-using System.Collections;
-using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -410,7 +408,7 @@ namespace Radzen.Blazor
 
                     if (IsDate(CategoryProperty) || IsNumeric(CategoryProperty))
                     {
-                        Items = Items.AsQueryable().OrderBy(CategoryProperty).ToList();
+                        Items = Items.AsQueryable().OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, CategoryProperty).ToList();
                     }
                 }
 

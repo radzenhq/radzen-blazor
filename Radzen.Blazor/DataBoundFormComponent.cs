@@ -278,7 +278,7 @@ namespace Radzen
 
                         query.Add($"{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)");
 
-                        _view = Query.Where(String.Join(".", query), ignoreCase ? searchText.ToLower() : searchText);
+                        _view = Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(".", query), ignoreCase ? searchText.ToLower() : searchText);
                     }
                     else
                     {

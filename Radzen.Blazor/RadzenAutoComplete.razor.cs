@@ -204,7 +204,7 @@ namespace Radzen.Blazor
 
                     string textProperty = string.IsNullOrEmpty(TextProperty) ? string.Empty : $".{TextProperty}";
 
-                    return Query.Where($"o=>o{textProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
+                    return Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"o=>o{textProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
                         FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
                 }
 

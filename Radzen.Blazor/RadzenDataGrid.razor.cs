@@ -34,14 +34,7 @@ namespace Radzen.Blazor
 #endif
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
-        class DynamicLinqCustomTypeProvider : System.Linq.Dynamic.Core.CustomTypeProviders.IDynamicLinkCustomTypeProvider
-        {
-            static readonly HashSet<Type> empty = [];
-            public HashSet<Type> GetCustomTypes() => empty;
-            public Dictionary<Type, List<System.Reflection.MethodInfo>> GetExtensionMethods() => throw new NotSupportedException();
-            public Type ResolveType(string typeName) => throw new NotSupportedException();
-            public Type ResolveTypeBySimpleName(string simpleTypeName) => throw new NotSupportedException();
-        }
+
 
 #if NET5_0_OR_GREATER
         /// <summary>
@@ -344,7 +337,7 @@ namespace Radzen.Blazor
                 if (_groupedPagedView == null)
                 {
                     var orderBy = GetOrderBy();
-                    var query = Groups.Count(g => g.SortOrder == null) == Groups.Count || !string.IsNullOrEmpty(orderBy) ? View : View.OrderBy(new ParsingConfig() { CustomTypeProvider = new DynamicLinqCustomTypeProvider() }, string.Join(',', Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")} {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
+                    var query = Groups.Count(g => g.SortOrder == null) == Groups.Count || !string.IsNullOrEmpty(orderBy) ? View : View.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(',', Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")} {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
                     var v = (AllowPaging && !LoadData.HasDelegate ? query.Skip(skip).Take(PageSize) : query).ToList().AsQueryable();
                     _groupedPagedView = v.GroupByMany(Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}").ToArray()).ToList();
                 }

@@ -558,7 +558,7 @@ namespace Radzen.Blazor
             var predicate = $"{EndProperty} >= @0 && {StartProperty} < @1";
 
             appointments = Data.AsQueryable()
-                               .Where(predicate, start, end)
+                               .Where(DynamicLinqCustomTypeProvider.ParsingConfig, predicate, start, end)
                                .ToList()
                                .Select(item => new AppointmentData { Start = startGetter(item), End = endGetter(item), Text = textGetter(item), Data = item });
 
