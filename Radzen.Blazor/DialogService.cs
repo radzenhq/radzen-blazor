@@ -279,6 +279,7 @@ namespace Radzen
                 CssClass = options != null ? options.CssClass : "",
                 WrapperCssClass = options != null ? options.WrapperCssClass : "",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
+                ContentCssClass = options != null ? options.ContentCssClass : ""
             });
         }
 
