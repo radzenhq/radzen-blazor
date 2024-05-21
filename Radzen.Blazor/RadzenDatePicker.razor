@@ -91,7 +91,7 @@
                                                 DateTime date = StartDate.AddDays(dayNumber++);
                                                 var dateArgs = DateAttributes(date);
 
-                                                <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)" @onmouseup=@Close
+                                                <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)" 
                                                 @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
                                                     <span class=@GetDayCssClass(date, dateArgs, false)>@date.Day</span>
                                                 </td>
