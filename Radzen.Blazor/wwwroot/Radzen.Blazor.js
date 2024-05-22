@@ -986,6 +986,7 @@ window.Radzen = {
       }
   },
   createDatePicker(el, popupId) {
+      if(!el) return;
       var handler = function (e, condition) {
           if (condition) {
               Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, false);
