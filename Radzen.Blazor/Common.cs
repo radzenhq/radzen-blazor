@@ -560,6 +560,58 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Supplies information about RadzenDropDown ItemRender event.
+    /// </summary>
+    public class DropDownBaseItemRenderEventArgs<TValue>
+    {
+        /// <summary>
+        /// Gets the data item.
+        /// </summary>
+        public object Item { get; internal set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this item is visible.
+        /// </summary>
+        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Visible { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this item is visible.
+        /// </summary>
+        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the row HTML attributes.
+        /// </summary>
+        public IDictionary<string, object> Attributes { get; private set; } = new Dictionary<string, object>();
+    }
+
+    /// <summary>
+    /// Supplies information about RadzenDropDown ItemRender event.
+    /// </summary>
+    public class DropDownItemRenderEventArgs<TValue> : DropDownBaseItemRenderEventArgs<TValue>
+    {
+        /// <summary>
+        /// Gets the DropDown.
+        /// </summary>
+        public RadzenDropDown<TValue> DropDown { get; internal set; }
+    }
+
+    /// <summary>
+    /// Supplies information about RadzenDropDown ItemRender event.
+    /// </summary>
+    public class ListBoxItemRenderEventArgs<TValue> : DropDownBaseItemRenderEventArgs<TValue>
+    {
+        /// <summary>
+        /// Gets the DropDown.
+        /// </summary>
+        public RadzenListBox<TValue> ListBox { get; internal set; }
+    }
+
+    /// <summary>
     /// Supplies information about a <see cref="RadzenDatePicker{TValue}.DateRender" /> event that is being raised.
     /// </summary>
     public class DateRenderEventArgs

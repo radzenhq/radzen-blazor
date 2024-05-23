@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -66,6 +67,32 @@ namespace Radzen.Blazor
         /// <value>The filter placeholder.</value>
         [Parameter]
         public string FilterPlaceholder { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the row render callback. Use it to set row attributes.
+        /// </summary>
+        /// <value>The row render callback.</value>
+        [Parameter]
+        public Action<DropDownItemRenderEventArgs<TValue>> ItemRender { get; set; }
+
+        internal DropDownItemRenderEventArgs<TValue> ItemAttributes(RadzenDropDownItem<TValue> item)
+        {
+            var disabled = !string.IsNullOrEmpty(DisabledProperty) ? GetItemOrValueFromProperty(item.Item, DisabledProperty) : false;
+
+            var args = new DropDownItemRenderEventArgs<TValue>() 
+            { 
+                DropDown = this, 
+                Item = item.Item, 
+                Disabled = disabled is bool ? (bool)disabled : false,
+            };
+
+            if (ItemRender != null)
+            {
+                ItemRender(args);
+            }
+
+            return args;
+        }
 
         private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
         {

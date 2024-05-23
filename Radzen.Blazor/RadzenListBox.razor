@@ -10,8 +10,14 @@
         <div class="rz-helper-hidden-accessible">
             <input name="@Name" readonly="@ReadOnly" disabled="@Disabled" type="text" aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes=@InputAttributes />
         </div>
-        @if (View != null && (AllowFiltering || (Multiple && AllowSelectAll)))
+        @if (View != null && (AllowFiltering || (Multiple && AllowSelectAll) || HeaderTemplate != null))
         {
+            @if (HeaderTemplate != null)
+            {
+                @HeaderTemplate
+            }
+            else
+            {
             <div class=" rz-listbox-header rz-helper-clearfix rz-listbox-header-w-checkbox">
                 @if (Multiple)
                 {
@@ -41,6 +47,7 @@
                     </div>
                 }
             </div>
+            }
         }
         @if (View != null)
         {

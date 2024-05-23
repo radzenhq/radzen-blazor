@@ -8,9 +8,10 @@
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenLabel Text="Select Value" Component="DropDownGrouping" Style="margin-right: 8px; vertical-align: middle;" />
     <RadzenDropDown @bind-Value=value AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Name="DropDownGrouping"
-                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID" Style="width: 100%; max-width: 400px;">
+                    Data=@groupedData ValueProperty="OrderID" TextProperty="OrderID" ItemRender="ItemRender" Style="width: 100%; max-width: 400px;">
         <Template>
-            @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
+            <span style="display:inline-block; font-weight: @(context.CompanyName != null ? "bold" : "normal");">
+                @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")</span>
         </Template>
     </RadzenDropDown>
 </div>
@@ -35,11 +36,21 @@
                     }))).ToList();
     }
 
+    void ItemRender(DropDownItemRenderEventArgs<int?> args)
+    {
+        var data = (GroupData)args.Item;
+        if (data.CompanyName != null)
+        {
+            // Use this code to prevent default item selection for group items.
+            args.Disabled = true;
+            args.Attributes.Add("style", "opacity: 1");
+        }
+    }
+
     class GroupData
     { 
         public string CompanyName { get; set; }
         public int OrderID { get; set; }
         public DateTime? OrderDate { get; set; }
-        public bool IsGroup { get { return CompanyName != null; } }
     }
 }

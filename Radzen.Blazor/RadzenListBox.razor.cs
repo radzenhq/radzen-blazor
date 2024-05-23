@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -31,11 +32,43 @@ namespace Radzen.Blazor
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 
+        /// <summary>
+        /// Gets or sets the row render callback. Use it to set row attributes.
+        /// </summary>
+        /// <value>The row render callback.</value>
+        [Parameter]
+        public Action<ListBoxItemRenderEventArgs<TValue>> ItemRender { get; set; }
+
+        internal ListBoxItemRenderEventArgs<TValue> ItemAttributes(RadzenListBoxItem<TValue> item)
+        {
+            var disabled = !string.IsNullOrEmpty(DisabledProperty) ? GetItemOrValueFromProperty(item.Item, DisabledProperty) : false;
+
+            var args = new ListBoxItemRenderEventArgs<TValue>()
+            {
+                ListBox = this,
+                Item = item.Item,
+                Disabled = disabled is bool ? (bool)disabled : false,
+            };
+
+            if (ItemRender != null)
+            {
+                ItemRender(args);
+            }
+
+            return args;
+        }
+
         internal override void RenderItem(RenderTreeBuilder builder, object item)
         {
             builder.OpenComponent(0, typeof(RadzenListBoxItem<TValue>));
             builder.AddAttribute(1, "ListBox", this);
             builder.AddAttribute(2, "Item", item);
+
+            if (DisabledProperty != null)
+            {
+                builder.AddAttribute(3, "Disabled", GetItemOrValueFromProperty(item, DisabledProperty));
+            }
+
             builder.SetKey(GetKey(item));
             builder.CloseComponent();
         }

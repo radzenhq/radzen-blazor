@@ -195,6 +195,13 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Gets or sets the header template.
+        /// </summary>
+        /// <value>The header template.</value>
+        [Parameter]
+        public RenderFragment HeaderTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether filtering is allowed. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if filtering is allowed; otherwise, <c>false</c>.</value>
@@ -544,7 +551,7 @@ namespace Radzen
         /// Gets the search identifier.
         /// </summary>
         /// <value>The search identifier.</value>
-        protected string SearchID
+        public string SearchID
         {
             get
             {

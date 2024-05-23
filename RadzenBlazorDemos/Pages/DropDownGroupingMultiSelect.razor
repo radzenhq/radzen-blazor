@@ -7,32 +7,92 @@
 
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenLabel Text="Select Value" Component="DropDownGroupingMultiSelect" Style="margin-right: 8px; vertical-align: middle;" />
-    <RadzenDropDown @bind-Value=values Multiple=true AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Name="DropDownGroupingMultiSelect"
-                    Data=@groupedData DisabledProperty="IsGroup" ValueProperty="OrderID" TextProperty="OrderID" MaxSelectedLabels="1" Style="width: 100%; max-width: 400px;" >
+    <RadzenDropDown @ref=dd Value=@values TValue="IEnumerable<int>" AllowClear="true" Name="DropDownGroupingMultiSelect"
+                    Data=@groupedData Style="width: 100%; max-width: 400px;" ItemRender="ItemRender">
+        <HeaderTemplate>
+            <RadzenStack Orientation="Orientation.Horizontal" class="rz-multiselect-header rz-dropdown-filter-container rz-helper-clearfix">
+                <RadzenCheckBox TValue="bool?" TriState=false Value="@AreAllSelected()" Change="@SelectAll" title="@(dd.SelectAllText)" Disabled=@(!groupedData.Any()) />
+                <input id="@($"{dd.SearchID}")" @oninput=@Search placeholder="Search..." class="rz-inputtext" role="textbox" type="text"
+                       aria-label="@(dd.SearchAriaLabel)" style="margin-inline-start:0.5rem;width:100%;border:0;background:transparent;" />
+            </RadzenStack>
+        </HeaderTemplate>
         <Template>
-                @(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")
+            <RadzenCheckBox Name="@($"{context.OrderID}")" TValue="bool?" TriState=false Value="@IsGroupSelected(context)" Change="@(args => SelectGroup(args, (GroupData)context))" />
+            <RadzenLabel Component="@($"{context.OrderID}")" Style=@($"margin-inline-start: 0.5rem; font-weight: {(context.CompanyName != null ? "bold" : "normal")}")
+                Text="@(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")"/>
         </Template>
+        <ValueTemplate>
+            @string.Join(", ", groupedData.Where(g => values?.Contains(g.OrderID) == true).Take(dd.MaxSelectedLabels).Select(g => g.OrderDate))
+        </ValueTemplate>
     </RadzenDropDown>
 </div>
 
 @code {
+    RadzenDropDown<IEnumerable<int>> dd;
     IEnumerable<int> values;
     IEnumerable<GroupData> groupedData;
+    string search;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        var orders = dbContext.Orders.Where(o => o.CustomerID != null).Include("Customer").ToList();
+        await Populate();
+    }
 
-        groupedData = orders.GroupBy(g => g.Customer.CompanyName)
-            .SelectMany(i => new GroupData[] { new GroupData() { CompanyName = i.Key } }
-                .Concat(i.Select(o => 
-                    new GroupData() 
-                    { 
-                        OrderID = o.OrderID,
-                        OrderDate = o.OrderDate
-                    }))).ToList();
+    void ItemRender(DropDownItemRenderEventArgs<IEnumerable<int>> args)
+    {
+        // Use this code to prevent default item selection.
+        args.Disabled = true;
+        args.Attributes.Add("style", "opacity: 1");
+    }
+
+    async Task Populate()
+    {
+        groupedData = await Task.FromResult(dbContext.Orders.Include("Customer")
+            .Where(o => o.CustomerID != null &&
+                    (string.IsNullOrEmpty(search) ? true :
+                        (o.OrderID.ToString().Contains(search)
+                            || o.CustomerID.ToLower().Contains(search.ToLower())
+                                || o.Customer.CompanyName.ToLower().Contains(search.ToLower())))).ToList()
+            .GroupBy(g => g.Customer.CompanyName)
+            .SelectMany(i => new GroupData[] { new GroupData() { CompanyName = i.Key, Items = i } }
+                        .Concat(i.Select(o => new GroupData() { OrderID = o.OrderID, OrderDate = o.OrderDate }))));
+    }
+
+    async Task Search(ChangeEventArgs args)
+    {
+        search = $"{args.Value}";
+        await Populate();
+    }
+
+    bool? AreAllSelected()
+    {
+        return groupedData?.All(g => values?.Contains(g.OrderID) == true) == true ? (groupedData?.Any() == true ? true : false ) :
+            groupedData?.Any(g => values?.Contains(g.OrderID) == true) == true ? null : false;
+    }
+
+    bool? IsGroupSelected(GroupData group)
+    {
+        if (group.CompanyName != null)
+        {
+            return group.Items.Any() && group.Items.All(i => values?.Contains(i.OrderID) == true) ? true :
+                group.Items.Any(i => values?.Contains(i.OrderID) == true) ? null : false;
+        }
+
+        return values?.Contains(group.OrderID) == true;
+    }
+
+    void SelectGroup(bool? value, GroupData group)
+    {
+        var newValues = values ?? Enumerable.Empty<int>();
+        var items = group.CompanyName != null ? group.Items.Select(i => i.OrderID) : new int[] { group.OrderID };
+        values = value == true ? newValues.Concat(items) : newValues.Except(items);
+    }
+
+    void SelectAll(bool? value)
+    {
+        values = value == true ? groupedData.Select(g => g.OrderID) : Enumerable.Empty<int>();
     }
 
     class GroupData
@@ -40,6 +100,6 @@
         public string CompanyName { get; set; }
         public int OrderID { get; set; }
         public DateTime? OrderDate { get; set; }
-        public bool IsGroup { get { return CompanyName != null; } }
+        public IEnumerable<Order> Items { get; set; } = Enumerable.Empty<Order>();
     }
 }

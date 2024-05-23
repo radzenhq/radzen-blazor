@@ -110,8 +110,14 @@
         <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
              style="display:none;min-width:400px;padding:0px;">
             <div class="rz-lookup-panel" @onkeydown="@CloseOnEscape">
-                @if (AllowFiltering)
+                @if (AllowFiltering || HeaderTemplate != null)
                 {
+                    @if (HeaderTemplate != null)
+                    {
+                        @HeaderTemplate
+                    }
+                    else
+                    {
                     <div class="rz-lookup-search">
                         <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@SearchTextPlaceholder"
                                @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")"
@@ -129,6 +135,7 @@
                             </button>
                         }
                     </div>
+                    }
                 }
                 @if (Template != null)
                 {

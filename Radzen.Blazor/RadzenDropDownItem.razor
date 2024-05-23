@@ -2,13 +2,17 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @typeparam TValue
-
+@{var itemArgs = DropDown?.ItemAttributes(this); }
+@if (itemArgs.Visible)
+{
+Disabled = itemArgs.Disabled;
 @if (DropDown.Multiple)
 {
     <li class="@GetComponentCssClass("rz-multiselect")"
         aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
-    @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
-        @onclick:preventDefault @onclick="args=>SelectItem(args,true)">
+        @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
+        @onclick:preventDefault @onclick="args=>SelectItem(args,true)" 
+        @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
         <div class="rz-chkbox ">
             <div class="@(DropDown.IsSelected(Item) ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
                 <span class="@(DropDown.IsSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon")"></span>
@@ -30,7 +34,8 @@ else
 {
     <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
     @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
-    @onclick:preventDefault @onclick="args=>SelectItem(args,true)">
+    @onclick:preventDefault @onclick="args=>SelectItem(args,true)"
+    @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
         <span>
             @if (DropDown.Template != null)
             {
@@ -43,7 +48,11 @@ else
        </span>
     </li>
 }
+}
 @code {
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+
     [Parameter]
     public RadzenDropDown<TValue> DropDown { get; set; }
 
