@@ -22,7 +22,7 @@
                 Text="@(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")"/>
         </Template>
         <ValueTemplate>
-            @string.Join(", ", groupedData.Where(g => values?.Contains(g.OrderID) == true).Take(dd.MaxSelectedLabels).Select(g => g.OrderDate))
+            @string.Join(", ", groupedData.Where(g => values?.Contains(g.OrderID) == true).Take(dd.MaxSelectedLabels).Select(g => $"OrderID: {g.OrderID}, Order date: {string.Format("{0:d}", g.OrderDate)}"))
         </ValueTemplate>
     </RadzenDropDown>
 </div>
