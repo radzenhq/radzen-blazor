@@ -44,7 +44,7 @@
     {
         // Use this code to prevent default item selection.
         args.Disabled = true;
-        args.Attributes.Add("style", "opacity: 1");
+        args.Attributes.Add("style", $"opacity:1;{(((GroupData)args.Item).CompanyName == null ? "margin-inline-start: 1rem;" : "")}");
     }
 
     async Task Populate()
