@@ -978,7 +978,7 @@ namespace Radzen
 
             if (valueAsEnumerable != null)
             {
-                if (!valueAsEnumerable.Cast<object>().SequenceEqual(selectedItems.Select(i => GetItemOrValueFromProperty(i, ValueProperty))))
+                if (!valueAsEnumerable.Cast<object>().SequenceEqual(selectedItems.Select(i => string.IsNullOrEmpty(ValueProperty) ? i : GetItemOrValueFromProperty(i, ValueProperty))))
                 {
                     selectedItems.Clear();
                 }

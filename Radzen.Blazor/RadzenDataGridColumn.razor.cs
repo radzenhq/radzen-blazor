@@ -123,7 +123,9 @@ namespace Radzen.Blazor
             {
                 Grid.AddColumn(this);
 
-                if (Grid.FilterMode == FilterMode.CheckBoxList)
+                var canSetFilterPropertyType = Grid.FilterMode == FilterMode.CheckBoxList && FilterTemplate == null;
+
+                if (canSetFilterPropertyType)
                 {
                     _filterPropertyType = typeof(IEnumerable<object>);
                     SetFilterOperator(FilterOperator.Contains);
@@ -136,7 +138,7 @@ namespace Radzen.Blazor
                     _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                 }
 
-                if (!string.IsNullOrEmpty(property) && Type == null && Grid.FilterMode != FilterMode.CheckBoxList)
+                if (!string.IsNullOrEmpty(property) && Type == null && !canSetFilterPropertyType)
                 {
                     _filterPropertyType = _propertyType;
                 }

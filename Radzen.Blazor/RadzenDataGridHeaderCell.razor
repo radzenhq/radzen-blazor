@@ -150,7 +150,14 @@
                                                    Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})">
                                         <Template>
-                                            @(!string.IsNullOrEmpty(Column.FormatString) ? string.Format(Grid?.Culture ?? CultureInfo.CurrentCulture, Column.FormatString, context) : Convert.ToString(context, Grid?.Culture ?? CultureInfo.CurrentCulture))
+                                            @if (context as Enum != null)
+                                            {
+                                                @EnumExtensions.GetDisplayDescription(context as Enum)
+                                            }
+                                            else
+                                            {
+                                                @(!string.IsNullOrEmpty(Column.FormatString) ? string.Format(Grid?.Culture ?? CultureInfo.CurrentCulture, Column.FormatString, context ?? "") : Convert.ToString(context ?? "", Grid?.Culture ?? CultureInfo.CurrentCulture))
+                                            }
                                         </Template>
                                     </RadzenListBox>
                                 }

@@ -1,7 +1,7 @@
 ﻿@using System.Linq.Dynamic.Core
 @using System.ComponentModel.DataAnnotations
     
-<RadzenDataGrid LoadData="LoadData" IsLoading=@isLoading Count="count" Data=@employees FilterMode="FilterMode.Advanced" AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
+<RadzenDataGrid Data=@employees AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
     <Columns>
         <RadzenDataGridColumn Property="ID" Title="ID" />
         <RadzenDataGridColumn Property="Gender" Title="Gender" />
@@ -12,7 +12,6 @@
 
 @code {
     int count;
-    IEnumerable<Employee> initialEmployees;
     IEnumerable<Employee> employees;
     bool isLoading = false;
 
@@ -56,7 +55,7 @@
 
     protected override void OnInitialized()
     {
-        initialEmployees = Enumerable.Range(0, 10).Select(i =>
+        employees = Enumerable.Range(0, 10).Select(i =>
             new Employee
             {
                 ID = i,
@@ -64,27 +63,5 @@
                 Status = i < 3 ? StatusType.Active : i < 6 ? StatusType.Inactive : null,
                 Color = i < 2 ? ColorType.Red: i < 4 ? ColorType.AlmondGreen : i < 6 ? ColorType.AppleBlueSeaGreen : ColorType.AzureBlue,
             });
-    }
-
-    void LoadData(LoadDataArgs args)
-    {
-        isLoading = true;
-        var query = initialEmployees.AsQueryable();
-
-        if (!string.IsNullOrEmpty(args.Filter))
-        {
-            query = query.Where(args.Filter);
-        }
-
-        if (!string.IsNullOrEmpty(args.OrderBy))
-        {
-            query = query.OrderBy(args.OrderBy);
-        }
-
-        count = query.Count();
-
-        employees = query.Skip(args.Skip.Value).Take(args.Top.Value).ToList();
-        isLoading = false;
-
     }
 }
