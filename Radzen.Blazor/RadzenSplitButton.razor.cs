@@ -140,6 +140,12 @@ namespace Radzen.Blazor
         public string OpenAriaLabel { get; set; } = "Open";
 
         /// <summary>
+        /// Gets or sets the icon of the drop down.
+        /// </summary>
+        [Parameter]
+        public string DropDownIcon { get; set; } = "arrow_drop_down";
+
+        /// <summary>
         /// Gets or sets the click callback.
         /// </summary>
         /// <value>The click callback.</value>

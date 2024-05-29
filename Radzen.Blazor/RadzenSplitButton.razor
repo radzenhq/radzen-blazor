@@ -40,8 +40,9 @@
                     }
                 }
             }
-        </button><button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class="@getPopupButtonCss()" type="button" aria-label="@OpenAriaLabel">
-            <span aria-hidden="true" class="rz-button-icon-left rzi rzi-chevron-down"></span><span class="rz-button-text"></span>
+        </button>
+        <button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class="@getPopupButtonCss()" type="button" aria-label="@OpenAriaLabel">
+            <RadzenIcon Icon="@DropDownIcon" />
         </button>
         <div id="@PopupID" class="rz-splitbutton-menu">
             <ul class="rz-menu-list">
