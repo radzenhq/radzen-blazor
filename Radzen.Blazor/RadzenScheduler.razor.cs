@@ -153,6 +153,24 @@ namespace Radzen.Blazor
         public EventCallback<SchedulerSlotSelectEventArgs> SlotSelect { get; set; }
 
         /// <summary>
+        /// A callback that will be invoked when the user clicks the Today button.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments TodaySelect=@OnTodaySelect&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        /// void OnTodaySelect(SchedulerTodaySelectEventArgs args)
+        /// {
+        ///     args.Today = DateTime.Today.AddDays(1);
+        /// }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<SchedulerTodaySelectEventArgs> TodaySelect { get; set; }
+
+        /// <summary>
         /// A callback that will be invoked when the user clicks an appointment in the current view. Commonly used to edit existing appointments.
         /// </summary>
         /// <example>
@@ -422,7 +440,11 @@ namespace Radzen.Blazor
 
         async Task OnToday()
         {
-            CurrentDate = DateTime.Now.Date;
+            var args = new SchedulerTodaySelectEventArgs { Today = DateTime.Now.Date };
+
+            await TodaySelect.InvokeAsync(args);
+
+            CurrentDate = args.Today;
 
             await InvokeLoadData();
         }
