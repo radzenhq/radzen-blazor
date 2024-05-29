@@ -950,6 +950,10 @@ namespace Radzen.Blazor
                 DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, Kind);
                 await ValueChanged.InvokeAsync((TValue)(object)offset);
             }
+            else if ((typeof(TValue) == typeof(DateTime) || typeof(TValue) == typeof(DateTime?)) && Value != null)
+            {
+                await ValueChanged.InvokeAsync((TValue)(object)DateTime.SpecifyKind((DateTime)Value, Kind));
+            }
             else
             {
                 await ValueChanged.InvokeAsync((TValue)Value);
