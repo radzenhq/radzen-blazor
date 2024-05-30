@@ -2,8 +2,18 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 @using System.Collections.ObjectModel
+@using Microsoft.JSInterop
 
 @inherits DbContextPage
+
+@inject IJSRuntime JSRuntime;
+
+<style>
+    .my-class td {
+        border-top: 1px solid black;
+        border-bottom: 1px solid black;
+    }
+</style>
 
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
     Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single"
@@ -52,7 +62,8 @@
         args.Attributes.Add("title", "Drag row to reorder");
         args.Attributes.Add("style", "cursor:grab");
         args.Attributes.Add("draggable", "true");
-        args.Attributes.Add("ondragover", "event.preventDefault()");
+        args.Attributes.Add("ondragover", "event.preventDefault();event.target.closest('.rz-data-row').classList.add('my-class')");
+        args.Attributes.Add("ondragleave", "event.target.closest('.rz-data-row').classList.remove('my-class')");
         args.Attributes.Add("ondragstart", EventCallback.Factory.Create<DragEventArgs>(this, () => draggedItem = args.Data));
         args.Attributes.Add("ondrop", EventCallback.Factory.Create<DragEventArgs>(this, () =>
         {
@@ -60,6 +71,8 @@
             var droppedIndex = employees.IndexOf(args.Data);
             employees.Remove(draggedItem);
             employees.Insert(draggedIndex <= droppedIndex ? droppedIndex++ : droppedIndex, draggedItem);
+
+            JSRuntime.InvokeVoidAsync("eval", $"document.querySelector('.my-class').classList.remove('my-class')");
         }));
     }
 }
