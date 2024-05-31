@@ -151,6 +151,7 @@ namespace Radzen.Blazor
         {
             if (ShowTimeOkButton)
             {
+                DateTimeValue = newValue;
                 CurrentDate = newValue;
             }
             else
