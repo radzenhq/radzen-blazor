@@ -129,6 +129,13 @@ namespace Radzen.Blazor
         public RenderFragment<dynamic> ValueTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the chip template.
+        /// </summary>
+        /// <value>The chip template.</value>
+        [Parameter]
+        public RenderFragment<dynamic> ChipTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating DataGrid density.
         /// </summary>
         [Parameter]
