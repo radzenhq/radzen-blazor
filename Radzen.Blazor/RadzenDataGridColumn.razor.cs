@@ -136,7 +136,7 @@ namespace Radzen.Blazor
                     propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
                 }
 
-                if (_filterPropertyType == typeof(string))
+                if (_filterPropertyType == typeof(string) && filterOperator == null)
                 {
                     FilterOperator = FilterOperator.Contains;
                 }
