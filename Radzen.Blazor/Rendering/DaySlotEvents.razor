@@ -2,47 +2,18 @@
 
 <div class="rz-events">
 @{
-    var eventGroups = AppointmentGroups(); 
-    var lefts = new Dictionary<AppointmentData, double>();
-}
-@for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
-{
-    var start = date;
-    var end = start.AddMinutes(MinutesPerSlot);
-
-    var appointments = AppointmentsInSlot(start, end);
-    var existingLefts = ExistingLefts(lefts, appointments);
-
-    @foreach (var item in appointments)
+    if(InitializeView())
     {
-        var width = 90.0 / appointments.Max(data => eventGroups[Appointments.IndexOf(data)]);
-
-        if (!lefts.TryGetValue(item, out var left))
-        {
-            left = DetermineLeft(existingLefts, width);
-            lefts.Add(item, left);
-            existingLefts.Add(left);
-        }
-
-        var eventStart = item.Start < StartDate ? StartDate : item.Start;
-        var eventEnd = item.End > EndDate ? EndDate : item.End;
-        var length = eventStart.Subtract(StartDate).TotalMinutes / MinutesPerSlot;
-        var top = 1.5 * length;
-        var height = Math.Max(1.5, 1.5 * eventEnd.Subtract(eventStart).TotalHours * (60 / MinutesPerSlot));
-
-        @if (item.Start >= start && item.Start <= end)
-        {
-            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect
-                CssClass="@(CurrentDate.Date == date.Date && object.Equals(Appointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" 
-                DragStart=@OnAppointmentDragStart />
-        } 
-        else if (date == StartDate)
-        {
-            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect
-                CssClass="@(CurrentDate == date && CurrentAppointment != - 1 && object.Equals(appointments.ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" 
-                DragStart=@OnAppointmentDragStart />
-        }
+        AssignColumns();
+        AssignLeftAndWidth();
     }
+}
+
+@foreach (var appointment in dayAppointments)
+{
+        <Appointment Data=@((AppointmentData)appointment) Top=@appointment.Top Left=@appointment.Left Width=@appointment.Width Height=@appointment.Height Click=@OnAppointmentSelect
+                    CssClass="@(CurrentDate.Date >= appointment.Start.Date && CurrentDate.Date <= appointment.End.Date && object.Equals(dayAppointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),appointment) ? " rz-state-focused" : "" )"
+                    DragStart=@OnAppointmentDragStart />
 }
 </div>
 
@@ -71,6 +42,67 @@
     [Parameter]
     public IList<AppointmentData> Appointments { get; set; }
 
+    public AppointmentDataRender[] dayAppointments { get; set; }
+
+    public int maxColumnCount { get; set; }
+    public double columnWidth { get; set; }
+
+    private bool InitializeView()
+    {
+        var appointments = AppointmentsInSlot(StartDate, EndDate);
+        maxColumnCount = 0;
+        dayAppointments = appointments.Select(e => new AppointmentDataRender(e)).ToArray();
+        if (dayAppointments.Length > 0)
+        {
+            dayAppointments[0].Column = 1;
+            dayAppointments[0].EventStart = dayAppointments[0].Start < StartDate ? StartDate : dayAppointments[0].Start;
+            dayAppointments[0].EventEnd = dayAppointments[0].End > EndDate ? EndDate : dayAppointments[0].End;
+            dayAppointments[0].Length = dayAppointments[0].EventStart.Subtract(StartDate).TotalMinutes / MinutesPerSlot; ;
+            dayAppointments[0].Top = 1.5 * dayAppointments[0].Length;
+            dayAppointments[0].Height = Math.Max(1.5, 1.5 * dayAppointments[0].EventEnd.Subtract(dayAppointments[0].EventStart).TotalMinutes / MinutesPerSlot);
+            dayAppointments[0].Left = 0;
+            dayAppointments[0].Width = 0;
+
+            maxColumnCount = 1;
+        }
+
+        return dayAppointments.Length > 0;
+    }
+
+    private void AssignColumns()
+    {
+        @foreach (var appointment in dayAppointments.Where(app => app.Column == 0))
+        {
+            var assignedAppointments = dayAppointments.Where(app => app.Column > 0);
+            var available = assignedAppointments.GroupBy(g => g.Column).Select(s => s.OrderByDescending(o => o.EventEnd).FirstOrDefault()).Where(w => w.End <= appointment.Start);
+            var available2 = available.Count() > 0 ? available.First() : null;
+
+            appointment.Column = available2 != null ? available2.Column : assignedAppointments.Max(m => m.Column) + 1;
+            appointment.EventStart = appointment.Start < StartDate ? StartDate : appointment.Start;
+            appointment.EventEnd = appointment.End > EndDate ? EndDate : appointment.End;
+            appointment.Length = appointment.EventStart.Subtract(StartDate).TotalMinutes / MinutesPerSlot; ;
+            appointment.Top = 1.5 * appointment.Length;
+            appointment.Height = Math.Max(1.5, 1.5 * appointment.EventEnd.Subtract(appointment.EventStart).TotalMinutes / MinutesPerSlot);
+            appointment.Left = 0;
+            appointment.Width = 0;
+
+            maxColumnCount = Math.Max(maxColumnCount, appointment.Column);
+        }
+        
+        columnWidth = 90.0 / maxColumnCount;
+    }
+
+    private void AssignLeftAndWidth()
+    {
+        @foreach (var appointment in dayAppointments)
+        {
+            var nextAdjacentAppointment = OverlappingAppointments(appointment.EventStart, appointment.EventEnd).Where(o => o.Column > appointment.Column).OrderBy(o => o.Column).FirstOrDefault();
+            var nextColumn = nextAdjacentAppointment == null ? maxColumnCount + 1 : nextAdjacentAppointment.Column;
+            appointment.Width = (nextColumn - appointment.Column) * columnWidth;
+            appointment.Left = (appointment.Column - 1) * columnWidth;
+        }
+    }
+
     async Task OnAppointmentSelect(AppointmentData data)
     {
         await Scheduler.SelectAppointment(data);
@@ -86,64 +118,38 @@
         return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
     }
 
-    double DetermineLeft(HashSet<double> existingLefts, double width)
+    private AppointmentDataRender[] OverlappingAppointments(DateTime start, DateTime end)
     {
-        double left = 0;
-
-        while (existingLefts.Contains(left))
+        if (dayAppointments == null)
         {
-            left += width;
+            return Array.Empty<AppointmentDataRender>();
         }
 
-        return left;
-    }
-
-    HashSet<double> ExistingLefts(IDictionary<AppointmentData, double> lefts, IEnumerable<AppointmentData> appointments)
-    {
-        var existingLefts = new HashSet<double>();
-
-        foreach (var appointment in appointments)
-        {
-            if (lefts.TryGetValue(appointment, out var existingLeft))
-            {
-                existingLefts.Add(existingLeft);
-            }
-        }
-
-        return existingLefts;
-    }
-    private IDictionary<int, int> AppointmentGroups()
-    {
-        var groups = new Dictionary<int, int>();
-
-        for (var index = 0; index < Appointments.Count(); index++)
-        {
-            groups[index] = 0;
-        }
-
-        for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
-        {
-            var start = date;
-            var end = start.AddMinutes(MinutesPerSlot);
-
-            var appointments = AppointmentsInSlot(start, end);
-
-            foreach (var item in appointments)
-            {
-                var index = Appointments.IndexOf(item);
-
-                var count = groups[index];
-
-                groups[index] = Math.Max(appointments.Length, count);
-            }
-        }
-
-        return groups;
+        return dayAppointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
     }
 
     public async Task OnAppointmentDragStart(AppointmentData Data)
     {
         await AppointmentDragStart.InvokeAsync(Data);
     }
-    
+
+    public class AppointmentDataRender : AppointmentData
+    {
+        public AppointmentDataRender(AppointmentData appointment)
+        {
+            this.Start = appointment.Start;
+            this.End = appointment.End;
+            this.Data = appointment.Data;
+            this.Text = appointment.Text;
+        }
+
+        public DateTime EventStart { get; set; }
+        public DateTime EventEnd { get; set; }
+        public double Length { get; set; }
+        public double Top { get; set; }
+        public double Height { get; set; }
+        public double Left { get; set; }
+        public double Width { get; set; }
+        public int Column { get; set; }
+    }
 }
