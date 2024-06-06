@@ -85,11 +85,6 @@
 
     void OnCellClick(DataGridCellMouseEventArgs<Order> args)
     {
-        Edit(args);
-    }
-
-    void Edit(DataGridCellMouseEventArgs<Order> args)
-    {
         editedColumn = args.Column.Property;
 
         if (ordersToUpdate.Any())
