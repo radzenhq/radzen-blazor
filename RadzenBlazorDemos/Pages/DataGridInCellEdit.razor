@@ -5,7 +5,7 @@
 @inject IJSRuntime JSRuntime
 @inherits DbContextPage
 
-<RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
+<RadzenDataGrid AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
                 Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())" 
                 ColumnWidth="200px" CellClick="@OnCellClick">
     <Columns>
@@ -71,12 +71,21 @@
 @code {
     string editedColumn;
 
-    RadzenDataGrid<Order> ordersGrid;
     IEnumerable<Order> orders;
     IEnumerable<Customer> customers;
     IEnumerable<Employee> employees;
 
     List<Order> ordersToUpdate = new List<Order>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+        employees = dbContext.Employees;
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
+    }
 
     bool Edited(string columnName, Order order)
     {
@@ -105,16 +114,6 @@
         {
             ordersToUpdate.Clear();
         }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
-
-        customers = dbContext.Customers;
-        employees = dbContext.Employees;
-
-        orders = dbContext.Orders.Include("Customer").Include("Employee");
     }
 
     void EditRow(Order order)
