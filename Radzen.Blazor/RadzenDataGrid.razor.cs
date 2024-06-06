@@ -149,6 +149,8 @@ namespace Radzen.Blazor
                 totalItemsCount = await Task.FromResult(_groupedPagedView.Count());
             }
 
+            _view = Enumerable.Empty<TItem>().AsQueryable();
+
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<GroupResult>(_groupedPagedView.Any() ? _groupedPagedView.Skip(request.StartIndex).Take(top) : _groupedPagedView, totalItemsCount);
         }
 #endif
