@@ -1,0 +1,140 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+@inherits DbContextPage
+
+<RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
+                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())" 
+                ColumnWidth="200px" CellClick="@OnCellClick">
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="280px">
+            <Template Context="order">
+                <RadzenText Text="@(order.Customer?.CompanyName)" Visible="@(!Edited("Customer.CompanyName", order))" />
+                <RadzenDropDown Visible="@(Edited("Customer.CompanyName", order))" @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;"
+                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="220px">
+            <Template Context="order">
+                <RadzenStack Orientation="Orientation.Horizontal" Visible="@(!Edited("Employee.LastName", order))">
+                    <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                    @order.Employee?.FirstName @order.Employee?.LastName
+                </RadzenStack>
+                <RadzenDropDown Visible="@(Edited("Employee.LastName", order))" @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
+                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
+                    <Template>
+                        <RadzenImage Path="@context.Photo" style="width: 20px; height: 20px; border-radius: 16px; margin-right: 6px;" />
+                        @context.FirstName @context.LastName
+                    </Template>
+                </RadzenDropDown>
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" Width="200px">
+            <Template Context="order">
+                <RadzenText Text="@(String.Format("{0:d}", order.OrderDate))" Visible="@(!Edited("OrderDate", order))" />
+                <RadzenDatePicker @bind-Value="order.OrderDate" Visible="@(Edited("OrderDate", order))" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order date" }})" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Freight" Title="Freight">
+            <Template Context="order">
+                <RadzenText Text="@(String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight))" Visible="@(!Edited("Freight", order))" />
+                <RadzenNumeric @bind-Value="order.Freight" Visible="@(Edited("Freight", order))" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select freight" }})" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="ShipName" Title="Ship Name">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipName)" Visible="@(!Edited("ShipName", order))" />
+                <RadzenTextBox @bind-Value="order.ShipName" Visible="@(Edited("ShipName", order))" Style="width:200px; display: block" Name="ShipName" aria-label="Enter ship name" />
+                <RadzenRequiredValidator Text="ShipName is required" Visible="@(Edited("ShipName", order))" Component="ShipName" Popup="true" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="ShipCountry" Title="ShipCountry">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipCountry)" Visible="@(!Edited("ShipCountry", order))" />
+                <RadzenTextBox @bind-Value="order.ShipCountry" Visible="@(Edited("ShipCountry", order))" Style="width:200px; display: block" Name="ShipCountry" aria-label="Enter ship country" />
+                <RadzenRequiredValidator Text="ShipCountry is required" Visible="@(Edited("ShipCountry", order))" Component="ShipCountry" Popup="true" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="ShipCity" Title="ShipCity">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipCountry)" Visible="@(!Edited("ShipCity", order))" />
+                <RadzenTextBox @bind-Value="order.ShipCity" Visible="@(Edited("ShipCity", order))" Style="width:200px; display: block" Name="ShipCity" aria-label="Enter ship city" />
+                <RadzenRequiredValidator Text="ShipCity is required" Visible="@(Edited("ShipCity", order))" Component="ShipCity" Popup="true" />
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    string editedColumn;
+
+    RadzenDataGrid<Order> ordersGrid;
+    IEnumerable<Order> orders;
+    IEnumerable<Customer> customers;
+    IEnumerable<Employee> employees;
+
+    List<Order> ordersToUpdate = new List<Order>();
+
+    bool Edited(string columnName, Order order)
+    {
+        return editedColumn == columnName && ordersToUpdate.Contains(order);
+    }
+
+    void OnCellClick(DataGridCellMouseEventArgs<Order> args)
+    {
+        Edit(args);
+    }
+
+    void Edit(DataGridCellMouseEventArgs<Order> args)
+    {
+        editedColumn = args.Column.Property;
+
+        if (ordersToUpdate.Any())
+        {
+            OnUpdateRow(ordersToUpdate.First());
+        }
+
+        EditRow(args.Data);
+    }
+
+    void Reset(Order order = null)
+    {
+        if (order != null)
+        {
+            ordersToUpdate.Remove(order);
+        }
+        else
+        {
+            ordersToUpdate.Clear();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+        employees = dbContext.Employees;
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
+    }
+
+    void EditRow(Order order)
+    {
+        Reset();
+
+        ordersToUpdate.Add(order);
+    }
+
+    void OnUpdateRow(Order order)
+    {
+        Reset(order);
+
+        dbContext.Update(order);
+
+        dbContext.SaveChanges();
+    }
+}
