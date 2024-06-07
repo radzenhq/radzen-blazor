@@ -42,7 +42,7 @@ namespace RadzenBlazorDemos.Models.Northwind
             get;
             set;
         }
-        public DateOnly? BirthDate
+        public DateTime? BirthDate
         {
             get;
             set;
