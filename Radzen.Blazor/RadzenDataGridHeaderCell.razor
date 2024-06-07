@@ -2,6 +2,9 @@
 @using Microsoft.JSInterop
 @using Radzen.Blazor.Rendering
 @using System.Globalization
+@using System.Linq.Dynamic.Core
+@using System.Collections
+
 @if (RowIndex == Column.GetLevel())
 {
 <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>
@@ -145,7 +148,7 @@
                                 {
                                     <RadzenListBox AllowVirtualization="true" AllowClear="true" Multiple="true" Style="height: 300px"
                                                    TValue="IEnumerable<object>" Data=@Column.GetFilterValues() Value=@Column.GetFilterValue()
-                                                   Change="@(args => Column.SetFilterValue(args))" 
+                                                   Change="@ListBoxChange" 
                                                    AllowFiltering="@(PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty()) == typeof(string))"
                                                    Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})">
@@ -189,6 +192,16 @@ else
 @code {
     Radzen.Blazor.Rendering.Popup popup;
     ElementReference filterButton;
+
+    void ListBoxChange(object args)
+    {
+        var enumerable = args as IEnumerable;
+
+        var property = Column.GetFilterProperty();
+        var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty());
+
+        Column.SetFilterValue(enumerable.Cast<object>().Any() ? enumerable.AsQueryable().Cast(propertyType) : args);
+    }
 
     string getFilterOpen()
     {

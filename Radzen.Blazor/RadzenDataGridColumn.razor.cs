@@ -1117,6 +1117,7 @@ namespace Radzen.Blazor
         /// </summary>
         public void ClearFilters()
         {
+            filterValues = null;
             SetFilterValue(null);
             SetFilterValue(null, false);
             SetFilterOperator(null);
