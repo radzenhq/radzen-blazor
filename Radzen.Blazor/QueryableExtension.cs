@@ -180,11 +180,28 @@ namespace Radzen
                     {
                         if (v != null)
                         {
-                            value = v is DateTime ? ((DateTime)v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : v is DateTimeOffset ? ((DateTimeOffset)v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : "";
+                           
+                            value = 
+                                v is DateTime ? ((DateTime) v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : v is DateTimeOffset ? ((DateTimeOffset) v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : 
+#if NET6_0_OR_GREATER
+                                v is DateOnly ? ((DateOnly) v).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
+#else
+                                    "";
+#endif
                         }
                         if (sv != null)
                         {
-                            secondValue = sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : "";
+                            secondValue = 
+                                sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) 
+                                : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) 
+                                : 
+#if NET6_0_OR_GREATER
+                                sv is DateOnly ? ((DateOnly) sv).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
+#else
+                            "";
+#endif
                         }
                     }
                     else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
@@ -416,6 +433,14 @@ namespace Radzen
             {
                 linqOperator = "==";
             }
+            bool isDateOnly = false;
+
+#if NET6_0_OR_GREATER
+            if (column.FilterPropertyType == typeof(DateOnly) || column.FilterPropertyType == typeof(DateOnly?))
+            {
+                isDateOnly = true;
+            }
+#endif
 
             if (column.FilterPropertyType == typeof(string))
             {
@@ -481,7 +506,7 @@ namespace Radzen
             else if (column.FilterPropertyType == typeof(DateTime) ||
                     column.FilterPropertyType == typeof(DateTime?) ||
                     column.FilterPropertyType == typeof(DateTimeOffset) ||
-                    column.FilterPropertyType == typeof(DateTimeOffset?))
+                    column.FilterPropertyType == typeof(DateTimeOffset?) || isDateOnly)
             {
                 if (columnFilterOperator == FilterOperator.IsNull || columnFilterOperator == FilterOperator.IsNotNull)
                 {
@@ -496,8 +521,19 @@ namespace Radzen
                     var dateTimeValue = DateTime.Parse(value, CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
                     var finalDate = dateTimeValue.TimeOfDay == TimeSpan.Zero ? dateTimeValue.Date : dateTimeValue;
                     var dateFormat = dateTimeValue.TimeOfDay == TimeSpan.Zero ? "yyyy-MM-dd" : "yyyy-MM-ddTHH:mm:ss.fffZ";
-                    var dateFunction = column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?) ? "DateTimeOffset" : "DateTime";
+                  
+                    string dateFunction = "DateTime"; //fallback to datetime, if it's an offset or dateonly use that
+                    if (column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                        dateFunction = "DateTimeOffset";
+                    else
+                    {
+#if NET6_0_OR_GREATER
+                        if (column.FilterPropertyType == typeof(DateOnly) || column.FilterPropertyType == typeof(DateOnly?))
+                            dateFunction = "DateOnly";
+#endif
+                    }
 
+                    
                     return $@"{property} {linqOperator} {dateFunction}(""{finalDate.ToString(dateFormat, CultureInfo.InvariantCulture)}"")";
                 }
             }
