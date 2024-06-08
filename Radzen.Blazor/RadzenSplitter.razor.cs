@@ -14,8 +14,6 @@ namespace Radzen.Blazor
     /// </summary>
     public partial class RadzenSplitter : RadzenComponent
     {
-        private int _sizeautopanes = 0;
-
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
@@ -30,7 +28,13 @@ namespace Radzen.Blazor
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
-        internal List<RadzenSplitterPane> Panes = new List<RadzenSplitterPane>();
+        /// <summary>
+        /// Use GetIndex in panes
+        /// </summary>
+        [Parameter]
+        public bool UseGetIndex { get; set; }
+        
+        internal List<RadzenSplitterPane> Panes = new();
 
         /// <summary>
         /// Adds the pane.
@@ -38,26 +42,42 @@ namespace Radzen.Blazor
         /// <param name="pane">The pane.</param>
         public void AddPane(RadzenSplitterPane pane)
         {
-            if (Panes.IndexOf(pane) != -1 || !pane.Visible)
+            Panes.Remove(pane);
+
+            if (!pane.Visible)
                 return;
 
             if (string.IsNullOrWhiteSpace(pane.Size))
-            {
-                //no size defined
                 pane.SizeAuto = true;
-                _sizeautopanes++;
-            }
 
-            pane.Index = Panes.Count;
             Panes.Add(pane);
 
-            foreach (var iPane in Panes)
-            {
-                if (!iPane.SizeAuto)
-                    continue;
+            if (UseGetIndex)
+                UpdateIndexesViaDelegate();
+            else
+                UpdateIndexes();
 
-                iPane.SizeRuntine = (100 / _sizeautopanes) + "%";
-            }
+            var sizeAutoPanes = Panes.Count(static a => a.SizeAuto);
+
+            foreach (var iPane in Panes.Where(static iPane => iPane.SizeAuto))
+                iPane.SizeRuntine = $"{100 / sizeAutoPanes}%";
+        }
+
+        private void UpdateIndexesViaDelegate()
+        {
+            foreach (var p in Panes)
+                p.Index = p.GetIndex?.Invoke() ?? 
+                        throw new InvalidOperationException("Expects GetIndex parameter");
+
+            Panes = Panes.OrderBy(static a => a.Index).ToList();
+        }
+        
+        private void UpdateIndexes()
+        {
+            var index = 0;
+
+            foreach (var p in Panes)
+                p.Index = index++;
         }
 
         /// <summary>
@@ -69,6 +89,7 @@ namespace Radzen.Blazor
             if (Panes.Contains(pane))
             {
                 Panes.Remove(pane);
+
                 try
                 {
                     InvokeAsync(StateHasChanged);
@@ -97,11 +118,11 @@ namespace Radzen.Blazor
         internal Task StartResize(PointerEventArgs args, int paneIndex)
         {
             var pane = Panes[paneIndex];
+
             if (!pane.Resizable)
                 return Task.CompletedTask;
 
             var paneNextResizable = Panes.Skip(paneIndex + 1).FirstOrDefault(o => o.Resizable && !o.GetCollapsed());
-
 
             return JSRuntime.InvokeVoidAsync("Radzen.startSplitterResize",
                 UniqueID,
@@ -151,6 +172,7 @@ namespace Radzen.Blazor
             {
                 var arg = new RadzenSplitterResizeEventArgs { PaneIndex = pane.Index, Pane = pane, NewSize = sizeNew };
                 await Resize.InvokeAsync(arg);
+
                 if (arg.Cancel)
                 {
                     var oldSize = pane.SizeRuntine;
@@ -170,7 +192,9 @@ namespace Radzen.Blazor
 
                 if (Expand.HasDelegate)
                 {
-                    var arg = new RadzenSplitterResizeEventArgs { PaneIndex = paneNext.Index, Pane = paneNext, NewSize = sizeNextNew.Value };
+                    var arg = new RadzenSplitterResizeEventArgs
+                            { PaneIndex = paneNext.Index, Pane = paneNext, NewSize = sizeNextNew.Value };
+
                     await Resize.InvokeAsync(arg);
                     //cancel omitted because it is managed by the parent panel
                 }
@@ -192,6 +216,7 @@ namespace Radzen.Blazor
                 {
                     var arg = new RadzenSplitterEventArgs { PaneIndex = paneNext.Index, Pane = paneNext };
                     await Expand.InvokeAsync(arg);
+
                     if (arg.Cancel)
                         return;
                 }
@@ -204,6 +229,7 @@ namespace Radzen.Blazor
                 {
                     var arg = new RadzenSplitterEventArgs { PaneIndex = pane.Index, Pane = pane };
                     await Collapse.InvokeAsync(arg);
+
                     if (arg.Cancel)
                         return;
                 }
@@ -225,6 +251,7 @@ namespace Radzen.Blazor
                 {
                     var arg = new RadzenSplitterEventArgs { PaneIndex = paneNext.Index, Pane = paneNext };
                     await Collapse.InvokeAsync(arg);
+
                     if (arg.Cancel)
                         return;
                 }
@@ -237,6 +264,7 @@ namespace Radzen.Blazor
                 {
                     var arg = new RadzenSplitterEventArgs { PaneIndex = pane.Index, Pane = pane };
                     await Expand.InvokeAsync(arg);
+
                     if (arg.Cancel)
                         return;
                 }
