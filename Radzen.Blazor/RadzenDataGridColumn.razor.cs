@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -158,7 +159,7 @@ namespace Radzen.Blazor
                 }
             }
         }
-
+        
         int? orderIndex;
 
         /// <summary>
@@ -473,6 +474,12 @@ namespace Radzen.Blazor
         /// <value>The edit template.</value>
         [Parameter]
         public RenderFragment<TItem> EditTemplate { get; set; }
+
+        /// <summary>
+        /// Allows the column to override whether or not this column's the <see cref="EditTemplate" /> is visible at runtime.
+        /// </summary>
+        [Parameter]
+        public Func<string, TItem, bool> IsInEditMode { get; set; } = (property, item) => false;
 
         /// <summary>
         /// Gets or sets the header template.
