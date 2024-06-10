@@ -556,7 +556,7 @@
                         <span class="rz-cell-data" @attributes="@spanAttributes">
                             @if (Item != null)
                             {
-                                @if (this.IsRowInEditMode(Item) && column.EditTemplate != null)
+                                @if ((column.IsInEditMode(column.Property, Item) || this.IsRowInEditMode(Item)) && column.EditTemplate is not null)
                                 {
                                     @column.EditTemplate(Item)
                                 }
