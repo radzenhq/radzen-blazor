@@ -298,7 +298,7 @@ namespace Radzen
         /// <typeparam name="T">The type that is being filtered</typeparam>
         /// <param name="filter">The RadzenDataFilter component</param>
         /// <returns>A Linq-compatible filter string</returns>
-        public static string ToLinqFilterString<T>(this RadzenDataFilter<T> filter)
+        public static string ToFilterString<T>(this RadzenDataFilter<T> filter)
         {
             return CompositeFilterToFilterString<T>(filter.Filters, filter, filter.LogicalFilterOperator);
         }
