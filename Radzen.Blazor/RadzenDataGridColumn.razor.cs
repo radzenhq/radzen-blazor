@@ -377,6 +377,13 @@ namespace Radzen.Blazor
         public string CssClass { get; set; }
 
         /// <summary>
+        /// Gets or sets a function that calculates the CSS class based on the <typeparamref name="TItem"/> value.
+        /// </summary>
+        /// <value>The dynamic CSS class applied to data cells.</value>
+        [Parameter]
+        public Func<RadzenDataGridColumn<TItem>, TItem, string> CalculatedCssClass { get; set; }
+
+        /// <summary>
         /// Gets or sets the header CSS class applied to header cell.
         /// </summary>
         /// <value>The header CSS class applied to header cell.</value>

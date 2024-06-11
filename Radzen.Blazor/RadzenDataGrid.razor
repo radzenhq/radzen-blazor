@@ -478,7 +478,7 @@
                 SetAttribute(cellAttributes, "style", cellStyle);
             }
 
-            var cellClass = GetCellCssClass(column, Attributes);
+            var cellClass = GetCellCssClass(column, Item, Attributes);
             if (!string.IsNullOrEmpty(cellClass))
             {
                 SetAttribute(cellAttributes, "class", cellClass);
@@ -580,7 +580,7 @@
                     @RenderCell(c, Item, this.CellAttributes(Item, c), rowArgs, RowIndex)
                 }
             }
-        </text>
+            </text>
         };
     }
 
@@ -596,18 +596,23 @@
         return columnStyle;
     }
 
-    string GetCellCssClass(RadzenDataGridColumn<TItem> column, IReadOnlyDictionary<string, object> Attributes)
+    string GetCellCssClass(RadzenDataGridColumn<TItem> column, TItem item, IReadOnlyDictionary<string, object> Attributes)
     {
-        var CssClass = column.CssClass + " " + getFrozenColumnClass(column, columns.Where(c => c.GetVisible()).ToList()) + " " + getCompositeCellCSSClass(column);
-
-        if (Attributes != null && Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
+        List<string> classes = [
+            column.CalculatedCssClass?.Invoke(column, item) ?? string.Empty,
+            column.CssClass,
+            getFrozenColumnClass(column, columns.Where(c => c.GetVisible()).ToList()),
+            getCompositeCellCSSClass(column),
+        ];
+        
+        if (Attributes?.TryGetValue("class", out var attributeClass) is true)
         {
-            return $"{CssClass} {@class}".Trim();
+            classes.Add(Convert.ToString(attributeClass));
         }
 
-        return String.IsNullOrWhiteSpace(CssClass) ? null : CssClass;
+        var result = string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c)));
+        return !String.IsNullOrWhiteSpace(result) ? result : null;
     }
-
 
     async Task OnContextMenu(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
     {
