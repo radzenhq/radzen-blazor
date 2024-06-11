@@ -10,6 +10,7 @@
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
         <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
+        <RadzenDataGridColumn Property="ProductDiscontinued" Title="Discontinued" />
         <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
@@ -32,6 +33,10 @@
     {
         await base.OnInitializedAsync();
 
-        orders = await Task.FromResult(dbContext.Orders.Include("Customer").Include("Employee").ToList());
+        orders = await Task.FromResult(dbContext.Orders.Include("OrderDetails.Product").Include("Customer").Include("Employee").ToList().Select(o =>
+            {
+                o.ProductDiscontinued = o.OrderDetails.FirstOrDefault()?.Product?.Discontinued;
+                return o;
+            }).AsQueryable());
     }
 }

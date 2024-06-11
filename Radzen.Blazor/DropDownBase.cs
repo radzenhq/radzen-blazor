@@ -46,7 +46,7 @@ namespace Radzen
             var totalItemsCount = LoadData.HasDelegate ? Count : view.Count();
             var top = request.Count;
 
-            if(top <= 0)
+            if (top <= 0)
             {
                 top = PageSize;
             }
@@ -122,7 +122,7 @@ namespace Radzen
                         });
                     }));
 
-                    if(VirtualizationOverscanCount != default(int))
+                    if (VirtualizationOverscanCount != default(int))
                     {
                         builder.AddAttribute(3, "OverscanCount", VirtualizationOverscanCount);
                     }
@@ -936,7 +936,7 @@ namespace Radzen
         {
 #if NET5_0_OR_GREATER
             var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
-            if(pageSize != default(int))
+            if (pageSize != default(int))
             {
                 PageSize = pageSize;
             }
@@ -1184,7 +1184,7 @@ namespace Radzen
         /// <param name="raiseChange">if set to <c>true</c> [raise change].</param>
         public async System.Threading.Tasks.Task SelectItem(object item, bool raiseChange = true)
         {
-            if (disabledPropertyGetter != null && disabledPropertyGetter(item) as bool? == true)
+            if (disabledPropertyGetter != null && item != null && disabledPropertyGetter(item) as bool? == true)
             {
                 return;
             }

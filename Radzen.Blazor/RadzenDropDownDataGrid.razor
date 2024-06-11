@@ -38,20 +38,24 @@
         else if ((selectedItems.Count > 0 || SelectedValue is IEnumerable && !(SelectedValue is string)) && Multiple)
         {
             var itemsToUse = SelectedValue is IEnumerable && !(SelectedValue is string) ? ((IEnumerable)SelectedValue).Cast<object>().ToList() : selectedItems;
-            @if (itemsToUse.Count < MaxSelectedLabels && Template == null && Chips)
+            @if (itemsToUse.Count < MaxSelectedLabels && Chips)
             {
                 <div class="rz-dropdown-chips-wrapper">
                     @foreach (var item in itemsToUse)
                     {
                         <div class="rz-chip">
                             <span class="rz-chip-text" @onkeydown:stopPropagation>
-                                @if (Template != null)
+                                @if (ValueTemplate != null)
+                                {
+                                    @ValueTemplate(item)
+                                }
+                                else if (Template != null)
                                 {
                                     @Template(item)
                                 }
                                 else
                                 {
-                                    @PropertyAccess.GetItemOrValueFromProperty(item, TextProperty)
+                                    @GetItemOrValueFromProperty(item, TextProperty)
                                 }
                             </span>
                             <button tabindex="0" title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty))" type="button" class="rz-button rz-button-sm rz-button-icon-only rz-light @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>

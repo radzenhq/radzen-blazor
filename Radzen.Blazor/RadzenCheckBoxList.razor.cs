@@ -108,7 +108,7 @@ namespace Radzen.Blazor
 
             if (value == true)
             {
-                Value = allItems.Select(i => i.Value);
+                Value = allItems.Where(i => !i.Disabled).Select(i => i.Value);
             }
             else if (value == false)
             {

@@ -91,5 +91,12 @@ namespace RadzenBlazorDemos.Models.Northwind
         get;
         set;
     }
-  }
+
+    [NotMapped]
+    public bool? ProductDiscontinued
+    {
+        get;
+        set;
+    }
+    }
 }

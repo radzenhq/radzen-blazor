@@ -152,13 +152,13 @@ namespace Radzen.Blazor
                     propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
                 }
 
-                if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom)
+                if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null)
                 {
                     SetFilterOperator(FilterOperator.Contains);
                 }
             }
         }
-
+        
         int? orderIndex;
 
         /// <summary>
@@ -473,6 +473,12 @@ namespace Radzen.Blazor
         /// <value>The edit template.</value>
         [Parameter]
         public RenderFragment<TItem> EditTemplate { get; set; }
+
+        /// <summary>
+        /// Allows the column to override whether or not this column's the <see cref="EditTemplate" /> is visible at runtime.
+        /// </summary>
+        [Parameter]
+        public Func<string, TItem, bool> IsInEditMode { get; set; } = (property, item) => false;
 
         /// <summary>
         /// Gets or sets the header template.
@@ -1117,6 +1123,7 @@ namespace Radzen.Blazor
         /// </summary>
         public void ClearFilters()
         {
+            filterValues = null;
             SetFilterValue(null);
             SetFilterValue(null, false);
             SetFilterOperator(null);

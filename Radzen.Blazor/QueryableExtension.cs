@@ -180,11 +180,28 @@ namespace Radzen
                     {
                         if (v != null)
                         {
-                            value = v is DateTime ? ((DateTime)v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : v is DateTimeOffset ? ((DateTimeOffset)v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : "";
+                           
+                            value = 
+                                v is DateTime ? ((DateTime) v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : v is DateTimeOffset ? ((DateTimeOffset) v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : 
+#if NET6_0_OR_GREATER
+                                v is DateOnly ? ((DateOnly) v).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
+#else
+                                    "";
+#endif
                         }
                         if (sv != null)
                         {
-                            secondValue = sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : "";
+                            secondValue = 
+                                sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) 
+                                : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) 
+                                : 
+#if NET6_0_OR_GREATER
+                                sv is DateOnly ? ((DateOnly) sv).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
+#else
+                            "";
+#endif
                         }
                     }
                     else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
@@ -287,6 +304,184 @@ namespace Radzen
                 }
 
                 return string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// Converts a RadzenDataFilter to a Linq-compatibly filter string
+        /// </summary>
+        /// <typeparam name="T">The type that is being filtered</typeparam>
+        /// <param name="filter">The RadzenDataFilter component</param>
+        /// <returns>A Linq-compatible filter string</returns>
+        public static string ToFilterString<T>(this RadzenDataFilter<T> filter)
+        {
+            return CompositeFilterToFilterString<T>(filter.Filters, filter, filter.LogicalFilterOperator);
+        }
+
+        /// <summary>
+        /// Creates a Linq-compatible filter string for a list of CompositeFilterDescriptions
+        /// </summary>
+        /// <typeparam name="T">The type that is being filtered</typeparam>
+        /// <param name="filters">The list if filters</param>
+        /// <param name="Datafilter">The RadzenDataFilter component</param>
+        /// <param name="filterOperator">Whether filter elements should be and-ed or or-ed</param>
+        /// <returns></returns>
+        private static string CompositeFilterToFilterString<T>(IEnumerable<CompositeFilterDescriptor> filters, RadzenDataFilter<T> Datafilter, LogicalFilterOperator filterOperator)
+        {
+            if (filters.Any())
+            {
+                var LogicalFilterOperator = filterOperator;
+                var BooleanOperator = LogicalFilterOperator == LogicalFilterOperator.And ? "&&" : "||";
+
+                var whereList = new List<string>();
+                foreach (var column in filters)
+                {
+                    if (column.Filters is not null && column.Filters.Any())
+                    {
+                        whereList.Add($"({CompositeFilterToFilterString(column.Filters, Datafilter, column.LogicalFilterOperator)})");
+                    }
+                    if (column.Property is not null)
+                    {
+                        whereList.Add($"{GetColumnFilter(Datafilter, column, Datafilter.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive)}");
+                    }
+                }
+
+                return string.Join($" {BooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
+            }
+
+            return "";
+
+        }
+
+        /// <summary>
+        /// Create a single linq-compatible filter string for one datafilter element (includes sub-lists)
+        /// </summary>
+        /// <typeparam name="T">The type that is being filtered</typeparam>
+        /// <param name="dataFilter">The RadzenDataFilter component</param>
+        /// <param name="column">The filter elements for which to create the filter string</param>
+        /// <param name="caseSensitive">Whether filtering is case sensitive or not</param>
+        /// <returns></returns>
+        private static string GetColumnFilter<T>(RadzenDataFilter<T> dataFilter, CompositeFilterDescriptor column, bool caseSensitive)
+        {
+            var property = column.Property;
+
+            if (property.Contains(".", StringComparison.CurrentCulture))
+            {
+                property = $"({property})";
+            }
+
+            var columnInfo = dataFilter.properties.Where(c => c.Property == column.Property).FirstOrDefault();
+            if (columnInfo == null) return "";
+
+            var columnType = columnInfo.FilterPropertyType;
+
+            var columnFilterOperator = column.FilterOperator;
+
+            var linqOperator = LinqFilterOperators[columnFilterOperator.Value];
+            linqOperator ??= "==";
+
+            var value = "";
+
+            if (columnType == typeof(string))
+            {
+                value = (string)Convert.ChangeType(column.FilterValue, typeof(string));
+                value = value?.Replace("\"", "\\\"");
+
+                string filterCaseSensitivityOperator = caseSensitive ? ".ToLower()" : "";
+
+                if (!string.IsNullOrEmpty(value) && column.FilterOperator == FilterOperator.Contains)
+                {
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator}.Contains(""{value}""{filterCaseSensitivityOperator})";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.DoesNotContain)
+                {
+                    return $@"({property} == null ? """" : !{property}){filterCaseSensitivityOperator}.Contains(""{value}""{filterCaseSensitivityOperator})";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.StartsWith)
+                {
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator}.StartsWith(""{value}""{filterCaseSensitivityOperator})";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.EndsWith)
+                {
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator}.EndsWith(""{value}""{filterCaseSensitivityOperator})";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.Equals)
+                {
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator} == ""{value}""{filterCaseSensitivityOperator}";
+                }
+                else if (!string.IsNullOrEmpty(value) && columnFilterOperator == FilterOperator.NotEquals)
+                {
+                    return $@"({property} == null ? """" : {property}){filterCaseSensitivityOperator} != ""{value}""{filterCaseSensitivityOperator}";
+                }
+            }
+            else if (PropertyAccess.IsNumeric(columnType))
+            {
+                value = (string)Convert.ChangeType(column.FilterValue, typeof(string));
+
+                return $"{property} {linqOperator} {value}";
+            }
+            else if (columnType == typeof(bool))
+            {
+                value = (string)Convert.ChangeType(column.FilterValue, typeof(string));
+
+                return $"{property} == {value}";
+            }
+            else if (PropertyAccess.IsDate(columnType))
+            {
+                var v = column.FilterValue;
+                if (v != null)
+                {
+                    value = $"DateTime({(v is DateTime time ? time.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : v is DateTimeOffset offset ? offset.UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) : "")})";
+                }
+            }
+            else if (PropertyAccess.IsEnum(columnType) || PropertyAccess.IsNullableEnum(columnType))
+            {
+                var v = column.FilterValue;
+                if (v != null)
+                {
+                    value = ((int)v).ToString();
+                }
+            }
+            else if (IsEnumerable(columnType) && columnType != typeof(string))
+            {
+                var v = column.FilterValue;
+                var enumerableValue = ((IEnumerable)(v ?? Enumerable.Empty<object>())).AsQueryable();
+
+                string baseType = columnType.GetGenericArguments().Count() == 1 ? columnType.GetGenericArguments()[0].Name : "";
+
+                var enumerableValueAsString = "new " + baseType + "[]{" + String.Join(",",
+                        (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() : enumerableValue.Cast<object>())) + "}";
+
+
+                if (enumerableValue?.Any() == true)
+                {
+                    if (property.Contains("."))
+                    {
+                        property = $"({property})";
+                    }
+
+                    if (columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain)
+                    {
+                        return $@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableValueAsString}).Contains({property})";
+                    }
+                    else if (columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn)
+                    {
+                        return $@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any()";
+                    }
+                }
+            }
+            else
+            {
+                value = (string)Convert.ChangeType(column.FilterValue, typeof(string), CultureInfo.InvariantCulture);
+            }
+            if (!string.IsNullOrEmpty(value) || column.FilterOperator == FilterOperator.IsNotNull
+                                            || column.FilterOperator == FilterOperator.IsNull
+                                            || column.FilterOperator == FilterOperator.IsEmpty
+                                            || column.FilterOperator == FilterOperator.IsNotEmpty)
+            {
+                return $"({property} {linqOperator} {value})";
             }
 
             return "";
@@ -416,6 +611,14 @@ namespace Radzen
             {
                 linqOperator = "==";
             }
+            bool isDateOnly = false;
+
+#if NET6_0_OR_GREATER
+            if (column.FilterPropertyType == typeof(DateOnly) || column.FilterPropertyType == typeof(DateOnly?))
+            {
+                isDateOnly = true;
+            }
+#endif
 
             if (column.FilterPropertyType == typeof(string))
             {
@@ -481,7 +684,7 @@ namespace Radzen
             else if (column.FilterPropertyType == typeof(DateTime) ||
                     column.FilterPropertyType == typeof(DateTime?) ||
                     column.FilterPropertyType == typeof(DateTimeOffset) ||
-                    column.FilterPropertyType == typeof(DateTimeOffset?))
+                    column.FilterPropertyType == typeof(DateTimeOffset?) || isDateOnly)
             {
                 if (columnFilterOperator == FilterOperator.IsNull || columnFilterOperator == FilterOperator.IsNotNull)
                 {
@@ -496,8 +699,19 @@ namespace Radzen
                     var dateTimeValue = DateTime.Parse(value, CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind);
                     var finalDate = dateTimeValue.TimeOfDay == TimeSpan.Zero ? dateTimeValue.Date : dateTimeValue;
                     var dateFormat = dateTimeValue.TimeOfDay == TimeSpan.Zero ? "yyyy-MM-dd" : "yyyy-MM-ddTHH:mm:ss.fffZ";
-                    var dateFunction = column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?) ? "DateTimeOffset" : "DateTime";
+                  
+                    string dateFunction = "DateTime"; //fallback to datetime, if it's an offset or dateonly use that
+                    if (column.FilterPropertyType == typeof(DateTimeOffset) || column.FilterPropertyType == typeof(DateTimeOffset?))
+                        dateFunction = "DateTimeOffset";
+                    else
+                    {
+#if NET6_0_OR_GREATER
+                        if (column.FilterPropertyType == typeof(DateOnly) || column.FilterPropertyType == typeof(DateOnly?))
+                            dateFunction = "DateOnly";
+#endif
+                    }
 
+                    
                     return $@"{property} {linqOperator} {dateFunction}(""{finalDate.ToString(dateFormat, CultureInfo.InvariantCulture)}"")";
                 }
             }
@@ -715,7 +929,14 @@ namespace Radzen
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
             {
-                return $"{property} {odataFilterOperator} {value}";
+                if (columnFilterOperator == FilterOperator.IsNull || columnFilterOperator == FilterOperator.IsNotNull)
+                {
+                    return $"{property} {odataFilterOperator} null";
+                }
+                else
+                {
+                    return $"{property} {odataFilterOperator} {value}";
+                }
             }
             else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
             {

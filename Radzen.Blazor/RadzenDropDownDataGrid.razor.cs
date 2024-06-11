@@ -957,7 +957,11 @@ namespace Radzen.Blazor
         /// </summary>
         public new async Task Reset() {
             base.Reset();
-            await grid.SelectRow(null);
+
+            if (!Multiple)
+            {
+                await grid.SelectRow(null);
+            }
         }
     }
 }

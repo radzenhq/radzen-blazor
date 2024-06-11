@@ -7,7 +7,7 @@
 
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenLabel Text="Select Value" Component="DropDownGroupingMultiSelect" Style="margin-right: 8px; vertical-align: middle;" />
-    <RadzenDropDown @ref=dd Value=@values TValue="IEnumerable<int>" AllowClear="true" Name="DropDownGroupingMultiSelect"
+    <RadzenDropDown @ref=dd @bind-Value=@values TValue="IEnumerable<int>" AllowClear="true" Name="DropDownGroupingMultiSelect"
                     Data=@groupedData Style="width: 100%; max-width: 400px;" ItemRender="ItemRender">
         <HeaderTemplate>
             <RadzenStack Orientation="Orientation.Horizontal" class="rz-multiselect-header rz-dropdown-filter-container rz-helper-clearfix">
@@ -17,9 +17,10 @@
             </RadzenStack>
         </HeaderTemplate>
         <Template>
-            <RadzenCheckBox Name="@($"{context.OrderID}")" TValue="bool?" TriState=false Value="@IsGroupSelected(context)" Change="@(args => SelectGroup(args, (GroupData)context))" />
-            <RadzenLabel Component="@($"{context.OrderID}")" Style=@($"margin-inline-start: 0.5rem; font-weight: {(context.CompanyName != null ? "bold" : "normal")}")
-                Text="@(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")"/>
+            <RadzenCheckBox TValue="bool?" TriState=false Value="@IsGroupSelected(context)" Change="@(args => SelectGroup(args, (GroupData)context))" />
+            <RadzenLabel Style=@($"margin-inline-start: 0.5rem; font-weight: {(context.CompanyName != null ? "bold" : "normal")}")
+                Text="@(context.CompanyName ?? $"OrderID: {context.OrderID}, Order date: {string.Format("{0:d}", context.OrderDate)}")" 
+                onclick="event.target.previousElementSibling.querySelector('.rz-chkbox-box').click()"/>
         </Template>
         <ValueTemplate>
             @string.Join(", ", groupedData.Where(g => values?.Contains(g.OrderID) == true).Take(dd.MaxSelectedLabels).Select(g => $"OrderID: {g.OrderID}, Order date: {string.Format("{0:d}", g.OrderDate)}"))

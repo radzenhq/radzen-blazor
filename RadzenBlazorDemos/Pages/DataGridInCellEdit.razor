@@ -1,0 +1,171 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
+
+@inject IJSRuntime JSRuntime
+@inherits DbContextPage
+
+@*
+    Pay attention to the following event handlers below: Sort, Page, and Filter. They are required to help maintain state on the Item and Property being edited.
+    The 'CellClick' event handler is used to trigger the column edit mode.
+*@
+
+<RadzenDataGrid TItem="Order" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
+                Data="@orders" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())" 
+                ColumnWidth="200px" CellClick="@OnCellClick">
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
+
+        <RadzenDataGridColumn TItem="Order" Property="Customer.CompanyName" Title="Customer" Width="280px" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(order.Customer?.CompanyName)" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;"
+                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="Employee.LastName" Title="Employee" Width="220px" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                    @order.Employee?.FirstName @order.Employee?.LastName
+                </RadzenStack>
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
+                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
+                    <Template>
+                        <RadzenImage Path="@context.Photo" style="width: 20px; height: 20px; border-radius: 16px; margin-right: 6px;" />
+                        @context.FirstName @context.LastName
+                    </Template>
+                </RadzenDropDown>
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Width="200px" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(String.Format("{0:d}", order.OrderDate))" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order date" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight))" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenNumeric @bind-Value="order.Freight" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select freight" }})" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipName)" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenTextBox @bind-Value="order.ShipName" Style="width:200px; display: block" Name="ShipName" aria-label="Enter ship name" />
+                <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="ShipCountry" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipCountry)" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenTextBox @bind-Value="order.ShipCountry" Style="width:200px; display: block" Name="ShipCountry" aria-label="Enter ship country" />
+                <RadzenRequiredValidator Text="ShipCountry is required" Component="ShipCountry" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+
+        <RadzenDataGridColumn TItem="Order" Property="ShipCity" Title="ShipCity" IsInEditMode="@IsEditing">
+            <Template Context="order">
+                <RadzenText Text="@(order.ShipCountry)" />
+            </Template>
+            <EditTemplate Context="order">
+                <RadzenTextBox @bind-Value="order.ShipCity" Style="width:200px; display: block" Name="ShipCity" aria-label="Enter ship city" />
+                <RadzenRequiredValidator Text="ShipCity is required" Component="ShipCity" Popup="true" />
+            </EditTemplate>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    string columnEditing;
+
+    IEnumerable<Order> orders;
+    IEnumerable<Customer> customers;
+    IEnumerable<Employee> employees;
+
+    List<Order> ordersToUpdate = new List<Order>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+        employees = dbContext.Employees;
+
+        orders = dbContext.Orders.Include("Customer").Include("Employee");
+    }
+
+    /// <summary>
+    /// Determines if the specified column is in edit mode for the specified order.
+    /// </summary>
+    /// <param name="columnName">The RadzenDataGridColumn.Property currently being rendered by the RadzenDataGrid.</param>
+    /// <param name="order">The Order currently being rendered by the RadzenDataGrid.</param>
+    /// <returns>True if the column should render the EditTemplate for the specified Order, otherwise false.</returns>
+    bool IsEditing(string columnName, Order order)
+    {
+        // Comparing strings is quicker than checking the contents of a List, so let the property check fail first.
+        return columnEditing == columnName && ordersToUpdate.Contains(order);
+    }
+
+    void OnCellClick(DataGridCellMouseEventArgs<Order> args)
+    {
+        // This sets which column is currently being edited.
+        columnEditing = args.Column.Property;
+
+        // This triggers a save on the previous edit. This can be removed if you are going to batch edits through another method.
+        if (ordersToUpdate.Any())
+        {
+            OnUpdateRow(ordersToUpdate.First());
+        }
+
+        // This sets the Item to be edited.
+        EditRow(args.Data);
+    }
+
+    void Reset(Order order = null)
+    {
+        if (order != null)
+        {
+            ordersToUpdate.Remove(order);
+        }
+        else
+        {
+            ordersToUpdate.Clear();
+        }
+    }
+
+    void EditRow(Order order)
+    {
+        Reset();
+
+        ordersToUpdate.Add(order);
+    }
+
+    void OnUpdateRow(Order order)
+    {
+        Reset(order);
+
+        dbContext.Update(order);
+
+        dbContext.SaveChanges();
+    }
+}

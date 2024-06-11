@@ -628,6 +628,17 @@ namespace RadzenBlazorDemos
 
                 new Example()
                 {
+                    New = true,
+                    Name = "InCell Editing",
+                    Path = "datagrid-incell-edit",
+                    Title = "Blazor DataGrid Component - InCell Editing | Free UI Components by Radzen",
+                    Description = "This example demonstrates how to configure the Razden Blazor DataGrid for in-cell editing.",
+                    Icon = "&#xe745",
+                    Tags = new [] { "in-cell", "editor", "datagrid", "table", "dataview" }
+                },
+
+                new Example()
+                {
                     Name = "Conditional formatting",
                     Path = "datagrid-conditional-template",
                     Title = "Blazor DataGrid Component - Conditional Formatting | Free UI Components by Radzen",
