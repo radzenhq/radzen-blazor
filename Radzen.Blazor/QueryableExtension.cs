@@ -929,7 +929,14 @@ namespace Radzen
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
             {
-                return $"{property} {odataFilterOperator} {value}";
+                if (columnFilterOperator == FilterOperator.IsNull || columnFilterOperator == FilterOperator.IsNotNull)
+                {
+                    return $"{property} {odataFilterOperator} null";
+                }
+                else
+                {
+                    return $"{property} {odataFilterOperator} {value}";
+                }
             }
             else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
             {
