@@ -77,17 +77,17 @@ namespace Radzen.Blazor
 
         internal int GetColSpan(bool isDataCell = false)
         {
-            if (!Grid.AllowCompositeDataCells && isDataCell)
+            if (!Grid.AllowCompositeDataCells && isDataCell || Columns == null)
                 return 1;
 
-            var directChildColumns = Grid.childColumns.Where(c => c.GetVisible() && c.Parent == this);
-
-            if (Parent == null)
+            if (Parent != null)
             {
-                return Columns == null ? 1 : directChildColumns.Sum(c => c.GetColSpan());
+                return ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count()) +
+                    ColumnsCollection.Where(c => c.ColumnsCollection.Count() == 0).Count();
             }
 
-            return Columns == null ? 1 : directChildColumns.Count();
+            return ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count())
+                - ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection).Count(c => c.ColumnsCollection.Any());
         }
 
         internal int GetRowSpan(bool isDataCell = false)
