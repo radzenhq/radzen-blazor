@@ -1037,7 +1037,7 @@ window.Radzen = {
 
       var top = parentRect.bottom + scrollTop;
 
-      if (top + rect.height > window.innerHeight && parentRect.top > rect.height) {
+      if (top + rect.height > window.innerHeight + scrollTop && parentRect.top > rect.height) {
           top = parentRect.top - rect.height + scrollTop;
       }
 
