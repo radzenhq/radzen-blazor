@@ -38,6 +38,13 @@ namespace Radzen.Blazor
         public bool Multiline { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether popup should open on focus. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if popup should open on focus; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool OpenOnFocus { get; set; }
+
+        /// <summary>
         /// Gets or sets the Popup height.
         /// </summary>
         /// <value>The number Popup height.</value>
@@ -144,6 +151,8 @@ namespace Radzen.Blazor
         async Task DebounceFilter()
         {
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
+
+            value = $"{value}";
 
             if (value.Length < MinLength)
             {

@@ -12,7 +12,7 @@
         @if (Multiline)
         {
             <textarea @ref="@search" @attributes="InputAttributes" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
-                oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"  @onchange="@OnChange"
+                oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"  @onchange="@OnChange" onfocus="@(OpenOnFocus ? OpenScript() : null)"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
                 class="@InputClassList" onblur="Radzen.activeElement = null"
                 id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
@@ -20,7 +20,7 @@
         else
         {
             <input @ref="@search" @attributes="InputAttributes" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
-                oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange"
+                oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange" onfocus="@(OpenOnFocus ? OpenScript() : null)"
                 aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
                 class="@InputClassList" onblur="Radzen.activeElement = null"
                 type="@InputType" id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
