@@ -54,7 +54,7 @@
             </EditTemplate>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight" IsInEditMode="@IsEditing">
+        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight" IsInEditMode="@IsEditing" CalculatedCssClass="@IsEdited">
             <Template Context="order">
                 <RadzenText Text="@(String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight))" />
             </Template>
@@ -85,7 +85,7 @@
 
         <RadzenDataGridColumn TItem="Order" Property="ShipCity" Title="ShipCity" IsInEditMode="@IsEditing">
             <Template Context="order">
-                <RadzenText Text="@(order.ShipCountry)" />
+                <RadzenText Text="@(order.ShipCity)" />
             </Template>
             <EditTemplate Context="order">
                 <RadzenTextBox @bind-Value="order.ShipCity" Style="width:200px; display: block" Name="ShipCity" aria-label="Enter ship city" />
@@ -95,6 +95,23 @@
     </Columns>
 </RadzenDataGrid>
 
+<style>
+    .table-cell-edited {
+        position: relative;
+    }
+
+        .table-cell-edited::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-top: 10px solid red;
+            border-left: 10px solid transparent;
+        }
+</style>
+
 @code {
     string columnEditing;
 
@@ -102,6 +119,7 @@
     IEnumerable<Customer> customers;
     IEnumerable<Employee> employees;
 
+    List<KeyValuePair<int, string>> editedFields = new List<KeyValuePair<int, string>>();
     List<Order> ordersToUpdate = new List<Order>();
 
     protected override async Task OnInitializedAsync()
@@ -126,8 +144,33 @@
         return columnEditing == columnName && ordersToUpdate.Contains(order);
     }
 
+    /// <summary>
+    /// Determines if the specified column needs a custom CSS class based on the <typeparamref name="TItem">TItem's</typeparamref> state.
+    /// </summary>
+    /// <param name="column">The RadzenDataGridColumn.Property currently being rendered by the RadzenDataGrid.</param>
+    /// <param name="order">The Order currently being rendered by the RadzenDataGrid.</param>
+    /// <returns>A string containing the CssClass to add, or <see cref="String.Empty">.</returns>
+    string IsEdited(RadzenDataGridColumn<Order> column, Order order)
+    {
+        // In a real scenario, you might use IRevertibleChangeTracking to check the current column
+        //  against a list of the object's edited fields.
+        return editedFields.Where(c => c.Key == order.OrderID && c.Value == column.Property).Any() ?
+            "table-cell-edited" :
+            string.Empty;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="args"></param>
     void OnCellClick(DataGridCellMouseEventArgs<Order> args)
     {
+        // Record the previous edited field, if you're not using IRevertibleChangeTracking to track object changes
+        if (ordersToUpdate.Any())
+        {
+            editedFields.Add(new(ordersToUpdate.First().OrderID, columnEditing));
+        }
+
         // This sets which column is currently being edited.
         columnEditing = args.Column.Property;
 
@@ -160,6 +203,14 @@
         ordersToUpdate.Add(order);
     }
 
+    /// <summary>
+    /// Saves the changes from the Order to the database.
+    /// </summary>
+    /// <param name="order">The <see cref="Order" /> to save.</param>
+    /// <remarks>
+    /// Currently, this is called every time the Cell is changed. In a real in-cell edit scenario, you would likely either update
+    /// on RowDeselect, or batch the changes using a "Save Changes" button in the header.
+    /// </remarks>
     void OnUpdateRow(Order order)
     {
         Reset(order);
@@ -167,5 +218,10 @@
         dbContext.Update(order);
 
         dbContext.SaveChanges();
+
+        // If you were doing row-level edits and handling RowDeselect, you could use the line below to
+        // clear edits for the current record.
+
+        //editedFields = editedFields.Where(c => c.Key != order.OrderID).ToList();
     }
 }
