@@ -461,13 +461,13 @@
             var cellAttributes = new Dictionary<string, object>(Attributes);
 
             var rowspan = column.GetRowSpan(true);
-            if(rowspan != 1)
+            if(rowspan > 1)
             {
                 SetAttribute(cellAttributes, "rowspan", rowspan);
             }
 
             var colspan = column.GetColSpan(true);
-            if(colspan != 1)
+            if(colspan > 1)
             {
                 SetAttribute(cellAttributes, "colspan", colspan);
             }
