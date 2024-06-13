@@ -295,6 +295,15 @@ namespace RadzenBlazorDemos
                             Title = "Blazor DataGrid Component - Composite Columns | Free UI Components by Radzen",
                             Description = "Use RadzenDataGridColumn Columns property to define child columns.",
                             Tags = new [] { "datagrid", "column", "composite", "merged", "complex" }
+                        },
+                        new Example
+                        {
+                            Name = "Conditional Columns",
+                            New = true,
+                            Path = "datagrid-conditional-columns-render",
+                            Title = "Blazor DataGrid Component - Conditional Columns Render | Free UI Components by Radzen",
+                            Description = "Use RadzenDataGridColumn Columns property to define child columns conditionally.",
+                            Tags = new [] { "datagrid", "column", "conditional", "render", "complex" }
                         }
                     }
                 },
