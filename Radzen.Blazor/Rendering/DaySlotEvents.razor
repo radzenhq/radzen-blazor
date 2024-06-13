@@ -2,46 +2,36 @@
 
 <div class="rz-events">
 @{
-    var eventGroups = AppointmentGroups(); 
-    var lefts = new Dictionary<AppointmentData, double>();
-}
-@for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
-{
-    var start = date;
-    var end = start.AddMinutes(MinutesPerSlot);
+    // ----------------------------------
+    // Rendering Algorithm - See Layout()
+    // ----------------------------------
+    // Note - Column, a property of the AppointmentDataExtended class, and colunCount are values that are set depending on todays overlapping appointments.
+    // i.e., if there are no overlapping appointments, all appointments will be assigned a Column value of 1
+    // *** definition "Can fit in Column" - if an appointments "Start" is equal to or later than the last chronological appointments "End" in a column, this appointment can "fit in column" ***
+    
+    // The algorithm is split into two parts.
+    // Part 1 - Assign columns to the appointments
+    // Part 2 - Set the Left and Width properties to the appointments
 
-    var appointments = AppointmentsInSlot(start, end);
-    var existingLefts = ExistingLefts(lefts, appointments);
+    // 1. Loop through all the appointments and assign which column they will be assigned (either existing or new)
+    //  1.1 If the appointment can fit in a column, it will be assigned that column value, otherwise a new column must be created to accomodate it
+    //  1.2 As the loop matures, there could be multiple columns that an appointment can fit in. It will select the one with the latest End time. This helps the view render more asthetically.
 
-    @foreach (var item in appointments)
+    // Once we know how many columns are required, we can set the width of each column (columnWidth = 90.0 / columnCount).
+
+    // 2. Loop through the appointments and assign a Left and Width property value
+    //  2.1 Left is assigned directly from the column it sits in.
+    //  2.2 The Width of an appointment will be set to extend from it's Left to either -
+    //      2.2.1 The extreme right of the view if there are no "OverlappingAppointments()" or
+    //      2.2.2 The adjacent appointments column for the first in "OverlappingAppointments()"
+
+    // Once the algorithm is complete, we then actually render the appointments
+
+    foreach (var appointment in Layout())
     {
-        var width = 90.0 / appointments.Max(data => eventGroups[Appointments.IndexOf(data)]);
-
-        if (!lefts.TryGetValue(item, out var left))
-        {
-            left = DetermineLeft(existingLefts, width);
-            lefts.Add(item, left);
-            existingLefts.Add(left);
-        }
-
-        var eventStart = item.Start < StartDate ? StartDate : item.Start;
-        var eventEnd = item.End > EndDate ? EndDate : item.End;
-        var length = eventStart.Subtract(StartDate).TotalMinutes / MinutesPerSlot;
-        var top = 1.5 * length;
-        var height = Math.Max(1.5, 1.5 * eventEnd.Subtract(eventStart).TotalHours * (60 / MinutesPerSlot));
-
-        @if (item.Start >= start && item.Start <= end)
-        {
-            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect
-                CssClass="@(CurrentDate.Date == date.Date && object.Equals(Appointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" 
+        <Appointment Data=@(appointment.Appointment) Top=@appointment.Top Left=@appointment.Left Width=@appointment.Width Height=@appointment.Height Click=@OnAppointmentSelect
+                CssClass="@(CurrentDate.Date >= appointment.Start.Date && CurrentDate.Date <= appointment.End.Date && object.Equals(Appointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),appointment.Appointment) ? " rz-state-focused" : "" )"
                 DragStart=@OnAppointmentDragStart />
-        } 
-        else if (date == StartDate)
-        {
-            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentSelect
-                CssClass="@(CurrentDate == date && CurrentAppointment != - 1 && object.Equals(appointments.ElementAtOrDefault(CurrentAppointment),item) ? "rz-state-focused" : "")" 
-                DragStart=@OnAppointmentDragStart />
-        }
     }
 }
 </div>
@@ -71,79 +61,91 @@
     [Parameter]
     public IList<AppointmentData> Appointments { get; set; }
 
+    private RenderedAppointment[] Layout()
+    {
+        RenderedAppointment[] appointments = [];
+
+        int columnCount = 1;
+        double columnWidth;
+
+        if (Appointments == null)
+        {
+            return Array.Empty<RenderedAppointment>();
+        }
+        else
+        {
+            appointments = Appointments.Where(item => Scheduler.IsAppointmentInRange(item, StartDate, EndDate)).OrderBy(item => item.Start).ThenByDescending(item => item.End).Select(n => new RenderedAppointment(n)).ToArray();
+
+            // Part 1 - Assign column
+            foreach (var appointment in appointments)
+            {
+                var assignedAppointments = appointments.Where(app => app.Column > 0);
+                var firstAvailableColumn = assignedAppointments.GroupBy(g => g.Column).Select(s => s.OrderByDescending(o => o.End).FirstOrDefault()).Where(w => w.Appointment.End <= appointment.Appointment.Start).FirstOrDefault();
+
+                appointment.Column = firstAvailableColumn != null ? firstAvailableColumn.Column : assignedAppointments.Count() > 0 ? assignedAppointments.Max(m => m.Column) + 1 : 1;
+                appointment.Start = appointment.Appointment.Start < StartDate ? StartDate : appointment.Appointment.Start;
+                appointment.End = appointment.Appointment.End > EndDate ? EndDate : appointment.Appointment.End;
+                appointment.Top = 1.5 * (appointment.Start.Subtract(StartDate).TotalMinutes / MinutesPerSlot);
+                appointment.Height = Math.Max(1.5, 1.5 * appointment.End.Subtract(appointment.Start).TotalMinutes / MinutesPerSlot);
+
+                columnCount = Math.Max(columnCount, appointment.Column);
+            }
+
+            columnWidth = 90.0 / columnCount;
+
+            // Part 2 - Assign Left and Width values
+            foreach (var appointment in appointments)
+            {
+                appointment.Left = ((appointment.Column - 1)) * columnWidth;
+
+                var adjacentAppointment = OverlappingAppointments(appointments, appointment.Start, appointment.End).Where(o => o.Column > appointment.Column).OrderBy(o => o.Column).FirstOrDefault();
+                var adjacentColumn = adjacentAppointment == null ? columnCount + 1 : adjacentAppointment.Column;
+                appointment.Width = (adjacentColumn - (appointment.Column)) * columnWidth;
+            }
+
+            return appointments;
+        }
+    }
+
     async Task OnAppointmentSelect(AppointmentData data)
     {
         await Scheduler.SelectAppointment(data);
     }
 
-    private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
+    private RenderedAppointment[] OverlappingAppointments(RenderedAppointment[] appointments, DateTime start, DateTime end)
     {
-        if (Appointments == null)
+        if (appointments == null)
         {
-            return Array.Empty<AppointmentData>();
+            return Array.Empty<RenderedAppointment>();
         }
 
-        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
-    }
-
-    double DetermineLeft(HashSet<double> existingLefts, double width)
-    {
-        double left = 0;
-
-        while (existingLefts.Contains(left))
-        {
-            left += width;
-        }
-
-        return left;
-    }
-
-    HashSet<double> ExistingLefts(IDictionary<AppointmentData, double> lefts, IEnumerable<AppointmentData> appointments)
-    {
-        var existingLefts = new HashSet<double>();
-
-        foreach (var appointment in appointments)
-        {
-            if (lefts.TryGetValue(appointment, out var existingLeft))
-            {
-                existingLefts.Add(existingLeft);
-            }
-        }
-
-        return existingLefts;
-    }
-    private IDictionary<int, int> AppointmentGroups()
-    {
-        var groups = new Dictionary<int, int>();
-
-        for (var index = 0; index < Appointments.Count(); index++)
-        {
-            groups[index] = 0;
-        }
-
-        for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
-        {
-            var start = date;
-            var end = start.AddMinutes(MinutesPerSlot);
-
-            var appointments = AppointmentsInSlot(start, end);
-
-            foreach (var item in appointments)
-            {
-                var index = Appointments.IndexOf(item);
-
-                var count = groups[index];
-
-                groups[index] = Math.Max(appointments.Length, count);
-            }
-        }
-
-        return groups;
+        return appointments.Where(item => Scheduler.IsAppointmentInRange(item.Appointment, start, end)).OrderBy(item => item.Appointment.Start).ThenByDescending(item => item.Appointment.End).ToArray();
     }
 
     public async Task OnAppointmentDragStart(AppointmentData Data)
     {
         await AppointmentDragStart.InvokeAsync(Data);
     }
-    
+
+    internal class RenderedAppointment
+    {
+        public RenderedAppointment(AppointmentData appointment)
+        {
+            this.Appointment = appointment;
+        }
+
+        public AppointmentData Appointment { get; set; }
+        // This will be the same as the appointment Start. Otherwise, if the appointment started before today, it will be equal to the parameter StartDate
+        public DateTime Start { get; set; }
+        // This will be the same as the appointment End. Otherwise, if the appointment finishes after today, it will be equal to the parameter EndDate
+        public DateTime End { get; set; }
+        public double Top { get; set; }
+        public double Height { get; set; }        
+        public double Left { get; set; }
+        public double Width { get; set; }
+        // This is used for both querying a collection of AppointmentExtended and for rendering the display
+        // A value of zero (the initial value) indicates that this appointment has not been assigned a column
+        // A value greater than zero is the actual column that this appointment has been assigned
+        public int Column { get; set; }
+    }
 }
