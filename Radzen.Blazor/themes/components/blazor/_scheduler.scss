@@ -304,6 +304,20 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   &:focus-visible {
     outline: var(--rz-scheduler-focus-outline);
     outline-offset: var(--rz-scheduler-focus-outline-offset);
+
+    .rz-slot:has(.rz-state-focused) {
+      outline: var(--rz-scheduler-focus-outline);
+      outline-offset: var(--rz-scheduler-focus-outline-offset);
+    }
+
+    .rz-event {
+      &.rz-state-focused {
+        .rz-event-content {
+          outline: var(--rz-scheduler-focus-outline);
+          outline-offset: var(--rz-outline-offset);
+        }
+      }
+    }
   }
 }
 
@@ -507,24 +521,6 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   .rz-view-content {
     flex: 1;
     flex-direction: column;
-
-    &:focus-visible {
-      .rz-slot:has(.rz-state-focused) {
-        outline: var(--rz-scheduler-focus-outline);
-        outline-offset: var(--rz-scheduler-focus-outline-offset);
-      }
-    }
-
-    &:focus-visible {
-      .rz-event {
-        &.rz-state-focused {
-          .rz-event-content {
-            outline: var(--rz-scheduler-focus-outline);
-            outline-offset: var(--rz-outline-offset);
-          }
-        }
-      }
-    }
   }
 
   .rz-slot {
