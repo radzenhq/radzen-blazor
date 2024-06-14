@@ -1051,11 +1051,13 @@ namespace Radzen.Blazor
 
             if (isFirst)
             {
-                filterValue = CanSetCurrentValue(value) ? value : null;
+                filterValue = CanSetCurrentValue(value) ? value : 
+                    GetFilterOperator() == FilterOperator.IsEmpty  || GetFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
             }
             else
             {
-                secondFilterValue = CanSetCurrentValue(value, false) ? value : null;
+                secondFilterValue = CanSetCurrentValue(value, false) ? value :
+                    GetSecondFilterOperator() == FilterOperator.IsEmpty || GetSecondFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
             }
         }
 
