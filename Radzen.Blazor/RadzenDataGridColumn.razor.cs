@@ -82,12 +82,15 @@ namespace Radzen.Blazor
 
             if (Parent != null)
             {
-                return ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count()) +
+                var childSpan = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count()) +
                     ColumnsCollection.Where(c => c.ColumnsCollection.Count() == 0).Count();
+                return childSpan != 0 ? childSpan : ColumnsCollection.Count;
             }
 
-            return ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count())
+            var span = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count())
                 - ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection).Count(c => c.ColumnsCollection.Any());
+
+            return span != 0 ? span : ColumnsCollection.Count;
         }
 
         internal int GetRowSpan(bool isDataCell = false)
