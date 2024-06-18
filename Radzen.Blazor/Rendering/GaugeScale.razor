@@ -113,7 +113,7 @@
 
         if (Math.Abs(end.X - start.X) < 0.01 && Math.Abs(end.Y - start.Y) < 0.01)
         {
-            // Full circle - SVG can't render a full circle arc 
+            // Full circle - SVG can't render a full circle arc
             end.X = end.X - 0.01;
         }
 
@@ -124,13 +124,18 @@
 
         if (TickPosition != GaugeTickPosition.None)
         {
-            var count = Math.Floor((Max - Min) / Step);
+            var count = Math.Ceiling((Max - Min) / Step);
             var step = Polar.ToRadian(EndAngle - StartAngle) / count;
             var angle = startAngle;
             var value = Min;
 
             for (var idx = 0; idx <= count; idx++)
             {
+                if (value > Max)
+                {
+                    continue;
+                }
+
                 var tick = new Tick();
 
                 if (ShowTickLabels)
