@@ -95,6 +95,11 @@ namespace Radzen.Blazor
                 return;
             }
 
+            if ((typeof(TValue) == typeof(byte) || typeof(TValue) == typeof(byte?)) && (newValue < 0 || newValue > 255))
+            {
+                return;
+            }
+
             Value = ConvertFromDecimal(newValue);
 
             await ValueChanged.InvokeAsync(Value);
