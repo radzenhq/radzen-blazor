@@ -178,6 +178,17 @@ namespace Radzen.Blazor
         private bool firstRender = true;
 
         /// <inheritdoc />
+        protected override Task SelectAll()
+        {
+            if (ReadOnly)
+            {
+                return Task.CompletedTask;
+            }
+
+            return base.SelectAll();
+        }
+
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);

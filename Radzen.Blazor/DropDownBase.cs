@@ -297,7 +297,7 @@ namespace Radzen
         /// <summary>
         /// Selects all.
         /// </summary>
-        protected async System.Threading.Tasks.Task SelectAll()
+        protected virtual async System.Threading.Tasks.Task SelectAll()
         {
             if (Disabled)
             {

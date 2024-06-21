@@ -161,5 +161,16 @@ namespace Radzen.Blazor
         {
             return GetClassList("rz-listbox rz-inputtext").ToString();
         }
+
+        /// <inheritdoc />
+        protected override Task SelectAll()
+        {
+            if (ReadOnly)
+            {
+                return Task.CompletedTask;
+            }
+
+            return base.SelectAll();
+        }
     }
 }
