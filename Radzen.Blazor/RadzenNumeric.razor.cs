@@ -77,6 +77,59 @@ namespace Radzen.Blazor
             }
         }
 
+        private bool IsNumericType(object value) => value switch
+        {
+            sbyte => true,
+            byte => true,
+            short => true,
+            ushort => true,
+            int => true,
+            uint => true,
+            long => true,
+            ulong => true,
+            float => true,
+            double => true,
+            decimal => true,
+            _ => false
+        };
+
+#if NET7_0_OR_GREATER
+        /// <summary>
+        /// Use native numeric type to process the step up/down while checking for possible overflow errors
+        /// and clamping to Min/Max values
+        /// </summary>
+        /// <typeparam name="TNum"></typeparam>
+        /// <param name="valueToUpdate"></param>
+        /// <param name="stepUp"></param>
+        /// <param name="decimalStep"></param>
+        /// <returns></returns>
+        private TNum UpdateValueWithStepNumeric<TNum>(TNum valueToUpdate, bool stepUp, decimal decimalStep) 
+            where TNum : struct, System.Numerics.INumber<TNum>, System.Numerics.IMinMaxValue<TNum>
+        {
+            var step = TNum.CreateSaturating(decimalStep);
+
+            if (stepUp && (TNum.MaxValue - step) < valueToUpdate)
+            {
+                return valueToUpdate;
+            }
+            if (!stepUp && (TNum.MinValue + step) > valueToUpdate)
+            {
+                return valueToUpdate;
+            }
+
+            var newValue = valueToUpdate + (stepUp ? step : -step);
+
+            if (Max.HasValue && newValue > TNum.CreateSaturating(Max.Value) 
+                || Min.HasValue && newValue < TNum.CreateSaturating(Min.Value) 
+                || object.Equals(Value, newValue))
+            {
+                return valueToUpdate;
+            }
+
+            return newValue;
+        }
+#endif
+
         async System.Threading.Tasks.Task UpdateValueWithStep(bool stepUp)
         {
             if (Disabled || ReadOnly)
@@ -86,21 +139,34 @@ namespace Radzen.Blazor
 
             var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
 
-            var valueToUpdate = ConvertToDecimal(Value);
-
-            var newValue = valueToUpdate + (stepUp ? step : -step);
-
-            if (Max.HasValue && newValue > Max.Value || Min.HasValue && newValue < Min.Value || object.Equals(Value, newValue))
+#if NET7_0_OR_GREATER
+            if (IsNumericType(Value))
             {
-                return;
-            }
+                // cannot call UpdateValueWithStepNumeric directly because TValue is not value type constrained
+                Func<dynamic, bool, decimal, dynamic> dynamicWrapper = (dynamic value, bool stepUp, decimal step) 
+                    => UpdateValueWithStepNumeric(value, stepUp, step);
 
-            if ((typeof(TValue) == typeof(byte) || typeof(TValue) == typeof(byte?)) && (newValue < 0 || newValue > 255))
+                Value = dynamicWrapper(Value, stepUp, step);
+            }
+            else
+#endif
             {
-                return;
-            }
+                var valueToUpdate = ConvertToDecimal(Value);
 
-            Value = ConvertFromDecimal(newValue);
+                var newValue = valueToUpdate + (stepUp ? step : -step);
+
+                if (Max.HasValue && newValue > Max.Value || Min.HasValue && newValue < Min.Value || object.Equals(Value, newValue))
+                {
+                    return;
+                }
+
+                if ((typeof(TValue) == typeof(byte) || typeof(TValue) == typeof(byte?)) && (newValue < 0 || newValue > 255))
+                {
+                    return;
+                }
+
+                Value = ConvertFromDecimal(newValue);
+            }
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
