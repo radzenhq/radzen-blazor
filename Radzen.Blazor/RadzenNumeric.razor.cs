@@ -138,6 +138,7 @@ namespace Radzen.Blazor
             }
 
             var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+            TValue newValue;
 
 #if NET7_0_OR_GREATER
             if (IsNumericType(Value))
@@ -146,27 +147,32 @@ namespace Radzen.Blazor
                 Func<dynamic, bool, decimal, dynamic> dynamicWrapper = (dynamic value, bool stepUp, decimal step) 
                     => UpdateValueWithStepNumeric(value, stepUp, step);
 
-                Value = dynamicWrapper(Value, stepUp, step);
+                newValue = dynamicWrapper(Value, stepUp, step);
             }
             else
 #endif
             {
                 var valueToUpdate = ConvertToDecimal(Value);
 
-                var newValue = valueToUpdate + (stepUp ? step : -step);
+                var newValueToUpdate = valueToUpdate + (stepUp ? step : -step);
 
-                if (Max.HasValue && newValue > Max.Value || Min.HasValue && newValue < Min.Value || object.Equals(Value, newValue))
+                if (Max.HasValue && newValueToUpdate > Max.Value || Min.HasValue && newValueToUpdate < Min.Value || object.Equals(Value, newValueToUpdate))
                 {
                     return;
                 }
 
-                if ((typeof(TValue) == typeof(byte) || typeof(TValue) == typeof(byte?)) && (newValue < 0 || newValue > 255))
+                if ((typeof(TValue) == typeof(byte) || typeof(TValue) == typeof(byte?)) && (newValueToUpdate < 0 || newValueToUpdate > 255))
                 {
                     return;
                 }
 
-                Value = ConvertFromDecimal(newValue);
+                newValue = ConvertFromDecimal(newValueToUpdate);
             }
+
+            if(object.Equals(newValue, Value))
+                return;
+
+            Value = newValue;
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
