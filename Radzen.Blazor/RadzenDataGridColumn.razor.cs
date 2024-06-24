@@ -88,7 +88,8 @@ namespace Radzen.Blazor
             }
 
             var span = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count())
-                - ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection).Count(c => c.ColumnsCollection.Any());
+                - ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection).Count(c => c.ColumnsCollection.Any())
+                + ColumnsCollection.Where(c => c.ColumnsCollection.Count() == 0).Count();
 
             return span != 0 ? span : ColumnsCollection.Count;
         }
