@@ -338,7 +338,7 @@
                 <tbody>
                     @if (Data != null)
                     {
-                        @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Data.Any() : true) || LoadData.HasDelegate && Data != null && Data.Any())
+                        @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Count > 0 : true) || LoadData.HasDelegate && Data.Count() > 0)
                         {
                             if (columns.Count > 0)
                             {
