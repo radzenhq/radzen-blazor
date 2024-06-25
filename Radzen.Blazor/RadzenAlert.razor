@@ -1,7 +1,8 @@
 ﻿@inherits RadzenComponentWithChildren
+<div aria-live="polite">
 @if (visible)
 {
-    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" aria-live="polite">
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()>
         <div class="rz-alert-item">
             @if (ShowIcon)
             {
@@ -30,3 +31,4 @@
         }
     </div>
 }
+</div>
