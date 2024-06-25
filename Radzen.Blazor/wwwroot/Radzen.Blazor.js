@@ -1564,6 +1564,10 @@ window.Radzen = {
       }
     }
 
+    if (item.parentElement && item.parentElement.closest('.rz-navigation-item') && !defaultActive) {
+        return;
+    };
+
     toggle(active);
 
     document.removeEventListener('click', target.clickHandler);
