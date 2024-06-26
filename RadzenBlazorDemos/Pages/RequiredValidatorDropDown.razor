@@ -21,7 +21,7 @@
                             <RadzenLabel Text="Products" />
                         </div>
                         <div class="col">
-                            <RadzenDropDown MaxSelectedLabels="2" style="display: block" Multiple="true" Name="Products" @bind-Value=@model.Products Data="@products" TextProperty="ProductName" ValueProperty="ProductName" Placeholder="Select products" class="w-100" />
+                            <RadzenDropDown MaxSelectedLabels="2" style="display: block" Multiple="true" Name="Products" @bind-Value=@model.Products Data="@products" TextProperty="@nameof(Product.ProductName)" ValueProperty="ProductName" Placeholder="Select products" class="w-100" />
                             <RadzenRequiredValidator Component="Products" Text="Products are required" Style="position: absolute"/>
                         </div>
                     </div>

@@ -23,10 +23,10 @@ else
                                 @order.Employee?.FirstName @order.Employee?.LastName
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}" Width="140px" />
+                        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" Width="140px" />
                         <RadzenDataGridColumn Property="RequiredDate" Title="Required Date" FormatString="{0:d}" Width="140px" />
                         <RadzenDataGridColumn Property="ShippedDate" Title="Shipped Date" FormatString="{0:d}" Width="140px" />
-                        <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
+                        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
                         <RadzenDataGridColumn Property="ShipCountry" Title="Ship Country" />
                     </Columns>
                 </RadzenDataGrid>
@@ -43,13 +43,13 @@ else
                                 <Columns>
                                     <RadzenDataGridColumn Property="Order.CustomerID" Title="Order" />
                                     <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
-                                    <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
+                                    <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="Unit Price">
                                         <Template Context="detail">
                                             @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
                                         </Template>
                                     </RadzenDataGridColumn>
-                                    <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
-                                    <RadzenDataGridColumn Property="Discount" Title="Discount">
+                                    <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+                                    <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
                                         <Template Context="detail">
                                             @String.Format("{0}%", detail.Discount * 100)
                                         </Template>

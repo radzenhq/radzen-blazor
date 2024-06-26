@@ -22,8 +22,8 @@
                 <RadzenText TextStyle="TextStyle.Caption">@order.Customer?.CompanyName</RadzenText>
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="Freight" Title="Freight">
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
             <Template Context="order">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
             </Template>

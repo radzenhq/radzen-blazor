@@ -48,7 +48,7 @@ else
                     @(string.Join(',', context.WorkStatuses.Select(s => s.Name)))
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title Of Courtesy" 
+            <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" 
                 FilterValue="@currentTOC">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by title of courtesy" }})"

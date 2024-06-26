@@ -17,11 +17,11 @@
                 @data.FirstName @data.LastName
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Title" Title="Title" />
-        <RadzenDataGridColumn Property="EmployeeID" Title="Employee ID" />
-        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="City" Title="City" />
-        <RadzenDataGridColumn Property="Country" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="Employee ID" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
     </Columns>
 </RadzenDataGrid>
 

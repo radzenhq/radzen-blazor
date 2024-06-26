@@ -4,7 +4,7 @@
 
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenLabel Text="Select Values" Component="DropDownMultiple" Style="margin-right: 8px; vertical-align: middle;" />
-    <RadzenDropDown @bind-Value=@values Data=@products TextProperty="ProductName" ValueProperty="ProductID" Name="DropDownMultiple"
+    <RadzenDropDown @bind-Value=@values Data=@products TextProperty="@nameof(Product.ProductName)" ValueProperty="@nameof(Product.ProductID)" Name="DropDownMultiple"
                     Multiple=true AllowClear=true Placeholder="Select products" Style="width: 100%; max-width: 400px;" />
 </div>
 

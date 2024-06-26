@@ -11,7 +11,7 @@
                 <RadzenText TextStyle="TextStyle.Body2" class="mb-2">Data from different tables.</RadzenText>
                 <RadzenTree Style="height: 300px" Data=@categories>
                     <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
-                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+                    <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) />
                 </RadzenTree>
             </RadzenCard>
         </div>

@@ -13,7 +13,7 @@
             <RadzenCard class="mt-4">
                 <RadzenTree Style="width: 100%; height: 300px" Change=@OnChange Data=@categories @bind-Value=@selection>
                     <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
-                    <RadzenTreeLevel TextProperty="ProductName" HasChildren=@(product => false) />
+                    <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) />
                 </RadzenTree>
             </RadzenCard>
         </div>

@@ -14,7 +14,7 @@
 
     <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@(view => ordersGrid.Reload())>
         <Properties>
-            <RadzenDataFilterProperty Property="OrderID" Title="Order ID" />
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderID)" Title="Order ID" />
             <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
             <MyCustomEnumerableDataFilterProperty Property="Employee.Title" Title="Employee Title" FilterValue="@finalSelectedTitles"
                                                     Type="typeof(IEnumerable<string>)" FilterOperator="FilterOperator.Contains">
@@ -23,8 +23,8 @@
                                     Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </MyCustomEnumerableDataFilterProperty>
-            <MyCustomDataFilterProperty Property="OrderDate" Title="Order Date" />
-            <RadzenDataFilterProperty Property="Freight" Title="Freight" />
+            <MyCustomDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date" />
+            <RadzenDataFilterProperty Property="@nameof(Order.Freight)" Title="Freight" />
         </Properties>
     </RadzenDataFilter>
 
@@ -32,7 +32,7 @@
                     Data="@(filteredOrders)" Count="@count" LoadData="@LoadData"
                     ColumnWidth="200px" PageSize="20" Style="height: 500px">
         <Columns>
-            <RadzenDataGridColumn Width="200px" Property="OrderID" Title="Order ID" />
+            <RadzenDataGridColumn Width="200px" Property="@nameof(Order.OrderID)" Title="Order ID" />
             <RadzenDataGridColumn Width="200px" Property="Customer.CompanyName" Title="Customer" />
             <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
                 <Template Context="order">
@@ -40,14 +40,14 @@
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn Property="Employee.Title" Title="Employee Title" />
-            <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}">
+            <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}">
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="Freight" Title="Freight">
+            <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
                 <Template Context="order">
                     @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
+            <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
         </Columns>
     </RadzenDataGrid>
 </RadzenStack>

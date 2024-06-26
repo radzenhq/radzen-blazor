@@ -15,11 +15,11 @@
                     <RadzenDataGridColumn Property="CompanyName" Title="Company Name" />
                     <RadzenDataGridColumn Property="ContactName" Title="Contact Name" />
                     <RadzenDataGridColumn Property="ContactTitle" Title="Contact Title" />
-                    <RadzenDataGridColumn Property="Address" Title="Address" />
-                    <RadzenDataGridColumn Property="City" Title="City" Width="140px" />
-                    <RadzenDataGridColumn Property="Region" Title="Region" Width="140px" />
-                    <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" Width="140px" />
-                    <RadzenDataGridColumn Property="Country" Title="Country" Width="140px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" Width="140px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" Width="140px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" Width="140px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" Width="140px" />
                     <RadzenDataGridColumn Property="Phone" Title="Phone" Width="140px" />
                     <RadzenDataGridColumn Property="Fax" Title="Fax" Width="140px" />
                 </Columns>
@@ -40,7 +40,7 @@
                             </RadzenStack>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="OrderDate" Title="Order Date">
+                    <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date">
                         <Template Context="order">
                             @String.Format("{0:d}", order.OrderDate)
                         </Template>
@@ -55,12 +55,12 @@
                             @String.Format("{0:d}", order.ShippedDate)
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="Freight" Title="Freight">
+                    <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
                         <Template Context="order">
                             @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
+                    <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
                     <RadzenDataGridColumn Property="ShipAddress" Title="Address" />
                     <RadzenDataGridColumn Property="ShipCity" Title="City" />
                     <RadzenDataGridColumn Property="ShipRegion" Title="Region" />
@@ -75,8 +75,8 @@
                         Data="@(orderDetailsByOrders)" ColumnWidth="200px">
                 <Columns>
                     <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
-                    <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
-                    <RadzenDataGridColumn Property="Discount" Title="Discount" FormatString="{0:P}" />
+                    <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+                    <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount" FormatString="{0:P}" />
                 </Columns>
             </RadzenDataGrid>
         </RadzenStepsItem>

@@ -3,10 +3,10 @@
     
 <RadzenDataGrid Data=@employees AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
     <Columns>
-        <RadzenDataGridColumn Property="ID" Title="ID" />
-        <RadzenDataGridColumn Property="Gender" Title="Gender" />
-        <RadzenDataGridColumn Property="Status" Title="Nullable Status" />
-        <RadzenDataGridColumn Property="Color" Title="Favorite Color (Display Attribute in Filter)" />
+        <RadzenDataGridColumn Property="@nameof(Employee.ID)" Title="ID" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Gender)" Title="Gender" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Status)" Title="Nullable Status" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Color)" Title="Favorite Color (Display Attribute in Filter)" />
     </Columns>
 </RadzenDataGrid>
 

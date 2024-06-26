@@ -8,15 +8,15 @@
                 AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" LogicalFilterOperator="LogicalFilterOperator.Or"
                 AllowSorting="true">
     <Columns>
-        <RadzenDataGridColumn Property="OrderID" Title="OrderID" />
-        <RadzenDataGridColumn Property="ProductID" Title="ProductID" />
-        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.OrderID)" Title="OrderID" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.ProductID)" Title="ProductID" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="Unit Price">
             <Template Context="detail">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
-        <RadzenDataGridColumn Property="Discount" Title="Discount">
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
             <Template Context="detail">
                 @String.Format("{0}%", detail.Discount * 100)
             </Template>

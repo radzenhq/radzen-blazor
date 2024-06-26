@@ -16,17 +16,17 @@
     FilterMode="FilterMode.Simple" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="300px"
     FilterCaseSensitivity="@filterCaseSensitivity" LogicalFilterOperator="@logicalFilterOperator">
     <Columns>
-        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="200px" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="FirstName" Title="First Name" />
-        <RadzenDataGridColumn Property="LastName" Title="Last Name" Width="150px"/>
-        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="Country" Title="Country" />
-        <RadzenDataGridColumn Property="Notes" Title="Notes" />
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
     </Columns>
 </RadzenDataGrid>
 

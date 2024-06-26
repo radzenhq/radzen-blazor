@@ -20,7 +20,7 @@
                 Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Freight" Title="Freight">
+        <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
             <Template Context="order">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
             </Template>
@@ -31,12 +31,12 @@
                 Group amount: <b>@String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", context.Data.Items.Cast<Order>().Sum(o => o.Freight))</b>
             </GroupFooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}">
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}">
             <FooterTemplate>
                 Last order date: <b>@String.Format("{0:d}", orders.OrderByDescending(o => o.OrderDate).LastOrDefault()?.OrderDate)</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Width="160px" Property="ShipName" Title="Ship Name" />
+        <RadzenDataGridColumn Width="160px" Property="@nameof(Order.ShipName)" Title="Ship Name" />
         <RadzenDataGridColumn Width="160px" Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 @order.Employee?.FirstName @order.Employee?.LastName

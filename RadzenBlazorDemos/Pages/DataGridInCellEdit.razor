@@ -22,7 +22,7 @@
                 <RadzenText Text="@(order.Customer?.CompanyName)" />
             </Template>
             <EditTemplate Context="order">
-                <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;"
+                <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width:100%; display: block;"
                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -45,7 +45,7 @@
             </EditTemplate>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" Width="200px" IsInEditMode="@IsEditing">
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.OrderDate)" Title="Order Date" Width="200px" IsInEditMode="@IsEditing">
             <Template Context="order">
                 <RadzenText Text="@(String.Format("{0:d}", order.OrderDate))" />
             </Template>
@@ -54,7 +54,7 @@
             </EditTemplate>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="Order" Property="Freight" Title="Freight" IsInEditMode="@IsEditing" CalculatedCssClass="@IsEdited">
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.Freight)" Title="Freight" IsInEditMode="@IsEditing" CalculatedCssClass="@IsEdited">
             <Template Context="order">
                 <RadzenText Text="@(String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight))" />
             </Template>
@@ -63,7 +63,7 @@
             </EditTemplate>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="Order" Property="ShipName" Title="Ship Name" IsInEditMode="@IsEditing">
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShipName)" Title="Ship Name" IsInEditMode="@IsEditing">
             <Template Context="order">
                 <RadzenText Text="@(order.ShipName)" />
             </Template>

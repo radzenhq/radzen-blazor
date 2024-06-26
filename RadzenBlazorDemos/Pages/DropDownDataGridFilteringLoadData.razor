@@ -9,7 +9,7 @@
     <RadzenLabel Text="Select Value" Component="DropDownDataGridFilteringLoadData" Style="margin-right: 8px; vertical-align: middle;" />
     <RadzenDropDownDataGrid AllowClear="true" @bind-Value=value
                     LoadData=@LoadData AllowFiltering="true"
-                    Data=@customers Count=@count TextProperty="CompanyName" ValueProperty="CustomerID" Name="DropDownDataGridFilteringLoadData" />
+                    Data=@customers Count=@count TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Name="DropDownDataGridFilteringLoadData" />
 </div>
 
 

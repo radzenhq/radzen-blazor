@@ -9,23 +9,23 @@
     Data="@data" TItem="OrderAndDetail" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" ShowPagingSummary="true"
     IsLoading=@isLoading Sort="@ShowLoading" Page="@ShowLoading" Group="@ShowLoading" Filter="@ShowLoading">
     <Columns>
-        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="FirstName" Title="First Name" Frozen="true" Width="160px" />
-        <RadzenDataGridColumn Property="LastName" Title="Last Name" Width="160px" />
-        <RadzenDataGridColumn Property="Title" Title="Job Title" Width="200px" />
-        <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title" Width="120px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title" Width="120px" />
         <RadzenDataGridColumn Property="OrderID" Title="OrderID" Width="160px" />
         <RadzenDataGridColumn Property="ProductID" Title="ProductID" Width="160px" />
-        <RadzenDataGridColumn Property="UnitPrice" Title="UnitPrice" Width="160px" FormatString="{0:C}" />
-        <RadzenDataGridColumn Property="Quantity" Title="Quantity" Width="160px" />
-        <RadzenDataGridColumn Property="Discount" Title="Discount" Width="160px" FormatString="{0:P}" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="UnitPrice" Width="160px" FormatString="{0:C}" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount" Width="160px" FormatString="{0:P}" />
         <RadzenDataGridColumn Property="CustomerID" Title="CustomerID" Width="160px" />
-        <RadzenDataGridColumn Property="OrderDate" Title="OrderDate" Width="160px" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="OrderDate" Width="160px" FormatString="{0:d}" />
     </Columns>
 </RadzenDataGrid>
 

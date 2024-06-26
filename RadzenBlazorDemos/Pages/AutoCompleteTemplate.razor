@@ -4,7 +4,7 @@
 @inherits DbContextPage
 
 <div class="rz-p-12 rz-text-align-center">
-    <RadzenAutoComplete @bind-Value=@companyName Placeholder="Select a customer..." Data=@customers TextProperty="CompanyName" Style="width: 13rem" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Company Name" }})">
+    <RadzenAutoComplete @bind-Value=@companyName Placeholder="Select a customer..." Data=@customers TextProperty="@nameof(Customer.CompanyName)" Style="width: 13rem" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Company Name" }})">
         <Template>
             CompanyName: @context.CompanyName
             <br />

@@ -10,13 +10,13 @@
     <Columns>
         <RadzenDataGridColumn Property="Order.OrderDate" Title="Order" FormatString="{0:d}" />
         <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
-        <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="Unit Price">
             <Template Context="detail">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
-        <RadzenDataGridColumn Property="Discount" Title="Discount   " FormatString="{0:P}" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+        <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount   " FormatString="{0:P}" />
     </Columns>
 </RadzenDataGrid>
 

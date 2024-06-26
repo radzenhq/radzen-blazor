@@ -7,7 +7,7 @@
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenLabel Text="Select Value" Component="DropDownVirtualization" Style="margin-right: 8px; vertical-align: middle;" />
     <RadzenDropDown AllowClear="true" @bind-Value=value AllowVirtualization="true" Name="DropDownVirtualization"
-        AllowFiltering="true" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 100%; max-width: 400px;" />
+        AllowFiltering="true" Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width: 100%; max-width: 400px;" />
 </div>
 
 

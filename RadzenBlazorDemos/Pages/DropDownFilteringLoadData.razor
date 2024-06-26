@@ -8,7 +8,7 @@
     <RadzenLabel Text="Select Value" Component="DropDownFilteringLoadData" Style="margin-right: 8px; vertical-align: middle;" />
     <RadzenDropDown AllowClear="true" @bind-Value=value
                     LoadData=@LoadData AllowFiltering="true"
-                    Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 100%; max-width: 400px;" Name="DropDownFilteringLoadData" />
+                    Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width: 100%; max-width: 400px;" Name="DropDownFilteringLoadData" />
 </div>
 
 

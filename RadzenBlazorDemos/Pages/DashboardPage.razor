@@ -138,7 +138,7 @@
                                 <img Style="width: 32px; height: 32px; border-radius: 50%; margin-right: 8px; border: 1px solid #cccccc;" src=@issue.User.AvatarUrl alt="User avatar" /><b>@issue.User.Login</b>
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn Property="Title" Title="Title" Width="400px">
+                        <RadzenDataGridColumn Property="@nameof(Issue.Title)" Title="Title" Width="400px">
                             <Template Context="issue">
                                 <RadzenLink Path=@issue.Url Text=@issue.Title Target="_blank" />
                             </Template>

@@ -8,25 +8,25 @@
 <RadzenDataGrid AllowColumnReorder="true" ColumnReordered="@OnColumnReordered" TItem="Employee"
     AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or">
     <Columns>
-        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
         <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="FirstName" Title="First Name" OrderIndex="2" />
-        <RadzenDataGridColumn Property="LastName" Title="Last Name" OrderIndex="1" />
-        <RadzenDataGridColumn Property="Title" Title="Title" />
-        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="Address" Title="Address" />
-        <RadzenDataGridColumn Property="City" Title="City" />
-        <RadzenDataGridColumn Property="Region" Title="Region" />
-        <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" />
-        <RadzenDataGridColumn Property="Country" Title="Country" />
-        <RadzenDataGridColumn Property="HomePhone" Title="Home Phone" />
-        <RadzenDataGridColumn Property="Extension" Title="Extension" />
-        <RadzenDataGridColumn Property="Notes" Title="Notes" />
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" OrderIndex="2" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" OrderIndex="1" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+        <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" />
+        <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
     </Columns>
 </RadzenDataGrid>
 

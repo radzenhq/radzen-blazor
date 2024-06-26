@@ -3,19 +3,19 @@
 <h3>Default Empty Text</h3>
 <RadzenDataGrid Data="@data">
     <Columns>
-        <RadzenDataGridColumn Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Title="Photo" Sortable="false" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="FirstName" Title="First Name" />
-        <RadzenDataGridColumn Property="LastName" Title="Last Name" />
-        <RadzenDataGridColumn Property="Title" Title="Title" />
-        <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title Of Courtesy" />
-        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="Address" Title="Address" />
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
     </Columns>
 </RadzenDataGrid>    
 
@@ -25,19 +25,19 @@
 </div>
 <RadzenDataGrid Data="@data" EmptyText="@emptyText">
     <Columns>
-        <RadzenDataGridColumn Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Title="Photo" Sortable="false" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="FirstName" Title="First Name" />
-        <RadzenDataGridColumn Property="LastName" Title="Last Name" />
-        <RadzenDataGridColumn Property="Title" Title="Title" />
-        <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title Of Courtesy" />
-        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="Address" Title="Address" />
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
     </Columns>
 </RadzenDataGrid>
 
@@ -47,19 +47,19 @@
         <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
     </EmptyTemplate>
     <Columns>
-        <RadzenDataGridColumn Property="EmployeeID" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Title="Photo" Sortable="false" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="FirstName" Title="First Name" />
-        <RadzenDataGridColumn Property="LastName" Title="Last Name" />
-        <RadzenDataGridColumn Property="Title" Title="Title" />
-        <RadzenDataGridColumn Property="TitleOfCourtesy" Title="Title Of Courtesy" />
-        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="HireDate" Title="Hire Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="Address" Title="Address" />
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
     </Columns>
 </RadzenDataGrid>
 

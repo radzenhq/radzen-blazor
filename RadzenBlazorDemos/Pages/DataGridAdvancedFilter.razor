@@ -9,15 +9,15 @@
                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" TItem="Employee" FilterCleared=@FilterCleared
     LogicalFilterOperator="LogicalFilterOperator.Or" FilterPopupRenderMode="PopupRenderMode.OnDemand">
     <Columns>
-        <RadzenDataGridColumn Property="EmployeeID" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="200px" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="FirstName" Title="First Name" />
-        <RadzenDataGridColumn Property="LastName" Title="Last Name" Width="150px"/>
-        <RadzenDataGridColumn Property="Title" Title="Job Title" 
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="150px"/>
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" 
                               Type="typeof(IEnumerable<string>)" LogicalFilterOperator=LogicalFilterOperator.Or
                               FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains"
                               SecondFilterValue="@selectedSecondTitles" SecondFilterOperator="FilterOperator.Contains"
@@ -31,9 +31,9 @@
                                 Change=@OnSelectedSecondTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
             </SecondFilterValueTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="BirthDate" Title="Birth Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="Country" Title="Country" />
-        <RadzenDataGridColumn Property="Notes" Title="Notes" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
     </Columns>
 </RadzenDataGrid>
 @code {

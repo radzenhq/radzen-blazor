@@ -39,9 +39,9 @@
     <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 Data="@(orderDetails.Where(o => o.OrderID == OrderID))" ColumnWidth="200px" Density="Density.Compact" AllowAlternatingRows="false">
         <Columns>
-            <RadzenDataGridColumn Property="Quantity" Title="Quantity" />
+            <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
             <RadzenDataGridColumn Property="Order.OrderDate" Title="Order Date" />
-            <RadzenDataGridColumn Property="Discount" Title="Discount" FormatString="{0:P}" />
+            <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount" FormatString="{0:P}" />
         </Columns>
     </RadzenDataGrid>
     </RadzenStack>

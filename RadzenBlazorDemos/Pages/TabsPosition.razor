@@ -47,28 +47,28 @@
                             <RadzenImage Path="@data?.Photo" Style="width: 40px; height: 40px; border-radius: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="LastName" Title="Last Name" />
-                    <RadzenDataGridColumn Property="FirstName" Title="First Name" />
-                    <RadzenDataGridColumn Property="EmployeeID" Title="Employee ID" />
-                    <RadzenDataGridColumn Property="Title" Title="Title" />
-                    <RadzenDataGridColumn Property="BirthDate" Title="Birth Date">
+                    <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="Employee ID" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Title" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date">
                         <Template Context="data">
                             @String.Format("{0:d}", data.BirthDate)
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="HireDate" Title="Hire Date">
+                    <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date">
                         <Template Context="data">
                             @String.Format("{0:d}", data.HireDate)
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="Address" Title="Address" />
-                    <RadzenDataGridColumn Property="City" Title="City" />
-                    <RadzenDataGridColumn Property="Region" Title="Region" />
-                    <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" />
-                    <RadzenDataGridColumn Property="Country" Title="Country" />
-                    <RadzenDataGridColumn Property="HomePhone" Title="Home Phone" />
-                    <RadzenDataGridColumn Property="Extension" Title="Extension" />
-                    <RadzenDataGridColumn Property="Notes" Title="Notes" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" />
                 </Columns>
             </RadzenDataGrid>
         </RadzenTabsItem>
@@ -79,11 +79,11 @@
                     <RadzenDataGridColumn Property="CompanyName" Title="Company Name" />
                     <RadzenDataGridColumn Property="ContactName" Title="Contact Name" />
                     <RadzenDataGridColumn Property="ContactTitle" Title="Contact Title" />
-                    <RadzenDataGridColumn Property="Address" Title="Address" />
-                    <RadzenDataGridColumn Property="City" Title="City" />
-                    <RadzenDataGridColumn Property="Region" Title="Region" />
-                    <RadzenDataGridColumn Property="PostalCode" Title="Postal Code" />
-                    <RadzenDataGridColumn Property="Country" Title="Country" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
                     <RadzenDataGridColumn Property="Phone" Title="Phone" />
                     <RadzenDataGridColumn Property="Fax" Title="Fax" />
                 </Columns>

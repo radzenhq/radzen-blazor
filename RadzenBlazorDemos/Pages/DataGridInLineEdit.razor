@@ -25,7 +25,7 @@
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
         <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="280px">
             <EditTemplate Context="order">
-                <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="CompanyName" ValueProperty="CustomerID" Style="width:100%; display: block;"
+                <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width:100%; display: block;"
                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -44,7 +44,7 @@
                 </RadzenDropDown>
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" Width="200px">
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" Width="200px">
             <Template Context="order">
                 @String.Format("{0:d}", order.OrderDate)
             </Template>
@@ -52,7 +52,7 @@
                 <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order date" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Freight" Title="Freight">
+        <RadzenDataGridColumn Property="@nameof(Order.Freight)" Title="Freight">
             <Template Context="order">
                 @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)
             </Template>
@@ -60,7 +60,7 @@
                 <RadzenNumeric @bind-Value="order.Freight" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select freight" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="ShipName" Title="Ship Name">
+        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name">
             <EditTemplate Context="order">
                 <RadzenTextBox @bind-Value="order.ShipName" Style="width:200px; display: block" Name="ShipName" aria-label="Enter ship name" />
                 <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />

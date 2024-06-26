@@ -7,7 +7,7 @@
 <div class="rz-p-sm-12 rz-text-align-center">
     <RadzenListBox AllowClear="true" @bind-Value=value
                     LoadData=@LoadData AllowFiltering="true"
-                   Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Style="width: 100%; max-width: 400px; height: 200px"
+                   Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width: 100%; max-width: 400px; height: 200px"
                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select company" }})" />
 </div>
 

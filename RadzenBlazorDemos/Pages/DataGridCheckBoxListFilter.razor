@@ -17,10 +17,10 @@
                 @order.Employee?.FirstName @order.Employee?.LastName
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" />
         <RadzenDataGridColumn Property="RequiredDate" Title="Required Date" FormatString="{0:d}" />
         <RadzenDataGridColumn Property="ShippedDate" Title="Shipped Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
         <RadzenDataGridColumn Property="ShipCountry" Title="Ship Country" />
     </Columns>
 </RadzenDataGrid>
