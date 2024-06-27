@@ -12,7 +12,7 @@ else
 {
     if (Item.ChildContent != null)
     {
-        <li style=@Style @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true)" onmouseleave="Radzen.toggleMenuItem(this, event, false)">
+        <li style=@Style @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true, false)" onmouseleave="Radzen.toggleMenuItem(this, event, false, false)">
             @ChildContent
         </li>
     }
