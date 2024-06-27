@@ -46,6 +46,12 @@ namespace Radzen.Blazor
         [Parameter]
         public string Text { get; set; }
 
+        /// <summary>
+        /// Gets or sets value indicating if the tree item checkbox can be checked.
+        /// </summary>
+        [Parameter]
+        public bool Checkable { get; set; } = true;
+
         private bool expanded;
 
         /// <summary>

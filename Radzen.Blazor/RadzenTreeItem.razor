@@ -11,7 +11,7 @@
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
-            <RadzenCheckBox TabIndex=-1 Name="@($"{GetHashCode()}")" TValue="bool?" Value="@(itemArgs.Item1.CheckedSet() ? itemArgs.Item1.Checked : IsChecked())" Change="@CheckedChange" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Tree.SelectItemAriaLabel }})" />
+            <RadzenCheckBox TabIndex=-1 Name="@($"{GetHashCode()}")" TValue="bool?" Disabled="@(!Checkable)" Value="@(itemArgs.Item1.CheckedSet() ? itemArgs.Item1.Checked : IsChecked())" Change="@CheckedChange" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Tree.SelectItemAriaLabel }})" />
         }
         @if (Template != null)
         {

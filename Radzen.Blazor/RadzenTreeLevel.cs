@@ -29,6 +29,12 @@ namespace Radzen.Blazor
         public string TextProperty { get; set; }
 
         /// <summary>
+        /// Specifies the name of the property which provides values for the <see cref="RadzenTreeItem.Checkable" /> property of the child items.
+        /// </summary>
+        [Parameter]
+        public string CheckableProperty { get; set; }
+
+        /// <summary>
         /// Specifies the name of the property which returns child data. The value returned by that property should be IEnumerable
         /// </summary>
         [Parameter]
@@ -77,6 +83,17 @@ namespace Radzen.Blazor
         /// </example>
         [Parameter]
         public Func<object, string> Text { get; set; }
+
+        /// <summary>
+        /// Determines the if the checkbox of the child item can be checked.
+        /// </summary>
+        /// <example>
+        /// <code>
+        ///     &lt;RadzenTreeLevel Checkable=@(e =&gt; (e as Employee).LastName != null) /&gt;
+        /// </code>
+        /// </example>
+        [Parameter]
+        public Func<object, bool> Checkable { get; set; }
 
         /// <summary>
         /// Gets or sets the template.

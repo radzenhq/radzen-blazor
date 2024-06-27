@@ -2740,9 +2740,17 @@ namespace Radzen
         /// </summary>
         public Func<object, string> Text { get; set; }
         /// <summary>
+        /// Gets or sets the function which returns a value for the <see cref="RadzenTreeItem.Checkable" /> of a child item.
+        /// </summary>
+        public Func<object, bool> Checkable { get; set; }
+        /// <summary>
         /// Gets or sets the name of the property which provides the value for the <see cref="RadzenTreeItem.Text" /> of a child item.
         /// </summary>
         public string TextProperty { get; set; }
+        /// <summary>
+        /// Gets or sets the name of the property which provides the value for the <see cref="RadzenTreeItem.Checkable" /> of a child item.
+        /// </summary>
+        public string CheckableProperty { get; set; }
         /// <summary>
         /// Gets or sets a function which returns whether a child item has children of its own. Called with an item from <see cref="Data" />.
         /// By default all items are considered to have children.

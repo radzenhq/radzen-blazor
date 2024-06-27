@@ -9,8 +9,8 @@
             <RadzenCard>
                 <RadzenTree AllowCheckBoxes="true" @bind-CheckedValues=@CheckedValues Style="width: 100%; height: 300px" Data=@categories
                     ItemRender="@TreeItemRender">
-                    <RadzenTreeLevel TextProperty="CategoryName" ChildrenProperty="Products" />
-                    <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) />
+                    <RadzenTreeLevel TextProperty="@nameof(Category.CategoryName)" ChildrenProperty="Products" Checkable="@(category => ((Category)category).CategoryName != "Condiments")" />
+                    <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) Checkable="@(product => ((Product)product).Category.CategoryName != "Condiments")" />
                 </RadzenTree>
             </RadzenCard>
         </div>
