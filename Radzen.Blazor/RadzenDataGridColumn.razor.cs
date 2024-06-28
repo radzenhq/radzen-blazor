@@ -80,13 +80,6 @@ namespace Radzen.Blazor
             if (!Grid.AllowCompositeDataCells && isDataCell || Columns == null)
                 return 1;
 
-            if (Parent != null)
-            {
-                var childSpan = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count()) +
-                    ColumnsCollection.Where(c => c.ColumnsCollection.Count() == 0).Count();
-                return childSpan != 0 ? childSpan : ColumnsCollection.Count;
-            }
-
             var span = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count())
                 - ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection).Count(c => c.ColumnsCollection.Any())
                 + ColumnsCollection.Where(c => c.ColumnsCollection.Count() == 0).Count();
@@ -102,7 +95,7 @@ namespace Radzen.Blazor
             if (Columns == null && Parent != null)
             {
                 var level = this.GetLevel();
-                return level == Grid.deepestChildColumnLevel ? 1 : level + 1;
+                return level == Grid.deepestChildColumnLevel ? 1 : level < Grid.deepestChildColumnLevel ? Grid.deepestChildColumnLevel : level + 1;
             }
 
             return Columns == null && Parent == null ? Grid.deepestChildColumnLevel + 1 : 1;
