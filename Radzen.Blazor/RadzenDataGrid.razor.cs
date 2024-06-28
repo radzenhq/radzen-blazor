@@ -982,6 +982,14 @@ namespace Radzen.Blazor
 
             column.ClearFilters();
 
+            if (FilterMode == FilterMode.CheckBoxList)
+            {
+                allColumns.ToList().ForEach(c =>
+                {
+                    c.ClearFilterValues();
+                });
+            }
+
             skip = 0;
             CurrentPage = 0;
 
