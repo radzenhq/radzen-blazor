@@ -625,6 +625,41 @@ namespace RadzenBlazorDemos
                     }
                 },
 
+                new Example
+                {
+                    Updated = true,
+                    Name = "Drag & Drop",
+                    Icon = "&#xe945",
+                    Children = new []
+                    {
+                        new Example()
+                        {
+                            Name = "Rows reorder",
+                            Path = "/datagrid-rowreorder",
+                            Title = "Blazor DataGrid Component - Reorder rows | Free UI Components by Radzen",
+                            Description = "This example demonstrates custom DataGrid rows reoder.",
+                            Tags = new [] { "datagrid", "reorder", "row" }
+                        },
+                        new Example()
+                        {
+                            Name = "Drag row between two DataGrids",
+                            Path = "/datagrid-rowdragbetween",
+                            Title = "Blazor DataGrid Component - Drag rows between two DataGrids | Free UI Components by Radzen",
+                            Description = "This example demonstrates drag and drop rows between two DataGrid components.",
+                            Tags = new [] { "datagrid", "drag", "row", "between" }
+                        },
+                        new Example()
+                        {
+                            New = true,
+                            Name = "Drag row between DataGrid and Scheduler",
+                            Path = "/datagrid-rowdrag-scheduler",
+                            Title = "Blazor DataGrid Component - Drag rows from DataGrid to Scheduler | Free UI Components by Radzen",
+                            Description = "This example demonstrates drag and drop rows between DataGrid and Scheduler.",
+                            Tags = new [] { "datagrid", "drag", "row", "scheduler" }
+                        }
+                    }
+                },
+
                 new Example()
                 {
                     Name = "InLine Editing",
@@ -681,24 +716,6 @@ namespace RadzenBlazorDemos
                     Description = "This example demonstrates Blazor DataGrid without data.",
                     Icon = "&#xe661",
                     Tags = new [] { "datagrid", "databinding" }
-                },
-                new Example()
-                {
-                    Name = "Rows reorder",
-                    Path = "/datagrid-rowreorder",
-                    Title = "Blazor DataGrid Component - Reorder rows | Free UI Components by Radzen",
-                    Description = "This example demonstrates custom DataGrid rows reoder.",
-                    Icon = "&#xe945",
-                    Tags = new [] { "datagrid", "reorder", "row" }
-                },
-                new Example()
-                {
-                    Name = "Drag row between two DataGrids",
-                    Path = "/datagrid-rowdragbetween",
-                    Title = "Blazor DataGrid Component - Drag rows between two DataGrids | Free UI Components by Radzen",
-                    Description = "This example demonstrates drag and drop rows between two DataGrid components.",
-                    Icon = "&#xe25d",
-                    Tags = new [] { "datagrid", "drag", "row", "between" }
                 }
             }
         },

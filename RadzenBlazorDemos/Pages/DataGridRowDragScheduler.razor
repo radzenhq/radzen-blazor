@@ -1,0 +1,77 @@
+﻿@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+<style>
+    .my-class {
+        outline: 1px solid red;
+    }
+</style>
+
+<RadzenStack Orientation="Orientation.Horizontal">
+
+    <RadzenDataGrid Data="@additionalAppointments" TItem="Appointment" RowRender="@RowRender" Style="width:50%">
+        <Columns>
+            <RadzenDataGridColumn Property="Text" Title="Additional Appointments" />
+        </Columns>
+    </RadzenDataGrid>
+
+    <RadzenScheduler @ref=@scheduler Data=@appointments TItem="Appointment" SlotRender=@OnSlotRender Style="width:50%" 
+        StartProperty="Start" EndProperty="End" TextProperty="Text" SelectedIndex="1">
+        <RadzenDayView />
+        <RadzenWeekView />
+        <RadzenMonthView />
+    </RadzenScheduler>
+
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    RadzenScheduler<Appointment> scheduler;
+    EventConsole console;
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    IList<Appointment> additionalAppointments = new List<Appointment>
+    {
+        new Appointment { Text = "Dinner" },
+        new Appointment { Text = "Lunch" },
+    };
+
+    IList<Appointment> appointments = new List<Appointment>
+    {
+        new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
+        new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
+        new Appointment { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "Work from home" },
+        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
+        new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
+        new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
+        new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
+    };
+
+    Appointment draggedItem;
+
+    void RowRender(RowRenderEventArgs<Appointment> args)
+    {
+        args.Attributes.Add("title", "Drag row to reorder");
+        args.Attributes.Add("style", "cursor:grab");
+        args.Attributes.Add("draggable", "true");
+        args.Attributes.Add("ondragstart", EventCallback.Factory.Create<DragEventArgs>(this, () =>
+        {
+            draggedItem = args.Data;
+            console.Log($"Dragged {draggedItem.Text}");
+        }));
+    }
+
+    void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    {
+        args.Attributes.Add("ondragover", "event.preventDefault();event.target.classList.add('my-class')");
+        args.Attributes.Add("ondragleave", "event.target.classList.remove('my-class')");
+        args.Attributes.Add("ondrop", EventCallback.Factory.Create<DragEventArgs>(this, () =>
+        {
+            console.Log($"Dropped {draggedItem.Text}");
+            var newAppointment = new Appointment { Start = args.Start, End = args.End, Text = draggedItem.Text };
+            appointments.Add(newAppointment);
+            scheduler.Reload();
+            JSRuntime.InvokeVoidAsync("eval", $"document.querySelector('.my-class').classList.remove('my-class')");
+        }));
+    }
+}

@@ -6,7 +6,7 @@
 	<WasmEnableWebcil>false</WasmEnableWebcil>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Radzen.Blazor" Version="*" Condition="'$(Configuration)' == 'Release'"/>
+    <PackageReference Include="Radzen.Blazor" Version="*" Condition="'$(Configuration)' == 'Release'" />
     <ProjectReference Include="..\Radzen.Blazor\Radzen.Blazor.csproj" Condition="'$(Configuration)' != 'Release'" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.0" PrivateAssets="all" />
@@ -14,5 +14,10 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.Extensions" Version="6.0.10" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.4.0-4.final" />
     <PackageReference Include="Microsoft.CodeAnalysis.Razor" Version="6.0.10" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Pages\DataGridRowDragSchedulerPage.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
   </ItemGroup>
 </Project>
