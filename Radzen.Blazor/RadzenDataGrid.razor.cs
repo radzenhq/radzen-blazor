@@ -859,6 +859,14 @@ namespace Radzen.Blazor
                         LogicalFilterOperator = column.GetLogicalFilterOperator()
                     });
 
+                    if (FilterMode == FilterMode.CheckBoxList)
+                    {
+                        allColumns.ToList().ForEach(c =>
+                        {
+                            c.ClearFilterValues();
+                        });
+                    }
+
                     SaveSettings();
 
                     if (LoadData.HasDelegate && IsVirtualizationAllowed())

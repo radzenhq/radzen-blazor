@@ -992,10 +992,14 @@ namespace Radzen.Blazor
                     property = $@"({property} == null ? """" : {property})";
                 }
 
-                filterValues = Grid.Data.AsQueryable().Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+                filterValues = Grid.Data.AsQueryable().Where<TItem>(Grid.allColumns.Where(c => c != this)).Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
             }
 
             return filterValues;
+        }
+        internal void ClearFilterValues()
+        {
+            filterValues = null;
         }
 
         /// <summary>
@@ -1129,7 +1133,7 @@ namespace Radzen.Blazor
         /// </summary>
         public void ClearFilters()
         {
-            filterValues = null;
+            ClearFilterValues();
             SetFilterValue(null);
             SetFilterValue(null, false);
             SetFilterOperator(null);
