@@ -200,7 +200,7 @@ else
         var property = Column.GetFilterProperty();
         var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty());
 
-        Column.SetFilterValue(enumerable.Cast<object>().Any() ? enumerable.AsQueryable().Cast(propertyType) : args);
+        Column.SetFilterValue(enumerable.Cast<object>().Any() ? enumerable.AsQueryable().Cast(propertyType) : null);
     }
 
     string getFilterOpen()
