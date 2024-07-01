@@ -11,7 +11,7 @@
         <input @ref="@input" @attributes="InputAttributes" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
                class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
                placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
-               onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator')"
+               onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
                onblur="@getOnInput()" onpaste="@getOnPaste()"
                @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
 
