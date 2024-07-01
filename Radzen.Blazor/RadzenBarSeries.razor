@@ -32,10 +32,11 @@
             {
                 var y = category(data) - barHeight / 2 + index * height + index * padding;
                 var x = value(data);
-                var itemValue = Value(data);                
+                var itemValue = Value(data);
                 var radius = Chart.BarOptions.Radius;
+                var width = Math.Abs(x0 - x);
 
-                if (radius > height / 2)
+                if (radius > height / 2 || radius > width)
                 {
                     radius = 0;
                 }
