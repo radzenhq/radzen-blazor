@@ -13,10 +13,10 @@
     <Authors>Radzen Ltd.</Authors>
     <Description>Radzen Blazor is a set of 70+ free native Blazor UI controls packed with DataGrid, Scheduler, Charts and robust theming including Material design and Fluent UI.</Description>
     <PackageTags>blazor material design fluent fluentui components datagrid scheduler charts</PackageTags>
-	<PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageProjectUrl>https://www.radzen.com</PackageProjectUrl>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <Title>Radzen Components for Blazor</Title>
     <RepositoryUrl>https://github.com/radzenhq/radzen-blazor</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
