@@ -27,18 +27,18 @@
                 var y = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
                 var itemValue = Value(data);
                 var radius = Chart.ColumnOptions.Radius;
+                var y0 = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
 
                 if (radius > 0)
                 {
+                    var height = Math.Abs(y0 - y);
                     var items = stackedColumnSeries.SelectMany(series => series.ItemsForCategory(category(data))).ToList();
                     var index = items.IndexOf(data);
-                    if (radius > width / 2 || index < items.Count - 1)
+                    if (radius > width / 2 || index < items.Count - 1 || radius > height)
                     {
                         radius = 0;
                     }
                 }
-
-                var y0 = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
 
                 var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
 

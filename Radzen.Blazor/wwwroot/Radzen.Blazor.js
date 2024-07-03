@@ -1371,7 +1371,10 @@ window.Radzen = {
             }
 
             if (options.autoFocusFirstElement) {
-                if (lastDialog.querySelectorAll('.rz-html-editor-content').length) {
+                var focusable = Radzen.getFocusableElements(lastDialog);
+                var editor = lastDialog.querySelector('.rz-html-editor');
+
+                if (editor && !focusable.includes(editor.previousElementSibling)) {
                     var editable = lastDialog.querySelector('.rz-html-editor-content');
                     if (editable) {
                         var selection = window.getSelection();

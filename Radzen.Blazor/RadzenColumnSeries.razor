@@ -32,8 +32,9 @@
                 var y = value(data);
                 var itemValue = Value(data);
                 var radius = Chart.ColumnOptions.Radius;
+                var height = Math.Abs(y0 - y);
 
-                if (radius > width / 2)
+                if (radius > width / 2 || radius > height)
                 {
                     radius = 0;
                 }
