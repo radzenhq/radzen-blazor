@@ -34,6 +34,7 @@
         args.Children.Text = GetTextForNode;
         args.Children.HasChildren = (path) => Directory.Exists((string)path);
         args.Children.Template = FileOrFolderTemplate;
+        args.Children.Checkable = o => false;
     }
 
     string GetTextForNode(object data)
