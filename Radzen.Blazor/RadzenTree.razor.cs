@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -353,7 +354,9 @@ namespace Radzen.Blazor
 
                         if (checkable == null)
                         {
-                            checkable = children.Checkable ?? Getter<bool>(data, children.CheckableProperty);
+                            checkable = children.Checkable ??
+                                (!string.IsNullOrEmpty(children.CheckableProperty) ? Getter<bool>(data, children.CheckableProperty) : null) ??
+                                    (o => true);
                         }
 
                         RenderTreeItem(builder, data, children.Template, text, checkable, children.HasChildren, children.Expanded, children.Selected);
