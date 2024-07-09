@@ -1653,6 +1653,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example()
                 {
+                    Name = "DataAnnotationValidator",
+                    Path = "dataannotationvalidator",
+                    Description = "Demonstration and configuration of the Radzen Blazor Data Annotation Validator component.",
+                    Icon = "&#xe6b3",
+                    Tags = new [] { "validator", "validation", "pattern", "annotations" }
+                },
+                new Example()
+                {
                     Name = "EmailValidator",
                     Path = "emailvalidator",
                     Description = "Demonstration and configuration of the Radzen Blazor Email Validator component.",
