@@ -66,7 +66,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Selects the specified slot.
         /// </summary>
-        /// <param name="start">The start of the month.</param>
+        /// <param name="start">The start.</param>
         /// <param name="end">The end.</param>
         /// <param name="appointments">The appointments for this range.</param>
         Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments);
