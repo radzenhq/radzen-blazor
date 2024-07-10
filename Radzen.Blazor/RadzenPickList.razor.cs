@@ -19,7 +19,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if multiple selection is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Multiple { get; set; } = false;
+        public bool Multiple { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether component is disabled.
+        /// </summary>
+        /// <value><c>true</c> if component is disabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
 
         /// <summary>
         /// Gets or sets the source header
