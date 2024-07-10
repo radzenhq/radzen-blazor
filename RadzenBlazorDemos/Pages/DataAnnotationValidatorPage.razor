@@ -1,91 +1,11 @@
 @page "/dataannotationvalidator"
-@using Radzen
-@using System.Text.Json
-@using System.ComponentModel.DataAnnotations
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataAnnotationValidator
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>DataAnnotationValidator</strong> component.
+</RadzenText>
 
-<RadzenExample Name="DataAnnotationValidator">
-    <div class="container my-4">
-        <div class="row">
-            <div class="col">
-                <RadzenCard class="w-100 mb-4" >
-                <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
-                    <RadzenLabel Text="Display validators as popup" Component="popup" Style="margin-left: 8px; vertical-align: middle;" />
-                </RadzenCard>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6 offset-lg-3">
-                <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
-                    <RadzenFieldset Text="Personal information">
-                        <div class="row mb-5">
-                            <div class="col-md-4">
-                                <RadzenLabel Text="Username" Component="Username" />
-                            </div>
-                            <div class="col">
-                                <RadzenTextBox style="display: block" Name="Username" @bind-Value=@model.Username class="w-100" />
-                                <RadzenDataAnnotationValidator Component="Username" Popup=@popup Style="position: absolute" />
-                            </div>
-                        </div>
-                        <div class="row mb-5">
-                            <div class="col-md-4">
-                                <RadzenLabel Text="Password" Component="Password" />
-                            </div>
-                            <div class="col">
-                                <RadzenPassword style="display: block" Name="Password" Placeholder="Enter password..." @bind-Value=@model.Password class="w-100" aria-label="enter password" />
-                                <RadzenDataAnnotationValidator Component="Password" Popup=@popup Style="position: absolute" />
-                            </div>
-                        </div>
-                        <div class="row mb-5">
-                            <div class="col-md-4">
-                                <RadzenLabel Text="Confirm Password" Component="ConfirmPassword" />
-                            </div>
-                            <div class="col">
-                                <RadzenPassword style="display: block" Name="ConfirmPassword" Placeholder="Confirm password..." @bind-Value=@model.ConfirmPassword class="w-100" aria-label="confirm password" />
-                                <RadzenDataAnnotationValidator Component="ConfirmPassword" Popup=@popup Style="position: absolute" />
-                            </div>
-                        </div>
-                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" ></RadzenButton>
-                    </RadzenFieldset>
-                </RadzenTemplateForm>
-            </div>
-        </div>
-    </div>
+<RadzenExample ComponentName="DataAnnotationValidator" Example="DataAnnotationValidatorConfig" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenDataAnnotationValidator.cs">
+    <DataAnnotationValidatorConfig />
 </RadzenExample>
-
-<EventConsole @ref=@console />
-
-@code {
-    class Model
-    {
-        [Required]
-        [StringLength(15, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long", MinimumLength = 4)]
-        public string Username { get; set; }
-
-
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long", MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match")]
-        public string ConfirmPassword { get; set; }
-    }
-
-    bool popup;
-
-    Model model = new Model();
-    EventConsole console;
-
-    void OnSubmit(Model model)
-    {
-        console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");
-    }
-
-    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
-    {
-        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
-    }
-}

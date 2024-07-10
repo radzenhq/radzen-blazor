@@ -1,0 +1,87 @@
+@using System.Text.Json
+@using System.ComponentModel.DataAnnotations
+
+<RadzenStack Class="rz-p-0 rz-p-md-12">
+    <RadzenCard Variant="Variant.Outlined" Style="width: 100%">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
+            <RadzenLabel Text="Display validators as popup" Component="popup" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenFieldset Text="Personal information">
+            <RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12">
+                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                     <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Username" Component="Username" />
+                     </RadzenColumn>
+                     <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenTextBox style="display: block" Name="Username" @bind-Value=@model.Username class="w-100" />
+                        <RadzenDataAnnotationValidator Component="Username" Popup=@popup Style="position: absolute" />
+                     </RadzenColumn>
+                 </RadzenRow>
+                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                     <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Password" Component="Password" />
+                     </RadzenColumn>
+                     <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenPassword style="display: block" Name="Password" Placeholder="Enter password..." @bind-Value=@model.Password class="w-100" aria-label="enter password" />
+                        <RadzenDataAnnotationValidator Component="Password" Popup=@popup Style="position: absolute" />
+                     </RadzenColumn>
+                 </RadzenRow>
+                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                     <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                        <RadzenLabel Text="Confirm Password" Component="ConfirmPassword" />
+                     </RadzenColumn>
+                     <RadzenColumn Size="12" SizeMD="8">
+                        <RadzenPassword style="display: block" Name="ConfirmPassword" Placeholder="Confirm password..." @bind-Value=@model.ConfirmPassword class="w-100" aria-label="confirm password" />
+                        <RadzenDataAnnotationValidator Component="ConfirmPassword" Popup=@popup Style="position: absolute" />
+                     </RadzenColumn>
+                 </RadzenRow>
+                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                    <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenStack>
+        </RadzenFieldset>
+    </RadzenTemplateForm>
+    <EventConsole @ref=@console />
+</RadzenStack>
+
+@code {
+    class Model
+    {
+        [Required]
+        [StringLength(15, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long", MinimumLength = 4)]
+        public string Username { get; set; }
+
+
+        [Required]
+        [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+
+        [DataType(DataType.Password)]
+        [Display(Name = "Confirm password")]
+        [Compare("Password", ErrorMessage = "The password and confirmation password do not match")]
+        public string ConfirmPassword { get; set; }
+    }
+
+    bool popup;
+
+    Model model = new Model();
+    EventConsole console;
+
+    void OnSubmit(Model model)
+    {
+        console.Log($"Submit: {JsonSerializer.Serialize(model, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() {  WriteIndented = true })}");
+    }
+}

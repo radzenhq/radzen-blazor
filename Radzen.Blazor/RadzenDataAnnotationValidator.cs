@@ -24,7 +24,7 @@ namespace Radzen.Blazor
     ///       [StringLength(50, ErrorMessage = "Name must be less than 50 characters.")]
     ///       public string Name { get; set; }
     ///    }
-    ///    UserModel user = new UserModel(); 
+    ///    UserModel user = new UserModel();
     /// }
     /// </code>
     /// </example>
@@ -32,37 +32,36 @@ namespace Radzen.Blazor
     {
         /// <summary>
         /// Gets or sets the message displayed when the component is invalid.
-        /// The message is generated from the data annotations applied to the model property.
+        /// The message is generated from the data annotation attributes applied to the model property.
         /// </summary>
         [Parameter]
         public override string Text { get; set; }
 
+        /// <summary>
+        /// Gets or sets the separator used to join multiple validation messages.
+        /// </summary>
+        [Parameter]
+        public string MessageSeparator { get; set; } = " and ";
+
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
-            var editContext = EditContext;
-            var fieldIdentifier = component.FieldIdentifier;
             var validationResults = new List<ValidationResult>();
 
-            // Try to get the value of the field
-            var field = editContext.Model.GetType().GetProperty(fieldIdentifier.FieldName);
-            if (field == null)
-            {
-                throw new InvalidOperationException($"Field '{fieldIdentifier.FieldName}' not found on model '{editContext.Model.GetType().Name}'.");
-            }
+            var getter = PropertyAccess.Getter<object>(EditContext.Model, component.FieldIdentifier.FieldName);
 
-            var fieldValue = field.GetValue(editContext.Model);
+            var value = getter(EditContext.Model);
 
-            // Validate the field using data annotations
-            var validationContext = new ValidationContext(editContext.Model)
+            var validationContext = new ValidationContext(EditContext.Model)
             {
-                MemberName = fieldIdentifier.FieldName
+                MemberName = component.FieldIdentifier.FieldName
             };
 
-            var isValid = Validator.TryValidateProperty(fieldValue, validationContext, validationResults);
+            var isValid = Validator.TryValidateProperty(value, validationContext, validationResults);
+
             if (!isValid)
             {
-                Text = string.Join(" and ", validationResults.Select(vr => vr.ErrorMessage));
+                Text = string.Join(MessageSeparator, validationResults.Select(vr => vr.ErrorMessage));
             }
 
             return isValid;
