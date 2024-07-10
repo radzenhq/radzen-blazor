@@ -175,7 +175,7 @@
         }
     }
 
-    [Inject]
+    [Inject] 
     DialogService Service { get; set; }
 
     protected override void OnInitialized()
@@ -187,7 +187,7 @@
     {
         var stateHasChanged = reference?.GetType().GetMethod("StateHasChanged", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        InvokeAsync(() =>
+        InvokeAsync(() => 
         {
             StateHasChanged();
             stateHasChanged?.Invoke(reference, null);
