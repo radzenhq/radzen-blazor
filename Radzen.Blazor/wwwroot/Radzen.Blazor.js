@@ -2290,5 +2290,53 @@ window.Radzen = {
         } else {
             start();
         }
+    },
+
+    makeElementDraggable: function (draggable, showTitle, dialogRef) {
+        if (draggable == "True" && showTitle == "True") {
+            var dialogs = document.querySelectorAll('.rz-dialog');
+            if (dialogs.length == 0) return;
+            var lastDialog = dialogs[dialogs.length - 1];
+
+            var initialPositionX = 0
+            var changeInX = 0
+            var initialPositionY = 0
+            var changeInY = 0
+
+            var dialogTitles = document.querySelectorAll('.rz-dialog-titlebar');
+            if (dialogTitles.length == 0) return;
+            dialogTitles[dialogTitles.length - 1].addEventListener('mousedown', initiateElementDrag);
+
+            function initiateElementDrag(e) {
+                e.preventDefault();
+                initialPositionX = e.clientX;
+                initialPositionY = e.clientY;
+                document.addEventListener("mouseup", endDrag)
+                document.addEventListener("mousemove", drag)
+            }
+
+            function endDrag(e) {
+                document.removeEventListener("mousemove", drag)
+                document.removeEventListener("mouseup", endDrag);
+
+                dialogRef.invokeMethodAsync(
+                    'RadzenDialog.OnDrag',
+                    lastDialog.style.top,
+                    lastDialog.style.left
+                );
+            }
+
+            function drag(e) {
+                e.preventDefault();
+
+                changeInX = initialPositionX - e.clientX;
+                changeInY = initialPositionY - e.clientY;
+                initialPositionX = e.clientX;
+                initialPositionY = e.clientY;
+
+                lastDialog.style.top = `${lastDialog.offsetTop - changeInY}px`;
+                lastDialog.style.left = `${lastDialog.offsetLeft - changeInX}px`;
+            }
+        }
     }
 };
