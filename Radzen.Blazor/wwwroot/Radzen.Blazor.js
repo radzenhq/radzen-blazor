@@ -1430,12 +1430,12 @@ window.Radzen = {
         var firstFocusable = focusable[0];
         var lastFocusable = focusable[focusable.length - 1];
 
-        if (firstFocusable && e.shiftKey && document.activeElement === firstFocusable) {
-            e.preventDefault();
-            firstFocusable.focus();
-        } else if (lastFocusable && !e.shiftKey && document.activeElement === lastFocusable) {
+        if (firstFocusable && lastFocusable && e.shiftKey && document.activeElement === firstFocusable) {
             e.preventDefault();
             lastFocusable.focus();
+        } else if (firstFocusable && lastFocusable && !e.shiftKey && document.activeElement === lastFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
         }
     }
   },

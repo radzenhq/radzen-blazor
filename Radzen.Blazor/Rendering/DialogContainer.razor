@@ -22,7 +22,7 @@
                         </div>
                         @if (Dialog.Options.ShowClose)
                         {
-                            <a @onclick:preventDefault="true" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                            <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
                                 <span class="rzi rzi-times"></span>
                             </a>
                         }
@@ -44,7 +44,7 @@
                     </div>
                     @if (Dialog.Options.ShowClose)
                     {
-                        <a @onclick:preventDefault="true" @onclick=@Close role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                        <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
                             <span class="rzi rzi-times"></span>
                         </a>
                     }
@@ -78,6 +78,16 @@
 </div>
 
 @code {
+    void OnKeyPress(KeyboardEventArgs args)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+
+        if (key == "Space" || key == "Enter")
+        {
+            Close();
+        }
+    }
+
     ElementReference dialog;
 
     string left;
