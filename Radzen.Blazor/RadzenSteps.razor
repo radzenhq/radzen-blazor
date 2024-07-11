@@ -23,7 +23,7 @@
             {
                     <li class="@step.GetItemCssClass()" @attributes="step.Attributes" style="@step.Style" tabindex="@(step.Disabled ? -1 : 0)" @onkeypress="@(args => OnKeyPress(args, SelectStep(step, true)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
                     <a id="@(GetId() + i.ToString() + "s")" title="@step.Title" aria-label="@step.AriaLabel"
-                       @onclick="@(async (args) => { if (!step.Disabled) { await SelectStep(step, true); } })"
+                       @onclick="@(async (args) => { if (!step.Disabled && AllowStepSelect) { await SelectStep(step, true); } })"
                        @onclick:preventDefault="true" class="rz-menuitem-link">
                         <span class="rz-steps-number">@(steps.Where(s => s.Visible).ToList().IndexOf(step) + 1)</span>
                         @if (step.Template != null)
