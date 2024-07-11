@@ -21,7 +21,7 @@
     {
             <RadzenPager @ref="topPager" Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" Density="@Density" PrevPageLabel="@PrevPageLabel" NextPageLabel="@NextPageLabel" />
     }
-    <div class="rz-datatable-scrollable-wrapper rz-helper-clearfix" style="">
+    <div class="rz-datatable-scrollable-wrapper rz-helper-clearfix">
         <div class="rz-datatable-scrollable-view">
 
             <div class="rz-datatable-scrollable-header">
@@ -38,7 +38,7 @@
                             }
                         </colgroup>
                         <thead class="rz-datatable-thead">
-                            <tr class="">
+                            <tr>
                                 @if (Template != null)
                                 {
                                     <th class="rz-col-icon  rz-unselectable-text" scope="col">
@@ -453,7 +453,7 @@
                                     }
                                 </colgroup>
                                 <tfoot class="rz-datatable-tfoot">
-                                    <tr class="">
+                                    <tr>
                                         @if (Template != null)
                                         {
                                             <td class="rz-col-icon  rz-unselectable-text" scope="col">
