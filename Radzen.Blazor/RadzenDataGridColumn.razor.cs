@@ -974,10 +974,25 @@ namespace Radzen.Blazor
             return filterValue ?? FilterValue;
         }
 
-        IEnumerable filterValues;
-        internal IEnumerable GetFilterValues()
-        {
-            if (filterValues == null && Grid.Data != null && !string.IsNullOrEmpty(GetFilterProperty()))
+        internal bool filterValuesLoading;
+        internal int filterValuesCount;
+        internal IEnumerable filterValues;
+        internal async Task LoadFilterValues()
+        {   
+            if (Grid.LoadColumnFilterData.HasDelegate)
+            {
+                filterValuesLoading = true;
+
+                var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = this };
+
+                await Grid.LoadColumnFilterData.InvokeAsync(args);
+
+                filterValues = args.Data;
+                filterValuesCount = args.Count;
+
+                filterValuesLoading = false;
+            }
+            else if(filterValues == null && Grid.Data != null && !string.IsNullOrEmpty(GetFilterProperty()))
             {
                 var property = GetFilterProperty();
                 var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), GetFilterProperty());
@@ -992,10 +1007,10 @@ namespace Radzen.Blazor
                     property = $@"({property} == null ? """" : {property})";
                 }
 
-                filterValues = Grid.Data.AsQueryable().Where<TItem>(Grid.allColumns.Where(c => c != this)).Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+                var query = Grid.Data.AsQueryable().Where<TItem>(Grid.allColumns.Where(c => c != this)).Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+                filterValues = query;
+                filterValuesCount = query.Count();
             }
-
-            return filterValues;
         }
         internal void ClearFilterValues()
         {

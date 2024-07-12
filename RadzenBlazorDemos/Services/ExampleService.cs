@@ -351,6 +351,15 @@ namespace RadzenBlazorDemos
                         new Example
                         {
                             New = true,
+                            Name = "CheckBoxList (Excel like) with OData",
+                            Path = "datagrid-checkboxlist-filter-odata",
+                            Title = "Blazor DataGrid Component - Excel like filtering with OData | Free UI Components by Radzen",
+                            Description = "RadzenDataGrid Excel like filtering with OData.",
+                            Tags = new [] { "filter", "excel", "grid", "datagrid", "table", "menu", "checkbox", "list", "odata" }
+                        },
+                        new Example
+                        {
+                            New = true,
                             Name = "Enum filtering",
                             Path = "datagrid-enum-filter",
                             Title = "Blazor DataGrid Component - Enum Filtering | Free UI Components by Radzen",

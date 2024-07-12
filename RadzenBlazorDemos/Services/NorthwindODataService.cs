@@ -359,7 +359,7 @@ namespace RadzenBlazorDemos
             return await response.ReadAsync<OrderDetail>();
         }
         partial void OnGetOrders(HttpRequestMessage requestMessage);
-        public async Task<ODataServiceResult<Order>> GetOrders(string filter = default(string), int? top = default(int?), int? skip = default(int?), string orderby = default(string), string expand = default(string), string select = default(string), bool? count = default(bool?))
+        public async Task<ODataServiceResult<Order>> GetOrders(string filter = default(string), int? top = default(int?), int? skip = default(int?), string orderby = default(string), string expand = default(string), string select = default(string), string apply = default(string), bool? count = default(bool?))
         {
             var uri = new Uri(baseUri, $"NorthwindOrders");
             uri = uri.GetODataUri(filter:filter, top:top, skip:skip, orderby:orderby, expand:expand, select:select, count:count);

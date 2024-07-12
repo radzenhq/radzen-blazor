@@ -2472,6 +2472,30 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Supplies information about a <see cref="RadzenDataGrid{TItem}.LoadColumnFilterData" /> event that is being raised.
+    /// </summary>
+    public class DataGridLoadColumnFilterDataEventArgs<T>
+    {
+        /// <summary>
+        /// Gets or sets the data.
+        /// </summary>
+        /// <value>The data.</value>
+        public IEnumerable Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets the total data count.
+        /// </summary>
+        /// <value>The total data count.</value>
+        public int Count { get; set; }
+
+        /// <summary>
+        /// Gets the column.
+        /// </summary>
+        /// <value>The column.</value>
+        public RadzenDataGridColumn<T> Column { get; internal set; }
+    }
+
+    /// <summary>
     /// Supplies information about a <see cref="RadzenPager.PageChanged" /> event that is being raised.
     /// </summary>
     public class PagerEventArgs

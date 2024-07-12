@@ -146,9 +146,9 @@
                                 }
                                 else
                                 {
-                                    <RadzenListBox AllowVirtualization="true" AllowClear="true" Multiple="true" Style="height: 300px"
-                                                   TValue="IEnumerable<object>" Data=@Column.GetFilterValues() Value=@Column.GetFilterValue()
-                                                   Change="@ListBoxChange" 
+                                    <RadzenListBox AllowVirtualization="true" AllowClear="true" Multiple="true" Style="height: 300px" 
+                                                   TValue="IEnumerable<object>" Value=@Column.GetFilterValue() Change="@ListBoxChange" 
+                                                   Data=@Column.filterValues Count=@Column.filterValuesCount LoadData="@Column.LoadFilterValues" IsLoading="@Column.filterValuesLoading"
                                                    AllowFiltering="@(!string.IsNullOrEmpty(Column.GetFilterProperty()) && PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty()) == typeof(string))"
                                                    Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})">

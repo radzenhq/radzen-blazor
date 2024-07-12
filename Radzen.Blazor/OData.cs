@@ -231,9 +231,10 @@ namespace Radzen
         /// <param name="orderby">The orderby.</param>
         /// <param name="expand">The expand.</param>
         /// <param name="select">The select.</param>
+        /// <param name="apply">The apply.</param>
         /// <param name="count">if set to <c>true</c> [count].</param>
         /// <returns>Uri.</returns>
-        public static Uri GetODataUri(this Uri uri, string filter = null, int? top = null, int? skip = null, string orderby = null, string expand = null, string select = null, bool? count = null)
+        public static Uri GetODataUri(this Uri uri, string filter = null, int? top = null, int? skip = null, string orderby = null, string expand = null, string select = null, string apply = null, bool? count = null)
         {
             var uriBuilder = new UriBuilder(uri);
             var queryString = HttpUtility.ParseQueryString(uriBuilder.Query);
@@ -266,6 +267,11 @@ namespace Radzen
             if (!string.IsNullOrEmpty(select))
             {
                 queryString["$select"] = $"{select}";
+            }
+
+            if (!string.IsNullOrEmpty(apply))
+            {
+                queryString["$apply"] = $"{apply}";
             }
 
             if (count != null)
