@@ -6,7 +6,7 @@
 @inherits DbContextPage
 
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
-    FilterMode="FilterMode.CheckBoxList" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders" ColumnWidth="300px">
+    FilterMode="FilterMode.CheckBoxList" FilterPopupRenderMode="PopupRenderMode.OnDemand" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders" ColumnWidth="300px">
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
         <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
