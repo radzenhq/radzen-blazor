@@ -261,7 +261,7 @@ namespace Radzen.Blazor
             {
                 ParentItem.AddItem(this);
 
-                var currentItems = ParentItem.ParentItem != null ? ParentItem.ParentItem.items : Tree.items;
+                var currentItems = Tree.items;
 
                 Tree.InsertInCurrentItems(currentItems.IndexOf(ParentItem) + (ParentItem != null ? ParentItem.items.Count : 0), this);
             }
