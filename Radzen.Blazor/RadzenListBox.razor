@@ -40,9 +40,7 @@
                 @if (AllowFiltering)
                 {
                     <div class="rz-listbox-filter-container">
-                        <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
-                               @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" @onkeydown:stopPropagation="true"
-                               @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) aria-label="@SearchAriaLabel" />
+                        @RenderFilter()
                         <span class="rz-listbox-filter-icon rzi rzi-search"></span>
                     </div>
                 }
@@ -58,4 +56,26 @@
             </div>
         }
     </div>
+}
+@code {
+    internal RenderFragment RenderFilter()
+    {
+#if NET7_0_OR_GREATER
+        return __builder => {
+            <text>
+                <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
+                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" @onkeydown:stopPropagation="true"
+                               @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => { searchText = $"{args}"; SearchTextChanged.InvokeAsync(searchText);}) aria-label="@SearchAriaLabel" />
+            </text>
+        };
+#else
+        return __builder => {
+            <text>
+                <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
+                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@searchText" @onkeydown:stopPropagation="true"
+                               @oninput=@((ChangeEventArgs args) => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) aria-label="@SearchAriaLabel" />
+            </text>
+        };
+#endif
+    }
 }

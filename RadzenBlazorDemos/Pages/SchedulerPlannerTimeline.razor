@@ -8,7 +8,7 @@
 
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
     TextProperty="Text" SelectedIndex="1"
-    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender>
+    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender MonthSelect=@OnMonthSelect>
     <RadzenMonthView />
     <RadzenYearPlannerView StartMonth="@startMonth" />
     <RadzenYearTimelineView StartMonth="@startMonth" />
@@ -70,6 +70,11 @@
                 await scheduler.Reload();
             }
         }
+    }
+
+    async Task OnMonthSelect(SchedulerMonthSelectEventArgs args)
+    {
+        console.Log($"MonthSelect: MonthStart={args.MonthStart} AppointmentCount={args.Appointments.Count()}");
     }
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)

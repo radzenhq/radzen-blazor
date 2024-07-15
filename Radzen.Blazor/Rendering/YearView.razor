@@ -26,12 +26,13 @@
         date = realstart.StartOfMonth().StartOfWeek();
         var currentDate = date;
         var currentMonth = month;
+        var startMonth = realstart;
 
         <div class="rz-year-month rz-display-flex rz-flex-column rz-col-12 rz-col-sm-6 rz-col-md-4 rz-col-lg-3"
                  tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
                  @onfocus=@(args => {CurrentDate = currentDate; CurrentMonth = currentMonth; })>
 
-            <div class="rz-slot-header rz-pb-2">
+            <div class="rz-slot-header rz-pb-2" style="cursor: pointer;" @onclick=@(args => OnMonthClick(startMonth))>
                 <span class="rz-text-subtitle1">
                     @realstart.ToString("MMMM yyyy", Scheduler.Culture)
                 </span>
@@ -54,7 +55,7 @@
                             @for (var col = 0; col < 7; col++)
                             {
                                 var day = date.AddDays((row * 7) + col);
-                                var appointments = AppointmentsInSlot(day, day.AddDays(1));
+                                var appointments = AppointmentsInRange(day, day.AddDays(1));
                                 var excessCount = appointments.Count();
                                 string classname = $"rz-slot-title {(day.Month != offSetMonth ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")} {(day == CurrentDate && month == CurrentMonth ? " rz-state-focused" : "")}".Trim();
 
@@ -117,7 +118,7 @@
         await Scheduler.SelectAppointment(data);
     }
 
-    private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
+    private AppointmentData[] AppointmentsInRange(DateTime start, DateTime end)
     {
         if (Appointments == null)
         {
@@ -125,6 +126,11 @@
         }
 
         return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+    }
+
+    async Task OnMonthClick(DateTime monthStart)
+    {
+        await Scheduler.SelectMonth(monthStart, AppointmentsInRange(monthStart, monthStart.EndOfMonth()));
     }
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
@@ -183,7 +189,7 @@
         }
         else if (key == "Enter")
         {
-            await OnListClick(CurrentDate, AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1)));
+            await OnListClick(CurrentDate, AppointmentsInRange(CurrentDate, CurrentDate.AddDays(1)));
 
             preventKeyPress = true;
         }

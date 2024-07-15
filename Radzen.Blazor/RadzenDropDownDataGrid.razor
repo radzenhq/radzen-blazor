@@ -123,9 +123,7 @@
                     else
                     {
                     <div class="rz-lookup-search">
-                        <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@SearchTextPlaceholder"
-                               @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")"
-                        @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
+                        @RenderFilter()
                         @if (ShowSearch)
                         {
                             <button tabindex="0" class="rz-button rz-button-md rz-button-icon-only rz-primary" type="button" title="@SearchTextPlaceholder" @onclick="@((args) => OnFilter(new ChangeEventArgs()))">
@@ -194,4 +192,26 @@
             <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
         }
     </div>
+}
+@code {
+    internal RenderFragment RenderFilter()
+    {
+#if NET7_0_OR_GREATER
+        return __builder => {
+            <text>
+                <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@SearchTextPlaceholder"
+                        @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" style="@(ShowSearch ? "" : "margin-right:0px;")"
+                        @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => { searchText = $"{args}"; SearchTextChanged.InvokeAsync(searchText);}) />
+            </text>
+        };
+#else
+        return __builder => {
+            <text>
+                <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@SearchTextPlaceholder"
+                        @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")"
+                        @oninput=@((ChangeEventArgs args) => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
+            </text>
+        };
+#endif
+    }
 }

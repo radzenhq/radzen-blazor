@@ -290,6 +290,13 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Steps { get; set; }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <value><c>true</c> user can jump to any step if enabled; <c>false</c> user can change steps only with step buttons (previous/next).</value>
+        [Parameter]
+        public bool AllowStepSelect { get; set; } = true;
+
         List<RadzenStepsItem> steps = new List<RadzenStepsItem>();
 
         /// <summary>
