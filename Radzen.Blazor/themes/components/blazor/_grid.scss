@@ -906,11 +906,55 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   display: flex;
   flex: auto;
   align-items: center;
-}
-
-.rz-cell-filter-content {
   color: var(--rz-grid-filter-color);
   min-height: 1.375rem;
+  container-type: inline-size;
+  container-name: rz-cell-filter-content;
+}
+
+@container rz-cell-filter-content (max-width: 200px) {
+  .rz-cell-filter-content {
+    .rz-filter-button {
+      .rzi {
+        display: none;
+      }
+    }
+
+    .rz-cell-filter-label {
+      position: relative;
+      min-width: calc(2 * map-get($button-sizes, md, min-width));
+    }
+
+    .rz-filter-button {
+      position: absolute;
+      z-index: 1;
+      min-height: 0;
+
+      @if $material == true or $fluent == true {
+        inset-inline-start: calc(var(--rz-border-width) + 1px);
+        height: calc(var(--rz-input-height) - var(--rz-border-width) * 2 - 2px);
+        max-height: calc(var(--rz-input-height) - var(--rz-border-width) * 2 - 2px);
+        line-height: calc(map-get($button-sizes, md, line-height) - var(--rz-border-width) * 2 - 2px);
+        border-radius: calc(var(--rz-input-border-radius) - var(--rz-border-width) - 1px);
+      }
+
+      @else {
+        inset-inline-start: calc(var(--rz-border-width));
+        height: calc(var(--rz-input-height) - var(--rz-border-width) * 2);
+        max-height: calc(var(--rz-input-height) - var(--rz-border-width) * 2);
+        line-height: calc(map-get($button-sizes, md, line-height) - var(--rz-border-width) * 2);
+        border-start-start-radius: calc(var(--rz-input-border-radius) - var(--rz-border-width));
+        border-start-end-radius: 0;
+        border-end-start-radius: calc(var(--rz-input-border-radius) - var(--rz-border-width));
+        border-end-end-radius: 0;  
+      }
+    }
+
+    .rz-textbox,
+    .rz-inputtext {
+      text-indent: map-get($button-sizes, md, min-width);
+    }
+  }
 }
 
 .rz-date-filter {
