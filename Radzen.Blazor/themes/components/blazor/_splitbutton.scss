@@ -37,6 +37,9 @@ $splitbutton-sizes: xs, sm, md, lg;
   }
 
   .rz-button:not(.rz-splitbutton-menubutton) {
+    flex: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
   }
