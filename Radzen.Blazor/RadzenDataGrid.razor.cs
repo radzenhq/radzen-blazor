@@ -3340,7 +3340,7 @@ namespace Radzen.Blazor
                         Visible = c.GetVisible(),
                         OrderIndex = c.GetOrderIndex(),
                         SortOrder = c.GetSortOrder(),
-                        SortIndex = c.getSortIndex(),
+                        SortIndex = c.GetSortIndex(),
                         FilterValue = c.GetFilterValue(),
                         FilterOperator = c.GetFilterOperator(),
                         SecondFilterValue = c.GetSecondFilterValue(),
