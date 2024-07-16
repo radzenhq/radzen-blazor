@@ -197,6 +197,8 @@
 
     public void Dispose()
     {
+        JSRuntime.InvokeVoidAsync("Radzen.changeElementDrag", false, DotNetReference);
+
         Service.OnRefresh -= OnRefresh;
     }
 
@@ -228,7 +230,7 @@
                 };
 
             await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference, DotNetReference);
-            await JSRuntime.InvokeVoidAsync("Radzen.makeElementDraggable", Dialog.Options.Draggable.ToString(), Dialog.Options.ShowTitle.ToString(), DotNetReference);
+            await JSRuntime.InvokeVoidAsync("Radzen.changeElementDrag", true, DotNetReference, Dialog.Options.Draggable.ToString(), Dialog.Options.ShowTitle.ToString());
         }
     }
 
