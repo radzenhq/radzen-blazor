@@ -37,9 +37,8 @@
         isLoading = true;
 
         var result = await service.GetOrders(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true, expand: "Customer,Employee");
-        // Update the Data property
+        
         orders = result.Value.AsODataEnumerable();
-        // Update the count
         count = result.Count;
 
         isLoading = false;
@@ -47,8 +46,19 @@
 
     async Task LoadColumnFilterData(DataGridLoadColumnFilterDataEventArgs<Order> args)
     {
-        var result = await service.GetOrders(count: true, apply: $"groupby({args.Column.Property})", select: args.Column.Property);
+        // Get the property name in OData format. Sub-properties are separated by /.
+        var property = args.Column.GetFilterProperty().Replace(".","/");
+
+        // Get the distinct values for the property in OData format for the current column.
+        var result = await service.GetOrders(count: true, apply: $"groupby(({property}))", expand: GetODataExpand(property));
+
         args.Count = result.Count;
-        args.Data = result.Value.AsQueryable().Select(args.Column.Property);
+        args.Data = result.Value;
+    }
+
+    string GetODataExpand(string property)
+    {
+        var properties = property.Split("/");
+        return properties.Count() > 1 ? $"{string.Join("/", properties.Take(properties.Length - 1))}($select={properties.LastOrDefault()})" : null;
     }
 }
