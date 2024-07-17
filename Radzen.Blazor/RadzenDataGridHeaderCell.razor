@@ -146,9 +146,9 @@
                                 }
                                 else
                                 {
-                                    <RadzenListBox AllowVirtualization="true" AllowClear="true" Multiple="true" Style="height: 300px"
-                                                   TValue="IEnumerable<object>" Data=@Column.GetFilterValues() Value=@Column.GetFilterValue()
-                                                   Change="@ListBoxChange" 
+                                    <RadzenListBox AllowVirtualization="true" AllowClear="true" Multiple="true" Style="height: 300px" 
+                                                   TValue="IEnumerable<object>" Value=@Column.GetFilterValue() Change="@ListBoxChange" 
+                                                   Data=@filterValues Count=@filterValuesCount LoadData="@LoadFilterValues" 
                                                    AllowFiltering="@(!string.IsNullOrEmpty(Column.GetFilterProperty()) && PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty()) == typeof(string))"
                                                    Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                                    InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueArialLabel  + Column.GetFilterValue() }})">
@@ -192,6 +192,40 @@ else
 @code {
     Radzen.Blazor.Rendering.Popup popup;
     ElementReference filterButton;
+
+    int filterValuesCount;
+    internal IEnumerable filterValues;
+    async Task LoadFilterValues()
+    {
+        var property = Column.GetFilterProperty();
+        var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
+
+        if (property.IndexOf(".") != -1)
+        {
+            property = $"np({property})";
+        }
+
+        if (propertyType == typeof(string))
+        {
+            property = $@"({property} == null ? """" : {property})";
+        }
+
+        if (Column.Grid.LoadColumnFilterData.HasDelegate)
+        {
+            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column };
+
+            await Column.Grid.LoadColumnFilterData.InvokeAsync(args);
+
+            filterValues = args.Data.AsQueryable().Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+            filterValuesCount = args.Count;
+        }
+        else if(filterValues == null && Column.Grid.Data != null && !string.IsNullOrEmpty(property))
+        {
+            var query = Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)).Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+            filterValues = query;
+            filterValuesCount = query.Count();
+        }
+    }
 
     void ListBoxChange(object args)
     {

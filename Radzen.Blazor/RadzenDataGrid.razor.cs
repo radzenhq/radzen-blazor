@@ -271,6 +271,14 @@ namespace Radzen.Blazor
             }
         }
 
+
+        /// <summary>
+        /// Gets or sets the callback used to load column filter data for DataGrid FilterMode.CheckBoxList filter mode.
+        /// </summary>
+        /// <value>The load filter data event callback.</value>
+        [Parameter]
+        public EventCallback<DataGridLoadColumnFilterDataEventArgs<TItem>> LoadColumnFilterData { get; set; }
+
         /// <summary>
         /// Gets or sets the load child data callback.
         /// </summary>
