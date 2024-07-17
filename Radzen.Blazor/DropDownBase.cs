@@ -761,7 +761,7 @@ namespace Radzen
                 if (previousKey != args.Key)
                 {
                     previousKey = args.Key;
-                    itemIndex = 0;
+                    itemIndex = -1;
                 }
 
                 itemIndex = itemIndex + 1 >= filteredItems.Count() ? 0 : itemIndex + 1;
