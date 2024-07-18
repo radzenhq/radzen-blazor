@@ -1,7 +1,7 @@
-﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenLabel Text="Select Date" Component="DatePickerHourFormat" Style="margin-right: 8px; vertical-align: middle;" />
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-12">
+    <RadzenLabel Text="Select Date" Component="DatePickerHourFormat" />
     <RadzenDatePicker @bind-Value=@value ShowTime="true" HourFormat="12" DateFormat="MM/dd/yyyy h:mm tt" Name="DatePickerHourFormat" />
-</div>
+</RadzenStack>
 
 @code {
     DateTime? value = DateTime.Now;

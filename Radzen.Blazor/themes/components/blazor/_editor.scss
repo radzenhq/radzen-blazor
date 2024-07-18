@@ -13,26 +13,8 @@ $editor-content-background-color: var(--rz-base-background-color) !default;
 $editor-focus-outline: var(--rz-outline-focus) !default;
 $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
-// Editor CSS variables
-
-:root {
-  --rz-editor-border: #{$editor-border};
-  --rz-editor-border-radius: #{$editor-border-radius};
-  --rz-editor-toolbar-background-color: #{$editor-toolbar-background-color};
-  --rz-editor-toolbar-item-margin: #{$editor-toolbar-item-margin};
-  --rz-editor-button-padding: #{$editor-button-padding};
-  --rz-editor-button-background-color: #{$editor-button-background-color};
-  --rz-editor-button-color: #{$editor-button-color};
-  --rz-editor-button-disabled-color: #{$editor-button-disabled-color};
-  --rz-editor-button-selected-background-color: #{$editor-button-selected-background-color};
-  --rz-editor-button-selected-color: #{$editor-button-selected-color};
-  --rz-editor-separator-background-color: #{$editor-separator-background-color};
-  --rz-editor-content-background-color: #{$editor-content-background-color};
-  --rz-editor-focus-outline: #{$editor-focus-outline};
-  --rz-editor-focus-outline-offset: #{$editor-focus-outline-offset};
-}
-
 .rz-html-editor {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   border-radius: var(--rz-editor-border-radius);

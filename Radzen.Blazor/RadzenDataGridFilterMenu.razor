@@ -128,7 +128,7 @@
     {
         var additionalStyle = Column.HasActiveFilter() ? "rz-grid-filter-active" : "";
 
-        return $"rz-filter-button rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-light {additionalStyle}";
+        return $"rz-filter-button rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-base rz-shade-default {additionalStyle}";
     }
 
     protected async Task ApplyFilter(FilterOperator value)

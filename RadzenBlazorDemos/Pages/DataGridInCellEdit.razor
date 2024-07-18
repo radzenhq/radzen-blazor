@@ -73,7 +73,7 @@
             </EditTemplate>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="Order" Property="ShipCountry" Title="ShipCountry" IsInEditMode="@IsEditing">
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShipCountry)" Title="ShipCountry" IsInEditMode="@IsEditing">
             <Template Context="order">
                 <RadzenText Text="@(order.ShipCountry)" />
             </Template>
@@ -83,7 +83,7 @@
             </EditTemplate>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn TItem="Order" Property="ShipCity" Title="ShipCity" IsInEditMode="@IsEditing">
+        <RadzenDataGridColumn TItem="Order" Property="@nameof(Order.ShipCity)" Title="ShipCity" IsInEditMode="@IsEditing">
             <Template Context="order">
                 <RadzenText Text="@(order.ShipCity)" />
             </Template>

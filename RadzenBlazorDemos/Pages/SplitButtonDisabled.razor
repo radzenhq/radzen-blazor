@@ -1,25 +1,20 @@
 ﻿@inject NotificationService NotificationService
-<div class="container-fluid splitbutton-demo">
-    <div class="row mb-4">
-        <div class="col">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Disabled SplitButton</RadzenText>
-            <RadzenSplitButton Disabled="true" Click=@(args => OnClick(args, "Disabled SplitButton")) Text="SplitButton">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" />
-                </ChildContent>
-            </RadzenSplitButton>
 
-            <RadzenSplitButton Click=@(args => OnClick(args, "Disabled SplitButton item")) Text="SplitButton Item Disabled">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Disabled Item2" Value="2" Disabled=true />
-                </ChildContent>
-            </RadzenSplitButton>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+    <RadzenSplitButton Disabled="true" Click=@(args => OnClick(args, "Disabled SplitButton")) Text="SplitButton">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
 
-        </div>
-    </div>
-</div>
+    <RadzenSplitButton Click=@(args => OnClick(args, "Disabled SplitButton item")) Text="SplitButton Item Disabled">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Disabled Item2" Value="2" Disabled=true />
+        </ChildContent>
+    </RadzenSplitButton>
+</RadzenStack>
 
 @code {
     void OnClick(RadzenSplitButtonItem item, string buttonName)

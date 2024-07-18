@@ -4,16 +4,6 @@ $footer-border: var(--rz-border-base-200) !default;
 $footer-color: var(--rz-text-color) !default;
 $footer-z: 2 !default;
 
-// Footer CSS Variables
-
-:root {
-  --rz-footer-padding: #{$footer-padding};
-  --rz-footer-background-color: #{$footer-background-color};
-  --rz-footer-border: #{$footer-border};
-  --rz-footer-color: #{$footer-color};
-  --rz-footer-z: #{$footer-z};
-}
-
 .rz-footer {
   padding: var(--rz-footer-padding);
   border-top: var(--rz-footer-border);

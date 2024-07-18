@@ -1,5 +1,6 @@
 $notification-padding: 1rem 1.25rem !default;
-$notification-icon-margin: 0 0.625rem 0 0 !default;
+$notification-gap: 0.625rem !default;
+$notification-icon-margin: 0 !default;
 $notification-container-background-color: transparent !default;
 $notification-shadow: none !default;
 $notification-border-radius: var(--rz-border-radius) !default;
@@ -16,91 +17,71 @@ $notification-info-color: var(--rz-on-info) !default;
 $notification-info-background-color: var(--rz-info) !default;
 $notification-info-icon-color: $notification-info-color !default;
 
-// Notification CSS variables
-
-:root {
-  --rz-notification-padding: #{$notification-padding};
-  --rz-notification-icon-margin: #{$notification-icon-margin};
-  --rz-notification-container-background-color: #{$notification-container-background-color};
-  --rz-notification-shadow: #{$notification-shadow};
-  --rz-notification-border-radius: #{$notification-border-radius};
-  --rz-notification-success-color: #{$notification-success-color};
-  --rz-notification-success-background-color: #{$notification-success-background-color};
-  --rz-notification-success-icon-color: #{$notification-success-icon-color};
-  --rz-notification-warning-color: #{$notification-warning-color};
-  --rz-notification-warning-background-color: #{$notification-warning-background-color};
-  --rz-notification-warning-icon-color: #{$notification-warning-icon-color};
-  --rz-notification-error-color: #{$notification-error-color};
-  --rz-notification-error-background-color: #{$notification-error-background-color};
-  --rz-notification-error-icon-color: #{$notification-error-icon-color};
-  --rz-notification-info-color: #{$notification-info-color};
-  --rz-notification-info-background-color: #{$notification-info-background-color};
-  --rz-notification-info-icon-color: #{$notification-info-icon-color};
-}
-
-.rz-growl {
+.rz-notification {
+  box-sizing: border-box;
   position: fixed;
-  top: 100px;
-  right: 20px;
+  z-index: 1002;
+  inset-block-start: 100px;
+  inset-inline-end: 1rem;
+}
+
+.rz-notification-item-wrapper {
+  position: static;
+  width: 250px;
   min-width: 20rem;
-}
-
-.rz-growl-item-container {
   background-color: var(--rz-notification-container-background-color);
+  margin: 1rem 0;
 }
 
-.rz-growl-item {
+.rz-notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rz-notification-gap);
   border-radius: var(--rz-notification-border-radius);
   box-shadow: var(--rz-notification-shadow);
   padding: var(--rz-notification-padding);
-}
 
-.rz-growl-message-success {
-  .rz-growl-item {
+  .rz-notification-success & {
     color: var(--rz-notification-success-color);
     background-color: var(--rz-notification-success-background-color);
   }
-}
 
-.rz-growl-message-warn {
-  .rz-growl-item {
+  .rz-notification-warn & {
     color: var(--rz-notification-warning-color);
     background-color: var(--rz-notification-warning-background-color);
   }
-}
 
-.rz-growl-message-error {
-  .rz-growl-item {
+  .rz-notification-error & {
     color: var(--rz-notification-error-color);
     background-color: var(--rz-notification-error-background-color);
   }
-}
 
-.rz-growl-message-info {
-  .rz-growl-item {
+  .rz-notification-info & {
     color: var(--rz-notification-info-color);
     background-color: var(--rz-notification-info-background-color);
   }
 }
 
-.rz-growl-item {
-  margin: 1rem 0;
-
-  p {
-    color: inherit;
-  }
+.rz-notification-message-wrapper {
+  flex: auto;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: var(--rz-notification-gap);
 }
 
-.rz-growl-icon-close {
-  float: right;
-
-  &:before {
-    content: "close";
-  }
+.rz-notification-message {
+  flex: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
-.rz-growl-image {
-  float: left;
+.rz-notification-title {
+  font-weight: bold;
+}
+
+.rz-notification-icon {
   margin: var(--rz-notification-icon-margin);
 
   &.rzi-check {
@@ -136,13 +117,11 @@ $notification-info-icon-color: $notification-info-color !default;
   }
 }
 
-.rz-growl-title {
-  font-weight: bold;
-}
+.rz-notification-close {
+  cursor: pointer;
+  opacity: 0.75;
 
-.rz-growl-message {
-  p {
-    display: inline-block;
-    margin-bottom: 0;
+  &:before {
+    content: "close";
   }
 }

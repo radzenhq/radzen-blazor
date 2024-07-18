@@ -1,4 +1,5 @@
 .rz-autocomplete {
+  box-sizing: border-box;
   display: inline-block;
   border: var(--rz-input-border);
   border-radius: var(--rz-input-border-radius);
@@ -20,7 +21,8 @@
 }
 
 .rz-autocomplete-input {
-  padding: var(--rz-input-padding);
+  padding-block: var(--rz-input-padding-block);
+  padding-inline: var(--rz-input-padding-inline);
   background-color: transparent;
   color: var(--rz-input-value-color);
   box-shadow: var(--rz-input-shadow);

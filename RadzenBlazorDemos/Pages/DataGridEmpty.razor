@@ -19,9 +19,9 @@
     </Columns>
 </RadzenDataGrid>    
 
-<h3 class="mt-4">Custom Empty Text</h3>
-<div class="mb-4">
-    Custom text: <RadzenTextBox @bind-Value="emptyText" class="ml-2" Style="width: 300px;" aria-label="custom text" />
+<h3 class="rz-mt-6">Custom Empty Text</h3>
+<div class="rz-mb-6">
+    Custom text: <RadzenTextBox @bind-Value="emptyText" class="rz-ms-2" Style="width: 300px;" aria-label="custom text" />
 </div>
 <RadzenDataGrid Data="@data" EmptyText="@emptyText">
     <Columns>
@@ -41,7 +41,7 @@
     </Columns>
 </RadzenDataGrid>
 
-<h3 class="mt-4">Render Fragment as Empty Text</h3>
+<h3 class="rz-mt-6">Render Fragment as Empty Text</h3>
 <RadzenDataGrid Data="@data">
     <EmptyTemplate>
         <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>

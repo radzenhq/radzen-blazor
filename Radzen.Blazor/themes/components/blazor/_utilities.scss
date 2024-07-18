@@ -1,3 +1,10 @@
+// Box Sizing
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
 // Theme Colors
 
 $rz-theme-colors-map: () !default;
@@ -6,6 +13,7 @@ $rz-theme-colors-map: map-merge(
     "white": $rz-white,
     "black": $rz-black,
     
+    "base": $rz-base,
     "base-50": $rz-base-50,
     "base-100": $rz-base-100,
     "base-200": $rz-base-200,
@@ -16,6 +24,10 @@ $rz-theme-colors-map: map-merge(
     "base-700": $rz-base-700,
     "base-800": $rz-base-800,
     "base-900": $rz-base-900,
+    "base-light": $rz-base-light,
+    "base-lighter": $rz-base-lighter,
+    "base-dark": $rz-base-dark,
+    "base-darker": $rz-base-darker,
     
     "primary": $rz-primary,
     "primary-light": $rz-primary-light,
@@ -52,6 +64,12 @@ $rz-theme-colors-map: map-merge(
     "danger-lighter": $rz-danger-lighter,
     "danger-dark": $rz-danger-dark,
     "danger-darker": $rz-danger-darker,
+
+    "on-base": $rz-base-900,
+    "on-base-light": $rz-base-900,
+    "on-base-lighter": $rz-base-900,
+    "on-base-dark": $rz-base-50,
+    "on-base-darker": $rz-base-50,
 
     "on-primary": $rz-white,
     "on-primary-light": $rz-white,
@@ -117,13 +135,6 @@ $rz-theme-colors-map: map-merge(
   $rz-theme-colors-map
 );
 
-// Theme Colors CSS variables
-:root {
-  @each $color, $value in $rz-theme-colors-map {
-    --rz-#{$color}: #{$value};
-  }
-}
-
 // Theme Constants
 
 $rz-theme-constants-map: () !default;
@@ -135,21 +146,12 @@ $rz-theme-constants-map: map-merge(
     "body-line-height": $rz-body-line-height,
     "body-background-color": $rz-body-background-color,
     "text-font-family": $rz-text-font-family,
-    "icon-size": $rz-icon-size,
-    "icon-font-family": $rz-icon-font-family,
     "outline-offset": $rz-outline-offset,
     "outline-width": $rz-outline-width,
     "outline-color": $rz-outline-color,
   ),
   $rz-theme-constants-map
 );
-
-// Theme Constants CSS variables
-:root {
-  @each $token, $value in $rz-theme-constants-map {
-    --rz-#{$token}: #{$value};
-  }
-}
 
 // Semantic Text Color
 
@@ -172,13 +174,6 @@ $rz-text-map: map-merge(
   ),
   $rz-text-map
 );
-
-// Semantic Text Color CSS variables
-:root {
-  @each $token, $value in $rz-text-map {
-    --rz-#{$token}: #{$value};
-  }
-}
 
 // Semantic Text Color CSS classes
 @each $token, $value in $rz-text-map {
@@ -209,20 +204,9 @@ $rz-link-map: map-merge(
   $rz-link-map
 );
 
-// Link Color CSS variables
-:root {
-  @each $token, $value in $rz-link-map {
-    --rz-#{$token}: #{$value};
-  }
-}
-
 // Background Color
 
 $rz-base-background-color: var(--rz-white) !default;
-
-:root {
-  --rz-base-background-color: #{$rz-base-background-color};
-}
 
 // Base/Light/Dark Styles Map 
 
@@ -282,14 +266,8 @@ $severity-styles-map: map-merge(
   $severity-styles-map
 );
 
-// Border
 
-// Border CSS variables
-:root {
-  @each $color, $value in $rz-theme-colors-map {
-    --rz-border-#{$color}: var(--rz-border-width) solid var(--rz-#{$color});
-  }
-}
+// Border
 
 // Interaction State Border
 $rz-border-normal: var(--rz-border-width) solid var(--rz-base-300) !default;
@@ -307,14 +285,6 @@ $rz-state-border-map: map-merge(
   ),
   $rz-state-border-map
 );
-
-// Interaction State Border CSS variables
-:root {
-  @each $token, $value in $rz-state-border-map {
-    --rz-#{$token}: #{$value};
-  }
-}
-
 
 // Border Radius
 
@@ -349,25 +319,11 @@ $rz-border-radius-map: map-merge(
   $rz-border-radius-map
 );
 
-// Border Radius CSS variables
-:root {
-  @each $token, $value in $rz-border-radius-map {
-    --rz-#{$token}: #{$value};
-  }
-}
-
 // Border Radius CSS classes
 @include rz-utility-map-css('border-radius', $rz-border-radius-map);
 
 
 // Outline
-
-// Outline CSS variables
-:root {
-  @each $color, $value in $rz-theme-colors-map {
-    --rz-outline-#{$color}: var(--rz-outline-width) solid var(--rz-#{$color});
-  }
-}
 
 // Interaction State Outline
 $rz-outline-normal: none !default;
@@ -382,27 +338,8 @@ $rz-state-outline-map: map-merge(
   $rz-state-outline-map
 );
 
-// Interaction State Outline CSS variables
-:root {
-  @each $token, $value in $rz-state-outline-map {
-    --rz-#{$token}: #{$value};
-  }
-}
-
 
 // Shadow
-
-/* $rz-shadow-0: none !default;
-$rz-shadow-1: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
-$rz-shadow-2: 0 6px 14px 0 rgba(0, 0, 0, 0.2) !default;
-$rz-shadow-3: none !default;
-$rz-shadow-4: none !default;
-$rz-shadow-5: none !default;
-$rz-shadow-6: none !default;
-$rz-shadow-7: none !default;
-$rz-shadow-8: none !default;
-$rz-shadow-9: none !default;
-$rz-shadow-10: none !default; */
 
 $rz-shadow-0: none !default;
 $rz-shadow-1: 0 0 2px 0 rgba(0, 0, 0, 0.08), 0px 2px 2px rgba(0, 0, 0, 0.08) !default;
@@ -434,13 +371,6 @@ $rz-shadow-map: map-merge(
   $rz-shadow-map
 );
 
-// Shadow CSS variables
-:root {
-  @each $token, $value in $rz-shadow-map {
-    --rz-#{$token}: #{$value};
-  }
-}
-
 // Shadow CSS classes
 @include rz-utility-map-css('box-shadow', $rz-shadow-map);
 
@@ -448,13 +378,6 @@ $rz-shadow-map: map-merge(
 
 $rz-transition: 0.1s linear !default;
 $rz-transition-all: all 0.1s linear !default;
-
-// Transition CSS variables
-
-:root {
-  --rz-transition: #{$rz-transition};
-  --rz-transition-all: #{$rz-transition-all};
-}
 
 // Layout
 

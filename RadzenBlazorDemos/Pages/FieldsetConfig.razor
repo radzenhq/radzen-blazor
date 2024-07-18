@@ -8,39 +8,43 @@
                 ExpandAriaLabel="Expand the list of orders." CollapseAriaLabel="Collapse the list of orders."
                 Expand=@(() => Change("Fieldset expanded")) Collapse=@(() => Change("Fieldset collapsed"))>
     <HeaderTemplate>
-        <span class="d-inline-flex align-items-center align-middle">
-            <RadzenIcon Icon="account_box" class="me-1" /><b>Orders</b>
-        </span>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="0.25rem">
+            <RadzenIcon Icon="account_box" /><b>Orders</b>
+        </RadzenStack>
     </HeaderTemplate>
     <ChildContent>
         <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
                         Data="@orders" TItem="Order">
             <Template Context="order">
                 <RadzenCard Style="width: 250px">
-                    <div class="row">
-                        <div class="col-md-8 text-truncate">
-                            <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="me-1" />
-                            <b>@(order.ShipName)</b>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
-                        </div>
-                    </div>
-                    <hr style="border: none; background-color: rgba(0,0,0,.08); height: 1px; margin: 1rem 0;" />
-                    <div class="d-flex flex-row align-items-center">
-                        <RadzenImage Path="@order.Employee?.Photo" class="rounded-circle float-start me-3" Style="width: 80px; height: 80px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
-                        <div>
-                            <h4 class="mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
-                            <div>@order.ShipAddress</div>
-                            <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
-                        </div>
-                    </div>
+                    <RadzenStack Gap="1rem">
+                        <RadzenRow>
+                            <RadzenColumn Size="8" Class="rz-text-truncate">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="rz-me-1" />
+                                <b>@(order.ShipName)</b>
+                            </RadzenColumn>
+                            <RadzenColumn Size="4" Class="rz-text-align-end">
+                                <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
+                            </RadzenColumn>
+                        </RadzenRow>
+
+                        <hr style="border: none; background-color: var(--rz-base-600); height: 1px; margin: 0;" />
+
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                            <RadzenStack Gap="0.25rem">
+                                <h4 class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</h4>
+                                <div>@order.ShipAddress</div>
+                                <div style="font-size: .8em">@(order.ShipCity), @(order.ShipCountry)</div>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenStack>
                 </RadzenCard>
             </Template>
         </RadzenDataList>
     </ChildContent>
     <SummaryTemplate>
-        <RadzenCard class="mt-3">
+        <RadzenCard class="rz-mt-4">
             <b>@orders.Count() Orders</b>
         </RadzenCard>
     </SummaryTemplate>

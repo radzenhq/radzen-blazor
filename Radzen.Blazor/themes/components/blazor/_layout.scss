@@ -1,12 +1,30 @@
 $layout-background-color: var(--rz-body-background-color) !default;
 
-// Layout CSS variables
+/* Radzen Blazor Layout reset styles */
 
-:root {
-  --rz-layout-background-color: #{$layout-background-color};
+:root:has(.rz-layout) {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  font-size: var(--rz-root-font-size);
+  
+  body {
+    margin: 0;
+    color: var(--rz-text-color);
+    background-color: var(--rz-body-background-color);
+    font-family: var(--rz-text-font-family);
+    font-size: var(--rz-body-font-size);
+    line-height: var(--rz-body-line-height);
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
 
+/* RadzenLayout styles */
+
 .rz-layout {
+  box-sizing: border-box;
   height: 100vh;
   overflow: hidden;
   display: grid;

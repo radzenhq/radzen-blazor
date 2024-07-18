@@ -1,8 +1,12 @@
-$form-field-margin: 0.625rem 0 0 !default;
-$form-field-start-end-padding: var(--rz-input-padding) !default;
+$form-field-margin-block: 0.625rem 0 !default;
+$form-field-margin-inline: 0 !default;
+$form-field-start-end-padding-block: 0 !default;
+$form-field-start-end-padding-inline: var(--rz-input-padding-inline) !default;
 $form-field-filled-height: 3.25rem !default;
-$form-field-filled-padding: 1.4375rem 0.4375rem 0.4375rem !default;
-$form-field-filled-numeric-padding: 1.5rem 1.25rem 0.5rem 0.5rem !default;
+$form-field-filled-padding-block: 1.4375rem 0.4375rem !default;
+$form-field-filled-padding-inline: 0.4375rem !default;
+$form-field-filled-numeric-padding-block: 1.5rem 0.5rem !default;
+$form-field-filled-numeric-padding-inline: 0.5rem 1.25rem !default;
 $form-field-filled-background-color: var(--rz-base-100) !default;
 $form-field-filled-hover-background-color: var(--rz-base-200) !default;
 $form-field-filled-border: var(--rz-input-border) !default;
@@ -20,42 +24,11 @@ $form-field-label-color: var(--rz-text-color) !default;
 $form-field-label-focus-color: var(--rz-primary) !default;
 $form-field-label-padding: 0.125rem 0.1875rem !default;
 $form-field-text-label-padding: 0.125rem 0 !default;
-$form-field-label-left: 0.25rem !default;
+$form-field-label-inset-inline-start: 0.25rem !default;
 $form-field-label-textarea-top: 0.375rem !default;
 $form-field-label-floating-top: -0.625rem !default;
 $form-field-label-floating-background-color: var(--rz-input-background-color) !default;
 $form-field-helper-padding: 0 0.5rem !default;
-
-:root {
-    --rz-form-field-margin: #{$form-field-margin};
-    --rz-form-field-start-end-padding: #{$form-field-start-end-padding};
-    --rz-form-field-filled-height: #{$form-field-filled-height};
-    --rz-form-field-filled-padding: #{$form-field-filled-padding};
-    --rz-form-field-filled-numeric-padding: #{$form-field-filled-numeric-padding};
-    --rz-form-field-filled-background-color: #{$form-field-filled-background-color};
-    --rz-form-field-filled-hover-background-color: #{$form-field-filled-hover-background-color};
-    --rz-form-field-filled-border: #{$form-field-filled-border};
-    --rz-form-field-filled-hover-border: #{$form-field-filled-hover-border};
-    --rz-form-field-filled-focus-border: #{$form-field-filled-focus-border};
-    --rz-form-field-filled-border-radius: #{$form-field-filled-border-radius};
-    --rz-form-field-filled-label-floating-top: #{$form-field-filled-label-floating-top};
-    --rz-form-field-filled-hover-shadow: #{$form-field-filled-hover-shadow};
-    --rz-form-field-filled-focus-shadow: #{$form-field-filled-focus-shadow};
-    --rz-form-field-filled-underline-display: #{$form-field-filled-underline-display};
-    --rz-form-field-shadow: #{$form-field-shadow};
-    --rz-form-field-hover-shadow: #{$form-field-hover-shadow};
-    --rz-form-field-focus-shadow: #{$form-field-focus-shadow};
-    --rz-form-field-label-color: #{$form-field-label-color};
-    --rz-form-field-label-focus-color: #{$form-field-label-focus-color};
-    --rz-form-field-label-padding: #{$form-field-label-padding};
-    --rz-form-field-text-label-padding: #{$form-field-text-label-padding};
-    --rz-form-field-label-left: #{$form-field-label-left};
-    --rz-form-field-label-textarea-top: #{$form-field-label-textarea-top};
-    --rz-form-field-label-floating-top: #{$form-field-label-floating-top};
-    --rz-form-field-label-floating-background-color: #{$form-field-label-floating-background-color};
-    --rz-form-field-helper-padding: #{$form-field-helper-padding};
-}
-
 
 .rz-form-field-helper {
     padding: var(--rz-form-field-helper-padding);
@@ -68,7 +41,8 @@ $form-field-helper-padding: 0 0.5rem !default;
     display: inline-flex;
     align-items: center;
     vertical-align: top;
-    margin: var(--rz-form-field-margin);
+    margin-block: var(--rz-form-field-margin-block);
+    margin-inline: var(--rz-form-field-margin-inline);
     box-shadow: var(--rz-form-field-shadow);
     transition: var(--rz-input-transition);
 
@@ -76,7 +50,7 @@ $form-field-helper-padding: 0 0.5rem !default;
     & > .rz-autocomplete, 
     & input,
     & .rz-inputtext,
-    & .rz-calendar.rz-state-disabled .rz-inputtext {
+    & .rz-datepicker.rz-state-disabled > .rz-inputtext {
         @extend %input-blank;
 
         flex: 1;
@@ -88,14 +62,14 @@ $form-field-helper-padding: 0 0.5rem !default;
         flex: 0;
         align-items: center;
         white-space: nowrap;
-        padding: var(--rz-form-field-start-end-padding);
-        padding-top: 0;
-        padding-bottom: 0;
+        padding-block: var(--rz-form-field-start-end-padding-block);
+        padding-inline: var(--rz-form-field-start-end-padding-inline);
     }
 
 }
 
 .rz-form-field {
+    box-sizing: border-box;
     display: inline-flex;
     flex-direction: column;
     vertical-align: top;
@@ -143,11 +117,11 @@ $form-field-helper-padding: 0 0.5rem !default;
     &.rz-variant-filled,
     &.rz-variant-flat {
         .rz-form-field-start {
-            padding-right: 0;
+            padding-inline-end: 0;
         }
     
         .rz-form-field-end {
-            padding-left: 0;
+            padding-inline-start: 0;
         }
     }
 
@@ -156,12 +130,14 @@ $form-field-helper-padding: 0 0.5rem !default;
         .rz-form-field-content {
             margin: 0;
             --rz-input-height: var(--rz-form-field-filled-height);
-            --rz-input-padding: var(--rz-form-field-filled-padding);
-            --rz-numeric-input-padding: var(--rz-form-field-filled-numeric-padding);
+            --rz-input-padding-block: var(--rz-form-field-filled-padding-block);
+            --rz-input-padding-inline: var(--rz-form-field-filled-padding-inline);
+            --rz-numeric-input-padding-block: var(--rz-form-field-filled-numeric-padding-block);
+            --rz-numeric-input-padding-inline: var(--rz-form-field-filled-numeric-padding-inline);
             --rz-form-field-label-floating-top: var(--rz-form-field-filled-label-floating-top);
             box-shadow: var(--rz-input-shadow);
 
-            .rz-spinner-up {
+            .rz-numeric-up {
                 top: calc(var(--rz-numeric-button-offset) + 1rem);
             }
 
@@ -237,10 +213,13 @@ $form-field-helper-padding: 0 0.5rem !default;
             box-shadow: none;
             --rz-input-background-color: transparent;
             --rz-input-border-radius: 0;
-            --rz-input-padding: 0.4375rem 0;
-            --rz-numeric-input-padding: 0.5rem 1.25rem 0.5rem 0;
-            --rz-text-area-padding: 0.4375rem 0;
-            --rz-form-field-label-left: 0;
+            --rz-input-padding-block: 0.4375rem;
+            --rz-input-padding-inline: 0;
+            --rz-numeric-input-padding-block: 0.5rem 0.5rem;
+            --rz-numeric-input-padding-inline: 0 1.25rem;
+            --rz-text-area-padding-block: 0.4375rem;
+            --rz-text-area-padding-inline: 0;
+            --rz-form-field-label-inset-inline-start: 0;
             --rz-form-field-label-padding: var(--rz-form-field-text-label-padding);
 
             & ~ .rz-form-field-helper {
@@ -249,11 +228,11 @@ $form-field-helper-padding: 0 0.5rem !default;
         }
 
         .rz-form-field-start {
-            padding-left: 0;
+            padding-inline-start: 0;
         }
     
         .rz-form-field-end {
-            padding-right: 0;
+            padding-inline-end: 0;
         }
     }
 
@@ -264,15 +243,15 @@ $form-field-helper-padding: 0 0.5rem !default;
                 content: "";
                 position: absolute;
                 z-index: 1;
-                left: 50%;
-                right: 50%;
+                inset-inline-start: 50%;
+                inset-inline-end: 50%;
                 bottom: calc(-1 * var(--rz-border-width));
                 height: calc(var(--rz-border-width) + 1px);
                 border: var(--rz-input-focus-border);
-                border-left-width: 0;
-                border-right-width: 0;
-                transition: left var(--rz-transition),
-                            right var(--rz-transition), 
+                border-inline-start-width: 0;
+                border-inline-end-width: 0;
+                transition: inset-inline-start var(--rz-transition),
+                            inset-inline-end var(--rz-transition), 
                             border-width var(--rz-transition);
             }
         
@@ -301,20 +280,20 @@ $form-field-helper-padding: 0 0.5rem !default;
     
         &.rz-state-focused:not(.rz-state-disabled) {
             .rz-form-field-content:before {
-                left: calc(-1 * var(--rz-border-width));
-                right: calc(-1 * var(--rz-border-width));
+                inset-inline-start: calc(-1 * var(--rz-border-width));
+                inset-inline-end: calc(-1 * var(--rz-border-width));
                 border: var(--rz-input-focus-border);
-                border-left-width: var(--rz-border-width);
-                border-right-width: var(--rz-border-width);
+                border-inline-start-width: var(--rz-border-width);
+                border-inline-end-width: var(--rz-border-width);
             }
         }
     }
 
-    .rz-spinner-button {
+    .rz-numeric-button {
         display: none;
     }
 
-    .rz-spinner:focus-within .rz-spinner-button {
+    .rz-numeric:focus-within .rz-numeric-button {
         display: block;
     }
 
@@ -329,25 +308,25 @@ $form-field-helper-padding: 0 0.5rem !default;
     position: absolute;
     pointer-events: none;
     padding: var(--rz-form-field-label-padding);
-    top: 50%;
-    right: auto;
+    inset-block-start: 50%;
+    inset-inline-end: auto;
     border-radius: var(--rz-border-radius);
-    left: var(--rz-form-field-label-left);
+    inset-inline-start: var(--rz-form-field-label-inset-inline-start);
     max-width: calc(100% - 1.5rem);
     transform: translate(0, -50%);
     background-color: transparent;
-    transition: top var(--rz-transition),
+    transition: inset-block-start var(--rz-transition),
                 transform var(--rz-transition), 
                 color var(--rz-transition),
                 font-size var(--rz-transition), 
                 max-width var(--rz-transition);
 
     &:last-child {
-        right: 1.5rem;
+        inset-inline-end: 1.5rem;
     }
 
     .rz-textarea ~ & {
-        top: var(--rz-form-field-label-textarea-top);
+        inset-block-start: var(--rz-form-field-label-textarea-top);
         transform: translate(0, 0);
 
         .rz-variant-filled &,
@@ -359,7 +338,7 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-form-field:not(.rz-floating-label) &,
     .rz-textbox:focus ~ &,
     .rz-textarea:focus ~ &,
-    .rz-spinner:focus-within ~ &,
+    .rz-numeric:focus-within ~ &,
     .rz-autocomplete:focus-within ~ &,
     .rz-textbox:not(:placeholder-shown) ~ &,
     :not(.rz-state-empty) ~ &,
@@ -373,10 +352,10 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-checkbox-list-horizontal  ~ &,
     .rz-chkbox ~ &,
     .rz-state-empty:has(.rz-placeholder) ~ & {
-        right: auto;
-        top: var(--rz-form-field-label-floating-top);
-        padding-top: 0;
-        padding-bottom: 0;
+        inset-inline-end: auto;
+        inset-block-start: var(--rz-form-field-label-floating-top);
+        padding-block-start: 0;
+        padding-block-end: 0;
         transform: translate(0, 0);
         color: var(--rz-input-placeholder-color);
         background-color: var(--rz-form-field-label-floating-background-color);
@@ -410,7 +389,7 @@ $form-field-helper-padding: 0 0.5rem !default;
 
     .rz-textbox:focus ~ &,
     .rz-textarea:focus ~ &,
-    .rz-spinner:focus-within ~ &,
+    .rz-numeric:focus-within ~ &,
     .rz-autocomplete:focus-within ~ &  {
         color: var(--rz-form-field-label-focus-color);
 

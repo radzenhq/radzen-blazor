@@ -4,12 +4,15 @@
 
 @inherits DbContextPage
 
-<RadzenCard class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
-    <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload())/>
-    <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" />
+<RadzenCard Variant="Variant.Outlined" Class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload())/>
+        <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" />
+    </RadzenStack>
 </RadzenCard>
+
 <RadzenDataGrid @ref="grid" AllowGrouping=true AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"  FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
-    Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" class="m-4" HideGroupedColumn="false" >
+    Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" HideGroupedColumn="false" >
     <Columns>
         <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >

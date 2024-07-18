@@ -1,47 +1,14 @@
 @import 'variables';
 @import 'mixins';
 $theme-dark: true;
-
-// Legacy Theme Tokens
-
-$primary: #ff6d41 !default;
-$secondary: #3b9fd5 !default;
-$danger: #f9777f !default;
-$info: #2cc8c8 !default;
-$success: #5dbf74 !default;
-$warning: #fac152 !default;
-$body-color: #f6f7fa !default;
-$body-bg: #28363c !default;
-$font-size: 16px !default;
-
-// Legacy Tokens Map
-
-$rz-base-100: $body-color !default;
-$rz-base-900: $body-bg !default;
-$rz-primary: $primary !default;
-$rz-secondary: $secondary !default;
-$rz-info: $info !default;
-$rz-success: $success !default;
-$rz-warning: $warning !default;
-$rz-danger: $danger !default;
-$rz-root-font-size: $font-size !default;
+$theme-name: dark;
 
 // Theme Colors
 
 $rz-white: #ffffff !default;
 $rz-black: #000000 !default;
 
-$rz-base-50: #ffffff !default;
-$rz-base-100: #f6f7fa !default;
-$rz-base-200: #e9edf0 !default;
-$rz-base-300: #dadfe2 !default;
-$rz-base-400: #a8b4b8 !default;
-$rz-base-500: #7b8a8e !default;
-$rz-base-600: #63737a !default;
-$rz-base-700: #45565e !default;
-$rz-base-800: #38474e !default;
-$rz-base-900: #28363c !default;
-
+$rz-base: #63737a !default;
 $rz-primary: #ff6d41 !default;
 $rz-secondary: #3b9fd5 !default;
 $rz-info: #2cc8c8 !default;
@@ -73,6 +40,21 @@ $rz-series-21: #fdc55f !default;
 $rz-series-22: #f64485 !default;
 $rz-series-23: #58c544 !default;
 $rz-series-24: #6a93ff !default;
+
+$rz-base-50: #ffffff !default;
+$rz-base-100: #f6f7fa !default;
+$rz-base-200: #e9edf0 !default;
+$rz-base-300: #dadfe2 !default;
+$rz-base-400: #a8b4b8 !default;
+$rz-base-500: #7b8a8e !default;
+$rz-base-600: #63737a !default;
+$rz-base-700: #45565e !default;
+$rz-base-800: #38474e !default;
+$rz-base-900: #28363c !default;
+$rz-base-light: #a8b4b8 !default;
+$rz-base-lighter: #ffffff !default;
+$rz-base-dark: #45565e !default;
+$rz-base-darker: #28363c !default;
 
 $rz-primary-light: mix($rz-white, $rz-primary, 12%)!default;
 $rz-primary-lighter: rgba($rz-primary, .16) !default;
@@ -115,53 +97,141 @@ $rz-body-background-color: var(--rz-base-900) !default;
 $rz-text-font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
 'Segoe UI Emoji', 'Segoe UI Symbol' !default;
-$rz-icon-font-family: 'Material Icons' !default;
-$rz-icon-size: 1.25rem !default;
 $rz-outline-offset: 2px !default;
 $rz-outline-width: 2px !default;
 $rz-outline-color: var(--rz-secondary) !default;
 
-// Bootstrap variable overrides. DO NOT USE IN COMPONENTS!
-
-$font-size-base: $rz-body-font-size !default;
-$border-radius: $rz-border-radius !default;
-$primary: $rz-primary !default;
-$secondary: $rz-secondary !default;
-$danger: $rz-danger !default;
-$info: $rz-info !default;
-$success: $rz-success !default;
-$warning: $rz-warning !default;
-$light: $rz-base-200 !default;
-$body-color: $rz-base-50 !default;
-$link-color: $rz-secondary !default;
-$link-hover-color: $rz-secondary !default;
-$link-decoration: none !default;
-$link-hover-decoration: underline !default;
-$state-success-bg: $rz-success !default;
-$state-warning-bg: $rz-warning !default;
-$state-danger-bg: $rz-danger !default;
-$state-info-bg: $rz-info !default;
-$grid-gutter-width: 2rem !default;
-
-// Bootstrap component overrides.
-
-$badge-font-size: 0.75rem !default;
-$badge-border-radius: var(--rz-border-radius) !default;
-$card-border-radius: var(--rz-border-radius) !default;
-$input-height: 2.25rem !default;
-$input-line-height: 1.429 !default;
-$input-border-radius: var(--rz-border-radius) !default;
-$input-placeholder-color: var(--rz-text-tertiary-color) !default;
-$tooltip-color: var(--rz-on-info) !default;
-$tooltip-border-radius: var(--rz-border-radius) !default;
-$tooltip-font-size: 0.875rem !default;
-$body-bg: var(--rz-base-900) !default;
-$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
-  'Segoe UI Emoji', 'Segoe UI Symbol' !default;
-
-
 // Utilities
+
+// Theme Colors
+
+$rz-theme-colors-map: () !default;
+$rz-theme-colors-map: map-merge(
+  (
+    "white": $rz-white,
+    "black": $rz-black,
+    
+    "base": $rz-base,
+    "base-50": $rz-base-50,
+    "base-100": $rz-base-100,
+    "base-200": $rz-base-200,
+    "base-300": $rz-base-300,
+    "base-400": $rz-base-400,
+    "base-500": $rz-base-500,
+    "base-600": $rz-base-600,
+    "base-700": $rz-base-700,
+    "base-800": $rz-base-800,
+    "base-900": $rz-base-900,
+    "base-light": $rz-base-light,
+    "base-lighter": $rz-base-lighter,
+    "base-dark": $rz-base-dark,
+    "base-darker": $rz-base-darker,
+    
+    "primary": $rz-primary,
+    "primary-light": $rz-primary-light,
+    "primary-lighter": $rz-primary-lighter,
+    "primary-dark": $rz-primary-dark,
+    "primary-darker": $rz-primary-darker,
+    
+    "secondary": $rz-secondary,
+    "secondary-light": $rz-secondary-light,
+    "secondary-lighter": $rz-secondary-lighter,
+    "secondary-dark": $rz-secondary-dark,
+    "secondary-darker": $rz-secondary-darker,
+    
+    "info": $rz-info,
+    "info-light": $rz-info-light,
+    "info-lighter": $rz-info-lighter,
+    "info-dark": $rz-info-dark,
+    "info-darker": $rz-info-darker,
+    
+    "success": $rz-success,
+    "success-light": $rz-success-light,
+    "success-lighter": $rz-success-lighter,
+    "success-dark": $rz-success-dark,
+    "success-darker": $rz-success-darker,
+    
+    "warning": $rz-warning,
+    "warning-light": $rz-warning-light,
+    "warning-lighter": $rz-warning-lighter,
+    "warning-dark": $rz-warning-dark,
+    "warning-darker": $rz-warning-darker,
+    
+    "danger": $rz-danger,
+    "danger-light": $rz-danger-light,
+    "danger-lighter": $rz-danger-lighter,
+    "danger-dark": $rz-danger-dark,
+    "danger-darker": $rz-danger-darker,
+
+    "on-base": $rz-white,
+    "on-base-light": $rz-base-900,
+    "on-base-lighter": $rz-base-900,
+    "on-base-dark": $rz-white,
+    "on-base-darker": $rz-white,
+
+    "on-primary": $rz-white,
+    "on-primary-light": $rz-white,
+    "on-primary-lighter": $rz-primary,
+    "on-primary-dark": $rz-white,
+    "on-primary-darker": $rz-white,
+    
+    "on-secondary": $rz-white,
+    "on-secondary-light": $rz-white,
+    "on-secondary-lighter": $rz-secondary,
+    "on-secondary-dark": $rz-white,
+    "on-secondary-darker": $rz-white,
+    
+    "on-info": $rz-white,
+    "on-info-light": $rz-white,
+    "on-info-lighter": $rz-info,
+    "on-info-dark": $rz-white,
+    "on-info-darker": $rz-white,
+    
+    "on-success": $rz-white,
+    "on-success-light": $rz-white,
+    "on-success-lighter": $rz-success,
+    "on-success-dark": $rz-white,
+    "on-success-darker": $rz-white,
+    
+    "on-warning": $rz-white,
+    "on-warning-light": $rz-white,
+    "on-warning-lighter": $rz-warning,
+    "on-warning-dark": $rz-white,
+    "on-warning-darker": $rz-white,
+    
+    "on-danger": $rz-white,
+    "on-danger-light": $rz-white,
+    "on-danger-lighter": $rz-danger,
+    "on-danger-dark": $rz-white,
+    "on-danger-darker": $rz-white,
+    
+    "series-1": $rz-series-1,
+    "series-2": $rz-series-2,
+    "series-3": $rz-series-3,
+    "series-4": $rz-series-4,
+    "series-5": $rz-series-5,
+    "series-6": $rz-series-6,
+    "series-7": $rz-series-7,
+    "series-8": $rz-series-8,
+    "series-9": $rz-series-9,
+    "series-10": $rz-series-10,
+    "series-11": $rz-series-11,
+    "series-12": $rz-series-12,
+    "series-13": $rz-series-13,
+    "series-14": $rz-series-14,
+    "series-15": $rz-series-15,
+    "series-16": $rz-series-16,
+    "series-17": $rz-series-17,
+    "series-18": $rz-series-18,
+    "series-19": $rz-series-19,
+    "series-20": $rz-series-20,
+    "series-21": $rz-series-21,
+    "series-22": $rz-series-22,
+    "series-23": $rz-series-23,
+    "series-24": $rz-series-24,
+  ),
+  $rz-theme-colors-map
+);
 
 // Text Color
 $rz-text-title-color: var(--rz-base-50) !default;
@@ -208,50 +278,6 @@ $base-styles-map: map-merge(
 
 // Components
 
-// Button
-$button-styles: () !default;
-$button-styles: map-merge(
-  (
-    primary: (
-      background-color: var(--rz-primary),
-      color: var(--rz-text-contrast-color)
-    ),
-    light: (
-      background-color: var(--rz-base-700),
-      color: var(--rz-text-contrast-color)
-    ),
-    dark: (
-      background-color: var(--rz-base-900),
-      color: var(--rz-text-contrast-color)
-    ),
-    secondary: (
-      background-color: var(--rz-secondary),
-      color: var(--rz-text-contrast-color)
-    ),
-    info: (
-      background-color: var(--rz-info),
-      color: var(--rz-text-contrast-color)
-    ),
-    warning: (
-      background-color: var(--rz-warning),
-      color: var(--rz-text-contrast-color)
-    ),
-    error: (
-      background-color: var(--rz-danger),
-      color: var(--rz-text-contrast-color)
-    ),
-    danger: (
-      background-color: var(--rz-danger),
-      color: var(--rz-text-contrast-color)
-    ),
-    success: (
-      background-color: var(--rz-success),
-      color: var(--rz-text-contrast-color)
-    )
-  ),
-  $button-styles
-);
-
 // Chip
 $chip-background-color: var(--rz-base-700) !default;
 
@@ -259,7 +285,7 @@ $chip-background-color: var(--rz-base-700) !default;
 $header-border: var(--rz-border-base-700) !default;
 
 // Sidebar
-$sidebar-border-right: var(--rz-border-base-800) !default;
+$sidebar-border-inline-end: var(--rz-border-base-800) !default;
 $sidebar-background-color: var(--rz-base-background-color) !default;
 
 // SidebarToggle
@@ -317,16 +343,16 @@ $grid-header-color: var(--rz-text-secondary-color) !default;
 $grid-stripe-background-color: var(--rz-base-700) !default;
 $grid-header-sorted-background-color: var(--rz-base-800) !default;
 $grid-filter-background-color: var(--rz-base-800) !default;
-$grid-filter-buttons-background-color: var(--rz-base-900) !default;
+$grid-filter-buttons-background-color: var(--rz-base-800) !default;
 $grid-detail-template-background-color: var(--rz-base-900) !default;
 
-// Paginator
-$paginator-back-button-background-color: var(--rz-base-700) !default;
-$paginator-next-button-background-color: var(--rz-base-700) !default;
-$paginator-numeric-button-background-color: var(--rz-base-700) !default;
-$paginator-numeric-button-selected-color: var(--rz-text-contrast-color) !default;
-$paginator-numeric-button-selected-background-color: var(--rz-base-900) !default;
-$paginator-numeric-button-selected-border: var(--rz-border-base-900) !default;
+// Pager
+$pager-back-button-background-color: var(--rz-base-700) !default;
+$pager-next-button-background-color: var(--rz-base-700) !default;
+$pager-numeric-button-background-color: var(--rz-base-700) !default;
+$pager-numeric-button-selected-color: var(--rz-text-contrast-color) !default;
+$pager-numeric-button-selected-background-color: var(--rz-base-900) !default;
+$pager-numeric-button-selected-border: var(--rz-border-base-900) !default;
 
 // DataList
 $datalist-item-border: none !default;
@@ -391,9 +417,6 @@ $splitter-bar-hover-opacity: 0.8 !default;
 // FormField
 $form-field-filled-background-color: var(--rz-base-700) !default;
 $form-field-filled-hover-background-color: var(--rz-base-700) !default;
-
-@import 'bootstrap';
-$bootstrap: true;
 
 @import 'fonts';
 @import 'components';

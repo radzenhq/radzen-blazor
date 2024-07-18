@@ -1,120 +1,69 @@
-$panel-menu-padding: 0 !default;
+$panel-menu-padding-block: 0 !default;
+$panel-menu-padding-inline: 0 !default;
 $panel-menu-font-size: var(--rz-body-font-size) !default;
 $panel-menu-font-weight: 600 !default;
-$panel-menu-color: var(--rz-text-contrast-color) !default;
-$panel-menu-background-color: var(--rz-base-800) !default;
-$panel-menu-hover-background-color: rgba($rz-black, .3) !default;
-$panel-menu-hover-color: $panel-menu-color !default;
 $panel-menu-focus-outline: var(--rz-outline-focus) !default;
 $panel-menu-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
-
 $panel-menu-item-line-height: 1.25rem !default;
-$panel-menu-item-padding: 0.75rem 1rem !default;
-$panel-menu-item-margin: 0 !default;
+$panel-menu-item-padding-block: 0.75rem !default;
+$panel-menu-item-padding-inline: 1rem !default;
+$panel-menu-item-margin-block: 0 !default;
+$panel-menu-item-margin-inline: 0 !default;
 $panel-menu-item-border: var(--rz-border-base-900) !default;
 $panel-menu-item-border-radius: 0 !default;
+$panel-menu-item-color: var(--rz-text-contrast-color) !default;
+$panel-menu-item-background-color: var(--rz-base-800) !default;
+$panel-menu-item-hover-color: $panel-menu-item-color !default;
+$panel-menu-item-hover-background-color: rgba($rz-black, .3) !default;
+$panel-menu-item-active-color: $panel-menu-item-color !default;
 $panel-menu-item-active-background-color: var(--rz-base-900) !default;
-$panel-menu-item-background-color: $panel-menu-item-active-background-color !default;
-$panel-menu-item-active-color: $panel-menu-color !default;
 $panel-menu-item-active-indicator: var(--rz-secondary) !default;
 $panel-menu-item-offset: 0.75rem !default;
 $panel-menu-item-transition: color var(--rz-transition), background-color var(--rz-transition) !default;
-
 $panel-menu-2nd-level-vertical-offset: 0 !default;
-$panel-menu-item-2nd-level-padding: 0.5rem 1rem !default;
-$panel-menu-item-2nd-level-margin: 0 !default;
+$panel-menu-item-2nd-level-padding-block: 0.5rem !default;
+$panel-menu-item-2nd-level-padding-inline: 1rem !default;
+$panel-menu-item-2nd-level-margin-block: 0 !default;
+$panel-menu-item-2nd-level-margin-inline: 0 !default;
 $panel-menu-item-2nd-level-border-radius: 0 !default;
 $panel-menu-item-2nd-level-offset: 2.75rem !default;
 $panel-menu-item-2nd-level-font-size: var(--rz-body-font-size) !default;
 $panel-menu-item-2nd-level-font-weight: 400 !default;
 $panel-menu-item-2nd-level-color: inherit !default;
-$panel-menu-item-2nd-level-hover-background-color: rgba($rz-black, .4) !default;
-$panel-menu-item-2nd-level-background-color: $panel-menu-item-2nd-level-hover-background-color !default;
+$panel-menu-item-2nd-level-background-color: var(--rz-base-900) !default;
 $panel-menu-item-2nd-level-hover-color: inherit !default;
-$panel-menu-item-2nd-level-active-background-color: $panel-menu-item-2nd-level-hover-background-color !default;
+$panel-menu-item-2nd-level-hover-background-color: rgba($rz-black, .4) !default;
 $panel-menu-item-2nd-level-active-color: inherit !default;
+$panel-menu-item-2nd-level-active-background-color: $panel-menu-item-2nd-level-hover-background-color !default;
 $panel-menu-item-2nd-level-active-font-weight: inherit !default;
-$panel-menu-item-3rd-level-hover-background-color: rgba($rz-black, .6) !default;
+$panel-menu-item-3rd-level-color: inherit !default;
+$panel-menu-item-3rd-level-background-color: rgba($rz-black, .4) !default;
 $panel-menu-item-3rd-level-hover-color: inherit !default;
-$panel-menu-item-3rd-level-active-background-color: $panel-menu-item-3rd-level-hover-background-color !default;
+$panel-menu-item-3rd-level-hover-background-color: rgba($rz-black, .6) !default;
 $panel-menu-item-3rd-level-active-color: inherit !default;
-
+$panel-menu-item-3rd-level-active-background-color: $panel-menu-item-3rd-level-hover-background-color !default;
 $panel-menu-icon-width: var(--rz-icon-size) !default;
 $panel-menu-icon-font-size: var(--rz-icon-size) !default;
 $panel-menu-icon-color: inherit !default;
 $panel-menu-icon-height: $panel-menu-icon-width !default;
-$panel-menu-icon-margin: 0 0.5rem 0 0 !default;
-$panel-menu-icon-2nd-level-margin: 0 0.625rem 0 -1.625rem !default;
+$panel-menu-icon-margin-inline: 0 0.5rem !default;
+$panel-menu-icon-2nd-level-margin-inline: -1.625rem 0.625rem !default;
 $panel-menu-icon-2nd-level-icon-size: calc(var(--rz-icon-size)*0.8) !default;
-
 $panel-menu-toggle-icon-font-size: var(--rz-icon-size) !default;
 $panel-menu-toggle-icon-opacity: 1 !default;
 
-// PanelMenu CSS variables
-
-:root {
-  --rz-panel-menu-padding: #{$panel-menu-padding};
-  --rz-panel-menu-font-size: #{$panel-menu-font-size};
-  --rz-panel-menu-font-weight: #{$panel-menu-font-weight};
-  --rz-panel-menu-color: #{$panel-menu-color};
-  --rz-panel-menu-background-color: #{$panel-menu-background-color};
-  --rz-panel-menu-hover-background-color: #{$panel-menu-hover-background-color};
-  --rz-panel-menu-hover-color: #{$panel-menu-hover-color};
-  --rz-panel-menu-focus-outline: #{$panel-menu-focus-outline};
-  --rz-panel-menu-focus-outline-offset: #{$panel-menu-focus-outline-offset};
-  
-  --rz-panel-menu-item-line-height: #{$panel-menu-item-line-height};
-  --rz-panel-menu-item-padding: #{$panel-menu-item-padding};
-  --rz-panel-menu-item-margin: #{$panel-menu-item-margin};
-  --rz-panel-menu-item-border: #{$panel-menu-item-border};
-  --rz-panel-menu-item-border-radius: #{$panel-menu-item-border-radius};
-  --rz-panel-menu-item-active-background-color: #{$panel-menu-item-active-background-color};
-  --rz-panel-menu-item-background-color: #{$panel-menu-item-background-color};
-  --rz-panel-menu-item-active-color: #{$panel-menu-item-active-color};
-  --rz-panel-menu-item-active-indicator: #{$panel-menu-item-active-indicator};
-  --rz-panel-menu-item-offset: #{$panel-menu-item-offset};
-  --rz-panel-menu-item-transition: #{$panel-menu-item-transition};
-  
-  --rz-panel-menu-2nd-level-vertical-offset: #{$panel-menu-2nd-level-vertical-offset};
-  --rz-panel-menu-item-2nd-level-padding: #{$panel-menu-item-2nd-level-padding};
-  --rz-panel-menu-item-2nd-level-margin: #{$panel-menu-item-2nd-level-margin};
-  --rz-panel-menu-item-2nd-level-border-radius: #{$panel-menu-item-2nd-level-border-radius};
-  --rz-panel-menu-item-2nd-level-offset: #{$panel-menu-item-2nd-level-offset};
-  --rz-panel-menu-item-2nd-level-font-size: #{$panel-menu-item-2nd-level-font-size};
-  --rz-panel-menu-item-2nd-level-font-weight: #{$panel-menu-item-2nd-level-font-weight};
-  --rz-panel-menu-item-2nd-level-color: #{$panel-menu-item-2nd-level-color};
-  --rz-panel-menu-item-2nd-level-hover-background-color: #{$panel-menu-item-2nd-level-hover-background-color};
-  --rz-panel-menu-item-2nd-level-background-color: #{$panel-menu-item-2nd-level-background-color};
-  --rz-panel-menu-item-2nd-level-hover-color: #{$panel-menu-item-2nd-level-hover-color};
-  --rz-panel-menu-item-2nd-level-active-background-color: #{$panel-menu-item-2nd-level-active-background-color};
-  --rz-panel-menu-item-2nd-level-active-color: #{$panel-menu-item-2nd-level-active-color};
-  --rz-panel-menu-item-2nd-level-active-font-weight: #{$panel-menu-item-2nd-level-active-font-weight};
-  --rz-panel-menu-item-3rd-level-hover-background-color: #{$panel-menu-item-3rd-level-hover-background-color};
-  --rz-panel-menu-item-3rd-level-hover-color: #{$panel-menu-item-3rd-level-hover-color};
-  --rz-panel-menu-item-3rd-level-active-background-color: #{$panel-menu-item-3rd-level-active-background-color};
-  --rz-panel-menu-item-3rd-level-active-color: #{$panel-menu-item-3rd-level-active-color};
-  
-  --rz-panel-menu-icon-width: #{$panel-menu-icon-width};
-  --rz-panel-menu-icon-font-size: #{$panel-menu-icon-font-size};
-  --rz-panel-menu-icon-color: #{$panel-menu-icon-color};
-  --rz-panel-menu-icon-height: #{$panel-menu-icon-height};
-  --rz-panel-menu-icon-margin: #{$panel-menu-icon-margin};
-  --rz-panel-menu-icon-2nd-level-margin: #{$panel-menu-icon-2nd-level-margin};
-  --rz-panel-menu-icon-2nd-level-icon-size: #{$panel-menu-icon-2nd-level-icon-size};
-
-  --rz-panel-menu-toggle-icon-font-size: #{$panel-menu-toggle-icon-font-size};
-  --rz-panel-menu-toggle-icon-opacity: #{$panel-menu-toggle-icon-opacity};
-}
-
 .rz-panel-menu {
+  box-sizing: border-box;
   list-style: none;
-  padding: var(--rz-panel-menu-padding);
-  margin-bottom: 0;
+  padding-block: var(--rz-panel-menu-padding-block);
+  padding-inline: var(--rz-panel-menu-padding-inline);
+  margin-block-start: 0;
+  margin-block-end: 0;
   overflow: auto;
   font-size: var(--rz-panel-menu-font-size);
   font-weight: var(--rz-panel-menu-font-weight);
-  color: var(--rz-panel-menu-color);
-  background-color: var(--rz-panel-menu-background-color);
+  color: var(--rz-panel-menu-item-color);
+  background-color: var(--rz-panel-menu-item-background-color);
 
   &:focus {
     outline: var(--rz-outline-normal);
@@ -131,12 +80,14 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     }
   }
 
+  /* First level items */
   & > .rz-navigation-item {
-    margin: var(--rz-panel-menu-item-margin);
+    margin-block: var(--rz-panel-menu-item-margin-block);
+    margin-inline: var(--rz-panel-menu-item-margin-inline);
   }
   
   .rz-navigation-item {
-    border-bottom: var(--rz-panel-menu-item-border);
+    border-block-end: var(--rz-panel-menu-item-border);
     border-radius: var(--rz-panel-menu-item-border-radius);
     overflow: hidden;
   }
@@ -149,11 +100,11 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     overflow: hidden;
 
     &:hover {
-      background-color: var(--rz-panel-menu-hover-background-color);
-      color: var(--rz-panel-menu-hover-color);
+      background-color: var(--rz-panel-menu-item-hover-background-color);
+      color: var(--rz-panel-menu-item-hover-color);
 
       .rz-navigation-item-icon {
-        color: var(--rz-panel-menu-hover-color);
+        color: var(--rz-panel-menu-item-hover-color);
       }
     }
   }
@@ -165,8 +116,8 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     &:before {
       position: absolute;
       content: '';
-      top: 0;
-      bottom: 0;
+      inset-block-start: 0;
+      inset-block-end: 0;
       width: 4px;
       background-color: var(--rz-panel-menu-item-active-indicator);
     }
@@ -177,7 +128,8 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   }
 
   .rz-navigation-item-link {
-    padding: var(--rz-panel-menu-item-padding);
+    padding-block: var(--rz-panel-menu-item-padding-block);
+    padding-inline: var(--rz-panel-menu-item-padding-inline);
     color: inherit;
     cursor: pointer;
     text-decoration: none;
@@ -193,7 +145,7 @@ $panel-menu-toggle-icon-opacity: 1 !default;
   }
 
   .rz-navigation-item-icon-children {
-    margin-left: auto;
+    margin-inline-start: auto;
     font-size: var(--rz-panel-menu-toggle-icon-font-size);
     opacity: var(--rz-panel-menu-toggle-icon-opacity);
     z-index: 1;
@@ -203,23 +155,23 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     height: var(--rz-panel-menu-icon-height);
     width: var(--rz-panel-menu-icon-width);
     color: var(--rz-panel-menu-icon-color);
-    margin: var(--rz-panel-menu-icon-margin);
+    margin-inline: var(--rz-panel-menu-icon-margin-inline);
     font-size: var(--rz-panel-menu-icon-font-size);
     transition: var(--rz-panel-menu-item-transition);
   }
 
+  /* Second level items */
   .rz-navigation-menu {
     list-style: none;
     padding: 0;
-    margin-bottom: 0;
+    margin-block-end: 0;
     overflow: hidden;
 
-
-
     .rz-navigation-item-wrapper {
-      margin: var(--rz-panel-menu-item-2nd-level-margin);
+      margin-block: var(--rz-panel-menu-item-2nd-level-margin-block);
+      margin-inline: var(--rz-panel-menu-item-2nd-level-margin-inline);
       border-radius: var(--rz-panel-menu-item-2nd-level-border-radius);
-      background-color: var(--rz-panel-menu-item-background-color);
+      background-color: var(--rz-panel-menu-item-2nd-level-background-color);
       overflow: hidden;
 
       &:hover {
@@ -247,23 +199,41 @@ $panel-menu-toggle-icon-opacity: 1 !default;
       height: var(--rz-panel-menu-icon-2nd-level-icon-size);
       width: var(--rz-panel-menu-icon-2nd-level-icon-size);
       font-size: var(--rz-panel-menu-icon-2nd-level-icon-size);
-      margin: var(--rz-panel-menu-icon-2nd-level-margin);
+      margin-inline: var(--rz-panel-menu-icon-2nd-level-margin-inline);
     }
 
+    .rz-navigation-item {
+      border-block-end: none;
+      color: var(--rz-panel-menu-item-2nd-level-color);
+      font-size: var(--rz-panel-menu-item-2nd-level-font-size);
+      font-weight: var(--rz-panel-menu-item-2nd-level-font-weight);
+
+      &:first-child {
+        margin-block-start: var(--rz-panel-menu-2nd-level-vertical-offset);
+      }
+
+      &:last-child {
+        margin-block-end: var(--rz-panel-menu-2nd-level-vertical-offset);
+      }
+
+      .rz-navigation-item-link {
+        padding-block: var(--rz-panel-menu-item-2nd-level-padding-block);
+        padding-inline: var(--rz-panel-menu-item-2nd-level-padding-inline);
+        padding-inline-start: var(--rz-panel-menu-item-2nd-level-offset);
+      }
+    }
+
+    /* Third level items */
     .rz-navigation-menu {
       margin: 0;
 
-      .rz-navigation-item-link {
-        padding-left: var(--rz-panel-menu-item-offset);
-      }
-
       .rz-navigation-item-wrapper {
-        background-color: var(--rz-panel-menu-item-2nd-level-background-color);
-        color: var(--rz-panel-menu-item-2nd-level-color);
+        color: var(--rz-panel-menu-item-3rd-level-color);
+        background-color: var(--rz-panel-menu-item-3rd-level-background-color);
 
         &:hover {
-          background-color: var(--rz-panel-menu-item-3rd-level-hover-background-color);
           color: var(--rz-panel-menu-item-3rd-level-hover-color);
+          background-color: var(--rz-panel-menu-item-3rd-level-hover-background-color);
         }
       }
 
@@ -271,26 +241,6 @@ $panel-menu-toggle-icon-opacity: 1 !default;
       .rz-navigation-item-wrapper-active {
         background-color: var(--rz-panel-menu-item-3rd-level-active-background-color);
         color: var(--rz-panel-menu-item-3rd-level-active-color);
-      }
-    }
-
-    .rz-navigation-item {
-      border-bottom: none;
-      color: var(--rz-panel-menu-item-2nd-level-color);
-      font-size: var(--rz-panel-menu-item-2nd-level-font-size);
-      font-weight: var(--rz-panel-menu-item-2nd-level-font-weight);
-
-      &:first-child {
-        margin-top: var(--rz-panel-menu-2nd-level-vertical-offset);
-      }
-
-      &:last-child {
-        margin-bottom: var(--rz-panel-menu-2nd-level-vertical-offset);
-      }
-
-      .rz-navigation-item-link {
-        padding: var(--rz-panel-menu-item-2nd-level-padding);
-        padding-left: var(--rz-panel-menu-item-2nd-level-offset);
       }
     }
   }

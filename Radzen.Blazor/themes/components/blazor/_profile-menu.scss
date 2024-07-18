@@ -1,44 +1,28 @@
 $profile-menu-background-color: var(--rz-base-background-color) !default;
 $profile-menu-top-item-background-color: $profile-menu-background-color !default;
 $profile-menu-border: var(--rz-border-base-200) !default;
-$profile-menu-padding: 0.625rem 1rem !default;
+$profile-menu-padding-block: 0.625rem !default;
+$profile-menu-padding-inline: 1rem !default;
 $profile-menu-border-radius: var(--rz-border-radius) !default;
 $profile-menu-toggle-button-color: var(--rz-secondary) !default;
-
 $profile-menu-item-hover-background-color: var(--rz-secondary) !default;
 $profile-menu-item-focus-outline: var(--rz-outline-focus) !default;
 $profile-menu-item-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $profile-menu-item-icon-width: var(--rz-icon-size) !default;
 $profile-menu-item-icon-height: $profile-menu-item-icon-width !default;
 $profile-menu-item-icon-font-size: $profile-menu-item-icon-height !default;
-$profile-menu-item-icon-margin: 0 0.5rem 0 0 !default;
-
-// ProfileMenu CSS variables
-
-:root {
-  --rz-profile-menu-background-color: #{$profile-menu-background-color};
-  --rz-profile-menu-top-item-background-color: #{$profile-menu-top-item-background-color};
-  --rz-profile-menu-border: #{$profile-menu-border};
-  --rz-profile-menu-padding: #{$profile-menu-padding};
-  --rz-profile-menu-border-radius: #{$profile-menu-border-radius};
-  --rz-profile-menu-toggle-button-color: #{$profile-menu-toggle-button-color};
-  
-  --rz-profile-menu-item-hover-background-color: #{$profile-menu-item-hover-background-color};
-  --rz-profile-menu-item-focus-outline: #{$profile-menu-item-focus-outline};
-  --rz-profile-menu-item-focus-outline-offset: #{$profile-menu-item-focus-outline-offset};
-  --rz-profile-menu-item-icon-width: #{$profile-menu-item-icon-width};
-  --rz-profile-menu-item-icon-height: #{$profile-menu-item-icon-height};
-  --rz-profile-menu-item-icon-font-size: #{$profile-menu-item-icon-font-size};
-  --rz-profile-menu-item-icon-margin: #{$profile-menu-item-icon-margin};
-}
+$profile-menu-item-icon-margin-inline: 0 0.5rem !default;
 
 ul.rz-profile-menu {
+  box-sizing: border-box;
   list-style: none;
-  margin-bottom: 0;
-  padding: var(--rz-profile-menu-padding);
+  margin-block-start: 0;
+  margin-block-end: 0;
+  padding-block: var(--rz-profile-menu-padding-block);
+  padding-inline: var(--rz-profile-menu-padding-inline);
   display: inline-block;
   background-color: var(--rz-profile-menu-top-item-background-color);
-  border-left: var(--rz-profile-menu-border);
+  border-inline-start: var(--rz-profile-menu-border);
   position: relative;
   z-index: 3;
 
@@ -69,21 +53,24 @@ ul.rz-profile-menu {
     list-style: none;
     overflow: hidden;
     position: absolute;
-    margin-bottom: 0;
-    padding: var(--rz-context-menu-padding);
+    margin-block-start: 0;
+    margin-block-end: 0;
+    padding-block: var(--rz-context-menu-padding-block);
+    padding-inline: var(--rz-context-menu-padding-inline);
     border-radius: var(--rz-profile-menu-border-radius);
     background-color: var(--rz-profile-menu-background-color);
     box-shadow: var(--rz-context-menu-box-shadow);
-    text-align: left;
-    top: calc(100% - 2px);
+    text-align: start;
+    inset-block-start: calc(100% - 2px);
+    inset-inline-end: 0;
     min-width: 100%;
-    right: 0;
     white-space: nowrap;
 
     .rz-navigation-item-wrapper {
 
       .rz-navigation-item-link {
-        padding: var(--rz-menu-item-padding);
+        padding-block: var(--rz-menu-item-padding-block);
+        padding-inline: var(--rz-menu-item-padding-inline);
       }
 
       &:hover {
@@ -109,7 +96,7 @@ ul.rz-profile-menu {
       width: var(--rz-profile-menu-item-icon-width);
       height: var(--rz-profile-menu-item-icon-height);
       font-size: var(--rz-profile-menu-item-icon-font-size);
-      margin: var(--rz-profile-menu-item-icon-margin);
+      margin-inline: var(--rz-profile-menu-item-icon-margin-inline);
     }
   }
 }

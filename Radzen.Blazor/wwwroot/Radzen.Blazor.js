@@ -21,6 +21,9 @@ var rejectCallbacks = [];
 var radzenRecognition;
 
 window.Radzen = {
+    isRTL: function (el) {
+        return el && getComputedStyle(el).direction == 'rtl';
+    },
     throttle: function (callback, delay) {
         var timeout = null;
         return function () {
@@ -196,7 +199,7 @@ window.Radzen = {
     script.src =
       'https://maps.googleapis.com/maps/api/js?' +
       (apiKey ? 'key=' + apiKey + '&' : '') +
-      'callback=rz_map_init';
+      'callback=rz_map_init&libraries=marker';
 
     script.async = true;
     script.defer = true;
@@ -265,16 +268,19 @@ window.Radzen = {
                 Radzen[id].instance.markers = [];
 
                 markers.forEach(function (m) {
-                    var marker = new this.google.maps.Marker({
+                    var content = document.createElement('span');
+                    content.innerHTML = m.label;
+
+                    var marker = new this.google.maps.marker.AdvancedMarkerElement({
                         position: m.position,
                         title: m.title,
-                        label: m.label
+                        content: content
                     });
 
                     marker.addListener('click', function (e) {
                         Radzen[id].invokeMethodAsync('RadzenGoogleMap.OnMarkerClick', {
                             Title: marker.title,
-                            Label: marker.label,
+                            Label: marker.content.innerText,
                             Position: marker.position
                         });
                     });
@@ -444,7 +450,8 @@ window.Radzen = {
         e.targetTouches && e.targetTouches[0]
           ? e.targetTouches[0].pageX - e.target.getBoundingClientRect().left
           : e.pageX - handle.getBoundingClientRect().left;
-      var percent = (handle.offsetLeft + offsetX) / parent.offsetWidth;
+      var percent = (Radzen.isRTL(handle) ? parent.offsetWidth - handle.offsetLeft - offsetX
+            : handle.offsetLeft + offsetX) / parent.offsetWidth;
 
       if (percent > 1) {
           percent = 1;
@@ -2033,7 +2040,7 @@ window.Radzen = {
           },
           mouseMoveHandler: function (e) {
               if (Radzen[el]) {
-                  var widthFloat = (Radzen[el].width - (Radzen[el].clientX - e.clientX));
+                  var widthFloat = (Radzen[el].width - (Radzen.isRTL(cell) ? -1 : 1) * (Radzen[el].clientX - e.clientX));
                   var minWidth = parseFloat(cell.style.minWidth || 0)
 
                   if (widthFloat < minWidth) {
@@ -2164,7 +2171,7 @@ window.Radzen = {
                     var spaceLength = Radzen[el].paneLength + Radzen[el].paneNextLength;
 
                     var length = (Radzen[el].paneLength -
-                        (Radzen[el].clientPos - (isHOrientation ? e.clientX : e.clientY)));
+                        (isHOrientation && Radzen.isRTL(e.target) ? -1 : 1) * (Radzen[el].clientPos - (isHOrientation ? e.clientX : e.clientY)));
 
                     if (length > spaceLength)
                         length = spaceLength;

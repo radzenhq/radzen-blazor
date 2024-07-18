@@ -5,17 +5,6 @@ $header-border: var(--rz-border-base-200) !default;
 $header-color: var(--rz-text-color) !default;
 $header-shadow: none !default;
 
-// Header CSS variables
-
-:root {
-  --rz-header-background-color: #{$header-background-color};
-  --rz-header-min-height: #{$header-min-height};
-  --rz-header-z: #{$header-z};
-  --rz-header-border: #{$header-border};
-  --rz-header-color: #{$header-color};
-  --rz-header-shadow: #{$header-shadow};
-}
-
 .rz-header {
   background-color: var(--rz-header-background-color);
   min-height: var(--rz-header-min-height);

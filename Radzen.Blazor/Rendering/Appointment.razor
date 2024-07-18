@@ -60,12 +60,12 @@
 
         if (Top.HasValue)
         {
-            style.Add($"top: {Top.ToInvariantString()}em");
+            style.Add($"inset-block-start: {Top.ToInvariantString()}em");
         }
 
         if (Left.HasValue)
         {
-            style.Add($"left: {Left.ToInvariantString()}%");
+            style.Add($"inset-inline-start: {Left.ToInvariantString()}%");
         }
 
         if (Width.HasValue)

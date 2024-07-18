@@ -1,22 +1,17 @@
-﻿<div class="container-fluid splitbutton-demo">
-    <div class="row mb-4">
-        <div class="col">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Set IsBusy</RadzenText>
-            <RadzenSplitButton style="width: 160px" IsBusy=@busy Click=@OnBusyClick Text="Save">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" />
-                </ChildContent>
-            </RadzenSplitButton>
-            <RadzenSplitButton Icon="save" BusyText="Saving ..." IsBusy=@busy Click=@OnBusyClick Text="Save">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" />
-                </ChildContent>
-            </RadzenSplitButton>
-        </div>
-    </div>
-</div>
+﻿<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="3rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+    <RadzenSplitButton IsBusy=@busy Click=@OnBusyClick Text="Save">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Icon="save" BusyText="Saving ..." IsBusy=@busy Click=@OnBusyClick Text="Save">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+</RadzenStack>
 
 @code {
     bool busy;

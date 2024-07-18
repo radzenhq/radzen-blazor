@@ -3,17 +3,13 @@
 
 @inherits DbContextPage
 
-<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-lg-6 offset-lg-3 p-3">
-            <RadzenCard>
-            <h4 class="mb-4">Employee: <b>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</b></h4>
-            <RadzenFileInput @bind-Value=@firstEmployee.Photo @bind-FileName=@fileName @bind-FileSize=@fileSize TValue="string" class="w-100" 
-                Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"/>
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+<RadzenStack AlignItems="AlignItems.Center">
+    <RadzenCard Class="rz-m-0 rz-m-md-12" Style="width: 100%; max-width: 600px;">
+        <RadzenText TextStyle="TextStyle.H4">Employee: <strong>@(firstEmployee.FirstName + " " + firstEmployee.LastName)</strong></RadzenText>
+        <RadzenFileInput @bind-Value=@firstEmployee.Photo @bind-FileName=@fileName @bind-FileSize=@fileSize TValue="string" Style="width: 100%" 
+            Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"/>
+    </RadzenCard>
+</RadzenStack>
 
 <EventConsole @ref=@console />
 

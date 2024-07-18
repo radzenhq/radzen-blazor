@@ -1,16 +1,19 @@
 @using System.Globalization
 
-<div class="container">
-    <RadzenCard class="mt-4 w-100 mb-4 d-flex align-items-center" >
-        <RadzenLabel Text="Color scheme:" Style="margin-right: 8px; vertical-align: middle;" Component="ColorScheme" />
-        <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" Name="ColorScheme">
-            <Template>
-                @Enum.GetName(typeof(ColorScheme), context)
-            </Template>
-        </RadzenDropDown>
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Color scheme:" Component="ColorScheme" />
+            <RadzenDropDown Data="@colorSchemes" @bind-Value="@colorScheme" Name="ColorScheme">
+                <Template>
+                    @Enum.GetName(typeof(ColorScheme), context)
+                </Template>
+            </RadzenDropDown>
+        </RadzenStack>
     </RadzenCard>
-    <div class="row my-5">
-        <div class="col-sm-12 col-lg-8">
+
+    <RadzenRow>
+        <RadzenColumn Size="12" SizeLG="8">
             <RadzenChart ColorScheme="@colorScheme">
                 @for (var year = 2017; year <= 2024; year++)
                 {
@@ -20,16 +23,17 @@
                 <RadzenColumnOptions Margin="0" />
                 <RadzenValueAxis Formatter="@FormatAsUSD" />
             </RadzenChart>
-        </div>
-        <div class="col-sm-12 col-lg-4">
+        </RadzenColumn>
+        <RadzenColumn Size="12" SizeLG="4">
             <RadzenChart ColorScheme="@colorScheme">
                 <RadzenPieSeries Data="@revenue.Where(r => r.Year == 2020)" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue" />
             </RadzenChart>
-        </div>
-    </div>
-    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">Custom colors and styling</RadzenText>
-    <div class="row my-5">
-        <div class="col-sm-12">
+        </RadzenColumn>
+    </RadzenRow>
+
+    <RadzenRow>
+        <RadzenColumn Size="12">
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">Custom colors and styling</RadzenText>
             <RadzenChart>
                 <RadzenAreaSeries Stroke="rgb(236,72,127)" StrokeWidth="2" Fill="rgba(236,72,127,.5)" Data="@revenue.Where(r => r.Year == 2020)" CategoryProperty="Quarter" ValueProperty="Revenue">
                     <ChildContent>
@@ -48,9 +52,9 @@
                 <RadzenChartTooltipOptions Style="border: 1px solid rgb(236,72,127); background: #eee; color: #000;" />
                 <RadzenLegend Visible="false" />
             </RadzenChart>
-        </div>
-    </div>
-</div>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
 
 @code {
     IEnumerable<ColorScheme> colorSchemes = Enum.GetValues(typeof(ColorScheme)).Cast<ColorScheme>();

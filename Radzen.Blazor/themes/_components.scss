@@ -3,6 +3,7 @@
 @import 'components/blazor/spacing';
 @import 'components/blazor/typography';
 @import 'components/blazor/icons';
+@import 'components/blazor/image';
 @import 'components/blazor/common';
 @import 'components/blazor/button';
 @import 'components/blazor/badge';
@@ -42,7 +43,7 @@
 @import 'components/blazor/numeric';
 @import 'components/blazor/upload';
 @import 'components/blazor/grid';
-@import 'components/blazor/paginator';
+@import 'components/blazor/pager';
 @import 'components/blazor/overlay-panel';
 @import 'components/blazor/tree';
 @import 'components/blazor/datalist';
@@ -73,3 +74,4 @@
 @import 'components/blazor/form-field';
 @import 'components/blazor/timeline';
 @import 'components/blazor/picklist';
+@import 'css-variables';

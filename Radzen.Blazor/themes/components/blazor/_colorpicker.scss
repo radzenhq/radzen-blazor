@@ -6,54 +6,19 @@ $colorpicker-panel-max-width: 20rem !default;
 $colorpicker-saturation-height: 200px !default;
 $colorpicker-focus-outline: var(--rz-outline-focus) !default;
 $colorpicker-focus-outline-offset: var(--rz-outline-offset) !default;
-
 $colorpicker-value-border-radius: var(--rz-border-radius) !default;
-
+$colorpicker-items-gap: 0.5rem !default;
 $colorpicker-item-size: 1.25rem !default;
 $colorpicker-item-border-radius: var(--rz-border-radius) !default;
-$colorpicker-item-margin: 0.25rem !default;
 $colorpicker-item-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.25) 0px 0px 4px inset !default;
-
 $colorpicker-handle-size: 12px !default;
 $colorpicker-handle-border: 2px solid var(--rz-white) !default;
 $colorpicker-handle-shadow: var(--rz-white) 0px 0px 0px 1px, rgba(0, 0, 0, 0.3) 0px 0px 1px 1px inset, rgba(0, 0, 0, 0.4) 0px 0px 1px 2px !default;
-
 $colorpicker-hex-input-padding: 0.25rem 0.5rem !default;
 $colorpicker-hex-input-height: 2rem !default;
 $colorpicker-rgba-input-padding: 0.25rem 0.5rem !default;
 $colorpicker-rgba-input-height: 2rem !default;
 $colorpicker-input-labels-color: var(--rz-text-tertiary-color) !default;
-
-// ColorPicker CSS variables
-
-:root {
-  --rz-colorpicker-panel-border: #{$colorpicker-panel-border};
-  --rz-colorpicker-panel-background-color: #{$colorpicker-panel-background-color};
-  --rz-colorpicker-panel-shadow: #{$colorpicker-panel-shadow};
-  --rz-colorpicker-panel-padding: #{$colorpicker-panel-padding};
-  --rz-colorpicker-panel-max-width: #{$colorpicker-panel-max-width};
-  --rz-colorpicker-saturation-height: #{$colorpicker-saturation-height};
-  --rz-colorpicker-focus-outline: #{$colorpicker-focus-outline};
-  --rz-colorpicker-focus-outline-offset: #{$colorpicker-focus-outline-offset};
-
-  --rz-colorpicker-value-border-radius: #{$colorpicker-value-border-radius};
-
-  --rz-colorpicker-item-size: #{$colorpicker-item-size};
-  --rz-colorpicker-item-border-radius: #{$colorpicker-item-border-radius};
-  --rz-colorpicker-item-margin: #{$colorpicker-item-margin};
-  --rz-colorpicker-item-shadow: #{$colorpicker-item-shadow};
-
-  --rz-colorpicker-handle-size: #{$colorpicker-handle-size};
-  --rz-colorpicker-handle-border: #{$colorpicker-handle-border};
-  --rz-colorpicker-handle-shadow: #{$colorpicker-handle-shadow};
-
-  --rz-colorpicker-hex-input-padding: #{$colorpicker-hex-input-padding};
-  --rz-colorpicker-hex-input-height: #{$colorpicker-hex-input-height};
-  --rz-colorpicker-rgba-input-padding: #{$colorpicker-rgba-input-padding};
-  --rz-colorpicker-rgba-input-height: #{$colorpicker-rgba-input-height};
-  --rz-colorpicker-input-labels-color: #{$colorpicker-input-labels-color};
-}
-
 
 .rz-colorpicker {
   display: inline-flex;
@@ -140,7 +105,7 @@ button.rz-colorpicker-trigger {
   right: 0;
   bottom: 0;
   border-radius: var(--rz-border-radius);
-  border-top-left-radius: calc(var(--rz-border-radius) - 1px);
+  border-start-start-radius: calc(var(--rz-border-radius) - 1px);
 }
 
 .rz-saturation-black {
@@ -227,7 +192,7 @@ button.rz-colorpicker-trigger {
 
 .rz-hue-and-alpha {
   flex: 1;
-  padding-right: 8px;
+  padding-inline-end: 8px;
 }
 
 .rz-alpha-picker,
@@ -241,10 +206,10 @@ button.rz-colorpicker-trigger {
     bottom: 0;
     right: 0;
     border-radius: var(--rz-border-radius);
-    background-image: linear-gradient(45deg, #cccccc 25%, transparent 25%),
-      linear-gradient(-45deg, #cccccc 25%, transparent 25%),
-      linear-gradient(45deg, transparent 75%, #cccccc 75%),
-      linear-gradient(-45deg, transparent 75%, #cccccc 75%);
+    background-image: linear-gradient(45deg, var(--rz-text-disabled-color) 25%, transparent 25%),
+      linear-gradient(-45deg, var(--rz-text-disabled-color) 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, var(--rz-text-disabled-color) 75%),
+      linear-gradient(-45deg, transparent 75%, var(--rz-text-disabled-color) 75%);
     background-size: 8px 8px;
     background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
   }
@@ -261,6 +226,7 @@ button.rz-colorpicker-trigger {
 
 .rz-colorpicker-rgba {
   display: flex;
+  gap: 4px;
 }
 
 .rz-color-box {
@@ -272,22 +238,18 @@ button.rz-colorpicker-trigger {
   font-size: 0.75rem;
   text-transform: uppercase;
 
-  &:not(:last-child) {
-    margin-right: 4px;
-  }
-
   .rz-textbox {
     width: 80px;
-    margin-right: 4px;
+    margin-inline-end: 4px;
     padding: var(--rz-colorpicker-hex-input-padding);
     height: var(--rz-colorpicker-hex-input-height);
   }
 
-  .rz-spinner {
+  .rz-numeric {
     padding: var(--rz-colorpicker-rgba-input-padding);
     height: var(--rz-colorpicker-rgba-input-height);
 
-    .rz-spinner-input {
+    .rz-numeric-input {
       padding: 0;
       outline: none;
     }
@@ -315,15 +277,13 @@ button.rz-colorpicker-trigger {
 .rz-colorpicker-colors {
   display: flex;
   flex-wrap: wrap;
-  margin-left: -4px;
-  margin-right: -4px;
+  gap: var(--rz-colorpicker-items-gap);
 }
 
 .rz-colorpicker-item {
   width: var(--rz-colorpicker-item-size);
   height: var(--rz-colorpicker-item-size);
   border-radius: var(--rz-colorpicker-item-border-radius);
-  margin: var(--rz-colorpicker-item-margin);
   box-shadow: var(--rz-colorpicker-item-shadow);
   cursor: pointer;
 

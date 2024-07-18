@@ -7,7 +7,7 @@
         aria-selected=@(IsSelected? "true" : "false") aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")" @onkeydown:stopPropagation>
         @if (!string.IsNullOrEmpty(Icon))
             {
-                <span class="rz-tabview-left-icon rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</span>
+                <span class="rzi rz-tabview-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</span>
             }
             @if (Template != null)
             {

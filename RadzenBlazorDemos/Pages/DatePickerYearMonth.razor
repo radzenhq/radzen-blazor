@@ -1,7 +1,7 @@
-﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenLabel Text="Select Year/Month" Component="DatePickerYearMonth" Style="margin-right: 8px; vertical-align: middle;" />
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-12">
+    <RadzenLabel Text="Select Year/Month" Component="DatePickerYearMonth" />
     <RadzenDatePicker @bind-Value=@value ShowDays=false DateFormat="yyyy/MM" CurrentDateChanged=@OnCurrentDateChanged Name="DatePickerYearMonth" />
-</div>
+</RadzenStack>
 
 @code {
     DateTime value = DateTime.Now;

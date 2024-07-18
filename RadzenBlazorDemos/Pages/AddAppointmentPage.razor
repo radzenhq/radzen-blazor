@@ -1,39 +1,26 @@
 @inject DialogService DialogService
 
 <RadzenTemplateForm TItem="Appointment" Data="@model" Submit=@OnSubmit>
-<div class="row" style="margin-bottom: 16px">
-    <div class="col-md-3">
-        <RadzenLabel Text="Text" />
-    </div>
-    <div class="col">
-        <RadzenTextBox @bind-Value="@model.Text" Name="Text" />
-        <RadzenRequiredValidator Text="Title is required" Component="Text" />
-    </div>
-</div>
-<div class="row" style="margin-bottom: 16px">
-    <div class="col-md-3">
-        <RadzenLabel Text="Start" />
-    </div>
-    <div class="col">
-        <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" />
-        <RadzenRequiredValidator Text="Start is required" Component="Start" />
-    </div>
-</div>
-<div class="row" style="margin-bottom: 16px">
-    <div class="col-md-3">
-        <RadzenLabel Text="End" />
-    </div>
-    <div class="col">
-        <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" />
-        <RadzenRequiredValidator Component="End" Text="End is required" />
-    </div>
-</div>
-<div class="row">
-    <div class="col-md-3"></div>
-    <div class="col">
-        <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
-    </div>
-</div>
+    <RadzenStack Gap="1rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Title" Style="width: 4rem;" />
+            <RadzenTextBox @bind-Value="@model.Text" Name="Text" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="Text" Text="Title is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Start" Style="width: 4rem;" />
+            <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="Start" Text="Start is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="End" Style="width: 4rem;" />
+            <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="End" Text="End is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" >
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+        </RadzenStack>
+    </RadzenStack>
 </RadzenTemplateForm>
 @code {
     [Parameter]

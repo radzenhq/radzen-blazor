@@ -1,13 +1,5 @@
 ﻿@page "/splitbutton"
-<style>
-    .splitbutton-demo .rz-splitbutton {
-        margin: 0 0.25rem 0.5rem 0;
-    }
 
-    .splitbutton-demo h3 {
-        margin-bottom: 1rem;
-    }
-</style>
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     SplitButton
 </RadzenText>
@@ -23,6 +15,16 @@
 </RadzenText>
 <RadzenExample ComponentName="SplitButton" Example="SplitButtonFilled">
     <SplitButtonFilled />
+</RadzenExample>
+
+<RadzenText Anchor="splitbutton#flat" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Flat SplitButton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Variant="Variant.Flat"</code> for flat split button variant.
+</RadzenText>
+<RadzenExample ComponentName="SplitButton" Example="SplitButtonFlat">
+    <SplitButtonFlat />
 </RadzenExample>
 
 <RadzenText Anchor="splitbutton#outlined" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">

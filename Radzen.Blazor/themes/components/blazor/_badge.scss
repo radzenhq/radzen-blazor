@@ -8,64 +8,8 @@ $badge-line-height: 1rem !default;
 $badge-text-transform: uppercase !default;
 $badge-letter-spacing: 0.02rem !default;
 
-// Badge CSS variables
-
-:root {
-  --rz-badge-border-radius: #{$badge-border-radius};
-  --rz-badge-pill-border-radius: #{$badge-pill-border-radius};
-  --rz-badge-padding: #{$badge-padding};
-  --rz-badge-pill-padding: #{$badge-pill-padding};
-  --rz-badge-font-size: #{$badge-font-size};
-  --rz-badge-font-weight: #{$badge-font-weight};
-  --rz-badge-line-height: #{$badge-line-height};
-  --rz-badge-text-transform: #{$badge-text-transform};
-  --rz-badge-letter-spacing: #{$badge-letter-spacing};
-}
-
-$badge-styles: () !default;
-
-$badge-styles: map-merge(
-  (
-    primary: (
-      background-color: var(--rz-primary),
-      color: var(--rz-on-primary)
-    ),
-    light: (
-      background-color: var(--rz-base-200),
-      color: var(--rz-base-900)
-    ),
-    dark: (
-      background-color: var(--rz-base-900)
-    ),
-    secondary: (
-      background-color: var(--rz-secondary),
-      color: var(--rz-on-secondary)
-    ),
-    info: (
-      background-color: var(--rz-info),
-      color: var(--rz-on-info)
-    ),
-    warning: (
-      background-color: var(--rz-warning),
-      color: var(--rz-on-warning)
-    ),
-    error: (
-      background-color: var(--rz-danger),
-      color: var(--rz-on-danger)
-    ),
-    danger: (
-      background-color: var(--rz-danger),
-      color: var(--rz-on-danger)
-    ),
-    success: (
-      background-color: var(--rz-success),
-      color: var(--rz-on-success)
-    )
-  ),
-  $badge-styles
-);
-
 .rz-badge {
+    box-sizing: border-box;
     color: var(--rz-text-contrast-color);
     display: inline-block;
     padding: var(--rz-badge-padding);
@@ -83,43 +27,43 @@ $badge-styles: map-merge(
     }
 }
 
-@each $style, $badge in $badge-styles {
-    .rz-badge-#{$style} {
-        @each $name, $value in $badge {
-          @if $style == 'dark' {
-            #{$name}: #{$value};
-          } @else if $style == 'light' {
-            #{$name}: #{$value};
-          } @else {
-            #{$name}: #{$value};
-            @if $name == 'background-color' {
-              &.rz-shade-lighter {
-                background-color: var(--rz-#{$style}-lighter);
-                color: var(--rz-on-#{$style}-lighter);
-              }
-              &.rz-shade-light {
-                background-color: var(--rz-#{$style}-light);
-                color: var(--rz-on-#{$style}-light);
-              }
-              &.rz-shade-default {
-                background-color: var(--rz-#{$style});
-                color: var(--rz-on-#{$style});
-              }
-              &.rz-shade-dark {
-                background-color: var(--rz-#{$style}-dark);
-                color: var(--rz-on-#{$style}-dark);
-              }
-              &.rz-shade-darker {
-                background-color: var(--rz-#{$style}-darker);
-                color: var(--rz-on-#{$style}-darker);
-              }
-            }
+@each $style, $badge in map-merge($severity-styles-map, $base-styles-map) {
+  .rz-badge-#{$style} {
+    @each $name, $value in $badge {
+      @if $style == 'dark' {
+        #{$name}: #{$value};
+      } @else if $style == 'light' {
+        #{$name}: #{$value};
+      } @else {
+        #{$name}: #{$value};
+        @if $name == 'background-color' {
+          &.rz-shade-lighter {
+            background-color: var(--rz-#{$style}-lighter);
+            color: var(--rz-on-#{$style}-lighter);
+          }
+          &.rz-shade-light {
+            background-color: var(--rz-#{$style}-light);
+            color: var(--rz-on-#{$style}-light);
+          }
+          &.rz-shade-default {
+            background-color: var(--rz-#{$style});
+            color: var(--rz-on-#{$style});
+          }
+          &.rz-shade-dark {
+            background-color: var(--rz-#{$style}-dark);
+            color: var(--rz-on-#{$style}-dark);
+          }
+          &.rz-shade-darker {
+            background-color: var(--rz-#{$style}-darker);
+            color: var(--rz-on-#{$style}-darker);
           }
         }
+      }
     }
+  }
 }
 
-@each $style, $badge in $badge-styles {
+@each $style, $badge in map-merge($severity-styles-map, $base-styles-map) {
   .rz-variant-outlined.rz-badge-#{$style} {
     @each $name, $value in $badge {
       @if $name == 'background-color' {
@@ -161,7 +105,7 @@ $badge-styles: map-merge(
   }
 }
 
-@each $style, $badge in $badge-styles {
+@each $style, $badge in map-merge($severity-styles-map, $base-styles-map) {
   .rz-variant-text.rz-badge-#{$style} {
     @each $name, $value in $badge {
       @if $name == 'background-color' {

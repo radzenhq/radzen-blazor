@@ -5,12 +5,12 @@
 <RadzenRow class="rz-p-2" Gap="0.5rem" Style="border-bottom: var(--rz-border-disabled);">
     <RadzenColumn>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0.5rem">
-            <RadzenButton Visible=@(!ReadOnly) IsBusy=@isBusy Disabled=@isBusy Click="Run" Text="Run" Icon="play_circle_outline" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Title="Preview edits" class="rz-text-truncate" />
-            <button class="rz-button rz-button-xs rz-variant-text rz-primary rz-shade-default rz-text-truncate" Title="Copy source code" onclick=@Copy >
+            <RadzenButton Visible=@(!ReadOnly) IsBusy=@isBusy Disabled=@isBusy Click="Run" Text="Run" Icon="play_circle" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Title="Preview edits" class="rz-text-truncate" />
+            <button class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-default rz-text-truncate" Title="Copy source code" onclick=@Copy >
                 <RadzenIcon Icon="content_copy" />
                 Copy
             </button>
-            <RadzenButton Visible=@(!ReadOnly) Disabled=@isBusy Click="@Reset" Text="Reset" Icon="refresh" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-text-truncate" />
+            <RadzenButton Visible=@(!ReadOnly) Disabled=@isBusy Click="@Reset" Text="Reset" Icon="refresh" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-text-truncate" />
         </RadzenStack>
     </RadzenColumn>
     <RadzenColumn>
@@ -21,7 +21,7 @@
     else
     {
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
-            <a target="blank" class="rz-button rz-button-xs rz-variant-text rz-primary rz-shade-default rz-text-truncate rz-text-capitalize" href="@ComponentSourceHref" title=@($"View Radzen{ComponentName} component source code in new tab") >
+            <a target="blank" class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-default rz-text-truncate rz-text-capitalize" href="@ComponentSourceHref" title=@($"View Radzen{ComponentName} component source code in new tab") >
                 <RadzenIcon Icon="open_in_new" /> @($"Radzen{ComponentName}") Source
             </a>
         </RadzenStack>

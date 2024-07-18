@@ -2,11 +2,12 @@ $checkbox-width: 1.25rem !default;
 $checkbox-height: $checkbox-width !default;
 $checkbox-border-radius: 2px !default;
 $checkbox-border-width: inherit !default;
-$checkbox-label-margin: 0 1rem 0 0.5rem !default;
-$checkbox-margin: 1rem 0 !default;
+$checkbox-label-margin-block: 0 !default;
+$checkbox-label-margin-inline: 0.5rem 1rem !default;
+$checkbox-margin-block: 1rem !default;
+$checkbox-margin-inline: 0 !default;
 $checkbox-focus-outline: var(--rz-outline-focus) !default;
 $checkbox-focus-outline-offset: var(--rz-outline-offset) !default;
-
 $checkbox-checked-background-color: var(--rz-secondary) !default;
 $checkbox-checked-color: var(--rz-on-secondary) !default;
 $checkbox-checked-hover-background-color: var(--rz-secondary-light) !default;
@@ -17,57 +18,28 @@ $checkbox-checked-hover-border: $checkbox-checked-border !default;
 $checkbox-checked-disabled-border: $checkbox-checked-border !default;
 $checkbox-checked-icon-background-color: transparent !default;
 $checkbox-checked-icon-border-radius: 0 !default;
-
 $checkbox-icon-width: var(--rz-body-font-size) !default;
 $checkbox-icon-height: $checkbox-icon-width !default;
 $checkbox-icon-font-size: var(--rz-body-font-size) !default;
-
 $checkbox-tri-icon-width: $checkbox-icon-width !default;
 $checkbox-tri-icon-height: $checkbox-icon-width !default;
 $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 
-// Checkbox CSS variables
-
-:root {
-  --rz-checkbox-width: #{$checkbox-width};
-  --rz-checkbox-height: #{$checkbox-height};
-  --rz-checkbox-border-radius: #{$checkbox-border-radius};
-  --rz-checkbox-border-width: #{$checkbox-border-width};
-  --rz-checkbox-label-margin: #{$checkbox-label-margin};
-  --rz-checkbox-margin: #{$checkbox-margin};
-  --rz-checkbox-focus-outline: #{$checkbox-focus-outline};
-  --rz-checkbox-focus-outline-offset: #{$checkbox-focus-outline-offset};
-
-  --rz-checkbox-checked-background-color: #{$checkbox-checked-background-color};
-  --rz-checkbox-checked-hover-background-color: #{$checkbox-checked-hover-background-color};
-  --rz-checkbox-checked-disabled-background-color: #{$checkbox-checked-disabled-background-color};
-  --rz-checkbox-checked-color: #{$checkbox-checked-color};
-  --rz-checkbox-checked-shadow: #{$checkbox-checked-shadow};
-  --rz-checkbox-checked-border: #{$checkbox-checked-border};
-  --rz-checkbox-checked-hover-border: #{$checkbox-checked-hover-border};
-  --rz-checkbox-checked-disabled-border: #{$checkbox-checked-disabled-border};
-  --rz-checkbox-checked-icon-background-color: #{$checkbox-checked-icon-background-color};
-  --rz-checkbox-checked-icon-border-radius: #{$checkbox-checked-icon-border-radius};
-
-  --rz-checkbox-icon-width: #{$checkbox-icon-width};
-  --rz-checkbox-icon-height: #{$checkbox-icon-height};
-  --rz-checkbox-icon-font-size: #{$checkbox-icon-font-size};
-
-  --rz-checkbox-tri-icon-width: #{$checkbox-tri-icon-width};
-  --rz-checkbox-tri-icon-height: #{$checkbox-tri-icon-height};
-  --rz-checkbox-tri-icon-font-size: #{$checkbox-tri-icon-font-size};
-}
-
 .rz-checkbox-list-vertical {
+  box-sizing: border-box;
+
   .rz-checkbox {
     display: flex;
     align-items: center;
-    margin: var(--rz-checkbox-margin);
+    margin-block: var(--rz-checkbox-margin-block);
+    margin-inline: var(--rz-checkbox-margin-inline);
     cursor: pointer;
   }
 }
 
 .rz-checkbox-list-horizontal {
+  box-sizing: border-box;
+  
   .rz-checkbox {
     display: inline-flex;
     align-items: center;
@@ -80,10 +52,12 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 
 .rz-chkbox-label,
 .rz-chkbox-template {
-  margin: var(--rz-checkbox-label-margin);
+  margin-block: var(--rz-checkbox-label-margin-block);
+  margin-inline: var(--rz-checkbox-label-margin-inline);
 }
 
 .rz-chkbox {
+  box-sizing: border-box;
   display: inline-block;
   vertical-align: middle;
   position: relative;
@@ -108,10 +82,7 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 .rz-chkbox-box {
   position: absolute;
   cursor: pointer;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;

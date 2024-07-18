@@ -25,7 +25,7 @@ namespace Radzen
     ///          &lt;div class="row"&gt;
     ///              &lt;div class="col-md-12"&gt;
     ///                  &lt;RadzenButton Text="Ok" Click="() =&gt; ds.Close(true)" Style="margin-bottom: 10px; width: 150px" /&gt;
-    ///                  &lt;RadzenButton Text="Cancel" Click="() =&gt; ds.Close(false)" ButtonStyle="ButtonStyle.Secondary"  Style="margin-bottom: 10px; width: 150px"/&gt;
+    ///                  &lt;RadzenButton Text="Cancel" Click="() =&gt; ds.Close(false)" ButtonStyle="ButtonStyle.Base"  Style="margin-bottom: 10px; width: 150px"/&gt;
     ///                  &lt;RadzenButton Text="Refresh" Click="(() =&gt; { orderID = 10249; ds.Refresh(); })" ButtonStyle="ButtonStyle.Info"  Style="margin-bottom: 10px; width: 150px"/&gt;
     ///                  Order ID: @orderID
     ///              &lt;/div&gt;
@@ -368,7 +368,7 @@ namespace Radzen
 
                     b.OpenComponent<Blazor.RadzenButton>(i++);
                     b.AddAttribute(i++, "Text", options != null ? options.CancelButtonText : "Cancel");
-                    b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Secondary);
+                    b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Base);
                     b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(false)));
                     b.CloseComponent();
 

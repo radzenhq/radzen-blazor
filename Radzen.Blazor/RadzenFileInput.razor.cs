@@ -65,7 +65,7 @@ namespace Radzen.Blazor
         /// Gets the button class list.
         /// </summary>
         /// <value>The button class list.</value>
-        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only rz-light")
+        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only rz-base rz-shade-default")
                                               .AddDisabled(Disabled);
 
         /// <inheritdoc />

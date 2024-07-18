@@ -1,7 +1,7 @@
 ﻿@inherits DbContextPage
 
-<div class="rz-p-12 rz-text-align-center">
-    <RadzenLabel Text="Select Value" Component="DropDownDataGridBindValue" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-12">
+    <RadzenLabel Text="Select Value" Component="DropDownDataGridBindValue" />
     <RadzenDropDownDataGrid @ref=grid Data="@data" ColumnWidth="200px" TValue="IDictionary<string, object>" 
                             AllowFiltering="true" AllowSorting="true" Value="@selectedItem" Change="@OnChange"
                             TextProperty="@(GetColumnPropertyExpression("LastName", typeof(string)))">
@@ -20,7 +20,7 @@
             }
         </Columns>
     </RadzenDropDownDataGrid>
-</div>
+</RadzenStack>
 
 @code {
     RadzenDropDownDataGrid<IDictionary<string, object>> grid;

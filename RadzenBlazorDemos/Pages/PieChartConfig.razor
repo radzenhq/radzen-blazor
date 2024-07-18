@@ -1,18 +1,19 @@
-<div class="container">
-        <div class="row">
-            <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
-            <RadzenCard class="w-100 mb-4" >
-                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" Component="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-            <RadzenChart SeriesClick=@OnSeriesClick>
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenCard Variant="Variant.Outlined" Style="width: 100%;">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenStack Style="width: 100%; max-width: 600px;">
+        <RadzenChart SeriesClick=@OnSeriesClick>
                 <RadzenPieSeries Data="@revenue" Title="Revenue" CategoryProperty="Quarter" ValueProperty="Revenue">
                     <RadzenSeriesDataLabels Visible="@showDataLabels" />
                 </RadzenPieSeries>
             </RadzenChart>
-        </div>
-    </div>
-</div>
+    </RadzenStack>
+</RadzenStack>
 
 <EventConsole @ref=@console />
 

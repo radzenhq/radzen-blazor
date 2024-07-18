@@ -1,34 +1,41 @@
 @using System.Globalization
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col">
-            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem" >
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenCheckBox @bind-Value="@trend" Name="trend"></RadzenCheckBox>
-                <RadzenLabel Text="Trend" Component="trend" Style="margin-right: 1rem;" class="rz-color-danger-dark" />
+                <RadzenLabel Text="Trend" Component="trend" class="rz-color-danger-dark" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenCheckBox @bind-Value="@median" Name="median"></RadzenCheckBox>
-                <RadzenLabel Text="Median" Component="median" Style="margin-right: 1rem;" class="rz-color-success-dark" />
+                <RadzenLabel Text="Median" Component="median" class="rz-color-success-dark" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenCheckBox @bind-Value="@mean" Name="mean"></RadzenCheckBox>
-                <RadzenLabel Text="Mean" Component="mean" Style="margin-right: 1rem;" class="rz-color-info-dark" />
+                <RadzenLabel Text="Mean" Component="mean" class="rz-color-info-dark" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
                 <RadzenCheckBox @bind-Value="@mode" Name="mode"></RadzenCheckBox>
                 <RadzenLabel Text="Mode" Component="mode" class="rz-color-warning-darker" />
-            </RadzenCard>
-            <RadzenChart>
-                <RadzenLineSeries Smooth="true" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
-                    <RadzenSeriesTrendLine Visible="@trend" Stroke="var(--rz-danger-dark)" LineType="LineType.Dashed" />
-                    <RadzenSeriesMedianLine Visible="@median" Stroke="var(--rz-success-dark)" LineType="LineType.Dotted" />
-                    <RadzenSeriesMeanLine Visible="@mean" Stroke="var(--rz-info-dark)" LineType="LineType.Dotted" />
-                    <RadzenSeriesModeLine Visible="@mode" Stroke="var(--rz-warning-darker)" LineType="LineType.Dotted" />
-                </RadzenLineSeries>
-                <RadzenCategoryAxis Padding="20" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
-                    <RadzenGridLines Visible="true" />
-                    <RadzenAxisTitle Text="Revenue in USD" />
-                </RadzenValueAxis>
-            </RadzenChart>
-        </div>
-    </div>
-</div>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenLineSeries Smooth="true" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
+            <RadzenSeriesTrendLine Visible="@trend" Stroke="var(--rz-danger-dark)" LineType="LineType.Dashed" />
+            <RadzenSeriesMedianLine Visible="@median" Stroke="var(--rz-success-dark)" LineType="LineType.Dotted" />
+            <RadzenSeriesMeanLine Visible="@mean" Stroke="var(--rz-info-dark)" LineType="LineType.Dotted" />
+            <RadzenSeriesModeLine Visible="@mode" Stroke="var(--rz-warning-darker)" LineType="LineType.Dotted" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Revenue in USD" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
 
 @code {
     bool trend = true;

@@ -36,7 +36,7 @@ namespace Radzen.Blazor
                 additionalClasses.Add("rz-density-compact");
             }
 
-            return $"rz-paginator rz-unselectable-text rz-helper-clearfix {HorizontalAlignCssClasses[HorizontalAlign]} {String.Join(" ", additionalClasses)}";
+            return $"rz-pager rz-unselectable-text rz-helper-clearfix {HorizontalAlignCssClasses[HorizontalAlign]} {String.Join(" ", additionalClasses)}";
         }
 
         /// <summary>

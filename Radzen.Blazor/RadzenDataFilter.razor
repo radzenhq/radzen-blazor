@@ -18,7 +18,7 @@
                 <RadzenSelectBarItem Text="@OrOperatorText" Value="LogicalFilterOperator.Or" title="@OrOperatorText" />
             </Items>
         </RadzenSelectBar>
-        <RadzenButton title="@ClearFilterText" class="rz-datafilter-item-clear rz-datafilter-all-items-clear" Icon="clear" Click="@(args => ClearFilters())" Visible=@(Filters.Any()) Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Dark" />
+        <RadzenButton title="@ClearFilterText" class="rz-datafilter-item-clear rz-datafilter-all-items-clear" Icon="clear" Click="@(args => ClearFilters())" Visible=@(Filters.Any()) Variant="Variant.Text" Size="ButtonSize.Small" ButtonStyle="ButtonStyle.Base" />
 
         <ul class="rz-datafilter-group">
             @foreach(var filter in Filters)
@@ -28,7 +28,7 @@
               </li>
             }
             <li class="rz-datafilter-item rz-datafilter-bar">
-                <RadzenSplitButton Icon="add" Click="@(args => AddFilter(args?.Value == "group"))" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Primary" Shade="Shade.Lighter">
+                <RadzenSplitButton Icon="add" Click="@(args => AddFilter(args?.Value == "group"))" Size="ButtonSize.Small" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Base">
                     <RadzenSplitButtonItem Icon="add" Text="@AddFilterText" />
                     <RadzenSplitButtonItem Icon="playlist_add" Value="group" Text="@AddFilterGroupText" />
                 </RadzenSplitButton>

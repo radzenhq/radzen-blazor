@@ -14,10 +14,10 @@
                     WrapItems="@(!allowVirtualization)" AllowPaging="@(!allowVirtualization)"
                     Data="@products" TItem="Product" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
         <Template Context="product">
-            <RadzenCard Style="width: 100%; padding: 0;">
+            <RadzenCard Variant="Variant.Outlined" Class="rz-p-0" Style="width: 100%; overflow: hidden;">
                 <RadzenRow Gap="0">
                     <RadzenColumn Size="12" SizeLG="3" Class="rz-p-4 product-title">
-                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-color-secondary">@(product.ProductName)</RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-color-on-secondary-lighter">@(product.ProductName)</RadzenText>
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeLG="7" Class="rz-p-4">
                         <RadzenRow Gap="0">

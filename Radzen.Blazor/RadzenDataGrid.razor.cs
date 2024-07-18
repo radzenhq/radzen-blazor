@@ -3269,7 +3269,7 @@ namespace Radzen.Blazor
                 additionalClasses.Add("rz-density-compact");
             }
 
-            return $"rz-has-paginator rz-datatable  rz-datatable-scrollable {String.Join(" ", additionalClasses)}";
+            return $"rz-has-pager rz-datatable  rz-datatable-scrollable {String.Join(" ", additionalClasses)}";
         }
 
         internal string getHeaderStyle()

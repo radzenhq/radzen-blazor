@@ -1,4 +1,5 @@
 ﻿.rz-breadcrumb {
+    box-sizing: border-box;
     display: flex;
     align-items: center;
 }
@@ -6,8 +7,8 @@
 .rz-breadcrumb-item + .rz-breadcrumb-item::before {
     content: '»';
     display: inline-block;
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+    padding-inline-start: 0.5rem;
+    padding-inline-end: 0.5rem;
     font-size: 1rem;
     line-height: 1.25rem;
 }
