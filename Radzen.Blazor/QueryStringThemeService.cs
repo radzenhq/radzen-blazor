@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNetCore.Components;
@@ -41,6 +42,7 @@ namespace Radzen
         private readonly IDisposable registration;
 #endif
         private readonly QueryStringThemeServiceOptions options;
+        private readonly PropertyInfo hasAttachedJSRuntimeProperty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryStringThemeService" /> class.
@@ -52,6 +54,8 @@ namespace Radzen
             this.themeService = themeService;
 
             this.options = options.Value;
+
+            hasAttachedJSRuntimeProperty = navigationManager.GetType().GetProperty("HasAttachedJSRuntime");
 
             var state = GetStateFromQueryString(navigationManager.Uri);
 
@@ -134,10 +138,14 @@ namespace Radzen
 
         private void OnThemeChanged()
         {
-            var state = GetStateFromQueryString(navigationManager.Uri);
 
-            navigationManager.NavigateTo(GetUriWithStateQueryParameters(navigationManager.Uri),
-                forceLoad: state.rightToLeft != themeService.RightToLeft);
+            if (hasAttachedJSRuntimeProperty is null || hasAttachedJSRuntimeProperty.GetValue(navigationManager) is true)
+            {
+                var state = GetStateFromQueryString(navigationManager.Uri);
+
+                navigationManager.NavigateTo(GetUriWithStateQueryParameters(navigationManager.Uri),
+                    forceLoad: state.rightToLeft != themeService.RightToLeft);
+            }
         }
 
         /// <inheritdoc />
