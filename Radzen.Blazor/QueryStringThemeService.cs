@@ -102,7 +102,9 @@ namespace Radzen
 
         private (string theme, bool? wcag, bool? rightToLeft) GetStateFromQueryString(string uri)
         {
-            var query = HttpUtility.ParseQueryString(new Uri(uri).Query);
+            var queryString = uri.Contains('?') ? uri[(uri.IndexOf('?') + 1)..] : string.Empty;
+
+            var query = HttpUtility.ParseQueryString(queryString);
 
             bool? wcag = query.Get(options.WcagParameter) != null ? query.Get(options.WcagParameter) == "true" : null;
             bool? rtl = query.Get(options.RightToLeftParameter) != null ? query.Get(options.RightToLeftParameter) == "true" : null;
