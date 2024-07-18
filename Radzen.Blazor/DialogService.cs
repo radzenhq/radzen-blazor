@@ -2,6 +2,7 @@
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -279,7 +280,9 @@ namespace Radzen
                 CssClass = options != null ? options.CssClass : "",
                 WrapperCssClass = options != null ? options.WrapperCssClass : "",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
-                ContentCssClass = options != null ? options.ContentCssClass : ""
+                ContentCssClass = options != null ? options.ContentCssClass : "",
+                Resize = options?.Resize,
+                Drag = options?.Drag
             });
         }
 
@@ -544,11 +547,25 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if resizable; otherwise, <c>false</c>.</value>
         public bool Resizable { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the change.
+        /// </summary>
+        /// <value>The change.</value>
+        public Action<Size> Resize { get; set; }
+
         /// <summary>
         /// Gets or sets a value indicating whether the dialog is draggable. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if draggable; otherwise, <c>false</c>.</value>
         public bool Draggable { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the change.
+        /// </summary>
+        /// <value>The change.</value>
+        public Action<Point> Drag { get; set; }
+
         /// <summary>
         /// Gets or sets the X coordinate of the dialog. Maps to the <c>left</c> CSS attribute.
         /// </summary>

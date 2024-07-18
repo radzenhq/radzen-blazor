@@ -108,8 +108,16 @@
     {
         shouldRender = false;
 
-        left = string.Format(System.Globalization.CultureInfo.InvariantCulture, "left: {0}px;", args.Rect.Left + (args.ClientX - clientX));
-        top = string.Format(System.Globalization.CultureInfo.InvariantCulture, "top: {0}px;", args.Rect.Top + (args.ClientY - clientY));
+        var l = args.Rect.Left + (args.ClientX - clientX);
+        var t = args.Rect.Top + (args.ClientY - clientY);
+
+        if(Dialog.Options.Drag != null)
+        {
+            Dialog.Options.Drag(new System.Drawing.Point(Convert.ToInt32(l), Convert.ToInt32(t)));
+        }
+
+        left = string.Format(System.Globalization.CultureInfo.InvariantCulture, "left: {0}px;", l);
+        top = string.Format(System.Globalization.CultureInfo.InvariantCulture, "top: {0}px;", t);
 
         shouldRender = true;
     }
@@ -124,6 +132,11 @@
     public void OnResize(double w, double h)
     {
         shouldRender = false;
+
+        if(Dialog.Options.Resize != null && w != 0 && h != 0)
+        {
+            Dialog.Options.Resize(new System.Drawing.Size(Convert.ToInt32(w), Convert.ToInt32(h)));
+        }
 
         width = $"width: {w}px;";
         height = $"height: {h}px;";
