@@ -108,7 +108,7 @@ namespace Radzen
         {
             var queryString = uri.Contains('?') ? uri[(uri.IndexOf('?') + 1)..] : string.Empty;
 
-            var query = HttpUtility.ParseQueryString(queryString);
+            var query = HttpUtility.ParseQueryString(queryString.Contains('#') ? queryString[..queryString.IndexOf('#')] : queryString);
 
             bool? wcag = query.Get(options.WcagParameter) != null ? query.Get(options.WcagParameter) == "true" : null;
             bool? rtl = query.Get(options.RightToLeftParameter) != null ? query.Get(options.RightToLeftParameter) == "true" : null;
