@@ -1889,7 +1889,7 @@ window.Radzen = {
     }
     return attributes.reduce(function (result, name) {
       if (target) {
-        result[name] = target[name];
+        result[name] = target[name].toString();
       }
       return result;
     }, { innerText: selection.toString(), innerHTML: innerHTML });
