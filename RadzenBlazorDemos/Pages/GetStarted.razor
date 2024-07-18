@@ -15,7 +15,7 @@
     <Tabs>
         <RadzenTabsItem Text=".NET 8">
             <div class="rz-py-0 rz-py-sm-4 rz-px-0 rz-px-sm-2 rz-px-lg-12">
-            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
 All interactive features of the Radzen Blazor components require interactivity of the container <code>.razor</code> file to be enabled or the <code>@@rendermode</code>
 attribute of the component to be set to one of the following values: <code>InteractiveServer</code>, <code>InteractiveAuto</code> or <code>InteractiveWebAssembly</code>.
 More info is available in the <a href="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0" target="_blank">rendering mode article</a> from the official Blazor documentation.
@@ -56,7 +56,7 @@ More info is available in the <a href="https://learn.microsoft.com/en-us/aspnet/
         </div>
         </RadzenTabsItem>
         <RadzenTabsItem Text=".NET 7 Server">
-            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
             @Installation(CurrentVersion)
             @Import(CurrentVersion)
             @IncludeTheme(("_Host.cshtml", "ServerPrerendered", CurrentVersion))
@@ -66,7 +66,7 @@ More info is available in the <a href="https://learn.microsoft.com/en-us/aspnet/
             </div>
         </RadzenTabsItem>
         <RadzenTabsItem Text=".NET 7 WebAssembly (hosted)">
-            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
             @Installation(CurrentVersion)
             @Import(CurrentVersion)
             @IncludeTheme(("_Host.cshtml", "WebAssemblyPrerendered", CurrentVersion))
@@ -76,7 +76,7 @@ More info is available in the <a href="https://learn.microsoft.com/en-us/aspnet/
             </div>
         </RadzenTabsItem>
         <RadzenTabsItem Text=".NET 6 Server">
-            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
             @Installation(CurrentVersion)
             @Import(CurrentVersion)
             @IncludeTheme(("_Layout.cshtml", "ServerPrerendered", CurrentVersion))
@@ -86,7 +86,7 @@ More info is available in the <a href="https://learn.microsoft.com/en-us/aspnet/
             </div>
         </RadzenTabsItem>
         <RadzenTabsItem Text=".NET 6 WebAssembly (hosted)">
-            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
             @Installation(CurrentVersion)
             @Import(CurrentVersion)
             @IncludeTheme(("_Layout.cshtml", "WebAssemblyPrerendered", CurrentVersion))
@@ -96,7 +96,7 @@ More info is available in the <a href="https://learn.microsoft.com/en-us/aspnet/
             </div>
         </RadzenTabsItem>
         <RadzenTabsItem Text="WebAssembly (standalone)">
-            <div class="rz-p-0 rz-p-sm-2 rz-p-lg-12">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
             @Installation(CurrentVersion)
             @Import(CurrentVersion)
             <RadzenText Anchor="@($"get-started/{CurrentVersion}#theme")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">3. Set the theme</RadzenText>
@@ -145,7 +145,7 @@ More info is available in the <a href="https://learn.microsoft.com/en-us/aspnet/
 
     RenderFragment<string> Installation = version =>
         @<text>
-            <RadzenText Anchor="@($"get-started/{version}#install")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">1. Install</RadzenText>
+            <RadzenText Anchor="@($"get-started/{version}#install")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-6 rz-mb-4">1. Install</RadzenText>
             <RadzenText>
                 The Radzen Blazor components are distributed via the <a href="https://www.nuget.org/packages/Radzen.Blazor/" target="_blank">Radzen.Blazor</a> nuget package.
             </RadzenText>
