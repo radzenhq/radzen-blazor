@@ -1486,6 +1486,80 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Wheres the specified filters.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="property">The property.</param>
+        /// <param name="value">The value.</param>
+        /// <param name="op">The StringFilterOperator.</param>
+        /// <param name="cs">The FilterCaseSensitivity.</param>
+        /// <returns>IQueryable&lt;T&gt;.</returns>
+        public static IQueryable Where(this IQueryable source, string property, string value, StringFilterOperator op, FilterCaseSensitivity cs)
+        {
+            IQueryable result;
+
+            if (!string.IsNullOrEmpty(value))
+            {
+                var ignoreCase = cs == FilterCaseSensitivity.CaseInsensitive;
+
+                var query = new List<string>();
+
+                if (!string.IsNullOrEmpty(property))
+                {
+                    query.Add(property);
+                }
+
+                if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
+                {
+                    query.Add("ToString()");
+                }
+
+                if (ignoreCase)
+                {
+                    query.Add("ToLower()");
+                }
+
+                query.Add($"{Enum.GetName(typeof(StringFilterOperator), op)}(@0)");
+
+                var search = ignoreCase ? value.ToLower() : value;
+
+                if (source.ElementType == typeof(Enum))
+                {
+                    result = source.Cast<Enum>()
+                        .Where((Func<Enum, bool>)(i =>
+                        {
+                            var v = ignoreCase ? i.GetDisplayDescription().ToLower() : i.GetDisplayDescription();
+
+                            if (op == StringFilterOperator.Contains)
+                            {
+                                return v.Contains(search);
+                            }
+                            else if (op == StringFilterOperator.StartsWith)
+                            {
+                                return v.StartsWith(search);
+                            }
+                            else if (op == StringFilterOperator.EndsWith)
+                            {
+                                return v.EndsWith(search);
+                            }
+
+                            return v == search;
+                        })).AsQueryable();
+                }
+                else
+                {
+                    result = source.Where(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(".", query), search);
+                }
+            }
+            else
+            {
+                result = source;
+            }
+
+            return result;
+        }
+
 
         /// <summary>
         /// Converts to OData filter expression.

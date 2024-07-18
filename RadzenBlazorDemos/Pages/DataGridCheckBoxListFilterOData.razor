@@ -50,7 +50,11 @@
         var property = args.Column.GetFilterProperty().Replace(".","/");
 
         // Get the distinct values for the property in OData format for the current column.
-        var result = await service.GetOrders(count: true, apply: $"groupby(({property}))", expand: GetODataExpand(property));
+        var result = await service.GetOrders(
+            count: true, 
+            filter: !string.IsNullOrEmpty(args.Filter) ? $"contains(tolower({property}), tolower('{args.Filter}'))" : null, 
+            apply: $"groupby(({property}))", 
+            expand: GetODataExpand(property));
 
         args.Count = result.Count;
         args.Data = result.Value;

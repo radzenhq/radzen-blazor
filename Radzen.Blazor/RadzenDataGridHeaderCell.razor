@@ -4,6 +4,7 @@
 @using System.Globalization
 @using System.Linq.Dynamic.Core
 @using System.Collections
+@using Radzen
 
 @if (RowIndex == Column.GetLevel())
 {
@@ -195,7 +196,8 @@ else
 
     int filterValuesCount;
     internal IEnumerable filterValues;
-    async Task LoadFilterValues()
+    string prevFilter;
+    async Task LoadFilterValues(LoadDataArgs loadDataArgs)
     {
         var property = Column.GetFilterProperty();
         var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
@@ -212,16 +214,24 @@ else
 
         if (Column.Grid.LoadColumnFilterData.HasDelegate)
         {
-            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column };
+            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column, Filter = loadDataArgs.Filter };
 
             await Column.Grid.LoadColumnFilterData.InvokeAsync(args);
 
             filterValues = args.Data.AsQueryable().Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
             filterValuesCount = args.Count;
         }
-        else if(filterValues == null && Column.Grid.Data != null && !string.IsNullOrEmpty(property))
+        else if(!string.IsNullOrEmpty(property) && (filterValues == null || loadDataArgs.Filter != prevFilter) && Column.Grid.Data != null)
         {
-            var query = Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)).Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+            prevFilter = loadDataArgs.Filter;
+
+            var query = (!string.IsNullOrEmpty(prevFilter) ? 
+                Radzen.QueryableExtension.Where(Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)),
+                property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive)
+                :
+                Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)))
+                .Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+
             filterValues = query;
             filterValuesCount = query.Count();
         }
