@@ -218,7 +218,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
 
-            Assert.Contains(@$"style=""display: inline-block;{value}""", component.Markup);
+            Assert.Contains(@$"style=""{value}""", component.Markup);
         }
 
         [Fact]
@@ -668,7 +668,7 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(@$"rz-calendar-week-number", component.Markup);
             Assert.Equal(8, component.FindAll(".rz-calendar-view th").Count());
             // check header and week number column
-            Assert.Single(component.FindAll("th.rz-calendar-week-number"));
+            Assert.Single(component.FindAll("th.rz-datepicker-week-number"));
             Assert.Equal(6, component.FindAll("td.rz-calendar-week-number").Count());
         }
 
@@ -701,7 +701,7 @@ namespace Radzen.Blazor.Tests
                 parameter.Add(p => p.CalendarWeekTitle, "Wk");
             });
 
-            var weekNumberHeader = component.Find(".rz-calendar-view th.rz-calendar-week-number");
+            var weekNumberHeader = component.Find(".rz-calendar-view th.rz-datepicker-week-number");
             Assert.Contains("Wk", weekNumberHeader.InnerHtml);
         }
     }
