@@ -1016,7 +1016,7 @@ window.Radzen = {
       var input = el.querySelector('.rz-inputtext');
       if (input) {
           input.onclick = function (e) {
-              handler(e, e.currentTarget.classList.contains('rz-readonly'));
+              handler(e, e.currentTarget.classList.contains('rz-readonly') || e.currentTarget.classList.contains('rz-input-trigger') );
           };
       }
   },
