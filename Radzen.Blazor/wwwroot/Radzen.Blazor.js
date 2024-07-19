@@ -2292,60 +2292,77 @@ window.Radzen = {
         }
     },
 
-    changeElementDrag: function (makeDraggable, dialogRef, draggable, showTitle) {
-        if (makeDraggable == true) {
-            if (draggable == "True" && showTitle == "True") {
-                var dialogTitles = document.querySelectorAll('.rz-dialog-titlebar');
-                if (dialogTitles.length == 0) return;
-                dialogTitles[dialogTitles.length - 1].addEventListener('mousedown', initiateElementDrag);
-            }
-        }
+    dialogDotNetObjectRef: null,
 
-        else {
+    makeElementDraggable: function (dialogRef, draggable, showTitle) {
+        if (draggable == true && showTitle == true) {
             var dialogTitles = document.querySelectorAll('.rz-dialog-titlebar');
-            if (dialogTitles.length == 0) return;
-            dialogTitles[dialogTitles.length - 1].removeEventListener('mousedown', initiateElementDrag);
+            if (dialogTitles.length == 0) {
+                return;
+            }
+
+            dialogDotNetObjectRef = dialogRef;
+            dialogTitles[dialogTitles.length - 1].addEventListener('mousedown', window.Radzen.initiateElementDrag);
         }
-
-        function initiateElementDrag(e) {
-            e.preventDefault();
-
-            var lastDialog = getLastDialog();
-            var initialPositionX = e.clientX;
-            var initialPositionY = e.clientY;
-            var changeInX = 0;
-            var changeInY = 0;
-
-            document.addEventListener("mouseup", endDrag);
-            document.addEventListener("mousemove", drag);
-
-            function getLastDialog () {
-                var dialogs = document.querySelectorAll('.rz-dialog');
-                if (dialogs.length == 0) return;
-                return dialogs[dialogs.length - 1];
-            }
-
-            function drag(e) {
-                e.preventDefault();
-                changeInX = initialPositionX - e.clientX;
-                changeInY = initialPositionY - e.clientY;
-                initialPositionX = e.clientX;
-                initialPositionY = e.clientY;
-                lastDialog.style.top = `${lastDialog.offsetTop - changeInY}px`;
-                lastDialog.style.left = `${lastDialog.offsetLeft - changeInX}px`;
-            }
-
-            function endDrag(e) {
-                document.removeEventListener("mousemove", drag);
-                document.removeEventListener("mouseup", endDrag);
-                dialogRef.invokeMethodAsync(
-                    'RadzenDialog.OnDrag',
-                    lastDialog.style.top,
-                    lastDialog.style.left
-                );
-            }
-        }
-
-
     },
+
+    removeElementDragEventListener: function () {
+        if (!dialogDotNetObjectRef) {
+            return;
+        }
+
+        var dialogTitles = document.querySelectorAll('.rz-dialog-titlebar');
+        if (dialogTitles.length == 0) {
+            return;
+        }
+
+        dialogTitles[dialogTitles.length - 1].removeEventListener('mousedown', window.Radzen.initiateElementDrag);
+        dialogDotNetObjectRef = null;
+    },
+
+    initiateElementDrag: function (e) {
+        if (!dialogDotNetObjectRef) {
+            return;
+        }
+
+        e.preventDefault();
+
+        var lastDialog = getLastDialog();
+        var initialPositionX = e.clientX;
+        var initialPositionY = e.clientY;
+        var changeInX = 0;
+        var changeInY = 0;
+
+        document.addEventListener("mouseup", endDrag);
+        document.addEventListener("mousemove", drag);
+
+        function getLastDialog() {
+            var dialogs = document.querySelectorAll('.rz-dialog');
+            if (dialogs.length == 0) {
+                return;
+            }
+
+            return dialogs[dialogs.length - 1];
+        }
+
+        function drag(e) {
+            e.preventDefault();
+            changeInX = initialPositionX - e.clientX;
+            changeInY = initialPositionY - e.clientY;
+            initialPositionX = e.clientX;
+            initialPositionY = e.clientY;
+            lastDialog.style.top = `${lastDialog.offsetTop - changeInY}px`;
+            lastDialog.style.left = `${lastDialog.offsetLeft - changeInX}px`;
+        }
+
+        function endDrag(e) {
+            document.removeEventListener("mousemove", drag);
+            document.removeEventListener("mouseup", endDrag);
+            dialogDotNetObjectRef.invokeMethodAsync(
+                'RadzenDialog.OnDrag',
+                lastDialog.style.top,
+                lastDialog.style.left
+            );
+        }
+    }
 };
