@@ -66,4 +66,20 @@ $layout-background-color: var(--rz-body-background-color) !default;
   .rz-body {
     width: 100vw;
   }
+
+  // Align layout to the end when second Sidebar is expanded
+  .rz-layout:has( > .rz-sidebar-collapsed + .rz-sidebar-expanded) {
+    justify-content: end;
+
+    .rz-header, .rz-footer {
+      margin-inline-start: auto;
+    }
+  }
+
+  // Set RadzenBody width to auto when both Sidebars are expanded
+  .rz-layout:has( > .rz-sidebar-expanded + .rz-sidebar-expanded) {
+    .rz-body {
+      width: auto;
+    }
+  }
 }
