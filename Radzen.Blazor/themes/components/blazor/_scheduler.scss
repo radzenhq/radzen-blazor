@@ -1,8 +1,5 @@
 $scheduler-toolbar-color: var(--rz-on-secondary) !default;
 $scheduler-toolbar-button-background-color: var(--rz-secondary) !default;
-
-// -----
-
 $scheduler-border: var(--rz-border-normal) !default;
 $scheduler-border-color: var(--rz-base-300) !default;
 $scheduler-minor-border-color: var(--rz-base-200) !default;
@@ -10,33 +7,34 @@ $scheduler-border-radius: var(--rz-border-radius) !default;
 $scheduler-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $scheduler-background-color: var(--rz-base-background-color) !default;
 $scheduler-color: var(--rz-text-tertiary-color) !default;
-
 $scheduler-toolbar-padding: 0.5rem !default;
 $scheduler-toolbar-background-color: var(--rz-base-200) !default;
-
 $scheduler-toolbar-title-font-size: 1rem !default;
 $scheduler-toolbar-title-font-weight: 700 !default;
 $scheduler-toolbar-title-color: var(--rz-text-title-color) !default;
-
 $scheduler-prev-next-button-background-color: $scheduler-toolbar-button-background-color !default;
 $scheduler-prev-next-button-color: $scheduler-toolbar-color !default;
-$scheduler-prev-next-button-padding: 0.5rem !default;
+$scheduler-prev-next-button-padding-block: 0.5rem !default;
+$scheduler-prev-next-button-padding-inline: 0.5rem !default;
 $scheduler-prev-next-button-font-size: var(--rz-icon-size) !default;
-$scheduler-prev-button-border-radius: var(--rz-border-radius) 0 0 var(--rz-border-radius) !default;
-$scheduler-next-button-border-radius: 0 var(--rz-border-radius) var(--rz-border-radius) 0 !default;
-
-$scheduler-today-button-margin-left: 0.5rem !default;
+$scheduler-prev-button-border-start-start-radius: var(--rz-border-radius) !default;
+$scheduler-prev-button-border-start-end-radius: 0 !default;
+$scheduler-prev-button-border-end-start-radius: var(--rz-border-radius) !default;
+$scheduler-prev-button-border-end-end-radius: 0 !default;
+$scheduler-next-button-border-start-start-radius: 0 !default;
+$scheduler-next-button-border-start-end-radius: var(--rz-border-radius) !default;
+$scheduler-next-button-border-end-start-radius: 0 !default;
+$scheduler-next-button-border-end-end-radius: var(--rz-border-radius) !default;
+$scheduler-today-button-margin-inline-start: 0.5rem !default;
 $scheduler-today-button-padding: 0.5rem 1rem !default;
 $scheduler-today-button-font-size: 0.75rem !default;
 $scheduler-today-button-text-transform: uppercase !default;
-
 $scheduler-view-button-border: var(--rz-border-normal) !default;
 $scheduler-view-button-color: var(--rz-text-secondary-color) !default;
 $scheduler-view-button-background-color: var(--rz-base-background-color) !default;
 $scheduler-view-selected-color: var(--rz-on-secondary) !default;
 $scheduler-view-selected-background-color: var(--rz-secondary) !default;
 $scheduler-view-selected-border-color: $scheduler-view-selected-background-color !default;
-
 $scheduler-header-background-color: var(--rz-base-200) !default;
 $scheduler-header-font-size: 0.75rem !default;
 $scheduler-header-font-size-small: 0.5rem !default;
@@ -44,121 +42,36 @@ $scheduler-header-text-transform: uppercase !default;
 $scheduler-header-color: inherit !default;
 $scheduler-header-border: var(--rz-border-normal) !default;
 $scheduler-header-padding: 0.5rem 0 !default;
-
 $scheduler-event-color: var(--rz-on-info) !default;
 $scheduler-event-background-color: var(--rz-info) !default;
 $scheduler-event-font-size: 0.75rem !default;
 $scheduler-event-line-height: 1.25rem !default;
-$scheduler-event-padding: 0 1px 1px 1px !default;
+$scheduler-event-padding-block: 0 1px !default;
+$scheduler-event-padding-inline: 1px !default;
 $scheduler-event-content-padding: 0.125rem 0.25rem !default;
-
 $scheduler-event-list-button-color: var(--rz-secondary);
 $scheduler-event-list-button-font-size: 0.75rem;
-
 $scheduler-slot-title-font-size: 0.875rem !default;
 $scheduler-slot-title-font-size-small: 0.6rem !default;
 $scheduler-slot-title-padding: 0 0.25rem !default;
-
 $scheduler-day-number-padding: 0 0.5rem !default;
-
 $scheduler-weekend-color: var(--rz-text-disabled-color) !default;
 $scheduler-weekend-background-color: var(--rz-base-50) !default;
 $scheduler-other-month-background-color: var(--rz-base-100) !default;
-
 $scheduler-timeline-slot-width: 7rem !default;
 $scheduler-timeline-slot-height: 7rem !default;
-
 $scheduler-year-padding: 1.5rem !default;
 $scheduler-year-slot-padding: 1px !default;
 $scheduler-year-slot-title-width: 100% !default;
 $scheduler-year-slot-title-border-radius: 0.25rem !default;
-
 $scheduler-planner-slot-width: 3rem !default;
 $scheduler-planner-slot-height: 4.5rem !default;
-
 $scheduler-focus-outline: var(--rz-outline-focus) !default;
 $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
-
-// Scheduler CSS variables
-
-:root {
-  --rz-scheduler-border: #{$scheduler-border};
-  --rz-scheduler-border-color: #{$scheduler-border-color};
-  --rz-scheduler-minor-border-color: #{$scheduler-minor-border-color};
-  --rz-scheduler-border-radius: #{$scheduler-border-radius};
-  --rz-scheduler-shadow: #{$scheduler-shadow};
-  --rz-scheduler-background-color: #{$scheduler-background-color};
-  --rz-scheduler-color: #{$scheduler-color};
-  
-  --rz-scheduler-toolbar-padding: #{$scheduler-toolbar-padding};
-  --rz-scheduler-toolbar-background-color: #{$scheduler-toolbar-background-color};
-  
-  --rz-scheduler-toolbar-title-font-size: #{$scheduler-toolbar-title-font-size};
-  --rz-scheduler-toolbar-title-font-weight: #{$scheduler-toolbar-title-font-weight};
-  --rz-scheduler-toolbar-title-color: #{$scheduler-toolbar-title-color};
-  
-  --rz-scheduler-prev-next-button-background-color: #{$scheduler-prev-next-button-background-color};
-  --rz-scheduler-prev-next-button-color: #{$scheduler-prev-next-button-color};
-  --rz-scheduler-prev-next-button-padding: #{$scheduler-prev-next-button-padding};
-  --rz-scheduler-prev-next-button-font-size: #{$scheduler-prev-next-button-font-size};
-  --rz-scheduler-prev-button-border-radius: #{$scheduler-prev-button-border-radius};
-  --rz-scheduler-next-button-border-radius: #{$scheduler-next-button-border-radius};
-
-  --rz-scheduler-today-button-margin-left: #{$scheduler-today-button-margin-left};
-  --rz-scheduler-today-button-padding: #{$scheduler-today-button-padding};
-  --rz-scheduler-today-button-font-size: #{$scheduler-today-button-font-size};
-  --rz-scheduler-today-button-text-transform: #{$scheduler-today-button-text-transform};
-  
-  --rz-scheduler-view-button-border: #{$scheduler-view-button-border};
-  --rz-scheduler-view-button-color: #{$scheduler-view-button-color};
-  --rz-scheduler-view-button-background-color: #{$scheduler-view-button-background-color};
-  --rz-scheduler-view-selected-color: #{$scheduler-view-selected-color};
-  --rz-scheduler-view-selected-background-color: #{$scheduler-view-selected-background-color};
-  --rz-scheduler-view-selected-border-color: #{$scheduler-view-selected-border-color};
-  
-  --rz-scheduler-header-background-color: #{$scheduler-header-background-color};
-  --rz-scheduler-header-font-size: #{$scheduler-header-font-size};
-  --rz-scheduler-header-font-size-small: #{$scheduler-header-font-size-small};
-  --rz-scheduler-header-text-transform: #{$scheduler-header-text-transform};
-  --rz-scheduler-header-color: #{$scheduler-header-color};
-  --rz-scheduler-header-border: #{$scheduler-header-border};
-  --rz-scheduler-header-padding: #{$scheduler-header-padding};
-  
-  --rz-scheduler-event-color: #{$scheduler-event-color};
-  --rz-scheduler-event-background-color: #{$scheduler-event-background-color};
-  --rz-scheduler-event-font-size: #{$scheduler-event-font-size};
-  --rz-scheduler-event-line-height: #{$scheduler-event-line-height};
-  --rz-scheduler-event-padding: #{$scheduler-event-padding};
-  --rz-scheduler-event-content-padding: #{$scheduler-event-content-padding};
-
-  --rz-scheduler-event-list-button-color: #{$scheduler-event-list-button-color};
-  --rz-scheduler-event-list-button-font-size: #{$scheduler-event-list-button-font-size};
-  
-  --rz-scheduler-slot-title-font-size: #{$scheduler-slot-title-font-size};
-  --rz-scheduler-slot-title-font-size-small: #{$scheduler-slot-title-font-size-small};
-  --rz-scheduler-slot-title-padding: #{$scheduler-slot-title-padding};
-
-  --rz-scheduler-day-number-padding: #{$scheduler-day-number-padding};
-
-  --rz-scheduler-weekend-color: #{$scheduler-weekend-color};
-  --rz-scheduler-weekend-background-color: #{$scheduler-weekend-background-color};
-  --rz-scheduler-other-month-background-color: #{$scheduler-other-month-background-color};
-  
-  --rz-scheduler-timeline-slot-width: #{$scheduler-timeline-slot-width};
-  --rz-scheduler-timeline-slot-height: #{$scheduler-timeline-slot-height};
-  
-  --rz-scheduler-year-padding: #{$scheduler-year-padding};
-  --rz-scheduler-year-slot-padding: #{$scheduler-year-slot-padding};
-  --rz-scheduler-year-slot-title-width: #{$scheduler-year-slot-title-width};
-  --rz-scheduler-year-slot-title-border-radius: #{$scheduler-year-slot-title-border-radius};
-
-  --rz-scheduler-planner-slot-width: #{$scheduler-planner-slot-width};
-  --rz-scheduler-planner-slot-height: #{$scheduler-planner-slot-height};
-  --rz-scheduler-focus-outline: #{$scheduler-focus-outline};
-  --rz-scheduler-focus-outline-offset: #{$scheduler-focus-outline-offset};
-}
+$scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
 
 .rz-scheduler {
+  box-sizing: border-box;
   container-name: scheduler;
   container-type: inline-size;
   display: flex;
@@ -174,7 +87,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
   a.rz-event-list-btn {
     position: absolute;
-    padding-left: 0.25rem;
+    padding-inline-start: 0.25rem;
     color: var(--rz-scheduler-event-list-button-color);
     font-size: var(--rz-scheduler-event-list-button-font-size);
 
@@ -189,12 +102,12 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 .rz-slot {
   display: flex;
   height: 1.5em;
-  border-top: 1px solid var(--rz-scheduler-border-color);
-  border-left: 1px solid var(--rz-scheduler-border-color);
+  border-block-start: 1px solid var(--rz-scheduler-border-color);
+  border-inline-start: 1px solid var(--rz-scheduler-border-color);
 }
 
 .rz-slot-title {
-  text-align: right;
+  text-align: end;
   font-size: var(--rz-scheduler-slot-title-font-size);
   padding: var(--rz-scheduler-slot-title-padding);
 }
@@ -204,10 +117,10 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
   .rz-slot-header {
     height: 1.5rem;
-    text-align: right;
+    text-align: end;
     font-size: var(--rz-scheduler-header-font-size);
     padding: 0 0.25rem;
-    border-right: 1px solid var(--rz-scheduler-border-color);
+    border-inline-end: 1px solid var(--rz-scheduler-border-color);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -215,19 +128,20 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 }
 
 .rz-slot-minor {
-  border-top: 1px solid var(--rz-scheduler-minor-border-color);
+  border-block-start: 1px solid var(--rz-scheduler-minor-border-color);
 }
 
 .rz-day-view,
 .rz-slots:first-child {
   .rz-slot {
-    border-left: none;
+    border-inline-start: none;
   }
 }
 
 .rz-event {
   position: absolute;
-  padding: var(--rz-scheduler-event-padding);
+  padding-block: var(--rz-scheduler-event-padding-block);
+  padding-inline: var(--rz-scheduler-event-padding-inline);
   cursor: pointer;
 }
 
@@ -263,8 +177,8 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 }
 
 .rz-view-header {
-  border-top: var(--rz-scheduler-header-border);
-  border-bottom: var(--rz-scheduler-header-border);
+  border-block-start: var(--rz-scheduler-header-border);
+  border-block-end: var(--rz-scheduler-header-border);
   background-color: var(--rz-scheduler-header-background-color);
   text-transform: var(--rz-scheduler-header-text-transform);
   color: var(--rz-scheduler-header-color);
@@ -334,17 +248,17 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
     color: var(--rz-scheduler-view-button-color);
     border: var(--rz-scheduler-view-button-border);
     border-radius: 0;
-    border-right: none;
+    border-inline-end: none;
 
     &:first-child {
-      border-top-left-radius: var(--rz-scheduler-border-radius);
-      border-bottom-left-radius: var(--rz-scheduler-border-radius);
+      border-start-start-radius: var(--rz-scheduler-border-radius);
+      border-end-start-radius: var(--rz-scheduler-border-radius);
     }
 
     &:last-child {
-      border-top-right-radius: var(--rz-scheduler-border-radius);
-      border-bottom-right-radius: var(--rz-scheduler-border-radius);
-      border-right: var(--rz-scheduler-view-button-border);
+      border-start-end-radius: var(--rz-scheduler-border-radius);
+      border-end-end-radius: var(--rz-scheduler-border-radius);
+      border-inline-end: var(--rz-scheduler-view-button-border);
     }
 
     &.rz-state-active {
@@ -365,26 +279,43 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   .rz-button {
     background-color: var(--rz-scheduler-prev-next-button-background-color);
     color: var(--rz-scheduler-prev-next-button-color);
-    padding: var(--rz-scheduler-prev-next-button-padding);
+    padding-block: var(--rz-scheduler-prev-next-button-padding-block);
+    padding-inline: var(--rz-scheduler-prev-next-button-padding-inline);
     font-size: var(--rz-scheduler-prev-next-button-font-size);
 
     &.rz-today {
-      margin-left: var(--rz-scheduler-today-button-margin-left);
+      margin-inline-start: var(--rz-scheduler-today-button-margin-inline-start);
       padding: var(--rz-scheduler-today-button-padding);
       font-size: var(--rz-scheduler-today-button-font-size);
       text-transform: var(--rz-scheduler-today-button-text-transform);
     }
 
     &.rz-prev {
-      border-radius: var(--rz-scheduler-prev-button-border-radius);
+      border-start-start-radius: var(--rz-scheduler-prev-button-border-start-start-radius);
+      border-start-end-radius: var(--rz-scheduler-prev-button-border-start-end-radius);
+      border-end-start-radius: var(--rz-scheduler-prev-button-border-end-start-radius);
+      border-end-end-radius: var(--rz-scheduler-prev-button-border-end-end-radius);
     }
 
     &.rz-next {
-      border-radius: var(--rz-scheduler-next-button-border-radius);
+      border-start-start-radius: var(--rz-scheduler-next-button-border-start-start-radius);
+      border-start-end-radius: var(--rz-scheduler-next-button-border-start-end-radius);
+      border-end-start-radius: var(--rz-scheduler-next-button-border-end-start-radius);
+      border-end-end-radius: var(--rz-scheduler-next-button-border-end-end-radius);
     }
 
     &:focus-visible {
       z-index: 1;
+    }
+  }
+}
+
+/* Right-to-left .rz-scheduler-nav-prev-next */
+*[dir="rtl"] .rz-scheduler-nav-prev-next {
+  .rz-button.rz-prev,
+  .rz-button.rz-next {
+    .rzi {
+      transform: rotate(180deg);
     }
   }
 }
@@ -407,7 +338,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   }
 
   &:first-child .rz-slot {
-    border-top: none;
+    border-block-start: none;
   }
 }
 
@@ -422,25 +353,25 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   }
 
   &:nth-child(2) .rz-slot {
-    border-top: none;
+    border-block-start: none;
   }
 
   .rz-slot {
     flex: 1;
     height: 100%;
     display: flex;
-    border-top: 1px solid var(--rz-scheduler-border-color);
-    border-left: 1px solid var(--rz-scheduler-border-color);
+    border-block-start: 1px solid var(--rz-scheduler-border-color);
+    border-inline-start: 1px solid var(--rz-scheduler-border-color);
   
     &:first-child {
       position: sticky;
       z-index: 9998;
-      left: 0;
+      inset-inline-start: 0;
       justify-content: center;
       align-items: center;
       background-color: var(--rz-scheduler-header-background-color);
-      border-left: none;
-      border-right: 1px solid var(--rz-scheduler-border-color);
+      border-inline-start: none;
+      border-inline-end: 1px solid var(--rz-scheduler-border-color);
 
 
       .rz-slot-header {
@@ -453,7 +384,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
     }
 
     &:nth-child(2) {
-      border-left: none;
+      border-inline-start: none;
     }
   }
 }
@@ -462,7 +393,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 .rz-day-view{
   .rz-slot:nth-of-type(2) {
-    border-top: none;
+    border-block-start: none;
   }
 
   .rz-view-header {
@@ -505,7 +436,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 .rz-week-view {
   .rz-slot:nth-of-type(2) {
-    border-top: none;
+    border-block-start: none;
   }
 
   .rz-view-header {
@@ -528,7 +459,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
     height: 100%;
 
     &:first-child {
-      border-left: none;
+      border-inline-start: none;
     }
   }
 }
@@ -540,7 +471,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
   .rz-view-header {
     position: sticky;
-    top: 0px;
+    inset-block-start: 0px;
     min-height: 2.25rem;
     z-index: 9999;
   }
@@ -612,7 +543,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
   .rz-view-header {
     position: sticky;
-    top: 0px;
+    inset-block-start: 0px;
     min-height: 36px;
     z-index: 9999;
 
@@ -680,7 +611,7 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
   .rz-slot {
     flex: 1;
-    border-top: none;
+    border-block-start: none;
     justify-content: center;
     height: initial;
     padding: var(--rz-scheduler-year-slot-padding);
@@ -740,8 +671,8 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   .rz-scheduler-nav {
     .rz-scheduler-nav-prev-next {
       justify-content: space-between;
-      margin-bottom: 0.5rem;
-      margin-right: 0.5rem;
+      margin-block-end: 0.5rem;
+      margin-inline-end: 0.5rem;
       order: 1;
     }
 
@@ -752,15 +683,15 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
     }
 
     .rz-scheduler-nav-views {
-      margin-bottom: 0.5rem;
+      margin-block-end: 0.5rem;
       justify-content: center;
       flex-grow: 1;
       order: 2;
 
       .rz-button {
         flex-grow: 1;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+        padding-inline-start: 0.5rem;
+        padding-inline-end: 0.5rem;
 
         .rz-button-text {
           display: none;
@@ -806,8 +737,8 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   .rz-scheduler-nav {
     .rz-scheduler-nav-prev-next {
       justify-content: space-between;
-      margin-bottom: 0.5rem;
-      margin-right: 0.5rem;
+      margin-block-end: 0.5rem;
+      margin-inline-end: 0.5rem;
       order: 1;
     }
 
@@ -818,15 +749,15 @@ $scheduler-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
     }
 
     .rz-scheduler-nav-views {
-      margin-bottom: 0.5rem;
+      margin-block-end: 0.5rem;
       justify-content: center;
       flex-grow: 1;
       order: 2;
 
       .rz-button {
         flex-grow: 1;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+        padding-inline-start: 0.5rem;
+        padding-inline-end: 0.5rem;
 
         .rz-button-text {
           display: none;

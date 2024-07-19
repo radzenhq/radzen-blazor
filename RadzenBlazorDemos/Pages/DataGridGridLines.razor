@@ -4,11 +4,14 @@
 
 @inherits DbContextPage
 
-<RadzenCard class="my-4" style="display: flex; align-items: center; gap: 0.5rem">
-    <div style="white-space:nowrap; margin-right: 16px">GridLines:</div>
-    <RadzenSelectBar @bind-Value="@GridLines" TextProperty="Text" ValueProperty="Value"
-                     Data="@(Enum.GetValues(typeof(Radzen.DataGridGridLines)).Cast<Radzen.DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+<RadzenCard Variant="Variant.Outlined" Class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <div>GridLines:</div>
+        <RadzenSelectBar @bind-Value="@GridLines" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(Radzen.DataGridGridLines)).Cast<Radzen.DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+    </RadzenStack>
 </RadzenCard>
+
 <RadzenDataGrid Data="@orderDetails" GridLines="@GridLines" AllowPaging="true" AllowSorting="true">
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="OrderID" />

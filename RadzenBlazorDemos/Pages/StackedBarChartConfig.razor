@@ -1,12 +1,15 @@
 @using System.Globalization
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-12">
-            <RadzenCard class="w-100 mb-4" >
-                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" Component="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+            <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenRow>
+        <RadzenColumn Size="12">
             <h4>Auto-size stacked bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
                 <RadzenStackedBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
@@ -21,6 +24,9 @@
                 </RadzenValueAxis>
                 <RadzenBarOptions Radius="5" />
             </RadzenChart>
+        </RadzenColumn>
+
+        <RadzenColumn Size="12">
             <h4>Custom size stacked bar series</h4>
             <RadzenChart SeriesClick=@OnSeriesClick style="height: 400px">
                 <RadzenStackedBarSeries Data="@revenue2024" CategoryProperty="Quarter" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue" />
@@ -31,9 +37,9 @@
                 </RadzenValueAxis>
                 <RadzenBarOptions Radius="5" Height="20" />
             </RadzenChart>
-        </div>
-    </div>
-</div>
+        </RadzenColumn>
+    </RadzenRow>
+</RadzenStack>
 
 <EventConsole @ref=@console />
 

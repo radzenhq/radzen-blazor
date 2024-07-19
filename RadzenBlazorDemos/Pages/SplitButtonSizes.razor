@@ -1,38 +1,88 @@
 ﻿@inject NotificationService NotificationService
-<div class="container-fluid splitbutton-demo">
-    <div class="row mb-4">
-        <div class="col">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">SplitButton Sizes</RadzenText>
-            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="ExtraSmall" Size="ButtonSize.ExtraSmall">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" />
-                </ChildContent>
-            </RadzenSplitButton>
-            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Small" Size="ButtonSize.Small">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" />
-                </ChildContent>
-            </RadzenSplitButton>
 
-            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Medium" Size="ButtonSize.Medium">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" />
-                </ChildContent>
-            </RadzenSplitButton>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3">Icon</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with icon")) Icon="account_circle" Size="ButtonSize.Large">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with icon")) Icon="account_circle" Size="ButtonSize.Medium">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with icon")) Icon="account_circle" Size="ButtonSize.Small">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with icon")) Icon="account_circle" Size="ButtonSize.ExtraSmall">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+</RadzenStack>
 
-            <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Large" Size="ButtonSize.Large">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" />
-                </ChildContent>
-            </RadzenSplitButton>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Text</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Large" Size="ButtonSize.Large">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Medium" Size="ButtonSize.Medium">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="Small" Size="ButtonSize.Small">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text")) Text="ExtraSmall" Size="ButtonSize.ExtraSmall">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+</RadzenStack>
 
-        </div>
-    </div>
-</div>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Icon and Text</RadzenText>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text and icon")) Text="SplitButton" Icon="account_circle" Size="ButtonSize.Large">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text and icon")) Text="SplitButton" Icon="account_circle" Size="ButtonSize.Medium">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text and icon")) Text="SplitButton" Icon="account_circle" Size="ButtonSize.Small">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+    <RadzenSplitButton Click=@(args => OnClick(args, "SplitButton with text and icon")) Text="SplitButton" Icon="account_circle" Size="ButtonSize.ExtraSmall">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+</RadzenStack>
 
 @code {
     void OnClick(RadzenSplitButtonItem item, string buttonName)

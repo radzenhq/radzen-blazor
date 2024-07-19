@@ -3,11 +3,13 @@ $fieldset-border-radius: 0 !default;
 $fieldset-padding: 1.25rem !default;
 $fieldset-legend-color: var(--rz-text-tertiary-color) !default;
 $fieldset-legend-font-size: var(--rz-body-font-size) !default;
-$fieldset-legend-margin: 0 0 0 1rem !default;
-$fieldset-legend-padding: 0 1rem !default;
-
+$fieldset-legend-margin-block: 0 !default;
+$fieldset-legend-margin-inline: 1rem 0 !default;
+$fieldset-legend-padding-block: 0 !default;
+$fieldset-legend-padding-inline: 1rem !default;
 $fieldset-toggle-width: 1.125rem !default;
-$fieldset-toggle-margin: 0 0.5rem 0 0 !default;
+$fieldset-toggle-margin-block: 0 !default;
+$fieldset-toggle-margin-inline: 0 0.5rem !default;
 $fieldset-toggle-height: $fieldset-toggle-width !default;
 $fieldset-toggle-background-color: var(--rz-base-200) !default;
 $fieldset-toggle-color: var(--rz-text-tertiary-color) !default;
@@ -16,30 +18,11 @@ $fieldset-toggle-border: none !default;
 $fieldset-toggle-focus-outline: var(--rz-outline-focus) !default;
 $fieldset-toggle-focus-outline-offset: var(--rz-outline-offset) !default;
 
-// Fieldset CSS variables
-
-:root {
-  --rz-fieldset-border: #{$fieldset-border};
-  --rz-fieldset-border-radius: #{$fieldset-border-radius};
-  --rz-fieldset-padding: #{$fieldset-padding};
-  --rz-fieldset-legend-color: #{$fieldset-legend-color};
-  --rz-fieldset-legend-font-size: #{$fieldset-legend-font-size};
-  --rz-fieldset-legend-margin: #{$fieldset-legend-margin};
-  --rz-fieldset-legend-padding: #{$fieldset-legend-padding};
-
-  --rz-fieldset-toggle-width: #{$fieldset-toggle-width};
-  --rz-fieldset-toggle-margin: #{$fieldset-toggle-margin};
-  --rz-fieldset-toggle-height: #{$fieldset-toggle-height};
-  --rz-fieldset-toggle-background-color: #{$fieldset-toggle-background-color};
-  --rz-fieldset-toggle-color: #{$fieldset-toggle-color};
-  --rz-fieldset-toggle-font-size: #{$fieldset-toggle-font-size};
-  --rz-fieldset-toggle-border: #{$fieldset-toggle-border};
-  --rz-fieldset-toggle-focus-outline: #{$fieldset-toggle-focus-outline};
-  --rz-fieldset-toggle-focus-outline-offset: #{$fieldset-toggle-focus-outline-offset};
-  
-}
-
 .rz-fieldset {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
   border: var(--rz-fieldset-border);
   border-radius: var(--rz-fieldset-border-radius);
 }
@@ -68,7 +51,8 @@ $fieldset-toggle-focus-outline-offset: var(--rz-outline-offset) !default;
     text-align: center;
     font-size: var(--rz-fieldset-toggle-font-size);
     line-height: var(--rz-fieldset-toggle-height);
-    margin: var(--rz-fieldset-toggle-margin);
+    margin-block: var(--rz-fieldset-toggle-margin-block);
+    margin-inline: var(--rz-fieldset-toggle-margin-inline);
   }
 
   &.rzi-minus {
@@ -95,8 +79,10 @@ $fieldset-toggle-focus-outline-offset: var(--rz-outline-offset) !default;
 
 .rz-fieldset-legend {
   float: none;
-  margin: var(--rz-fieldset-legend-margin);
-  padding: var(--rz-fieldset-legend-padding);
+  margin-block: var(--rz-fieldset-legend-margin-block);
+  margin-inline: var(--rz-fieldset-legend-margin-inline);
+  padding-block: var(--rz-fieldset-legend-padding-block);
+  padding-inline: var(--rz-fieldset-legend-padding-inline);
   width: auto;
   color: var(--rz-fieldset-legend-color);
   font-size: var(--rz-fieldset-legend-font-size);

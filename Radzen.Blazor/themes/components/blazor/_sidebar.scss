@@ -1,23 +1,13 @@
 $sidebar-z: 1 !default;
 $sidebar-width: 250px !default;
-$sidebar-border-right: var(--rz-border-normal) !default;
+$sidebar-border-inline-end: var(--rz-border-normal) !default;
 $sidebar-background-color: var(--rz-base-800) !default;
 $sidebar-color: var(--rz-white) !default;
-
-// Sidebar CSS variables
-
-:root {
-  --rz-sidebar-z: #{$sidebar-z};
-  --rz-sidebar-width: #{$sidebar-width};
-  --rz-sidebar-border-right: #{$sidebar-border-right};
-  --rz-sidebar-background-color: #{$sidebar-background-color};
-  --rz-sidebar-color: #{$sidebar-color};
-}
 
 .rz-sidebar {
   background-color: var(--rz-sidebar-background-color);
   color: var(--rz-sidebar-color);
-  border-right: var(--rz-sidebar-border-right);
+  border-inline-end: var(--rz-sidebar-border-inline-end);
   position: fixed;
   overflow: auto;
   left: 0;
@@ -26,7 +16,7 @@ $sidebar-color: var(--rz-white) !default;
   z-index: var(--rz-sidebar-z);
   width: var(--rz-sidebar-width);
   opacity: 1;
-  transition: var(--rz-transition-all);
+  transition: width var(--rz-transition), opacity var(--rz-transition);
 }
 
 @media (max-width: 768px) { 

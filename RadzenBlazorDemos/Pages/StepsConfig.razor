@@ -45,12 +45,12 @@
                             @String.Format("{0:d}", order.OrderDate)
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="RequiredDate" Title="Required Date">
+                    <RadzenDataGridColumn Property="@nameof(Order.RequiredDate)" Title="Required Date">
                         <Template Context="order">
                             @String.Format("{0:d}", order.RequiredDate)
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="ShippedDate" Title="Shipped Date">
+                    <RadzenDataGridColumn Property="@nameof(Order.ShippedDate)" Title="Shipped Date">
                         <Template Context="order">
                             @String.Format("{0:d}", order.ShippedDate)
                         </Template>
@@ -62,10 +62,10 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
                     <RadzenDataGridColumn Property="ShipAddress" Title="Address" />
-                    <RadzenDataGridColumn Property="ShipCity" Title="City" />
+                    <RadzenDataGridColumn Property="@nameof(Order.ShipCity)" Title="City" />
                     <RadzenDataGridColumn Property="ShipRegion" Title="Region" />
                     <RadzenDataGridColumn Property="ShipPostalCode" Title="Postal Code" />
-                    <RadzenDataGridColumn Property="ShipCountry" Title="Country" />
+                    <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Country" />
                 </Columns>
             </RadzenDataGrid>
         </RadzenStepsItem>

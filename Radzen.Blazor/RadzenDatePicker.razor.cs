@@ -905,7 +905,7 @@ namespace Radzen.Blazor
 
         private string getStyle()
         {
-            return $"display: inline-block;{(Inline ? "overflow:auto;" : "")}{(Style != null ? Style : "")}";
+            return $"{(Inline ? "overflow:auto;" : "")}{(Style != null ? Style : "")}";
         }
 
         /// <summary>
@@ -935,11 +935,11 @@ namespace Radzen.Blazor
             {
                 if (Inline)
                 {
-                    return "white-space: nowrap";
+                    return "";
                 }
                 else
                 {
-                    return $"width: 320px; {contentStyle}";
+                    return $"{contentStyle}";
                 }
             }
         }
@@ -969,7 +969,7 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return ClassList.Create()
-                            .Add("rz-calendar-inline", Inline)
+                            .Add("rz-datepicker-inline", Inline)
                             .Add(FieldIdentifier, EditContext)
                             .ToString();
         }
@@ -1146,9 +1146,9 @@ namespace Radzen.Blazor
         {
             return ClassList.Create()
                                .Add("rz-state-default", !forCell)
-                               .Add("rz-datepicker-other-month", CurrentDate.Month != date.Month)
+                               .Add("rz-calendar-other-month", CurrentDate.Month != date.Month)
                                .Add("rz-state-active", !forCell && DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)
-                               .Add("rz-datepicker-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
+                               .Add("rz-calendar-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-focused", !forCell && FocusedDate.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-disabled", !forCell && dateArgs.Disabled)
                                .ToString();

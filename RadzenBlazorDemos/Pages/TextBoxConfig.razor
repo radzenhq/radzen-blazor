@@ -1,49 +1,47 @@
-﻿<div class="container-fluid">
-    <div class="row px-3">
-        <div class="col-md-6 col-lg-4 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Default TextBox</RadzenText>
-                <RadzenTextBox Change=@(args => OnChange(args, "TextBox")) class="w-100" aria-label="Default TextBox" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Placeholder</RadzenText>
-                <RadzenTextBox Placeholder="Search..." Change=@(args => OnChange(args, "TextBox with placeholder")) class="w-100" aria-label="TextBox with placeholder" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">5 characters maximum</RadzenText>
-                <RadzenTextBox @bind-Value=@value MaxLength="5" Change=@(args => OnChange(args, "TextBox with 5 maximum characters")) class="w-100" aria-label="TextBox with 5 maximum characters" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Change on every input</RadzenText>
-                <RadzenTextBox @oninput=@(args => OnChange(args.Value.ToString(), "TextBox with change on every input")) class="w-100" aria-label="TextBox with change on every input" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled TextBox</RadzenText>
-                <RadzenTextBox Disabled="true" class="w-100" aria-label="Disabled TextBox" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextBox with disabled AutoComplete</RadzenText>
-                <RadzenTextBox AutoComplete="false" class="w-100" aria-label="Disabled AutoComplete TextBox" />
-            </RadzenCard>
-        </div>
-        <div class="col-md-6 col-lg-4 p-3">
-            <RadzenCard>
-                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextBox with custom AutoComplete</RadzenText>
-                <RadzenTextBox autocomplete="custom" class="w-100" aria-label="Custom AutoComplete TextBox" />
-            </RadzenCard>
-        </div>
-    </div>
-</div>
+﻿<RadzenRow Gap="2rem" RowGap="2rem" Class="rz-m-0 rz-m-md-12">
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Default TextBox</RadzenText>
+            <RadzenTextBox Change=@(args => OnChange(args, "TextBox")) Style="width: 100%" aria-label="Default TextBox" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Placeholder</RadzenText>
+            <RadzenTextBox Placeholder="Search..." Change=@(args => OnChange(args, "TextBox with placeholder")) Style="width: 100%" aria-label="TextBox with placeholder" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">5 characters maximum</RadzenText>
+            <RadzenTextBox @bind-Value=@value MaxLength="5" Change=@(args => OnChange(args, "TextBox with 5 maximum characters")) Style="width: 100%" aria-label="TextBox with 5 maximum characters" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Change on every input</RadzenText>
+            <RadzenTextBox @oninput=@(args => OnChange(args.Value.ToString(), "TextBox with change on every input")) Style="width: 100%" aria-label="TextBox with change on every input" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Disabled TextBox</RadzenText>
+            <RadzenTextBox Disabled="true" Style="width: 100%" aria-label="Disabled TextBox" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextBox with disabled AutoComplete</RadzenText>
+            <RadzenTextBox AutoComplete="false" Style="width: 100%" aria-label="Disabled AutoComplete TextBox" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard>
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextBox with custom AutoComplete</RadzenText>
+            <RadzenTextBox autocomplete="custom" Style="width: 100%" aria-label="Custom AutoComplete TextBox" />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
 
 <EventConsole @ref=@console />
 

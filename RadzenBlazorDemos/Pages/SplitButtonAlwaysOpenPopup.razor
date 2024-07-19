@@ -1,18 +1,13 @@
 ﻿@inject NotificationService NotificationService
-<div class="container-fluid splitbutton-demo">
-    <div class="row mb-4">
-        <div class="col">
-            <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3">Always open popup with items on click</RadzenText>
-            <RadzenSplitButton Click=@(args => OnClick(args, "Opened SplitButton")) AlwaysOpenPopup=true Text="SplitButton">
-                <ChildContent>
-                    <RadzenSplitButtonItem Text="Item1" Value="1" />
-                    <RadzenSplitButtonItem Text="Item2" Value="2" />
-                </ChildContent>
-            </RadzenSplitButton>
 
-        </div>
-    </div>
-</div>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+    <RadzenSplitButton Click=@(args => OnClick(args, "Opened SplitButton")) AlwaysOpenPopup=true Text="SplitButton">
+        <ChildContent>
+            <RadzenSplitButtonItem Text="Item1" Value="1" />
+            <RadzenSplitButtonItem Text="Item2" Value="2" />
+        </ChildContent>
+    </RadzenSplitButton>
+</RadzenStack>
 
 @code {
     void OnClick(RadzenSplitButtonItem item, string buttonName)

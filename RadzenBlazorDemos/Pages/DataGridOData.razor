@@ -65,19 +65,19 @@
     </LoadingTemplate>
 </RadzenDataGrid>
 
-<RadzenCard class="mt-4">
-    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="mb-3">Data-bind to a service</RadzenText>
+<RadzenCard class="rz-mt-6">
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" class="rz-mb-4">Data-bind to a service</RadzenText>
         <RadzenText TextStyle="TextStyle.Body1">
             1. Set the Data and Count properties.
         </RadzenText>
-        <pre class="mt-3 p-3">
+        <pre class="rz-mt-4 rz-p-4">
             <code>&lt;RadzenDataGrid Count="@@count" Data="@@employees"</code>
         </pre>
         <RadzenText TextStyle="TextStyle.Body1">
             2. Handle the LoadData event and update the Data and Count backing fields (<code>employees</code> and <code>count</code> in this case).
         </RadzenText>
             
-        <pre class="mt-3 p-3">
+        <pre class="rz-mt-4 rz-p-4">
             <code>
 async Task LoadData(LoadDataArgs args)
 {

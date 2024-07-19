@@ -6,21 +6,17 @@ $button-shadow: none !default;
 $button-transition: var(--rz-transition-all), width 0, height 0 !default;
 $button-line-height: 1.25rem !default;
 $button-vertical-align: top !default;
-
 $button-hover-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.2) !default;
 $button-hover-gradient: linear-gradient(rgba(#fff, 0.1), rgba(#fff, 0.1)) !default;
 $button-hover-background-size: $button-background-size !default;
-
 $button-focus-shadow: inset 0 -3px 0 0 rgba(255, 255, 255, 0.2) !default;
 $button-focus-gradient: linear-gradient(rgba(#fff, 0.1), rgba(#fff, 0.1)) !default;
 $button-focus-background-size: $button-background-size !default;
 $button-focus-outline: var(--rz-outline-focus) !default;
 $button-focus-outline-offset: var(--rz-outline-offset) !default;
-
 $button-active-shadow: inset 0 3px 0 0 rgba(0, 0, 0, 0.1) !default;
 $button-active-gradient: linear-gradient(rgba(#000, 0.1), rgba(#000, 0.1)) !default;
 $button-active-background-size: $button-background-size !default;
-
 $button-disabled-opacity: 0.2 !default;
 $button-empty-opacity: 0.4 !default;
 
@@ -104,168 +100,92 @@ $button-sizes: map-merge(
   $button-sizes
 );
 
-rz-button[type],
-p-button[type] {
-  -webkit-appearance: none;
-}
-
-$button-styles: () !default;
-
-$button-styles: map-merge(
-  (
-    primary: (
-      background-color: var(--rz-primary),
-      color: var(--rz-on-primary)
-    ),
-    light: (
-      background-color: var(--rz-base-200),
-      color: var(--rz-text-color)
-    ),
-    base: (
-      background-color: var(--rz-base-200),
-      color: var(--rz-text-color)
-    ),
-    dark: (
-      background-color: var(--rz-base-900),
-      color: var(--rz-text-contrast-color)
-    ),
-    secondary: (
-      background-color: var(--rz-secondary),
-      color: var(--rz-on-secondary)
-    ),
-    info: (
-      background-color: var(--rz-info),
-      color: var(--rz-on-info)
-    ),
-    warning: (
-      background-color: var(--rz-warning),
-      color: var(--rz-on-warning)
-    ),
-    error: (
-      background-color: var(--rz-danger),
-      color: var(--rz-on-danger)
-    ),
-    danger: (
-      background-color: var(--rz-danger),
-      color: var(--rz-on-danger)
-    ),
-    success: (
-      background-color: var(--rz-success),
-      color: var(--rz-on-success)
-    )
-  ),
-  $button-styles
-);
-
-// Button CSS variables
-
-:root {
-  --rz-button-base-background-color: #{$button-base-background-color};
-  --rz-button-base-color: #{$button-base-color};
-  --rz-button-background-size: #{$button-background-size};
-  --rz-button-border-radius: #{$button-border-radius};
-  --rz-button-shadow: #{$button-shadow};
-  --rz-button-transition: #{$button-transition};
-  --rz-button-line-height: #{$button-line-height};
-  --rz-button-vertical-align: #{$button-vertical-align};
-  --rz-button-hover-shadow: #{$button-hover-shadow};
-  --rz-button-hover-gradient: #{$button-hover-gradient};
-  --rz-button-hover-background-size: #{$button-hover-background-size};
-  --rz-button-focus-shadow: #{$button-focus-shadow};
-  --rz-button-focus-gradient: #{$button-focus-gradient};
-  --rz-button-focus-background-size: #{$button-focus-background-size};
-  --rz-button-focus-outline: #{$button-focus-outline};
-  --rz-button-focus-outline-offset: #{$button-focus-outline-offset};
-  --rz-button-active-shadow: #{$button-active-shadow};
-  --rz-button-active-gradient: #{$button-active-gradient};
-  --rz-button-active-background-size: #{$button-active-background-size};
-  --rz-button-disabled-opacity: #{$button-disabled-opacity};
-  --rz-button-empty-opacity: #{$button-empty-opacity};
-}
-
 %button, .rz-button {
-    -webkit-appearance: none;
-    display: inline-block;
-    border-radius: var(--rz-button-border-radius);
-    background-color: var(--rz-button-base-background-color);
-    color: var(--rz-button-base-color);
-    border: none;
-    outline: none;
-    line-height: var(--rz-button-line-height);
-    font-size: 1.0625rem;
-    text-decoration: none;
-    box-shadow: var(--rz-button-shadow);
-    transition: var(--rz-button-transition);
-    background-size: var(--rz-button-background-size);
-    background-repeat: no-repeat;
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 0;
+  color: var(--rz-button-base-color);
+  background-color: var(--rz-button-base-background-color);
+  background-size: var(--rz-button-background-size);
+  background-repeat: no-repeat;
+  border: none;
+  border-radius: var(--rz-button-border-radius);
+  outline: none;
+  box-shadow: var(--rz-button-shadow);
+  font-size: 1.0625rem;
+  font-family: inherit;
+  line-height: var(--rz-button-line-height);
+  text-decoration: none;
+  transition: var(--rz-button-transition);
+  -webkit-appearance: none;
 
-    &:focus {
-        outline: var(--rz-outline-normal);
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-button-focus-outline);
+    outline-offset: var(--rz-button-focus-outline-offset);
+  }
+
+  &:not(.rz-state-disabled) {
+    cursor: pointer;
+
+    &:hover {
+      &:not(:active) {
+        text-decoration: none;
+        background-image: var(--rz-button-hover-gradient);
+        background-size: var(--rz-button-hover-background-size);
+        box-shadow: var(--rz-button-hover-shadow);
+      }
     }
 
     &:focus-visible {
-        outline: var(--rz-button-focus-outline);
-        outline-offset: var(--rz-button-focus-outline-offset);
+      &:not(:active) {
+        text-decoration: none;
+        background-image: var(--rz-button-focus-gradient);
+        background-size: var(--rz-button-focus-background-size);
+        box-shadow: var(--rz-button-focus-shadow);
+      }
     }
 
-    &:not(.rz-state-disabled) {
-        cursor: pointer;
-
-        &:hover {
-            &:not(:active) {
-                text-decoration: none;
-                background-image: var(--rz-button-hover-gradient);
-                background-size: var(--rz-button-hover-background-size);
-                box-shadow: var(--rz-button-hover-shadow);
-            }
-        }
-
-        &:focus-visible {
-            &:not(:active) {
-                text-decoration: none;
-                background-image: var(--rz-button-focus-gradient);
-                background-size: var(--rz-button-focus-background-size);
-                box-shadow: var(--rz-button-focus-shadow);
-            }
-        }
-
-        &:active {
-            text-decoration: none;
-            background-image: var(--rz-button-active-gradient);
-            background-size: var(--rz-button-active-background-size);
-            box-shadow: var(--rz-button-active-shadow);
-        }
+    &:active {
+      text-decoration: none;
+      background-image: var(--rz-button-active-gradient);
+      background-size: var(--rz-button-active-background-size);
+      box-shadow: var(--rz-button-active-shadow);
     }
+  }
 
-    &.rz-state-disabled {
-        opacity: var(--rz-button-disabled-opacity);
-        cursor: initial;
-    }
+  &.rz-state-disabled {
+    opacity: var(--rz-button-disabled-opacity);
+    cursor: initial;
+  }
 
-    &.rz-state-empty {
-        opacity: var(--rz-button-empty-opacity);
-        cursor: initial;
-    }
+  &.rz-state-empty {
+    opacity: var(--rz-button-empty-opacity);
+    cursor: initial;
+  }
 
-    .rz-button-box {
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        vertical-align: var(--rz-button-vertical-align);
-        line-height: var(--rz-button-line-height);
-    }
+  .rz-button-box {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    vertical-align: var(--rz-button-vertical-align);
+    line-height: var(--rz-button-line-height);
+  }
 
-    .rz-button-text {
-        vertical-align: var(--rz-button-vertical-align);
-    }
+  .rz-button-text {
+    vertical-align: var(--rz-button-vertical-align);
+  }
 
-    .rzi {
-        vertical-align: var(--rz-button-vertical-align);
-    }
+  .rzi {
+    vertical-align: var(--rz-button-vertical-align);
+  }
 }
 
 // Focus Styles
-@each $style, $button in $button-styles {
+@each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
   .rz-button.rz-#{$style}:focus-visible {
     @if $style != 'dark' and $style != 'light' {
       outline-color: var(--rz-#{$style});
@@ -275,36 +195,23 @@ $button-styles: map-merge(
   }
 }
 
-@each $style, $button in $button-styles {
+@each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
   .rz-button.rz-#{$style} {
     @each $name, $value in $button {
       @if $style == 'dark' {
         #{$name}: #{$value};
-      } @else if $style == 'light' {
+      } 
+      @else if $style == 'light' {
         #{$name}: #{$value};
-      } @else {
+      } 
+      @else {
         #{$name}: #{$value};
         @if $name == 'background-color' {
-          &.rz-shade-lighter {
-            background-color: var(--rz-#{$style}-lighter);
-            color: var(--rz-on-#{$style}-lighter);
-          }
-          &.rz-shade-light {
-            background-color: var(--rz-#{$style}-light);
-            color: var(--rz-on-#{$style}-light);
-          }
-          &.rz-shade-default {
-            background-color: var(--rz-#{$style});
-            color: var(--rz-on-#{$style});
-          }
-          &.rz-shade-dark {
-            background-color: var(--rz-#{$style}-dark);
-            color: var(--rz-on-#{$style}-dark);
-          }
-          &.rz-shade-darker {
-            background-color: var(--rz-#{$style}-darker);
-            color: var(--rz-on-#{$style}-darker); 
-          }
+          &.rz-shade-lighter { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+          &.rz-shade-light { background-color: var(--rz-#{$style}-light); color: var(--rz-on-#{$style}-light); }
+          &.rz-shade-default { background-color: var(--rz-#{$style}); color: var(--rz-on-#{$style}); }
+          &.rz-shade-dark { background-color: var(--rz-#{$style}-dark); color: var(--rz-on-#{$style}-dark); }
+          &.rz-shade-darker { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); }
         }
       }
     }
@@ -313,71 +220,57 @@ $button-styles: map-merge(
 
       &:focus-visible {
         @if $style != 'dark' and $style != 'light' {
-            outline-color: var(--rz-#{$style});
-        } @else {
-            outline-color: var(--rz-outline-color);
+          outline-color: var(--rz-#{$style});
+        } 
+        @else {
+          outline-color: var(--rz-outline-color);
         }
       }
     }
   }
 }
 
-@each $style, $button in $button-styles {
+@each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
   .rz-button.rz-variant-outlined.rz-#{$style} {
     @each $name, $value in $button {
       @if $name == 'background-color' {
         @if $style == 'dark' {
-          &.rz-shade-default {
-            box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
-            color: #{$value};
-          }
-        } @else if $style == 'light' {
+          &.rz-shade-default { box-shadow: inset 0 0 0 var(--rz-border-width) #{$value}; color: #{$value}; }
+        } 
+        @else if $style == 'light' {
           @if $theme-dark == true {
-            &.rz-shade-default {
-              box-shadow: inset 0 0 0 var(--rz-border-width) map-get($button, color);
-              color: map-get($button, color);
-            }
-          } @else {
-            &.rz-shade-default {
-              box-shadow: inset 0 0 0 var(--rz-border-width) #{$value};
-              color: #{$value};
-            }
+            &.rz-shade-default { box-shadow: inset 0 0 0 var(--rz-border-width) map-get($button, color); color: map-get($button, color); }
+          } 
+          @else {
+            &.rz-shade-default { box-shadow: inset 0 0 0 var(--rz-border-width) #{$value}; color: #{$value}; }
           }
-        } @else {
-          &.rz-shade-lighter {
-            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-lighter);
-            color: var(--rz-#{$style}-light)
-          }
-          &.rz-shade-light {
-            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-light);
-            color: var(--rz-#{$style}-light)
-          }
-          &.rz-shade-default {
-            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style});
-            color: var(--rz-#{$style})
-          }
-          &.rz-shade-dark {
-            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-dark);
-            color: var(--rz-#{$style}-dark)
-          }
-          &.rz-shade-darker {
-            box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker);
-            color: var(--rz-#{$style}-darker)
-          }
+        } 
+        @else if $style == 'base' {
+          &.rz-shade-lighter { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-lighter); color: var(--rz-#{$style}-light); }
+          &.rz-shade-light { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-light); color: var(--rz-#{$style}-light); }
+          &.rz-shade-default { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-text-color); color: var(--rz-text-color); }
+          &.rz-shade-dark { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-dark); color: var(--rz-#{$style}-dark); }
+          &.rz-shade-darker { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker); color: var(--rz-#{$style}-darker); }
+        } 
+        @else {
+          &.rz-shade-lighter { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-lighter); color: var(--rz-#{$style}-light); }
+          &.rz-shade-light { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-light); color: var(--rz-#{$style}-light); }
+          &.rz-shade-default { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}); color: var(--rz-#{$style}); }
+          &.rz-shade-dark { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-dark); color: var(--rz-#{$style}-dark); }
+          &.rz-shade-darker { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker); color: var(--rz-#{$style}-darker); }
         }
         background-color: transparent;
 
         &:not(.rz-state-disabled):hover:not(:active),
         &:not(.rz-state-disabled):focus-visible:not(:active),
         &:not(.rz-state-disabled):active {
-          @if $style == 'light' {
-            background-color: rgba(255, 255, 255, .12);
-          } @else if $style == 'dark' {
-            background-color: rgba(0, 0, 0, .12);
-          } @else {
-            background-color: var(--rz-#{$style}-lighter);
-            color: var(--rz-on-#{$style}-lighter);
+          @if $style == 'light' { background-color: rgba(255, 255, 255, .12); } 
+          @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); }
+          @else if $style == 'base' {
+            @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); } 
+            @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
           }
+          @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); } 
           background-image: none;
         }
       }
@@ -385,34 +278,26 @@ $button-styles: map-merge(
   }
 }
 
-@each $style, $button in $button-styles {
+@each $style, $button in map-merge($severity-styles-map, $base-styles-map) {
   .rz-button.rz-variant-text.rz-#{$style} {
     @each $name, $value in $button {
       @if $name == 'background-color' {
-        @if $style == 'dark' {
-          color: #{$value};
-        } @else if $style == 'light' {
-          @if $theme-dark == true {
-            color: map-get($button, color);
-          } @else {
-            color: #{$value};
-          }
+        @if $style == 'dark' { color: #{$value}; }
+        @else if $style == 'light' {
+          @if $theme-dark == true { color: map-get($button, color); } 
+          @else { color: #{$value}; }
+        } @else if $style == 'base' {
+          &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
+          &.rz-shade-light { color: var(--rz-#{$style}-light); }
+          &.rz-shade-default { color: inherit }
+          &.rz-shade-dark { color: var(--rz-#{$style}-dark); }
+          &.rz-shade-darker { color: var(--rz-#{$style}-darker); }
         } @else {
-          &.rz-shade-lighter {
-            color: var(--rz-#{$style}-lighter)
-          }
-          &.rz-shade-light {
-            color: var(--rz-#{$style}-light)
-          }
-          &.rz-shade-default {
-            color: var(--rz-#{$style})
-          }
-          &.rz-shade-dark {
-            color: var(--rz-#{$style}-dark)
-          }
-          &.rz-shade-darker {
-            color: var(--rz-#{$style}-darker)
-          }
+          &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
+          &.rz-shade-light { color: var(--rz-#{$style}-light); }
+          &.rz-shade-default { color: var(--rz-#{$style}); }
+          &.rz-shade-dark { color: var(--rz-#{$style}-dark); }
+          &.rz-shade-darker { color: var(--rz-#{$style}-darker); }
         }
         background-color: transparent;
         box-shadow: none;
@@ -420,14 +305,13 @@ $button-styles: map-merge(
         &:not(.rz-state-disabled):hover:not(:active),
         &:not(.rz-state-disabled):focus-visible:not(:active),
         &:not(.rz-state-disabled):active {
-          @if $style == 'light' {
-            background-color: rgba(255, 255, 255, .12);
-          } @else if $style == 'dark' {
-            background-color: rgba(0, 0, 0, .12);
-          } @else {
-            background-color: var(--rz-#{$style}-lighter);
-            color: var(--rz-on-#{$style}-lighter);
+          @if $style == 'light' { background-color: rgba(255, 255, 255, .12); } 
+          @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); } 
+          @else if $style == 'base' {
+            @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); }
+            @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
           }
+          @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); } 
           background-image: none;
           box-shadow: none;
         }
@@ -439,29 +323,20 @@ $button-styles: map-merge(
 
 @each $size, $button in $button-sizes {
   %button-#{$size}, .rz-button-#{$size} {
-    font-size: map-get($button, font-size);
-    font-weight: map-get($button, font-weight);
     padding: map-get($button, padding);
     height: map-get($button, height);
     line-height: map-get($button, line-height);
     min-height: map-get($button, min-height);
     min-width: map-get($button, min-width);
+    border-radius: map-get($button, border-radius);
+    font-size: map-get($button, font-size);
+    font-weight: map-get($button, font-weight);
     letter-spacing: map-get($button, letter-spacing);
     text-transform: map-get($button, text-transform);
-    border-radius: map-get($button, border-radius);
 
-    & .rz-button-box {
-      line-height: map-get($button, line-height);
-      gap: map-get($button, gap);
-    }
-
-    &.rz-button-icon-left {
-      padding: map-get($button, text-with-icon-padding);
-    }
-
-    &.rz-button-icon-only {
-      padding: map-get($button, icon-only-padding);
-    }
+    & .rz-button-box { line-height: map-get($button, line-height); gap: map-get($button, gap);}
+    &.rz-button-icon-left { padding: map-get($button, text-with-icon-padding); }
+    &.rz-button-icon-only { padding: map-get($button, icon-only-padding); }
 
     .rzi {
       @each $name, $value in map-get($button, icon) {
@@ -472,10 +347,6 @@ $button-styles: map-merge(
 }
 
 @keyframes button-icon-spin {
-    from {
-        transform:rotate(0deg);
-    }
-    to {
-        transform:rotate(360deg);
-    }
+  from { transform:rotate(0deg); }
+  to { transform:rotate(360deg); }
 }

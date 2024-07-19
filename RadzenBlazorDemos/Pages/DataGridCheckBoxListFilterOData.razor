@@ -1,0 +1,68 @@
+﻿@using System.Linq.Dynamic.Core
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" IsLoading="@isLoading" TItem="Order"
+        FilterMode="FilterMode.CheckBoxList" FilterPopupRenderMode="PopupRenderMode.OnDemand" PageSize="5" AllowPaging="true" AllowSorting="true" 
+        Data="@orders" Count="@count" LoadData="@LoadData" LoadColumnFilterData="@LoadColumnFilterData" ColumnWidth="300px">
+    <Columns>
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
+        <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
+            <Template Context="order">
+                <RadzenImage Path="@order.Employee?.Photo" style="width: 32px; height: 32px; border-radius: 16px; margin-right: 6px;" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.RequiredDate)" Title="Required Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShippedDate)" Title="Shipped Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
+        <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship Country" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    NorthwindODataService service = new NorthwindODataService("https://services.radzen.com/odata/Northwind/");
+
+    IEnumerable<Order> orders;
+    int count;
+    bool isLoading;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        var result = await service.GetOrders(filter: args.Filter, top: args.Top, skip: args.Skip, orderby: args.OrderBy, count: true, expand: "Customer,Employee");
+        
+        orders = result.Value.AsODataEnumerable();
+        count = result.Count;
+
+        isLoading = false;
+    }
+
+    async Task LoadColumnFilterData(DataGridLoadColumnFilterDataEventArgs<Order> args)
+    {
+        // Get the property name in OData format. Sub-properties are separated by /.
+        var property = args.Column.GetFilterProperty().Replace(".","/");
+
+        // Get the distinct values for the property in OData format for the current column.
+        var result = await service.GetOrders(
+            count: true, 
+            filter: !string.IsNullOrEmpty(args.Filter) ? $"contains(tolower({property}), tolower('{args.Filter}'))" : null, 
+            apply: $"groupby(({property}))", 
+            expand: GetODataExpand(property));
+
+        args.Count = result.Count;
+        args.Data = result.Value;
+    }
+
+    string GetODataExpand(string property)
+    {
+        var properties = property.Split("/");
+        return properties.Count() > 1 ? $"{string.Join("/", properties.Take(properties.Length - 1))}($select={properties.LastOrDefault()})" : null;
+    }
+}

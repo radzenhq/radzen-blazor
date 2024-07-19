@@ -11,14 +11,14 @@
     <div @ref="Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
         @if (Range)
         {
-            <span class="rz-slider-range" style="left: @(Left.ToInvariantString())%; width: @((SecondLeft - Left).ToInvariantString())%;"></span>
-            <span tabindex="@(Disabled ? -1 : 0)" @ref="minHandle" class="rz-slider-handle" style="left: @(Left.ToInvariantString())%; bottom: auto;" @onkeydown="@(args => OnKeyPress(args, true))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation></span>
-            <span tabindex="@(Disabled ? -1 : 0)" @ref="maxHandle" class="rz-slider-handle rz-slider-handle-active" style="left: @(SecondLeft.ToInvariantString())%; bottom: auto;" @onkeydown="@(args => OnKeyPress(args, false))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation></span>
+            <span class="rz-slider-range" style="inset-inline-start: @(Left.ToInvariantString())%; width: @((SecondLeft - Left).ToInvariantString())%;"></span>
+            <span tabindex="@(Disabled ? -1 : 0)" @ref="minHandle" class="rz-slider-handle" style="inset-inline-start: @(Left.ToInvariantString())%; bottom: auto;" @onkeydown="@(args => OnKeyPress(args, true))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation></span>
+            <span tabindex="@(Disabled ? -1 : 0)" @ref="maxHandle" class="rz-slider-handle rz-slider-handle-active" style="inset-inline-start: @(SecondLeft.ToInvariantString())%; bottom: auto;" @onkeydown="@(args => OnKeyPress(args, false))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation></span>
         }
         else
         {
             <span class="rz-slider-range rz-slider-range-min" style="width: @(Left.ToInvariantString())%;"></span>
-            <span tabindex="@(Disabled ? -1 : 0)" @ref="handle" class="rz-slider-handle" style="left: @(Left.ToInvariantString())%;" @onkeydown="@(args => OnKeyPress(args, false))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation></span>
+            <span tabindex="@(Disabled ? -1 : 0)" @ref="handle" class="rz-slider-handle" style="inset-inline-start: @(Left.ToInvariantString())%;" @onkeydown="@(args => OnKeyPress(args, false))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation></span>
         }
     </div>
 }

@@ -2,47 +2,14 @@
 @import 'mixins';
 $base: true;
 $material: true;
-
-// Legacy Theme Tokens
-
-$primary: #4340D2 !default;
-$secondary: #e91e63 !default;
-$info: #2196f3 !default;
-$success: #4caf50 !default;
-$warning: #ff9800 !default;
-$danger: #f44336 !default;
-$body-color: #616161 !default;
-$body-bg: #f5f5f5 !default;
-$font-size: 16px !default;
-
-// Legacy Tokens Map
-
-$rz-base-100: $body-bg !default;
-$rz-base-700: $body-color !default;
-$rz-primary: $primary !default;
-$rz-secondary: $secondary !default;
-$rz-info: $info !default;
-$rz-success: $success !default;
-$rz-warning: $warning !default;
-$rz-danger: $danger !default;
-$rz-root-font-size: $font-size !default;
+$theme-name: material;
 
 // Theme Colors
 
 $rz-white: #ffffff !default;
 $rz-black: #000000 !default;
 
-$rz-base-50: #fafafa !default;
-$rz-base-100: #f5f5f5 !default;
-$rz-base-200: #eeeeee !default;
-$rz-base-300: #e0e0e0 !default;
-$rz-base-400: #bdbdbd !default;
-$rz-base-500: #9e9e9e !default;
-$rz-base-600: #757575 !default;
-$rz-base-700: #616161 !default;
-$rz-base-800: #424242 !default;
-$rz-base-900: #212121 !default;
-
+$rz-base: #eeeeee !default;
 $rz-primary: #4340D2 !default;
 $rz-secondary: #e91e63 !default;
 $rz-info: #2196f3 !default;
@@ -74,6 +41,21 @@ $rz-series-21: #fff59d !default;
 $rz-series-22: #c5e1a5 !default;
 $rz-series-23: #80cbc4 !default;
 $rz-series-24: #b3e5fc !default;
+
+$rz-base-50: #fafafa !default;
+$rz-base-100: #f5f5f5 !default;
+$rz-base-200: #eeeeee !default;
+$rz-base-300: #e0e0e0 !default;
+$rz-base-400: #bdbdbd !default;
+$rz-base-500: #9e9e9e !default;
+$rz-base-600: #757575 !default;
+$rz-base-700: #616161 !default;
+$rz-base-800: #424242 !default;
+$rz-base-900: #212121 !default;
+$rz-base-light: #f5f5f5 !default;
+$rz-base-lighter: #ffffff !default;
+$rz-base-dark: #757575 !default;
+$rz-base-darker: #212121 !default;
 
 $rz-primary-light: mix($rz-white, $rz-primary, 20%) !default;
 $rz-primary-lighter: rgba($rz-primary, .12) !default;
@@ -114,13 +96,139 @@ $rz-body-font-size: 1rem !default;
 $rz-body-line-height: 1.5 !default;
 $rz-body-background-color: var(--rz-base-100) !default;
 $rz-text-font-family: Roboto, sans-serif !default;
-$rz-icon-font-family: 'Material Icons' !default;
-$rz-icon-size: 1.5rem !default;
 $rz-outline-offset: 2px !default;
 $rz-outline-width: 2px !default;
 $rz-outline-color: var(--rz-primary) !default;
 
 // Utilities
+
+$rz-theme-colors-map: () !default;
+$rz-theme-colors-map: map-merge(
+  (
+    "white": $rz-white,
+    "black": $rz-black,
+
+    "base": $rz-base,
+    "base-50": $rz-base-50,
+    "base-100": $rz-base-100,
+    "base-200": $rz-base-200,
+    "base-300": $rz-base-300,
+    "base-400": $rz-base-400,
+    "base-500": $rz-base-500,
+    "base-600": $rz-base-600,
+    "base-700": $rz-base-700,
+    "base-800": $rz-base-800,
+    "base-900": $rz-base-900,
+    "base-light": $rz-base-light,
+    "base-lighter": $rz-base-lighter,
+    "base-dark": $rz-base-dark,
+    "base-darker": $rz-base-darker,
+    
+    "primary": $rz-primary,
+    "primary-light": $rz-primary-light,
+    "primary-lighter": $rz-primary-lighter,
+    "primary-dark": $rz-primary-dark,
+    "primary-darker": $rz-primary-darker,
+    
+    "secondary": $rz-secondary,
+    "secondary-light": $rz-secondary-light,
+    "secondary-lighter": $rz-secondary-lighter,
+    "secondary-dark": $rz-secondary-dark,
+    "secondary-darker": $rz-secondary-darker,
+    
+    "info": $rz-info,
+    "info-light": $rz-info-light,
+    "info-lighter": $rz-info-lighter,
+    "info-dark": $rz-info-dark,
+    "info-darker": $rz-info-darker,
+    
+    "success": $rz-success,
+    "success-light": $rz-success-light,
+    "success-lighter": $rz-success-lighter,
+    "success-dark": $rz-success-dark,
+    "success-darker": $rz-success-darker,
+    
+    "warning": $rz-warning,
+    "warning-light": $rz-warning-light,
+    "warning-lighter": $rz-warning-lighter,
+    "warning-dark": $rz-warning-dark,
+    "warning-darker": $rz-warning-darker,
+    
+    "danger": $rz-danger,
+    "danger-light": $rz-danger-light,
+    "danger-lighter": $rz-danger-lighter,
+    "danger-dark": $rz-danger-dark,
+    "danger-darker": $rz-danger-darker,
+
+    "on-base": $rz-base-900,
+    "on-base-light": $rz-base-900,
+    "on-base-lighter": $rz-base-900,
+    "on-base-dark": $rz-white,
+    "on-base-darker": $rz-white,
+
+    "on-primary": $rz-white,
+    "on-primary-light": $rz-white,
+    "on-primary-lighter": $rz-primary,
+    "on-primary-dark": $rz-white,
+    "on-primary-darker": $rz-white,
+    
+    "on-secondary": $rz-white,
+    "on-secondary-light": $rz-white,
+    "on-secondary-lighter": $rz-secondary,
+    "on-secondary-dark": $rz-white,
+    "on-secondary-darker": $rz-white,
+    
+    "on-info": $rz-white,
+    "on-info-light": $rz-white,
+    "on-info-lighter": $rz-info,
+    "on-info-dark": $rz-white,
+    "on-info-darker": $rz-white,
+    
+    "on-success": $rz-white,
+    "on-success-light": $rz-white,
+    "on-success-lighter": $rz-success,
+    "on-success-dark": $rz-white,
+    "on-success-darker": $rz-white,
+    
+    "on-warning": $rz-white,
+    "on-warning-light": $rz-white,
+    "on-warning-lighter": $rz-warning,
+    "on-warning-dark": $rz-white,
+    "on-warning-darker": $rz-white,
+    
+    "on-danger": $rz-white,
+    "on-danger-light": $rz-white,
+    "on-danger-lighter": $rz-danger,
+    "on-danger-dark": $rz-white,
+    "on-danger-darker": $rz-white,
+    
+    "series-1": $rz-series-1,
+    "series-2": $rz-series-2,
+    "series-3": $rz-series-3,
+    "series-4": $rz-series-4,
+    "series-5": $rz-series-5,
+    "series-6": $rz-series-6,
+    "series-7": $rz-series-7,
+    "series-8": $rz-series-8,
+    "series-9": $rz-series-9,
+    "series-10": $rz-series-10,
+    "series-11": $rz-series-11,
+    "series-12": $rz-series-12,
+    "series-13": $rz-series-13,
+    "series-14": $rz-series-14,
+    "series-15": $rz-series-15,
+    "series-16": $rz-series-16,
+    "series-17": $rz-series-17,
+    "series-18": $rz-series-18,
+    "series-19": $rz-series-19,
+    "series-20": $rz-series-20,
+    "series-21": $rz-series-21,
+    "series-22": $rz-series-22,
+    "series-23": $rz-series-23,
+    "series-24": $rz-series-24,
+  ),
+  $rz-theme-colors-map
+);
 
 // Semantic Text Color
 $rz-text-title-color: var(--rz-base-900) !default;
@@ -154,26 +262,30 @@ $rz-shadow-10: 0px 24px 38px rgba(0, 0, 0, 0.14), 0px 9px 46px rgba(0, 0, 0, 0.1
 
 // Typography
 $text: (
-  display-h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: normal, font-weight: 100, letter-spacing: -1.5px, color: var(--rz-text-title-color), margin-bottom: 1rem),
-  display-h2: (font-size: clamp(3rem, 4.167vw, 3.75rem), line-height: normal,  font-weight: 100, letter-spacing: -0.5px, color: var(--rz-text-title-color), margin-bottom: 1rem),
-  display-h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
-  display-h4: (font-size: clamp(1.75rem, 2.361vw, 2.125rem), line-height: normal,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  display-h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  display-h6: (font-size: clamp(1rem, 1.389vw, 1.25rem), line-height: normal,  font-weight: 500, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: normal, font-weight: 100, letter-spacing: -1.5px, color: var(--rz-text-title-color), margin-bottom: 1rem),
-  h2: (font-size: clamp(3rem, 4.167vw, 3.75rem), line-height: normal,  font-weight: 100, letter-spacing: -0.5px, color: var(--rz-text-title-color), margin-bottom: 1rem),
-  h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-bottom: 0.75rem),
-  h4: (font-size: clamp(1.75rem, 2.361vw, 2.125rem), line-height: normal,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  h6: (font-size: clamp(1rem, 1.389vw, 1.25rem), line-height: normal,  font-weight: 500, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  subtitle1: (font-size: 1rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  subtitle2: (font-size: 0.875rem, line-height: 1.5,  font-weight: 500, letter-spacing: 0.1px, color: var(--rz-text-title-color), margin-bottom: 0.5rem),
-  body1: (font-size: 1rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.5px, color: var(--rz-text-color), margin-bottom: 0.5rem),
-  body2: (font-size: 0.875rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-color), margin-bottom: 0.5rem),
-  button: (font-size: 0.875rem, line-height: normal,  font-weight: 500, letter-spacing: 1.25px, text-transform: uppercase, color: var(--rz-text-color), margin-bottom: 0.5rem),
-  caption: (font-size: 0.75rem, line-height: normal,  font-weight: 400, letter-spacing: 0.4px, color: var(--rz-text-color), margin-bottom: 0.5rem),
-  overline:  (font-size: 0.625rem, line-height: normal,  font-weight: 400, letter-spacing: 1.5px, text-transform: uppercase, color: var(--rz-text-color), margin-bottom: 0.5rem),
+  display-h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: normal, font-weight: 400, letter-spacing: -1.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 1rem),
+  display-h2: (font-size: clamp(3rem, 4.167vw, 3.75rem), line-height: normal,  font-weight: 400, letter-spacing: -0.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 1rem),
+  display-h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.75rem),
+  display-h4: (font-size: clamp(1.75rem, 2.361vw, 2.125rem), line-height: normal,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  display-h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  display-h6: (font-size: clamp(1rem, 1.389vw, 1.25rem), line-height: normal,  font-weight: 500, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  h1: (font-size: clamp(4.5rem, 6.667vw, 6rem), line-height: normal, font-weight: 400, letter-spacing: -1.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 1rem),
+  h2: (font-size: clamp(3rem, 4.167vw, 3.75rem), line-height: normal,  font-weight: 400, letter-spacing: -0.5px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 1rem),
+  h3: (font-size: clamp(2.25rem, 3.333vw, 3rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.75rem),
+  h4: (font-size: clamp(1.75rem, 2.361vw, 2.125rem), line-height: normal,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  h5: (font-size: clamp(1.25rem, 1.667vw, 1.5rem), line-height: normal,  font-weight: 400, letter-spacing: 0, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  h6: (font-size: clamp(1rem, 1.389vw, 1.25rem), line-height: normal,  font-weight: 500, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  subtitle1: (font-size: 1rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.15px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  subtitle2: (font-size: 0.875rem, line-height: 1.5,  font-weight: 500, letter-spacing: 0.1px, color: var(--rz-text-title-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  body1: (font-size: 1rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.5px, color: var(--rz-text-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  body2: (font-size: 0.875rem, line-height: 1.5,  font-weight: 400, letter-spacing: 0.25px, color: var(--rz-text-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  button: (font-size: 0.875rem, line-height: normal,  font-weight: 500, letter-spacing: 1.25px, text-transform: uppercase, color: var(--rz-text-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  caption: (font-size: 0.75rem, line-height: normal,  font-weight: 400, letter-spacing: 0.4px, color: var(--rz-text-color), margin-block-start: 0, margin-block-end: 0.5rem),
+  overline:  (font-size: 0.625rem, line-height: normal,  font-weight: 400, letter-spacing: 1.5px, text-transform: uppercase, color: var(--rz-text-color), margin-block-start: 0, margin-block-end: 0.5rem),
 ) !default;
+
+// Icon
+$rz-icon-size: 1.5rem !default;
+$rz-icon-optical-size: 40 !default;
 
 // Button
 $button-shadow: var(--rz-shadow-1) !default;
@@ -275,13 +387,15 @@ $button-sizes: (
 $badge-font-weight: 500 !default;
 
 // Chip
-$chip-padding: 0.125rem 0.125rem 0.125rem 0.75rem !default;
+$chip-padding-block: 0.125rem !default;
+$chip-padding-inline: 0.75rem 0.125rem !default;
 $chip-border-radius: calc(4 * var(--rz-border-radius)) !default;
 
 // Input
 $input-height: 2.5rem !default;
 $input-line-height: var(--rz-body-line-height) !default;
-$input-padding: 0.4375rem 0.9375rem !default;
+$input-padding-block: 0.4375rem !default;
+$input-padding-inline: 0.9375rem !default;
 $input-shadow: none !default;
 $input-focus-shadow: inset 0 0 0 1px var(--rz-primary) !default;
 $input-disabled-background-color: var(--rz-base-background-color) !default;
@@ -307,7 +421,7 @@ $footer-color: var(--rz-text-secondary-color) !default;
 
 // Sidebar
 $sidebar-z: 1 !default;
-$sidebar-border-right: var(--rz-border-base-200) !default;
+$sidebar-border-inline-end: var(--rz-border-base-200) !default;
 $sidebar-width: 300px !default;
 $sidebar-background-color: var(--rz-base-background-color) !default;
 $sidebar-color: var(--rz-text-color) !default;
@@ -319,18 +433,21 @@ $card-shadow: var(--rz-shadow-1) !default;
 $card-border: var(--rz-border-base-300) !default;
 
 // Accordion
-$accordion-item-padding: 1rem !default;
+$accordion-item-padding-block: 1rem !default;
+$accordion-item-padding-inline: 1rem !default;
 $accordion-item-color: var(--rz-text-secondary-color) !default;
 $accordion-item-line-height: 1.5rem !default;
 $accordion-item-font-weight: 500 !default;
-$accordion-icon-margin: 0 0.75rem 0 0 !default;
-$accordion-toggle-icon-margin: 0 0 0 0.75rem !default;
+$accordion-icon-margin-inline: 0 0.75rem !default;
+$accordion-toggle-icon-margin-inline: 0.75rem 0 !default;
 $accordion-toggle-icon-order: 1 !default;
 $accordion-toggle-icon-collapsed: 'keyboard_arrow_down' !default;
+$accordion-toggle-icon-collapsed-rtl: $accordion-toggle-icon-collapsed !default;
 $accordion-toggle-icon-expanded: 'keyboard_arrow_up' !default;
 $accordion-selected-color: var(--rz-text-title-color) !default;
 $accordion-hover-color: $accordion-selected-color !default;
-$accordion-content-padding: 1rem !default;
+$accordion-content-padding-block: 1rem !default;
+$accordion-content-padding-inline: 1rem !default;
 $accordion-border-radius: var(--rz-border-radius)!default;
 $accordion-item-border: var(--rz-border-base-200) !default;
 $accordion-shadow: var(--rz-shadow-1) !default;
@@ -359,14 +476,16 @@ $sidebar-toggle-hover-border-radius: 50% !default;
 $menu-background-color: var(--rz-base-background-color) !default;
 $menu-border: none !default;
 $menu-border-radius: var(--rz-border-radius) !default;
-$menu-item-padding: 0.5rem 1rem !default;
+$menu-item-padding-block: 0.5rem !default;
+$menu-item-padding-inline: 1rem !default;
 $menu-item-color: var(--rz-text-color) !default;
 $menu-item-hover-color: var(--rz-text-title-color) !default;
 $menu-item-hover-background-color: var(--rz-base-100) !default;
 $menu-item-selected-color: var(--rz-text-title-color) !default;
 $menu-item-icon-color: $menu-item-color !default;
 $menu-item-icon-hover-color: $menu-item-hover-color !default;
-$menu-top-item-padding: 0.5rem !default;
+$menu-top-item-padding-block: 0.5rem !default;
+$menu-top-item-padding-inline: 0.5rem !default;
 $menu-top-item-color: var(--rz-on-primary) !default;
 $menu-top-item-background-color: var(--rz-primary) !default;
 $menu-top-item-hover-color: var(--rz-on-primary) !default;
@@ -374,7 +493,8 @@ $menu-top-item-hover-background-color: transparent !default;
 $menu-top-item-selected-color: var(--rz-on-primary) !default;
 $menu-top-item-icon-color: $menu-top-item-color !default;
 $menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
-$context-menu-padding: 0.5rem 0 !default;
+$context-menu-padding-block: 0.5rem !default;
+$context-menu-padding-inline: 0 !default;
 $context-menu-box-shadow: var(--rz-shadow-6) !default;
 
 .rz-navigation-item-link,
@@ -385,38 +505,42 @@ $context-menu-box-shadow: var(--rz-shadow-6) !default;
 // PanelMenu
 $panel-menu-font-size: calc(var(--rz-body-font-size) * 0.875) !default;
 $panel-menu-font-weight: 500 !default;
-$panel-menu-background-color: var(--rz-base-background-color) !default;
-$panel-menu-color: var(--rz-text-title-color) !default;
-$panel-menu-hover-background-color: rgba(0, 0, 0, 0.04) !default;
-$panel-menu-hover-color: var(--rz-text-title-color) !default;
 $panel-menu-item-line-height: 1.5rem !default;
-$panel-menu-item-padding: 1rem !default;
+$panel-menu-item-padding-block: 1rem !default;
+$panel-menu-item-padding-inline: 1rem !default;
 $panel-menu-item-border: var(--rz-border-base-200) !default;
+$panel-menu-item-color: var(--rz-text-title-color) !default;
 $panel-menu-item-background-color: var(--rz-base-background-color) !default;
-$panel-menu-item-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-hover-color: var(--rz-text-title-color) !default;
+$panel-menu-item-hover-background-color: rgba(0, 0, 0, 0.04) !default;
 $panel-menu-item-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-active-background-color: var(--rz-primary-lighter) !default;
 $panel-menu-item-offset: 0 !default;
 $panel-menu-2nd-level-vertical-offset: 0.5rem !default;
-$panel-menu-item-2nd-level-padding: 0.5rem 0.5rem 0.5rem 1rem !default;
-$panel-menu-item-2nd-level-margin: 0 0.5rem !default;
+$panel-menu-item-2nd-level-padding-block: 0.5rem !default;
+$panel-menu-item-2nd-level-padding-inline: 1rem 0.5rem !default;
+$panel-menu-item-2nd-level-margin-block: 0 !default;
+$panel-menu-item-2nd-level-margin-inline: 0.5rem !default;
 $panel-menu-item-2nd-level-border-radius: var(--rz-border-radius) !default;
 $panel-menu-item-2nd-level-offset: 3rem !default;
-$panel-menu-item-2nd-level-background-color: var(--rz-base-background-color) !default;
 $panel-menu-item-2nd-level-color: var(--rz-text-tertiary-color) !default;
+$panel-menu-item-2nd-level-background-color: var(--rz-base-background-color) !default;
 $panel-menu-item-2nd-level-font-size: calc(var(--rz-body-font-size) * 0.875) !default;
 $panel-menu-item-2nd-level-font-weight: 400 !default;
-$panel-menu-item-2nd-level-hover-background-color: var(--rz-base-100) !default;
 $panel-menu-item-2nd-level-hover-color: var(--rz-text-title-color) !default;
-$panel-menu-item-2nd-level-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-2nd-level-hover-background-color: var(--rz-base-100) !default;
 $panel-menu-item-2nd-level-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-2nd-level-active-background-color: var(--rz-primary-lighter) !default;
 $panel-menu-item-2nd-level-active-font-weight: 500 !default;
-$panel-menu-item-3rd-level-hover-background-color: var(--rz-base-100) !default;
+$panel-menu-item-3rd-level-color: var(--rz-text-tertiary-color) !default;
+$panel-menu-item-3rd-level-background-color: var(--rz-base-background-color) !default;
 $panel-menu-item-3rd-level-hover-color: var(--rz-text-title-color) !default;
-$panel-menu-item-3rd-level-active-background-color: var(--rz-primary-lighter) !default;
+$panel-menu-item-3rd-level-hover-background-color: var(--rz-base-100) !default;
 $panel-menu-item-3rd-level-active-color: var(--rz-on-primary-lighter) !default;
+$panel-menu-item-3rd-level-active-background-color: var(--rz-primary-lighter) !default;
 $panel-menu-icon-color: var(--rz-text-tertiary-color) !default;
-$panel-menu-icon-margin: 0 1rem 0 0 !default;
-$panel-menu-icon-2nd-level-margin: 0 1rem 0 -2.25rem !default;
+$panel-menu-icon-margin-inline: 0 1rem !default;
+$panel-menu-icon-2nd-level-margin-inline: -2.25rem 1rem !default;
 
 .panel-menu {
   .navigation-item-wrapper-active {
@@ -441,7 +565,8 @@ $panel-menu-icon-2nd-level-margin: 0 1rem 0 -2.25rem !default;
 $profile-menu-background-color: var(--rz-base-background-color) !default;
 $profile-menu-top-item-background-color: var(--rz-primary) !default;
 $profile-menu-border: none !default;
-$profile-menu-padding: 0.5rem 1rem !default;
+$profile-menu-padding-block: 0.5rem !default;
+$profile-menu-padding-inline: 1rem !default;
 $profile-menu-toggle-button-color: var(--rz-text-contrast-color) !default;
 $profile-menu-item-hover-background-color: var(--rz-base-100) !default;
 
@@ -451,7 +576,8 @@ $gravatar-width: 2.5rem !default;
 
 // Steps
 $steps-color: var(--rz-text-tertiary-color) !default;
-$steps-number-padding: 0.25rem 0 !default;
+$steps-number-padding-block: 0.25rem !default;
+$steps-number-padding-inline: 0 !default;
 $steps-number-background-color: var(--rz-base-500) !default;
 $steps-number-color: var(--rz-text-contrast-color) !default;
 
@@ -469,7 +595,7 @@ $steps-number-color: var(--rz-text-contrast-color) !default;
         content: '';
         flex: auto;
         height: 1px;
-        margin-right: 16px;
+        margin-inline-end: 16px;
         background-color: var(--rz-base-300);
       }
     }
@@ -479,7 +605,7 @@ $steps-number-color: var(--rz-text-contrast-color) !default;
 // Checkbox
 $checkbox-width: 1.125rem !default;
 $checkbox-border-width: 2px !default;
-$checkbox-label-margin: 0 1rem !default;
+$checkbox-label-margin-inline: 1rem !default;
 $checkbox-checked-background-color: var(--rz-primary) !default;
 $checkbox-checked-color: var(--rz-on-primary) !default;
 $checkbox-checked-hover-background-color: var(--rz-primary-light) !default;
@@ -540,7 +666,7 @@ $switch-height: 0.875rem !default;
 $switch-circle-background-color: var(--rz-text-contrast-color) !default;
 $switch-checked-circle-background-color: var(--rz-on-primary-lighter) !default;
 $switch-circle-size: 1.25rem !default;
-$switch-circle-margin: 0 !default;
+$switch-circle-offset: 0 !default;
 
 .rz-switch .rz-switch-circle {
   &:hover:not(.rz-disabled) {
@@ -564,7 +690,7 @@ $radio-width: 1.25rem !default;
 $radio-height: $radio-width !default;
 $radio-border-radius: 50% !default;
 $radio-border-width: 2px !default;
-$radio-label-margin: 0 1rem !default;
+$radio-label-margin-inline: 1rem !default;
 $radio-active-background-color: var(--rz-base-background-color) !default;
 $radio-active-shadow: none !default;
 $radio-checked-background-color: var(--rz-base-background-color) !default;
@@ -626,10 +752,13 @@ $fieldset-border-radius: var(--rz-border-radius) !default;
 $fieldset-padding: 0 1rem 1rem !default;
 $fieldset-legend-color: var(--rz-text-color) !default;
 $fieldset-legend-font-size: var(--rz-body-font-size) !default;
-$fieldset-legend-margin: 0 0 1rem 0.5rem !default;
-$fieldset-legend-padding: 0 0.5rem !default;
+$fieldset-legend-margin-block: 0 1rem !default;
+$fieldset-legend-margin-inline: 0.5rem 0 !default;
+$fieldset-legend-padding-block: 0 !default;
+$fieldset-legend-padding-inline: 0.5rem !default;
 $fieldset-toggle-width: 1.5rem !default;
-$fieldset-toggle-margin: 0 !default;
+$fieldset-toggle-margin-block: 0 !default;
+$fieldset-toggle-margin-inline: 0 !default;
 $fieldset-toggle-height: $fieldset-toggle-width !default;
 $fieldset-toggle-background-color: transparent !default;
 $fieldset-toggle-color: var(--rz-text-tertiary-color) !default;
@@ -650,7 +779,6 @@ $dropdown-item-selected-color: var(--rz-on-primary-lighter) !default;
 $dropdown-item-selected-hover-background-color: var(--rz-primary-lighter) !default;
 $dropdown-item-selected-hover-color: var(--rz-on-primary-lighter) !default;
 $dropdown-item-transition: none !default;
-$multiselect-checkbox-margin: 0 1rem 0 0 !default;
 $dropdown-filter-border: var(--rz-border-base-200) !default;
 $dropdown-filter-padding: 1rem 0 0.5rem !default;
 $dropdown-open-background-color: var(--rz-base-background-color) !default;
@@ -658,15 +786,18 @@ $dropdown-open-border: 2px solid var(--rz-primary) !default;
 $dropdown-panel-padding: 0 $dropdown-horizontal-padding !default;
 $dropdown-panel-border: none !default;
 $dropdown-panel-shadow: var(--rz-shadow-4) !default;
-$dropdown-chips-padding: 0.4375rem 0.9375rem 0.4375rem 0.4375rem !default;
+$dropdown-chips-padding-block: 0.4375rem !default;
+$dropdown-chips-padding-inline: 0.4375rem 0.9375rem !default;
+
+$multiselect-checkbox-margin-block: 0 !default;
+$multiselect-checkbox-margin-inline: 0 1rem !default;
 
 // ListBox
 $listbox-filter-border: var(--rz-border-base-200) !default;
-$listbox-checkbox-margin: 0 1rem 0 0 !default;
-$listbox-header-padding: 0.75rem 1rem !default;
-
-// SplitButton
-$splitbutton-padding:  0 1rem !default;
+$listbox-checkbox-margin-block: 0 !default;
+$listbox-checkbox-margin-inline: 0 1rem !default;
+$listbox-header-padding-block: 0.75rem !default;
+$listbox-header-padding-inline: 1rem !default;
 
 // Slider
 $slider-border: none !default;
@@ -730,13 +861,19 @@ $selectbar-border-radius: var(--rz-border-radius) !default;
 $datepicker-line-height: 1.5rem !default;
 $datepicker-trigger-icon-color: var(--rz-text-secondary-color) !default;
 $datepicker-trigger-icon-hover-color: var(--rz-text-title-color) !default;
+$datepicker-popup-width: 22rem !default;
 $datepicker-panel-border: none !default;
 $datepicker-panel-shadow: var(--rz-shadow-4);
 $datepicker-header-background-color: var(--rz-base-background-color) !default;
+$datepicker-header-padding-block: 0.75rem !default;
+$datepicker-header-padding-inline: 0.75rem !default;
 $datepicker-footer-padding: 0 0.75rem !default;
-$datepicker-header-line-height: 3.625rem !default;
 $datepicker-footer-line-height: 3rem !default;
-$datepicker-calendar-padding: 0.625rem 0 !default;
+$datepicker-prev-next-icon-size: 2rem !default;
+$datepicker-prev-next-button-border-radius: 50% !default;
+$datepicker-calendar-padding-block: 0 0.75rem !default;
+$datepicker-calendar-padding-inline: 0.75rem !default;
+$datepicker-calendar-item-padding: 0.625rem 0 !default;
 $datepicker-calendar-header-font-size: 0.75rem !default;
 $datepicker-calendar-font-size: 0.875rem !default;
 $datepicker-calendar-hover-color: var(--rz-text-title-color) !default;
@@ -750,7 +887,10 @@ $datepicker-calendar-border-radius: 50% !default;
 $datepicker-calendar-transition: var(--rz-transition-all) !default;
 $datepicker-calendar-today-color: var(--rz-text-color) !default;
 $datepicker-calendar-today-box-shadow: inset 0 0 0 1px var(--rz-text-color) !default;
-$datepicker-title-height: 3.5rem !default;
+$datepicker-month-dropdown-width: 8.75rem !default;
+$datepicker-year-dropdown-width: 6rem !default;
+$timepicker-padding-block: 0.75rem !default;
+$timepicker-padding-inline: 0.75rem !default;
 $timepicker-background-color: var(--rz-base-background-color) !default;
 $timepicker-button-background-color: var(--rz-base-300) !default;
 $timepicker-button-color: var(--rz-text-color) !default;
@@ -762,34 +902,12 @@ $timepicker-separator-margin: 0 0.5rem !default;
 $timepicker-border: var(--rz-border-base-300) !default;
 
 .rz-datepicker-inline {
-  &:not(.ng-trigger) {
-    table {
-      width: 100%;
-    }
+  table {
+    width: 100%;
   }
 }
 
-.rz-datepicker {
-  &.rz-popup {
-    width: 340px !important;
-  }
-
-  .rz-datepicker-calendar-container {
-    padding: 0 0.75rem 0.5rem;
-  }
-}
-
-.rz-datepicker-title {
-  .rz-dropdown {
-    min-width: 100px !important;
-    margin-top: 0.75rem !important
-  }
-  .rz-dropdown:first-child {
-    min-width: 140px !important;
-  }
-}
-
-.rz-datepicker-calendar {
+.rz-calendar-view {
   td,
   th {
     text-align: center;
@@ -816,7 +934,7 @@ $timepicker-border: var(--rz-border-base-300) !default;
 .rz-timepicker {
   flex-wrap: wrap;
 
-  .rz-spinner {
+  .rz-numeric {
     flex: 1;
   }
 
@@ -825,22 +943,17 @@ $timepicker-border: var(--rz-border-base-300) !default;
   }
 }
 
-.rz-calendar {
-  .rz-inputtext {
-    padding-right: 2.5rem !important;
-  }
-}
-
 // Numeric
 $numeric-button-background-color: transparent !default;
 $numeric-button-color: var(--rz-text-color) !default;
 $numeric-button-disabled-background-color: transparent !default;
 $numeric-line-height: var(--rz-body-line-height) !default;
-$numeric-input-padding: 0.4375rem 1.25rem 0.4375rem 0.9375rem;
+$numeric-input-padding-block: 0.4375rem !default;
+$numeric-input-padding-inline: 0.9375rem 1.25rem !default;
 $numeric-button-width: 1rem !default;
 
-.rz-spinner {
-  .rz-spinner-button {
+.rz-numeric {
+  .rz-numeric-button {
     box-shadow: none;
 
     &:hover {
@@ -891,13 +1004,14 @@ $grid-header-font-weight: 500 !default;
 $grid-header-text-transform: none !default;
 $grid-header-color: var(--rz-text-title-color) !default;
 $grid-header-cell-padding: 0.75rem 0 !default;
-$grid-header-title-padding: 0 0 0 1rem !default;
+$grid-header-title-padding-inline: 1rem 0 !default;
 $grid-header-sorted-background-color: var(--rz-base-200) !default;
 $grid-foot-background-color: var(--rz-base-100) !default;
 $grid-filter-background-color: var(--rz-base-background-color) !default;
 $grid-filter-border: none !default;
 $grid-filter-font-size: 0.875rem !default;
 $grid-filter-icon-font-size: 0.875rem !default;
+$grid-filter-buttons-padding: 0 1rem 1rem !default;
 $grid-filter-buttons-border: none !default;
 $grid-filter-buttons-background-color: var(--rz-base-background-color) !default;
 $grid-clear-filter-button-background-color: var(--rz-base-background-color) !default;
@@ -906,7 +1020,7 @@ $grid-clear-filter-button-shadow: none !default;
 $grid-apply-filter-button-background-color: var(--rz-base-background-color) !default;
 $grid-apply-filter-button-color: var(--rz-primary) !default;
 $grid-apply-filter-button-shadow: none !default;
-$grid-header-filter-icon-margin: 0 1rem 0 auto !default;
+$grid-header-filter-icon-margin-inline: auto 1rem !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-title-color) !default;
 $grid-header-filter-icon-font-size: 1.25rem !default;
 $grid-border: var(--rz-border-base-300) !default;
@@ -918,17 +1032,18 @@ $grid-column-resizer-helper-background-color: var(--rz-secondary) !default;
 $grid-detail-template-background-color: var(--rz-base-100) !default;
 $grid-group-header-padding: 1rem !default;
 $grid-group-header-item-background-color: var(--rz-base-200) !default;
-$grid-group-header-item-padding: 0.25rem 0.5rem 0.25rem 0.75rem !default;
+$grid-group-header-item-padding-block: 0.25rem !default;
+$grid-group-header-item-padding-inline: 0.75rem 0.5rem !default;
 $grid-group-header-item-border: var(--rz-border-base-200) !default;
 $grid-group-header-item-border-radius: calc(4 * var(--rz-border-radius)) !default;
 $column-drag-handle-color: var(--rz-text-disabled-color) !default;
 $column-drag-handle-hover-color: var(--rz-text-title-color) !default;
-$column-drag-handle-margin: 0 !default;
+$column-drag-handle-margin-inline: 0 !default;
 $column-draggable-shadow: var(--rz-shadow-4) !default;
 
 .rz-datatable {
   .rz-col-icon {
-    border-right: $grid-cell-border;
+    border-inline-end: $grid-cell-border;
   }
 }
 
@@ -937,45 +1052,38 @@ $column-draggable-shadow: var(--rz-shadow-4) !default;
   --rz-grid-header-cell-border: #{$grid-cell-border};
 }
 
-// Paginator
-$paginator-background-color: transparent !default;
-$paginator-padding: 0.5rem 1rem !default;
-$paginator-border: none !default;
-$paginator-button-border-radius: 2rem !default;
-$paginator-button-shadow: inherit !default;
-$paginator-numeric-button-background-color: transparent !default;
-$paginator-numeric-button-color: var(--rz-text-color) !default;
-$paginator-numeric-button-border: none !default;
-$paginator-numeric-button-hover-background-color: var(--rz-base-100) !default;
-$paginator-numeric-button-hover-color: var(--rz-text-title-color) !default;
-$paginator-numeric-button-margin: 0 0.25rem !default;
-$paginator-numeric-button-padding: 0.75rem 1rem !default;
-$paginator-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
-$paginator-numeric-button-selected-color: var(--rz-on-primary-lighter) !default;
-$paginator-numeric-button-selected-border: none !default;
-$paginator-numeric-button-min-width: 3rem !default;
-$paginator-back-button-background-color: transparent !default;
-$paginator-back-button-color: var(--rz-text-color) !default;
-$paginator-back-button-hover-background-color: var(--rz-base-100) !default;
-$paginator-back-button-hover-color: var(--rz-text-title-color) !default;
-$paginator-first-button-margin: 0 0.5rem 0 0 !default;
-$paginator-last-button-margin: 0 0 0 0.5rem !default;
-$paginator-next-button-background-color: transparent !default;
-$paginator-next-button-color: var(--rz-text-color) !default;
-$paginator-next-button-hover-background-color: var(--rz-base-100) !default;
-$paginator-next-button-hover-color: var(--rz-text-title-color) !default;
-$paginator-dropdown-width: 80px !default;
-$paginator-dropdown-margin: $paginator-last-button-margin !default;
-$paginator-summary-padding: 0 1.25rem 0 0 !default;
-$paginator-summary-font-size: 0.875rem !default;
-$paginator-summary-color: var(--rz-text-tertiary-color) !default;
-$paginator-button-size: "%button-lg" !default;
+// Pager
+$pager-background-color: transparent !default;
+$pager-padding: 0.5rem 1rem !default;
+$pager-border: none !default;
+$pager-button-border-radius: 2rem !default;
+$pager-button-shadow: inherit !default;
+$pager-numeric-button-background-color: transparent !default;
+$pager-numeric-button-color: var(--rz-text-color) !default;
+$pager-numeric-button-border: none !default;
+$pager-numeric-button-hover-background-color: var(--rz-base-100) !default;
+$pager-numeric-button-hover-color: var(--rz-text-title-color) !default;
+$pager-numeric-button-padding: 0.75rem 1rem !default;
+$pager-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
+$pager-numeric-button-selected-color: var(--rz-on-primary-lighter) !default;
+$pager-numeric-button-selected-border: none !default;
+$pager-numeric-button-min-width: 3rem !default;
+$pager-back-button-background-color: transparent !default;
+$pager-back-button-color: var(--rz-text-color) !default;
+$pager-gap: 0.5rem !default;
+$pager-next-button-background-color: transparent !default;
+$pager-next-button-color: var(--rz-text-color) !default;
+$pager-dropdown-width: 80px !default;
+$pager-summary-padding: 1.25rem !default;
+$pager-summary-font-size: 0.875rem !default;
+$pager-summary-color: var(--rz-text-tertiary-color) !default;
+$pager-button-size: "%button-lg" !default;
 
-.rz-paginator-pages {
+.rz-pager-pages {
   max-height: 3rem;
 }
 
-.rz-paginator-element {
+.rz-pager-element {
   box-shadow: var(--rz-shadow-0) !important;
 
   &:hover {
@@ -989,11 +1097,13 @@ $paginator-button-size: "%button-lg" !default;
 
 // Tree
 $tree-background-color: transparent !default;
-$tree-node-padding: 0.25rem 0.5rem !default;
+$tree-node-padding-block: 0.25rem !default;
+$tree-node-padding-inline: 0.5rem !default;
 $tree-node-selected-background-color: var(--rz-primary-lighter) !default;
 $tree-node-selected-color: var(--rz-on-primary-lighter) !default;
 $tree-node-selected-border-radius: var(--rz-border-radius) !default;
-$tree-node-margin: 0 !default;
+$tree-node-margin-block: 0 !default;
+$tree-node-margin-inline: 0 !default;
 $tree-node-hover-background-color: var(--rz-base-100) !default;
 $tree-node-hover-color: var(--rz-text-title-color) !default;
 $tree-node-toggle-width: 2rem !default;
@@ -1064,11 +1174,18 @@ $scheduler-toolbar-title-font-weight: 700 !default;
 $scheduler-toolbar-title-color: var(--rz-text-title-color) !default;
 $scheduler-prev-next-button-background-color: var(--rz-base-background-color) !default;
 $scheduler-prev-next-button-color: var(--rz-text-color) !default;
-$scheduler-prev-next-button-padding: 0.5rem !default;
+$scheduler-prev-next-button-padding-block: 0.5rem !default;
+$scheduler-prev-next-button-padding-inline: 0.5rem !default;
 $scheduler-prev-next-button-font-size: var(--rz-icon-size) !default;
-$scheduler-prev-button-border-radius: 2rem !default;
-$scheduler-next-button-border-radius: 2rem !default;
-$scheduler-today-button-margin-left: 1rem !default;
+$scheduler-prev-button-border-start-start-radius: 2rem !default;
+$scheduler-prev-button-border-start-end-radius: 2rem !default;
+$scheduler-prev-button-border-end-start-radius: 2rem !default;
+$scheduler-prev-button-border-end-end-radius: 2rem !default;
+$scheduler-next-button-border-start-start-radius: 2rem !default;
+$scheduler-next-button-border-start-end-radius: 2rem !default;
+$scheduler-next-button-border-end-start-radius: 2rem !default;
+$scheduler-next-button-border-end-end-radius: 2rem !default;
+$scheduler-today-button-margin-inline-start: 1rem !default;
 $scheduler-today-button-padding: 0.5rem 1rem !default;
 $scheduler-today-button-font-size: 0.875rem !default;
 $scheduler-today-button-text-transform: capitalize !default;
@@ -1088,7 +1205,6 @@ $scheduler-event-color: var(--rz-on-info) !default;
 $scheduler-event-background-color: var(--rz-info) !default;
 $scheduler-event-font-size: 0.75rem !default;
 $scheduler-event-line-height: 1.25rem !default;
-$scheduler-event-padding: 0 1px 1px 1px !default;
 $scheduler-event-content-padding: 0.125rem 0.25rem !default;
 $scheduler-slot-title-padding: 0 0.25rem !default;
 $scheduler-day-number-padding: 0 0.5rem !default;
@@ -1131,7 +1247,8 @@ $tabs-tab-line-height: 1.5rem !default;
 $tabs-tab-font-weight: 500 !default;
 $tabs-tab-text-transform: uppercase !default;
 $tabs-tab-letter-spacing: 1.25px !default;
-$tabs-tab-padding: 0.75rem 1rem !default;
+$tabs-tab-padding-block: 0.75rem !default;
+$tabs-tab-padding-inline: 1rem !default;
 $tabs-tab-background-color: transparent !default;
 $tabs-tab-color: var(--rz-text-secondary-color) !default;
 $tabs-tab-selected-color: var(--rz-primary) !default;
@@ -1143,7 +1260,7 @@ $tabs-tab-focus-background-color: var(--rz-base-200) !default;
 $tabs-tab-focus-color: var(--rz-text-title-color) !default;
 $tabs-tab-panels-border: var(--rz-border-base-300) !default;
 $tabs-icon-font-size: var(--rz-icon-size) !default;
-$tabs-icon-margin: 0 0.25rem 0 -0.25rem !default;
+$tabs-icon-margin-inline: -0.25rem 0.25rem !default;
 
 .rz-tabview-nav > li > a {
   @include rz-ripple($pseudo: true);
@@ -1205,7 +1322,8 @@ $dialog-background-color: var(--rz-base-background-color) !default;
 $dialog-shadow: var(--rz-shadow-9) !default;
 $dialog-title-background-color: var(--rz-base-background-color) !default;
 $dialog-title-border: none !default;
-$dialog-title-padding: 1.5rem 1.5rem 0 1.5rem !default;
+$dialog-title-padding-block: 1.5rem 0 !default;
+$dialog-title-padding-inline: 1.5rem !default;
 $dialog-title-font-size: 1.25rem !default;
 $dialog-title-line-height: 1.5rem !default;
 $dialog-title-font-weight: 500 !default;
@@ -1221,7 +1339,8 @@ $dialog-border-radius: var(--rz-border-radius) !default;
 
 //Notification
 $notification-padding: 1rem 1.25rem !default;
-$notification-icon-margin: 0 0.625rem 0 0 !default;
+$notification-gap: 0.625rem !default;
+$notification-icon-margin: 0 !default;
 $notification-container-background-color: var(--rz-white) !default;
 $notification-success-color: var(--rz-success) !default;
 $notification-success-background-color: var(--rz-success-lighter) !default;
@@ -1342,11 +1461,15 @@ $splitter-bar-color-active: var(--rz-on-primary) !default;
 $splitter-bar-background-color-active: var(--rz-primary) !default;
 
 // FormField
-$form-field-margin: 0.5rem 0 0 !default;
-$form-field-start-end-padding: 0 0.75rem !default;
+$form-field-margin-block: 0.5rem 0 !default;
+$form-field-margin-inline: 0 !default;
+$form-field-start-end-padding-block: 0 !default;
+$form-field-start-end-padding-inline: 0.75rem !default;
 $form-field-filled-height: 3.375rem !default;
-$form-field-filled-padding: 1.4375rem 0.9375rem 0.4375rem !default;
-$form-field-filled-numeric-padding: 1.4375rem 1.25rem 0.4375rem 0.9375rem !default;
+$form-field-filled-padding-block: 1.4375rem 0.4375rem  !default;
+$form-field-filled-padding-inline: 0.9375rem !default;
+$form-field-filled-numeric-padding-block: 1.4375rem 0.4375rem !default;
+$form-field-filled-numeric-padding-inline: 0.9375rem 1.25rem !default;
 $form-field-filled-background-color: var(--rz-base-200) !default;
 $form-field-filled-hover-background-color: var(--rz-base-300) !default;
 $form-field-filled-border: var(--rz-border-width) solid var(--rz-base-200) !default;
@@ -1361,7 +1484,7 @@ $form-field-hover-shadow: var(--rz-input-hover-shadow) !default;
 $form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
 $form-field-label-padding: 0 0.25rem !default;
 $form-field-text-label-padding: 0 !default;
-$form-field-label-left: 0.6875rem !default;
+$form-field-label-inset-inline-start: 0.6875rem !default;
 $form-field-label-textarea-top: 0.5rem !default;
 $form-field-label-floating-top: -0.5625rem !default;
 $form-field-helper-padding: 0 1rem !default;

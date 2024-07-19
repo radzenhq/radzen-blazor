@@ -1,7 +1,7 @@
-﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenLabel Text="Select Date" Component="DatePickerMinMax" Style="margin-right: 8px; vertical-align: middle;" />
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-12">
+    <RadzenLabel Text="Select Date" Component="DatePickerMinMax" />
     <RadzenDatePicker @bind-Value=@value Min="DateTime.Today.AddDays(-7)" Max="DateTime.Today.AddDays(7)" Name="DatePickerMinMax" />
-</div>
+</RadzenStack>
 
 @code {
     DateTime? value = DateTime.Now;

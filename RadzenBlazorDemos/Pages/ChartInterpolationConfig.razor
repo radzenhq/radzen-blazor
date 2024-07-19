@@ -1,26 +1,25 @@
 @using System.Globalization
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-12 my-5">
-            <RadzenCard class="w-100 mb-4" Style="display: flex; align-items: center; gap: 0.5rem">
-                <RadzenLabel Text="Interpolation" Component="interpolation" Style="margin-right: 1rem;"/>
-                <RadzenDropDown AllowClear="false" Name="interpolation" @bind-Value="@interpolation"
-                                TValue="Interpolation" ValueProperty="Value" TextProperty="Text"
-                                Data="@(Enum.GetValues<Interpolation>().Select(v => new { Value = v, Text = $"{v:G}" }))"/>
-            </RadzenCard>
-            <RadzenChart>
-                <RadzenLineSeries Interpolation="@interpolation" Data="@revenue2024" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue" />
-                <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2023" CategoryProperty="Date" Title="2024" ValueProperty="Revenue" />
-                <RadzenCategoryAxis Padding="20" />
-                <RadzenValueAxis Formatter="@FormatAsUSD">
-                    <RadzenGridLines Visible="true"/>
-                    <RadzenAxisTitle Text="Revenue in USD"/>
-                </RadzenValueAxis>
-            </RadzenChart>
-        </div>
-    </div>
-</div>
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Interpolation" Component="interpolation" />
+            <RadzenDropDown AllowClear="false" Name="interpolation" @bind-Value="@interpolation"
+                            TValue="Interpolation" ValueProperty="Value" TextProperty="Text"
+                            Data="@(Enum.GetValues<Interpolation>().Select(v => new { Value = v, Text = $"{v:G}" }))"/>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenLineSeries Interpolation="@interpolation" Data="@revenue2024" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue" />
+        <RadzenAreaSeries Interpolation="@interpolation" Data="@revenue2023" CategoryProperty="Date" Title="2024" ValueProperty="Revenue" />
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true"/>
+            <RadzenAxisTitle Text="Revenue in USD"/>
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
 
 @code {
     Interpolation interpolation = Interpolation.Line;

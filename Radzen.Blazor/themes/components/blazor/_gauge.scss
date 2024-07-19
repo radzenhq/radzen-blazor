@@ -6,20 +6,9 @@ $gauge-arc-scale-color: var(--rz-base-300) !default;
 $gauge-arc-scale-label-color: var(--rz-text-tertiary-color) !default;
 $gauge-arc-value-color: var(--rz-secondary) !default;
 
-// Gauge CSS variables
-
-:root {
-  --rz-gauge-scale-color: #{$gauge-scale-color};
-  --rz-gauge-scale-label-color: #{$gauge-scale-label-color};
-  --rz-gauge-scale-font-size: #{$gauge-scale-font-size};
-  --rz-gauge-pointer-color: #{$gauge-pointer-color};
-  --rz-gauge-arc-scale-color: #{$gauge-arc-scale-color};
-  --rz-gauge-arc-scale-label-color: #{$gauge-arc-scale-label-color};
-  --rz-gauge-arc-value-color: #{$gauge-arc-value-color};
-}
-
 .rz-gauge,
 .rz-arc-gauge {
+  box-sizing: border-box;
   position: relative;
   display: inline-block;
   width: 300px;

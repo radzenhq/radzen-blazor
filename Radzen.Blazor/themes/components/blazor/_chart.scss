@@ -68,21 +68,8 @@ $chart-color-schemes: (
   )
 ) !default;
 
-// Chart CSS variables
-
-:root {
-  --rz-chart-axis-color: #{$chart-axis-color};
-  --rz-chart-axis-label-color: #{$chart-axis-label-color};
-  --rz-chart-axis-font-size: #{$chart-axis-font-size};
-  --rz-chart-legend-font-size: #{$chart-legend-font-size};
-  --rz-chart-legend-focus-outline: #{$chart-legend-focus-outline};
-  --rz-chart-legend-focus-outline-offset: #{$chart-legend-focus-outline-offset};
-  --rz-chart-tooltip-background: #{$chart-tooltip-background};
-  --rz-chart-tooltip-color: #{$chart-tooltip-color};
-  --rz-chart-marker-stroke: #{$chart-marker-stroke};
-}
-
 .rz-chart {
+  box-sizing: border-box;
   position: relative;
   height: 300px;
 }
@@ -146,6 +133,11 @@ $chart-color-schemes: (
 
 .rz-value-axis .rz-tick-text {
   text-anchor: end;
+
+  /* Right-to-left anchor */
+  *[dir="rtl"] & {
+    text-anchor: start;
+  }
 }
 
 .rz-category-axis .rz-tick-text {

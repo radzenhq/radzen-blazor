@@ -1,12 +1,13 @@
 ﻿@using System.Collections
 @using System.ComponentModel.DataAnnotations
 
-<div class="rz-p-sm-12 rz-text-align-center">
-    <RadzenLabel Text="Select Value" Component="DropDownEnums" Style="margin-right: 8px; vertical-align: middle;" />
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+    <RadzenLabel Text="Select Value" Component="DropDownEnums" />
     <RadzenDropDown Data="@(Enum.GetValues(typeof(ColorType)).Cast<Enum>())" @bind-Value=@color
                     AllowClear="true" AllowFiltering="true" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" Style="width: 100%; max-width: 400px;" Name="DropDownEnums">
     </RadzenDropDown>
-</div>
+</RadzenStack>
+
 @code {
     ColorType? color;
 

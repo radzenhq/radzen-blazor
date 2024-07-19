@@ -7,7 +7,7 @@
         @if (Dialog.Options.ShowTitle)
         {
             <div class="rz-dialog-titlebar">
-                <div class="rz-dialog-title" style="display: inline" id="rz-dialog-0-label">
+                <div class="rz-dialog-title" id="rz-dialog-0-label">
                     @if (Dialog.Options.TitleContent != null)
                     {
                         @Dialog.Options.TitleContent(Service)
@@ -79,12 +79,22 @@
     {
         shouldRender = false;
 
+        if(Dialog.Options.Resize != null && w != 0 && h != 0)
+        {
+            Dialog.Options.Resize(new System.Drawing.Size(Convert.ToInt32(w), Convert.ToInt32(h)));
+        }
+
         width = $"width: {w}px;";
         height = $"height: {h}px;";
 
         shouldRender = true;
     }
 
+    /// <summary>
+    /// Called when dragged.
+    /// </summary>
+    /// <param name="t">The top value.</param>
+    /// <param name="l">The left value.</param>
     [JSInvokable("RadzenDialog.OnDrag")]
     public void OnDrag(string t, string l)
     {

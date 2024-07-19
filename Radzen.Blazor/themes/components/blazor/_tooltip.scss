@@ -5,18 +5,8 @@ $tooltip-padding: 0.25rem 0.5rem !default;
 $tooltip-border-radius: var(--rz-border-radius) !default;
 $tooltip-font-size: var(--rz-body-font-size) !default;
 
-// Tooltip CSS variables
-
-:root {
-  --rz-tooltip-background-color: #{$tooltip-background-color};
-  --rz-tooltip-color: #{$tooltip-color};
-  --rz-tooltip-shadow: #{$tooltip-shadow};
-  --rz-tooltip-padding: #{$tooltip-padding};
-  --rz-tooltip-border-radius: #{$tooltip-border-radius};
-  --rz-tooltip-font-size: #{$tooltip-font-size};
-}
-
 .rz-tooltip {
+  box-sizing: border-box;
   position: absolute;
   transition: top 0.2s, left 0.2s;
   top: 0;
@@ -41,8 +31,8 @@ $tooltip-font-size: var(--rz-body-font-size) !default;
   position: absolute;
   width: 8px;
   height: 8px;
-  bottom: 0;
-  left: 12px;
+  inset-block-end: 0;
+  inset-inline-start: 12px;
   background-color: inherit;
   transform-origin: center;
   transform: translate(-50%, -12px) rotate(45deg);
@@ -58,8 +48,8 @@ $tooltip-font-size: var(--rz-body-font-size) !default;
   position: absolute;
   width: 8px;
   height: 8px;
-  top: 0;
-  left: 12px;
+  inset-block-start: 0;
+  inset-inline-start: 12px;
   background-color: inherit;
   transform-origin: center;
   transform: translate(-50%, -12px) rotate(45deg);

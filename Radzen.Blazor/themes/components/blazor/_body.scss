@@ -3,15 +3,6 @@ $layout-body-padding: 1rem !default;
 $layout-body-border-radius: 0 !default;
 $layout-body-background-color: transparent !default;
 
-// Body CSS variables
-
-:root {
-  --rz-layout-body-margin: #{$layout-body-margin};
-  --rz-layout-body-padding: #{$layout-body-padding};
-  --rz-layout-body-border-radius: #{$layout-body-border-radius};
-  --rz-layout-body-background-color: #{$layout-body-background-color};
-}
-
 .rz-body {
   margin: var(--rz-layout-body-margin);
   padding: var(--rz-layout-body-padding);

@@ -22,7 +22,7 @@
                 These themes are free for commercial use. The source SCSS files are licensed under MIT and available on <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">GitHub</a>.
             </RadzenText>
             <RadzenStack Gap="1rem">
-                <RadzenDataList Data="@ThemeService.Themes.Where(t => !t.Premium)" Style="--rz-datalist-item-border: none;--rz-datalist-padding: 0.5rem 0;--rz-datalist-item-vertical-margin: 0;--rz-datalist-item-horizontal-margin: 0;">
+                <RadzenDataList Data="@Themes.Free" Style="--rz-datalist-item-border: none;--rz-datalist-padding: 0.5rem 0;--rz-datalist-item-vertical-margin: 0;--rz-datalist-item-horizontal-margin: 0;">
                     <Template>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
                             <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">@context.Text</RadzenText>
@@ -51,7 +51,7 @@
                                 <rect x="156" y="43" width="12" height="2" rx="1" fill="@context.ContentText"/>
                                 <rect x="120" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
                                 <rect x="138" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
-                                <rect x="156" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/> 
+                                <rect x="156" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
                                 <rect x="20" y="44" width="28" height="8" rx="@context.ButtonRadius" fill="@context.Primary"/>
                                 <rect x="56" y="44" width="28" height="8" rx="@context.ButtonRadius" fill="@context.Secondary"/>
                                 <rect x="56" y="21" width="28" height="2" rx="1" fill="@context.ContentText"/>
@@ -98,7 +98,7 @@
                 Premium themes can be used with an active <a href="https://www.radzen.com/pricing/" title="See Radzen Pricing" target="_blank">Radzen Professional or Enterprise subscription</a>.
             </RadzenText>
             <RadzenStack Gap="1rem">
-                <RadzenDataList Data="@ThemeService.Themes.Where(t => t.Premium)" Style="--rz-datalist-item-border: none;--rz-datalist-padding: 0.5rem 0;--rz-datalist-item-vertical-margin: 0;--rz-datalist-item-horizontal-margin: 0;">
+                <RadzenDataList Data="@Themes.Premium" Style="--rz-datalist-item-border: none;--rz-datalist-padding: 0.5rem 0;--rz-datalist-item-vertical-margin: 0;--rz-datalist-item-horizontal-margin: 0;">
                     <Template>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
                             <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">@context.Text</RadzenText>
@@ -127,7 +127,7 @@
                                 <rect x="156" y="43" width="12" height="2" rx="1" fill="@context.ContentText"/>
                                 <rect x="120" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
                                 <rect x="138" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
-                                <rect x="156" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/> 
+                                <rect x="156" y="48" width="12" height="2" rx="1" fill="@context.ContentText"/>
                                 <rect x="20" y="44" width="28" height="8" rx="@context.ButtonRadius" fill="@context.Primary"/>
                                 <rect x="56" y="44" width="28" height="8" rx="@context.ButtonRadius" fill="@context.Secondary"/>
                                 <rect x="56" y="21" width="28" height="2" rx="1" fill="@context.ContentText"/>

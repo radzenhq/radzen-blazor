@@ -1,27 +1,27 @@
+<RadzenStack Class="rz-p-0 rz-p-md-6 rz-p-lg-12" AlignItems="AlignItems.Center">
+    <RadzenCard Variant="Variant.Outlined" Style="width: 100%;">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+            <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+        </RadzenStack>
+    </RadzenCard>
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-12 col-lg-6 offset-lg-3 my-5">
-            <RadzenCard class="w-100 mb-4" >
-                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
-                <RadzenLabel Text="Show Data Labels" Component="dataLabels" Style="margin-left: 8px; vertical-align: middle;" />
-            </RadzenCard>
-            <RadzenChart>
-                <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180">
-                    <ChildContent>
-                        <RadzenSeriesDataLabels Visible="@showDataLabels" />
-                    </ChildContent>
-                    <TitleTemplate>
-                        <div class="rz-donut-content">
-                            <div>Revenue</div>
-                            <div>for 2024</div>
-                        </div>
-                    </TitleTemplate>
-                </RadzenDonutSeries>
-            </RadzenChart>
-        </div>
-    </div>
-</div>
+    <RadzenStack Style="width: 100%; max-width: 600px;">
+        <RadzenChart>
+            <RadzenDonutSeries Data="@revenue" CategoryProperty="Quarter" ValueProperty="Revenue" TotalAngle="180" StartAngle="180">
+                <ChildContent>
+                    <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                </ChildContent>
+                <TitleTemplate>
+                    <div class="rz-donut-content">
+                        <div>Revenue</div>
+                        <div>for 2024</div>
+                    </div>
+                </TitleTemplate>
+            </RadzenDonutSeries>
+        </RadzenChart>
+    </RadzenStack>
+</RadzenStack>
 
 @code {
     bool showDataLabels = false;

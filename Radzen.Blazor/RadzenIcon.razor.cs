@@ -3,7 +3,7 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenIcon component. Displays icon from Material Icons font.
+    /// RadzenIcon component. Displays icon from Material Symbols variable font.
     /// </summary>
     /// <example>
     /// <code>

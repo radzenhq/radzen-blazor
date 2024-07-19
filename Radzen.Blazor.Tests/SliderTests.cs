@@ -39,7 +39,7 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.Add<int>(p => p.Value, value));
 
             Assert.Contains(@$"style=""width: {Math.Round((value / max * 100)).ToInvariantString()}%;""", component.Markup);
-            Assert.Contains(@$"style=""left: {Math.Round((value / max * 100)).ToInvariantString()}%;""", component.Markup);
+            Assert.Contains(@$"style=""inset-inline-start: {Math.Round((value / max * 100)).ToInvariantString()}%;""", component.Markup);
         }
 
         [Fact]
@@ -55,9 +55,9 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<IEnumerable<int>>(p => p.Value, new int[] { 4, 30 });
             });
 
-            Assert.Contains(@$"left: 4%", component.Markup);
-            Assert.Contains(@$"left: 30%", component.Markup);
-            Assert.Contains(@$"left: 4%; width: 26%;", component.Markup);
+            Assert.Contains(@$"inset-inline-start: 4%", component.Markup);
+            Assert.Contains(@$"inset-inline-start: 30%", component.Markup);
+            Assert.Contains(@$"inset-inline-start: 4%; width: 26%;", component.Markup);
         }
 
         [Fact]

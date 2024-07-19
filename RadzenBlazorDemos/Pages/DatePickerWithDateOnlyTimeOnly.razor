@@ -1,15 +1,13 @@
-﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenStack Orientation="Orientation.Horizontal">
-        <RadzenStack>
-            <RadzenLabel Text="Select Date, bound to DateOnly" Component="DatePickerDateOnlyType" Style="margin-right: 8px; vertical-align: middle;"/>
-            <RadzenDatePicker @bind-Value="@value" DateFormat="MM/dd/yyyy" Name="DatePickerDateOnlyType"/>
-        </RadzenStack>
-        <RadzenStack>
-            <RadzenLabel Text="Select Time, bound to TimeOnly" Component="DatePickerTimeOnlyType" Style="margin-right: 8px; vertical-align: middle;" />
-            <RadzenDatePicker @bind-Value="@timeValue" ShowSeconds="true" DateFormat="HH:mm" Name="DatePickerTimeOnlyType" />
-        </RadzenStack>
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap" Class="rz-p-12">
+    <RadzenStack Gap="0.5rem">
+        <RadzenLabel Text="Select Date, bound to DateOnly" Component="DatePickerDateOnlyType" />
+        <RadzenDatePicker @bind-Value="@value" DateFormat="MM/dd/yyyy" Name="DatePickerDateOnlyType"/>
     </RadzenStack>
-</div>
+    <RadzenStack Gap="0.5rem">
+        <RadzenLabel Text="Select Time, bound to TimeOnly" Component="DatePickerTimeOnlyType" />
+        <RadzenDatePicker @bind-Value="@timeValue" ShowSeconds="true" DateFormat="HH:mm" Name="DatePickerTimeOnlyType" />
+    </RadzenStack>
+</RadzenStack>
 
 @code {
     DateOnly value = DateOnly.FromDateTime(DateTime.Now);

@@ -1,47 +1,14 @@
 @import 'variables';
 @import 'mixins';
 $standard: true;
-
-// Legacy Theme Tokens
-
-$primary: #1151f3 !default;
-$secondary: #5d89f7 !default;
-$danger: #f31155 !default;
-$info: #12a4f5 !default;
-$success: #009b51 !default;
-$warning: #ffae11 !default;
-$body-color: #4f4f50 !default;
-$body-bg: #f4f5f9 !default;
-$font-size: 16px !default;
-
-// Legacy Tokens Map
-
-$rz-base-100: $body-bg !default;
-$rz-base-800: $body-color !default;
-$rz-primary: $primary !default;
-$rz-secondary: $secondary !default;
-$rz-info: $info !default;
-$rz-success: $success !default;
-$rz-warning: $warning !default;
-$rz-danger: $danger !default;
-$rz-root-font-size: $font-size !default;
+$theme-name: standard;
 
 // Theme Colors
 
 $rz-white: #ffffff !default;
 $rz-black: #000000 !default;
 
-$rz-base-50: #ffffff !default;
-$rz-base-100: #f4f5f9 !default;
-$rz-base-200: #e9eaed !default;
-$rz-base-300: #e0e1e4 !default;
-$rz-base-400: #c9cacd !default;
-$rz-base-500: #afafb2 !default;
-$rz-base-600: #8d8e90 !default;
-$rz-base-700: #707072 !default;
-$rz-base-800: #4f4f50 !default;
-$rz-base-900: #262526 !default;
-
+$rz-base: #e0e1e4 !default;
 $rz-primary: #1151f3 !default;
 $rz-secondary: #5d89f7 !default;
 $rz-info: #12a4f5 !default;
@@ -73,6 +40,21 @@ $rz-series-21: #fdc55f !default;
 $rz-series-22: #f64485 !default;
 $rz-series-23: #58c544 !default;
 $rz-series-24: #6a93ff !default;
+
+$rz-base-50: #ffffff !default;
+$rz-base-100: #f4f5f9 !default;
+$rz-base-200: #e9eaed !default;
+$rz-base-300: #e0e1e4 !default;
+$rz-base-400: #c9cacd !default;
+$rz-base-500: #afafb2 !default;
+$rz-base-600: #8d8e90 !default;
+$rz-base-700: #707072 !default;
+$rz-base-800: #4f4f50 !default;
+$rz-base-900: #262526 !default;
+$rz-base-light: #e9eaed !default;
+$rz-base-lighter: #f4f5f9 !default;
+$rz-base-dark: #707072 !default;
+$rz-base-darker: #262526 !default;
 
 $rz-primary-light: mix($rz-white, $rz-primary, 16%) !default;
 $rz-primary-lighter: rgba($rz-primary, .16) !default;
@@ -115,50 +97,9 @@ $rz-body-background-color: var(--rz-base-100) !default;
 $rz-text-font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
 'Segoe UI Emoji', 'Segoe UI Symbol' !default;
-$rz-icon-font-family: 'Material Icons' !default;
-$rz-icon-size: 1.25rem !default;
 $rz-outline-offset: 1px !default;
 $rz-outline-width: 2px !default;
 $rz-outline-color: var(--rz-primary-light) !default;
-
-// Bootstrap variable overrides. DO NOT USE IN COMPONENTS!
-
-$font-size-base: $rz-body-font-size !default;
-$border-radius: $rz-border-radius !default;
-$primary: $rz-primary !default;
-$secondary: $rz-secondary !default;
-$danger: $rz-danger !default;
-$info: $rz-info !default;
-$success: $rz-success !default;
-$warning: $rz-warning !default;
-$light: $rz-base-200 !default;
-$body-color: $rz-base-800 !default;
-$link-color: $rz-secondary !default;
-$link-hover-color: $rz-secondary-dark !default;
-$link-decoration: none !default;
-$link-hover-decoration: underline !default;
-$state-success-bg: $rz-success !default;
-$state-warning-bg: $rz-warning !default;
-$state-danger-bg: $rz-danger !default;
-$state-info-bg: $rz-info !default;
-$grid-gutter-width: 2rem !default;
-
-// Bootstrap component overrides. 
-
-$badge-font-size: 0.75rem !default;
-$badge-border-radius: var(--rz-border-radius) !default;
-$card-border-radius: var(--rz-border-radius) !default;
-$input-height: 2.25rem !default;
-$input-line-height: 1.429 !default;
-$input-border-radius: var(--rz-border-radius) !default;
-$input-placeholder-color: var(--rz-text-tertiary-color) !default;
-$tooltip-color: var(--rz-white) !default;
-$tooltip-border-radius: var(--rz-border-radius) !default;
-$tooltip-font-size: 0.875rem !default;
-$body-bg: var(--rz-base-100) !default;
-$font-family-sans-serif: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
-  'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
-  'Segoe UI Emoji', 'Segoe UI Symbol' !default;
 
 // Utilities
 
@@ -229,68 +170,28 @@ $splitbutton-menu-shadow: none !default;
 $badge-border-radius: var(--rz-border-radius) !default;
 $badge-pill-border-radius: calc(4 * var(--rz-border-radius)) !default;
 
-$badge-styles: () !default;
-
-$badge-styles: map-merge(
-  (
-    primary: (
-      background-color: var(--rz-primary),
-      color: var(--rz-on-rimary)
-    ),
-    light: (
-      background-color: var(--rz-base-200),
-      color: var(--rz-base-800)
-    ),
-    secondary: (
-      background-color: var(--rz-secondary-lighter),
-      color: var(--rz-secondary)
-    ),
-    info: (
-      background-color: var(--rz-info),
-      color: var(--rz-on-info)
-    ),
-    warning: (
-      background-color: var(--rz-warning),
-      color: var(--rz-on-warning)
-    ),
-    error: (
-      background-color: var(--rz-danger),
-      color: var(--rz-on-danger)
-    ),
-    danger: (
-      background-color: var(--rz-danger),
-      color: var(--rz-on-danger)
-    ),
-    success: (
-      background-color: var(--rz-success),
-      color: var(--rz-on-success)
-    )
-  ),
-  $badge-styles
-);
-
 // PanelMenu
-
-$panel-menu-color: $rz-white !default;
-$panel-menu-background-color: $rz-base-900 !default;
-$panel-menu-hover-background-color: mix($rz-white, $rz-base-900, 6%) !default;
-$panel-menu-hover-color: inherit !default;
 $panel-menu-item-border: 1px solid mix($rz-white, $rz-base-900, 8%) !default;
-$panel-menu-item-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
-$panel-menu-item-background-color: mix($rz-white, $rz-base-900, 8%) !default;
+$panel-menu-item-color: $rz-white !default;
+$panel-menu-item-background-color: $rz-base-900 !default;
+$panel-menu-item-hover-color: inherit !default;
+$panel-menu-item-hover-background-color: mix($rz-white, $rz-base-900, 6%) !default;
 $panel-menu-item-active-color: inherit !default;
+$panel-menu-item-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
 $panel-menu-item-active-indicator: $rz-primary !default;
 $panel-menu-item-2nd-level-color: inherit !default;
-$panel-menu-item-2nd-level-hover-background-color: mix($rz-white, $rz-base-900, 16%) !default;
-$panel-menu-item-2nd-level-background-color: mix($rz-white, $rz-base-900, 12%) !default;
+$panel-menu-item-2nd-level-background-color: mix($rz-white, $rz-base-900, 8%) !default;
 $panel-menu-item-2nd-level-hover-color: inherit !default;
-$panel-menu-item-2nd-level-active-background-color: mix($rz-white, $rz-base-900, 16%)  !default;
+$panel-menu-item-2nd-level-hover-background-color: mix($rz-white, $rz-base-900, 16%) !default;
 $panel-menu-item-2nd-level-active-color: inherit !default;
-$panel-menu-item-3rd-level-hover-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-item-2nd-level-active-background-color: mix($rz-white, $rz-base-900, 16%)  !default;
+$panel-menu-item-3rd-level-color: inherit !default;
+$panel-menu-item-3rd-level-background-color: mix($rz-white, $rz-base-900, 12%) !default;
 $panel-menu-item-3rd-level-hover-color: inherit !default;
-$panel-menu-item-3rd-level-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-item-3rd-level-hover-background-color: mix($rz-white, $rz-base-900, 20%) !default;
 $panel-menu-item-3rd-level-active-color: inherit !default;
-$panel-menu-icon-color: $panel-menu-color !default;
+$panel-menu-item-3rd-level-active-background-color: mix($rz-white, $rz-base-900, 20%) !default;
+$panel-menu-icon-color: $panel-menu-item-color !default;
 $panel-menu-toggle-icon-opacity: 0.4 !default;
 
 // Card
@@ -336,7 +237,7 @@ $grid-filter-background-color: var(--rz-base-100) !default;
 $grid-filter-border: none !default;
 $grid-filter-color: var(--rz-text-disabled-color) !default;
 $grid-filter-focus-color: var(--rz-text-title-color) !default;
-$grid-filter-buttons-background-color: var(--rz-white) !default;
+$grid-filter-buttons-background-color: var(--rz-base-100) !default;
 $grid-clear-filter-button-background-color: var(--rz-base-200) !default;
 $grid-clear-filter-button-color: var(--rz-text-color) !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-title-color) !default;
@@ -395,11 +296,11 @@ $scheduler-color: var(--rz-text-color) !default;
 $overlay-shadow: $rz-shadow-3 !default;
 
 // Pager
-$paginator-background-color: transparent !default;
-$paginator-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
-$paginator-numeric-button-selected-color: var(--rz-on-primary-lighter) !default;
-$paginator-numeric-button-selected-border: 1px solid transparent !default;
-$paginator-summary-color: var(--rz-text-tertiary-color) !default;
+$pager-background-color: transparent !default;
+$pager-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
+$pager-numeric-button-selected-color: var(--rz-on-primary-lighter) !default;
+$pager-numeric-button-selected-border: 1px solid transparent !default;
+$pager-summary-color: var(--rz-text-tertiary-color) !default;
 
 // Tree
 $tree-node-selected-background-color: var(--rz-primary) !default;
@@ -422,7 +323,7 @@ $header-shadow: $rz-shadow-3 !default;
 $footer-border: none !default;
 
 // Sidebar
-$sidebar-border-right: var(--rz-border-base-800) !default;
+$sidebar-border-inline-end: var(--rz-border-base-800) !default;
 $sidebar-background-color: var(--rz-base-900) !default;
 
 // SidebarToggle
@@ -474,6 +375,10 @@ $datepicker-trigger-icon-hover-color: var(--rz-text-title-color) !default;
 $datepicker-panel-shadow: $rz-shadow-3 !default;
 $datepicker-header-background-color: var(--rz-base-background-color) !default;
 $datepicker-header-color: var(--rz-text-color) !default;
+$datepicker-header-padding-block: 0.5rem !default;
+$datepicker-header-padding-inline: 0.5rem !default;
+$datepicker-calendar-padding-block: 0 0.5rem !default;
+$datepicker-calendar-padding-inline: 0.5rem !default;
 $datepicker-calendar-hover-color: var(--rz-on-primary-lighter) !default;
 $datepicker-calendar-hover-background-color: var(--rz-primary-lighter) !default;
 $datepicker-calendar-selected-color: var(--rz-on-primary) !default;
@@ -482,10 +387,8 @@ $datepicker-calendar-selected-hover-color: var(--rz-on-primary-light) !default;
 $datepicker-calendar-selected-hover-background-color: var(--rz-primary-light) !default;
 $datepicker-calendar-border: none !default;
 $datepicker-calendar-border-radius: var(--rz-border-radius) !default;
-
 $datepicker-calendar-today-color: var(--rz-primary) !default;
 $datepicker-calendar-today-box-shadow: inset 0 0 0 1px var(--rz-primary) !default;
-
 $timepicker-background-color: $datepicker-header-background-color !default;
 $timepicker-separator-color: var(--rz-text-disabled-color) !default;
 $timepicker-button-background-color: var(--rz-primary) !default;
@@ -602,7 +505,8 @@ $upload-cancel-background-color: var(--rz-base-300) !default;
 
 // Dialog
 $dialog-title-background-color: var(--rz-base-background-color) !default;
-$dialog-title-padding: 1.25rem 1.25rem 0.5rem !default;
+$dialog-title-padding-block: 1.25rem 0.5rem !default;
+$dialog-title-padding-inline: 1.25rem !default;
 $dialog-title-font-size: 1.5rem !default;
 $dialog-title-line-height: 1.25em !default;
 $dialog-close-vertical-align: top !default;
@@ -638,9 +542,6 @@ $form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
 
 // Layout
 $layout-background-color: transparent !default;
-
-@import 'bootstrap';
-$bootstrap: true;
 
 @import 'fonts';
 @import 'components';

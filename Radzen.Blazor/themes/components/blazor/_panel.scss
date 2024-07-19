@@ -14,33 +14,14 @@ $panel-hover-color: var(--rz-secondary) !default;
 $panel-border-radius: var(--rz-border-radius) !default;
 $panel-shadow: none !default;
 
-// Panel CSS variables
-
-:root {
-  --rz-panel-background-color: #{$panel-background-color};
-  --rz-panel-padding: #{$panel-padding};
-  --rz-panel-title-line-height: #{$panel-title-line-height};
-  --rz-panel-title-font-weight: #{$panel-title-font-weight};
-  --rz-panel-content-margin: #{$panel-content-margin};
-  --rz-panel-toggle-icon-width: #{$panel-toggle-icon-width};
-  --rz-panel-toggle-icon-height: #{$panel-toggle-icon-height};
-  --rz-panel-toggle-icon-font-size: #{$panel-toggle-icon-font-size};
-  --rz-panel-toggle-icon-border-radius: #{$panel-toggle-icon-border-radius};
-  --rz-panel-toggle-icon-background-color: #{$panel-toggle-icon-background-color};
-  --rz-panel-toggle-icon-focus-outline: #{$panel-toggle-icon-focus-outline};
-  --rz-panel-toggle-icon-focus-outline-offset: #{$panel-toggle-icon-focus-outline-offset};
-  --rz-panel-hover-color: #{$panel-hover-color};
-  --rz-panel-border-radius: #{$panel-border-radius};
-  --rz-panel-shadow: #{$panel-shadow};
-}
-
 .rz-panel {
-  background: var(--rz-panel-background-color);
-  border-radius: var(--rz-panel-border-radius);
-  padding: var(--rz-panel-padding);
-  box-shadow: var(--rz-panel-shadow);
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
+  padding: var(--rz-panel-padding);
+  background: var(--rz-panel-background-color);
+  border-radius: var(--rz-panel-border-radius);
+  box-shadow: var(--rz-panel-shadow);
 }
 
 .rz-panel-titlebar {

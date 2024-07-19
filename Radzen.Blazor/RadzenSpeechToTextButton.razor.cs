@@ -20,7 +20,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The button style.</value>
         [Parameter]
-        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Light;
+        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Base;
 
         /// <summary>
         /// Gets or sets the icon displayed while not recording.

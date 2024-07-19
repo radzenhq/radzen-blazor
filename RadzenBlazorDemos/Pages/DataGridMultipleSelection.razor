@@ -5,14 +5,17 @@
 
 @inherits DbContextPage
 
-<RadzenCard class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
-    <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
-    <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" />
-    <RadzenButton Text="Clear selected rows" Click="@(args => selectedEmployees = null)" />
+<RadzenCard Variant="Variant.Outlined" Class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+        <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
+        <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" />
+        <RadzenButton Text="Clear selected rows" Click="@(args => selectedEmployees = null)" />
+    </RadzenStack>
 </RadzenCard>
+
 <RadzenDataGrid @ref="grid" AllowRowSelectOnRowClick="@allowRowSelectOnRowClick" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
             AllowSorting="true" Data="@employees" ColumnWidth="200px"
-            SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees class="m-4">
+            SelectionMode="DataGridSelectionMode.Multiple" @bind-Value=@selectedEmployees >
     <Columns>
         <RadzenDataGridColumn Width="60px" Sortable="false" Filterable="false">
             <HeaderTemplate>
@@ -25,9 +28,9 @@
                     TValue="bool" Change=@(args => { if(!allowRowSelectOnRowClick) { grid.SelectRow(data); }}) />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="Photo" Title="Employee" Sortable="false" Filterable="false">
+        <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" style="width: 40px; height: 40px; border-radius: 8px; margin-right: 8px;" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" Class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
                 @data.FirstName @data.LastName
             </Template>
         </RadzenDataGridColumn>

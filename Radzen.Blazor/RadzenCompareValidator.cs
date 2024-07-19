@@ -105,18 +105,18 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (ValidateOnComponentValueChange && valueChanged && !firstRender)
+            if (ValidateOnComponentValueChange && valueChanged && !firstRender && Visible)
             {
                 var component = Form.FindComponent(Component);
                 if (component != null && component.FieldIdentifier.FieldName != null)
                 {
                     IsValid = Validate(component);
 
-                    messages.Clear(component.FieldIdentifier);
+                    messages?.Clear(component.FieldIdentifier);
 
                     if (!IsValid)
                     {
-                        messages.Add(component.FieldIdentifier, Text);
+                        messages?.Add(component.FieldIdentifier, Text);
                     }
 
                     EditContext?.NotifyValidationStateChanged();

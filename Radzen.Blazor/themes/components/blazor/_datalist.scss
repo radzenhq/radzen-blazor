@@ -3,37 +3,18 @@ $datalist-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $datalist-padding: 0.5rem !default;
 $datalist-border: var(--rz-border-base-200) !default;
 $datalist-border-radius: var(--rz-border-radius) !default;
-
 $datalist-item-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $datalist-item-border: var(--rz-border-base-200) !default;
-$datalist-item-vertical-margin: 0.5rem !default;
-$datalist-item-horizontal-margin: 0.5rem !default;
+$datalist-item-margin-block: 0.5rem !default;
+$datalist-item-margin-inline: 0.5rem !default;
 $datalist-item-padding: 1rem !default;
 $datalist-item-background-color: var(--rz-base-background-color) !default;
-
-
-// DataList CSS variables
-
-:root {
-  --rz-datalist-background-color: #{$datalist-background-color};
-  --rz-datalist-shadow: #{$datalist-shadow};
-  --rz-datalist-padding: #{$datalist-padding};
-  --rz-datalist-border: #{$datalist-border};
-  --rz-datalist-border-radius: #{$datalist-border-radius};
-
-  --rz-datalist-item-shadow: #{$datalist-item-shadow};
-  --rz-datalist-item-border: #{$datalist-item-border};
-  --rz-datalist-item-vertical-margin: #{$datalist-item-vertical-margin};
-  --rz-datalist-item-horizontal-margin: #{$datalist-item-horizontal-margin};
-  --rz-datalist-item-padding: #{$datalist-item-padding};
-  --rz-datalist-item-background-color: #{$datalist-item-background-color};
-}
 
 .rz-datalist,
 .rz-datagrid {
   background-color: var(--rz-datalist-background-color);
-  border-bottom-right-radius: var(--rz-datalist-border-radius);
-  border-bottom-left-radius: var(--rz-datalist-border-radius);
+  border-end-start-radius: var(--rz-datalist-border-radius);
+  border-end-end-radius: var(--rz-datalist-border-radius);
   box-shadow: var(--rz-datalist-shadow);
   border: var(--rz-datalist-border);
 }
@@ -54,14 +35,15 @@ $datalist-item-background-color: var(--rz-base-background-color) !default;
   > li {
     @extend %datalist-item;
 
-    margin: var(--rz-datalist-item-vertical-margin);
+    margin-block: var(--rz-datalist-item-margin-block);
+    margin-inline: var(--rz-datalist-item-margin-inline);
 
     &:first-child {
-      margin-top: 0;
+      margin-block-start: 0;
     }
 
     &:last-child {
-      margin-bottom: 0;
+      margin-block-end: 0;
     }
   }
 }
@@ -73,10 +55,12 @@ $datalist-item-background-color: var(--rz-base-background-color) !default;
   > div {
     @extend %datalist-item;
     flex: auto;
-    margin: var(--rz-datalist-item-vertical-margin) var(--rz-datalist-item-horizontal-margin);
+    margin-block: var(--rz-datalist-item-margin-block);
+    margin-inline: var(--rz-datalist-item-margin-inline);
   }
 }
 
 .rz-datalist-content {
+    box-sizing: border-box;
     position: relative;
 }

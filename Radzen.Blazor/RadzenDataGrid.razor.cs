@@ -271,6 +271,14 @@ namespace Radzen.Blazor
             }
         }
 
+
+        /// <summary>
+        /// Gets or sets the callback used to load column filter data for DataGrid FilterMode.CheckBoxList filter mode.
+        /// </summary>
+        /// <value>The load filter data event callback.</value>
+        [Parameter]
+        public EventCallback<DataGridLoadColumnFilterDataEventArgs<TItem>> LoadColumnFilterData { get; set; }
+
         /// <summary>
         /// Gets or sets the load child data callback.
         /// </summary>
@@ -3261,7 +3269,7 @@ namespace Radzen.Blazor
                 additionalClasses.Add("rz-density-compact");
             }
 
-            return $"rz-has-paginator rz-datatable  rz-datatable-scrollable {String.Join(" ", additionalClasses)}";
+            return $"rz-has-pager rz-datatable  rz-datatable-scrollable {String.Join(" ", additionalClasses)}";
         }
 
         internal string getHeaderStyle()
@@ -3340,7 +3348,7 @@ namespace Radzen.Blazor
                         Visible = c.GetVisible(),
                         OrderIndex = c.GetOrderIndex(),
                         SortOrder = c.GetSortOrder(),
-                        SortIndex = c.getSortIndex(),
+                        SortIndex = c.GetSortIndex(),
                         FilterValue = c.GetFilterValue(),
                         FilterOperator = c.GetFilterOperator(),
                         SecondFilterValue = c.GetSecondFilterValue(),

@@ -1,0 +1,759 @@
+@import 'variables';
+@import 'mixins';
+$dark: true;
+$standard: true;
+$theme-name: standard-dark;
+
+// Theme Colors
+
+$rz-white: #ffffff !default;
+$rz-black: #000000 !default;
+
+$rz-base: #4f5154 !default;
+$rz-primary: #3871ff !default;
+$rz-secondary: #2a3c68 !default;
+$rz-info: #12a4f5 !default;
+$rz-success: #009b51 !default;
+$rz-warning: #ffae11 !default;
+$rz-danger: #f31155 !default;
+
+$rz-series-1: #376df5 !default;
+$rz-series-2: #64dfdf !default;
+$rz-series-3: #f68769 !default;
+$rz-series-4: #c161e2 !default;
+$rz-series-5: #fdd07a !default;
+$rz-series-6: #f8629b !default;
+$rz-series-7: #74d062 !default;
+$rz-series-8: #84a7ff !default;
+$rz-series-9: #4d99f9 !default;
+$rz-series-10: #8cecec !default;
+$rz-series-11: #fab793 !default;
+$rz-series-12: #da88ee !default;
+$rz-series-13: #fee3ab !default;
+$rz-series-14: #fb89c3 !default;
+$rz-series-15: #a2e389 !default;
+$rz-series-16: #b5caff !default;
+$rz-series-17: #1750f3 !default;
+$rz-series-18: #46d7d7 !default;
+$rz-series-19: #f46e4c !default;
+$rz-series-20: #b343db !default;
+$rz-series-21: #fdc55f !default;
+$rz-series-22: #f64485 !default;
+$rz-series-23: #58c544 !default;
+$rz-series-24: #6a93ff !default;
+
+$rz-base-50: #f6f6f7 !default;
+$rz-base-100: #eaebec !default;
+$rz-base-200: #e1e2e3 !default;
+$rz-base-300: #c9cacd !default;
+$rz-base-400: #b0b2b5 !default;
+$rz-base-500: #6d6f74 !default;
+$rz-base-600: #4f5154 !default;
+$rz-base-700: #3b3c3f !default;
+$rz-base-800: #242527 !default;
+$rz-base-900: #19191a !default;
+$rz-base-light: #e1e2e3 !default;
+$rz-base-lighter: #ffffff !default;
+$rz-base-dark: #3b3c3f !default;
+$rz-base-darker: #000000 !default;
+
+
+$rz-primary-light: mix($rz-white, $rz-primary, 40%) !default;
+$rz-primary-lighter: rgba($rz-primary, .20) !default;
+$rz-primary-dark: mix($rz-black, $rz-primary, 16%) !default;
+$rz-primary-darker: mix($rz-black, $rz-primary, 24%) !default;
+
+$rz-secondary-light: mix($rz-white, $rz-secondary, 16%) !default;
+$rz-secondary-lighter: rgba($rz-secondary, .20) !default;
+$rz-secondary-dark: mix($rz-black, $rz-secondary, 16%) !default;
+$rz-secondary-darker: mix($rz-black, $rz-secondary, 24%) !default;
+
+$rz-info-light: mix($rz-white, $rz-info, 16%) !default;
+$rz-info-lighter: rgba($rz-info, .20) !default;
+$rz-info-dark: mix($rz-black, $rz-info, 16%) !default;
+$rz-info-darker: mix($rz-black, $rz-info, 24%) !default;
+
+$rz-success-light: mix($rz-white, $rz-success, 16%) !default;
+$rz-success-lighter: rgba($rz-success, .20) !default;
+$rz-success-dark: mix($rz-black, $rz-success, 16%) !default;
+$rz-success-darker: mix($rz-black, $rz-success, 24%) !default;
+
+$rz-warning-light: mix($rz-white, $rz-warning, 16%) !default;
+$rz-warning-lighter: rgba($rz-warning, .20) !default;
+$rz-warning-dark: mix($rz-black, $rz-warning, 16%) !default;
+$rz-warning-darker: mix($rz-black, $rz-warning, 24%) !default;
+
+$rz-danger-light: mix($rz-white, $rz-danger, 16%) !default;
+$rz-danger-lighter: rgba($rz-danger, .20) !default;
+$rz-danger-dark: mix($rz-black, $rz-danger, 16%) !default;
+$rz-danger-darker: mix($rz-black, $rz-danger, 24%) !default;
+
+// Theme Constants
+
+$rz-border-width: 1px !default;
+$rz-border-radius: 4px !default;
+$rz-root-font-size: 16px !default;
+$rz-body-font-size: 0.875rem !default;
+$rz-body-line-height: 1.429 !default;
+$rz-body-background-color: var(--rz-base-900) !default;
+$rz-text-font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont,
+'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji',
+'Segoe UI Emoji', 'Segoe UI Symbol' !default;
+$rz-outline-offset: 1px !default;
+$rz-outline-width: 2px !default;
+$rz-outline-color: var(--rz-primary-light) !default;
+
+// Utilities
+
+// Theme Colors
+
+$rz-theme-colors-map: () !default;
+$rz-theme-colors-map: map-merge(
+  (
+    "white": $rz-white,
+    "black": $rz-black,
+    
+    "base": $rz-base,
+    "base-50": $rz-base-50,
+    "base-100": $rz-base-100,
+    "base-200": $rz-base-200,
+    "base-300": $rz-base-300,
+    "base-400": $rz-base-400,
+    "base-500": $rz-base-500,
+    "base-600": $rz-base-600,
+    "base-700": $rz-base-700,
+    "base-800": $rz-base-800,
+    "base-900": $rz-base-900,
+    "base-light": $rz-base-light,
+    "base-lighter": $rz-base-lighter,
+    "base-dark": $rz-base-dark,
+    "base-darker": $rz-base-darker,
+    
+    "primary": $rz-primary,
+    "primary-light": $rz-primary-light,
+    "primary-lighter": $rz-primary-lighter,
+    "primary-dark": $rz-primary-dark,
+    "primary-darker": $rz-primary-darker,
+    
+    "secondary": $rz-secondary,
+    "secondary-light": $rz-secondary-light,
+    "secondary-lighter": $rz-secondary-lighter,
+    "secondary-dark": $rz-secondary-dark,
+    "secondary-darker": $rz-secondary-darker,
+    
+    "info": $rz-info,
+    "info-light": $rz-info-light,
+    "info-lighter": $rz-info-lighter,
+    "info-dark": $rz-info-dark,
+    "info-darker": $rz-info-darker,
+    
+    "success": $rz-success,
+    "success-light": $rz-success-light,
+    "success-lighter": $rz-success-lighter,
+    "success-dark": $rz-success-dark,
+    "success-darker": $rz-success-darker,
+    
+    "warning": $rz-warning,
+    "warning-light": $rz-warning-light,
+    "warning-lighter": $rz-warning-lighter,
+    "warning-dark": $rz-warning-dark,
+    "warning-darker": $rz-warning-darker,
+    
+    "danger": $rz-danger,
+    "danger-light": $rz-danger-light,
+    "danger-lighter": $rz-danger-lighter,
+    "danger-dark": $rz-danger-dark,
+    "danger-darker": $rz-danger-darker,
+
+    "on-base": $rz-white,
+    "on-base-light": $rz-base-900,
+    "on-base-lighter": $rz-base-900,
+    "on-base-dark": $rz-white,
+    "on-base-darker": $rz-white,
+
+    "on-primary": $rz-white,
+    "on-primary-light": $rz-black,
+    "on-primary-lighter": $rz-primary-light,
+    "on-primary-dark": $rz-white,
+    "on-primary-darker": $rz-white,
+    
+    "on-secondary": $rz-white,
+    "on-secondary-light": $rz-white,
+    "on-secondary-lighter": $rz-white,
+    "on-secondary-dark": $rz-white,
+    "on-secondary-darker": $rz-white,
+    
+    "on-info": $rz-white,
+    "on-info-light": $rz-white,
+    "on-info-lighter": $rz-info,
+    "on-info-dark": $rz-white,
+    "on-info-darker": $rz-white,
+    
+    "on-success": $rz-white,
+    "on-success-light": $rz-white,
+    "on-success-lighter": $rz-success,
+    "on-success-dark": $rz-white,
+    "on-success-darker": $rz-white,
+    
+    "on-warning": $rz-white,
+    "on-warning-light": $rz-white,
+    "on-warning-lighter": $rz-warning,
+    "on-warning-dark": $rz-white,
+    "on-warning-darker": $rz-white,
+    
+    "on-danger": $rz-white,
+    "on-danger-light": $rz-white,
+    "on-danger-lighter": $rz-danger,
+    "on-danger-dark": $rz-white,
+    "on-danger-darker": $rz-white,
+    
+    "series-1": $rz-series-1,
+    "series-2": $rz-series-2,
+    "series-3": $rz-series-3,
+    "series-4": $rz-series-4,
+    "series-5": $rz-series-5,
+    "series-6": $rz-series-6,
+    "series-7": $rz-series-7,
+    "series-8": $rz-series-8,
+    "series-9": $rz-series-9,
+    "series-10": $rz-series-10,
+    "series-11": $rz-series-11,
+    "series-12": $rz-series-12,
+    "series-13": $rz-series-13,
+    "series-14": $rz-series-14,
+    "series-15": $rz-series-15,
+    "series-16": $rz-series-16,
+    "series-17": $rz-series-17,
+    "series-18": $rz-series-18,
+    "series-19": $rz-series-19,
+    "series-20": $rz-series-20,
+    "series-21": $rz-series-21,
+    "series-22": $rz-series-22,
+    "series-23": $rz-series-23,
+    "series-24": $rz-series-24,
+  ),
+  $rz-theme-colors-map
+);
+
+// Semantic Text Color
+$rz-text-title-color: var(--rz-base-50) !default;
+$rz-text-color: var(--rz-base-100) !default;
+$rz-text-secondary-color: var(--rz-base-300) !default;
+$rz-text-tertiary-color: var(--rz-base-400) !default;
+$rz-text-disabled-color: var(--rz-base-500) !default;
+$rz-text-contrast-color: var(--rz-white) !default;
+
+// Link Color
+$rz-link-color: var(--rz-primary-light) !default;
+$rz-link-hover-color: var(--rz-primary) !default;
+$rz-link-hover-decoration: underline !default;
+
+// Base/Light/Dark Styles Map 
+
+$base-styles-map: () !default;
+$base-styles-map: map-merge(
+  (
+    base: (
+      background-color: var(--rz-base),
+      color: var(--rz-on-base)
+    ),
+    light: (
+      background-color: var(--rz-base-500),
+      color: var(--rz-text-color)
+    ),
+    dark: (
+      background-color: var(--rz-base-900),
+      color: var(--rz-text-contrast-color)
+    )
+  ),
+  $base-styles-map
+);
+
+// Background Color
+$rz-base-background-color: var(--rz-base-800) !default;
+
+// Borders
+$rz-border-normal: var(--rz-border-width) solid var(--rz-base-600) !default;
+$rz-border-hover: var(--rz-border-width) solid var(--rz-base-500) !default;
+$rz-border-focus: var(--rz-border-width) solid var(--rz-base-500) !default;
+$rz-border-disabled: var(--rz-border-width) solid var(--rz-base-700) !default;
+
+// Shadows
+$rz-shadow-1: 0 0 2px 0 rgba(0, 0, 0, 0.18), 0px 2px 2px rgba(0, 0, 0, 0.18) !default;
+$rz-shadow-2: 0 0 2px 0 rgba(0, 0, 0, 0.18), 0px 2px 2px rgba(0, 0, 0, 0.18), 0px 4px 12px 0 rgba(0, 0, 0, 0.14)  !default;
+$rz-shadow-3: 0 0 4px 0 rgba(0, 0, 0, 0.14), 0px 2px 4px rgba(0, 0, 0, 0.14), 0px 4px 16px rgba(0, 0, 0, 0.20) !default;
+$rz-shadow-4: 0 0 4px 0 rgba(0, 0, 0, 0.14), 0px 3px 5px rgba(0, 0, 0, 0.14), 0px 8px 20px rgba(0, 0, 0, 0.21) !default;
+$rz-shadow-5: 0 0 6px 0 rgba(0, 0, 0, 0.14), 0px 4px 6px rgba(0, 0, 0, 0.14), 0px 12px 24px rgba(0, 0, 0, 0.22) !default;
+$rz-shadow-6: 0 0 6px 0 rgba(0, 0, 0, 0.14), 0px 5px 8px rgba(0, 0, 0, 0.14), 0px 14px 28px rgba(0, 0, 0, 0.23) !default;
+$rz-shadow-7: 0 0 8px 0 rgba(0, 0, 0, 0.14), 0px 6px 10px rgba(0, 0, 0, 0.14), 0px 16px 32px rgba(0, 0, 0, 0.24) !default;
+$rz-shadow-8: 0 0 8px 0 rgba(0, 0, 0, 0.14), 0px 7px 12px rgba(0, 0, 0, 0.14), 0px 18px 40px rgba(0, 0, 0, 0.25) !default;
+$rz-shadow-9: 0 0 12px 0 rgba(0, 0, 0, 0.14), 0px 8px 16px rgba(0, 0, 0, 0.14), 0px 20px 48px rgba(0, 0, 0, 0.26) !default;
+$rz-shadow-10: 0 0 12px 0 rgba(0, 0, 0, 0.14), 0px 9px 20px rgba(0, 0, 0, 0.14), 0px 22px 64px rgba(0, 0, 0, 0.30) !default;
+
+$rz-shadow-inset-level-1: inset 0px 0px 2px rgba(0, 0, 0, 0.3) !default;
+
+// Components
+
+// Button
+$button-base-background-color: $rz-base-700 !default;
+$button-base-color: $rz-base-800 !default;
+$button-hover-shadow: none !default;
+$button-hover-gradient: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0) 100%) !default;
+$button-focus-shadow: none !default;
+$button-focus-gradient: linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0) 100%) !default;
+$button-active-shadow: none !default;
+$button-active-gradient: $button-hover-gradient !default;
+$button-border-radius: $rz-border-radius !default;
+$button-shadow: none !default;
+$button-disabled-opacity: 0.5 !default;
+$button-line-height: 1.25rem !default;
+$button-vertical-align: top !default;
+$button-background-size: 100% 0%, 100% 0% !default;
+$button-hover-background-size: 100% 200%, 100% 0%  !default;
+$button-focus-background-size: 100% 200%, 100% 0%  !default;
+$button-active-background-size: 100% 0%, 100% 200%  !default;
+
+// Chip
+$chip-background-color: var(--rz-base-600) !default;
+
+// SelectButton
+$selectbar-background-color: transparent !default;
+$selectbar-selected-background-color: var(--rz-primary-lighter) !default;
+$selectbar-selected-color: var(--rz-primary-light) !default;
+$selectbar-selected-border: var(--rz-border-normal) !default;
+
+
+// SplitButton
+$splitbutton-menu-shadow: none !default;
+
+// Badge
+$badge-border-radius: var(--rz-border-radius) !default;
+$badge-pill-border-radius: calc(4 * var(--rz-border-radius)) !default;
+
+// PanelMenu
+$panel-menu-item-border: var(--rz-border-base-800) !default;
+$panel-menu-item-color: var(rz-text-color) !default;
+$panel-menu-item-background-color: var(--rz-base-800) !default;
+$panel-menu-item-hover-color: inherit !default;
+$panel-menu-item-hover-background-color: var(--rz-base-700) !default;
+$panel-menu-item-active-color: inherit !default;
+$panel-menu-item-active-background-color: var(--rz-base-700) !default;
+$panel-menu-item-active-indicator: $rz-primary !default;
+$panel-menu-item-2nd-level-color: inherit !default;
+$panel-menu-item-2nd-level-background-color: var(--rz-base-900) !default;
+$panel-menu-item-2nd-level-hover-color: inherit !default;
+$panel-menu-item-2nd-level-hover-background-color: var(--rz-base-700) !default;
+$panel-menu-item-2nd-level-active-color: inherit !default;
+$panel-menu-item-2nd-level-active-background-color: var(--rz-base-700)  !default;
+$panel-menu-item-3rd-level-color: inherit !default;
+$panel-menu-item-3rd-level-background-color: var(--rz-base-900) !default;
+$panel-menu-item-3rd-level-hover-color: inherit !default;
+$panel-menu-item-3rd-level-hover-background-color: var(--rz-base-700) !default;
+$panel-menu-item-3rd-level-active-color: inherit !default;
+$panel-menu-item-3rd-level-active-background-color: var(--rz-base-700) !default;
+$panel-menu-icon-color: $panel-menu-item-color !default;
+$panel-menu-toggle-icon-opacity: 0.4 !default;
+
+// Card
+$card-shadow: $rz-shadow-2 !default;
+$card-flat-background-color: var(--rz-base-800) !default;
+
+// Steps
+$steps-number-background-color: var(--rz-base-700) !default;
+$steps-number-selected-background: var(--rz-primary) !default;
+$steps-title-selected-color: var(--rz-primary) !default;
+$steps-button-color: var(--rz-primary) !default;
+
+// ProgressBar
+$progressbar-background-color: var(--rz-base-700) !default;
+$progressbar-value-background-color: var(--rz-primary-lighter) !default;
+
+// Accordion
+$accordion-selected-color: var(--rz-base-900) !default;
+$accordion-hover-color: var(--rz-primary) !default;
+
+// Tabs
+$tabs-shadow: none !default;
+$tabs-border: var(--rz-border-base-700) !default;
+$tabs-tab-color: var(--rz-text-color) !default;
+$tabs-tab-background-color: var(--rz-base-700) !default;
+$tabs-tab-selected-color: var(--rz-text-title-color) !default;
+$tabs-tab-selected-top-border-color: var(--rz-primary) !default;
+$tabs-tab-hover-color: var(--rz-text-color) !default;
+$tabs-tab-hover-background-color: var(--rz-base-600) !default;
+
+// Grid
+$grid-border-radius: 0 !default;
+$grid-cell-border: var(--rz-border-base-700);
+$grid-data-border-shadow: 0 1px 0 0 var(--rz-base-600), 0 -1px 0 0 var(--rz-base-600);
+$grid-hover-background-color: var(--rz-primary-lighter) !default;
+$grid-hover-color: var(--rz-on-primary-lighter) !default;
+$grid-selected-background-color: var(--rz-primary-lighter) !default;
+$grid-selected-color: var(--rz-on-primary-lighter) !default;
+$grid-stripe-background-color: var(--rz-base-900) !default;
+$grid-header-cell-border-bottom: var(--rz-border-normal) !default;
+$grid-header-background-color: var(--rz-base-800) !default;
+$grid-header-font-size: 0.875rem !default;
+$grid-header-text-transform: none !default;
+$grid-header-color: var(--rz-text-title-color) !default;
+$grid-header-sorted-background-color: var(--rz-base-800) !default;
+$grid-foot-cell-color: var(--rz-text-title-color) !default;
+$grid-foot-background-color: var(--rz-base-700) !default;
+$grid-filter-background-color: var(--rz-base-700) !default;
+$grid-filter-border: none !default;
+$grid-filter-color: var(--rz-base-300) !default;
+$grid-filter-focus-color: var(--rz-text-title-color) !default;
+$grid-filter-buttons-background-color: var(--rz-base-700) !default;
+$grid-clear-filter-button-background-color: var(--rz-base) !default;
+$grid-clear-filter-button-color: var(--rz-on-base) !default;
+$grid-header-filter-icon-hover-color: var(--rz-text-title-color) !default;
+$grid-header-filter-icon-active-color: var(--rz-primary) !default;
+$grid-sort-icon-color: var(--rz-text-color) !default;
+$grid-border: none !default;
+$grid-shadow: none !default;
+$grid-column-resizer-helper-background-color: var(--rz-primary) !default;
+$grid-detail-template-background-color: var(--rz-base-900) !default;
+$grid-loading-indicator-color: var(--rz-on-primary-lighter) !default;
+$grid-loading-indicator-background-color: var(--rz-primary-lighter) !default;
+$column-drag-handle-color: var(--rz-text-disabled-color) !default;
+$column-drag-handle-hover-color: var(--rz-text-title-color) !default;
+
+.rz-selectable {
+  .rz-datatable-even,
+  .rz-datatable-odd {
+    td,
+    .rz-cell-data {
+      transition: background-color var(--rz-transition), color var(--rz-transition);
+    }
+
+    &:hover {
+      > td:not(.rz-frozen-cell) {
+        background-color: $grid-hover-background-color;
+        
+      }
+
+      .rz-cell-data {
+        color: $grid-hover-color;
+      }
+    }
+  }
+}
+
+// DataList
+$datalist-background-color: transparent !default;
+$datalist-shadow: none !default;
+$datalist-item-shadow: none !default;
+$datalist-border: var(--rz-border-base-700) !default;
+$datalist-item-border: var(--rz-border-base-700) !default;
+
+// Scheduler
+$scheduler-shadow: none !default;
+$scheduler-toolbar-background-color: var(--rz-base-700) !default;
+$scheduler-prev-next-button-background-color: var(--rz-base-600) !default;
+$scheduler-prev-next-button-color: var(--rz-text-color) !default;
+$scheduler-view-button-color: var(--rz-text-color) !default;
+$scheduler-view-button-background-color: transparent !default;
+$scheduler-view-selected-background-color: var(--rz-primary-lighter) !default;
+$scheduler-view-selected-border-color: transparent !default;
+$scheduler-view-selected-color: var(--rz-on-primary-lighter) !default;
+$scheduler-header-background-color: var(--rz-base-700) !default;
+$scheduler-header-color: var(--rz-text-tertiary-color) !default;
+$scheduler-border-color: var(--rz-base-600) !default;
+$scheduler-minor-border-color: var(--rz-base-700) !default;
+$scheduler-color: var(--rz-text-color) !default;
+$scheduler-highlight-background-color: var(--rz-info-lighter) !default;
+$scheduler-weekend-color: var(--rz-text-tertiary-color) !default;
+$scheduler-weekend-background-color: var(--rz-base-700) !default;
+$scheduler-other-month-background-color: var(--rz-base-700) !default;
+
+// Overlay Panel
+$overlay-background-color: var(--rz-base-700) !default;
+$overlay-shadow: $rz-shadow-3 !default;
+
+// Pager
+$pager-background-color: transparent !default;
+$pager-back-button-background-color: var(--rz-base-700) !default;
+$pager-next-button-background-color: var(--rz-base-700) !default;
+$pager-numeric-button-background-color: var(--rz-base-700) !default;
+$pager-numeric-button-selected-background-color: var(--rz-primary-lighter) !default;
+$pager-numeric-button-selected-color: var(--rz-on-primary-lighter) !default;
+$pager-numeric-button-selected-border: 1px solid transparent !default;
+$pager-summary-color: var(--rz-text-tertiary-color) !default;
+
+// Tree
+$tree-node-selected-background-color: var(--rz-primary) !default;
+$tree-node-selected-border-radius: var(--rz-border-radius) !default;
+$tree-node-hover-background-color: var(--rz-primary-lighter) !default;
+$tree-node-hover-color: var(--rz-primary) !default;
+$tree-node-toggle-hover-color: var(--rz-text-title-color) !default;
+
+
+// Switch
+$switch-background-color: var(--rz-base-600) !default;
+$switch-checked-background-color: var(--rz-primary) !default;
+$switch-box-shadow: $rz-shadow-2 !default;
+
+// Header
+$header-background-color:  var(--rz-base-800) !default;
+$header-border:  var(--rz-border-base-800) !default;
+$header-shadow: $rz-shadow-3 !default;
+
+// Footer
+$footer-border: none !default;
+
+// Sidebar
+$sidebar-border-inline-end: var(--rz-border-base-700) !default;
+$sidebar-background-color: var(--rz-base-800) !default;
+
+// SidebarToggle
+$sidebar-toggle-border: var(--rz-border-base-700) !default;
+$sidebar-toggle-hover-color: var(--rz-text-title-color)  !default;
+$sidebar-toggle-color: var(--rz-text-color) !default;
+
+// Menu
+$menu-border: none !default;
+$menu-border-radius: 0 !default;
+$menu-item-color: var(--rz-text-color) !default;
+$menu-item-hover-color: var(--rz-on-primary-lighter) !default;
+$menu-item-hover-background-color: var(--rz-primary-lighter) !default;
+$menu-item-selected-color: var(--rz-on-primary-lighter) !default;
+$menu-item-transition: var(--rz-transition-all) !default;
+$menu-top-item-color: $menu-item-color !default;
+$menu-top-item-background-color: transparent !default;
+$menu-top-item-hover-color: var(--rz-on-primary-lighter) !default;
+$menu-top-item-hover-background-color: var(--rz-primary-lighter) !default;
+$menu-top-item-icon-color: $menu-top-item-color !default;
+$menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
+$menu-top-item-selected-color: $menu-item-selected-color !default;
+$context-menu-box-shadow: $rz-shadow-3 !default;
+
+// ProfileMenu
+$profile-menu-toggle-button-color: var(--rz-text-color) !default;
+$profile-menu-border: var(--rz-base-800) !default;
+$profile-menu-top-item-background-color: transparent !default;
+$profile-menu-item-hover-background-color:var(--rz-primary-lighter) !default;
+
+// Gravatar
+$gravatar-box-shadow: $rz-shadow-inset-level-1 !default;
+
+// Panel
+$panel-toggle-icon-border-radius: var(--rz-border-radius) !default;
+$panel-hover-color: var(--rz-primary) !default;
+
+// Input
+$input-shadow: none !default;
+$input-hover-border: var(--rz-border-primary-light) !default;
+$input-focus-border: var(--rz-border-primary-light) !default;
+$input-focus-shadow: 0px 0px 0px 1px var(--rz-base-900), 0px 0px 0px 3px rgba($rz-primary, 0.4) !default;
+$input-disabled-background-color: var(--rz-base-900);
+$input-disabled-opacity: .5 !default;
+
+// Numeric
+$numeric-button-background-color: var(--rz-base-background-color) !default;
+$numeric-button-disabled-background-color: var(--rz-base-100) !default;
+$numeric-button-color: var(--rz-text-tertiary-color) !default;
+
+// DatePicker
+$datepicker-trigger-icon-color: var(--rz-text-color)  !default;
+$datepicker-trigger-icon-hover-color: var(--rz-text-title-color) !default;
+$datepicker-panel-shadow: $rz-shadow-3 !default;
+$datepicker-header-background-color: var(--rz-base-background-color) !default;
+$datepicker-header-color: var(--rz-text-color) !default;
+$datepicker-header-padding-block: 0.5rem !default;
+$datepicker-header-padding-inline: 0.5rem !default;
+$datepicker-calendar-padding-block: 0 0.5rem !default;
+$datepicker-calendar-padding-inline: 0.5rem !default;
+$datepicker-calendar-hover-color: var(--rz-on-primary-lighter) !default;
+$datepicker-calendar-hover-background-color: var(--rz-primary-lighter) !default;
+$datepicker-calendar-selected-color: var(--rz-on-primary) !default;
+$datepicker-calendar-selected-background-color: var(--rz-primary) !default;
+$datepicker-calendar-selected-hover-color: var(--rz-on-primary-dark) !default;
+$datepicker-calendar-selected-hover-background-color: var(--rz-primary-dark) !default;
+$datepicker-calendar-border: none !default;
+$datepicker-calendar-border-radius: var(--rz-border-radius) !default;
+$datepicker-calendar-today-color: var(--rz-primary) !default;
+$datepicker-calendar-today-box-shadow: inset 0 0 0 1px var(--rz-primary) !default;
+$timepicker-background-color: $datepicker-header-background-color !default;
+$timepicker-separator-color: var(--rz-text-disabled-color) !default;
+$timepicker-button-background-color: var(--rz-primary) !default;
+$timepicker-button-color: var(--rz-on-primary) !default;
+$timepicker-button-border-radius: var(--rz-border-radius) !default;
+
+// Fieldset
+$fieldset-border: var(--rz-border-base-700) !default;
+$fieldset-border-radius: var(--rz-border-radius) !default;
+$fieldset-legend-color: var(--rz-text-color) !default;
+$fieldset-toggle-color: var(--rz-text-color) !default;
+$fieldset-toggle-background-color: var(--rz-base-700) !default;
+
+// Slider
+$slider-border: var(--rz-border-normal) !default;
+$slider-range-background-color: var(--rz-primary-lighter) !default;
+$slider-range-border: var(--rz-border-primary-lighter) !default;
+$slider-handle-background-color: var(--rz-base-800) !default;
+$slider-handle-width: 1.25rem !default;
+$slider-handle-height: 1.25rem !default;
+$slider-handle-border: 0.25rem solid var(--rz-primary);
+$slider-handle-border-radius: calc(4 * var(--rz-border-radius)) !default;
+$slider-handle-hover-background-color: var(--rz-primary) !default;
+$slider-handle-hover-shadow: none !default;
+$slider-disabled-range-background-color: var(--rz-base-600) !default;
+$slider-disabled-range-border: var(--rz-border-base-600) !default;
+$slider-disabled-handle-background-color: var(--rz-base-800) !default;
+$slider-disabled-handle-border: 0.25rem solid var(--rz-base-600);
+$slider-border-radius: calc(2 * var(--rz-border-radius)) !default;
+
+// Checkbox
+$checkbox-border-radius: var(--rz-border-radius);
+$checkbox-border-width: 1px !default;
+$checkbox-checked-background-color: var(--rz-base-background-color) !default;
+$checkbox-checked-hover-background-color: var(--rz-base-background-color) !default;
+$checkbox-checked-color: var(--rz-primary-light) !default;
+$checkbox-checked-shadow: none !default;
+$checkbox-checked-border: var(--rz-input-border) !default;
+$checkbox-checked-hover-border: var(--rz-input-hover-border) !default;
+$checkbox-icon-width: 1rem !default;
+$checkbox-icon-font-size: 1rem !default;
+$checkbox-checked-icon-background-color: var(--rz-base-background-color) !default;
+$checkbox-checked-icon-border-radius: calc(var(--rz-border-radius) / 2) !default;
+
+.rz-checkbox-list-vertical,
+.rz-checkbox-list-horizontal {
+
+  &.rz-state-disabled > div > .rz-chkbox-label {
+    opacity: 0.5;
+  }
+
+  &:not(.rz-state-disabled) > div > .rz-chkbox-label:hover {
+    color: var(--rz-primary-light);
+    cursor: pointer;
+  }
+}
+
+// Radio Button
+$radio-active-background-color: var(--rz-base-background-color) !default;
+$radio-active-shadow: none !default;
+$radio-checked-background-color: var(--rz-base-background-color) !default;
+$radio-checked-hover-background-color: var(--rz-base-background-color) !default;
+$radio-checked-hover-shadow: none !default;
+$radio-checked-color: var(--rz-text-contrast-color) !default;
+$radio-circle-background-color: var(--rz-primary-light) !default;
+$radio-circle-shadow: none !default;
+$radio-circle-hover-background-color: var(--rz-primary) !default;
+$radio-icon-width: 0.625rem !default;
+$radio-icon-height: $radio-icon-width !default;
+$radio-checked-border: var(--rz-input-border) !default;
+
+.rz-radio-button-list-vertical,
+.rz-radio-button-list-horizontal {
+
+  &.rz-state-disabled > div > .rz-radiobutton-label {
+    opacity: 0.5;
+  }
+
+  &:not(.rz-state-disabled) > div > .rz-radiobutton-label:hover {
+    color: var(--rz-primary-light);
+    cursor: pointer;
+  }
+}
+
+// DropDown
+$dropdown-item-hover-background-color: var(--rz-primary-lighter) !default;
+$dropdown-item-selected-background-color: var(--rz-primary-lighter) !default;
+$dropdown-item-selected-shadow: none !default;
+$dropdown-item-hover-color: var(--rz-on-primary-lighter) !default;
+$dropdown-item-selected-color: var(--rz-on-primary-lighter) !default;
+$dropdown-item-selected-hover-background-color: var(--rz-primary-lighter) !default;
+$dropdown-item-selected-hover-color: var(--rz-on-primary-lighter) !default;
+$dropdown-item-transition: var(--rz-transition-all) !default;
+$dropdown-filter-border: var(--rz-border-base-700) !default;
+
+// ColorPicker
+$colorpicker-panel-shadow: $rz-shadow-3 !default;
+$colorpicker-value-border-radius: 1rem !default;
+$colorpicker-item-border-radius: 1rem !default;
+$colorpicker-item-shadow: $rz-shadow-inset-level-1 !default;
+$colorpicker-handle-shadow: $rz-shadow-inset-level-1, $rz-shadow-1, 0 0 0 1px rgba(0,0,0,.08);
+$colorpicker-input-labels-color: var(--rz-text-tertiary-color) !default;
+
+// ListBox
+$listbox-filter-border: var(--rz-border-base-700) !default;
+
+// Rating
+$rating-color: var(--rz-text-tertiary-color) !default;
+$rating-disabled-opacity: 0.5 !default;
+
+// Upload
+$upload-button-bar-background-color: var(--rz-base-700) !default;
+$upload-choose-background-color: var(--rz-base) !default;
+$upload-choose-color: var(--rz-on-base) !default;
+$upload-choose-hover-background-color: var(--rz-base-700) !default;
+$upload-choose-hover-color: var(--rz-text-color) !default;
+$upload-choose-active-background-color: var(--rz-base-900) !default;
+$upload-choose-active-color: var(--rz-text-color) !default;
+$upload-cancel-background-color: var(--rz-base-600) !default;
+
+// Dialog
+$dialog-title-background-color: var(--rz-base-background-color) !default;
+$dialog-title-padding-block: 1.25rem 0.5rem !default;
+$dialog-title-padding-inline: 1.25rem !default;
+$dialog-title-font-size: 1.5rem !default;
+$dialog-title-line-height: 1.25em !default;
+$dialog-close-vertical-align: top !default;
+$dialog-mask-background-color: var(--rz-base-600) !default;
+$dialog-border-radius: calc(2 * var(--rz-border-radius)) !default;
+
+// Scrollbar
+$scrollbar-color: rgba($rz-base-500, 0.5) !default;
+
+// Login
+$login-register-background-color: var(--rz-base-900) !default;
+
+// Editor
+$editor-toolbar-background-color: var(--rz-base-700) !default;
+$editor-button-background-color: var(--rz-base-700) !default;
+$editor-button-selected-background-color: var(--rz-primary) !default;
+$editor-button-selected-color: var(--rz-on-primary) !default;
+$editor-separator-background-color: var(--rz-base-600) !default;
+
+// Splitter
+$splitter-bar-color: var(--rz-text-secondary-color) !default;
+$splitter-bar-color-active: var(--rz-on-primary) !default;
+$splitter-bar-background-color: var(--rz-base-700) !default;
+$splitter-bar-background-color-active: var(--rz-primary) !default;
+
+// Tooltip
+$tooltip-background-color: var(--rz-black) !default;
+$tooltip-color: var(--rz-white) !default;
+$tooltip-shadow: $rz-shadow-4 !default;
+
+// Gauge
+$gauge-pointer-color: var(--rz-primary) !default;
+$gauge-arc-value-color: var(--rz-primary) !default;
+
+// FormField
+$form-field-filled-background-color: var(--rz-base-700) !default;
+$form-field-filled-hover-background-color: var(--rz-base-600) !default;
+$form-field-label-focus-color: var(--rz-primary-light) !default;
+$form-field-hover-shadow: var(--rz-input-hover-shadow) !default;
+$form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
+
+// Chart
+$chart-axis-color: var(--rz-base-600) !default ;
+$chart-axis-label-color: var(--rz-text-secondary-color) !default;
+
+//TimeLine
+$rz-timeline-line-color: var(--rz-base-600) !default;
+
+// Layout
+$layout-background-color: transparent !default;
+
+@import 'fonts';
+@import 'components';
+
+// Body
+$rz-body-background: no-repeat 180% 0 / 60% fixed url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwNCIgaGVpZ2h0PSIxNDU4IiB2aWV3Qm94PSIwIDAgMTIwNCAxNDU4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8ZyBvcGFjaXR5PSIwLjUiIGZpbHRlcj0idXJsKCNmaWx0ZXIwX2ZfNDkzXzEwMTM0KSI+CjxjaXJjbGUgY3g9IjcyMi4xMjgiIGN5PSI4MzkuMDIiIHI9IjQ4MS40MTkiIGZpbGw9InVybCgjcGFpbnQwX3JhZGlhbF80OTNfMTAxMzQpIi8+CjwvZz4KPGcgb3BhY2l0eT0iMC41IiBmaWx0ZXI9InVybCgjZmlsdGVyMV9mXzQ5M18xMDEzNCkiPgo8Y2lyY2xlIGN4PSI0NzAuMzMzIiBjeT0iNTcwLjMzMyIgcj0iNDcwLjMzMyIgZmlsbD0idXJsKCNwYWludDFfcmFkaWFsXzQ5M18xMDEzNCkiLz4KPC9nPgo8ZyBvcGFjaXR5PSIwLjUiIGZpbHRlcj0idXJsKCNmaWx0ZXIyX2ZfNDkzXzEwMTM0KSI+CjxjaXJjbGUgY3g9IjY5MS41MTEiIGN5PSI1MjIuMjk3IiByPSIzMzEuNTAzIiBmaWxsPSJ1cmwoI3BhaW50Ml9yYWRpYWxfNDkzXzEwMTM0KSIvPgo8L2c+CjxnIG9wYWNpdHk9IjAuNSIgZmlsdGVyPSJ1cmwoI2ZpbHRlcjNfZl80OTNfMTAxMzQpIj4KPGNpcmNsZSBjeD0iNjA4LjI0NCIgY3k9IjEwNzkuOTciIHI9IjMzMS41MDMiIHRyYW5zZm9ybT0icm90YXRlKC04MS4yMjQ0IDYwOC4yNDQgMTA3OS45NykiIGZpbGw9InVybCgjcGFpbnQzX3JhZGlhbF80OTNfMTAxMzQpIi8+CjwvZz4KPGRlZnM+CjxmaWx0ZXIgaWQ9ImZpbHRlcjBfZl80OTNfMTAxMzQiIHg9IjE0MC43MDkiIHk9IjI1Ny42MDEiIHdpZHRoPSIxMTYyLjg0IiBoZWlnaHQ9IjExNjIuODQiIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0ic2hhcGUiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNTAiIHJlc3VsdD0iZWZmZWN0MV9mb3JlZ3JvdW5kQmx1cl80OTNfMTAxMzQiLz4KPC9maWx0ZXI+CjxmaWx0ZXIgaWQ9ImZpbHRlcjFfZl80OTNfMTAxMzQiIHg9Ii0xMDAiIHk9IjAiIHdpZHRoPSIxMTQwLjY3IiBoZWlnaHQ9IjExNDAuNjciIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0ic2hhcGUiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNTAiIHJlc3VsdD0iZWZmZWN0MV9mb3JlZ3JvdW5kQmx1cl80OTNfMTAxMzQiLz4KPC9maWx0ZXI+CjxmaWx0ZXIgaWQ9ImZpbHRlcjJfZl80OTNfMTAxMzQiIHg9IjI2MC4wMDgiIHk9IjkwLjc5MzkiIHdpZHRoPSI4NjMuMDA2IiBoZWlnaHQ9Ijg2My4wMDYiIGZpbHRlclVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgY29sb3ItaW50ZXJwb2xhdGlvbi1maWx0ZXJzPSJzUkdCIj4KPGZlRmxvb2QgZmxvb2Qtb3BhY2l0eT0iMCIgcmVzdWx0PSJCYWNrZ3JvdW5kSW1hZ2VGaXgiLz4KPGZlQmxlbmQgbW9kZT0ibm9ybWFsIiBpbj0iU291cmNlR3JhcGhpYyIgaW4yPSJCYWNrZ3JvdW5kSW1hZ2VGaXgiIHJlc3VsdD0ic2hhcGUiLz4KPGZlR2F1c3NpYW5CbHVyIHN0ZERldmlhdGlvbj0iNTAiIHJlc3VsdD0iZWZmZWN0MV9mb3JlZ3JvdW5kQmx1cl80OTNfMTAxMzQiLz4KPC9maWx0ZXI+CjxmaWx0ZXIgaWQ9ImZpbHRlcjNfZl80OTNfMTAxMzQiIHg9IjE3Ni42OTQiIHk9IjY0OC40MjMiIHdpZHRoPSI4NjMuMSIgaGVpZ2h0PSI4NjMuMSIgZmlsdGVyVW5pdHM9InVzZXJTcGFjZU9uVXNlIiBjb2xvci1pbnRlcnBvbGF0aW9uLWZpbHRlcnM9InNSR0IiPgo8ZmVGbG9vZCBmbG9vZC1vcGFjaXR5PSIwIiByZXN1bHQ9IkJhY2tncm91bmRJbWFnZUZpeCIvPgo8ZmVCbGVuZCBtb2RlPSJub3JtYWwiIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9IkJhY2tncm91bmRJbWFnZUZpeCIgcmVzdWx0PSJzaGFwZSIvPgo8ZmVHYXVzc2lhbkJsdXIgc3RkRGV2aWF0aW9uPSI1MCIgcmVzdWx0PSJlZmZlY3QxX2ZvcmVncm91bmRCbHVyXzQ5M18xMDEzNCIvPgo8L2ZpbHRlcj4KPHJhZGlhbEdyYWRpZW50IGlkPSJwYWludDBfcmFkaWFsXzQ5M18xMDEzNCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSg3MjIuMTI4IDgzOS4wMikgcm90YXRlKDkwKSBzY2FsZSg0ODEuNDE5KSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRjFBNkMiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkYxQTZDIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPHJhZGlhbEdyYWRpZW50IGlkPSJwYWludDFfcmFkaWFsXzQ5M18xMDEzNCIgY3g9IjAiIGN5PSIwIiByPSIxIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSg0NzAuMzMzIDU3MC4zMzMpIHJvdGF0ZSg5MCkgc2NhbGUoNDcwLjMzMykiPgo8c3RvcCBzdG9wLWNvbG9yPSIjM0FBQ0ZGIi8+CjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzNBOTVGRiIgc3RvcC1vcGFjaXR5PSIwIi8+CjwvcmFkaWFsR3JhZGllbnQ+CjxyYWRpYWxHcmFkaWVudCBpZD0icGFpbnQyX3JhZGlhbF80OTNfMTAxMzQiIGN4PSIwIiBjeT0iMCIgcj0iMSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGdyYWRpZW50VHJhbnNmb3JtPSJ0cmFuc2xhdGUoNjkxLjUxMSA1MjIuMjk3KSByb3RhdGUoOTApIHNjYWxlKDMzMS41MDMpIj4KPHN0b3Agc3RvcC1jb2xvcj0iIzQ4M0FGRiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiM0ODNBRkYiIHN0b3Atb3BhY2l0eT0iMCIvPgo8L3JhZGlhbEdyYWRpZW50Pgo8cmFkaWFsR3JhZGllbnQgaWQ9InBhaW50M19yYWRpYWxfNDkzXzEwMTM0IiBjeD0iMCIgY3k9IjAiIHI9IjEiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIiBncmFkaWVudFRyYW5zZm9ybT0idHJhbnNsYXRlKDYwOC4yNDQgMTA3OS45Nykgcm90YXRlKDkwKSBzY2FsZSgzMzEuNTAzKSI+CjxzdG9wIHN0b3AtY29sb3I9IiNGRkM4M0EiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkZDODNBIiBzdG9wLW9wYWNpdHk9IjAiLz4KPC9yYWRpYWxHcmFkaWVudD4KPC9kZWZzPgo8L3N2Zz4K") !default;
+
+body {
+  background: $rz-base-900 $rz-body-background;
+}

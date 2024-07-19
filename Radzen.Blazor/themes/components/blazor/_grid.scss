@@ -1,5 +1,4 @@
 $grid-data-border-shadow: none !default;
-
 $grid-cell-border: var(--rz-border-normal) !default;
 $grid-right-cell-border: $grid-cell-border !default;
 $grid-bottom-cell-border: $grid-cell-border !default;
@@ -11,16 +10,12 @@ $grid-cell-focus-background-color: var(--rz-secondary-lighter) !default;
 $grid-cell-focus-color: var(--rz-on-secondary-lighter) !default;
 $grid-cell-focus-outline: var(--rz-outline-focus) !default;
 $grid-cell-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
-
 $grid-hover-background-color: var(--rz-secondary-lighter) !default;
 $grid-hover-color: var(--rz-on-secondary-lighter) !default;
-
 $grid-focus-outline: var(--rz-outline-focus) !default;
 $grid-focus-outline-offset: var(--rz-outline-offset) !default;
-
 $grid-selected-background-color: var(--rz-secondary-dark) !default;
 $grid-selected-color: var(--rz-on-secondary-dark) !default;
-
 $grid-toolbar-background-color: var(--rz-base-background-color) !default;
 $grid-header-cell-border: $grid-cell-border !default;
 $grid-header-cell-border-bottom: none !default;
@@ -31,14 +26,11 @@ $grid-header-font-weight: 600 !default;
 $grid-header-text-transform: uppercase !default;
 $grid-header-color: var(--rz-text-color) !default;
 $grid-header-cell-padding: 0.625rem 0 !default;
-$grid-header-title-padding: 0 0 0 0.5rem !default;
+$grid-header-title-padding-inline: 0.5rem 0 !default;
 $grid-header-sorted-background-color: var(--rz-base-300) !default;
-
 $grid-header-padding: 1rem !default;
-
 $grid-foot-cell-color: $grid-cell-color !default;
 $grid-foot-background-color: $grid-header-background-color !default;
-
 $grid-filter-background-color: var(--rz-base-100) !default;
 $grid-filter-padding: 0.5rem !default;
 $grid-filter-margin: 0 !default;
@@ -46,192 +38,61 @@ $grid-filter-border: $grid-cell-border !default;
 $grid-filter-font-size: var(--rz-body-font-size) !default;
 $grid-filter-icon-width: var(--rz-icon-size) !default;
 $grid-filter-icon-height: $grid-filter-icon-width !default;
-$grid-filter-icon-margin: 0 0.25rem 0 0 !default;
+$grid-filter-icon-margin-inline: 0 0.25rem !default;
 $grid-filter-icon-font-size: var(--rz-icon-size) !default;
 $grid-filter-color: var(--rz-text-disabled-color) !default;
 $grid-filter-focus-color: var(--rz-secondary) !default;
 $grid-filter-gap: 1rem !default;
-$grid-filter-buttons-padding: 1rem !default;
-$grid-filter-buttons-border: var(--rz-border-normal) !default;
-$grid-filter-buttons-background-color: var(--rz-base-200) !default;
-
-$grid-clear-filter-button-background-color: var(--rz-secondary) !default;
-$grid-clear-filter-button-color: var(--rz-on-secondary) !default;
-$grid-clear-filter-button-shadow: inherit !default;
+$grid-filter-buttons-padding: 0 1rem 1rem !default;
+$grid-filter-buttons-border: none !default;
+$grid-filter-buttons-background-color: var(--rz-base-100) !default;
+$grid-filter-button-padding-inline: 1rem !default;
+$grid-clear-filter-button-background-color: var(--rz-base) !default;
+$grid-clear-filter-button-color: var(--rz-on-base) !default;
+$grid-clear-filter-button-shadow: none !default;
 $grid-apply-filter-button-background-color: var(--rz-primary) !default;
 $grid-apply-filter-button-color: var(--rz-on-primary) !default;
-$grid-apply-filter-button-shadow: inherit !default;
-
-$grid-header-filter-icon-margin: 0 0.5rem 0 auto !default;
+$grid-apply-filter-button-shadow: none !default;
+$grid-header-filter-icon-margin-inline: auto 0.5rem !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-color) !default;
 $grid-header-filter-icon-active-color: var(--rz-primary) !default;
 $grid-header-filter-icon-font-size: 1rem !default;
-
 $grid-border: var(--rz-border-normal) !default;
 $grid-border-radius: 0 !default;
-
 $grid-sort-icon-width: 1rem !default;
 $grid-sort-icon-height: $grid-sort-icon-width !default;
 $grid-sort-icon-color: var(--rz-text-disabled-color) !default;
-
 $grid-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.01) !default;
 $grid-background-color: var(--rz-base-background-color) !default;
-
 $grid-stripe-background-color: var(--rz-base-100) !default;
 $grid-stripe-odd-background-color: $grid-background-color !default;
-
 $grid-column-resizer-width: 0.5rem !default;
 $grid-column-resizer-helper-width: 0.25rem !default;
 $grid-column-resizer-helper-background-color: var(--rz-secondary) !default;
-
 $grid-column-icon-width: 2rem !default;
 $grid-column-icon-padding: 0 !default;
-
 $grid-detail-template-border: none !default;
 $grid-detail-template-border-radius: 0 !default;
 $grid-detail-template-padding: 0 !default;
 $grid-detail-template-background-color: var(--rz-base-background-color) !default;
-
 $grid-loading-indicator-color: currentColor !default;
 $grid-loading-indicator-background-color: rgba(var(--rz-base-600), 0.5) !default;
-
 $grid-frozen-cell-border: $grid-cell-border !default;
 $grid-frozen-cell-background-color: $grid-header-background-color !default;
-
 $grid-state-transition: var(--rz-transition-all) !default;
-
 $grid-group-header-padding: 0.5rem !default;
+$grid-group-header-gap: 0.5rem !default;
+$grid-group-header-item-color: var(--rz-text-color) !default;
 $grid-group-header-item-background-color: var(--rz-base-background-color) !default;
-$grid-group-header-item-padding: 0.5rem !default;
-$grid-group-header-item-margin: 0 0.5rem 0.5rem 0 !default;
+$grid-group-header-item-padding-block: 0.5rem !default;
+$grid-group-header-item-padding-inline: 0.5rem !default;
 $grid-group-header-item-border: $grid-cell-border !default;
 $grid-group-header-item-border-radius: var(--rz-border-radius) !default;
-$grid-group-header-items-margin: 0 0 -0.5rem 0 !default;
-
+$grid-group-header-item-title-margin-inline: 0 0.5rem !default;
 $column-drag-handle-color: $grid-header-color !default;
 $column-drag-handle-hover-color: $column-drag-handle-color !default;
-$column-drag-handle-margin: 0 auto 0 0 !default;
+$column-drag-handle-margin-inline: 0 auto !default;
 $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
-
-// Grid CSS variables
-
-:root {
-  --rz-grid-data-border-shadow: #{$grid-data-border-shadow};
-
-  --rz-grid-cell-border: #{$grid-cell-border};
-  --rz-grid-right-cell-border: #{$grid-right-cell-border};
-  --rz-grid-bottom-cell-border: #{$grid-bottom-cell-border};
-  --rz-grid-cell-padding: #{$grid-cell-padding};
-  --rz-grid-cell-color: #{$grid-cell-color};
-  --rz-grid-cell-font-size: #{$grid-cell-font-size};
-  --rz-grid-cell-line-height: #{$grid-cell-line-height};
-  --rz-grid-cell-focus-background-color: #{$grid-cell-focus-background-color};
-  --rz-grid-cell-focus-color: #{$grid-cell-focus-color};
-  --rz-grid-cell-focus-outline: #{$grid-cell-focus-outline};
-  --rz-grid-cell-focus-outline-offset: #{$grid-cell-focus-outline-offset};
- 
-  --rz-grid-hover-background-color: #{$grid-hover-background-color};
-  --rz-grid-hover-color: #{$grid-hover-color};
-
-  --rz-grid-focus-outline: #{$grid-focus-outline};
-  --rz-grid-focus-outline-offset: #{$grid-focus-outline-offset};
-
-  --rz-grid-selected-background-color: #{$grid-selected-background-color};
-  --rz-grid-selected-color: #{$grid-selected-color};
-
-  --rz-grid-toolbar-background-color: #{$grid-toolbar-background-color};
-  --rz-grid-header-cell-border: #{$grid-header-cell-border};
-  --rz-grid-header-cell-border-bottom: #{$grid-header-cell-border-bottom};
-  --rz-grid-header-background-color: #{$grid-header-background-color};
-  --rz-grid-header-font-size: #{$grid-header-font-size};
-  --rz-grid-header-line-height: #{$grid-header-line-height};
-  --rz-grid-header-font-weight: #{$grid-header-font-weight};
-  --rz-grid-header-text-transform: #{$grid-header-text-transform};
-  --rz-grid-header-color: #{$grid-header-color};
-  --rz-grid-header-cell-padding: #{$grid-header-cell-padding};
-  --rz-grid-header-title-padding: #{$grid-header-title-padding};
-  --rz-grid-header-sorted-background-color: #{$grid-header-sorted-background-color};
-  --rz-grid-header-padding: #{$grid-header-padding};
-  
-  --rz-grid-foot-cell-color: #{$grid-foot-cell-color};
-  --rz-grid-foot-background-color: #{$grid-foot-background-color};
-  
-  --rz-grid-filter-background-color: #{$grid-filter-background-color};
-  --rz-grid-filter-padding: #{$grid-filter-padding};
-  --rz-grid-filter-margin: #{$grid-filter-margin};
-  --rz-grid-filter-border: #{$grid-filter-border};
-  --rz-grid-filter-font-size: #{$grid-filter-font-size};
-  --rz-grid-filter-icon-width: #{$grid-filter-icon-width};
-  --rz-grid-filter-icon-height: #{$grid-filter-icon-height};
-  --rz-grid-filter-icon-margin: #{$grid-filter-icon-margin};
-  --rz-grid-filter-icon-font-size: #{$grid-filter-icon-font-size};
-  
-  --rz-grid-filter-color: #{$grid-filter-color};
-  --rz-grid-filter-focus-color: #{$grid-filter-focus-color};
-  --rz-grid-filter-gap: #{$grid-filter-gap};
-  --rz-grid-filter-buttons-padding: #{$grid-filter-buttons-padding};
-  --rz-grid-filter-buttons-border: #{$grid-filter-buttons-border};
-  --rz-grid-filter-buttons-background-color: #{$grid-filter-buttons-background-color};
-  
-  --rz-grid-clear-filter-button-background-color: #{$grid-clear-filter-button-background-color};
-  --rz-grid-clear-filter-button-color: #{$grid-clear-filter-button-color};
-  --rz-grid-clear-filter-button-shadow: #{$grid-clear-filter-button-shadow};
-  --rz-grid-apply-filter-button-background-color: #{$grid-apply-filter-button-background-color};
-  --rz-grid-apply-filter-button-color: #{$grid-apply-filter-button-color};
-  --rz-grid-apply-filter-button-shadow: #{$grid-apply-filter-button-shadow};
- 
-  
-  --rz-grid-header-filter-icon-margin: #{$grid-header-filter-icon-margin};
-  --rz-grid-header-filter-icon-hover-color: #{$grid-header-filter-icon-hover-color};
-  --rz-grid-header-filter-icon-active-color: #{$grid-header-filter-icon-active-color};
-  --rz-grid-header-filter-icon-font-size: #{$grid-header-filter-icon-font-size};
-  
-  --rz-grid-border: #{$grid-border};
-  --rz-grid-border-radius: #{$grid-border-radius};
-  
-  --rz-grid-sort-icon-width: #{$grid-sort-icon-width};
-  --rz-grid-sort-icon-height: #{$grid-sort-icon-height};
-  --rz-grid-sort-icon-color: #{$grid-sort-icon-color};
-  
-  --rz-grid-shadow: #{$grid-shadow};
-  --rz-grid-background-color: #{$grid-background-color};
-
-  --rz-grid-stripe-background-color: #{$grid-stripe-background-color};
-  --rz-grid-stripe-odd-background-color: #{$grid-stripe-odd-background-color};
-  
-  --rz-grid-column-resizer-width: #{$grid-column-resizer-width};
-  --rz-grid-column-resizer-helper-width: #{$grid-column-resizer-helper-width};
-  --rz-grid-column-resizer-helper-background-color: #{$grid-column-resizer-helper-background-color};
-  
-  --rz-grid-column-icon-width: #{$grid-column-icon-width};
-  --rz-grid-column-icon-padding: #{$grid-column-icon-padding};
-  
-  --rz-grid-detail-template-border: #{$grid-detail-template-border};
-  --rz-grid-detail-template-border-radius: #{$grid-detail-template-border-radius};
-  --rz-grid-detail-template-padding: #{$grid-detail-template-padding};
-  --rz-grid-detail-template-background-color: #{$grid-detail-template-background-color};
-  
-  --rz-grid-loading-indicator-color: #{$grid-loading-indicator-color};
-  --rz-grid-loading-indicator-background-color: #{$grid-loading-indicator-background-color};
-  
-  --rz-grid-frozen-cell-border: #{$grid-frozen-cell-border};
-  --rz-grid-frozen-cell-background-color: #{$grid-frozen-cell-background-color};
-  
-  --rz-grid-state-transition: #{$grid-state-transition};
-  
-  --rz-grid-group-header-padding: #{$grid-group-header-padding};
-  --rz-grid-group-header-item-background-color: #{$grid-group-header-item-background-color};
-  --rz-grid-group-header-item-padding: #{$grid-group-header-item-padding};
-  --rz-grid-group-header-item-margin: #{$grid-group-header-item-margin};
-  --rz-grid-group-header-item-border: #{$grid-group-header-item-border};
-  --rz-grid-group-header-item-border-radius: #{$grid-group-header-item-border-radius};
-  --rz-grid-group-header-items-margin: #{$grid-group-header-items-margin};
-  
-  --rz-column-drag-handle-color: #{$column-drag-handle-color};
-  --rz-column-drag-handle-hover-color: #{$column-drag-handle-hover-color};
-  --rz-column-drag-handle-margin: #{$column-drag-handle-margin};
-  --rz-column-draggable-shadow: #{$column-draggable-shadow};
-}
 
 .rz-datatable {
   position: relative;
@@ -262,6 +123,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     vertical-align: top;
     &:before {
       content: 'arrow_right';
+    }
+
+    /* Right-to-left arrow icons */
+    *[dir="rtl"] & {
+      transform: rotate(180deg);
     }
   }
 
@@ -328,8 +194,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
 .rz-column-resizer {
   position: absolute;
-  top: 0;
-  right: 0;
+  inset-block-start: 0;
+  inset-inline-end: 0;
   height: 100%;
   cursor: col-resize;
   width: var(--rz-grid-column-resizer-width);
@@ -337,8 +203,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   &:after {
     content: "";
     position: absolute;
-    top: 0;
-    right: 0;
+    inset-block-start: 0;
+    inset-inline-end: 0;
     height: 100%;
     width: var(--rz-grid-column-resizer-helper-width);
     background-color: transparent;
@@ -371,10 +237,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: inherit;
     border-bottom: var(--rz-grid-header-cell-border-bottom);
 
     &:not(:last-child) {
-      border-right: var(--rz-grid-header-cell-border);
+      border-inline-end: var(--rz-grid-header-cell-border);
     }
 
     > div:not(.rz-cell-filter) {
@@ -394,13 +261,14 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     .rz-column-title {
       display: inline-flex;
       flex: auto;
-      width: 100%;
       align-items: center;
+      gap: 0.25rem;
+      width: 100%;
       font-size: var(--rz-grid-header-font-size);
       line-height: var(--rz-grid-header-line-height);
       text-transform: var(--rz-grid-header-text-transform);
       color: var(--rz-grid-header-color);
-      padding: var(--rz-grid-header-title-padding);
+      padding-inline: var(--rz-grid-header-title-padding-inline);
       font-weight: var(--rz-grid-header-font-weight);
       white-space: nowrap;
       overflow: hidden;
@@ -421,11 +289,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     &.rz-text-align-center {
       .rz-column-title {
         justify-content: center;
-        padding-left: 0;
+        padding-inline-start: 0;
       }
       &.rz-sortable-column {
         .rz-column-title {
-          padding-left: var(--rz-grid-sort-icon-width);
+          padding-inline-start: var(--rz-grid-sort-icon-width);
         }
       }
     }
@@ -436,14 +304,14 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       }
       &.rz-sortable-column {
         .rz-column-title {
-          padding-left: var(--rz-grid-sort-icon-width);
+          padding-inline-start: var(--rz-grid-sort-icon-width);
         }
       }
     }
 
     .rz-column-drag {
       + .rz-column-title {
-        padding-left: 0;
+        padding-inline-start: 0;
       }
     }
   }
@@ -461,11 +329,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     text-overflow: ellipsis;
 
     &:not(:last-child) {
-      border-right: var(--rz-grid-right-cell-border);
+      border-inline-end: var(--rz-grid-right-cell-border);
     }
 
     &.rz-composite-cell {
-      border-right: var(--rz-grid-right-cell-border);
+      border-inline-end: var(--rz-grid-right-cell-border);
     }
   }
 }
@@ -483,7 +351,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   border-bottom-left-radius: var(--rz-border-radius);
 }
 
-.rz-has-paginator {
+.rz-has-pager {
   .rz-datatable-scrollable-body {
     border-radius: 0;
   }
@@ -563,7 +431,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       border-bottom: var(--rz-grid-header-cell-border);
 
       &.rz-composite-cell {
-        border-right: var(--rz-grid-header-cell-border);
+        border-inline-end: var(--rz-grid-header-cell-border);
       }
     }
   }
@@ -576,11 +444,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     border-bottom: var(--rz-grid-bottom-cell-border);
 
     &:not(:last-child) {
-      border-right: var(--rz-grid-right-cell-border);
+      border-inline-end: var(--rz-grid-right-cell-border);
     }
 
     &.rz-composite-cell {
-      border-right: var(--rz-grid-right-cell-border);
+      border-inline-end: var(--rz-grid-right-cell-border);
     }
 
     .rz-cell-data {
@@ -603,15 +471,19 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       align-items: center;
       gap: 0.25rem;
     }
+
+    .rz-column-footer {
+      color: var(--rz-grid-foot-cell-color);
+    }
   }
 
   tr {
     td {
       &:first-child {
-        border-left: none;
+        border-inline-start: none;
       }
       &:last-child:not(.rz-composite-cell) {
-        border-right: none;
+        border-inline-end: none;
       }
     }
 
@@ -640,7 +512,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       border-bottom: var(--rz-grid-cell-border);
 
       &:not(:last-child) {
-        border-right: var(--rz-grid-cell-border);
+        border-inline-end: var(--rz-grid-cell-border);
       }
     }
   }
@@ -652,7 +524,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     > tbody > tr > td,
     > tfoot > tr > td {
       border-bottom: none;
-      border-right: none;
+      border-inline-end: none;
     }
   }
 
@@ -663,7 +535,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     > tbody > tr > td,
     > tfoot > tr > td {
       border-bottom: var(--rz-grid-cell-border);
-      border-right: none;
+      border-inline-end: none;
     }
   }
 
@@ -676,7 +548,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       border-bottom: none;
 
       &:not(:last-child) {
-        border-right: var(--rz-grid-cell-border);
+        border-inline-end: var(--rz-grid-cell-border);
       }
     }
   }
@@ -739,7 +611,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-cell-filter {
   padding: var(--rz-grid-filter-padding);
   margin: var(--rz-grid-filter-margin);
-  background-color: var(--rz-grid-filter-background-color);
   border-top: var(--rz-grid-filter-border);
   font-size: var(--rz-grid-filter-font-size);
   font-weight: normal;
@@ -753,16 +624,16 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       width: var(--rz-grid-filter-icon-width);
       height: var(--rz-grid-filter-icon-height);
       font-size: var(--rz-grid-filter-icon-font-size);
-      margin: var(--rz-grid-filter-icon-margin);
+      margin-inline: var(--rz-grid-filter-icon-margin-inline);
       color: var(--rz-grid-filter-color);
 
       &.rz-cell-filter-clear {
-        margin-left: auto;
+        margin-inline-start: auto;
       }
     }
 
     .rz-current-filter {
-      margin-left: 0.5rem;
+      margin-inline-start: 0.5rem;
     }
   }
 }
@@ -906,30 +777,54 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   display: flex;
   flex: auto;
   align-items: center;
-}
-
-.rz-cell-filter-content {
   color: var(--rz-grid-filter-color);
   min-height: 1.375rem;
+  container-type: inline-size;
+  container-name: rz-cell-filter-content;
 }
 
-.rz-date-filter {
-  display: flex;
-  align-items: stretch;
-  background-color: var(--rz-grid-filter-background-color);
-  gap: var(--rz-grid-filter-gap);
-  padding: var(--rz-grid-filter-gap);
-
-  .rz-listbox {
-    min-width: 10rem;
-
-    .rz-listbox-item {
-      font-size: 0.875rem;
+@container rz-cell-filter-content (max-width: 200px) {
+  .rz-cell-filter-content {
+    .rz-filter-button {
+      .rzi {
+        display: none;
+      }
     }
-  }
 
-  .rz-calendar-inline {
-    border-radius: var(--rz-border-radius);
+    .rz-cell-filter-label {
+      position: relative;
+      min-width: calc(2 * map-get($button-sizes, md, min-width));
+    }
+
+    .rz-filter-button {
+      position: absolute;
+      z-index: 1;
+      min-height: 0;
+
+      @if $material == true or $fluent == true {
+        inset-inline-start: calc(var(--rz-border-width) + 1px);
+        height: calc(var(--rz-input-height) - var(--rz-border-width) * 2 - 2px);
+        max-height: calc(var(--rz-input-height) - var(--rz-border-width) * 2 - 2px);
+        line-height: calc(map-get($button-sizes, md, line-height) - var(--rz-border-width) * 2 - 2px);
+        border-radius: calc(var(--rz-input-border-radius) - var(--rz-border-width) - 1px);
+      }
+
+      @else {
+        inset-inline-start: calc(var(--rz-border-width));
+        height: calc(var(--rz-input-height) - var(--rz-border-width) * 2);
+        max-height: calc(var(--rz-input-height) - var(--rz-border-width) * 2);
+        line-height: calc(map-get($button-sizes, md, line-height) - var(--rz-border-width) * 2);
+        border-start-start-radius: calc(var(--rz-input-border-radius) - var(--rz-border-width));
+        border-start-end-radius: 0;
+        border-end-start-radius: calc(var(--rz-input-border-radius) - var(--rz-border-width));
+        border-end-end-radius: 0;  
+      }
+    }
+
+    .rz-textbox,
+    .rz-inputtext {
+      text-indent: map-get($button-sizes, md, min-width);
+    }
   }
 }
 
@@ -972,36 +867,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 }
 
-.rz-date-filter-buttons {
-  display: flex;
-  justify-content: space-between;
-  padding: var(--rz-grid-filter-buttons-padding);
-  background-color: var(--rz-grid-filter-buttons-background-color);
-  border-top: var(--rz-grid-filter-buttons-border);
-
-  .rz-button {
-    @extend %button-md;
-  }
-}
-
-.rz-clear-filter {
-  background-color: var(--rz-grid-clear-filter-button-background-color);
-  color: var(--rz-grid-clear-filter-button-color);
-  box-shadow: var(--rz-grid-clear-filter-button-shadow);
-}
-
-.rz-apply-filter {
-  background-color: var(--rz-grid-apply-filter-button-background-color);
-  color: var(--rz-grid-apply-filter-button-color);
-  box-shadow: var(--rz-grid-apply-filter-button-shadow);
-}
-
 .rz-datatable-loading {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background-color: var(--rz-grid-loading-indicator-background-color);
   z-index: 2;
 }
@@ -1081,7 +949,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   padding: 1rem;
 
   .rz-dropdown,
-  .rz-spinner,
+  .rz-numeric,
   .rz-textbox,
   .rz-grid-filter-label {
     display: block;
@@ -1093,18 +961,65 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 }
 
+.rz-grid-date-filter {
+  width: 576px;
+}
+
+.rz-date-filter {
+  display: flex;
+  align-items: stretch;
+  background-color: var(--rz-grid-filter-background-color);
+  gap: var(--rz-grid-filter-gap);
+  padding: var(--rz-grid-filter-gap);
+
+  .rz-listbox {
+    min-width: 11em;
+
+    .rz-listbox-item {
+      font-size: 0.875rem;
+    }
+  }
+
+  .rz-datepicker-inline {
+    border-radius: var(--rz-border-radius);
+
+    table {
+      width: 100%;
+    }
+  }
+}
+
 .rz-grid-filter-buttons {
   display: flex;
   justify-content: space-between;
   padding: var(--rz-grid-filter-buttons-padding);
+  background-color: var(--rz-grid-filter-buttons-background-color);
+  border-top: var(--rz-grid-filter-buttons-border);
+
+  .rz-button.rz-shade-default{
+    &.rz-clear-filter {
+      background-color: var(--rz-grid-clear-filter-button-background-color);
+      color: var(--rz-grid-clear-filter-button-color);
+      box-shadow: var(--rz-grid-clear-filter-button-shadow);
+      padding-inline: var(--rz-grid-filter-button-padding-inline);
+    }
+  
+    &.rz-apply-filter {
+      background-color: var(--rz-grid-apply-filter-button-background-color);
+      color: var(--rz-grid-apply-filter-button-color);
+      box-shadow: var(--rz-grid-apply-filter-button-shadow);
+      padding-inline: var(--rz-grid-filter-button-padding-inline);
+    }
+  }
 }
 
 .rz-grid-filter-icon {
   justify-self: flex-end;
   color: var(--rz-grid-filter-color);
-  margin: var(--rz-grid-header-filter-icon-margin);
+  margin-inline: var(--rz-grid-header-filter-icon-margin-inline);
   font-size: var(--rz-grid-header-filter-icon-font-size);
   transition: var(--rz-grid-state-transition);
+  font-weight: 400;
   &:hover {
     cursor: pointer;
     color: var(--rz-grid-header-filter-icon-hover-color);
@@ -1113,9 +1028,11 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
 .rz-grid-filter-active {
   color: var(--rz-grid-header-filter-icon-active-color) !important;
+  --rz-icon-fill: 1;
 }
 
 .rz-data-grid {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
@@ -1160,18 +1077,26 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
   .rz-frozen-cell-left.rz-frozen-cell-left-end {
     box-shadow: 5px 0 5px -5px rgba(0,0,0,0.12);
-    border-right: var(--rz-grid-frozen-cell-border) !important;
+    border-inline-end: var(--rz-grid-frozen-cell-border) !important;
+
+    *[dir="rtl"] & {
+      box-shadow: -5px 0 5px -5px rgba(0,0,0,0.12);
+    }
   }
 
   .rz-frozen-cell-right.rz-frozen-cell-right-end {
     box-shadow: -5px 0 5px -5px rgba(0,0,0,0.12);
-    border-left: var(--rz-grid-frozen-cell-border) !important;
+    border-inline-start: var(--rz-grid-frozen-cell-border) !important;
+
+    *[dir="rtl"] & {
+      box-shadow: 5px 0 5px -5px rgba(0,0,0,0.12);
+    }
   }
 
   .rz-frozen-cell-left-inner,
   .rz-frozen-cell-right-inner {
-    border-right: var(--rz-grid-frozen-cell-border) !important;
-    border-left: var(--rz-grid-frozen-cell-border) !important;
+    border-inline-end: var(--rz-grid-frozen-cell-border) !important;
+    border-inline-start: var(--rz-grid-frozen-cell-border) !important;
   }
 }
 
@@ -1209,7 +1134,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   font-size: inherit;
   color: var(--rz-column-drag-handle-color);
   transition: var(--rz-grid-state-transition);
-  margin: var(--rz-column-drag-handle-margin);
+  margin-inline: var(--rz-column-drag-handle-margin-inline);
 
   &:after {
     content: 'more_vert';
@@ -1267,26 +1192,30 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-group-header {
-  background-color: var(--rz-grid-header-background-color);
-  padding: var(--rz-grid-group-header-padding);
-  border-bottom: var(--rz-grid-bottom-cell-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--rz-grid-group-header-gap);
+  padding: var(--rz-grid-group-header-padding);
+  background-color: var(--rz-grid-header-background-color);
+  border-bottom: var(--rz-grid-bottom-cell-border);
 }
 
 .rz-group-header-items {
-  margin: var(--rz-grid-group-header-items-margin);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--rz-grid-group-header-gap);
 }
 
 .rz-group-header-item {
   display: flex;
   align-items: center;
+  color: var(--rz-grid-group-header-item-color);
   background-color: var(--rz-grid-group-header-item-background-color);
   border: var(--rz-grid-group-header-item-border);
   border-radius: var(--rz-grid-group-header-item-border-radius);
-  padding: var(--rz-grid-group-header-item-padding);
-  margin: var(--rz-grid-group-header-item-margin);
+  padding-block: var(--rz-grid-group-header-item-padding-block);
+  padding-inline: var(--rz-grid-group-header-item-padding-inline);
   width: fit-content;
   float: left;
 
@@ -1300,7 +1229,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-group-header-item-title {
   font-size: var(--rz-grid-header-font-size);
   font-weight: var(--rz-grid-header-font-weight);
-  margin-right: 0.5rem;
+  margin-inline: var(--rz-grid-group-header-item-title-margin-inline);
 }
 
 .rz-group-header-drop {
@@ -1320,7 +1249,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
 .rz-filter-button {
   flex: none;
-  margin-right: 0.5rem;
+  margin-inline-end: 0.5rem;
 }
 
 // Density
@@ -1330,16 +1259,13 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     --rz-grid-cell-padding: 0.25rem 0.5rem;
     --rz-grid-header-cell-padding: 0.25rem 0;
     --rz-grid-header-padding: 0.25rem 1rem;
-    --rz-grid-header-title-padding: 0 0 0 0.5rem;
+    --rz-grid-header-title-padding-inline: 0.5rem 0;
     --rz-grid-filter-padding: 0.25rem 0.5rem;
     --rz-grid-group-header-padding: 0.25rem;
-    --rz-grid-group-header-items-margin: 0 0 -0.25rem 0;
-    --rz-grid-group-header-item-padding: 0.125rem 0.25rem 0.125rem 0.5rem;
-    --rz-grid-group-header-item-margin: 0 0.25rem 0.25rem 0;
+    --rz-grid-group-header-gap: 0.25rem;
+    --rz-grid-group-header-item-padding-block: 0.125rem ;
+    --rz-grid-group-header-item-padding-inline: 0.5rem 0.25rem;
+    --rz-grid-group-header-item-title-margin-inline: 0 0.25rem;
     --rz-dialog-close-font-size: 1rem;
-
-    .rz-group-header-item-title {
-      margin-right: 0.25rem;
-    }
   }
 }

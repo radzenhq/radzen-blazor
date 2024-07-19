@@ -750,10 +750,7 @@ namespace Radzen
             }
             else
             {
-                var filteredItems = GetView(items.AsQueryable(),
-                    args.Key,
-                    StringFilterOperator.StartsWith,
-                    FilterCaseSensitivity.CaseInsensitive)
+                var filteredItems = Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive)
                     .Cast<object>()
                     .ToList();
 
@@ -761,7 +758,7 @@ namespace Radzen
                 if (previousKey != args.Key)
                 {
                     previousKey = args.Key;
-                    itemIndex = 0;
+                    itemIndex = -1;
                 }
 
                 itemIndex = itemIndex + 1 >= filteredItems.Count() ? 0 : itemIndex + 1;
@@ -1061,71 +1058,6 @@ namespace Radzen
             }
         }
 
-        IQueryable GetView(IQueryable source, string value, StringFilterOperator? op = null, FilterCaseSensitivity? cs = null)
-        {
-            IQueryable result;
-
-            if (!string.IsNullOrEmpty(value))
-            {
-                var ignoreCase = (cs ?? FilterCaseSensitivity) == FilterCaseSensitivity.CaseInsensitive;
-
-                var query = new List<string>();
-
-                if (!string.IsNullOrEmpty(TextProperty))
-                {
-                    query.Add(TextProperty);
-                }
-
-                if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
-                {
-                    query.Add("ToString()");
-                }
-
-                if (ignoreCase)
-                {
-                    query.Add("ToLower()");
-                }
-
-                query.Add($"{Enum.GetName(typeof(StringFilterOperator), op ?? FilterOperator)}(@0)");
-
-                var search = ignoreCase ? value.ToLower() : value;
-
-                if (source.ElementType == typeof(Enum))
-                {
-                    result = source.Cast<Enum>()
-                        .Where((Func<Enum, bool>)(i =>
-                        {
-                            var v = ignoreCase ? i.GetDisplayDescription().ToLower() : i.GetDisplayDescription();
-
-                            if (FilterOperator == StringFilterOperator.Contains)
-                            {
-                                return v.Contains(search);
-                            }
-                            else if (FilterOperator == StringFilterOperator.StartsWith)
-                            {
-                                return v.StartsWith(search);
-                            }
-                            else if (FilterOperator == StringFilterOperator.EndsWith)
-                            {
-                                return v.EndsWith(search);
-                            }
-
-                            return v == search;
-                        })).AsQueryable();
-                }
-                else
-                {
-                    result = source.Where(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(".", query), search);
-                }
-            }
-            else
-            {
-                result = source;
-            }
-
-            return result;
-        }
-
         /// <summary>
         /// Gets the view.
         /// </summary>
@@ -1136,7 +1068,7 @@ namespace Radzen
             {
                 if (_view == null && Query != null)
                 {
-                    _view = GetView(Query, searchText);
+                    _view = Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                 }
 
                 return _view;

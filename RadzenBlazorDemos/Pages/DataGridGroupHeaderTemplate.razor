@@ -4,12 +4,15 @@
 
 @inherits DbContextPage
 
-<RadzenCard class="m-4" style="display: flex; align-items: center; gap: 0.5rem">
-    <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />
-    <RadzenLabel Text="All groups expanded" Component="CheckBox1" />
+<RadzenCard Variant="Variant.Outlined" Class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenCheckBox @bind-Value=@groupsExpanded Name="CheckBox1" TValue="bool?" TriState="true" />
+        <RadzenLabel Text="All groups expanded" Component="CheckBox1" />
+    </RadzenStack>
 </RadzenCard>
+
 <RadzenDataGrid @ref="ordersGrid" ColumnWidth="220px" AllowGrouping="true" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-        Data="@orders" Render="@OnRender" GroupRowRender="OnGroupRowRender" class="m-4">
+        Data="@orders" Render="@OnRender" GroupRowRender="OnGroupRowRender">
     <GroupHeaderTemplate>
         @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
     </GroupHeaderTemplate>

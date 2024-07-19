@@ -4,31 +4,38 @@
 
 @inherits DbContextPage
 
-<div style="margin-bottom: 16px">
-    <RadzenButton Click="@FirstPage" Text="First page" class="me-2" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenButton Click="@TenthPage" Text="10th page" class="me-2" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenButton Click="@LastPage" Text="Last page" class="me-2" ButtonStyle="ButtonStyle.Secondary" />
-    <RadzenCheckBox @bind-Value=@showPagerSummary Name="CheckBox1" Style="margin-left: 5px;" />
-    <RadzenLabel Text="Show pager summary" Component="CheckBox1" Style="margin-left: 5px;" />
-</div>
-<RadzenDataGrid @ref=@dataGrid Data="@orderDetails" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" AllowSorting="true" 
-PageSizeOptions="@pageSizeOptions" ShowPagingSummary="@showPagerSummary" PagingSummaryFormat="@pagingSummaryFormat" Page="@OnPage">
-    <Columns>
-        <RadzenDataGridColumn Property="@nameof(OrderDetail.OrderID)" Title="OrderID" />
-        <RadzenDataGridColumn Property="@nameof(OrderDetail.ProductID)" Title="ProductID" />
-        <RadzenDataGridColumn Property="@nameof(OrderDetail.UnitPrice)" Title="Unit Price">
-            <Template Context="detail">
-                @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
-            </Template>
-        </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
-        <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
-            <Template Context="detail">
-                @String.Format("{0}%", detail.Discount * 100)
-            </Template>
-        </RadzenDataGridColumn>
-    </Columns>
-</RadzenDataGrid>
+<RadzenStack Gap="1rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem;" Wrap="FlexWrap.Wrap">
+            <RadzenButton Click="@FirstPage" Text="First page" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Click="@TenthPage" Text="10th page" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenButton Click="@LastPage" Text="Last page" ButtonStyle="ButtonStyle.Secondary" />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenCheckBox @bind-Value=@showPagerSummary Name="CheckBox1" />
+                <RadzenLabel Text="Show pager summary" Component="CheckBox1" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenDataGrid @ref=@dataGrid Data="@orderDetails" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" AllowSorting="true" 
+    PageSizeOptions="@pageSizeOptions" ShowPagingSummary="@showPagerSummary" PagingSummaryFormat="@pagingSummaryFormat" Page="@OnPage">
+        <Columns>
+            <RadzenDataGridColumn Property="OrderID" Title="OrderID" />
+            <RadzenDataGridColumn Property="ProductID" Title="ProductID" />
+            <RadzenDataGridColumn Property="UnitPrice" Title="Unit Price">
+                <Template Context="detail">
+                    @String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", detail.UnitPrice)
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
+            <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount">
+                <Template Context="detail">
+                    @String.Format("{0}%", detail.Discount * 100)
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenStack>
 
 @code {
     string pagingSummaryFormat = "Displaying page {0} of {1} <b>(total {2} records)</b>";

@@ -14,7 +14,7 @@
         <RadzenSelectBar @bind-Value="@variant" Name="Variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
         <RadzenDropDown @bind-Value="@variant" Name="Variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
     </RadzenStack>
-    <RadzenAlert Variant="Variant.Flat" AlertStyle="AlertStyle.Warning" Icon="info_outline" Shade="Shade.Lighter" Size="AlertSize.Small" AllowClose=false>
+    <RadzenAlert Variant="Variant.Flat" AlertStyle="AlertStyle.Warning" Icon="info" Shade="Shade.Lighter" Size="AlertSize.Small" AllowClose=false>
         Base, Light and Dark alert styles don't have Shades
     </RadzenAlert>
 </RadzenStack>

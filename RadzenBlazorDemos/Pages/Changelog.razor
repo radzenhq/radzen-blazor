@@ -1,0 +1,630 @@
+﻿@page "/changelog"
+
+<div class="changelog">
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v5 Changelog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Track and review changes to Radzen Blazor Components v5.
+</RadzenText>
+
+<RadzenText Anchor="changelog#dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Dependencies
+</RadzenText>
+<ul>
+    <li>Dropped Bootstrap - including the Bootsrap CSS is not mandatory any more.</li>
+    <li>Dropped the obsolete RadzenGrid component.</li>
+    <li>Dropped support for .NET Core 3.x and .NET 5.</li>
+</ul>
+
+<RadzenText Anchor="changelog#dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Common
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> RTL Support - All components now support right to left direction for languages that are written from the right to the left (like Arabic).</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> All components now render with <code>box-sizing: border-box;</code>.</li>
+</ul>
+
+<RadzenText Anchor="changelog#dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    New Components
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <code><a href="/appearance-toggle">RadzenAppearanceToggle</a></code> - A toggle button to quickly switch between light and dark themes.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <code>RadzenTheme</code>  - Use it to load themes to your app.</li>
+</ul>
+
+<RadzenText Anchor="changelog#themes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Themes
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> Open sourced Material Dark theme - you can now use Material Dark theme for free!</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> Added Standard Dark free theme.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> Added Humanistic Dark free theme.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> Added Software Dark free theme.</li>
+</ul>
+
+<RadzenText Anchor="changelog#colors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Colors
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> Added <strong>--rz-base</strong> color variable and shades.</li>
+</ul>
+
+<RadzenText Anchor="changelog#typography" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Typography
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Replaced all <b>Source Sans Pro</b> fonts with <b>Source Sans 3</b> variable fonts.
+        <ul>
+        <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" />SourceSans3VF-Italic.ttf.woff2</li>
+        <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" />SourceSans3VF-Upright.ttf.woff2</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-Black.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-BlackIt.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-Black.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-BlackIt.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-Bold.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-BoldIt.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-ExtraLight.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-ExtraLightIt.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-It.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-Light.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-LightIt.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-Regular.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-Semibold.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />SourceSansPro-SemiboldIt.woff</li>
+        </ul>
+    </li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Replaced all <b>Roboto</b> fonts with <b>Roboto Flex</b> variable font.
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" />RobotoFlex.woff2</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />roboto-v15-latin-300.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />roboto-v15-latin-700.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />roboto-v15-latin-regular.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />roboto-v30-latin-300.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />roboto-v30-latin-500.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />roboto-v30-latin-700.woff</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />roboto-v30-latin-regular.woff</li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#icons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Icons
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Replaced <b>Material Icons</b> font with <b>Material Symbols</b> variable font.
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" />MaterialSymbolsOutlined.woff2</li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" />MaterialIcons-Regular.woff</li>
+        </ul>
+    </li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Removed <code>direction: ltr;</code> rule from <code>.rzi</code> CSS class.</li>
+</ul>
+
+<RadzenText Anchor="changelog#datagrid" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    DataGrid
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Updated and unified Clear and Apply button appearance in filtering popups</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-grid-header-filter-icon-margin</code> is now <code>--rz-grid-header-filter-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-grid-header-title-padding</code> is now <code>--rz-grid-header-title-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-column-drag-handle-margin</code> is now <code>--rz-column-drag-handle-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-grid-filter-icon-margin</code> is now <code>--rz-grid-filter-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-grid-group-header-item-padding</code> is now <code>--rz-grid-group-header-item-padding-block</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-grid-group-header-item-title-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-grid-group-header-item-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-grid-group-header-gap</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-grid-group-header-item-color</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-grid-group-header-item-margin</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-grid-group-header-items-margin</code></li>
+
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#datalist" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    DataList
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-datalist-item-vertical-margin</code> is now <code>--rz-datalist-item-margin-block</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-datalist-item-horizontal-margin</code> is now <code>--rz-datalist-item-margin-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#datafilter" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    DataFilter
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-datafilter-item-padding-y</code> is now <code>--rz-datafilter-item-padding-block</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-datafilter-item-padding-left</code> is now <code>--rz-datafilter-item-padding-inline-start</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#pager" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Pager
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> All CSS classes starting with <code>.rz-paginator-*</code> are renamed to <code>.rz-pager-*</code></li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> All CSS variables starting with <code>--rz-paginator-*</code> are renamed to <code>--rz-pager-*</code></li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Replaced spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-pager-gap</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-first-button-margin</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-last-button-margin</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-dropdown-margin</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-numeric-button-margin</code></li>
+        </ul>
+    </li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-back-button-hover-color</code></li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-back-button-hover-background-color</code></li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-next-button-hover-color</code></li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-next-button-hover-background-color</code></li>
+</ul>
+
+<RadzenText Anchor="changelog#scheduler" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Scheduler
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-scheduler-prev-next-button-padding</code> is now <code>--rz-scheduler-prev-next-button-padding-block</code> and <code>--rz-scheduler-prev-next-button-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-scheduler-today-button-margin-left</code> is now <code>--rz-scheduler-today-button-margin-inline-start</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-scheduler-event-padding</code> is now <code>--rz-scheduler-event-padding-block</code> and <code>--rz-scheduler-event-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-scheduler-prev-button-border-radius</code> is now split into:
+                <ul>
+                    <li><code>--rz-scheduler-prev-button-border-start-start-radius</code></li>
+                    <li><code>--rz-scheduler-prev-button-border-start-end-radius</code></li>
+                    <li><code>--rz-scheduler-prev-button-border-end-start-radius</code></li>
+                    <li><code>--rz-scheduler-prev-button-border-end-end-radius</code></li>
+                </ul>
+            </li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-scheduler-next-button-border-radius</code> is now split into:
+                <ul>
+                    <li><code>--rz-scheduler-next-button-border-start-start-radius</code></li>
+                    <li><code>--rz-scheduler-next-button-border-start-end-radius</code></li>
+                    <li><code>--rz-scheduler-next-button-border-end-start-radius</code></li>
+                    <li><code>--rz-scheduler-next-button-border-end-end-radius</code></li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <code>--rz-scheduler-highlight-background-color</code> - Use it to highlight working hours in day view, or today in calendar view.</li>
+</ul>
+
+<RadzenText Anchor="changelog#tree" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Tree
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-tree-node-padding</code> is now <code>--rz-tree-node-padding-block</code> and <code>--rz-tree-node-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-tree-node-margin</code> is now <code>--rz-tree-node-margin-block</code> and <code>--rz-tree-node-margin-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#image" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Image
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> Added <code>vertical-align: middle;</code> to all images and SVGs inside a Radzen Blazor Component</li>
+</ul>
+
+<RadzenText Anchor="changelog#layout" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Layout
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> CSS reset styles to <code>&lt;body&gt;</code> are applied only when <code>&lt;RadzenLayout&gt;</code> is used.</li>
+</ul>
+
+<RadzenText Anchor="changelog#dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Dialog
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Dialog's title bar now uses flex model for its layout.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-dialog-title-padding</code> is now <code>--rz-dialog-title-padding-block</code> and <code>--rz-dialog-title-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Sidebar
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed direction related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-sidebar-border-right</code> is now <code>--rz-sidebar-border-inline-end</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#splitter" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Splitter
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Splitter icons now use <code>font-family: var(--rz-icon-font-family)</code> instead of hardcoded icon font.</li>
+</ul>
+
+<RadzenText Anchor="changelog#accordion" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Accordion
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-accordion-item-padding</code> is now <code>--rz-accordion-item-padding-block</code> and <code>--rz-accordion-item-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-accordion-icon-margin</code> is now <code>--rz-accordion-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-accordion-toggle-icon-margin</code> is now <code>--rz-accordion-toggle-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-accordion-content-padding</code> is now <code>--rz-accordion-content-padding-block</code> and <code>--rz-accordion-content-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-accordion-toggle-icon-collapsed-rtl</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-accordion-toggle-icon-expanded-rtl</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#contextmenu" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    ContextMenu
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-context-menu-padding</code> is now <code>--rz-context-menu-padding-block</code> and <code>--rz-context-menu-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#login" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Login
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-login-register-padding</code> is now <code>--rz-login-register-padding-block</code> and <code>--rz-login-register-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-login-register-margin</code> is now <code>--rz-login-register-margin-block</code> and <code>--rz-login-register-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-login-register-button-margin</code> is now <code>--rz-login-register-button-margin-block</code> and <code>--rz-login-register-button-margin-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#menu" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Menu
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-menu-item-icon-margin</code> is now <code>--rz-menu-item-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-menu-item-padding</code> is now <code>--rz-menu-item-padding-block</code> and <code>--rz-menu-item-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-menu-top-item-padding</code> is now <code>--rz-menu-top-item-padding-block</code> and <code>--rz-menu-top-item-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#panelmenu" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    PanelMenu
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Remapped CSS variables for margin, padding, color and background color to match the respective PanelMenu item level.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed some of the above mentioned CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-color</code> is now <code>--rz-panel-menu-item-color</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-background-color</code> is now <code>--rz-panel-menu-item-background-color</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-hover-color</code> is now <code>--rz-panel-menu-item-hover-color</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-hover-background-color</code> is now <code>--rz-panel-menu-item-hover-background-color</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-padding</code> is now <code>--rz-panel-menu-padding-block</code> and <code>--rz-panel-menu-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-item-padding</code> is now <code>--rz-panel-menu-item-padding-block</code> and <code>--rz-panel-menu-item-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-item-2nd-level-padding</code> is now <code>--rz-panel-menu-item-2nd-level-padding-block</code> and <code>--rz-panel-menu-item-2nd-level-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-item-margin</code> is now <code>--rz-panel-menu-item-margin-block</code> and <code>--rz-panel-menu-item-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-item-2nd-level-margin</code> is now <code>--rz-panel-menu-item-2nd-level-margin-block</code> and <code>--rz-panel-menu-item-2nd-level-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-icon-margin</code> is now <code>--rz-panel-menu-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-panel-menu-icon-2nd-level-margin</code> is now <code>--rz-panel-menu-icon-2nd-level-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-panel-menu-item-3rd-level-color</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-panel-menu-item-3rd-level-background-color</code></li>
+
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#profilemenu" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    ProfileMenu
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-profile-menu-item-icon-margin</code> is now <code>--rz-profile-menu-item-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-profile-menu-padding</code> is now <code>--rz-profile-menu-padding-block</code> and <code>--rz-profile-menu-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#steps" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Steps
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-steps-number-padding</code> is now <code>--rz-steps-number-padding-block</code> and <code>--rz-steps-number-padding-inline</code></li>
+        </ul>
+    </li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Prev and Next icon is now rendered via CSS. Instead of <code>&lt;i class="rzi"&gt;navigate_next&lt;/i&gt;</code> and <code>&lt;i class="rzi"&gt;navigate_before&lt;/i&gt;</code> the component now renders <code>&lt;span class="rzi"&gt;&lt;/span&gt;</code></li>
+</ul>
+
+<RadzenText Anchor="changelog#tabs" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Tabs
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-tabs-icon-margin</code> is now <code>--rz-tabs-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-tabs-tab-padding</code> is now <code>--rz-tabs-tab-padding-block</code> and <code>--rz-tabs-tab-padding-inline</code></li>
+        </ul>
+    </li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Updated Tab icon CSS classes <code>&lt;span class="rz-tabview-left-icon rzi" ...</code> to <code>&lt;span class="rzi rz-tabview-icon" ...</code>.</li>
+</ul>
+
+<RadzenText Anchor="changelog#button" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Button
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Removed <code>$button-styles</code> SCSS map and use <code>$severity-styles-map</code> and <code>$base-styles-map</code> to generate CSS for Button styles.</li>
+</ul>
+
+<RadzenText Anchor="changelog#checkbox" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    CheckBox
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-checkbox-margin</code> is now <code>--rz-checkbox-margin-block</code> and <code>--rz-checkbox-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-checkbox-label-margin</code> is now <code>--rz-checkbox-label-margin-block</code> and <code>--rz-checkbox-label-margin-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#colorpicker" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    ColorPicker
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-colorpicker-item-margin</code> is now <code>--rz-colorpicker-items-gap</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#datepicker" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    DatePicker
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> New DatePicker markup. Revised HTML elements and CSS classes to better describe DatePicker's contents.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-datepicker-header-padding</code> is now <code>--rz-datepicker-header-padding-block</code> and <code>--rz-datepicker-header-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-datepicker-calendar-padding</code> is now <code>--rz-datepicker-calendar-item-padding</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-timepicker-padding</code> is now <code>--rz-timepicker-padding-block</code> and <code>--rz-timepicker-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-datepicker-calendar-padding-block</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-datepicker-calendar-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-datepicker-popup-width</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-datepicker-popup-width</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-datepicker-prev-next-icon-size</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-datepicker-prev-next-button-border-radius</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-datepicker-header-line-height</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#dropdown" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    DropDown
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> New DatePicker markup. Revised HTML elements and CSS classes to better describe DatePicker's contents.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-dropdown-trigger-icon-margin</code> is now <code>--rz-dropdown-trigger-icon-margin-block</code> and <code>--rz-dropdown-trigger-icon-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-dropdown-label-padding</code> is now <code>--rz-dropdown-label-padding-block</code> and <code>--rz-dropdown-label-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-multiselect-checkbox-margin</code> is now <code>--rz-multiselect-checkbox-margin-block</code> and <code>--rz-multiselect-checkbox-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-dropdown-chips-padding</code> is now <code>--rz-dropdown-chips-padding-block</code> and <code>--rz-dropdown-chips-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#dropdowndatagrid" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    DropDownDataGrid
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Improved lookup styles:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-lookup-search-margin-bottom</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> <code>--rz-lookup-search-gap</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#fieldset" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Fieldset
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-fieldset-legend-margin</code> is now <code>--rz-fieldset-legend-margin-block</code> and <code>--rz-fieldset-legend-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-fieldset-legend-padding</code> is now <code>--rz-fieldset-legend-padding-block</code> and <code>--rz-fieldset-legend-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-fieldset-toggle-margin</code> is now <code>--rz-fieldset-toggle-margin-block</code> and <code>--rz-fieldset-toggle-margin-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#formfield" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    FormField
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-form-field-filled-padding</code> is now <code>--rz-form-field-filled-padding-block</code> and <code>--rz-form-field-filled-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-form-field-start-end-padding</code> is now <code>--rz-form-field-start-end-padding-block</code> and <code>--rz-form-field-start-end-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-form-field-margin</code> is now <code>--rz-form-field-margin-block</code> and <code>--rz-form-field-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-form-field-filled-numeric-padding</code> is now <code>--rz-form-field-filled-numeric-padding-block</code> and <code>--rz-form-field-filled-numeric-padding-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-form-field-label-left</code> is now <code>--rz-form-field-label-inset-inline-start</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#htmleditor" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    HtmlEditor
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Changed Underline icon from <code>format_underline</code> to <code>format_underlined</code></li>
+</ul>
+
+<RadzenText Anchor="changelog#listbox" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    ListBox
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-listbox-checkbox-margin</code> is now <code>--rz-listbox-checkbox-margin-block</code> and <code>--rz-listbox-checkbox-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-listbox-header-padding</code> is now <code>--rz-listbox-header-padding-block</code> and <code>--rz-listbox-header-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#numeric" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Numeric
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> All CSS classes starting with <code>.rz-spinner-*</code> are renamed to <code>.rz-numeric-*</code></li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-numeric-input-padding</code> is now <code>--rz-numeric-input-padding-block</code> and <code>--rz-numeric-input-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#radiobuttonlist" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    RadioButtonList
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-radio-label-margin</code> is now <code>--rz-radio-label-margin-block</code> and <code>--rz-radio-label-margin-inline</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-radio-margin</code> is now <code>--rz-radio-margin-block</code> and <code>--rz-radio-margin-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#speechtotextbutton" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    SpeechToTextButton
+</RadzenText>
+<ul>
+    <li>---</li>
+</ul>
+
+<RadzenText Anchor="changelog#splitbutton" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    SplitButton
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Remove redundant CSS variables:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-splitbutton-menu-button-width</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-splitbutton-menu-button-padding</code></li>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-splitbutton-menu-button-font-size</code></li>
+        </ul>
+    </li>
+</ul>
+
+
+<RadzenText Anchor="changelog#switch" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Switch
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-switch-circle-margin</code> is now <code>--rz-switch-circle-offset</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#textarea" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    TextArea
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-text-area-padding</code> is now <code>--rz-text-area-padding-block</code> and <code>--rz-text-area-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#textbox" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    TextBox
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-input-padding</code> is now <code>--rz-input-padding-block</code> and <code>--rz-input-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#badge" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Badge
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Removed <code>$badge-styles</code> SCSS map and use <code>$severity-styles-map</code> and <code>$base-styles-map</code> to generate CSS for Badge styles.</li>
+</ul>
+
+<RadzenText Anchor="changelog#chip" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Chip
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Renamed spacing related CSS variables and updated values respectively:
+        <ul>
+            <li><RadzenBadge BadgeStyle="BadgeStyle.Base" Text="Updated" /> <code>--rz-chip-padding</code> is now <code>--rz-chip-padding-block</code> and <code>--rz-chip-padding-inline</code></li>
+        </ul>
+    </li>
+</ul>
+
+
+<RadzenText Anchor="changelog#notification" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Notification
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> New Notification markup. The component now uses flex model for its layout.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> All CSS classes starting with <code>.rz-growl-*</code> are renamed to <code>.rz-notification-*</code></li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Success" Shade="Shade.Lighter" Text="Added" /> New <code>--rz-notification-gap</code> CSS variable.</li>
+</ul>
+
+<RadzenText Anchor="changelog#alert" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    Alert
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Changed Alert icons:
+        <ul>
+            <li><code>check_circle_outline</code> is now <code>check_circle</code></li>
+            <li><code>error_outline</code> is now <code>error</code></li>
+            <li><code>info_outline</code> is now <code>info</code></li>
+            <li><code>lightbulb_outline</code> is now <code>lightbulb</code></li>
+        </ul>
+    </li>
+</ul>
+
+<RadzenText Anchor="changelog#progressbar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    ProgressBar
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="Update" /> Removed <code>$progressbar-styles</code> SCSS map and use <code>$severity-styles-map</code> and <code>$progressbar-base-styles</code> to generate CSS for ProgressBar styles.</li>
+</ul>
+</div>
+
+<style>
+    .changelog li {
+        margin-block: 0.25rem;
+    }
+</style>

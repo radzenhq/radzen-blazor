@@ -12,21 +12,6 @@ $rz-timeline-line-position-offset: calc(var(--rz-timeline-item-padding) + (var(-
 $rz-timeline-line-start-offset: calc(var(--rz-timeline-item-padding) + (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
 $rz-timeline-line-end-offset: calc(100% - var(--rz-timeline-item-padding) - (var(--rz-timeline-point-size) / 2) - (var(--rz-timeline-line-width) / 2));
 
-// Timeline CSS variables
-
-:root {
-  --rz-timeline-item-padding: #{$rz-timeline-item-padding};
-  --rz-timeline-axis-size: #{$rz-timeline-axis-size};
-  --rz-timeline-point-size: #{$rz-timeline-point-size};
-  --rz-timeline-point-border: #{$rz-timeline-point-border};
-  --rz-timeline-point-border-radius: #{$rz-timeline-point-border-radius};
-  --rz-timeline-point-background-color: #{$rz-timeline-point-background-color};
-  --rz-timeline-point-color: #{$rz-timeline-point-color};
-  --rz-timeline-line-color: #{$rz-timeline-line-color};
-  --rz-timeline-line-width: #{$rz-timeline-line-width};
-  --rz-timeline-line-border-radius: #{$rz-timeline-line-border-radius};
-}
-
 $timeline-point-sizes: () !default;
 $timeline-point-sizes: map-merge(
   (
@@ -51,6 +36,7 @@ $timeline-point-sizes: map-merge(
 );
 
 .rz-timeline {
+  box-sizing: border-box;
   display: flex;
 
   // Orientation.Vertical
