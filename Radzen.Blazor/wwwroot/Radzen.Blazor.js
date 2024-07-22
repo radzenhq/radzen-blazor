@@ -2317,7 +2317,11 @@ window.Radzen = {
         dialogTitles[dialogTitles.length - 1].addEventListener('mousedown', window.Radzen.initiateElementDrag);
     },
 
-    removeElementDragEventListener: function () {
+    removeElementDragEventListener: function (draggable, showTitle) {
+        if (draggable != true || showTitle != true) {
+            return;
+        }
+
         var dialogTitles = document.querySelectorAll('.rz-dialog-titlebar');
         if (dialogTitles.length == 0) {
             return;

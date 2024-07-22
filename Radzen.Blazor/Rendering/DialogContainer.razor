@@ -225,7 +225,7 @@
 
     public void Dispose()
     {
-        JSRuntime.InvokeVoidAsync("Radzen.removeElementDragEventListener");
+        JSRuntime.InvokeVoidAsync("Radzen.removeElementDragEventListener", Dialog.Options.Draggable, Dialog.Options.ShowTitle);
 
         Service.OnRefresh -= OnRefresh;
     }
