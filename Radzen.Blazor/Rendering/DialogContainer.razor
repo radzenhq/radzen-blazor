@@ -6,50 +6,24 @@
     <div @ref="dialog" class="@CssClass" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
-            @if (Dialog.Options.Draggable)
-            {
-                <Draggable Drag="@OnDrag" DragStart="@OnDragStart">
-                    <div class="rz-dialog-titlebar">
-                        <div class="rz-dialog-title" id="rz-dialog-0-label">
-                            @if (Dialog.Options.TitleContent != null)
-                            {
-                                @Dialog.Options.TitleContent(Service)
-                            }
-                            else
-                            {
-                                @((MarkupString)Dialog.Title)
-                            }
-                        </div>
-                        @if (Dialog.Options.ShowClose)
-                        {
-                            <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
-                                <span class="rzi rzi-times"></span>
-                            </a>
-                        }
-                    </div>
-                </Draggable>
-            }
-            else
-            {
-                <div class="rz-dialog-titlebar">
-                    <div class="rz-dialog-title" id="rz-dialog-0-label">
-                        @if (Dialog.Options.TitleContent != null)
-                        {
-                            @Dialog.Options.TitleContent(Service)
-                        }
-                        else
-                        {
-                            @((MarkupString)Dialog.Title)
-                        }
-                    </div>
-                    @if (Dialog.Options.ShowClose)
+            <div class="rz-dialog-titlebar">
+                <div class="rz-dialog-title" id="rz-dialog-0-label">
+                    @if (Dialog.Options.TitleContent != null)
                     {
-                        <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
-                            <span class="rzi rzi-times"></span>
-                        </a>
+                        @Dialog.Options.TitleContent(Service)
+                    }
+                    else
+                    {
+                        @((MarkupString)Dialog.Title)
                     }
                 </div>
-            }
+                @if (Dialog.Options.ShowClose)
+                {
+                    <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                        <span class="rzi rzi-times"></span>
+                    </a>
+                }
+            </div>
         }
         <div class="@ContentCssClass">
             @if (Dialog.Options.ChildContent != null)
@@ -95,29 +69,13 @@
     string height;
     string width;
 
-    double clientX;
-    double clientY;
-
-    void OnDragStart(DraggableEventArgs args)
-    {
-        clientX = args.ClientX;
-        clientY = args.ClientY;
-    }
-
-    void OnDrag(DraggableEventArgs args)
+    [JSInvokable("RadzenDialog.OnDrag")]
+    public void OnDrag(string t, string l)
     {
         shouldRender = false;
 
-        var l = args.Rect.Left + (args.ClientX - clientX);
-        var t = args.Rect.Top + (args.ClientY - clientY);
-
-        if(Dialog.Options.Drag != null)
-        {
-            Dialog.Options.Drag(new System.Drawing.Point(Convert.ToInt32(l), Convert.ToInt32(t)));
-        }
-
-        left = string.Format(System.Globalization.CultureInfo.InvariantCulture, "left: {0}px;", l);
-        top = string.Format(System.Globalization.CultureInfo.InvariantCulture, "top: {0}px;", t);
+        top = $"top: {t};";
+        left = $"left: {l};";
 
         shouldRender = true;
     }

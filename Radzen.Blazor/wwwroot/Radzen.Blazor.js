@@ -1377,6 +1377,38 @@ window.Radzen = {
                 Radzen.dialogResizer = new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
             }
 
+            if (options.draggable) {
+                var dialogTitle = lastDialog.parentElement.querySelector('.rz-dialog-titlebar');
+                if (dialogTitle) {
+                    var start = function (e) {
+                        var rect = lastDialog.parentElement.getBoundingClientRect();
+                        var offsetX = e.clientX - rect.left;
+                        var offsetY = e.clientY - rect.top;
+
+                        var move = function (e) {
+                            lastDialog.parentElement.style.left = e.clientX - offsetX + 'px';
+                            lastDialog.parentElement.style.top = e.clientY - offsetY + 'px';
+                        };
+
+                        var stop = function () {
+                            document.removeEventListener('mousemove', move);
+                            document.removeEventListener('mouseup', stop);
+
+                            dialog.invokeMethodAsync(
+                                'RadzenDialog.OnDrag',
+                                lastDialog.parentElement.style.top,
+                                lastDialog.parentElement.style.left
+                            );
+                        };
+
+                        document.addEventListener('mousemove', move);
+                        document.addEventListener('mouseup', stop);
+                    };
+
+                    dialogTitle.addEventListener('mousedown', start);
+                }
+            }
+
             if (options.autoFocusFirstElement) {
                 var focusable = Radzen.getFocusableElements(lastDialog);
                 var editor = lastDialog.querySelector('.rz-html-editor');
