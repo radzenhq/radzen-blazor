@@ -1050,7 +1050,7 @@ window.Radzen = {
 
       popup.style.top = top + 'px';
   },
-  openPopup: function (parent, id, syncWidth, position, x, y, instance, callback, closeOnDocumentClick = true, autoFocusFirstElement = false) {
+  openPopup: function (parent, id, syncWidth, position, x, y, instance, callback, closeOnDocumentClick = true, autoFocusFirstElement = false, disableSmartPosition = false) {
     var popup = document.getElementById(id);
     if (!popup) return;
 
@@ -1092,7 +1092,9 @@ window.Radzen = {
     var smartPosition = !position || position == 'bottom';
 
     if (smartPosition && top + rect.height > window.innerHeight && parentRect.top > rect.height) {
-      top = parentRect.top - rect.height;
+        if (disableSmartPosition !== true) {
+            top = parentRect.top - rect.height;
+        }
 
       if (position) {
         top = top - 40;
