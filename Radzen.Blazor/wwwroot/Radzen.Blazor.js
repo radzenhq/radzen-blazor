@@ -2299,22 +2299,11 @@ window.Radzen = {
         }
     },
 
-    dialogDotNetObjectRef: null,
+    dialogsDotNetObjectReferences: {},
+    dialogsHaveDragActions: {},
 
-    makeElementDraggable: function (dialogRef, draggable, showTitle) {
-        if (draggable == true && showTitle == true) {
-            var dialogTitles = document.querySelectorAll('.rz-dialog-titlebar');
-            if (dialogTitles.length == 0) {
-                return;
-            }
-
-            dialogDotNetObjectRef = dialogRef;
-            dialogTitles[dialogTitles.length - 1].addEventListener('mousedown', window.Radzen.initiateElementDrag);
-        }
-    },
-
-    removeElementDragEventListener: function () {
-        if (!dialogDotNetObjectRef) {
+    makeElementDraggable: function (dialogRef, draggable, showTitle, hasDragAction) {
+        if (draggable != true || showTitle != true) {
             return;
         }
 
@@ -2323,22 +2312,37 @@ window.Radzen = {
             return;
         }
 
-        dialogTitles[dialogTitles.length - 1].removeEventListener('mousedown', window.Radzen.initiateElementDrag);
-        dialogDotNetObjectRef = null;
+        window.Radzen.dialogsDotNetObjectReferences[dialogTitles.length - 1] = dialogRef;
+        window.Radzen.dialogsHaveDragActions[dialogTitles.length - 1] = hasDragAction;
+        dialogTitles[dialogTitles.length - 1].addEventListener('mousedown', window.Radzen.initiateElementDrag);
     },
 
-    initiateElementDrag: function (e) {
-        if (!dialogDotNetObjectRef) {
+    removeElementDragEventListener: function () {
+        var dialogTitles = document.querySelectorAll('.rz-dialog-titlebar');
+        if (dialogTitles.length == 0) {
             return;
         }
 
+        dialogTitles[dialogTitles.length - 1].removeEventListener('mousedown', window.Radzen.initiateElementDrag);
+        delete window.Radzen.dialogsDotNetObjectReferences[dialogTitles.length - 1]
+        delete window.Radzen.dialogsHaveDragActions[dialogTitles.length - 1]
+    },
+
+    initiateElementDrag: function (e) {
         e.preventDefault();
 
         var lastDialog = getLastDialog();
+        var lastDialogTitleIndex = getDialogTitleIndex();
+        var lastDialogDotNetObjectRef = window.Radzen.dialogsDotNetObjectReferences[lastDialogTitleIndex];
+        var lastDialogHasDragAction = window.Radzen.dialogsHaveDragActions[lastDialogTitleIndex]
         var initialPositionX = e.clientX;
         var initialPositionY = e.clientY;
         var changeInX = 0;
         var changeInY = 0;
+
+        if (lastDialogDotNetObjectRef == undefined || lastDialogHasDragAction == undefined) {
+            return;
+        }
 
         document.addEventListener("mouseup", endDrag);
         document.addEventListener("mousemove", drag);
@@ -2352,6 +2356,15 @@ window.Radzen = {
             return dialogs[dialogs.length - 1];
         }
 
+        function getDialogTitleIndex() {
+            var dialogTitles = document.querySelectorAll('.rz-dialog-titlebar');
+            if (dialogTitles.length == 0) {
+                return;
+            }
+
+            return dialogTitles.length - 1;
+        }
+
         function drag(e) {
             e.preventDefault();
             changeInX = initialPositionX - e.clientX;
@@ -2360,13 +2373,21 @@ window.Radzen = {
             initialPositionY = e.clientY;
             lastDialog.style.top = `${lastDialog.offsetTop - changeInY}px`;
             lastDialog.style.left = `${lastDialog.offsetLeft - changeInX}px`;
+
+            if (lastDialogHasDragAction == true) {
+                lastDialogDotNetObjectRef.invokeMethodAsync(
+                    'RadzenDialog.OnDrag',
+                    lastDialog.style.top,
+                    lastDialog.style.left
+                );
+            }
         }
 
         function endDrag(e) {
             document.removeEventListener("mousemove", drag);
             document.removeEventListener("mouseup", endDrag);
-            dialogDotNetObjectRef.invokeMethodAsync(
-                'RadzenDialog.OnDrag',
+            lastDialogDotNetObjectRef.invokeMethodAsync(
+                'RadzenDialog.OnDragEnd',
                 lastDialog.style.top,
                 lastDialog.style.left
             );

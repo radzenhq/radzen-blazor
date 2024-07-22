@@ -79,7 +79,7 @@
     {
         shouldRender = false;
 
-        if(Dialog.Options.Resize != null && w != 0 && h != 0)
+        if (Dialog.Options.Resize != null && w != 0 && h != 0)
         {
             Dialog.Options.Resize(new System.Drawing.Size(Convert.ToInt32(w), Convert.ToInt32(h)));
         }
@@ -97,6 +97,24 @@
     /// <param name="l">The left value.</param>
     [JSInvokable("RadzenDialog.OnDrag")]
     public void OnDrag(string t, string l)
+    {
+        shouldRender = false;
+
+        if (Dialog.Options.Drag != null)
+        {
+            Dialog.Options.Drag(new System.Drawing.Point(int.Parse(l.AsSpan(0, l.Length - 2)), int.Parse(t.AsSpan(0, t.Length - 2))));
+        }
+
+        shouldRender = true;
+    }
+
+    /// <summary>
+    /// Called when drag ends.
+    /// </summary>
+    /// <param name="t">The top value.</param>
+    /// <param name="l">The left value.</param>
+    [JSInvokable("RadzenDialog.OnDragEnd")]
+    public void OnDragEnd(string t, string l)
     {
         shouldRender = false;
 
@@ -177,7 +195,7 @@
             var widthStyle = !string.IsNullOrEmpty(width) ? width : string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
             var heightStyle = !string.IsNullOrEmpty(height) ? height : string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
             var topStyle = !string.IsNullOrEmpty(top) ? top : string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
-            var leftStyle = !string.IsNullOrEmpty(left) ? left :string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
+            var leftStyle = !string.IsNullOrEmpty(left) ? left : string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
             var bottomStyle = string.IsNullOrEmpty(Dialog.Options.Bottom) ? "" : $"bottom: {Dialog.Options.Bottom};";
             var resizeStyle = Dialog.Options.Resizable ? "resize:both;" : "";
 
@@ -185,7 +203,7 @@
         }
     }
 
-    [Inject] 
+    [Inject]
     DialogService Service { get; set; }
 
     protected override void OnInitialized()
@@ -197,7 +215,7 @@
     {
         var stateHasChanged = reference?.GetType().GetMethod("StateHasChanged", BindingFlags.NonPublic | BindingFlags.Instance);
 
-        InvokeAsync(() => 
+        InvokeAsync(() =>
         {
             StateHasChanged();
             stateHasChanged?.Invoke(reference, null);
@@ -240,7 +258,7 @@
                 };
 
             await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference, DotNetReference);
-            await JSRuntime.InvokeVoidAsync("Radzen.makeElementDraggable", DotNetReference, Dialog.Options.Draggable, Dialog.Options.ShowTitle);
+            await JSRuntime.InvokeVoidAsync("Radzen.makeElementDraggable", DotNetReference, Dialog.Options.Draggable, Dialog.Options.ShowTitle, Dialog.Options.Drag != null);
         }
     }
 
