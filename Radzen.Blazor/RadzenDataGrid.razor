@@ -336,7 +336,7 @@
                     {
                         @if (!ShowEmptyMessage || Count > 0 && (IsVirtualizationAllowed() ? Count > 0 : true) || LoadData.HasDelegate && Data.Count() > 0)
                         {
-                            if (columns.Count > 0 && Data.Any())
+                            if (columns.Count > 0)
                             {
                                 @DrawRows(visibleColumns)
                             }

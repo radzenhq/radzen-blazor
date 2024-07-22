@@ -1016,7 +1016,7 @@ window.Radzen = {
       var input = el.querySelector('.rz-inputtext');
       if (input) {
           input.onclick = function (e) {
-              handler(e, e.currentTarget.classList.contains('rz-readonly'));
+              handler(e, e.currentTarget.classList.contains('rz-readonly') || e.currentTarget.classList.contains('rz-input-trigger') );
           };
       }
   },
@@ -1375,6 +1375,38 @@ window.Radzen = {
                     }
                 };
                 Radzen.dialogResizer = new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
+            }
+
+            if (options.draggable) {
+                var dialogTitle = lastDialog.parentElement.querySelector('.rz-dialog-titlebar');
+                if (dialogTitle) {
+                    var start = function (e) {
+                        var rect = lastDialog.parentElement.getBoundingClientRect();
+                        var offsetX = e.clientX - rect.left;
+                        var offsetY = e.clientY - rect.top;
+
+                        var move = function (e) {
+                            lastDialog.parentElement.style.left = e.clientX - offsetX + 'px';
+                            lastDialog.parentElement.style.top = e.clientY - offsetY + 'px';
+                        };
+
+                        var stop = function () {
+                            document.removeEventListener('mousemove', move);
+                            document.removeEventListener('mouseup', stop);
+
+                            dialog.invokeMethodAsync(
+                                'RadzenDialog.OnDrag',
+                                lastDialog.parentElement.style.top,
+                                lastDialog.parentElement.style.left
+                            );
+                        };
+
+                        document.addEventListener('mousemove', move);
+                        document.addEventListener('mouseup', stop);
+                    };
+
+                    dialogTitle.addEventListener('mousedown', start);
+                }
             }
 
             if (options.autoFocusFirstElement) {
@@ -1889,7 +1921,7 @@ window.Radzen = {
     }
     return attributes.reduce(function (result, name) {
       if (target) {
-        result[name] = target[name];
+        result[name] = target[name].toString();
       }
       return result;
     }, { innerText: selection.toString(), innerHTML: innerHTML });
