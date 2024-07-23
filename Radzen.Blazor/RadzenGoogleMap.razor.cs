@@ -61,6 +61,13 @@ namespace Radzen.Blazor
         public string ApiKey { get; set; }
 
         /// <summary>
+        /// Gets or sets the Google Map Id.
+        /// </summary>
+        /// <value>The Google Map Id.</value>
+        [Parameter]
+        public string MapId { get; set; }
+
+        /// <summary>
         /// Gets or sets the Google map options: https://developers.google.com/maps/documentation/javascript/reference/map#MapOptions.
         /// </summary>
         /// <value>The Google map options.</value>
@@ -199,7 +206,7 @@ namespace Radzen.Blazor
 
             if (firstRender)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, Zoom, Center,
+                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, MapId, Zoom, Center,
                      data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate);
             }
             else

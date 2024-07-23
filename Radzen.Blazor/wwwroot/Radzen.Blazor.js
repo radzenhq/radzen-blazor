@@ -211,7 +211,7 @@ window.Radzen = {
 
     document.body.appendChild(script);
   },
-  createMap: function (wrapper, ref, id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate) {
+  createMap: function (wrapper, ref, id, apiKey, mapId, zoom, center, markers, options, fitBoundsToMarkersOnUpdate) {
     var api = function () {
       var defaultView = document.defaultView;
 
@@ -230,7 +230,8 @@ window.Radzen = {
 
       Radzen[id].instance = new google.maps.Map(wrapper, {
         center: center,
-        zoom: zoom
+        zoom: zoom,
+        mapId: mapId
       });
 
       Radzen[id].instance.addListener('click', function (e) {
