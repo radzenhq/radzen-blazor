@@ -196,7 +196,8 @@ else
 
     int filterValuesCount;
     internal IEnumerable filterValues;
-    string prevFilter;
+    string loadDataArgsString;
+
     async Task LoadFilterValues(LoadDataArgs loadDataArgs)
     {
         var property = Column.GetFilterProperty();
@@ -212,6 +213,8 @@ else
             property = $@"({property} == null ? """" : {property})";
         }
 
+        var loadDataArgsString = $"{loadDataArgs.Skip}|{loadDataArgs.Top}{loadDataArgs.Filter}";
+
         if (Column.Grid.LoadColumnFilterData.HasDelegate)
         {
             var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column, Filter = loadDataArgs.Filter };
@@ -221,16 +224,26 @@ else
             filterValues = args.Data.AsQueryable().Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
             filterValuesCount = args.Count;
         }
-        else if(!string.IsNullOrEmpty(property) && (filterValues == null || loadDataArgs.Filter != prevFilter) && Column.Grid.Data != null)
+        else if(!string.IsNullOrEmpty(property) && (filterValues == null || this.loadDataArgsString != loadDataArgsString) && Column.Grid.Data != null)
         {
-            prevFilter = loadDataArgs.Filter;
+            this.loadDataArgsString = loadDataArgsString;
 
-            var query = (!string.IsNullOrEmpty(prevFilter) ? 
+            var query = (!string.IsNullOrEmpty(loadDataArgs.Filter) ? 
                 Radzen.QueryableExtension.Where(Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)),
                 property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive)
                 :
                 Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)))
                 .Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+
+            if(loadDataArgs.Skip != null)
+            {
+                query = query.Skip(loadDataArgs.Skip.Value);
+            }
+
+            if(loadDataArgs.Top != null)
+            {
+                query = query.Take(loadDataArgs.Top.Value);
+            }
 
             filterValues = query;
             filterValuesCount = query.Count();
