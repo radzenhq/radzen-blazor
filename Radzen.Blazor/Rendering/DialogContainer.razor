@@ -69,13 +69,23 @@
     string height;
     string width;
 
+    /// <summary>
+    /// Called when dragged.
+    /// </summary>
+    /// <param name="t">The top value.</param>
+    /// <param name="l">The left value.</param>
     [JSInvokable("RadzenDialog.OnDrag")]
-    public void OnDrag(string t, string l)
+    public void OnDrag(double t, double l)
     {
         shouldRender = false;
 
-        top = $"top: {t};";
-        left = $"left: {l};";
+        if (Dialog.Options.Drag != null)
+        {
+            Dialog.Options.Drag(new System.Drawing.Point(Convert.ToInt32(l), Convert.ToInt32(t)));
+        }
+
+        top = $"top: {t}px;";
+        left = $"left: {l}px;";
 
         shouldRender = true;
     }

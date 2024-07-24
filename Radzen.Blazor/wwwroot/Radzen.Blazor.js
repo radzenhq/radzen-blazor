@@ -1383,32 +1383,31 @@ window.Radzen = {
             if (options.draggable) {
                 var dialogTitle = lastDialog.parentElement.querySelector('.rz-dialog-titlebar');
                 if (dialogTitle) {
-                    var start = function (e) {
+                    Radzen[dialogTitle] = function (e) {
                         var rect = lastDialog.parentElement.getBoundingClientRect();
                         var offsetX = e.clientX - rect.left;
                         var offsetY = e.clientY - rect.top;
 
                         var move = function (e) {
-                            lastDialog.parentElement.style.left = e.clientX - offsetX + 'px';
-                            lastDialog.parentElement.style.top = e.clientY - offsetY + 'px';
+                            var left = e.clientX - offsetX;
+                            var top = e.clientY - offsetY;
+
+                            lastDialog.parentElement.style.left = left + 'px';
+                            lastDialog.parentElement.style.top = top + 'px';
+
+                            dialog.invokeMethodAsync('RadzenDialog.OnDrag', top, left);
                         };
 
                         var stop = function () {
                             document.removeEventListener('mousemove', move);
                             document.removeEventListener('mouseup', stop);
-
-                            dialog.invokeMethodAsync(
-                                'RadzenDialog.OnDrag',
-                                lastDialog.parentElement.style.top,
-                                lastDialog.parentElement.style.left
-                            );
                         };
 
                         document.addEventListener('mousemove', move);
                         document.addEventListener('mouseup', stop);
                     };
 
-                    dialogTitle.addEventListener('mousedown', start);
+                    dialogTitle.addEventListener('mousedown', Radzen[dialogTitle]);
                 }
             }
 
@@ -1446,6 +1445,17 @@ window.Radzen = {
     Radzen.dialogResizer = null;
     document.body.classList.remove('no-scroll');
     var dialogs = document.querySelectorAll('.rz-dialog-content');
+
+    var lastDialog = dialogs.length && dialogs[dialogs.length - 1];
+    if (lastDialog) {
+        var dialogTitle = lastDialog.parentElement.querySelector('.rz-dialog-titlebar');
+        if (dialogTitle) {
+            dialogTitle.removeEventListener('mousedown', Radzen[dialogTitle]);
+            Radzen[dialogTitle] = null;
+            delete Radzen[dialogTitle];
+        }
+    }
+
     if (dialogs.length <= 1) {
         document.removeEventListener('keydown', Radzen.closePopupOrDialog);
         delete Radzen.dialogService;
