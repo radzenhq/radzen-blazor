@@ -784,7 +784,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 @container rz-cell-filter-content (max-width: 200px) {
-  .rz-cell-filter-content {
+  .rz-cell-filter-content:has(.rz-filter-button) {
     .rz-filter-button {
       .rzi {
         display: none;
