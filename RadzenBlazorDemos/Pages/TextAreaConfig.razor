@@ -13,8 +13,9 @@
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="4">
         <RadzenCard>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with 5 maximum characters</RadzenText>
-            <RadzenTextArea MaxLength="5" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) Style="width: 100%" aria-label="TextArea with 5 maximum characters" />
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">TextArea with @maxLength maximum characters</RadzenText>
+            <RadzenTextArea @bind-Value=@maxLengthValue @oninput="@(args => maxLengthValue = $"{args.Value}")" MaxLength="@maxLength" Change=@(args => OnChange(args, "TextArea with 5 maximum characters")) Style="width: 100%" aria-label="TextArea with 5 maximum characters" />
+            <span style="font-style: italic;">@($"{maxLengthValue.Length}/{maxLength}")</span>
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="4">
@@ -34,6 +35,9 @@
 <EventConsole @ref=@console />
 
 @code {
+    string maxLengthValue = "";
+    int maxLength = 5;
+
     string value;
 
     EventConsole console;
