@@ -525,7 +525,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string DownAriaLabel { get; set; } = "Down";
 
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Sets the focus on the input element.
         /// </summary>
@@ -533,6 +532,5 @@ namespace Radzen.Blazor
         {
             await input.FocusAsync();
         }
-#endif
     }
 }

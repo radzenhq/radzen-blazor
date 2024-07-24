@@ -385,7 +385,6 @@ namespace Radzen.Blazor
             return "rz-fileupload";
         }
 
-#if NET5_0_OR_GREATER
         async Task OnInputChange(Microsoft.AspNetCore.Components.Forms.InputFileChangeEventArgs args)
         {
             if (Disabled)
@@ -402,6 +401,5 @@ namespace Radzen.Blazor
 
             await InvokeAsync(StateHasChanged);
         }
-#endif
     }
 }

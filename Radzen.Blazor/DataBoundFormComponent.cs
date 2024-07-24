@@ -392,13 +392,12 @@ namespace Radzen
                                                                        .AddDisabled(Disabled)
                                                                        .Add(FieldIdentifier, EditContext)
                                                                        .Add("rz-state-empty", !HasValue);
-#if NET5_0_OR_GREATER
+
         /// <inheritdoc/>
         public virtual async ValueTask FocusAsync()
         {
             await Element.FocusAsync();
         }
-#endif
 
         /// <summary> Provides support for RadzenFormField integration. </summary>
         [CascadingParameter]

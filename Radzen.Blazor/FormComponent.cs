@@ -326,12 +326,11 @@ namespace Radzen
 
         /// <summary> Gets the current placeholder. Returns empty string if this component is inside a RadzenFormField.</summary>
         protected string CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
-#if NET5_0_OR_GREATER
+
         /// <inheritdoc/>
         public virtual async ValueTask FocusAsync()
         {
             await Element.FocusAsync();
         }
-#endif
     }
 }

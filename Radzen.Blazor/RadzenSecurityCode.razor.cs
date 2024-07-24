@@ -136,12 +136,10 @@ namespace Radzen.Blazor
             return ch != default(char) ? ch.ToString() : " ";
         }
 
-#if NET5_0_OR_GREATER
         /// <inheritdoc/>
         public override async ValueTask FocusAsync()
         {
             await JSRuntime.InvokeVoidAsync("Radzen.focusSecurityCode", Element);
         }
-#endif
     }
 }

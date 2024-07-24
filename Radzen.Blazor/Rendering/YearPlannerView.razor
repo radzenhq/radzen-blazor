@@ -295,9 +295,7 @@
         else if (key == "Enter")
         {
             await OnListClick(CurrentDate, AppointmentsInRange(CurrentDate, CurrentDate.AddDays(1)));
-#if NET5_0_OR_GREATER
             await view.FocusAsync();
-#endif
             preventKeyPress = true;
         }
         else if (key == "Space")
@@ -306,9 +304,7 @@
             if (appointment != null)
             {
                 await Scheduler.SelectAppointment(appointment);
-#if NET5_0_OR_GREATER
                 await view.FocusAsync();
-#endif
             }
 
             preventKeyPress = true;

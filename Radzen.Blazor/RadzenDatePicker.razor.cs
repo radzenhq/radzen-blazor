@@ -991,9 +991,7 @@ namespace Radzen.Blazor
                     Close();
                 }
             }
-#if NET5_0_OR_GREATER
             await FocusAsync();
-#endif
         }
 
         private void SetMonth(int month)
@@ -1135,9 +1133,7 @@ namespace Radzen.Blazor
             if (PopupRenderMode == PopupRenderMode.OnDemand && !Disabled && !ReadOnly && !Inline)
             {
                 await popup.ToggleAsync(Element);
-#if NET5_0_OR_GREATER
                 await FocusAsync();
-#endif
             }
         }
         DateTime FocusedDate { get; set; } = DateTime.Now;
@@ -1178,27 +1174,21 @@ namespace Radzen.Blazor
                 await SetDay(FocusedDate);
 
                 await ClosePopup();
-#if NET5_0_OR_GREATER
                 await FocusAsync();
-#endif
             }
             else if (key == "Escape")
             {
                 preventKeyPress = false;
 
                 await ClosePopup();
-#if NET5_0_OR_GREATER
                 await FocusAsync();
-#endif
             }
             else if (key == "Tab")
             {
                 preventKeyPress = false;
 
                 await ClosePopup();
-#if NET5_0_OR_GREATER
                 await FocusAsync();
-#endif
             }
             else
             {
@@ -1214,9 +1204,7 @@ namespace Radzen.Blazor
                 preventKeyPress = false;
 
                 await ClosePopup();
-#if NET5_0_OR_GREATER
                 await FocusAsync();
-#endif
             }
         }
 
@@ -1249,9 +1237,7 @@ namespace Radzen.Blazor
                 preventKeyPress = false;
 
                 await ClosePopup();
-#if NET5_0_OR_GREATER
                 await FocusAsync();
-#endif
             }
             else
             {
@@ -1284,7 +1270,7 @@ namespace Radzen.Blazor
         }
 
         bool preventKeyPress = false;
-#if NET5_0_OR_GREATER
+
         /// <inheritdoc/>
         public async ValueTask FocusAsync()
         {
@@ -1295,6 +1281,5 @@ namespace Radzen.Blazor
             catch
             {}
         }
-#endif
     }
 }

@@ -143,10 +143,7 @@
         else if (key == "Enter")
         {
             await OnSlotClick(CurrentDate);
-
-#if NET5_0_OR_GREATER
             await view.FocusAsync();
-#endif
 
             preventKeyPress = true;
         }
@@ -156,9 +153,7 @@
             if (appointment != null)
             {
                 await Scheduler.SelectAppointment(appointment);
-#if NET5_0_OR_GREATER
                 await view.FocusAsync();
-#endif
             }
 
             preventKeyPress = true;

@@ -627,7 +627,6 @@
 
     async Task OnContextMenu(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
     {
-#if NET5_0_OR_GREATER
         await OnCellContextMenu(new DataGridCellMouseEventArgs<TItem>
         {
             Data = Item,
@@ -647,25 +646,6 @@
             Type = args.Type,
             Column = Column
         });
-#else
-        await OnCellContextMenu(new DataGridCellMouseEventArgs<TItem>
-        {
-            Data = Item,
-            AltKey = args.AltKey,
-            Button = args.Button,
-            Buttons = args.Buttons,
-            ClientX = args.ClientX,
-            ClientY = args.ClientY,
-            CtrlKey = args.CtrlKey,
-            Detail = args.Detail,
-            MetaKey = args.MetaKey,
-            ScreenX = args.ScreenX,
-            ScreenY = args.ScreenY,
-            ShiftKey = args.ShiftKey,
-            Type = args.Type,
-            Column = Column
-        });
-#endif
     }
 
     bool clicking;
@@ -678,7 +658,6 @@
         try
         {
             clicking = true;
-#if NET5_0_OR_GREATER
         await OnCellClick(new DataGridCellMouseEventArgs<TItem>
         {
             Data = Item,
@@ -698,26 +677,7 @@
             Type = args.Type,
             Column = Column
         });
-#else
-        await OnCellClick(new DataGridCellMouseEventArgs<TItem>
-        {
-            Data = Item,
-            AltKey = args.AltKey,
-            Button = args.Button,
-            Buttons = args.Buttons,
-            ClientX = args.ClientX,
-            ClientY = args.ClientY,
-            CtrlKey = args.CtrlKey,
-            Detail = args.Detail,
-            MetaKey = args.MetaKey,
-            ScreenX = args.ScreenX,
-            ScreenY = args.ScreenY,
-            ShiftKey = args.ShiftKey,
-            Type = args.Type,
-            Column = Column
-        });
-#endif
-#if NET5_0_OR_GREATER
+
         await OnRowClick(new DataGridRowMouseEventArgs<TItem>
         {
             Data = Item,
@@ -736,24 +696,7 @@
             ShiftKey = args.ShiftKey,
             Type = args.Type
         });
-#else
-        await OnRowClick(new DataGridRowMouseEventArgs<TItem>
-        {
-            Data = Item,
-            AltKey = args.AltKey,
-            Button = args.Button,
-            Buttons = args.Buttons,
-            ClientX = args.ClientX,
-            ClientY = args.ClientY,
-            CtrlKey = args.CtrlKey,
-            Detail = args.Detail,
-            MetaKey = args.MetaKey,
-            ScreenX = args.ScreenX,
-            ScreenY = args.ScreenY,
-            ShiftKey = args.ShiftKey,
-            Type = args.Type
-        });
-#endif
+
         }
         finally
         {
@@ -763,7 +706,6 @@
 
     async Task OnDblClick(RadzenDataGridColumn<TItem> Column, TItem Item, MouseEventArgs args)
     {
-#if NET5_0_OR_GREATER
         await OnCellDblClick(new DataGridCellMouseEventArgs<TItem>
         {
             Data = Item,
@@ -783,26 +725,7 @@
             Type = args.Type,
             Column = Column
         });
-#else
-            await OnCellDblClick(new DataGridCellMouseEventArgs<TItem>
-            {
-                Data = Item,
-                AltKey = args.AltKey,
-                Button = args.Button,
-                Buttons = args.Buttons,
-                ClientX = args.ClientX,
-                ClientY = args.ClientY,
-                CtrlKey = args.CtrlKey,
-                Detail = args.Detail,
-                MetaKey = args.MetaKey,
-                ScreenX = args.ScreenX,
-                ScreenY = args.ScreenY,
-                ShiftKey = args.ShiftKey,
-                Type = args.Type,
-                Column = Column
-            });
-#endif
-#if NET5_0_OR_GREATER
+
         await OnRowDblClick(new DataGridRowMouseEventArgs<TItem>
         {
             Data = Item,
@@ -821,24 +744,6 @@
             ShiftKey = args.ShiftKey,
             Type = args.Type
         });
-#else
-        await OnRowDblClick(new DataGridRowMouseEventArgs<TItem>
-        {
-            Data = Item,
-            AltKey = args.AltKey,
-            Button = args.Button,
-            Buttons = args.Buttons,
-            ClientX = args.ClientX,
-            ClientY = args.ClientY,
-            CtrlKey = args.CtrlKey,
-            Detail = args.Detail,
-            MetaKey = args.MetaKey,
-            ScreenX = args.ScreenX,
-            ScreenY = args.ScreenY,
-            ShiftKey = args.ShiftKey,
-            Type = args.Type
-        });
-#endif
     }
 
     static string getExpandIconStyle(RadzenDataGrid<TItem> Grid, TItem Item, bool expandable)

@@ -157,9 +157,7 @@
     async Task OnAppointmentClick(AppointmentData data)
     {
         await Scheduler.SelectAppointment(data);
-#if NET5_0_OR_GREATER
         await contentView.FocusAsync();
-#endif
     }
 
     private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
@@ -236,9 +234,7 @@
         else if (key == "Enter")
         {
             await OnSlotClick(CurrentDate);
-#if NET5_0_OR_GREATER
             await contentView.FocusAsync();
-#endif
 
             preventKeyPress = true;
         }

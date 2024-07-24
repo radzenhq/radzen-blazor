@@ -17,7 +17,6 @@ namespace Radzen
     /// <typeparam name="T"></typeparam>
     public class DropDownBase<T> : DataBoundFormComponent<T>
     {
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Gets or sets a value that determines how many additional items will be rendered before and after the visible region. This help to reduce the frequency of rendering during scrolling. However, higher values mean that more elements will be present in the page.
         /// </summary>
@@ -78,27 +77,19 @@ namespace Radzen
         /// </summary>
         [Parameter]
         public int PageSize { get; set; } = 5;
-#endif
+
         /// <summary>
         /// Determines whether virtualization is allowed.
         /// </summary>
         /// <returns><c>true</c> if virtualization is allowed; otherwise, <c>false</c>.</returns>
         internal bool IsVirtualizationAllowed()
         {
-#if NET5_0_OR_GREATER
             return AllowVirtualization;
-#else
-            return false;
-#endif
         }
 
         internal int GetVirtualizationOverscanCount()
         {
-#if NET5_0_OR_GREATER
             return VirtualizationOverscanCount;
-#else
-            return 0;
-#endif
         }
 
         /// <summary>
@@ -109,7 +100,6 @@ namespace Radzen
         {
             return new RenderFragment(builder =>
             {
-#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
                     builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<object>));
@@ -138,12 +128,6 @@ namespace Radzen
                         RenderItem(builder, item);
                     }
                 }
-#else
-                foreach (var item in LoadData.HasDelegate ? Data : View)
-                {
-                    RenderItem(builder, item);
-                }
-#endif
             });
         }
 
@@ -522,7 +506,6 @@ namespace Radzen
             return item;
         }
 
-#if NET5_0_OR_GREATER
         /// <inheritdoc/>
         protected override async Task OnDataChanged()
         {
@@ -533,7 +516,6 @@ namespace Radzen
                 await InvokeAsync(Virtualize.RefreshDataAsync);
             }
         }
-#endif
 
         /// <summary>
         /// Gets the popup identifier.
@@ -653,9 +635,7 @@ namespace Radzen
             {
                 if (IsVirtualizationAllowed())
                 {
-#if NET5_0_OR_GREATER
                     items = virtualItems ?? Enumerable.Empty<object>().ToList();
-#endif
                 }
                 else
                 {
@@ -808,13 +788,11 @@ namespace Radzen
                 _view = null;
                 if (IsVirtualizationAllowed())
                 {
-#if NET5_0_OR_GREATER
                     if (virtualize != null)
                     {
                         await virtualize.RefreshDataAsync();
                     }
                     await InvokeAsync(() => { StateHasChanged(); });
-#endif
                 }
                 else
                 {
@@ -825,7 +803,6 @@ namespace Radzen
             {
                 if (IsVirtualizationAllowed())
                 {
-#if NET5_0_OR_GREATER
                     if (virtualize != null)
                     {
                         await InvokeAsync(virtualize.RefreshDataAsync);
@@ -835,7 +812,6 @@ namespace Radzen
                         await LoadData.InvokeAsync(await GetLoadDataArgs());
                     }
                     await InvokeAsync(() => { StateHasChanged(); });
-#endif
                 }
                 else
                 {
@@ -885,7 +861,6 @@ namespace Radzen
         /// <returns>LoadDataArgs.</returns>
         internal virtual async System.Threading.Tasks.Task<LoadDataArgs> GetLoadDataArgs()
         {
-#if NET5_0_OR_GREATER
             if (AllowVirtualization)
             {
                 return await Task.FromResult(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, Filter = searchText });
@@ -894,9 +869,6 @@ namespace Radzen
             {
                 return await Task.FromResult(new Radzen.LoadDataArgs() { Filter = searchText });
             }
-#else
-            return await Task.FromResult(new Radzen.LoadDataArgs() { Filter = searchText });
-#endif
         }
 
         /// <summary>
@@ -931,13 +903,12 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-#if NET5_0_OR_GREATER
             var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
             if (pageSize != default(int))
             {
                 PageSize = pageSize;
             }
-#endif
+
             var selectedItemChanged = parameters.DidParameterChange(nameof(SelectedItem), SelectedItem);
             if (selectedItemChanged)
             {

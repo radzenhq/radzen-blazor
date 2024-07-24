@@ -315,7 +315,6 @@ namespace Radzen.Blazor
             }
         }
 
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Sets the focus on the input element.
         /// </summary>
@@ -323,6 +322,5 @@ namespace Radzen.Blazor
         {
             await search.FocusAsync();
         }
-#endif
     }
 }

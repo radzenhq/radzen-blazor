@@ -120,7 +120,6 @@ namespace Radzen.Blazor
         ElementReference ContentEditable { get; set; }
         RadzenTextArea TextArea { get; set; }
 
-#if NET5_0_OR_GREATER
         /// <summary>
         /// Focuses the editor.
         /// </summary>
@@ -136,7 +135,6 @@ namespace Radzen.Blazor
                 return TextArea.Element.FocusAsync();
             }
         }
-#endif
 
         internal RadzenHtmlEditorCommandState State { get; set; } = new RadzenHtmlEditorCommandState();
 

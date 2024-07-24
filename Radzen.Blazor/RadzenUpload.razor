@@ -43,33 +43,21 @@
 </div>
 }
 @code {
-#if NET5_0_OR_GREATER
-        RenderFragment RenderInput()
-        {
-            return __builder => {
-                <text>
-                    @if(!string.IsNullOrEmpty(Url))
-                    {
-                        <input id="@(Name ?? GetId())" @ref="@fileUpload" @attributes="InputAttributes" type="file" multiple="@Multiple" accept="@Accept" disabled="@Disabled" 
-                           onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true, '@ParameterName')" tabindex="-1" onkeydown="event.stopPropagation()"/>
-                    }
-                    else
-                    {
-                        <Microsoft.AspNetCore.Components.Forms.InputFile id="@(Name ?? GetId())" @attributes="InputAttributes" multiple="@Multiple" accept="@Accept" disabled="@Disabled" 
-                            tabindex="-1" onkeydown="event.stopPropagation()" OnChange="@OnInputChange" />
-                    }
-                </text>
-             };
-        }
-#else
-        RenderFragment RenderInput()
-        {
-            return __builder => {
-                <text>
+    RenderFragment RenderInput()
+    {
+        return __builder => {
+            <text>
+                @if(!string.IsNullOrEmpty(Url))
+                {
                     <input id="@(Name ?? GetId())" @ref="@fileUpload" @attributes="InputAttributes" type="file" multiple="@Multiple" accept="@Accept" disabled="@Disabled" 
-                           onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true, '@ParameterName')" tabindex="-1" onkeydown="event.stopPropagation()"/>
-                </text>
-             };
-        }
-#endif
+                        onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true, '@ParameterName')" tabindex="-1" onkeydown="event.stopPropagation()"/>
+                }
+                else
+                {
+                    <Microsoft.AspNetCore.Components.Forms.InputFile id="@(Name ?? GetId())" @attributes="InputAttributes" multiple="@Multiple" accept="@Accept" disabled="@Disabled" 
+                        tabindex="-1" onkeydown="event.stopPropagation()" OnChange="@OnInputChange" />
+                }
+            </text>
+            };
+    }
  }

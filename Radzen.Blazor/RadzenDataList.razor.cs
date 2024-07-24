@@ -44,7 +44,6 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if wrap items; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool WrapItems { get; set; }
-#if NET5_0_OR_GREATER
 
         /// <summary>
         /// Gets or sets a value indicating whether this instance is virtualized.
@@ -88,12 +87,10 @@ namespace Radzen.Blazor
 
             return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
         }
-#endif
         RenderFragment DrawDataListRows()
         {
             return new RenderFragment(builder =>
             {
-#if NET5_0_OR_GREATER
                 if (AllowVirtualization)
                 {
                     builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>));
@@ -115,9 +112,6 @@ namespace Radzen.Blazor
                 {
                     DrawRows(builder);
                 }
-#else
-                DrawRows(builder);
-#endif
             });
         }
 
@@ -127,12 +121,11 @@ namespace Radzen.Blazor
         public async override Task Reload()
         {
             await base.Reload();
-#if NET5_0_OR_GREATER
+
             if (virtualize != null)
             {
                 await virtualize.RefreshDataAsync();
             }
-#endif
         }
 
         internal void DrawRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
