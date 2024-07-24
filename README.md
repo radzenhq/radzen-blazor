@@ -1,39 +1,13 @@
-![Radzen Blazor Components](RadzenBlazorDemos/wwwroot/images/radzen-blazor-components.png)
+![Radzen Blazor Components](https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/wwwroot/images/radzen-blazor-components.png)
 
-<h1 align="center">
-    Radzen Blazor Components
-</h1>
+Radzen Blazor Components
+========================
 
-<p align="center">
-    A set of <strong>70+ free and open source</strong> native Blazor UI controls.
-</p>
+A set of **70+ free and open source** native Blazor UI controls.
 
-<div align="center">
+See Online Demos or Read the Docs
 
-[See Online Demos](https://blazor.radzen.com) or [Read the Docs](https://blazor.radzen.com/docs/)
-
-</div>
-
----
-
-<p align="center">
-    <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE">
-        <img alt="License - MIT" src="https://img.shields.io/github/license/radzenhq/radzen-blazor?logo=github&style=for-the-badge" />
-    </a>
-    <a href="https://www.nuget.org/packages/Radzen.Blazor">
-        <img alt="NuGet Downloads" src="https://img.shields.io/nuget/dt/Radzen.Blazor?color=%232694F9&label=nuget%20downloads&logo=nuget&style=for-the-badge" />
-    </a>
-    <img alt="Last Commit" src="https://img.shields.io/github/last-commit/radzenhq/radzen-blazor?logo=github&style=for-the-badge" />
-    <a href="https://github.com/radzenhq/radzen-blazor/graphs/contributors">
-        <img alt="Github Contributors" src="https://img.shields.io/github/contributors/radzenhq/radzen-blazor?logo=github&style=for-the-badge" />
-    </a>
-    <a href="https://blazor.radzen.com">
-        <img alt="Radzen Blazor Components - Online Demos" src="https://img.shields.io/badge/demos-online-brightgreen?color=%232694F9&logo=blazor&style=for-the-badge" />
-    </a>
-    <a href="https://blazor.radzen.com/docs">
-        <img alt="Radzen Blazor Components - Documentation" src="https://img.shields.io/badge/docs-online-brightgreen?color=%232694F9&logo=blazor&style=for-the-badge" />
-    </a>
-</p>
+ [![License - MIT](https://img.shields.io/github/license/radzenhq/radzen-blazor?logo=github&style=for-the-badge)](https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE)[![NuGet Downloads](https://img.shields.io/nuget/dt/Radzen.Blazor?color=%232694F9&label=nuget%20downloads&logo=nuget&style=for-the-badge) ](https://www.nuget.org/packages/Radzen.Blazor)![Last Commit](https://img.shields.io/github/last-commit/radzenhq/radzen-blazor?logo=github&style=for-the-badge) [![Github Contributors](https://img.shields.io/github/contributors/radzenhq/radzen-blazor?logo=github&style=for-the-badge) ](https://github.com/radzenhq/radzen-blazor/graphs/contributors)[![Radzen Blazor Components - Online Demos](https://img.shields.io/badge/demos-online-brightgreen?color=%232694F9&logo=blazor&style=for-the-badge) ](https://blazor.radzen.com)[![Radzen Blazor Components - Documentation](https://img.shields.io/badge/docs-online-brightgreen?color=%232694F9&logo=blazor&style=for-the-badge)](https://blazor.radzen.com/docs)
 
 ## Why choose Radzen Blazor Components?
 
