@@ -23,8 +23,6 @@
         employees = allEmployees.Where(e => e.ReportsTo == null);
     }
 
-    Employee draggedItem;
-
     void ItemContextMenu(TreeItemContextMenuEventArgs args)
     { 
         ContextMenuService.Open(args,

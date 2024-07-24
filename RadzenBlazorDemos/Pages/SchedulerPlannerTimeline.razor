@@ -75,6 +75,7 @@
     async Task OnMonthSelect(SchedulerMonthSelectEventArgs args)
     {
         console.Log($"MonthSelect: MonthStart={args.MonthStart} AppointmentCount={args.Appointments.Count()}");
+        await Task.CompletedTask;
     }
 
     async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
