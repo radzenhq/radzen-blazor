@@ -17,6 +17,7 @@ namespace RadzenBlazorDemos
         {
             Name = "Dashboard",
             Path = "/dashboard",
+            Updated = true,
             Title = "Sample Dashboard | Free UI Components by Radzen",
             Description = "Rich dashboard created with the Radzen Blazor Components library.",
             Icon = "&#xe871"
