@@ -20,7 +20,7 @@ The Radzen.Blazor library provides a built-in service that persists the current 
 <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-8 rz-mb-4">1. Open the <code>Program.cs</code> file of your application and register the <code>CookieThemeService</code>:</RadzenText>
 <pre class="rz-p-4">
 <code>
-builder.Services.AddCookieThemeService(options =&gt;
+builder.Services.AddRadzenCookieThemeService(options =&gt;
 {
     options.Name = "MyApplicationTheme"; // The name of the cookie
     options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
