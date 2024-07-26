@@ -3,7 +3,7 @@
 @if (YAxis.Visible)
 {
     <g class="rz-axis rz-value-axis">
-    <Line Class="rz-line" X1="@x1" Y1="@y1" X2="@x1" Y2="@y2" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
+    <Line class="rz-line" X1="@x1" Y1="@y1" X2="@x1" Y2="@y2" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
     @for (var idx = start; idx <= end; idx += step)
     {
         var value = Chart.ValueScale.Value(idx);
@@ -25,7 +25,7 @@
 
         if (YAxis.GridLines.Visible && idx > start)
         {
-            <Line Class="rz-grid-line" X1="@x1" Y1="@y" X2="@x2" Y2="@y" Stroke="@YAxis.GridLines.Stroke" StrokeWidth="@YAxis.GridLines.StrokeWidth" LineType="@YAxis.GridLines.LineType" />
+            <Line class="rz-grid-line" X1="@x1" Y1="@y" X2="@x2" Y2="@y" Stroke="@YAxis.GridLines.Stroke" StrokeWidth="@YAxis.GridLines.StrokeWidth" LineType="@YAxis.GridLines.LineType" />
         }
     }
     @if (!String.IsNullOrEmpty(YAxis.Title.Text))

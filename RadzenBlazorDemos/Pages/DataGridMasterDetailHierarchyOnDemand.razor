@@ -30,7 +30,7 @@
         <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="200px" />
         <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="200px" >
             <Template Context="order">
-                <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" Class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 @order.Employee?.FirstName @order.Employee?.LastName
             </Template>
         </RadzenDataGridColumn>

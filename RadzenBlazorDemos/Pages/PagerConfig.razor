@@ -18,10 +18,10 @@
             </RadzenStack>
             <hr style="border: none; background-color: rgba(0,0,0,.2); height: 1px; margin: 1rem 0;" />
             <RadzenRow>
-                <RadzenColumn Size="8" Class="rz-text-truncate">
+                <RadzenColumn Size="8" class="rz-text-truncate">
                     <b>@(order.ShipName)</b>
                 </RadzenColumn>
-                <RadzenColumn Size="4" Class="rz-text-align-end">
+                <RadzenColumn Size="4" class="rz-text-align-end">
                     <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
                 </RadzenColumn>
             </RadzenRow>

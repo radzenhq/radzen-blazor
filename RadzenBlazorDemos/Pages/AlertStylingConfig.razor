@@ -1,18 +1,18 @@
 ﻿<RadzenStack Gap="1rem">
     <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
         <RadzenLabel Text="AlertStyle:" Style="width: 5rem;" Component="AlertStyle" />
-        <RadzenSelectBar @bind-Value="@alertStyle" Name="AlertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
-        <RadzenDropDown @bind-Value="@alertStyle" Name="AlertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+        <RadzenSelectBar @bind-Value="@alertStyle" Name="AlertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@alertStyle" Name="AlertStyle" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertStyle)).Cast<AlertStyle>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-inline-flex rz-display-xl-none" />
     </RadzenStack>
     <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
         <RadzenLabel Text="Size:" Style="width: 5rem;" Component="Size" />
-        <RadzenSelectBar @bind-Value="@size" Name="Size" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertSize)).Cast<AlertSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
-        <RadzenDropDown @bind-Value="@size" Name="Size" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertSize)).Cast<AlertSize>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+        <RadzenSelectBar @bind-Value="@size" Name="Size" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertSize)).Cast<AlertSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@size" Name="Size" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(AlertSize)).Cast<AlertSize>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-inline-flex rz-display-xl-none" />
     </RadzenStack>
     <RadzenStack Gap="1rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
         <RadzenLabel Text="Variant:" Style="width: 5rem;" Component="Variant" />
-        <RadzenSelectBar @bind-Value="@variant" Name="Variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" Class="rz-display-none rz-display-xl-flex" />
-        <RadzenDropDown @bind-Value="@variant" Name="Variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Class="rz-display-inline-flex rz-display-xl-none" />
+        <RadzenSelectBar @bind-Value="@variant" Name="Variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex" />
+        <RadzenDropDown @bind-Value="@variant" Name="Variant" TextProperty="Text" ValueProperty="Value" Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-inline-flex rz-display-xl-none" />
     </RadzenStack>
     <RadzenAlert Variant="Variant.Flat" AlertStyle="AlertStyle.Warning" Icon="info" Shade="Shade.Lighter" Size="AlertSize.Small" AllowClose=false>
         Base, Light and Dark alert styles don't have Shades

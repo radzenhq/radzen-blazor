@@ -5,7 +5,7 @@
 @inherits DbContextPage
 
 
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-2">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-2">
         <RadzenCheckBox @bind-Value="@allowVirtualization" Name="allowVirtualization"  />
         <RadzenLabel Text="Allow virtualization" Component="allowVirtualization" />
     </RadzenStack>
@@ -14,31 +14,31 @@
                     WrapItems="@(!allowVirtualization)" AllowPaging="@(!allowVirtualization)"
                     Data="@products" TItem="Product" PageSize="5" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true">
         <Template Context="product">
-            <RadzenCard Variant="Variant.Outlined" Class="rz-p-0" Style="width: 100%; overflow: hidden;">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0" Style="width: 100%; overflow: hidden;">
                 <RadzenRow Gap="0">
-                    <RadzenColumn Size="12" SizeLG="3" Class="rz-p-4 product-title">
-                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-color-on-secondary-lighter">@(product.ProductName)</RadzenText>
+                    <RadzenColumn Size="12" SizeLG="3" class="rz-p-4 product-title">
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-color-on-secondary-lighter">@(product.ProductName)</RadzenText>
                     </RadzenColumn>
-                    <RadzenColumn Size="12" SizeLG="7" Class="rz-p-4">
+                    <RadzenColumn Size="12" SizeLG="7" class="rz-p-4">
                         <RadzenRow Gap="0">
                             <RadzenColumn Size="12" SizeMD="6" SizeLG="2">
-                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-mb-0">In Stock</RadzenText>
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-mb-0">In Stock</RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body2">@(product.UnitsInStock)</RadzenText>
                             </RadzenColumn>
                             <RadzenColumn Size="12" SizeMD="6" SizeLG="2">
-                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-mb-0">Origin</RadzenText>
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-mb-0">Origin</RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body2">@(product.Supplier?.Country)</RadzenText>
                             </RadzenColumn>
                             <RadzenColumn Size="12" SizeMD="6" SizeLG="5">
-                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" Class="rz-mb-0">Sold by</RadzenText>
+                                <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H5" class="rz-mb-0">Sold by</RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body2">@(product.Supplier?.CompanyName)</RadzenText>
                             </RadzenColumn>
-                            <RadzenColumn Size="12" SizeMD="6" SizeLG="3" Class="rz-text-align-start rz-text-align-lg-end">
+                            <RadzenColumn Size="12" SizeMD="6" SizeLG="3" class="rz-text-align-start rz-text-align-lg-end">
                                 <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Shade="Shade.Lighter" class="price-badge" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", product.UnitPrice)}") />
                             </RadzenColumn>
                         </RadzenRow>
                     </RadzenColumn>
-                    <RadzenColumn Size="12" SizeLG="2" Class="rz-p-4">
+                    <RadzenColumn Size="12" SizeLG="2" class="rz-p-4">
                         <RadzenButton Text="Order now" Style="width: 100%" />
                     </RadzenColumn>
                 </RadzenRow>

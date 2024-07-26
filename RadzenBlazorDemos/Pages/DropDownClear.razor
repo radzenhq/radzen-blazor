@@ -2,7 +2,7 @@
 
 @inherits DbContextPage
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
     <RadzenLabel Text="Select Value" Component="DropDownClear" />
     <RadzenDropDown @bind-Value=@value Data=@products TextProperty="@nameof(Product.ProductName)" ValueProperty="ProductID" AllowClear=true Placeholder="Select product" Style="width: 100%; max-width: 400px;" Name="DropDownClear" />
 </RadzenStack>

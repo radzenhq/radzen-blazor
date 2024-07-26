@@ -1,6 +1,6 @@
 ﻿@inherits DbContextPage
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-12">
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-12">
     <RadzenLabel Text="Select Value" Component="DropDownDataGridChangeEvent" />
     <RadzenDropDownDataGrid TValue="string" Value=@value Data=@companyNames Change="@(args => value = $"{args}")" Name="DropDownDataGridChangeEvent" />
 </RadzenStack>

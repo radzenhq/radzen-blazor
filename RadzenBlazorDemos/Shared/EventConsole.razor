@@ -1,13 +1,13 @@
 @using Radzen
 @using System.Text.Json
 @inject IJSRuntime JSRuntime
-<RadzenCard Variant="Variant.Outlined" Class="rz-mt-4">
+<RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
     <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem" @attributes=@Attributes>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween">
-            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">Console log</RadzenText>
+            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">Console log</RadzenText>
             <RadzenButton Click=@OnClearClick Text="Clear console" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" />
         </RadzenStack>
-        <RadzenStack Orientation="Orientation.Vertical" Gap="0" ID="event-console" Class="rz-pt-1" Style="border-top: var(--rz-grid-cell-border); min-height: 2rem; max-height: 12rem; overflow: auto;">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0" ID="event-console" class="rz-pt-1" Style="border-top: var(--rz-grid-cell-border); min-height: 2rem; max-height: 12rem; overflow: auto;">
             @foreach (var message in messages)
             {
                 <RadzenAlert ShowIcon="false" Variant="Variant.Flat" AlertStyle="message.AlertStyle" Size="AlertSize.ExtraSmall" Shade="Shade.Lighter" AllowClose="false" Style="font-size: 0.75rem">

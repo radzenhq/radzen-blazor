@@ -5,7 +5,7 @@
 
 @inherits DbContextPage
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
     <RadzenLabel Text="Select Value" Component="DropDownGroupingMultiSelect" Style="margin-right: 8px; vertical-align: middle;" />
     <RadzenDropDown @ref=dd @bind-Value=@values TValue="IEnumerable<int>" AllowClear="true" Name="DropDownGroupingMultiSelect"
                     Data=@groupedData Style="width: 100%; max-width: 400px;" ItemRender="ItemRender">

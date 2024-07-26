@@ -2,12 +2,12 @@
 @inherits DbContextPage
 @inject NotificationService NotificationService
 
-<RadzenStack Class="rz-p-0 rz-p-md-12">
+<RadzenStack class="rz-p-0 rz-p-md-12">
     <RadzenTemplateForm TItem="Model" Data=@model Submit="@OnSubmit" InvalidSubmit="@OnIvalidSubmit">
         <RadzenFieldset Text="Category and products">
-            <RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12">
+            <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                         <RadzenLabel Text="Category" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
@@ -16,7 +16,7 @@
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                         <RadzenLabel Text="Last Name" Component="LastName" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
@@ -24,7 +24,7 @@
                         <RadzenRequiredValidator Component="Products" Text="Products are required" Style="position: absolute"/>
                     </RadzenColumn>
                 </RadzenRow>
-                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
                     <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
                         <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
                     </RadzenColumn>

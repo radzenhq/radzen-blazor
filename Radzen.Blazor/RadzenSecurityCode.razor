@@ -8,20 +8,20 @@
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" type="hidden" name="@Name">
         </div>
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="@Gap" Class="rz-security-code-wrapper">
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="@Gap" class="rz-security-code-wrapper">
             @foreach (var index in Enumerable.Range(1, Count))
             {
                 @if (Type == SecurityCodeType.Password)
                 {
-                    <RadzenPassword Value="@ElementAt(index - 1)" Disabled="@Disabled" autocomplete="one-time-code" MaxLength="1" size="1" Class="rz-security-code-input" />
+                    <RadzenPassword Value="@ElementAt(index - 1)" Disabled="@Disabled" autocomplete="one-time-code" MaxLength="1" size="1" class="rz-security-code-input" />
                 }
                 else if (Type == SecurityCodeType.Numeric)
                 {
-                    <RadzenTextBox inputmode="numeric" pattern="[0-9]*" Value="@ElementAt(index - 1)" Disabled="@Disabled" autocomplete="one-time-code" MaxLength="1" size="1" Class="rz-security-code-input" />
+                    <RadzenTextBox inputmode="numeric" pattern="[0-9]*" Value="@ElementAt(index - 1)" Disabled="@Disabled" autocomplete="one-time-code" MaxLength="1" size="1" class="rz-security-code-input" />
                 }
                 else
                 {
-                    <RadzenTextBox Value="@ElementAt(index - 1)" Disabled="@Disabled" autocomplete="one-time-code" MaxLength="1" size="1" Class="rz-security-code-input" />
+                    <RadzenTextBox Value="@ElementAt(index - 1)" Disabled="@Disabled" autocomplete="one-time-code" MaxLength="1" size="1" class="rz-security-code-input" />
                 }
             }
         </RadzenStack>

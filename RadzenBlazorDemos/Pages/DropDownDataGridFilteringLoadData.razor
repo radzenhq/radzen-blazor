@@ -5,7 +5,7 @@
 
 @inherits DbContextPage
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-12">
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-12">
     <RadzenLabel Text="Select Value" Component="DropDownDataGridFilteringLoadData" />
     <RadzenDropDownDataGrid AllowClear="true" @bind-Value=value
                     LoadData=@LoadData AllowFiltering="true"

@@ -2,22 +2,22 @@
 @using Radzen.Blazor.Rendering
 
 <g class="rz-line">
-    <Path D=@Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" Class="rz-scale-line" />
+    <Path D=@Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" class="rz-scale-line" />
 </g>
 @foreach (var tick in Ticks)
 {
     <g class="rz-tick">
-        <Path Class="rz-tick-line" D=@tick.Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" />
+        <Path class="rz-tick-line" D=@tick.Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" />
         if (!string.IsNullOrEmpty(tick.Value))
         {
-            <Text Value=@tick.Value Class="rz-tick-text" Position=@tick.Text />
+            <Text Value=@tick.Value class="rz-tick-text" Position=@tick.Text />
         }
     </g>
 }
 @foreach (var tick in MinorTicks)
 {
     <g class="rz-tick rz-minor-tick">
-        <Path Class="rz-tick-line" D=@tick.Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" />
+        <Path class="rz-tick-line" D=@tick.Path Stroke=@Stroke StrokeWidth=@StrokeWidth Fill="none" />
     </g>
 }
 

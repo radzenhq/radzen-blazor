@@ -3,14 +3,14 @@
 
 @inherits DbContextPage
 
-<RadzenCard Variant="Variant.Outlined" Class="rz-m-0 rz-m-md-12">
+<RadzenCard Variant="Variant.Outlined" class="rz-m-0 rz-m-md-12">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
         <RadzenButton Click=@(() => selection = categories.Skip(1).FirstOrDefault()) Text="Select 'Condiments'" ButtonStyle="ButtonStyle.Secondary" />
         <RadzenButton Click=@(() => selection = null) Text="Clear selection" ButtonStyle="ButtonStyle.Light" />
     </RadzenStack>
 </RadzenCard>
 
-<RadzenCard  Class="rz-m-0 rz-my-4 rz-m-md-12">
+<RadzenCard  class="rz-m-0 rz-my-4 rz-m-md-12">
     <RadzenTree Style="width: 100%; height: 300px" Change=@OnChange Data=@categories @bind-Value=@selection>
         <RadzenTreeLevel TextProperty="@nameof(Category.CategoryName)" ChildrenProperty="Products" />
         <RadzenTreeLevel TextProperty="@nameof(Product.ProductName)" HasChildren=@(product => false) />

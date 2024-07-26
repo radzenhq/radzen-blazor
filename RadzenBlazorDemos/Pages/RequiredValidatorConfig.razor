@@ -1,7 +1,7 @@
 @using Radzen
 @using System.Text.Json
 
-<RadzenStack Class="rz-p-0 rz-p-md-12">
+<RadzenStack class="rz-p-0 rz-p-md-12">
     <RadzenCard Variant="Variant.Outlined" Style="width: 100%">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
             <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
@@ -11,9 +11,9 @@
 
     <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
         <RadzenFieldset Text="Personal information">
-            <RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12">
+            <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                         <RadzenLabel Text="First Name" Component="FirstName" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
@@ -22,7 +22,7 @@
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                         <RadzenLabel Text="Last Name" Component="LastName" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
@@ -30,7 +30,7 @@
                         <RadzenRequiredValidator Component="LastName" Text="Last name is required" Popup=@popup Style="position: absolute"/>
                     </RadzenColumn>
                 </RadzenRow>
-                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
                     <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
                         <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
                     </RadzenColumn>

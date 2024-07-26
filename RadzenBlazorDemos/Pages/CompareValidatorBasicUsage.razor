@@ -1,17 +1,17 @@
 @using Radzen
 @using System.Text.Json
 
-<RadzenStack Class="rz-p-0 rz-p-md-12">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenCheckBox @bind-Value=@popup Name="popup"></RadzenCheckBox>
         <RadzenLabel Text="Display validators as popup" Component="popup" />
     </RadzenStack>
 
     <RadzenTemplateForm TItem="Model" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
         <RadzenFieldset Text="Password">
-            <RadzenStack Gap="2rem" Class="rz-p-4 rz-p-md-12">
+            <RadzenStack Gap="2rem" class="rz-p-4 rz-p-md-12">
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                         <RadzenLabel Text="Password" Component="Password" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
@@ -20,7 +20,7 @@
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
-                    <RadzenColumn Size="12" SizeMD="4" Class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
                         <RadzenLabel Text="Repeat Password" Component="RepeatPassword" />
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
@@ -29,7 +29,7 @@
                         <RadzenCompareValidator Visible=@(!string.IsNullOrEmpty(model.RepeatPassword)) Value=@model.Password Component="RepeatPassword" Text="Passwords should be the same" Popup=@popup Style="position: absolute" />
                     </RadzenColumn>
                 </RadzenRow>
-                <RadzenRow AlignItems="AlignItems.Center" Class="rz-mt-4">
+                <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
                     <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
                         <RadzenButton ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
                     </RadzenColumn>

@@ -10,30 +10,30 @@
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween" Style="height: 100%;">
     <RadzenStack>
     <RadzenRow>
-        <RadzenColumn Size="12" SizeMD="6" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
+        <RadzenColumn Size="12" SizeMD="6" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
             <RadzenText TextStyle="TextStyle.Subtitle1">Contact</RadzenText>
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                 <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
-                <RadzenStack Gap="0" Class="rz-text-truncate">
-                    <RadzenText TextStyle="TextStyle.Overline" Class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Employee</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1" Class="rz-text-truncate"><b>@(order?.Employee?.FirstName + " " + order?.Employee?.LastName)</b></RadzenText>
-                    <RadzenText TextStyle="TextStyle.Overline" Class="rz-mt-4 rz-mb-0" Style="color: var(--rz-text-tertiary-color);">Company</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1" Class="rz-text-truncate"><b>@order.Customer?.CompanyName</b></RadzenText>
+                <RadzenStack Gap="0" class="rz-text-truncate">
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Employee</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(order?.Employee?.FirstName + " " + order?.Employee?.LastName)</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-4 rz-mb-0" Style="color: var(--rz-text-tertiary-color);">Company</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@order.Customer?.CompanyName</b></RadzenText>
                 </RadzenStack>
             </RadzenStack>
         </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
+        <RadzenColumn Size="12" SizeMD="6" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border)">
             <RadzenText TextStyle="TextStyle.Subtitle1">Delivery Information</RadzenText>
-            <RadzenStack Gap="0" Class="rz-text-truncate">
-                <RadzenText TextStyle="TextStyle.Overline" Class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Address</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1" Class="rz-text-truncate"><b>@(order.ShipAddress), @(order.ShipCity), @(order.ShipCountry)</b></RadzenText>
-                <RadzenText TextStyle="TextStyle.Overline" Class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Ship name</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1" Class="rz-text-truncate"><b>@(order.ShipName)</b></RadzenText>
+            <RadzenStack Gap="0" class="rz-text-truncate">
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Address</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(order.ShipAddress), @(order.ShipCity), @(order.ShipCountry)</b></RadzenText>
+                <RadzenText TextStyle="TextStyle.Overline" class="rz-mt-2 rz-my-0" Style="color: var(--rz-text-tertiary-color);">Ship name</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-text-truncate"><b>@(order.ShipName)</b></RadzenText>
             </RadzenStack>
         </RadzenColumn>
     </RadzenRow>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
-        <RadzenText TextStyle="TextStyle.Subtitle1" Class="rz-m-0">Order @OrderID Details</RadzenText>
+        <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-m-0">Order @OrderID Details</RadzenText>
         <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}")/>
     </RadzenStack>
     <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"

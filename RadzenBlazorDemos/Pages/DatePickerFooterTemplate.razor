@@ -1,8 +1,8 @@
-﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" Class="rz-p-12">
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
     <RadzenLabel Text="Select Date" Component="DatePickerFooterTemplate" />
     <RadzenDatePicker @bind-Value=@value Name="DatePickerFooterTemplate">
         <FooterTemplate>
-            <RadzenButton Click=@(args => value = DateTime.Now) Text="Today" Style="width: 100%;" Class="rz-my-4" />
+            <RadzenButton Click=@(args => value = DateTime.Now) Text="Today" Style="width: 100%;" class="rz-my-4" />
         </FooterTemplate>
     </RadzenDatePicker>
 </RadzenStack>

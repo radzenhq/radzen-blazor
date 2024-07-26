@@ -5,9 +5,9 @@
 @inject NorthwindODataService service
 
 <RadzenStack Gap="2rem">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenCheckBox @bind-Value="@auto" Name="auto" />
-        <RadzenLabel Text="Auto filter" Component="auto" Class="rz-me-6" />
+        <RadzenLabel Text="Auto filter" Component="auto" class="rz-me-6" />
         <RadzenButton Text="Apply Filter" Click="@ApplyFilter" Disabled="@auto" Size="ButtonSize.Small" />
     </RadzenStack>
 

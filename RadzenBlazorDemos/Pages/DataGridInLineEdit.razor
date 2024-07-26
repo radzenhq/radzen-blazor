@@ -10,7 +10,7 @@
     }
 </style>
 
-<RadzenCard Variant="Variant.Outlined" Class="rz-my-4">
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
         <div>Edit Mode:</div>
         <RadzenSelectBar @bind-Value="@editMode" TextProperty="Text" ValueProperty="Value"
@@ -34,14 +34,14 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="220px">
             <Template Context="order">
-                <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" Class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 @order.Employee?.FirstName @order.Employee?.LastName
             </Template>
             <EditTemplate Context="order">
                 <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
                     <Template>
-                        <RadzenImage Path="@context.Photo" Style="width: 20px; height: 20px;" Class="rz-border-radius-4 rz-me-2" />
+                        <RadzenImage Path="@context.Photo" Style="width: 20px; height: 20px;" class="rz-border-radius-4 rz-me-2" />
                         @context.FirstName @context.LastName
                     </Template>
                 </RadzenDropDown>

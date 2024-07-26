@@ -19,11 +19,11 @@
                 <RadzenCard Style="width: 250px">
                     <RadzenStack Gap="1rem">
                         <RadzenRow>
-                            <RadzenColumn Size="8" Class="rz-text-truncate">
+                            <RadzenColumn Size="8" class="rz-text-truncate">
                                 <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="rz-me-1" />
                                 <b>@(order.ShipName)</b>
                             </RadzenColumn>
-                            <RadzenColumn Size="4" Class="rz-text-align-end">
+                            <RadzenColumn Size="4" class="rz-text-align-end">
                                 <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
                             </RadzenColumn>
                         </RadzenRow>

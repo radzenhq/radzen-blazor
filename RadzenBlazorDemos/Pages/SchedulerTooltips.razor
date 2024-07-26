@@ -23,8 +23,8 @@
     void OnAppointmentMouseEnter(SchedulerAppointmentMouseEventArgs<Appointment> args)
     {
 TooltipService.Open(args.Element, ts =>
-@<RadzenStack Orientation="Orientation.Vertical" Gap="0" Class="rz-p-6" Style="min-width: 250px; max-width: 500px;">
-    <RadzenText TextStyle="TextStyle.H4" Class="rz-mb-4" Style="color: var(--rz-tooltip-color);">
+@<RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-p-6" Style="min-width: 250px; max-width: 500px;">
+    <RadzenText TextStyle="TextStyle.H4" class="rz-mb-4" Style="color: var(--rz-tooltip-color);">
         @args.Data.Text
     </RadzenText>
     <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">

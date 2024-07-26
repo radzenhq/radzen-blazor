@@ -25,7 +25,7 @@
                 <RadzenDataList Data="@Themes.Free" Style="--rz-datalist-item-border: none;--rz-datalist-padding: 0.5rem 0;--rz-datalist-item-vertical-margin: 0;--rz-datalist-item-horizontal-margin: 0;">
                     <Template>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
-                            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">@context.Text</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">@context.Text</RadzenText>
                             <svg width="100%" viewBox="0 0 288 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: var(--rz-border-radius); overflow: hidden; outline: var(--rz-border-disabled);">
                                 <rect width="288" height="72" fill="@context.Base"/>
                                 <g filter="url(#dropShadow1)"><rect x="196" y="12" width="80" height="48" rx="@context.CardRadius" fill="@context.Content"/></g>
@@ -101,7 +101,7 @@
                 <RadzenDataList Data="@Themes.Premium" Style="--rz-datalist-item-border: none;--rz-datalist-padding: 0.5rem 0;--rz-datalist-item-vertical-margin: 0;--rz-datalist-item-horizontal-margin: 0;">
                     <Template>
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap" @onclick=@(args => NavigationManager.NavigateTo(NavigationManager.GetUriWithQueryParameter("theme", $"{context.Value}"), true)) Style="cursor:pointer">
-                            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" Class="rz-m-0">@context.Text</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-m-0">@context.Text</RadzenText>
                             <svg width="100%" viewBox="0 0 288 72" fill="none" xmlns="http://www.w3.org/2000/svg" style="border-radius: var(--rz-border-radius); overflow: hidden; outline: var(--rz-border-disabled);">
                                 <rect width="288" height="72" fill="@context.Base"/>
                                 <g filter="url(#dropShadow1)"><rect x="196" y="12" width="80" height="48" rx="@context.CardRadius" fill="@context.Content"/></g>
@@ -174,7 +174,7 @@
                 Swatches are a premium feature of Radzen Blazor Studio. Each theme contains a collection of predefined color swatches to pick from.
             </RadzenText>
                 <RadzenLink Path="https://www.radzen.com/blazor-studio/documentation/appearance/themes-and-swatches/#swatches" target="_blank">
-                    <RadzenImage Path="images/radzen-blazor-material3-theme.gif" Style="width: 100%" Class="rz-mb-6" AlternateText="material3"></RadzenImage>
+                    <RadzenImage Path="images/radzen-blazor-material3-theme.gif" Style="width: 100%" class="rz-mb-6" AlternateText="material3"></RadzenImage>
                     Read more about swatches ↗
                 </RadzenLink>
         </RadzenCard>
@@ -188,7 +188,7 @@
         <RadzenText TextStyle="TextStyle.Subtitle1">
             The Appearance panel in Radzen Blazor Studio provides a comprehensive interface to easily customize the UI theme of your Blazor application in real time.
         </RadzenText>
-        <RadzenLink Path="https://www.radzen.com/blazor-studio/documentation/appearance/edit-theme/" target="_blank" Class="rz-display-block rz-mb-6">
+        <RadzenLink Path="https://www.radzen.com/blazor-studio/documentation/appearance/edit-theme/" target="_blank" class="rz-display-block rz-mb-6">
             Read more about theme editing ↗
         </RadzenLink>
     <RadzenCard Variant="Variant.Outlined" class="rz-p-7">

@@ -1,6 +1,6 @@
 ﻿@inject ContextMenuService ContextMenuService
 
-<RadzenStack Gap="1rem" Class="rz-p-sm-12">
+<RadzenStack Gap="1rem" class="rz-p-sm-12">
     <button @oncontextmenu=@(args => ShowContextMenuWithContent(args)) @oncontextmenu:preventDefault="true">
         Right click me
     </button>

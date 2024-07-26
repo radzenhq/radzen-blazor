@@ -1,5 +1,5 @@
-﻿<div Class="rz-p-0 rz-p-md-12">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+﻿<div class="rz-p-0 rz-p-md-12">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
             <RadzenCheckBox @bind-Value=@showHSV Name="HSV" />
             <RadzenLabel Text="Show HSV picker" Component="HSV" />
@@ -17,8 +17,8 @@
             <RadzenLabel Text="Show OK button" Component="OKButton" />
         </RadzenStack>
     </RadzenStack>
-    <RadzenRow Class="rz-my-12">
-        <RadzenColumn Size="12" SizeMD="6" Class="rz-text-align-center rz-text-align-md-end">
+    <RadzenRow class="rz-my-12">
+        <RadzenColumn Size="12" SizeMD="6" class="rz-text-align-center rz-text-align-md-end">
             <svg viewBox="0 0 162 132" style="max-width: 320px; width: 100%; fill: @color" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M1.29477 24.6984C25.7628 11.5979 46.6508 12.9238 67.3361 1.63629C78.4325 4.06733 86.6932 3.09548 94.3293 1.37421C117.758 12.1606 138.358 13.89 160.371 24.9604C158.541 36.5199 154.512 46.5082 147.791 54.5742C139.638 50.2043 131.923 48.4679 124.467 48.2845L123.943 126.905C91.8215 132.888 64.5959 130.303 37.9844 126.643L37.7224 48.5466C28.3517 48.2744 21.2219 51.7371 13.8741 54.8363C6.80686 45.2009 3.50523 35.0276 1.29477 24.6984Z" stroke="black" stroke-width="2"/>
                 <path d="M4.96375 23.388C7.17842 34.1365 11.0472 44.1749 18.5913 52.7397" stroke="black"/>
@@ -37,8 +37,8 @@
                 <path d="M60.5 47C55.2532 47 51 51.2532 51 56.4998C51 60.4533 53.4157 63.842 56.8515 65.2724C56.8173 63.6038 56.7306 61.9644 56.6892 61.0248H59.3073C59.1975 61.6463 59.143 63.8236 59.1558 65.9034C59.5952 65.9655 60.0435 66 60.5 66C65.7464 66 70 61.7468 70 56.5002C70 51.2535 65.7468 47 60.5 47ZM59.3073 60.1769H56.6892C57.0405 58.079 56.773 53.3497 56.6892 51.4533H59.3073C59.114 52.5487 59.0914 58.4494 59.3073 60.1769ZM63.2627 55.46C64.2625 55.7019 66.0952 56.8078 66.0952 56.8078C66.0952 56.8078 63.9608 56.9448 62.9574 56.7016C62.165 56.512 61.5905 55.9602 61.3864 55.7364C60.853 56.2428 60.4208 56.6441 59.7513 57.6094L59.5834 57.6426L59.5334 57.5183L59.5538 57.4759C60.0225 56.7983 60.2542 56.5623 60.6699 56.1117L61.1422 55.6332C61.7841 55.0156 62.2452 54.6916 62.3671 54.6163C62.5193 54.2686 62.9715 53.3806 63.8336 52.8254C64.9208 52.1257 67.5071 51.4175 67.5071 51.4175C67.5071 51.4175 65.7898 53.4755 64.7062 54.1762C63.904 54.6925 62.9814 54.7668 62.5492 54.7724L62.5374 54.7915C62.5295 54.7934 62.1565 55.0307 61.599 55.531C61.9612 55.4271 62.5998 55.2979 63.2627 55.46Z" fill="#F36F45"/>
             </svg>
         </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6" Class="rz-text-align-center rz-text-align-md-start">
-            <RadzenText TextStyle="TextStyle.H6" Class="rz-mt-4 rz-mt-md-12">Choose T-Shirt color</RadzenText>
+        <RadzenColumn Size="12" SizeMD="6" class="rz-text-align-center rz-text-align-md-start">
+            <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mt-md-12">Choose T-Shirt color</RadzenText>
             <RadzenColorPicker @bind-Value=@color ShowHSV=@showHSV ShowRGBA=@showRGBA ShowColors=@showColors ShowButton=@showButton Change=@OnChange />
         </RadzenColumn>
     </RadzenRow>

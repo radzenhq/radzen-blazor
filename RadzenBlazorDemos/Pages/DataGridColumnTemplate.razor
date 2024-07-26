@@ -18,10 +18,10 @@
         <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                    <RadzenImage Path="@order.Employee?.Photo" Style="width: 40px; height: 40px;" Class="rz-border-radius-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                    <RadzenImage Path="@order.Employee?.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                     <RadzenStack Gap="0">
-                        <RadzenText TextStyle="TextStyle.Subtitle2" Class="rz-mb-0">@order.Employee?.FirstName @order.Employee?.LastName</RadzenText>
-                        <RadzenText TextStyle="TextStyle.Caption" Class="rz-mb-0">@order.Customer?.CompanyName</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-mb-0">@order.Employee?.FirstName @order.Employee?.LastName</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Caption" class="rz-mb-0">@order.Customer?.CompanyName</RadzenText>
                     </RadzenStack>
                 </RadzenStack>
             </Template>

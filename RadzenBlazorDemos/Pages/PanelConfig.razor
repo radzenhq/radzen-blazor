@@ -14,16 +14,16 @@
     </style>
 }
 
-<RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
     <RadzenText TextStyle="TextStyle.Body1">Expand/Collapse position:</RadzenText>
     <RadzenSelectBar @bind-Value="@position" TextProperty="Text" ValueProperty="Value"
                      Data="@(new []{ new { Text = "Left", Value = 0 }, new { Text = "Right", Value = 1 } })" Size="ButtonSize.Small" />
 </RadzenStack>
 
-<RadzenPanel AllowCollapse="true" Class="rz-my-10 rz-mx-auto" Style="width: 700px;"
+<RadzenPanel AllowCollapse="true" class="rz-my-10 rz-mx-auto" Style="width: 700px;"
                 Expand=@(() => Change("Panel expanded")) Collapse=@(() => Change("Panel collapsed")) >
     <HeaderTemplate>
-        <RadzenText TextStyle="TextStyle.H6" Class="rz-display-flex rz-align-items-center rz-m-0">
+        <RadzenText TextStyle="TextStyle.H6" class="rz-display-flex rz-align-items-center rz-m-0">
             <RadzenIcon Icon="account_box" class="rz-me-1" /><b>Orders</b>
         </RadzenText>
     </HeaderTemplate>
@@ -46,7 +46,7 @@
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
                             <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                             <RadzenStack Gap="0">
-                                <RadzenText TextStyle="TextStyle.H6" Class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
+                                <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body1">@order.ShipAddress</RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body2">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
                             </RadzenStack>

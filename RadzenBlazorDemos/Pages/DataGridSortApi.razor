@@ -4,9 +4,9 @@
 
 @inherits DbContextPage
 
-<RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
+<RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" class="rz-p-4 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);">
     <RadzenCheckBox @bind-Value="@resetPaging" Name="resetPaging" />
-    <RadzenLabel Text="Reset to first page on sort" Component="resetPaging" Class="rz-me-6" />
+    <RadzenLabel Text="Reset to first page on sort" Component="resetPaging" class="rz-me-6" />
 </RadzenStack>
 
 <RadzenDataGrid @ref="grid" AllowColumnResize="true" PageSize="5" AllowPaging="true" GotoFirstPageOnSort="@resetPaging"

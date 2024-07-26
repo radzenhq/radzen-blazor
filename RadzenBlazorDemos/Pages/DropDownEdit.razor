@@ -1,6 +1,6 @@
 ﻿@inherits DbContextPage
 
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" Class="rz-p-sm-12">
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
     <RadzenLabel id="DropDownEditLabel" Text="Select Value" Component="DropDownEdit" />
     <RadzenDropDown @bind-Value=@value Data=@companyNames Style="width: 100%; max-width: 400px;" Name="DropDownEdit">
         <ValueTemplate>

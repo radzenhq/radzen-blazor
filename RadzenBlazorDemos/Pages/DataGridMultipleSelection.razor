@@ -5,7 +5,7 @@
 
 @inherits DbContextPage
 
-<RadzenCard Variant="Variant.Outlined" Class="rz-my-4">
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
         <RadzenCheckBox @bind-Value=@allowRowSelectOnRowClick Name="CheckBox1" />
         <RadzenLabel Text="Allow row select on row click" Component="CheckBox1" />
@@ -30,7 +30,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" Class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
                 @data.FirstName @data.LastName
             </Template>
         </RadzenDataGridColumn>

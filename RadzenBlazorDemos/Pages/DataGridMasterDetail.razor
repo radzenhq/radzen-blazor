@@ -18,7 +18,7 @@ else
                     <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="200px" />
                     <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="200px" >
                         <Template Context="order">
-                            <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" Class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
+                            <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                             @order.Employee?.FirstName @order.Employee?.LastName
                         </Template>
                     </RadzenDataGridColumn>
@@ -33,7 +33,7 @@ else
         <RadzenColumn Size="12" SizeMD="6">
             <RadzenCard Variant="Variant.Outlined" Style="height: 100%;">
                 <RadzenStack Gap="1rem">
-                    <RadzenCard Variant="Variant.Text" Class="rz-background-color-primary-lighter rz-color-on-primary-lighter">
+                    <RadzenCard Variant="Variant.Text" class="rz-background-color-primary-lighter rz-color-on-primary-lighter">
                     Company:
                     <b>@SelectedOrders.FirstOrDefault()?.Customer?.CompanyName</b>
                 </RadzenCard>
@@ -62,7 +62,7 @@ else
                                 <RadzenDataList WrapItems="true" AllowPaging="true" Data="@(SelectedOrders.FirstOrDefault()?.OrderDetails)" PageSize="10">
                                     <Template Context="detail">
                                         <RadzenCard Variant="Variant.Outlined"Style="width:100px; height:100px">
-                                            <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Product" Class="rz-mb-1" />
+                                            <RadzenBadge Shade="Shade.Lighter" BadgeStyle="BadgeStyle.Info" Text="Product" class="rz-mb-1" />
                                             <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P">@detail?.Product?.ProductName</RadzenText>
                                         </RadzenCard>
                                     </Template>

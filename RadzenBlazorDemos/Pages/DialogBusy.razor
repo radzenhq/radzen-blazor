@@ -31,7 +31,7 @@
     async Task BusyDialog()
     {
         await DialogService.OpenAsync("", ds =>
-    @<RadzenStack AlignItems="AlignItems.Center" Gap="2rem" Class="rz-p-12">
+    @<RadzenStack AlignItems="AlignItems.Center" Gap="2rem" class="rz-p-12">
         <RadzenImage Path="images/community.svg" Style="width: 200px;" AlternateText="community" />
         <RadzenText TextStyle="TextStyle.H6">Loading, please wait...</RadzenText>
     </RadzenStack>, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });

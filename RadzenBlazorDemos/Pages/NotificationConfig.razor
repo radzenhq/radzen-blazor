@@ -1,8 +1,8 @@
 ﻿@inject NotificationService NotificationService
 
-<RadzenRow Gap="1rem" RowGap="1rem" Class="rz-m-0 rz-m-md-12">
+<RadzenRow Gap="1rem" RowGap="1rem" class="rz-m-0 rz-m-md-12">
     <RadzenColumn Size="12" SizeMD="3">
-        <RadzenCard Variant="Variant.Flat" Class="rz-background-color-info-lighter">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-info-lighter">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Info</RadzenText>
             <RadzenButton Text="Show info notification" Style="width: 100%;"
                 ButtonStyle="ButtonStyle.Info"
@@ -10,7 +10,7 @@
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="3">
-        <RadzenCard Variant="Variant.Flat" Class="rz-background-color-warning-lighter">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-warning-lighter">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Warning</RadzenText>
             <RadzenButton Text="Show warning notification" Style="width: 100%;"
                 ButtonStyle="ButtonStyle.Warning"
@@ -18,7 +18,7 @@
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="3">
-        <RadzenCard Variant="Variant.Flat" Class="rz-background-color-danger-lighter">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-danger-lighter">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Error</RadzenText>
             <RadzenButton Text="Show error notification" Style="width: 100%;"
                 ButtonStyle="ButtonStyle.Danger"
@@ -26,7 +26,7 @@
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="3">
-        <RadzenCard Variant="Variant.Flat" Class="rz-background-color-success-lighter">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-success-lighter">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Success</RadzenText>
             <RadzenButton Text="Show success notification" Style="width: 100%;"
                 ButtonStyle="ButtonStyle.Success"
@@ -35,23 +35,23 @@
     </RadzenColumn>
 </RadzenRow>
 
-<RadzenRow Gap="1rem" RowGap="1rem" Class="rz-m-0 rz-m-md-12">
+<RadzenRow Gap="1rem" RowGap="1rem" class="rz-m-0 rz-m-md-12">
     <RadzenColumn Size="12" SizeMD="4">
-        <RadzenCard Variant="Variant.Flat" Class="rz-background-color-primary-lighter">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary-lighter">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Notification with custom position</RadzenText>
             <RadzenButton Text="Show notification at custom position" Style="width: 100%;"
                 Click=@(args => ShowNotification(new NotificationMessage { Style = "position: absolute; inset-inline-start: -1000px;", Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 })) />
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="4">
-        <RadzenCard Variant="Variant.Flat" Class="rz-background-color-primary-lighter">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary-lighter">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Notification with custom click handler</RadzenText>
             <RadzenButton Text="Show notification with custom click handler" Style="width: 100%;"
                 Click="@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Click Summary", Detail = "Click Me", Duration = 4000, Click=NotificationClick, CloseOnClick = true, Payload = DateTime.Now }))" />
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="4">
-        <RadzenCard Variant="Variant.Flat" Class="rz-background-color-primary-lighter">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary-lighter">
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Notification with custom content</RadzenText>
             <RadzenButton Text="Show notification with custom content" Style="width: 100%;"
                 Click="@(args => ShowNotificationWithCustomContent())" />

@@ -3,7 +3,7 @@
 @if (XAxis.Visible)
 {
     <g class="rz-axis rz-category-axis">
-    <Line Class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@XAxis.Stroke" StrokeWidth="@XAxis.StrokeWidth" LineType="@XAxis.LineType" />
+    <Line class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@XAxis.Stroke" StrokeWidth="@XAxis.StrokeWidth" LineType="@XAxis.LineType" />
     @for (var idx = start; idx <= end; idx += step)
     {
         var value = Chart.CategoryScale.Value((double)idx);
@@ -26,7 +26,7 @@
 
         if (XAxis.GridLines.Visible && idx > start)
         {
-            <Line Class="rz-grid-line" X1="@x" Y1="@y1" X2="@x" Y2="@y2" Stroke="@XAxis.GridLines.Stroke" StrokeWidth="@XAxis.GridLines.StrokeWidth" LineType="@XAxis.GridLines.LineType" />
+            <Line class="rz-grid-line" X1="@x" Y1="@y1" X2="@x" Y2="@y2" Stroke="@XAxis.GridLines.Stroke" StrokeWidth="@XAxis.GridLines.StrokeWidth" LineType="@XAxis.GridLines.LineType" />
         }
     }
     @if (!String.IsNullOrEmpty(XAxis.Title.Text))

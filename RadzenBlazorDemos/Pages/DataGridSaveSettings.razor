@@ -22,7 +22,7 @@
     <Columns>
         <RadzenDataGridColumn Title="Employee" Sortable="false" Filterable="false" UniqueID="Employee">
             <Template Context="data">
-                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" Class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                <RadzenImage Path="@data.Photo" Style="width: 40px; height: 40px;" class="rz-border-radius-2 rz-me-2" AlternateText="@(data.FirstName + " " + data.LastName)" />
                 @data.FirstName @data.LastName
             </Template>
         </RadzenDataGridColumn>

@@ -1,6 +1,6 @@
 ﻿@inject ContextMenuService ContextMenuService
 
-<RadzenStack Gap="1rem" Class="rz-p-sm-12">
+<RadzenStack Gap="1rem" class="rz-p-sm-12">
     <RadzenButton Text="Right click me" ContextMenu=@(args => ShowContextMenuWithContent(args)) ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Large" />
     <EventConsole @ref=@console />
 </RadzenStack>

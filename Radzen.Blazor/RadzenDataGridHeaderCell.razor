@@ -171,8 +171,8 @@
                         @if (Column.FilterTemplate == null)
                         {
                             <div class="rz-grid-filter-buttons">
-                                <RadzenButton ButtonStyle="ButtonStyle.Base" Class="rz-clear-filter" Click="@ClearFilter" Text=@Grid.ClearFilterText title="@Grid.ClearFilterText" />
-                                <RadzenButton ButtonStyle="ButtonStyle.Primary" Class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-clear-filter" Click="@ClearFilter" Text=@Grid.ClearFilterText title="@Grid.ClearFilterText" />
+                                <RadzenButton ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
                             </div>
                         }
                     </Popup>
