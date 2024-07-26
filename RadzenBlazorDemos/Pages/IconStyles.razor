@@ -1,9 +1,35 @@
-﻿<RadzenDataList TItem="IconStyle" Data="@(Enum.GetValues<IconStyle>())" WrapItems="true" class="rz-p-12">
-    <Template Context="style">
-        <div>
-            <h5>@style.ToString()</h5>
-            <RadzenIcon Icon="dashboard" IconStyle="@style" />
-            <RadzenIcon Icon="open_with" IconStyle="@style" />
-        </div>
-    </Template>
-</RadzenDataList>
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" class="rz-p-0 rz-p-md-6 rz-p-lg-12" >
+    <RadzenCard Variant="Variant.Flat">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Primary" />
+    </RadzenCard>
+    <RadzenCard Variant="Variant.Flat">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Secondary" />
+    </RadzenCard>
+    <RadzenCard Variant="Variant.Flat">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Info" />
+    </RadzenCard>
+    <RadzenCard Variant="Variant.Flat">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Success" />
+    </RadzenCard>
+    <RadzenCard Variant="Variant.Flat">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Warning" />
+    </RadzenCard>
+    <RadzenCard Variant="Variant.Flat">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Danger" />
+    </RadzenCard>
+    <RadzenCard Variant="Variant.Flat" class="rz-background-color-base-700">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Light" />
+    </RadzenCard>
+    <RadzenCard Variant="Variant.Flat" class="rz-background-color-on-base">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Base" />
+    </RadzenCard>
+    <RadzenCard Variant="Variant.Flat" class="rz-background-color-base-200">
+        <RadzenIcon Icon="dashboard" IconStyle="IconStyle.Dark" />
+    </RadzenCard>
+</RadzenStack>
+
+<style>
+    .rz-card {
+        line-height: 0;
+    }
+</style>
