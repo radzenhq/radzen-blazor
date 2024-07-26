@@ -33,3 +33,30 @@ builder.Services.AddRadzenCookieThemeService(options =&gt;
 @@inject CookieThemeService CookieThemeService
 </code>
 </pre>
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">3. Open the <code>App.razor</code> file of your application and add this code<code>@@code{}</code>:</RadzenText>
+<pre class="rz-p-4">
+<code>
+@@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; }
+
+    [Inject]
+    private ThemeService ThemeService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        if (HttpContext != null)
+        {
+            var theme = HttpContext.Request.Cookies["MyApplicationTheme"];
+
+            if (!string.IsNullOrEmpty(theme))
+            {
+                ThemeService.SetTheme(theme, false);
+            }
+        }
+    }
+}
+</code>
+</pre>
