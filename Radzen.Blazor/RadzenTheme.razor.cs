@@ -25,9 +25,11 @@ namespace Radzen.Blazor
 
         private bool wcag;
 
-        private string Href => $"{Path}/{theme}-base.css";
+        private static readonly string Version = typeof(RadzenTheme).Assembly.GetName().Version.ToString();
 
-        private string WcagHref => $"{Path}/{theme}-wcag.css";
+        private string Href => $"{Path}/{theme}-base.css?v={Version}";
+
+        private string WcagHref => $"{Path}/{theme}-wcag.css?v={Version}";
 
         private string Path => Embedded ? $"_content/Radzen.Blazor/css" : "css";
 
