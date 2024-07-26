@@ -130,7 +130,7 @@ namespace Radzen.Blazor.Tests
             Assert.True(firstPageButton.HasAttribute("disabled"));
 
             var prevPageButton = component.Find("a.rz-pager-prev");
-            Assert.True(firstPageButton.HasAttribute("disabled"));
+            Assert.True(prevPageButton.HasAttribute("disabled"));
         }
 
         [Fact]
@@ -146,14 +146,14 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<bool>(p => p.ShowPagingSummary, true);
             });
 
-            await component.Instance.GoToPage(5);
+            await component.Instance.GoToPage(9);
             component.Render();
 
-            var firstPageButton = component.Find("a.rz-pager-last");
-            Assert.True(firstPageButton.HasAttribute("disabled"));
+            var lastPageButton = component.Find("a.rz-pager-last");
+            Assert.True(lastPageButton.HasAttribute("disabled"));
 
-            var prevPageButton = component.Find("a.rz-pager-next");
-            Assert.True(firstPageButton.HasAttribute("disabled"));
+            var nextPageButton = component.Find("a.rz-pager-next");
+            Assert.True(nextPageButton.HasAttribute("disabled"));
         }
     }
 }
