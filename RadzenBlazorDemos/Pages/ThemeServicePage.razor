@@ -5,9 +5,8 @@
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     The <code>ThemeService</code> allows you to change the theme of your application at runtime. It provides a set of methods to change the theme, get the current theme, and listen to theme changes.
 </RadzenText>
-<RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
-The <code>ThemeService</code> is registered by the <code>AddRadzenComponents()</code> method.
-Requires <code>RadzenTheme</code> (check the <RadzenLink Path="/get-started" Text="getting started instructions" />).
+<RadzenAlert AlertStyle="AlertStyle.Base" Variant="Variant.Flat" AllowClose="false" class="rz-mb-6">
+The <strong>ThemeService</strong> is registered by the <strong>AddRadzenComponents()</strong> method and requires <strong>RadzenTheme</strong>. Check the <RadzenLink Path="/get-started" Text="Get started" /> instructions.
 </RadzenAlert>
 <RadzenExample ComponentName="ThemeService" Example="ThemeServiceConfig">
     <ThemeServiceConfig />
@@ -18,7 +17,7 @@ Requires <code>RadzenTheme</code> (check the <RadzenLink Path="/get-started" Tex
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
 The Radzen.Blazor library provides a built-in service that persists the current theme in a cookie. This means that the theme will be remembered even after the user closes the browser or navigates to a different page. The theme will be restored when the user returns to the application.
 </RadzenText>
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">1. Open the <code>Program.cs</code> file of your application and register the <code>CookieThemeService</code>:</RadzenText>
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-8 rz-mb-4">1. Open the <code>Program.cs</code> file of your application and register the <code>CookieThemeService</code>:</RadzenText>
 <pre class="rz-p-4">
 <code>
 builder.Services.AddCookieThemeService(options =&gt;
@@ -28,7 +27,7 @@ builder.Services.AddCookieThemeService(options =&gt;
 });
 </code>
 </pre>
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">2. Open the <code>MainLayout.razor</code> file of your application and inject the <code>CookieThemeService</code>:</RadzenText>
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">2. Open the <code>MainLayout.razor</code> file of your application and inject the <code>CookieThemeService</code>:</RadzenText>
 <pre class="rz-p-4">
 <code>
 @@inject CookieThemeService CookieThemeService

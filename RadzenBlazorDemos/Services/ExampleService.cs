@@ -70,7 +70,8 @@ namespace RadzenBlazorDemos
                     New = true,
                     Title = "ThemeService",
                     Description = "The ThemeService allows to change the theme of the application at runtime.",
-                    Tags = ["theme", "service", "change", "runtime"]
+                    Icon = "&#xe3ae",
+                    Tags = ["theme", "service", "change", "runtime", "rtl", "right to left", "direction", "wcag", "accessibility"]
                 },
                 new Example
                 {
@@ -79,7 +80,7 @@ namespace RadzenBlazorDemos
                     New = true,
                     Title = "Blazor Themes | Free UI Components by Radzen",
                     Description = "The AppearanceToggle button allows you to switch between two predefined themes, most commonly light and dark.",
-                    Icon = "&#xe51c",
+                    Icon = "&#xeb37",
                     Tags = new[] { "theme", "light", "dark", "mode", "appearance", "toggle", "switch"}
                 },
                 new Example
@@ -89,7 +90,7 @@ namespace RadzenBlazorDemos
                     Updated = true,
                     Title = "Blazor Color Utilities | Free UI Components by Radzen",
                     Description = "List of colors and utility CSS classes available in Radzen Blazor Components library.",
-                    Icon = "&#xe891",
+                    Icon = "&#xe997",
                     Tags = new[] { "color", "background", "border", "utility", "css", "var"}
                 },
                 new Example
