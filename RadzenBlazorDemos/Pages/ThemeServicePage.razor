@@ -1,4 +1,5 @@
-@page "/theme-service"
+@page "/theme-service/{version?}"
+@inject NavigationManager NavigationManager
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     ThemeService
 </RadzenText>
@@ -17,22 +18,11 @@ The <strong>ThemeService</strong> is registered by the <strong>AddRadzenComponen
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
 The Radzen.Blazor library provides a built-in service that persists the current theme in a cookie. This means that the theme will be remembered even after the user closes the browser or navigates to a different page. The theme will be restored when the user returns to the application.
 </RadzenText>
-<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-8 rz-mb-4">1. Open the <code>Program.cs</code> file of your application and register the <code>CookieThemeService</code>:</RadzenText>
-<pre class="rz-p-4">
-<code>
-builder.Services.AddRadzenCookieThemeService(options =&gt;
-{
-    options.Name = "MyApplicationTheme"; // The name of the cookie
-    options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
-});
-</code>
-</pre>
-<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">2. Open the <code>MainLayout.razor</code> file of your application and inject the <code>CookieThemeService</code>:</RadzenText>
-<pre class="rz-p-4">
-<code>
-@@inject CookieThemeService CookieThemeService
-</code>
-</pre>
+<RadzenTabs SelectedIndex=@selectedIndex Change="@OnTabChange">
+    <Tabs>
+        <RadzenTabsItem Text=".NET 8">
+@RegisterService
+@MainLayout
 <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">3. Open the <code>App.razor</code> file of your application and add this code:</RadzenText>
 <pre class="rz-p-4">
 <code>
@@ -60,3 +50,91 @@ builder.Services.AddRadzenCookieThemeService(options =&gt;
 }
 </code>
 </pre>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 7">
+@RegisterService
+@MainLayout
+@Host
+@Persist("_Host.cshtml")
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 6">
+@RegisterService
+@MainLayout
+@Host
+@Persist("_Layout.cshtml")
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    private static readonly string[] versions = ["net8", "net7", "net6"];
+
+    private int selectedIndex = 0;
+
+    [Parameter]
+    public string Version { get; set; }
+
+    private string CurrentVersion => Version ?? "net8";
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        selectedIndex = Array.IndexOf(versions, CurrentVersion);
+    }
+
+    private void OnTabChange(int index)
+    {
+        NavigationManager.NavigateTo($"/theme-service/{versions[index]}#persist");
+    }
+
+    RenderFragment MainLayout => @<text>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">2. Open <code>MainLayout.razor</code> and inject the <code>CookieThemeService</code>:</RadzenText>
+<pre class="rz-p-4">
+<code>
+@@inject CookieThemeService CookieThemeService
+</code>
+</pre>
+    </text>;
+
+    RenderFragment RegisterService => @<text>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-8 rz-mb-4">1. Open <code>Program.cs</code> file(s) and register the <code>CookieThemeService</code>:</RadzenText>
+<pre class="rz-p-4">
+<code>
+builder.Services.AddRadzenCookieThemeService(options =&gt;
+{
+    options.Name = "MyApplicationTheme"; // The name of the cookie
+    options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
+});
+</code>
+</pre>
+<RadzenAlert AlertStyle="AlertStyle.Base" Variant="Variant.Flat" AllowClose="false" class="rz-mb-6">
+Register CookieThemeService in all <code>Program.cs</code> files of your application.
+</RadzenAlert>
+        </text>;
+    RenderFragment Host => @<text>
+        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">3. Open <code>_Host.cshtml</code> and add this code:</RadzenText>
+<pre class="rz-p-4">
+<code>
+@@inject Radzen.ThemeService ThemeService
+@@{
+    var theme = HttpContext.Request.Cookies["MuApplicationTheme"];
+
+    if (!string.IsNullOrEmpty(theme))
+    {
+        ThemeService.SetTheme(theme, true);
+    }
+}
+</code>
+</pre>
+    </text>;
+
+    RenderFragment<string> Persist => fileName => @<text>
+<RadzenText TextStyle="TextStyle.H6" TagName="TagName.H3" class="rz-mt-12 rz-mb-4">4. Open <code>@fileName</code> and append the following code after the last <code>script</code> tag:</RadzenText>
+<pre class="rz-p-4">
+<code>
+&lt;persist-component-state /&gt;
+</code>
+</pre>
+    </text>;
+}
