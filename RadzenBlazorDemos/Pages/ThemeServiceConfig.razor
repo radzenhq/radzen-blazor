@@ -1,0 +1,41 @@
+@inject ThemeService ThemeService
+@implements IDisposable
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-sm-2">
+    <RadzenLabel Text="Change the current theme" />
+    <RadzenDropDown Name="ThemeDropDown" TValue="string" Value="@ThemeService.Theme" ValueChanged="@ChangeTheme" Data="@Themes.All" TextProperty=@nameof(Theme.Text) ValueProperty=@nameof(Theme.Value)>
+    </RadzenDropDown>
+</RadzenStack>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-sm-2">
+    <RadzenLabel Text="Right-to-left" />
+    <RadzenSwitch Value=@(ThemeService.RightToLeft == true) ValueChanged=@ChangeRightToLeft />
+</RadzenStack>
+<EventConsole @ref=@console />
+@code {
+    EventConsole console;
+
+    void ChangeTheme(string value)
+    {
+        ThemeService.SetTheme(value);
+    }
+
+    void ChangeRightToLeft(bool value)
+    {
+        ThemeService.SetRightToLeft(value);
+    }
+
+    protected override void OnInitialized()
+    {
+        ThemeService.ThemeChanged += OnThemeChanged;
+    }
+
+    public void Dispose()
+    {
+        ThemeService.ThemeChanged -= OnThemeChanged;
+    }
+
+    void OnThemeChanged()
+    {
+        console.Log($"Theme changed to {ThemeService.Theme}");
+    }
+}

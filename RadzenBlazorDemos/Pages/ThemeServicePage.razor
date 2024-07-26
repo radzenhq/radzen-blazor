@@ -1,0 +1,36 @@
+@page "/theme-service"
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    ThemeService
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The <code>ThemeService</code> allows you to change the theme of your application at runtime. It provides a set of methods to change the theme, get the current theme, and listen to theme changes.
+</RadzenText>
+<RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
+The <code>ThemeService</code> is registered by the <code>AddRadzenComponents()</code> method.
+Requires <code>RadzenTheme</code> (check the <RadzenLink Path="/get-started" Text="getting started instructions" />).
+</RadzenAlert>
+<RadzenExample ComponentName="ThemeService" Example="ThemeServiceConfig">
+    <ThemeServiceConfig />
+</RadzenExample>
+<RadzenText Anchor="theme-service#persist" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Persist the theme
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+The Radzen.Blazor library provides a built-in service that persists the current theme in a cookie. This means that the theme will be remembered even after the user closes the browser or navigates to a different page. The theme will be restored when the user returns to the application.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">1. Open the <code>Program.cs</code> file of your application and register the <code>CookieThemeService</code>:</RadzenText>
+<pre class="rz-p-4">
+<code>
+builder.Services.AddCookieThemeService(options =&gt;
+{
+    options.Name = "MyApplicationTheme"; // The name of the cookie
+    options.Duration = TimeSpan.FromDays(365); // The duration of the cookie
+});
+</code>
+</pre>
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">2. Open the <code>MainLayout.razor</code> file of your application and inject the <code>CookieThemeService</code>:</RadzenText>
+<pre class="rz-p-4">
+<code>
+@@inject CookieThemeService CookieThemeService
+</code>
+</pre>
