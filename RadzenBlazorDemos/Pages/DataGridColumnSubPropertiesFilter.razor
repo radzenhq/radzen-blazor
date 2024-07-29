@@ -7,7 +7,7 @@
 <RadzenDataGrid @ref=grid AllowPaging="true" AllowSorting="true" AllowFiltering="true" Data="@orders">
     <Columns>
         <RadzenDataGridColumn Property="Customer.CompanyName" Title="Company Name" />
-        <RadzenDataGridColumn Property="OrderDetails" FilterProperty="Product.ProductName" Title="Product Name" Type="typeof(IEnumerable<OrderDetail>)">
+        <RadzenDataGridColumn Property="OrderDetails" FilterProperty="Product.ProductName" Title="Product Name" Type="typeof(IEnumerable<OrderDetail>)" Sortable="false">
             <Template>
                 @(string.Join(',', context.OrderDetails.Select(od => od.Product.ProductName)))
             </Template>
