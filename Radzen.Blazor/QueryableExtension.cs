@@ -888,7 +888,14 @@ namespace Radzen
                             }
                             else
                             {
-                                whereList.Add($@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})", new object[] { column.GetFilterValue() });
+                                if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
+                                {
+                                    whereList.Add($@"{column.Property}.Any(i => i.{column.FilterProperty}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator}))", new object[] { column.GetFilterValue() });
+                                }
+                                else
+                                {
+                                    whereList.Add($@"{property}{filterCaseSensitivityOperator}.{comparison}(@{index}{filterCaseSensitivityOperator})", new object[] { column.GetFilterValue() });
+                                }
                             }
 
                             index++;
@@ -927,6 +934,10 @@ namespace Radzen
                                 whereList.Add($@"{(comparison == "NotIn" ? "!" : "")}{column.Property}.Any(i => i.{column.FilterProperty} in @{index})", new object[] { column.GetFilterValue() });
                                 index++;
                             }
+                        }
+                        else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
+                        {
+                            whereList.Add($@"{column.Property}.Any(i => i.{column.FilterProperty}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator})", new object[] { column.GetFilterValue() });
                         }
                         else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
                         {

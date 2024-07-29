@@ -387,6 +387,15 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            New = true,
+                            Name = "Filtering sub properties",
+                            Path = "datagrid-sub-properties-filter",
+                            Title = "Blazor DataGrid Component - Sub Properties Filtering | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to use sub properties in the RadzenDataGrid column filter.",
+                            Tags = new [] { "filter", "sub properties", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
                             Name = "Filter API",
                             Path = "datagrid-filter-api",
                             Title = "Blazor DataGrid Component - Filter API | Free UI Components by Radzen",

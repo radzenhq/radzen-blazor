@@ -1,0 +1,45 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenDataGrid @ref=grid AllowPaging="true" AllowSorting="true" AllowFiltering="true" Data="@orders">
+    <Columns>
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Company Name" />
+        <RadzenDataGridColumn Property="OrderDetails" FilterProperty="Product.ProductName" Title="Product Name" Type="typeof(IEnumerable<OrderDetail>)">
+            <Template>
+                @(string.Join(',', context.OrderDetails.Select(od => od.Product.ProductName)))
+            </Template>
+        </RadzenDataGridColumn>
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<Order> grid;
+    IQueryable<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orders = dbContext.Orders.Include("OrderDetails.Product");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var column = grid.ColumnsCollection.Where(c => c.Property == "OrderDetails").FirstOrDefault();
+
+            if (column != null)
+            {
+                column.SetFilterValue("Tofu");
+                column.SetFilterOperator(FilterOperator.Contains);
+                await grid.Reload();
+            }
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}
