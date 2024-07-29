@@ -124,8 +124,16 @@ namespace Radzen.Blazor
 
                 if (canSetFilterPropertyType)
                 {
-                    _filterPropertyType = typeof(IEnumerable<object>);
-                    SetFilterOperator(FilterOperator.Contains);
+                    if (Type == null)
+                    {
+                        _filterPropertyType = typeof(IEnumerable<object>);
+                    }
+
+                    if (GetFilterOperator() == FilterOperator.Equals)
+                    {
+                        SetFilterOperator(FilterOperator.Contains);
+                    }
+
                     Grid.FilterPopupRenderMode = PopupRenderMode.OnDemand;
                 }
 

@@ -5,8 +5,14 @@
 
 @inherits DbContextPage
 
+<style>
+    .rz-grid-table {
+        width: unset;
+    }
+</style>
+
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
-    FilterMode="FilterMode.CheckBoxList" FilterPopupRenderMode="PopupRenderMode.OnDemand" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders" ColumnWidth="300px">
+    FilterMode="FilterMode.CheckBoxList" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders">
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
         <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
@@ -15,6 +21,12 @@
             <Template Context="order">
                 <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                 @order.Employee?.FirstName @order.Employee?.LastName
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@nameof(Order.OrderDetails)" FilterProperty="Product.ProductName" Title="Product Name"
+            Type="typeof(IEnumerable<OrderDetail>)" FilterOperator="FilterOperator.In" Sortable="false">
+            <Template>
+                @(string.Join(',', context.OrderDetails.Select(od => od.Product.ProductName)))
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" />

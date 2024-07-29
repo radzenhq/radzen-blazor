@@ -200,7 +200,9 @@ else
 
     async Task LoadFilterValues(LoadDataArgs loadDataArgs)
     {
-        var property = Column.GetFilterProperty();
+        var property = Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty) ? Column.Property :
+            Column.GetFilterProperty();
+
         var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
 
         if (property.IndexOf(".") != -1)
@@ -228,12 +230,29 @@ else
         {
             this.loadDataArgsString = loadDataArgsString;
 
-            var query = (!string.IsNullOrEmpty(loadDataArgs.Filter) ? 
-                Radzen.QueryableExtension.Where(Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)),
-                property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive)
-                :
-                Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)))
-                .Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+            IQueryable query;
+
+            if(!string.IsNullOrEmpty(loadDataArgs.Filter))
+            {
+                query = Radzen.QueryableExtension.Where(Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column)),
+                property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive);
+            }
+            else
+            {
+                query = Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column));
+            }
+
+            if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
+            {
+                query = query
+                    .SelectMany(DynamicLinqCustomTypeProvider.ParsingConfig, property)
+                    .Select(DynamicLinqCustomTypeProvider.ParsingConfig, Column.FilterProperty)
+                    .Distinct().Cast(typeof(object));
+            }
+            else
+            {
+                query = query.Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+            }
 
             if(loadDataArgs.Skip != null)
             {
@@ -254,10 +273,26 @@ else
     {
         var enumerable = args as IEnumerable;
 
-        var property = Column.GetFilterProperty();
-        var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty());
+        Type propertyType = null;
 
-        Column.SetFilterValue(enumerable.Cast<object>().Any() ? enumerable.AsQueryable().Cast(propertyType) : null);
+        if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
+        {
+            var collectionType =  PropertyAccess.GetPropertyType(typeof(TItem), Column.Property);
+            if (collectionType != null && collectionType.IsGenericType)
+            {
+                var itemType = collectionType.GenericTypeArguments.FirstOrDefault();
+                if(itemType != null)
+                {
+                    propertyType = PropertyAccess.GetPropertyType(itemType, Column.FilterProperty);
+                }
+            }
+        }
+        else
+        {
+            propertyType = PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty());
+        }
+
+        Column.SetFilterValue(enumerable.Cast<object>().Any() ? propertyType != null ? enumerable.AsQueryable().Cast(propertyType) : enumerable : null);
     }
 
     string getFilterOpen()
