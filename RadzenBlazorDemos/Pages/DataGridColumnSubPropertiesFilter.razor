@@ -23,7 +23,7 @@
     {
         await base.OnInitializedAsync();
 
-        orders = dbContext.Orders.Include("OrderDetails.Product");
+        orders = dbContext.Orders.Include("OrderDetails.Product").Include("Customer");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
