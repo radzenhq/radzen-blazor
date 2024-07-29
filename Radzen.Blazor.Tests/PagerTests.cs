@@ -109,5 +109,51 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"rz-density-compact", component.Markup);
         }
+
+        [Fact]
+        public async void RadzenPager_First_And_Prev_Buttons_Are_Disabled_When_On_The_First_Page()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters => {
+                parameters.Add<int>(p => p.PageSize, 10);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<bool>(p => p.ShowPagingSummary, true);
+            });
+
+            await component.Instance.GoToPage(0);
+            component.Render();
+
+            var firstPageButton = component.Find("a.rz-pager-first");
+            Assert.True(firstPageButton.HasAttribute("disabled"));
+
+            var prevPageButton = component.Find("a.rz-pager-prev");
+            Assert.True(prevPageButton.HasAttribute("disabled"));
+        }
+
+        [Fact]
+        public async void RadzenPager_Last_And_Next_Buttons_Are_Disabled_When_On_The_Last_Page()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenPager>(parameters => {
+                parameters.Add<int>(p => p.PageSize, 10);
+                parameters.Add<int>(p => p.Count, 100);
+                parameters.Add<bool>(p => p.ShowPagingSummary, true);
+            });
+
+            await component.Instance.GoToPage(9);
+            component.Render();
+
+            var lastPageButton = component.Find("a.rz-pager-last");
+            Assert.True(lastPageButton.HasAttribute("disabled"));
+
+            var nextPageButton = component.Find("a.rz-pager-next");
+            Assert.True(nextPageButton.HasAttribute("disabled"));
+        }
     }
 }
