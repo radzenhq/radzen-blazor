@@ -877,7 +877,14 @@ namespace Radzen
                         {
                             if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "Contains")
                             {
-                                whereList.Add($@"(@{index}).Contains({property})", new object[] { column.GetFilterValue() });
+                                if (column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
+                                {
+                                    whereList.Add($@"{column.Property}.Any(i => i.{column.FilterProperty}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator}))", new object[] { column.GetFilterValue() });
+                                }
+                                else
+                                {
+                                    whereList.Add($@"(@{index}).Contains({property})", new object[] { column.GetFilterValue() });
+                                }
                             }
                             else
                             {
@@ -890,7 +897,14 @@ namespace Radzen
                         {
                             if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "DoesNotContain")
                             {
-                                whereList.Add($@"!(@{index}).Contains({property})", new object[] { column.GetFilterValue() });
+                                if (column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
+                                {
+                                    whereList.Add($@"!{column.Property}.Any(i => i.{column.FilterProperty}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator}))", new object[] { column.GetFilterValue() });
+                                }
+                                else
+                                {
+                                    whereList.Add($@"!(@{index}).Contains({property})", new object[] { column.GetFilterValue() });
+                                }
                             }
                             else
                             {
