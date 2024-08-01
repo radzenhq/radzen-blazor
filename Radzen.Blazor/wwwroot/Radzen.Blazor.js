@@ -269,8 +269,12 @@ window.Radzen = {
                 Radzen[id].instance.markers = [];
 
                 markers.forEach(function (m) {
-                    var content = document.createElement('span');
-                    content.innerHTML = m.label;
+                    var content;
+
+                    if (m.label) {
+                        document.createElement('span');
+                        content.innerHTML = m.label;
+                    }
 
                     var marker = new this.google.maps.marker.AdvancedMarkerElement({
                         position: m.position,
