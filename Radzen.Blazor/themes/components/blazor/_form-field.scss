@@ -47,9 +47,11 @@ $form-field-helper-padding: 0 0.5rem !default;
     transition: var(--rz-input-transition);
 
     & > *,
-    & > .rz-autocomplete, 
+    & > .rz-autocomplete,
+    & > .rz-autocomplete.rz-state-disabled > .rz-inputtext,
     & input,
     & .rz-inputtext,
+    & .rz-inputtext.rz-state-disabled,
     & .rz-datepicker.rz-state-disabled > .rz-inputtext {
         @extend %input-blank;
 
