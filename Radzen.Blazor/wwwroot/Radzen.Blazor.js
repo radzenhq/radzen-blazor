@@ -272,7 +272,7 @@ window.Radzen = {
                     var content;
 
                     if (m.label) {
-                        document.createElement('span');
+                        content = document.createElement('span');
                         content.innerHTML = m.label;
                     }
 
