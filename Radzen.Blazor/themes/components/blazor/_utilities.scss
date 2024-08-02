@@ -1,8 +1,15 @@
 // Box Sizing
-*,
-*::before,
-*::after {
-  box-sizing: inherit;
+
+[class^='rz-'],
+[class*=' rz-'] {
+  &,
+  &::before,
+  &::after,
+  & *,
+  & *::before,
+  & *::after {
+    box-sizing: border-box;
+  }
 }
 
 // Theme Colors
