@@ -58,50 +58,6 @@ $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
       }
     }
   }
-
-  // Text Align
-
-  &.rz-text-align-start {
-    input {
-      text-align: start;
-    }
-  }
-
-  &.rz-text-align-end {
-    input {
-      text-align: end;
-    }
-  }
-
-  &.rz-text-align-left {
-    input {
-      text-align: left;
-    }
-  }
-
-  &.rz-text-align-right {
-    input {
-      text-align: right;
-    }
-  }
-
-  &.rz-text-align-center {
-    input {
-      text-align: center;
-    }
-  }
-
-  &.rz-text-align-justify {
-    input {
-      text-align: justify;
-    }
-  }
-
-  &.rz-text-align-justify-all {
-    input {
-      text-align: justify-all;
-    }
-  }
 }
 
 .rz-numeric-button {
