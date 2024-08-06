@@ -197,9 +197,12 @@ namespace Radzen.Blazor
             await UpdateValueFromTime(newValue);
         }
 
-        async Task OkClick()
+        async Task OkClick(bool shouldClose = true)
         {
-            Close();
+            if (shouldClose)
+            {
+                Close();
+            }
 
             if(Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value)
             {
@@ -979,7 +982,7 @@ namespace Radzen.Blazor
             if (ShowTimeOkButton)
             {
                 CurrentDate = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
-                await OkClick();
+                await OkClick(false);
             }
             else
             {
