@@ -6,6 +6,7 @@
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         <button aria-label="@(ButtonAriaLabel ?? Text)" tabindex="-1" disabled="@IsDisabled" class="@getButtonCss()" type="button" @onclick="@OnClick">
+            <span class="rz-button-box">
             @if (ButtonContent != null)
             {
                 @ButtonContent
@@ -40,6 +41,7 @@
                     }
                 }
             }
+            </span>
         </button>
         <button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class="@getPopupButtonCss()" type="button" aria-label="@OpenAriaLabel">
             <RadzenIcon Icon="@DropDownIcon" />

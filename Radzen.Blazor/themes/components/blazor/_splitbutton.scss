@@ -58,6 +58,7 @@ $splitbutton-sizes: xs, sm, md, lg;
   .rz-menuitem-icon {
     @extend %rzi;
     vertical-align: top;
+    margin-inline: var(--rz-menu-item-icon-margin-inline);
   }
 }
 
