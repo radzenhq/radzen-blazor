@@ -539,7 +539,8 @@ $gravatar-box-shadow: $rz-shadow-inset-level-1 !default;
 
 // Panel
 $panel-toggle-icon-border-radius: var(--rz-border-radius) !default;
-$panel-hover-color: var(--rz-primary) !default;
+$panel-toggle-icon-background-color: var(--rz-base-700) !default;
+$panel-hover-color: var(--rz-primary-light) !default;
 
 // Input
 $input-shadow: none !default;
