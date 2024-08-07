@@ -254,6 +254,8 @@ else
                 query = query.Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
             }
 
+            filterValuesCount = query.Count();
+
             if(loadDataArgs.Skip != null)
             {
                 query = query.Skip(loadDataArgs.Skip.Value);
@@ -265,7 +267,6 @@ else
             }
 
             filterValues = query;
-            filterValuesCount = query.Count();
         }
     }
 
