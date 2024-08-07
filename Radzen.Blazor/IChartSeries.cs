@@ -60,6 +60,10 @@ namespace Radzen.Blazor
         /// <returns>RenderFragment.</returns>
         RenderFragment RenderTooltip(object data, double marginLeft, double marginTop, double chartHeight);
         /// <summary>
+        /// Renders a tooltip item with the specified data to be displayed in a shared tooltip
+        /// </summary>
+        RenderFragment RenderSharedTooltipItem(object category);
+        /// <summary>
         /// Renders the legend item.
         /// </summary>
         /// <returns>RenderFragment.</returns>
