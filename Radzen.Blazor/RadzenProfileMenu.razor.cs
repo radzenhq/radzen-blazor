@@ -93,7 +93,7 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                if (focusedIndex >= 0 && focusedIndex < items.Count)
+                if (!contentStyle.Contains("display:none;") && focusedIndex >= 0 && focusedIndex < items.Count)
                 {
                     var item = items[focusedIndex];
 
@@ -110,9 +110,9 @@ namespace Radzen.Blazor
                 {
                     await Toggle(new MouseEventArgs());
 
-                    if (contentStyle.IndexOf("display:none;") == -1)
+                    if (!contentStyle.Contains("display:none;"))
                     {
-                        focusedIndex = 0;
+                        focusedIndex = focusedIndex != -1 ? focusedIndex : 0;
                     }
                 }
             }
