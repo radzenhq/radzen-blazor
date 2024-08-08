@@ -221,8 +221,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override void Dispose()
         {
-            Close();
             base.Dispose();
+
+            if (IsJSRuntimeAvailable)
+            {
+                JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
+            }
         }
 
         internal int focusedIndex = -1;
