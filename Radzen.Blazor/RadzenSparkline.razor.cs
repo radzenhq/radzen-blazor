@@ -74,7 +74,45 @@ namespace Radzen.Blazor
                 ValueScale.Round = false;
             }
 
-            MarginTop = MarginRight = MarginLeft = MarginBottom = 0;
+            var legendSize = Legend.Measure(this);
+            var valueAxisSize = ValueAxis.Measure(this);
+            var categoryAxisSize = CategoryAxis.Measure(this);
+
+            if (!ShouldRenderAxes())
+            {
+                valueAxisSize = categoryAxisSize = 0;
+            }
+
+            if (ValueAxis.Visible)
+            {
+                MarginLeft = valueAxisSize;
+            }
+
+            if (Legend.Visible)
+            {
+                if (Legend.Position == LegendPosition.Right || Legend.Position == LegendPosition.Left)
+                {
+                    if (Legend.Position == LegendPosition.Right)
+                    {
+                        MarginRight = legendSize + 16;
+                    }
+                    else
+                    {
+                        MarginLeft = legendSize + 16 + valueAxisSize;
+                    }
+                }
+                else if (Legend.Position == LegendPosition.Top || Legend.Position == LegendPosition.Bottom)
+                {
+                    if (Legend.Position == LegendPosition.Top)
+                    {
+                        MarginTop = legendSize + 16;
+                    }
+                    else
+                    {
+                        MarginBottom = legendSize + 16 + categoryAxisSize;
+                    }
+                }
+            }
 
             CategoryScale.Output = new ScaleRange { Start = MarginLeft, End = Width.Value - MarginRight };
             ValueScale.Output = new ScaleRange { Start = Height.Value - MarginBottom, End = MarginTop };

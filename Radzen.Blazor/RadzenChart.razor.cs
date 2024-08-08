@@ -112,7 +112,11 @@ namespace Radzen.Blazor
             Series.Remove(series);
         }
 
-        private bool ShouldRenderAxes()
+        /// <summary>
+        /// Returns whether the chart should render axes.
+        /// </summary>
+        /// <returns></returns>
+        protected bool ShouldRenderAxes()
         {
             var pieType = typeof(RadzenPieSeries<>);
             var donutType = typeof(RadzenDonutSeries<>);
