@@ -444,13 +444,14 @@ namespace Radzen
         private static string GetColumnFilter<T>(RadzenDataGridColumn<T> column, string value, bool second = false)
         {
             var property = PropertyAccess.GetProperty(column.GetFilterProperty());
+            var propertyType = !string.IsNullOrEmpty(property) ? PropertyAccess.GetPropertyType(typeof(T), property) : null;
 
             if (property.IndexOf(".") != -1)
             {
                 property = $"({property})";
             }
             bool hasNp = property.Contains("np(");
-            string npProperty = hasNp ? property : $@"np({property})";
+            string npProperty = hasNp ? property : (propertyType != null ? Nullable.GetUnderlyingType(propertyType) != null : true) ? $@"np({property})" : property;
 
             var columnFilterOperator = !second ? column.GetFilterOperator() : column.GetSecondFilterOperator();
 
