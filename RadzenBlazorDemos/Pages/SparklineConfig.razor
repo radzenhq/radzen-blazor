@@ -1,0 +1,92 @@
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+    <RadzenText>@people[0].Name</RadzenText>
+    <RadzenSparkline style="width: 100px; height: 30px">
+        <RadzenLineSeries Smooth="true" Data="@people[0].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+    </RadzenSparkline>
+</RadzenStack>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+    <RadzenText>@people[1].Name</RadzenText>
+    <RadzenSparkline style="width: 100px; height: 30px">
+        <RadzenColumnSeries Data="@people[1].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+        <RadzenColumnOptions Margin="2" />
+    </RadzenSparkline>
+</RadzenStack>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+    <RadzenText>@people[2].Name</RadzenText>
+    <RadzenSparkline style="width: 100px; height: 30px">
+        <RadzenAreaSeries Smooth="true" Data="@people[2].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+    </RadzenSparkline>
+</RadzenStack>
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+    <RadzenText>@people[3].Name</RadzenText>
+    <RadzenSparkline style="width: 100px; height: 30px">
+        <RadzenPieSeries X="15" Y="15" Data="@people[3].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+    </RadzenSparkline>
+</RadzenStack>
+@code {
+    public class Test
+    {
+        public int TestId { get; set; }
+        public string TestName { get; set; }
+        public int Score { get; set; }
+    }
+
+    public class Person
+    {
+        public string Name { get; set; }
+        public IEnumerable<Test> Tests { get; set; }
+    }
+
+    private IList<Person> people;
+
+    protected override void OnInitialized()
+    {
+        people = new List<Person>
+        {
+            new Person
+            {
+                Name = "Alfred",
+                Tests = new List<Test>
+                {
+                    new Test { TestName = "Test 1", Score = 58 },
+                    new Test { TestName = "Test 2", Score = 93 },
+                    new Test { TestName = "Test 3", Score = 84 },
+                    new Test { TestName = "Test 4", Score = 65 }
+                }
+            },
+            new Person
+            {
+                Name = "Angela",
+                Tests = new List<Test>
+                {
+                    new Test { TestName = "Test 1", Score = 53 },
+                    new Test { TestName = "Test 2", Score = 99 },
+                    new Test { TestName = "Test 3", Score = 89 },
+                    new Test { TestName = "Test 4", Score = 71 }
+                }
+            },
+            new Person
+            {
+                Name = "Bob",
+                Tests = new List<Test>
+                {
+                    new Test { TestName = "Test 1", Score = 92 },
+                    new Test { TestName = "Test 2", Score = 58 },
+                    new Test { TestName = "Test 3", Score = 52 },
+                    new Test { TestName = "Test 4", Score = 61 }
+                }
+            },
+            new Person
+            {
+                Name = "Brett",
+                Tests = new List<Test>
+                {
+                    new Test { TestName = "Test 1", Score = 52 },
+                    new Test { TestName = "Test 2", Score = 52 },
+                    new Test { TestName = "Test 3", Score = 73 },
+                    new Test { TestName = "Test 4", Score = 64 }
+                }
+            },
+    };
+    }
+}

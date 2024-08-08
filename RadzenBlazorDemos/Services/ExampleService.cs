@@ -1544,6 +1544,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Sparkline",
+                    Path = "sparkline",
+                    Description = "Demonstration and configuration of RadzenSparkline component.",
+                    Icon = "&#xe3fc",
+                    Tags = new [] { "chart", "sparkline" }
+                },
+                new Example
+                {
                     Name = "Arc Gauge",
                     Path = "arc-gauge",
                     Description = "Demonstration and configuration of Radzen Blazor Arc Gauge component.",
