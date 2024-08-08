@@ -512,6 +512,11 @@ namespace Radzen
         /// Whether to show a mask on the background or not
         /// </summary>
         public bool ShowMask { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to focus the first focusable HTML element. Set to <c>true</c> by default.
+        /// </summary>
+        public bool AutoFocusFirstElement { get; set; } = false;
     }
 
     /// <summary>

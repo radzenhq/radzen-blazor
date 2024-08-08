@@ -1343,6 +1343,37 @@ window.Radzen = {
         }
     }
   },
+  focusFirstFocusableElement: function (el) {
+      var focusable = Radzen.getFocusableElements(el);
+      var editor = el.querySelector('.rz-html-editor');
+
+      if (editor && !focusable.includes(editor.previousElementSibling)) {
+          var editable = el.querySelector('.rz-html-editor-content');
+          if (editable) {
+              var selection = window.getSelection();
+              var range = document.createRange();
+              range.setStart(editable, 0);
+              range.setEnd(editable, 0);
+              selection.removeAllRanges();
+              selection.addRange(range);
+          }
+      } else {
+          var firstFocusable = focusable[0];
+          if (firstFocusable) {
+              firstFocusable.focus();
+          }
+      }
+  },
+  openSideDialog: function (options) {
+      setTimeout(function () {
+          if (options.autoFocusFirstElement) {
+              var dialogs = document.querySelectorAll('.rz-dialog-side-content');
+              if (dialogs.length == 0) return;
+              var lastDialog = dialogs[dialogs.length - 1];
+              Radzen.focusFirstFocusableElement(lastDialog);
+          }
+      }, 500);
+  },
   openDialog: function (options, dialogService, dialog) {
     if (Radzen.closeAllPopups) {
         Radzen.closeAllPopups();
@@ -1416,26 +1447,7 @@ window.Radzen = {
             }
 
             if (options.autoFocusFirstElement) {
-                var focusable = Radzen.getFocusableElements(lastDialog);
-                var editor = lastDialog.querySelector('.rz-html-editor');
-
-                if (editor && !focusable.includes(editor.previousElementSibling)) {
-                    var editable = lastDialog.querySelector('.rz-html-editor-content');
-                    if (editable) {
-                        var selection = window.getSelection();
-                        var range = document.createRange();
-                        range.setStart(editable, 0);
-                        range.setEnd(editable, 0);
-                        selection.removeAllRanges();
-                        selection.addRange(range);
-                    }
-                } else {
-                    var focusable = Radzen.getFocusableElements(lastDialog);
-                    var firstFocusable = focusable[0];
-                    if (firstFocusable) {
-                        firstFocusable.focus();
-                    }
-                }
+                Radzen.focusFirstFocusableElement(lastDialog);
             }
         }
     }, 500);
