@@ -1597,6 +1597,21 @@ namespace Radzen.Blazor
                 {
                     var actualColumnIndexFrom = columns.IndexOf(columnToReorder);
                     var actualColumnIndexTo = columns.IndexOf(columnToReorderTo);
+
+                    var reorderingArgs = new DataGridColumnReorderingEventArgs<TItem>
+                    {
+                        Column = columnToReorder,
+                        ToColumn = columnToReorderTo
+                    };
+
+                    await ColumnReordering.InvokeAsync(reorderingArgs);
+
+                    if(reorderingArgs.Cancel)
+                    {
+                        indexOfColumnToReoder = null;
+                        return;
+                    }
+
                     columns.Remove(columnToReorder);
                     columns.Insert(actualColumnIndexTo, columnToReorder);
 
@@ -1649,6 +1664,13 @@ namespace Radzen.Blazor
         /// <value>The column resized callback.</value>
         [Parameter]
         public EventCallback<DataGridColumnResizedEventArgs<TItem>> ColumnResized { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column reordering callback.
+        /// </summary>
+        /// <value>The column reordering callback.</value>
+        [Parameter]
+        public EventCallback<DataGridColumnReorderingEventArgs<TItem>> ColumnReordering { get; set; }
 
         /// <summary>
         /// Gets or sets the column reordered callback.
