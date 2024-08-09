@@ -89,7 +89,7 @@ body {
         .rz-#{$shorthand}s-#{$breakpoint}-#{$gutter} {
           #{$property}-inline-start: #{$gutter-value} !important;
         }
-        .rz-#{$shorthand}s-#{$breakpoint}-#{$gutter} {
+        .rz-#{$shorthand}e-#{$breakpoint}-#{$gutter} {
           #{$property}-inline-end: #{$gutter-value} !important;
         }
       }
