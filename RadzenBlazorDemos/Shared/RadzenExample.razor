@@ -27,11 +27,11 @@
 <div class="documentation-links">
 @if (Documentation)
 {
-    <a target="blank" href="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem;" class="rz-me-1" /> @Name Docs</a>
+    <RadzenLink target="blank" Path="@DocumentationHref" title=@($"Open {Name} documentation in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem;" class="rz-me-1" /> @Name Docs</RadzenLink>
 }
 @if (Heading)
 {
-    <a target="blank" href="@ComponentSourceHref" title=@($"View {Name} source code in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem;" class="rz-me-1" /> @Name Source</a>
+    <RadzenLink target="blank" Path="@ComponentSourceHref" title=@($"View {Name} source code in new tab") ><RadzenIcon Icon="launch" style="font-size: 1rem;" class="rz-me-1" /> @Name Source</RadzenLink>
 }
 </div>
 <RadzenCard class="rz-p-0 rz-material-3-demo-card">

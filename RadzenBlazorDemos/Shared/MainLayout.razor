@@ -24,9 +24,9 @@
             <RadzenColumn Size="7">
                 <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
                     <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
-                        <a href="/docs/" title="Radzen Blazor Components Documentation" class="rz-mx-2 rz-mx-lg-4" target="_blank">Documentation</a>
-                        <a href="https://www.radzen.com/" title="Create .NET Core web applications fast & easy" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank">About Radzen</a>
-                        <a href="https://github.com/radzenhq/radzen-blazor" title="Star Radzen Blazor Components on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank">GitHub</a>
+                        <RadzenLink Path="/docs/" Text="Documentation" title="Radzen Blazor Components Documentation" class="rz-mx-2 rz-mx-lg-4" target="_blank" />
+                        <RadzenLink Path="https://www.radzen.com/" Text="About Radzen" title="Create .NET Core web applications fast & easy" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
+                        <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" Text="GitHub" title="Star Radzen Blazor Components on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
                     </div>
                     <RadzenAppearanceToggle class="rz-mx-2" />
                     <RadzenSidebarToggle Icon="settings" Click="@(() => configSidebarExpanded = !configSidebarExpanded)" class="rz-m-0" />
@@ -60,8 +60,8 @@
                             </RadzenCard>
                             <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center" class="rz-mt-12">
                                 <span>Radzen Blazor Components, &copy; 2018-2024 Radzen.</span> <br />
-                                <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under
-                                <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a>
+                                <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</RadzenLink> licensed under
+                                <RadzenLink Path="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</RadzenLink>
                             </RadzenText>
                             <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Center">
                                 <Social />

@@ -7,9 +7,13 @@
 
 <RadzenComponents />
 
-<RadzenContentContainer Name="main">
-    @Body
-</RadzenContentContainer>
+<RadzenLayout>
+    <RadzenBody Class="rz-m-0 rz-p-0 rz-border-radius-0">
+        <RadzenContentContainer Name="main">
+            @Body
+        </RadzenContentContainer>
+    </RadzenBody>
+</RadzenLayout>
 
 @code {
 
