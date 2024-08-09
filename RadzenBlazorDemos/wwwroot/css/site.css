@@ -253,12 +253,11 @@ video {
     --rz-link-hover-text-decoration: none;
 
     .rz-link {
-        flex: 0 0 auto;
+        display: block;
         width: 100%;
-        max-width: calc(3*(100% - 11* var(--rz-gap)) / 12 + 2* var(--rz-gap));
-        flex-basis: calc(3*(100% - 11* var(--rz-gap)) / 12 + 2* var(--rz-gap));
         font-weight: 600;
         position: relative;
+        border-radius: var(--rz-card-border-radius);
 
         .rz-badge {
             --rz-badge-font-size: 12px;
@@ -301,7 +300,8 @@ video {
         }
     }
 
-    .rz-link:hover {
+    .rz-link:hover,
+    .rz-link:focus-visible {
         .rz-badge.rz-badge-success {
             width: 46px;
         }
@@ -309,6 +309,10 @@ video {
         .rz-badge.rz-badge-info {
             width: 66px;
         }
+    }
+
+    .rz-link:focus-visible {
+        outline: var(--rz-outline-focus);
     }
 }
 
