@@ -1,4 +1,6 @@
+$progressbar-value: 100% !default;
 $progressbar-background-color: var(--rz-base-200) !default;
+$progressbar-color: var(--rz-text-color) !default;
 $progressbar-font-size: var(--rz-body-font-size) !default;
 $progressbar-height: 1.25rem !default;
 $progressbar-border-radius: var(--rz-border-radius) !default;
@@ -66,17 +68,25 @@ $progressbar-circular-sizes: map-merge(
   position: absolute;
   background-color: var(--rz-progressbar-value-background-color);
   height: 100%;
-  width: 100%;
+  width: var(--rz-progressbar-value);
   transition: var(--rz-progressbar-value-transition);
 }
 
 
-.rz-progressbar-label {
-  position: relative;
-  width: 100%;
+.rz-progressbar-label,
+.rz-progressbar-label-value {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 50%;
+  margin-top: calc(-1 * (var(--rz-progressbar-height) / 2));
   text-align: center;
   font-size: var(--rz-progressbar-font-size);
-  line-height: var(--rz-progressbar-font-size);
+  line-height: var(--rz-progressbar-height);
+}
+
+.rz-progressbar-label-value {
+  color: var(--rz-progressbar-color);
+  clip-path: inset(0 0 0 var(--rz-progressbar-value));
 }
 
 .rz-progressbar-circular {
