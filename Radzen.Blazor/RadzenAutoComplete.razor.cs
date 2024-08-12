@@ -1,15 +1,15 @@
-﻿using Radzen;
-using Radzen.Blazor.Rendering;
-using System.Collections;
-using System.Linq.Dynamic.Core;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using System.Linq;
+using Microsoft.JSInterop;
+using Radzen;
+using Radzen.Blazor.Rendering;
 using System;
-using System.Threading.Tasks;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -195,7 +195,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Data != null && !string.IsNullOrEmpty(searchText) ? Data.AsQueryable() : null;
+                return Data != null && (!string.IsNullOrEmpty(searchText) || OpenOnFocus) ? Data.AsQueryable() : null;
             }
         }
 
@@ -212,6 +212,12 @@ namespace Radzen.Blazor
                     string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
 
                     string textProperty = string.IsNullOrEmpty(TextProperty) ? string.Empty : $".{TextProperty}";
+
+                    // Return all items if search text is empty and OpenOnFocus is true
+                    if (string.IsNullOrEmpty(searchText) && OpenOnFocus)
+                    {
+                        return Query;
+                    }
 
                     return Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"o=>o{textProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
                         FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
