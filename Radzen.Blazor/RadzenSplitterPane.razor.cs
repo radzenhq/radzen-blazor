@@ -23,7 +23,7 @@ namespace Radzen.Blazor
 
         internal bool IsLastResizable
         {
-            get { return Splitter.Panes.Last(o => o.Resizable && !o.GetCollapsed()) == this; }
+            get { return Splitter.Panes.LastOrDefault(o => o.Resizable && !o.GetCollapsed()) == this; }
         }
 
         internal bool IsLast => Splitter.Panes.Count - 1 == Index;
