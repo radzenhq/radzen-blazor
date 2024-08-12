@@ -208,8 +208,8 @@ $chart-color-schemes: (
 .rz-legend-item {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin: 4px;
+  gap: 0.25rem;
+  margin: 0.25rem;
   cursor: pointer;
 
   &:focus {
@@ -240,11 +240,11 @@ $chart-color-schemes: (
   background: var(--rz-chart-tooltip-background);
   color: var(--rz-chart-tooltip-color);
   box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
-  padding: 0.25rem 0.5rem;
-  border-radius: var(--rz-border-radius);
+  padding: 0.5rem;
+  border-radius: var(--rz-tooltip-border-radius);
   white-space: nowrap;
+  font-size: var(--rz-tooltip-font-size);
 }
-
 
 .rz-chart-tooltip {
   &:not(.rz-pie-tooltip) {
@@ -265,4 +265,43 @@ $chart-color-schemes: (
       }
     }
   }
+}
+
+.rz-chart-tooltip-title {
+  font-weight: 700;
+}
+
+.rz-chart-tooltip-item-value {
+  font-weight: 600;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+// Shared Tooltip Styles
+
+.rz-chart-shared-tooltip:has(.rz-chart-tooltip-item) {
+  .rz-chart-tooltip-title {
+    padding: 0 0.5rem;
+  }
+}
+
+.rz-chart-tooltip-item {
+  
+  & > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.125rem 0.5rem;
+    border-radius: var(--rz-border-radius);
+  
+    &:hover {
+      background-color: var(--rz-grid-stripe-background-color);
+    }
+  }
+
+  .rz-legend-item {
+    margin: 0;
+  }
+
 }

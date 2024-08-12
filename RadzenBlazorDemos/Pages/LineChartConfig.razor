@@ -22,27 +22,24 @@
         </RadzenStack>
     </RadzenCard>
 
-
+   <RadzenChart>
+        <RadzenChartTooltipOptions Shared="@sharedTooltip" />
+        <RadzenLineSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue">
+            <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" />
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenLineSeries>
+        <RadzenLineSeries Smooth="@smooth" Data="@revenue2024" CategoryProperty="Date" Title="2024" ValueProperty="Revenue">
+            <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Circle" />
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenLineSeries>
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Revenue in USD" />
+        </RadzenValueAxis>
+    </RadzenChart>
 </RadzenStack>
 
-<RadzenText>
-    Lorem ipsum
-    <RadzenSparkline style="display: inline-block; width: 80px; height: 20px;">
-        <RadzenChartTooltipOptions Shared="@sharedTooltip" />
-        <RadzenLineSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue">
-            <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" Size="2" />
-        </RadzenLineSeries>
-    </RadzenSparkline>
-    dolor sit amet
-</RadzenText>
-
-    <RadzenSparkline style="display: inline-block; width: 80px; height: 20px;">
-        <RadzenChartTooltipOptions Shared="@sharedTooltip" />
-        <RadzenLineSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue">
-            <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" Size="2" />
-        </RadzenLineSeries>
-        <RadzenCategoryAxis Visible="true" />
-    </RadzenSparkline>
 @code {
     bool smooth = false;
     bool sharedTooltip = true;
