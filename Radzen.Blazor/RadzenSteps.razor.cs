@@ -391,6 +391,16 @@ namespace Radzen.Blazor
         {
             var newIndex = steps.IndexOf(step);
 
+            if (newIndex > SelectedIndex && !AllowNext)
+            {
+                return;
+            }
+            
+            if (newIndex < SelectedIndex && !AllowPrevious)
+            {
+                return;
+            }
+            
             var canChangeArgs = new StepsCanChangeEventArgs { SelectedIndex = SelectedIndex, NewIndex = newIndex };
 
             await CanChange.InvokeAsync(canChangeArgs);
@@ -468,15 +478,11 @@ namespace Radzen.Blazor
             }
         }
 
-        private string DissabledStyle => "pointer-events: none; opacity: 0.5; cursor:default";
-        
-        private string PreviousButtonStyle => IsPreviousDisabled() ? DissabledStyle : "";
         private bool IsPreviousDisabled()
         {
             return IsFirstVisibleStep() || !AllowPrevious;
         }
         
-        private string NextButtonStyle => IsNextDisabled() ? DissabledStyle : "";
         private bool IsNextDisabled()
         {
             return IsLastVisibleStep() || !AllowNext;
