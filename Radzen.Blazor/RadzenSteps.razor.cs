@@ -470,7 +470,7 @@ namespace Radzen.Blazor
 
         private string DissabledStyle => "pointer-events: none; opacity: 0.5; cursor:default";
         
-        private string PrevioustButtonStyle => IsPreviousDisabled() ? DissabledStyle : "";
+        private string PreviousButtonStyle => IsPreviousDisabled() ? DissabledStyle : "";
         private bool IsPreviousDisabled()
         {
             return IsFirstVisibleStep() || !AllowPrevious;
