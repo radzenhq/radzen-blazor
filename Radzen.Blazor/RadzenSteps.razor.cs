@@ -468,11 +468,15 @@ namespace Radzen.Blazor
             }
         }
 
+        private string DissabledStyle => "pointer-events: none; opacity: 0.5; cursor:default";
+        
+        private string PrevioustButtonStyle => IsPreviousDisabled() ? DissabledStyle : "";
         private bool IsPreviousDisabled()
         {
             return IsFirstVisibleStep() || !AllowPrevious;
         }
-
+        
+        private string NextButtonStyle => IsNextDisabled() ? DissabledStyle : "";
         private bool IsNextDisabled()
         {
             return IsLastVisibleStep() || !AllowNext;
