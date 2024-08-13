@@ -44,28 +44,22 @@
         <RadzenIcon Icon="glyphs" Style="vertical-align: middle;" /> Quiz scores as a sparkline in text.
     </RadzenText>
     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" class="rz-mb-6">
-        The first quiz was won by  @(people[2].Name)  (
-            <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
+        The first quiz was won by  @(people[2].Name) (<RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
                 <RadzenLineSeries Smooth="true" Data="@people[2].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                 <RadzenCategoryAxis Visible="false" Padding="-20" />
-            </RadzenSparkline>
-        ).
+            </RadzenSparkline>).
     </RadzenText>
     <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" class="rz-mb-6">
-        The second quiz was the easiest for @(people[0].Name)  (
-            <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
+        The second quiz was the easiest for @(people[0].Name) (<RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
                 <RadzenColumnSeries Data="@people[0].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                 <RadzenColumnOptions Margin="2" />
-                <RadzenCategoryAxis Visible="false" Padding="-20" />
-            </RadzenSparkline>
-        ) 
-        and @(people[1].Name) (
-            <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
+                <RadzenCategoryAxis Visible="false" Padding="-12" />
+            </RadzenSparkline>) 
+        and @(people[1].Name) (<RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
                 <RadzenColumnSeries Data="@people[1].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                 <RadzenColumnOptions Margin="2" />
-                <RadzenCategoryAxis Visible="false" Padding="-20" />
-            </RadzenSparkline>
-        ).
+                <RadzenCategoryAxis Visible="false" Padding="-12" />
+            </RadzenSparkline>).
     </RadzenText>
 </RadzenCard>
 
