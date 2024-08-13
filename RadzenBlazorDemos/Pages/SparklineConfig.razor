@@ -12,17 +12,20 @@
                     <RadzenColumn Size="3" SizeMD="3" class="rz-p-1">
                         <RadzenSparkline style="width: 100%; height: 30px">
                             <RadzenAreaSeries Smooth="true" Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                            <RadzenCategoryAxis Visible="false" Padding="-20" />
                         </RadzenSparkline>
                     </RadzenColumn>
                     <RadzenColumn Size="3" SizeMD="3" class="rz-p-1">
                         <RadzenSparkline style="width: 100%; height: 30px">
                             <RadzenLineSeries Smooth="true" Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                            <RadzenCategoryAxis Visible="false" Padding="-20" />
                         </RadzenSparkline>
                     </RadzenColumn>
                     <RadzenColumn Size="3" SizeMD="3" class="rz-p-1">
                         <RadzenSparkline style="width: 100%; height: 30px">
                             <RadzenColumnSeries Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                             <RadzenColumnOptions Margin="2" />
+                            <RadzenCategoryAxis Visible="false" Padding="-20" />
                         </RadzenSparkline>
                     </RadzenColumn>
                     <RadzenColumn Size="3" SizeMD="1" class="rz-p-1">
@@ -44,6 +47,7 @@
         The first quiz was won by  @(people[2].Name)  (
             <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
                 <RadzenLineSeries Smooth="true" Data="@people[2].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                <RadzenCategoryAxis Visible="false" Padding="-20" />
             </RadzenSparkline>
         ).
     </RadzenText>
@@ -52,12 +56,14 @@
             <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
                 <RadzenColumnSeries Data="@people[0].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                 <RadzenColumnOptions Margin="2" />
+                <RadzenCategoryAxis Visible="false" Padding="-20" />
             </RadzenSparkline>
         ) 
         and @(people[1].Name) (
             <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
                 <RadzenColumnSeries Data="@people[1].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                 <RadzenColumnOptions Margin="2" />
+                <RadzenCategoryAxis Visible="false" Padding="-20" />
             </RadzenSparkline>
         ).
     </RadzenText>
