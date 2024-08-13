@@ -181,6 +181,43 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<StepsCanChangeEventArgs> CanChange { get; set; }
 
+
+        /// <summary>
+        /// A boolean that sets the disabled or enabled state of the next button.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenSteps @ref="steps"&gt;
+        /// &lt;/RadzenSteps&gt;
+        /// @code {
+        ///  void OnActionTakenByUser()
+        ///  {
+        ///     // Condition not met to move forward
+        ///     steps.AllowNext = false;
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
+        public bool AllowNext { get; set; }
+
+        /// <summary>
+        /// A boolean that sets the disabled or enabled state of the previous button.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenSteps @ref="steps"&gt;
+        /// &lt;/RadzenSteps&gt;
+        /// @code {
+        ///  void OnActionTakenByUser()
+        ///  {
+        ///     // Condition not met to movebackwards 
+        ///     steps.AllowPrevious = false;
+        ///  }
+        /// }
+        /// </code>
+        /// </example>
+        public bool AllowPrevious { get; set; }
+
         private string _nextStep = "Next";
         /// <summary>
         /// Gets or sets the next button text.
@@ -429,6 +466,16 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = false;
             }
+        }
+
+        private bool IsPreviousDisabled()
+        {
+            return IsFirstVisibleStep() || !AllowPrevious;
+        }
+
+        private bool IsNextDisabled()
+        {
+            return IsLastVisibleStep() || !AllowNext;
         }
     }
 }

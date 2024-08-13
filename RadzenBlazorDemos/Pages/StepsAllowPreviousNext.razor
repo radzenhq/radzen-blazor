@@ -1,0 +1,43 @@
+@inject DialogService DialogService
+
+<RadzenSteps @ref="steps" Change="OnChange">
+    <Steps>
+        <RadzenStepsItem>
+            <div class="rz-p-12 rz-text-align-center">
+                <RadzenButton Text="Enable next" Click="@EnableNext"/>
+            </div>
+        </RadzenStepsItem>
+        <RadzenStepsItem>
+            <div class="rz-p-12 rz-text-align-center">
+                <RadzenButton Text="Enable previous" Click="@EnablePrevious" />
+                <RadzenButton Text="Enable next" Click="@EnableNext" />
+            </div>
+        </RadzenStepsItem>
+        <RadzenStepsItem>
+            <div class="rz-p-12 rz-text-align-center">
+                <RadzenButton Text="Enable previous" Click="@EnablePrevious" />
+            </div>  
+        </RadzenStepsItem>
+    </Steps>
+</RadzenSteps>
+
+@code {
+    
+    private RadzenSteps steps;
+    
+    private void OnChange()
+    {
+        steps.AllowPrevious = false;
+        steps.AllowNext = false;
+    }
+    
+    private void EnablePrevious()
+    {
+        steps.AllowPrevious = true;
+    }
+    
+    private void EnableNext()
+    {
+        steps.AllowNext = true;
+    }
+}
