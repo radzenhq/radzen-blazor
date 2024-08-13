@@ -540,7 +540,7 @@ namespace Radzen.Blazor
                     builder.OpenComponent<ChartSharedTooltipItem>(0);
                     builder.AddAttribute(1, nameof(ChartSharedTooltipItem.Value), TooltipValue(item));
                     builder.AddAttribute(2, nameof(ChartSharedTooltipItem.ChildContent), TooltipTemplate?.Invoke(item));
-                    builder.AddAttribute(3, nameof(ChartSharedTooltipItem.LegendItem), RenderLegendItem());
+                    builder.AddAttribute(3, nameof(ChartSharedTooltipItem.LegendItem), RenderLegendItem(false));
                     builder.CloseComponent();
                 }
             };
@@ -567,6 +567,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public virtual RenderFragment RenderLegendItem()
         {
+            return RenderLegendItem(true);
+        }
+
+        /// <summary>
+        /// Renders the legend item for this series.
+        /// </summary>
+        protected virtual RenderFragment RenderLegendItem(bool clickable)
+        {
             var style = new List<string>();
 
             if (IsVisible == false)
@@ -584,6 +592,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(5, nameof(LegendItem.MarkerSize), MarkerSize);
                 builder.AddAttribute(6, nameof(LegendItem.Text), GetTitle());
                 builder.AddAttribute(7, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
+                builder.AddAttribute(8, nameof(LegendItem.Clickable), clickable);
                 builder.CloseComponent();
             };
         }

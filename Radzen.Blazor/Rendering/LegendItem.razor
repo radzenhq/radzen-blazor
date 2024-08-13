@@ -1,13 +1,13 @@
 @using Radzen.Blazor
 
-<li class="rz-legend-item" style="@Style" @onclick="@Click" tabindex="0" @onkeypress="@(args => OnKeyPress(args, Click.InvokeAsync(null)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
+<span class="rz-legend-item" style="@Style" @onclick="@OnClick" tabindex="0" @onkeypress="@OnKeyPress" @onkeypress:preventDefault=@preventKeyPress @onkeypress:stopPropagation>
     <svg width="@((MarkerSize * 2).ToInvariantString())" height="@((MarkerSize * 2).ToInvariantString())">
         <g class="rz-series-@Index @Class">
             <Marker X="@MarkerSize" Y="@MarkerSize" Type="@(MarkerType == MarkerType.None ? MarkerType.Square : MarkerType)" Fill="@Color" Size="@MarkerSize" />
         </g>
     </svg>
     <span class="rz-legend-item-text">@Text</span>
-</li>
+</span>
 
 @code {
     [Parameter]
@@ -32,10 +32,22 @@
     public EventCallback Click { get; set; }
 
     [Parameter]
+    public bool Clickable { get; set; } = true;
+
+    [Parameter]
     public int Index { get; set; }
 
     bool preventKeyPress = false;
-    async Task OnKeyPress(KeyboardEventArgs args, Task task)
+
+    async Task OnClick()
+    {
+        if (Clickable)
+        {
+            await Click.InvokeAsync();
+        }
+    }
+
+    async Task OnKeyPress(KeyboardEventArgs args)
     {
         var key = args.Code != null ? args.Code : args.Key;
 
@@ -43,7 +55,7 @@
         {
             preventKeyPress = true;
 
-            await task;
+            await OnClick();
         }
         else
         {

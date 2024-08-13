@@ -125,7 +125,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public override RenderFragment RenderLegendItem()
+        protected override RenderFragment RenderLegendItem(bool clickable)
         {
             return builder =>
             {
@@ -138,6 +138,7 @@ namespace Radzen.Blazor
                     builder.AddAttribute(4, nameof(LegendItem.MarkerType), MarkerType);
                     builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(Items.IndexOf(data), Fills));
                     builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, () => OnLegendClick(data)));
+                    builder.AddAttribute(7, nameof(LegendItem.Clickable), clickable);
                     builder.CloseComponent();
                 };
             };
