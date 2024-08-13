@@ -198,7 +198,7 @@ namespace Radzen.Blazor
         /// }
         /// </code>
         /// </example>
-        public bool AllowNext { get; set; }
+        public bool AllowNext { get; set; } = true;
 
         /// <summary>
         /// A boolean that sets the disabled or enabled state of the previous button.
@@ -216,7 +216,7 @@ namespace Radzen.Blazor
         /// }
         /// </code>
         /// </example>
-        public bool AllowPrevious { get; set; }
+        public bool AllowPrevious { get; set; } = true;
 
         private string _nextStep = "Next";
         /// <summary>
