@@ -1,28 +1,68 @@
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-    <RadzenText>@people[0].Name</RadzenText>
-    <RadzenSparkline style="width: 100px; height: 30px">
-        <RadzenLineSeries Smooth="true" Data="@people[0].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
-    </RadzenSparkline>
-</RadzenStack>
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-    <RadzenText>@people[1].Name</RadzenText>
-    <RadzenSparkline style="width: 100px; height: 30px">
-        <RadzenColumnSeries Data="@people[1].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
-        <RadzenColumnOptions Margin="2" />
-    </RadzenSparkline>
-</RadzenStack>
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-    <RadzenText>@people[2].Name</RadzenText>
-    <RadzenSparkline style="width: 100px; height: 30px">
-        <RadzenAreaSeries Smooth="true" Data="@people[2].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
-    </RadzenSparkline>
-</RadzenStack>
-<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-    <RadzenText>@people[3].Name</RadzenText>
-    <RadzenSparkline style="width: 100px; height: 30px">
-        <RadzenPieSeries X="15" Y="15" Data="@people[3].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
-    </RadzenSparkline>
-</RadzenStack>
+<RadzenCard class="rz-my-12 rz-p-4 rz-p-md-8 rz-mx-auto" Style="max-width: 800px">
+    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3">
+        <RadzenIcon Icon="glyphs" Style="vertical-align: middle;" /> Quiz scores represented in different sparklines
+    </RadzenText>
+    <RadzenDataList WrapItems="true" Data="@people" TItem="Person" Style="--rz-datalist-item-margin-inline: 0;">
+        <Template Context="people">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-0" Style="width: 100%;">
+                <RadzenRow Gap="0" AlignItems="AlignItems.Center">
+                    <RadzenColumn Size="12" SizeMD="2" class="rz-p-4">
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" class="rz-m-0">@(people.Name)</RadzenText>
+                    </RadzenColumn>
+                    <RadzenColumn Size="3" SizeMD="3" class="rz-p-1">
+                        <RadzenSparkline style="width: 100%; height: 30px">
+                            <RadzenAreaSeries Smooth="true" Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                        </RadzenSparkline>
+                    </RadzenColumn>
+                    <RadzenColumn Size="3" SizeMD="3" class="rz-p-1">
+                        <RadzenSparkline style="width: 100%; height: 30px">
+                            <RadzenLineSeries Smooth="true" Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                        </RadzenSparkline>
+                    </RadzenColumn>
+                    <RadzenColumn Size="3" SizeMD="3" class="rz-p-1">
+                        <RadzenSparkline style="width: 100%; height: 30px">
+                            <RadzenColumnSeries Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                            <RadzenColumnOptions Margin="2" />
+                        </RadzenSparkline>
+                    </RadzenColumn>
+                    <RadzenColumn Size="3" SizeMD="1" class="rz-p-1">
+                        <RadzenSparkline style="width: 100%; height: 30px">
+                            <RadzenPieSeries X="15" Y="15" Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                        </RadzenSparkline>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenCard>
+        </Template>
+    </RadzenDataList>
+</RadzenCard>
+
+<RadzenCard class="rz-my-12 rz-p-4 rz-p-md-8 rz-mx-auto" Style="max-width: 800px">
+    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-mb-6">
+        <RadzenIcon Icon="glyphs" Style="vertical-align: middle;" /> Quiz scores as a sparkline in text.
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" class="rz-mb-6">
+        The first quiz was won by  @(people[2].Name)  (
+            <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
+                <RadzenLineSeries Smooth="true" Data="@people[2].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+            </RadzenSparkline>
+        ).
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H4" class="rz-mb-6">
+        The second quiz was the easiest for @(people[0].Name)  (
+            <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
+                <RadzenColumnSeries Data="@people[0].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                <RadzenColumnOptions Margin="2" />
+            </RadzenSparkline>
+        ) 
+        and @(people[1].Name) (
+            <RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
+                <RadzenColumnSeries Data="@people[1].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
+                <RadzenColumnOptions Margin="2" />
+            </RadzenSparkline>
+        ).
+    </RadzenText>
+</RadzenCard>
+
 @code {
     public class Test
     {
@@ -48,10 +88,10 @@
                 Name = "Alfred",
                 Tests = new List<Test>
                 {
-                    new Test { TestName = "Test 1", Score = 58 },
-                    new Test { TestName = "Test 2", Score = 93 },
-                    new Test { TestName = "Test 3", Score = 84 },
-                    new Test { TestName = "Test 4", Score = 65 }
+                    new Test { TestName = "Quiz 1", Score = 58 },
+                    new Test { TestName = "Quiz 2", Score = 93 },
+                    new Test { TestName = "Quiz 3", Score = 84 },
+                    new Test { TestName = "Quiz 4", Score = 65 }
                 }
             },
             new Person
@@ -59,10 +99,10 @@
                 Name = "Angela",
                 Tests = new List<Test>
                 {
-                    new Test { TestName = "Test 1", Score = 53 },
-                    new Test { TestName = "Test 2", Score = 99 },
-                    new Test { TestName = "Test 3", Score = 89 },
-                    new Test { TestName = "Test 4", Score = 71 }
+                    new Test { TestName = "Quiz 1", Score = 53 },
+                    new Test { TestName = "Quiz 2", Score = 99 },
+                    new Test { TestName = "Quiz 3", Score = 89 },
+                    new Test { TestName = "Quiz 4", Score = 71 }
                 }
             },
             new Person
@@ -70,10 +110,10 @@
                 Name = "Bob",
                 Tests = new List<Test>
                 {
-                    new Test { TestName = "Test 1", Score = 92 },
-                    new Test { TestName = "Test 2", Score = 58 },
-                    new Test { TestName = "Test 3", Score = 52 },
-                    new Test { TestName = "Test 4", Score = 61 }
+                    new Test { TestName = "Quiz 1", Score = 92 },
+                    new Test { TestName = "Quiz 2", Score = 58 },
+                    new Test { TestName = "Quiz 3", Score = 52 },
+                    new Test { TestName = "Quiz 4", Score = 61 }
                 }
             },
             new Person
@@ -81,10 +121,10 @@
                 Name = "Brett",
                 Tests = new List<Test>
                 {
-                    new Test { TestName = "Test 1", Score = 52 },
-                    new Test { TestName = "Test 2", Score = 52 },
-                    new Test { TestName = "Test 3", Score = 73 },
-                    new Test { TestName = "Test 4", Score = 64 }
+                    new Test { TestName = "Quiz 1", Score = 52 },
+                    new Test { TestName = "Quiz 2", Score = 52 },
+                    new Test { TestName = "Quiz 3", Score = 73 },
+                    new Test { TestName = "Quiz 4", Score = 64 }
                 }
             },
     };
