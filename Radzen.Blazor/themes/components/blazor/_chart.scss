@@ -6,6 +6,10 @@ $chart-legend-focus-outline: var(--rz-outline-focus) !default;
 $chart-legend-focus-outline-offset: var(--rz-outline-offset) !default;
 $chart-tooltip-background: var(--rz-base-background-color) !default;
 $chart-tooltip-color: var(--rz-text-color) !default;
+$chart-tooltip-border-radius: var(--rz-tooltip-border-radius) !default;
+$chart-tooltip-font-size: var(--rz-tooltip-font-size) !default;
+$chart-tooltip-item-border-radius: var(--rz-border-radius) !default;
+$chart-tooltip-item-hover-background-color: var(--rz-grid-stripe-background-color) !default;
 $chart-marker-stroke: var(--rz-base-background-color) !default;
 
 $chart-color-schemes: (
@@ -241,9 +245,9 @@ $chart-color-schemes: (
   color: var(--rz-chart-tooltip-color);
   box-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.15);
   padding: 0.5rem;
-  border-radius: var(--rz-tooltip-border-radius);
+  border-radius: var(--rz-chart-tooltip-border-radius);
   white-space: nowrap;
-  font-size: var(--rz-tooltip-font-size);
+  font-size: var(--rz-chart-tooltip-font-size);
 }
 
 .rz-chart-tooltip {
@@ -279,26 +283,27 @@ $chart-color-schemes: (
 
 // Shared Tooltip Styles
 
-.rz-chart-shared-tooltip:has(.rz-chart-tooltip-item) {
+.rz-chart-shared-tooltip:has(.rz-chart-tooltip-item-content) {
   .rz-chart-tooltip-title {
     padding: 0 0.5rem;
   }
+
+  .rz-chart-tooltip-content {
+    border: none;
+  }
 }
 
-.rz-chart-tooltip-item {
-  
-  & > div {
+.rz-chart-tooltip-item-content {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     padding: 0.125rem 0.5rem;
-    border-radius: var(--rz-border-radius);
+    border-radius: var(  --rz-chart-tooltip-item-border-radius);
   
     &:hover {
-      background-color: var(--rz-grid-stripe-background-color);
+      background-color: var(--rz-chart-tooltip-item-hover-background-color);
     }
-  }
 
   .rz-legend-item {
     margin: 0;
