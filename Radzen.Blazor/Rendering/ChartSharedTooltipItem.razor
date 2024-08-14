@@ -1,0 +1,26 @@
+<div class="rz-chart-tooltip-item">
+@if (ChildContent != null)
+{
+    @ChildContent
+}
+else
+{
+    <div class="rz-chart-tooltip-item-content">
+        @LegendItem
+        <span class="rz-chart-tooltip-item-value">@Value</span>
+    </div>
+}
+</div>
+@code {
+    [Parameter]
+    public string Title { get; set; }
+
+    [Parameter]
+    public string Value { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment LegendItem { get; set; }
+}

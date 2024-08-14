@@ -1453,6 +1453,7 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Line Chart",
                             Path = "line-chart",
+                            Updated = true,
                             Description = "Radzen Blazor Chart with line series.",
                             Tags = new [] { "chart", "graph", "line" }
                         },
@@ -1541,6 +1542,15 @@ namespace RadzenBlazorDemos
                             Tags = new [] { "chart", "graph", "styling" }
                         },
                     }
+                },
+                new Example
+                {
+                    Name = "Sparkline",
+                    Path = "sparkline",
+                    New = true,
+                    Description = "Demonstration and configuration of RadzenSparkline component.",
+                    Icon = "&#xf64f",
+                    Tags = new [] { "chart", "sparkline" }
                 },
                 new Example
                 {

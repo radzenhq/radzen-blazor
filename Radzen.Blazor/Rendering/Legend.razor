@@ -2,7 +2,7 @@
 @if (Chart.Legend.Visible)
 {
     <div class="@Class">
-        <ul class="rz-legend-items">
+        <div class="rz-legend-items">
         @foreach (var series in Chart.Series)
         {
             @if (series.ShowInLegend)
@@ -10,7 +10,7 @@
                 @series.RenderLegendItem()
             }
         }
-        </ul>
+        </div>
     </div>
 }
 @code {

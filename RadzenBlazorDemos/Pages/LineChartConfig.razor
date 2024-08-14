@@ -15,10 +15,15 @@
                 <RadzenCheckBox @bind-Value="@showMarkers" Name="markers"></RadzenCheckBox>
                 <RadzenLabel Text="Show Markers" Component="markers" />
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@sharedTooltip" Name="sharedToltip"></RadzenCheckBox>
+                <RadzenLabel Text="Shared Tooltip" Component="sharedTooltip" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
 
-    <RadzenChart>
+   <RadzenChart>
+        <RadzenChartTooltipOptions Shared="@sharedTooltip" />
         <RadzenLineSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" LineType="LineType.Dashed" ValueProperty="Revenue">
             <RadzenMarkers Visible="@showMarkers" MarkerType="MarkerType.Square" />
             <RadzenSeriesDataLabels Visible="@showDataLabels" />
@@ -37,6 +42,7 @@
 
 @code {
     bool smooth = false;
+    bool sharedTooltip = true;
     bool showDataLabels = false;
     bool showMarkers = true;
 

@@ -1,0 +1,23 @@
+<div class="rz-chart-tooltip rz-chart-shared-tooltip @Class" style="left: @(X.ToInvariantString())px; top: @(Y.ToInvariantString())px">
+    <div class="rz-chart-tooltip-content">
+        <div class="rz-chart-tooltip-title">@Title</div>
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public double X { get; set; }
+
+    [Parameter]
+    public double Y { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    [Parameter]
+    public string Title { get; set; }
+}

@@ -5,6 +5,8 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
+using System.Net.Mime;
+using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -485,18 +487,62 @@ namespace Radzen.Blazor
 
             return builder =>
             {
-                builder.OpenComponent<ChartTooltip>(0);
-                builder.AddAttribute(1, nameof(ChartTooltip.X), x + marginLeft);
-                builder.AddAttribute(2, nameof(ChartTooltip.Y), y + marginTop);
 
-                builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate?.Invoke(item));
+                if (Chart.Tooltip.Shared)
+                {
+                    var category = PropertyAccess.GetValue(item, CategoryProperty);
+                    builder.OpenComponent<ChartSharedTooltip>(0);
+                    builder.AddAttribute(1, nameof(ChartSharedTooltip.X), x + marginLeft);
+                    builder.AddAttribute(2, nameof(ChartSharedTooltip.Y), y + marginTop);
+                    builder.AddAttribute(3, nameof(ChartSharedTooltip.Class), TooltipClass(item));
+                    builder.AddAttribute(4, nameof(ChartSharedTooltip.Title), TooltipTitle(item));
+                    builder.AddAttribute(4, nameof(ChartSharedTooltip.ChildContent), RenderSharedTooltipItems(category));
+                    builder.CloseComponent();
+                }
+                else
+                {
+                    builder.OpenComponent<ChartTooltip>(0);
+                    builder.AddAttribute(1, nameof(ChartTooltip.X), x + marginLeft);
+                    builder.AddAttribute(2, nameof(ChartTooltip.Y), y + marginTop);
+                    builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate?.Invoke(item));
+                    builder.AddAttribute(4, nameof(ChartTooltip.Title), TooltipTitle(item));
+                    builder.AddAttribute(5, nameof(ChartTooltip.Label), TooltipLabel(item));
+                    builder.AddAttribute(6, nameof(ChartTooltip.Value), TooltipValue(item));
+                    builder.AddAttribute(7, nameof(ChartTooltip.Class), TooltipClass(item));
+                    builder.AddAttribute(8, nameof(ChartTooltip.Style), TooltipStyle(item));
+                    builder.CloseComponent();
+                }
+            };
+        }
 
-                builder.AddAttribute(4, nameof(ChartTooltip.Title), TooltipTitle(item));
-                builder.AddAttribute(5, nameof(ChartTooltip.Label), TooltipLabel(item));
-                builder.AddAttribute(6, nameof(ChartTooltip.Value), TooltipValue(item));
-                builder.AddAttribute(7, nameof(ChartTooltip.Class), TooltipClass(item));
-                builder.AddAttribute(8, nameof(ChartTooltip.Style), TooltipStyle(item));
-                builder.CloseComponent();
+        private RenderFragment RenderSharedTooltipItems(object category)
+        {
+            return builder =>
+            {
+                var visibleSeries = Chart.Series.Where(s => s.Visible).ToList();
+
+                foreach (var series in visibleSeries)
+                {
+                    builder.AddContent(1, series.RenderSharedTooltipItem(category));
+                }
+            };
+        }
+
+        /// <inheritdoc />
+        public virtual RenderFragment RenderSharedTooltipItem(object category)
+        {
+            return builder =>
+            {
+                var item = Items.FirstOrDefault(i => PropertyAccess.GetValue(i, CategoryProperty) == category);
+
+                if (item != null)
+                {
+                    builder.OpenComponent<ChartSharedTooltipItem>(0);
+                    builder.AddAttribute(1, nameof(ChartSharedTooltipItem.Value), TooltipValue(item));
+                    builder.AddAttribute(2, nameof(ChartSharedTooltipItem.ChildContent), TooltipTemplate?.Invoke(item));
+                    builder.AddAttribute(3, nameof(ChartSharedTooltipItem.LegendItem), RenderLegendItem(false));
+                    builder.CloseComponent();
+                }
             };
         }
 
@@ -521,6 +567,14 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public virtual RenderFragment RenderLegendItem()
         {
+            return RenderLegendItem(true);
+        }
+
+        /// <summary>
+        /// Renders the legend item for this series.
+        /// </summary>
+        protected virtual RenderFragment RenderLegendItem(bool clickable)
+        {
             var style = new List<string>();
 
             if (IsVisible == false)
@@ -538,6 +592,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(5, nameof(LegendItem.MarkerSize), MarkerSize);
                 builder.AddAttribute(6, nameof(LegendItem.Text), GetTitle());
                 builder.AddAttribute(7, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
+                builder.AddAttribute(8, nameof(LegendItem.Clickable), clickable);
                 builder.CloseComponent();
             };
         }
