@@ -19,22 +19,25 @@
           </svg>
         </RadzenLink>
       </RadzenColumn>
-      <RadzenColumn SizeXS="8" class="rz-display-none rz-display-xs-block rz-text-align-end nav-links rz-align-items-center" >
-        <RadzenLink Path="/docs/" Text="Documentation" title="Radzen Blazor Components Documentation" target="_blank" />
-        <RadzenLink Path="https://www.radzen.com/" Text="About Radzen" title="Create .NET Core web applications fast & easy" target="_blank" />
-        <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" title="GitHub" target="_blank" >
-          <svg width="28" height="28" viewBox="0 0 512 499.36" xmlns="http://www.w3.org/2000/svg">
-            <title>GitHub</title>
-            <path fill="currentColor" fill-rule="evenodd" d="M256 0C114.64 0 0 114.61 0 256c0 113.09 73.34 209 175.08 242.9 12.8 2.35 17.47-5.56 17.47-12.34 0-6.08-.22-22.18-.35-43.54-71.2 15.49-86.2-34.34-86.2-34.34-11.64-29.57-28.42-37.45-28.42-37.45-23.27-15.84 1.73-15.55 1.73-15.55 25.69 1.81 39.21 26.38 39.21 26.38 22.84 39.12 59.92 27.82 74.5 21.27 2.33-16.54 8.94-27.82 16.25-34.22-56.84-6.43-116.6-28.43-116.6-126.49 0-27.95 10-50.8 26.35-68.69-2.63-6.48-11.42-32.5 2.51-67.75 0 0 21.49-6.88 70.4 26.24a242.65 242.65 0 0 1 128.18 0c48.87-33.13 70.33-26.24 70.33-26.24 14 35.25 5.18 61.27 2.55 67.75 16.41 17.9 26.31 40.75 26.31 68.69 0 98.35-59.85 120-116.88 126.32 9.19 7.9 17.38 23.53 17.38 47.41 0 34.22-.31 61.83-.31 70.23 0 6.85 4.61 14.81 17.6 12.31C438.72 464.97 512 369.08 512 256.02 512 114.62 397.37 0 256 0z"></path>
-          </svg>
-        </RadzenLink>
+      <RadzenColumn SizeXS="8" class="rz-display-none rz-display-xs-block nav-links" >
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="3rem">
+          <RadzenLink Path="/docs/" Text="Documentation" title="Radzen Blazor Components Documentation" target="_blank" />
+          <RadzenLink Path="https://www.radzen.com/" Text="About Radzen" title="Create .NET Core web applications fast & easy" target="_blank" />
+          <RadzenAppearanceToggle />
+          <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" title="GitHub" target="_blank" >
+            <svg width="28" height="28" viewBox="0 0 512 499.36" xmlns="http://www.w3.org/2000/svg">
+              <title>GitHub</title>
+              <path fill="currentColor" fill-rule="evenodd" d="M256 0C114.64 0 0 114.61 0 256c0 113.09 73.34 209 175.08 242.9 12.8 2.35 17.47-5.56 17.47-12.34 0-6.08-.22-22.18-.35-43.54-71.2 15.49-86.2-34.34-86.2-34.34-11.64-29.57-28.42-37.45-28.42-37.45-23.27-15.84 1.73-15.55 1.73-15.55 25.69 1.81 39.21 26.38 39.21 26.38 22.84 39.12 59.92 27.82 74.5 21.27 2.33-16.54 8.94-27.82 16.25-34.22-56.84-6.43-116.6-28.43-116.6-126.49 0-27.95 10-50.8 26.35-68.69-2.63-6.48-11.42-32.5 2.51-67.75 0 0 21.49-6.88 70.4 26.24a242.65 242.65 0 0 1 128.18 0c48.87-33.13 70.33-26.24 70.33-26.24 14 35.25 5.18 61.27 2.55 67.75 16.41 17.9 26.31 40.75 26.31 68.69 0 98.35-59.85 120-116.88 126.32 9.19 7.9 17.38 23.53 17.38 47.41 0 34.22-.31 61.83-.31 70.23 0 6.85 4.61 14.81 17.6 12.31C438.72 464.97 512 369.08 512 256.02 512 114.62 397.37 0 256 0z"></path>
+            </svg>
+          </RadzenLink>
+        </RadzenStack>
       </RadzenColumn>
     </RadzenRow>
 
     <RadzenRow>
       <RadzenColumn Size="12" class="rz-text-align-center">
         <RadzenText TextStyle="TextStyle.DisplayH1" TagName="TagName.H1" class="rz-my-8 rz-pt-8 rz-my-sm-10 rz-pt-sm-10 rz-my-md-12 rz-pt-md-12" Style="--rz-text-display-h1-font-weight: 500;">Radzen Blazor Components</RadzenText>
-        <RadzenText TextStyle="TextStyle.DisplayH5" TagName="TagName.H2" Style="--rz-text-display-h5-font-weight: normal;">A set of <span style="font-weight: 600">80+ free and open source</span> native Blazor UI controls.</RadzenText>
+        <RadzenText TextStyle="TextStyle.DisplayH5" TagName="TagName.H2" Style="--rz-text-display-h5-font-weight: normal;">A set of <span style="font-weight: 600">80+ free</span> Blazor UI controls. Open source. Native. Growing.</RadzenText>
         
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-mt-8">
           <RadzenLink Path="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE">
@@ -52,6 +55,11 @@
         </RadzenStack>
         
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-mt-8 rz-py-8 rz-mt-sm-10 rz-py-sm-10 rz-mt-md-12 rz-py-md-12">
+          <NavLink class="cta-button primary" href="/get-started">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Style="height: 100%;">
+              <span>Get Started</span>
+            </RadzenStack>
+          </NavLink>
           <Anchor class="cta-button" href="#components">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
               <RadzenIcon aria-hidden="true" Icon="south" />
@@ -63,6 +71,34 @@
     </RadzenRow>
 
     <RadzenRow Gap="1rem" RowGap="1rem" class="rz-mt-6 rz-mt-sm-8 rz-mt-md-12">
+      <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Outlined" Style="height: 100%;" class="rz-p-6 rz-p-md-12 customers-logos rz-background-color-white">
+          <RadzenRow>
+            <RadzenColumn Size="12" SizeMD="3" class="rz-p-md-6 rz-pe-md-12">
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3" class="rz-m-0 rz-color-base-900">Trusted by thousands of developers and IT leaders.</RadzenText>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeMD="9" class="rz-pe-md-6">
+              <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center" Style="height: 100%;">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="0">
+                  <span><img alt="Microsoft" src="images/microsoft.svg" /></span>
+                  <span class="square"><img alt="Porsche" src="images/porsche.svg" /></span>
+                  <span class="square"><img alt="NASA" src="images/nasa.svg" /></span>
+                  <span><img alt="Allianz" src="images/allianz.svg" /></span>
+                  <span class="square"><img alt="Dell" src="images/dell.svg" /></span>
+                  <span class="square"><img alt="Shell" src="images/shell.svg" /></span>
+                  <span><img alt="Siemens" src="images/siemens.svg" /></span>
+                  <span><img alt="DHL" src="images/DHL.svg" /></span>
+                  <span><img alt="Nokia" src="images/nokia.svg" /></span>
+                  <span><img alt="Eurobank" src="images/eurobank.svg" style="height: 36px;"/></span>
+                  <span class="square"><img alt="Konica Minolta" src="images/konica-minolta.svg"/></span>
+                  <span><img alt="Accenture" src="images/accenture.svg" /></span>
+                  <span><img alt="Deloitte" src="images/deloitte.svg" /></span>
+                </RadzenStack>
+              </RadzenStack>
+            </RadzenColumn>
+          </RadzenRow>
+        </RadzenCard>
+      </RadzenColumn>
       <RadzenColumn SizeSM="4">
         <RadzenCard Variant="Variant.Outlined" Style="height: 100%;" class="rz-p-6 rz-p-md-12">
           <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3" class="rz-mb-4">Free</RadzenText>
@@ -84,34 +120,6 @@
           <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">We add new components and features on a regular basis.</RadzenText>
           <RadzenText TextStyle="TextStyle.Body1">Short development cycle. We release as soon as new stuff is available. No more quarterly releases.</RadzenText>
         </RadzenCard>
-      </RadzenColumn>
-      <RadzenColumn Size="12">
-          <RadzenRow>
-            <RadzenColumn Size="12"  SizeSM="3">
-              <RadzenCard Variant="Variant.Outlined" Style="height: 100%;" class="rz-p-6 rz-p-md-12">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Trusted by thousands of developers and IT leaders.</RadzenText>
-              </RadzenCard>
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeSM="9">
-              <RadzenCard Variant="Variant.Outlined" Style="height: 100%;" class="rz-p-6 rz-p-md-12 customers-logos rz-background-color-white">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="0">
-                  <span><img alt="Microsoft" src="images/microsoft.svg" /></span>
-                  <span class="square"><img alt="Porsche" src="images/porsche.svg" /></span>
-                  <span class="square"><img alt="NASA" src="images/nasa.svg" /></span>
-                  <span><img alt="Allianz" src="images/allianz.svg" /></span>
-                  <span class="square"><img alt="Dell" src="images/dell.svg" /></span>
-                  <span class="square"><img alt="Shell" src="images/shell.svg" /></span>
-                  <span><img alt="Siemens" src="images/siemens.svg" /></span>
-                  <span><img alt="DHL" src="images/DHL.svg" /></span>
-                  <span><img alt="Nokia" src="images/nokia.svg" /></span>
-                  <span><img alt="Eurobank" src="images/eurobank.svg" style="height: 36px;"/></span>
-                  <span class="square"><img alt="Konica Minolta" src="images/konica-minolta.svg"/></span>
-                  <span><img alt="Accenture" src="images/accenture.svg" /></span>
-                  <span><img alt="Deloitte" src="images/deloitte.svg" /></span>
-                </RadzenStack>
-              </RadzenCard>
-            </RadzenColumn>
-          </RadzenRow>
       </RadzenColumn>
     </RadzenRow>
 
