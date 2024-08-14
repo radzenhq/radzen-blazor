@@ -72,7 +72,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
 
-            Assert.Contains(@$"style=""{value}""", component.Markup);
+            Assert.Contains(@$"style=""--rz-progressbar-value: 0%;{value}""", component.Markup);
         }
 
         [Fact]
@@ -118,7 +118,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<double>(p => p.Max, max);
             });
 
-            Assert.Contains(@$"style=""width: {Math.Min(value / max * 100, 100).ToInvariantString()}%;""", component.Markup);
+            Assert.Contains(@$"style=""--rz-progressbar-value: {Math.Min(value / max * 100, 100).ToInvariantString()}%;""", component.Markup);
         }
 
         [Fact]

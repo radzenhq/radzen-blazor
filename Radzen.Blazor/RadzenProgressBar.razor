@@ -3,9 +3,9 @@
 @using Radzen.Blazor.Rendering;
 @if (Visible)
 {
-    <div @ref="@Element" style="@Style" aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
+    <div @ref="@Element" style="@($"--rz-progressbar-value: {(NormalizedValue * 100).ToInvariantString()}%;{Style}")" aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
          aria-valuenow="@Value" id="@GetId()">
-        <div class="rz-progressbar-value rz-progressbar-value-animate" style="@($"width: {(NormalizedValue * 100).ToInvariantString()}%;")"></div>
+        <div class="rz-progressbar-value"></div>
         @if (ShowValue)
         {
             <div class="rz-progressbar-label">
@@ -16,6 +16,7 @@
                 else
                 {
                     @Value@Unit
+                    <span aria-hidden="true" class="rz-progressbar-label-value">@Value@Unit</span>
                 }
             </div>
         }
