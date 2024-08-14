@@ -68,7 +68,7 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenProgressBar>();
 
-            var value = "width:20px";
+            var value = "--rz-progressbar-value: 0%;width:20px";
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Style, value));
 
@@ -118,7 +118,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<double>(p => p.Max, max);
             });
 
-            Assert.Contains(@$"style=""width: {Math.Min(value / max * 100, 100).ToInvariantString()}%;""", component.Markup);
+            Assert.Contains(@$"style=""--rz-progressbar-value: {Math.Min(value / max * 100, 100).ToInvariantString()}%;""", component.Markup);
         }
 
         [Fact]
