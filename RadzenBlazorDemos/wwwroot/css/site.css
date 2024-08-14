@@ -129,28 +129,9 @@ body {
 
 /* Top navigation links */
 .nav-links a {
-    display: inline-block;
-    height: 2rem;
-    line-height: 2rem;
     color: var(--rz-text-title-color);
-    margin-block: .5rem 0;
-    margin-inline: 2.5rem 0;
     transition: all 0.3s;
     text-decoration: none;
-}
-
-.nav-links a:hover {
-    color: var(--rz-link-hover-color);
-    text-decoration: none;
-}
-
-#popup-themes {
-    width: 320px !important;
-    height: 400px;
-}
-
-#popup-themes .rz-dropdown-items-wrapper {
-    max-height: 400px !important;
 }
 
 /* CTA Buttons */
