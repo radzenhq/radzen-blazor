@@ -88,11 +88,6 @@ namespace Radzen.Blazor
                 if (Step is IConvertible)
                 {
                     step = Convert.ToDouble(Step);
-
-                    if (step <= 0)
-                    {
-                        throw new ArgumentOutOfRangeException("Step must be greater than zero");
-                    }
                 }
             }
 
@@ -102,7 +97,7 @@ namespace Radzen.Blazor
                 end = Math.Ceiling(end / step) * step;
             }
 
-            if (!Double.IsFinite(Input.Start) && !Double.IsFinite(Input.End))
+            if (!double.IsFinite(Input.Start) || !double.IsFinite(Input.End))
             {
                 Input.Start = start = 0;
                 Input.End = end = 2;
@@ -110,12 +105,17 @@ namespace Radzen.Blazor
                 Round = false;
             }
 
-            if (!Double.IsFinite(start) && !Double.IsFinite(end))
+            if (!double.IsFinite(start) || !double.IsFinite(end))
             {
                 Input.Start = start = 0;
                 Input.End = end = 2;
                 Step = step = 1;
                 Round = false;
+            }
+
+            if (step <= 0)
+            {
+                throw new ArgumentOutOfRangeException("Step must be greater than zero");
             }
 
             return (start, end, step);
