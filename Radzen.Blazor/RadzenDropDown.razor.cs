@@ -101,6 +101,24 @@ namespace Radzen.Blazor
                 await OpenPopup("Enter", false);
             }
         }
+        internal override async Task ClosePopup(string key)
+        {
+            bool of = false;
+
+            if (key == "Enter")
+            {
+                of = OpenOnFocus;
+                OpenOnFocus = false;
+            }
+
+            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+
+            if (key == "Enter")
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
+                OpenOnFocus = of;
+            }
+        }
 
         /// <summary>
         /// Opens the popup.
