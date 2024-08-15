@@ -21,14 +21,14 @@
                             <RadzenCategoryAxis Visible="false" Padding="-20" />
                         </RadzenSparkline>
                     </RadzenColumn>
-                    <RadzenColumn Size="3" SizeMD="3" class="rz-p-1">
-                        <RadzenSparkline style="width: 100%; height: 30px">
+                    <RadzenColumn Size="3" SizeMD="2" class="rz-p-1">
+                        <RadzenSparkline style="width: 80px; height: 30px">
                             <RadzenColumnSeries Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
-                            <RadzenColumnOptions Margin="2" />
-                            <RadzenCategoryAxis Visible="false" Padding="-20" />
+                            <RadzenColumnOptions Margin="-10" Width="15" />
+                            <RadzenCategoryAxis Visible="false" />
                         </RadzenSparkline>
                     </RadzenColumn>
-                    <RadzenColumn Size="3" SizeMD="1" class="rz-p-1">
+                    <RadzenColumn Size="3" SizeMD="2" class="rz-p-1">
                         <RadzenSparkline style="width: 100%; height: 30px">
                             <RadzenPieSeries X="15" Y="15" Data="@people.Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                         </RadzenSparkline>
@@ -54,7 +54,7 @@
                 <RadzenColumnSeries Data="@people[0].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                 <RadzenColumnOptions Margin="2" />
                 <RadzenCategoryAxis Visible="false" Padding="-12" />
-            </RadzenSparkline>) 
+            </RadzenSparkline>)
         and @(people[1].Name) (<RadzenSparkline style="display: inline-block; width: 100px; height: 20px">
                 <RadzenColumnSeries Data="@people[1].Tests" Title="Score" CategoryProperty="@nameof(Test.TestName)" ValueProperty="@nameof(Test.Score)" />
                 <RadzenColumnOptions Margin="2" />
