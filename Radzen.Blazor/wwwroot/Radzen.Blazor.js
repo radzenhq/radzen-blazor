@@ -1861,7 +1861,15 @@ window.Radzen = {
                     var status = xhr.status;
                     if (status === 0 || (status >= 200 && status < 400)) {
                         var result = JSON.parse(xhr.responseText);
-                        document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
+                        var html = '<img src="' + result.url + '">';
+                        if (paste) {
+                            instance.invokeMethodAsync('OnPaste', html)
+                                .then(function (html) {
+                                    document.execCommand("insertHTML", false, html);
+                                });
+                        } else {
+                          document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
+                        }
                     } else {
                         instance.invokeMethodAsync('OnError', xhr.responseText);
                     }
@@ -1877,7 +1885,16 @@ window.Radzen = {
         } else {
             var reader = new FileReader();
             reader.onload = function (e) {
-                document.execCommand("insertHTML", false, '<img src="' + e.target.result + '">');
+              var html = '<img src="' + e.target.result + '">';
+
+              if (paste) {
+                instance.invokeMethodAsync('OnPaste', html)
+                  .then(function (html) {
+                    document.execCommand("insertHTML", false, html);
+                  });
+              } else {
+                document.execCommand("insertHTML", false, html);
+              }
             };
             reader.readAsDataURL(file);
         }
