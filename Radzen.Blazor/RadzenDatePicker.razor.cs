@@ -982,7 +982,7 @@ namespace Radzen.Blazor
             if (ShowTimeOkButton)
             {
                 CurrentDate = new DateTime(newValue.Year, newValue.Month, newValue.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
-                await OkClick(false);
+                await OkClick(!ShowTime);
             }
             else
             {
