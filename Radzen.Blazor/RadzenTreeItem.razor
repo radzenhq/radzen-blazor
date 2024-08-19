@@ -18,7 +18,14 @@
             <div class="rz-treenode-label" @onkeydown:stopPropagation>@Template(this)</div>
         } else
         {
-            <span for="@(GetHashCode())" class="rz-treenode-label">@Text</span>
+            if (Tree.AllowCheckOnLabelClick)
+            {
+                <label for="@(GetHashCode())" class="rz-treenode-label">@Text</label>
+            }
+            else
+            {
+                <span class="rz-treenode-label">@Text</span>
+            }
         }
     </div>
     @if (ChildContent != null && expanded)

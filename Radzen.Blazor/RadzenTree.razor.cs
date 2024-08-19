@@ -183,6 +183,12 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public bool AllowCheckParents { get; set; } = true;
+        
+        /// <summary>
+        /// Specifies whether clicking on a item's label will check its checkbox. Set to <c>true</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool AllowCheckOnLabelClick { get; set; } = true;
 
         /// <summary>
         /// Specifies whether siblings items are collapsed. Set to <c>false</c> by default.
