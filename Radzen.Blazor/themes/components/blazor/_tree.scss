@@ -87,6 +87,7 @@ $tree-transition: var(--rz-transition-all), width 0, height 0 !default;
   .rz-treenode-label {
     display: flex;
     align-items: center;
+    cursor: inherit;
     padding-block: var(--rz-tree-node-padding-block);
     padding-inline: var(--rz-tree-node-padding-inline);
 
