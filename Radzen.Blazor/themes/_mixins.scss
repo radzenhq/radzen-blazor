@@ -74,3 +74,11 @@
     }
   }
 }
+
+@mixin rz-hover-state {
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      @content;
+    }
+  }
+}

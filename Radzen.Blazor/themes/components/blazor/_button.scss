@@ -131,17 +131,15 @@ $button-sizes: map-merge(
   &:not(.rz-state-disabled) {
     cursor: pointer;
 
-    &:hover {
-      &:not(:active) {
+    &:not(:active) {
+      @include rz-hover-state {
         text-decoration: none;
         background-image: var(--rz-button-hover-gradient);
         background-size: var(--rz-button-hover-background-size);
         box-shadow: var(--rz-button-hover-shadow);
       }
-    }
-
-    &:focus-visible {
-      &:not(:active) {
+      
+      &:focus-visible {
         text-decoration: none;
         background-image: var(--rz-button-focus-gradient);
         background-size: var(--rz-button-focus-background-size);
@@ -261,17 +259,28 @@ $button-sizes: map-merge(
         }
         background-color: transparent;
 
-        &:not(.rz-state-disabled):hover:not(:active),
-        &:not(.rz-state-disabled):focus-visible:not(:active),
-        &:not(.rz-state-disabled):active {
-          @if $style == 'light' { background-color: rgba(255, 255, 255, .12); } 
-          @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); }
-          @else if $style == 'base' {
-            @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); } 
-            @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+        &:not(.rz-state-disabled) {
+          @include rz-hover-state {
+            @if $style == 'light' { background-color: rgba(255, 255, 255, .12); } 
+            @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); }
+            @else if $style == 'base' {
+              @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); } 
+              @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+            }
+            @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); } 
+            background-image: none;
           }
-          @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); } 
-          background-image: none;
+        
+          &:active {
+            @if $style == 'light' { background-color: rgba(255, 255, 255, .12); } 
+            @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); }
+            @else if $style == 'base' {
+              @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); } 
+              @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+            }
+            @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); } 
+            background-image: none;
+          }
         }
       }
     }
@@ -302,18 +311,30 @@ $button-sizes: map-merge(
         background-color: transparent;
         box-shadow: none;
 
-        &:not(.rz-state-disabled):hover:not(:active),
-        &:not(.rz-state-disabled):focus-visible:not(:active),
-        &:not(.rz-state-disabled):active {
-          @if $style == 'light' { background-color: rgba(255, 255, 255, .12); } 
-          @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); } 
-          @else if $style == 'base' {
-            @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); }
-            @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+        &:not(.rz-state-disabled) {
+          @include rz-hover-state {
+            @if $style == 'light' { background-color: rgba(255, 255, 255, .12); } 
+            @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); } 
+            @else if $style == 'base' {
+              @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); }
+              @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+            }
+            @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); } 
+            background-image: none;
+            box-shadow: none;
           }
-          @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); } 
-          background-image: none;
-          box-shadow: none;
+
+          &:active {
+            @if $style == 'light' { background-color: rgba(255, 255, 255, .12); } 
+            @else if $style == 'dark' { background-color: rgba(0, 0, 0, .12); } 
+            @else if $style == 'base' {
+              @if $theme-dark == true { background-color: var(--rz-#{$style}-darker); color: var(--rz-on-#{$style}-darker); }
+              @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); }
+            }
+            @else { background-color: var(--rz-#{$style}-lighter); color: var(--rz-on-#{$style}-lighter); } 
+            background-image: none;
+            box-shadow: none;
+          }
         }
       }
 
