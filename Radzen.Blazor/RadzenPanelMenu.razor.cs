@@ -112,27 +112,29 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        bool ShouldMatch(string url)
+        bool ShouldMatch(RadzenPanelMenuItem item)
         {
-            if (string.IsNullOrEmpty(url))
+            if (string.IsNullOrEmpty(item.Path))
             {
                 return false;
             }
 
             var currentAbsoluteUrl = UriHelper.ToAbsoluteUri(UriHelper.Uri).AbsoluteUri;
-            var absoluteUrl = UriHelper.ToAbsoluteUri(url).AbsoluteUri;
+            var absoluteUrl = UriHelper.ToAbsoluteUri(item.Path).AbsoluteUri;
 
             if (EqualsHrefExactlyOrIfTrailingSlashAdded(absoluteUrl, currentAbsoluteUrl))
             {
                 return true;
             }
 
-            if (url == "/")
+            if (item.Path == "/")
             {
                 return false;
             }
 
-            if (Match == NavLinkMatch.Prefix
+            var match = item.Match != NavLinkMatch.Prefix ? item.Match : Match;
+
+            if (match == NavLinkMatch.Prefix
                 && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
             {
                 return true;
@@ -185,7 +187,7 @@ namespace Radzen.Blazor
 
         internal void SelectItem(RadzenPanelMenuItem item)
         {
-            var selected = ShouldMatch(item.Path);
+            var selected = ShouldMatch(item);
             item.Select(selected);
         }
 
