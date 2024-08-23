@@ -1163,6 +1163,7 @@ window.Radzen = {
         if (lastPopup) {
             currentPopup.instance = lastPopup.instance;
             currentPopup.callback = lastPopup.callback;
+            currentPopup.parent = lastPopup.parent;
         }
 
         if(e.type == 'contextmenu' || !e.target || !closeOnDocumentClick) return;
@@ -1178,8 +1179,8 @@ window.Radzen = {
                 Radzen.closeAllPopups();
             }
         }
-        if (parent) {
-          if (e.type == 'mousedown' && !parent.contains(e.target) && !currentPopup.contains(e.target)) {
+        if (currentPopup.parent) {
+          if (e.type == 'mousedown' && !currentPopup.parent.contains(e.target) && !currentPopup.contains(e.target)) {
               Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
           }
         } else {
@@ -1193,7 +1194,7 @@ window.Radzen = {
         Radzen.popups = [];
     }
 
-    Radzen.popups.push({ id, instance, callback });
+    Radzen.popups.push({ id, instance, callback, parent });
 
     document.body.appendChild(popup);
     document.removeEventListener('mousedown', Radzen[id]);
