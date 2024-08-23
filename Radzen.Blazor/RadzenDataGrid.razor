@@ -373,7 +373,7 @@
                         }
                     }
                 </tbody>
-                @if (visibleColumns.Where(c => c.FooterTemplate != null).Any())
+                @if (allColumns.Where(c => c.Visible && c.FooterTemplate != null).Any())
                 {
                     <tfoot class="rz-datatable-tfoot" @onkeydown:stopPropagation>
                         @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
