@@ -42,7 +42,7 @@ namespace Radzen.Blazor
         /// Gets or sets a value indicating whether DataList should show empty message.
         /// </summary>
         [Parameter]
-        public bool ShowEmptyMessage { get; set; } = true;
+        public bool ShowEmptyMessage { get; set; }
 
         private string _emptyText = "No records to display.";
         /// <summary>
