@@ -10,15 +10,29 @@
         }
         @if (Data != null)
         {
-            @if (!WrapItems)
+            @if (!ShowEmptyMessage || Count > 0 && (AllowVirtualization ? Count > 0 : true) || LoadData.HasDelegate && Data.Count() > 0)
             {
-                @DrawDataListRows()
-            }
-            else
-            {
+                @if (!WrapItems)
+                {
+                    @DrawDataListRows()
+                }
+                else
+                {
                 <div class="rz-g">
                     @DrawDataListRows()
                 </div>
+                }
+            }
+            else
+            {
+                @if (EmptyTemplate != null)
+                {
+                    @EmptyTemplate
+                }
+                else
+                {
+                    <span style="white-space: normal">@EmptyText</span>
+                }
             }
         }
         @if (IsLoading)

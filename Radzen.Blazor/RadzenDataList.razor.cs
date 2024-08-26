@@ -39,6 +39,37 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets a value indicating whether DataList should show empty message.
+        /// </summary>
+        [Parameter]
+        public bool ShowEmptyMessage { get; set; } = true;
+
+        private string _emptyText = "No records to display.";
+        /// <summary>
+        /// Gets or sets the empty text shown when Data is empty collection.
+        /// </summary>
+        /// <value>The empty text.</value>
+        [Parameter]
+        public string EmptyText
+        {
+            get { return _emptyText; }
+            set
+            {
+                if (value != _emptyText)
+                {
+                    _emptyText = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the empty template shown when Data is empty collection.
+        /// </summary>
+        /// <value>The empty template.</value>
+        [Parameter]
+        public RenderFragment EmptyTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether to wrap items.
         /// </summary>
         /// <value><c>true</c> if wrap items; otherwise, <c>false</c>.</value>
