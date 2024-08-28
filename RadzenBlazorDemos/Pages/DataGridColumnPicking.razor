@@ -46,6 +46,7 @@
 
     void PickedColumnsChanged(DataGridPickedColumnsChangedEventArgs<Employee> args)
     {
+        EmployeeIDVisible = args.Columns.Select(c => c.Property).Contains(nameof(Employee.EmployeeID));
         console.Log($"Picked columns: {string.Join(", ", args.Columns.Select(c => c.Title))}");
     }
 }
