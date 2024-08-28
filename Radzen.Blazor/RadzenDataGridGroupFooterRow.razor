@@ -1,33 +1,33 @@
 @typeparam TItem
 @using System.Linq.Dynamic.Core
-<tr>
-    @if (Grid.Template != null && Grid.ShowExpandColumn)
-    {
-     @if (Grid.ShowGroupExpandColumn)
-     {
-        <th class="rz-col-icon rz-unselectable-text" scope="col">
-            <span class="rz-column-title"></span>
-        </th>
-     }
-    }
-    @for(var i = 0; i < GetLevel(); i++)
-    {
-        <td class="rz-col-icon">
-            <span class="rz-column-title"></span>
-        </td>
-    }
-    @foreach (var column in Columns)
-    {
-        <td class="@($" {column.GroupFooterCssClass} {Grid.getFrozenColumnClass(column, Columns)}".Trim())" style="@column.GetStyle(true, true)">
-            <span class="rz-column-footer">
-                @if (column.GroupFooterTemplate != null)
+@for (var i = 0; i < Grid.deepestChildColumnLevel + 1; i++)
+{
+    <tr>
+        @if (i == 0) // Only add the th elements for the first row
+        {
+            @if (Grid.Template != null && Grid.ShowExpandColumn)
+            {
+                @if (Grid.ShowGroupExpandColumn)
                 {
-                    @column.GroupFooterTemplate(Group)
+                    <th class="rz-col-icon rz-unselectable-text" scope="col">
+                        <span class="rz-column-title"></span>
+                    </th>
                 }
-            </span>
-        </td>
-    }
-</tr>
+
+            }
+        }
+        @for (var j = 0; j < GetLevel(); j++)
+        {
+            <td class="rz-col-icon">
+                <span class="rz-column-title"></span>
+            </td>
+        }
+        @foreach (var column in Columns)
+        {
+            <RadzenDataGridGroupFooterCell Group="@Group" RowIndex="@i" Grid="@Grid" Column="@column" CssClass="@($"{column.GroupFooterCssClass} {Grid.getFrozenColumnClass(column, Columns)} {Grid.getCompositeCellCSSClass(column)}".Trim())" />
+        }
+    </tr>
+}
 @code {
         [Parameter]
         public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
