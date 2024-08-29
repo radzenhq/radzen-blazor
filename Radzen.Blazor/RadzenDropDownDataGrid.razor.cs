@@ -362,11 +362,13 @@ namespace Radzen.Blazor
                 }
 
                 StateHasChanged();
-            }
 
-            if (!Multiple && grid != null)
-            {
-                await grid.SelectRow(SelectedItem, false);
+                if (!Multiple && grid != null && SelectedItem != null)
+                {
+                    var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (pagedData != null ? pagedData : Enumerable.Empty<object>())).OfType<object>().ToList();
+                    selectedIndex = items.IndexOf(SelectedItem);
+                    await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", selectedIndex - 1, null);
+                }
             }
 
             await base.OnAfterRenderAsync(firstRender);
