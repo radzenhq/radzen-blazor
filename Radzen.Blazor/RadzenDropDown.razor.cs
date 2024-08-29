@@ -134,7 +134,7 @@ namespace Radzen.Blazor
             await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true);
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
 
-            if (list != null)
+            if (list != null && selectedIndex != -1)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.selectListItem", search, list, selectedIndex);
             }
