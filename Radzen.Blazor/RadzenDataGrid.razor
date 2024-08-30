@@ -143,7 +143,7 @@
                             }
                         </tr>
                     }
-                    @if (AllowFiltering && (FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
+                    @if (AllowFiltering && (visibleColumns.Any(c => c.FilterMode == FilterMode.Simple || c.FilterMode == FilterMode.SimpleWithMenu) || FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
                     {
                         <tr @onkeydown:stopPropagation>
                              @if (ShowGroupExpandColumn)
@@ -163,6 +163,7 @@
                             }
                             @foreach (var column in visibleColumns)
                             {
+                                var filterMode = column.FilterMode ?? FilterMode;
                                 <th colspan="@column.GetColSpan()" class="@($"rz-unselectable-text {getFrozenColumnClass(column, visibleColumns)} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true, true)">
                                     @if (AllowFiltering && column.Filterable && column.Columns == null && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
                                     {
@@ -177,7 +178,7 @@
                                                     <span class="rz-cell-filter-label" style="height:35px; width:100%;" onclick="event.preventDefault()">
                                                         @if (PropertyAccess.IsDate(column.FilterPropertyType))
                                                         {
-                                                            if (FilterMode == FilterMode.Simple)
+                                                            if (filterMode == FilterMode.Simple)
                                                             {
                                                                     <button aria-label="@FilterToggleAriaLabel" class="rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-base rz-shade-default" onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
                                                                     <i class="rzi">date_range</i>
@@ -297,7 +298,7 @@
                                                         }
                                                         else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
                                                         {
-                                                            if (FilterMode == FilterMode.SimpleWithMenu)
+                                                            if (filterMode == FilterMode.SimpleWithMenu)
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
                                                             }
@@ -311,7 +312,7 @@
                                                         }
                                                         else
                                                         {
-                                                            if (FilterMode == FilterMode.SimpleWithMenu)
+                                                            if (filterMode == FilterMode.SimpleWithMenu)
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
                                                             }

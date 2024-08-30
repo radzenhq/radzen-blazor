@@ -379,8 +379,8 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Mixed Advanced Mode",
-                            Path = "datagrid-mixed-advanced-filter",
+                            Name = "Mixed Mode",
+                            Path = "datagrid-mixed-filter",
                             Title = "Blazor DataGrid Component -  Excel like and Advanced mixed Filter Mode | Free UI Components by Radzen",
                             Description = "RadzenDataGrid Excel like and advanced mixed mode filtering.",
                             Tags = new [] { "filter", "advanced", "grid", "datagrid", "table"}

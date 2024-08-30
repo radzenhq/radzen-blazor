@@ -11,11 +11,23 @@
     }
 </style>
 
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <div>Filter Mode:</div>
+        <RadzenSelectBar Size="ButtonSize.Small" @bind-Value="@filterMode" Change=@((int args) => grid.Reload())>
+            <Items>
+                <RadzenSelectBarItem Value="0" Text="Advanced and CheckBoxList Mixed Filter" />
+                <RadzenSelectBarItem Value="1" Text="Simple and SimpleWithMenu Mixed Filter" />
+            </Items>
+        </RadzenSelectBar>
+    </RadzenStack>
+</RadzenCard>
+
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true" 
-    FilterMode="FilterMode.CheckBoxList" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders">
+    FilterMode="@(filterMode == 0 ? FilterMode.CheckBoxList : FilterMode.Simple)" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders">
     <Columns>
-        <RadzenDataGridColumn Property="OrderID" Title="Order ID" FilterMode="FilterMode.Advanced" />
-        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
+        <RadzenDataGridColumn Property="OrderID" Title="Order ID" FilterMode="@(filterMode == 0 ? FilterMode.Advanced : null)" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" FilterMode="@(filterMode == 1 ? FilterMode.SimpleWithMenu : null)" />
         <RadzenDataGridColumn Property="ProductDiscontinued" Title="Discontinued" />
         <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
             <Template Context="order">
@@ -38,6 +50,7 @@
 </RadzenDataGrid>
 
 @code {
+    int filterMode;
     IEnumerable<Order> orders;
     RadzenDataGrid<Order> grid;
 
