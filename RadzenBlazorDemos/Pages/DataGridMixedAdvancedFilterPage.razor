@@ -1,0 +1,14 @@
+﻿@page "/datagrid-mixed-advanced-filter"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    DataGrid <strong>Advanced mode and CheckBox list (Excel like) mixed Filter</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The column <code>FilterMode</code> property allows you to specify <code>FilterMode.Advanced</code> or <code>FilterMode.CheckBoxList</code> filter mode per column. 
+    OrderID column is using <code>FilterMode.Advanced</code> while rest columns will use <code>FilterMode.CheckBoxList</code>
+    Filter modes <code>FilterMode.Advanced</code> and <code>FilterMode.CheckBoxList</code> cannot be mixed with <code>FilterMode.Simple</code> and <code>FilterMode.SimpleWithMenu</code> modes.
+</RadzenText>
+
+<RadzenExample ComponentName="DataGrid" Example="DataGridCheckBoxListFilter">
+    <DataGridMixedAdvancedFilter />
+</RadzenExample>

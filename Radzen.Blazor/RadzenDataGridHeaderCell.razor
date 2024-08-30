@@ -58,7 +58,8 @@
                     @onmousedown:preventDefault="true"
                     @onmousedown=@StartColumnResize @onmouseup=@StopColumnResize>&nbsp;</div>
         }
-        @if (Grid.AllowFiltering && Column.Filterable && (Grid.FilterMode == FilterMode.Advanced || Grid.FilterMode == FilterMode.CheckBoxList))
+        @{var filterMode = Column.FilterMode ?? Grid.FilterMode;}
+        @if (Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Advanced || filterMode == FilterMode.CheckBoxList))
         {
                 <i @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
                    class="@getFilterIconCss(Column)" onclick=@getFilterOpen() @onclick:preventDefault="true">
@@ -75,7 +76,7 @@
                             else
                             {
                                 <form id="@($"{getColumnPopupID()}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
-                                @if(Grid.FilterMode == FilterMode.Advanced)
+                                @if (filterMode == FilterMode.Advanced)
                                 {
                                 <span class="rz-grid-filter-label">@Grid.FilterText</span>
                                 <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Grid.FilterOperatorArialLabel + Column.GetFilterOperatorText(Column.GetSecondFilterOperator()) }})"
