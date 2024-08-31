@@ -490,7 +490,7 @@ window.Radzen = {
             ? e.targetTouches[0].pageX - e.target.getBoundingClientRect().left
             : e.offsetX;
         var percent = offsetX / parent.offsetWidth;
-        var newValue = percent * max;
+        var newValue = percent * (max - min) + min;
         var oldValue = range ? value[slider.isMin ? 0 : 1] : value;
         if (newValue >= min && newValue <= max && newValue != oldValue) {
           slider.invokeMethodAsync(
