@@ -533,7 +533,7 @@ namespace Radzen.Blazor
         {
             return builder =>
             {
-                var item = Items.FirstOrDefault(i => PropertyAccess.GetValue(i, CategoryProperty) == category);
+                var item = Items.FirstOrDefault(i => object.Equals(PropertyAccess.GetValue(i, CategoryProperty), category));
 
                 if (item != null)
                 {
