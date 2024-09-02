@@ -369,7 +369,10 @@ namespace Radzen.Blazor
                     if (items.Any())
                     {
                         selectedIndex = items.IndexOf(SelectedItem);
-                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", selectedIndex - 1, null);
+                        if (selectedIndex >= 0)
+                        {
+                            await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", selectedIndex - 1, null);
+                        }
                     }
                 }
             }
