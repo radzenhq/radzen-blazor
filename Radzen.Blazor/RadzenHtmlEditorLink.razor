@@ -20,28 +20,29 @@
             blank = true;
         }
 
-        var result = await DialogService.OpenAsync(Title, ds =>
-    @<div class="rz-html-editor-dialog">
-        <div class="rz-html-editor-dialog-item">
-            <label>@UrlText</label>
-            <RadzenTextBox @bind-Value=@attributes.Href style="width: 100%" />
-        </div>
-        @if (string.IsNullOrWhiteSpace(attributes.InnerHtml) || attributes.InnerHtml == "<br>")
-        {
-        <div class="rz-html-editor-dialog-item">
-            <label>@LinkText</label>
-            <RadzenTextBox @bind-Value=@attributes.InnerText style="width: 100%" />
-        </div>
-        }
-        <div class="rz-html-editor-dialog-item">
-            <RadzenCheckBox @bind-Value=@blank />
-            <label>@OpenInNewWindowText</label>
-        </div>
-        <div class="rz-html-editor-dialog-buttons">
-            <RadzenButton Text=@OkText Click="()=> ds.Close(true)" />
-            <RadzenButton Text=@CancelText Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
-        </div>
-    </div>);
+        var result = await DialogService.OpenAsync(Title, ds => @<div class="rz-html-editor-dialog">
+            <RadzenTemplateForm TItem="LinkAttributes" Data="@attributes" Submit="() => ds.Close(true)">
+                <div class="rz-html-editor-dialog-item">
+                    <label>@UrlText</label>
+                    <RadzenTextBox @bind-Value=@attributes.Href style="width: 100%" />
+                </div>
+                @if (string.IsNullOrWhiteSpace(attributes.InnerHtml) || attributes.InnerHtml == "<br>")
+                {
+                <div class="rz-html-editor-dialog-item">
+                    <label>@LinkText</label>
+                    <RadzenTextBox @bind-Value=@attributes.InnerText style="width: 100%" />
+                </div>
+                }
+                <div class="rz-html-editor-dialog-item">
+                    <RadzenCheckBox @bind-Value=@blank />
+                    <label>@OpenInNewWindowText</label>
+                </div>
+                <div class="rz-html-editor-dialog-buttons">
+                    <RadzenButton Text=@OkText ButtonType="ButtonType.Submit" />
+                    <RadzenButton Text=@CancelText Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />
+                </div>
+            </RadzenTemplateForm>
+        </div>);
 
         await Editor.RestoreSelectionAsync();
 
@@ -58,6 +59,5 @@
 
             await Editor.ExecuteCommandAsync("insertHTML", html.ToString());
         }
-
     }
 }
