@@ -66,10 +66,16 @@ The Radzen HtmlEditor supports the following tools:
     <HtmlEditorCustomToolsSet />
 </RadzenExample>
 
-<RadzenText Anchor="html-editor#get-set-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
-    Upload files
+<RadzenText Anchor="html-editor#upload" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Upload images
 </RadzenText>
-<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorUploadUrl">
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can insert images by pasting them or using the <strong>RadzenHtmlEditorImage</strong> tool. By default images are inserted as base64 encoded strings.
+    To upload images to the server you need to implement a file upload endpoint and set the <code>UploadUrl</code> property of the RadzenHtmlEditor component:
+    <code>&lt;RadzenHtmlEditor @@bind-Value=@@htmlValue UploadUrl="upload/image" /&gt;</code>.
+    For a sample implementation check the <code>UploadController.cs</code> tab.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorUploadUrl" AdditionalSourceCodePages="@(new [] { "../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"})" >
     <HtmlEditorUploadUrl />
 </RadzenExample>
 <RadzenText Anchor="html-editor#focus" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">

@@ -1,9 +1,17 @@
-﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 300px;" Input=@OnInput Change=@OnChange Paste=@OnPaste Execute=@OnExecute UploadUrl="upload/image" />
+﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput Change=@OnChange Paste=@OnPaste Execute=@OnExecute UploadUrl="upload/image" />
 
 <EventConsole @ref=@console />
 
 @code {
-    string htmlValue = "<h1>Hello World!</h1>";
+    string htmlValue = @"<h2 style=""text-align:center"">Accelerated, smarter, and cost-effective Blazor development</h2>
+    <h3 style=""text-align:center"">Radzen Blazor Studio provides tons of productivity gains for Blazor developers</h3>
+    <div style=""text-align:center"">
+        <img alt=""Radzen Blazor Studio"" src=""images/radzen-blazor-studio-dark.png"" width=""300"">
+    </div>
+    <h4 style=""text-align:center"">Get started today. Radzen Blazor Studio is free to use.</h4>
+    <div style=""text-align:center"">
+        <a href=""https://www.radzen.com/blazor-studio/download/"" target=""_blank"" title=""Get Radzen Blazor Studio for Windows, Mac or Linux"">Download Now</a>
+    </div>";
 
     EventConsole console;
 
