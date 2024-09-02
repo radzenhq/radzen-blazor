@@ -555,21 +555,32 @@ namespace Radzen.Blazor
             {
                 if (!Multiple)
                 {
+                    bool raiseChange = false;
+
                     if (!string.IsNullOrEmpty(ValueProperty))
                     {
                         var item = Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", value).FirstOrDefault();
-                        if (item != null)
+                        if (item != null && SelectedItem != item)
                         {
                             SelectedItem = item;
+                            raiseChange = true;
                         }
                     }
                     else
                     {
-                        SelectedItem = internalValue;
+                        if (SelectedItem != internalValue)
+                        {
+                            SelectedItem = internalValue;
+                            raiseChange = true;
+                        }
                     }
-                    SelectedItemChanged.InvokeAsync(SelectedItem);
-                    selectedItems.Clear();
-                    selectedItems.Add(SelectedItem);
+
+                    if (raiseChange)
+                    {
+                        SelectedItemChanged.InvokeAsync(SelectedItem);
+                        selectedItems.Clear();
+                        selectedItems.Add(SelectedItem);
+                    }
                 }
                 else
                 {
