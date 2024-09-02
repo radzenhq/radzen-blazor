@@ -1836,8 +1836,22 @@ window.Radzen = {
     };
 
     ref.clickListener = function (e) {
-      if (e.target && e.target.matches('a,button')) {
-        e.preventDefault();
+      if (e.target) {
+        if (e.target.matches('a,button')) {
+          e.preventDefault();
+        }
+
+        for (var img of ref.querySelectorAll('img.rz-state-selected')) {
+          img.classList.remove('rz-state-selected');
+        }
+
+        if (e.target.matches('img')) {
+          e.target.classList.add('rz-state-selected');
+          var range = document.createRange();
+          range.selectNode(e.target);
+          getSelection().removeAllRanges();
+          getSelection().addRange(range);
+        }
       }
     }
 
@@ -1940,7 +1954,8 @@ window.Radzen = {
     var selection = getSelection();
     var range = selection.rangeCount > 0 && selection.getRangeAt(0);
     var parent = range && range.commonAncestorContainer;
-    var inside = false;
+    var img = container.querySelector('img.rz-state-selected');
+    var inside = img && selector == 'img';
     while (parent) {
       if (parent == container) {
         inside = true;
@@ -1953,7 +1968,10 @@ window.Radzen = {
     }
     var target = selection.focusNode;
     var innerHTML;
-    if (target) {
+
+    if (img && selector == 'img') {
+      target = img;
+    } else if (target) {
       if (target.nodeType == 3) {
         target = target.parentElement;
       } else {
@@ -1966,9 +1984,10 @@ window.Radzen = {
         target = target.closest(selector);
       }
     }
+
     return attributes.reduce(function (result, name) {
       if (target) {
-        result[name] = target[name].toString();
+        result[name] = name == 'innerText' ? target[name] : target.getAttribute(name);
       }
       return result;
     }, { innerText: selection.toString(), innerHTML: innerHTML });
