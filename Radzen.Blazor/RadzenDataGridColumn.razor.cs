@@ -954,9 +954,9 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator))
+            if (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator) || _filterOperator != null)
             {
-                filterOperator = parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
+                filterOperator = _filterOperator ?? parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
             }
 
             if (parameters.DidParameterChange(nameof(SecondFilterValue), SecondFilterValue))
@@ -1149,12 +1149,23 @@ namespace Radzen.Blazor
             LogicalFilterOperator = default(LogicalFilterOperator);
         }
 
+        FilterOperator? _filterOperator;
         /// <summary>
         /// Gets or sets the filter operator.
         /// </summary>
         /// <value>The filter operator.</value>
         [Parameter]
-        public FilterOperator FilterOperator { get; set; }
+        public FilterOperator FilterOperator 
+        {
+            get
+            {
+                return _filterOperator ?? FilterOperator.Equals;
+            }
+            set
+            {
+                _filterOperator = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the second filter operator.
