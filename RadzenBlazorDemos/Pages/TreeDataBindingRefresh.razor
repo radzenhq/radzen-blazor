@@ -4,7 +4,7 @@
 <RadzenRow class="rz-p-0 rz-p-lg-12">
     <RadzenColumn Size="12" SizeLG="6" OffsetLG="3">
         <RadzenCard>
-            <RadzenTree Data=@entries Expand=@LoadSubsidiaries ItemContextMenu="@this.GetContextMenuForNode" Style="width: 100%; height: 300px">
+            <RadzenTree @ref="this.tree" Data=@entries Expand=@LoadSubsidiaries ItemContextMenu="@this.GetContextMenuForNode" Style="width: 100%; height: 300px">
                 <RadzenTreeLevel Text="@this.GetTextForNode" />
             </RadzenTree>
         </RadzenCard>
@@ -22,6 +22,7 @@
 
     IEnumerable<string> entries;
     string subsidiary;
+    RadzenTree tree = new();
 
     protected override void OnInitialized() {
         entries = ["Volkswagen Group"];
@@ -41,11 +42,10 @@
     );
 
         if ((result is string s) && !string.IsNullOrWhiteSpace(s)) {
-            var subsidiaries = Data[parent];
-            if (subsidiaries == null) {
-                Data[parent] = [s];
-            } else {
+            if (Data.TryGetValue(parent, out var subsidiaries)) {
                 Data[parent] = subsidiaries.Append(s);
+            } else {
+                Data[parent] = [s];
             }
         }
     }
@@ -54,6 +54,7 @@
         this.ContextMenuService.Open(args, [new ContextMenuItem() { Text = "Add" }], async (e) => {
             this.subsidiary = null;
             await this.AddSubsidiary(args.Text);
+            await this.tree.Reload();
         });
     }
 
