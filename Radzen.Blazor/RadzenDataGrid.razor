@@ -83,6 +83,8 @@
 
         <div class="rz-data-grid-data" tabindex="-1">
             <table class="rz-grid-table rz-grid-table-fixed @(AllowAlternatingRows ? "rz-grid-table-striped" : "") @(allColumns.Any(c => c.Parent != null) ? "rz-grid-table-composite" : "") @(getGridLinesCSSClass())">
+                @if(allColumns.All(c => c.Parent == null))
+                {
                 <colgroup>
                     @if (ShowGroupExpandColumn)
                     {
@@ -100,6 +102,7 @@
                         <col id=@(getColumnUniqueId(visibleColumns.IndexOf(column)) + "-col") style="@column.GetStyle(false, false, true)">
                     }
                 </colgroup>
+                }
                 <thead>
                     @for (var i = 0; i < deepestChildColumnLevel + 1; i++)
                     {
