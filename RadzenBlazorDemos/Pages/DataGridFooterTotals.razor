@@ -10,11 +10,12 @@
     <Columns>
         <RadzenDataGridColumn Width="60px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
             <Template>
-                <RenderOnceComponent CanRender=@(!(index >= ordersGrid.PageSize))>
+                @{var pageSize = Math.Min(ordersGrid.PageSize, ordersGrid.View.Count());}
+                <RenderOnceComponent CanRender=@(!(index >= pageSize))>
                 @{
-                    ResetIndex(index >= ordersGrid.PageSize);
+                    ResetIndex(index >= pageSize);
                 }
-                @((ordersGrid.CurrentPage * ordersGrid.PageSize) + index++ + 1)
+                @((ordersGrid.CurrentPage * pageSize) + index++ + 1)
                 </RenderOnceComponent>
             </Template>
         </RadzenDataGridColumn>
