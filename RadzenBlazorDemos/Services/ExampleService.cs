@@ -900,6 +900,14 @@ namespace RadzenBlazorDemos
                             Description = "This example demonstrates context menu in RadzenTree.",
                             Path = "tree-contextmenu",
                             Tags = new [] { "tree", "treeview", "nodes", "context", "menu" },
+                        },
+                        new Example
+                        {
+                            Name = "Refreshing tree data-binding",
+                            Title = "Blazor Tree Component - Refreshing tree data-binding | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to refresh a lazily loaded RadzenTree.",
+                            Path = "tree-data-binding-refresh",
+                            Tags = new [] { "tree", "treeview", "nodes" },
                         }
                     }
                 },
