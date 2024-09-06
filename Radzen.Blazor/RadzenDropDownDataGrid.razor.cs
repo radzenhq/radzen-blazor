@@ -719,10 +719,7 @@ namespace Radzen.Blazor
                         }
                     }
 
-                    if (!Multiple)
-                    {
-                        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-                    }
+                    await CloseAndFocus();
                 }
             }
             else if (args.AltKey && key == "ArrowDown")
@@ -892,18 +889,27 @@ namespace Radzen.Blazor
 
         async Task OnRowSelect(object item)
         {
-            if (!Disabled && !Multiple)
-            {
-                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-            }
-
-            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
+            await CloseAndFocus();
 
             if (AllowRowSelectOnRowClick)
             {
                 await SelectItem(item);
             }
+        }
 
+        async Task CloseAndFocus()
+        {
+            if (!Disabled && !Multiple)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+            }
+
+            var of = OpenOnFocus;
+            OpenOnFocus = false;
+
+            await JSRuntime.InvokeVoidAsync("Radzen.focusElement", UniqueID);
+
+            OpenOnFocus = of;
         }
 
         private async Task OnChipRemove(object item)
