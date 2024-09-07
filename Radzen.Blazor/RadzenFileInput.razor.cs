@@ -100,6 +100,23 @@ namespace Radzen.Blazor
             }
         }
 
+        private string ImageValue
+        {
+            get
+            {
+                if (Value == null)
+                {
+                    return string.Empty;
+                }
+                else if (Value is byte[] bytes)
+                {
+                    return System.Text.Encoding.Default.GetString(bytes);
+                }
+
+                return Value.ToString();
+            }
+        }
+
         async Task OnChange()
         {
             string uploadValue;
