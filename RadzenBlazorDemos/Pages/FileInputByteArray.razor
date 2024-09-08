@@ -1,0 +1,26 @@
+﻿<RadzenStack AlignItems="AlignItems.Center">
+    <RadzenCard class="rz-m-0 rz-m-md-12" Style="width: 100%; max-width: 600px;">
+        <RadzenFileInput @bind-Value=@photo @bind-FileName=@fileName @bind-FileSize=@fileSize TValue="byte[]" Style="width: 100%" 
+            Change=@(args => OnChange(args, "FileInput")) Error=@(args => OnError(args, "FileInput")) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"/>
+    </RadzenCard>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    byte[] photo;
+
+    string fileName;
+    long? fileSize;
+
+    void OnChange(byte[] value, string name)
+    {
+        console.Log($"{name} value changed");
+    }
+
+    void OnError(UploadErrorEventArgs args, string name)
+    {
+        console.Log($"{args.Message}");
+    }
+}
