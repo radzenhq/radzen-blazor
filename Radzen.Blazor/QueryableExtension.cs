@@ -1072,7 +1072,8 @@ namespace Radzen
             else
             {
                 if (filter.Property == null || filter.FilterOperator == null || (filter.FilterValue == null &&
-                    filter.FilterOperator != FilterOperator.IsNull && filter.FilterOperator != FilterOperator.IsNotNull))
+                    filter.FilterOperator != FilterOperator.IsNull && filter.FilterOperator != FilterOperator.IsNotNull &&
+                    filter.FilterOperator != FilterOperator.IsEmpty && filter.FilterOperator != FilterOperator.IsNotEmpty))
                 {
                     return;
                 }
