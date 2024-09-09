@@ -307,6 +307,11 @@ else
         if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
         {
             await popup.ToggleAsync(filterButton);
+
+            Grid.allColumns
+            .Where(c => c != Column && c.headerCell != null)
+            .Select(c => c.headerCell).ToList()
+            .ForEach(cell => InvokeAsync(cell.CloseFilter));
         }
     }
 
