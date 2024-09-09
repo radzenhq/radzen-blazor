@@ -8,7 +8,7 @@
 @if (Visible)
 {
     <span @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <input @ref="@input" @attributes="InputAttributes" type="text" inputmode="decimal" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
+        <input @ref="@input" @attributes="InputAttributes" type="text" inputmode="@(Attributes?.ContainsKey("inputmode") == true ? (string)Attributes["inputmode"] : "decimal")" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
                class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
                placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
                onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
