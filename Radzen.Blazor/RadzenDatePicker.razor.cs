@@ -170,9 +170,9 @@ namespace Radzen.Blazor
 
             if (v < 0)
             {
-                newHour = 23;
-                newMinute = 59;
-                newSecond = 59;
+                newHour = string.IsNullOrEmpty(HoursStep) ? 23 : 0;
+                newMinute = string.IsNullOrEmpty(MinutesStep) ? 59 : 0;
+                newSecond = string.IsNullOrEmpty(SecondsStep) ? 59 : 0;
             }
 
             var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour > 23 || newHour < 0 ? 0 : newHour, newMinute, newSecond);
