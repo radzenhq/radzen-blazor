@@ -42,6 +42,12 @@ namespace Radzen.Blazor
         [Parameter]
         public IComparable Max { get; set; }
 
+        /// <summary>
+        /// Specifies if value can be null. If true, range validation will only be tested if component value is not null.
+        /// </summary>
+        [Parameter]
+        public bool AllowNull { get; set; } = false;
+
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
@@ -54,7 +60,7 @@ namespace Radzen.Blazor
 
             if (value == null)
             {
-                return false;
+                return AllowNull ? true : false;
             }
 
 
