@@ -60,7 +60,7 @@ namespace Radzen.Blazor
 
             if (value == null)
             {
-                return AllowNull ? true : false;
+                return AllowNull;
             }
 
 
