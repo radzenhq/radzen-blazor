@@ -140,8 +140,8 @@ namespace Radzen.Blazor
 
             if (Groups.Any())
             {
-                query = view.AsQueryable().OrderBy(Groups.Any() ? string.Join(',', Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}")) : "it");
-                _groupedPagedView = query.GroupByMany(Groups.Any() ? Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}").ToArray() : new string[] { "it" }).ToList();
+                query = view.AsQueryable().OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, Groups.Any() ? string.Join(',', Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}")) : "it");
+                _groupedPagedView = query.GroupByMany(DynamicLinqCustomTypeProvider.ParsingConfig, Groups.Any() ? Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}").ToArray() : new string[] { "it" }).ToList();
 
                 totalItemsCount = await Task.FromResult(_groupedPagedView.Count());
             }
@@ -341,7 +341,7 @@ namespace Radzen.Blazor
                     var orderBy = GetOrderBy();
                     var query = Groups.Count(g => g.SortOrder == null) == Groups.Count || !string.IsNullOrEmpty(orderBy) ? View : View.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(',', Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")} {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
                     var v = (AllowPaging && !LoadData.HasDelegate ? query.Skip(skip).Take(PageSize) : query).ToList().AsQueryable();
-                    _groupedPagedView = v.GroupByMany(Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}").ToArray()).ToList();
+                    _groupedPagedView = v.GroupByMany(DynamicLinqCustomTypeProvider.ParsingConfig, Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}").ToArray()).ToList();
                 }
                 return _groupedPagedView;
             }
