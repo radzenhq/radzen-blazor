@@ -71,7 +71,7 @@ namespace Radzen.Blazor.Tests
                 component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10).Add(p => p.AllowNull, true));
             });
 
-            Assert.False(component.Instance.Validate(null));
+            Assert.True(component.Instance.Validate(null));
         }
 
         [Fact]
