@@ -39,6 +39,12 @@ namespace Radzen.Blazor
         public RadzenDataGridColumn<TItem> Parent { get; set; }
 
         /// <summary>
+        /// Specifies wether CheckBoxList filter list virtualization is enabled. Set to <c>true</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool AllowCheckBoxListVirtualization { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the column filter mode.
         /// </summary>
         /// <value>The column filter mode.</value>
