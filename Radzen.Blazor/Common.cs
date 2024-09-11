@@ -3290,6 +3290,21 @@ namespace Radzen
 
             return null;
         }
+
+        /// <summary>
+        /// Gets the dynamic property expression when binding to IDictionary.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        /// <param name="type">The property type.</param>
+        /// <returns>Dynamic property expression.</returns>
+        public static string GetDynamicPropertyExpression(string name, Type type)
+        {
+            var isEnum = type.IsEnum || Nullable.GetUnderlyingType(type)?.IsEnum == true;
+            var typeName = isEnum ? "Enum" : (Nullable.GetUnderlyingType(type) ?? type).Name;
+            var typeFunc = $@"{typeName}{(!isEnum && Nullable.GetUnderlyingType(type) != null ? "?" : "")}";
+
+            return $@"{typeFunc}(it[""{name}""])";
+        }
     }
 
     /// <summary>

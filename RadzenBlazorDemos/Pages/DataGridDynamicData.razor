@@ -6,7 +6,7 @@
         @foreach (var column in columns)
         {
             <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
-                                  Property="@GetColumnPropertyExpression(column.Key, column.Value)">
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
                 <Template>
                     @context[@column.Key]
                 </Template>
@@ -28,37 +28,20 @@
         EnumValue2
     }
 
-    public string GetColumnPropertyExpression(string name, Type type)
-    {
-        var expression = $@"it[""{name}""].ToString()";
-
-        if (type == typeof(int))
-        {
-            return $"int.Parse({expression})";
-        }
-        else if (type == typeof(DateTime))
-        {
-            return $"DateTime.Parse({expression})";
-        }
-        else if (type.IsEnum)
-        {
-            return $@"Int32(Enum.Parse(it[""{name}""].GetType(), {expression}))";
-        }
-
-        return expression;
-    }
-
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
         columns = new Dictionary<string, Type>()
         {
-            { "EmployeeID", typeof(int) },
-            { "MyColumn", typeof(EnumTest) },
+            { "EmployeeID", typeof(int?) },
+            { "MyColumn", typeof(EnumTest?) },
             { "FirstName", typeof(string) },
             { "LastName", typeof(string) },
-            { "HireDate", typeof(DateTime) },
+            { "HireDate", typeof(DateTime?) },
+            { "DateOnly", typeof(DateOnly?) },
+            { "TimeOnly", typeof(TimeOnly?) },
+            { "UID", typeof(Guid?) },
         };
 
         foreach (var i in Enumerable.Range(0, 50))
@@ -74,13 +57,19 @@
             {
                 row.Add(
                     column.Key,
-                    column.Value == typeof(EnumTest)
-                        ? (i % 2 == 0 ? EnumTest.EnumValue1 : EnumTest.EnumValue2)
-                        : column.Value == typeof(int)
-                            ? i
-                            : column.Value == typeof(DateTime)
-                                ? DateTime.Now.AddMonths(i)
-                                : $"{column.Key}{i}"
+                    column.Value == typeof(EnumTest?)
+                        ? i == 0 ? null : (i % 2 == 0 ? EnumTest.EnumValue1 : EnumTest.EnumValue2)
+                        : column.Value == typeof(int?)
+                            ? i == 0 ? null : i
+                            : column.Value == typeof(DateTime?)
+                                ? i == 0 ? null : DateTime.Now.AddMonths(i)
+                                : column.Value == typeof(Guid?)
+                                ? i == 0 ? null : Guid.NewGuid()
+                                : column.Value == typeof(DateOnly?)
+                                ? i == 0 ? null : DateOnly.FromDateTime(DateTime.Now.AddMonths(i))
+                                : column.Value == typeof(TimeOnly?)
+                                ? i == 0 ? null : TimeOnly.FromDateTime(DateTime.Now.AddMonths(i))
+                                : $"{column.Key}{i}" 
                 );
             }
 
