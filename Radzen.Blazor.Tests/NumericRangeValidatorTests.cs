@@ -60,6 +60,19 @@ namespace Radzen.Blazor.Tests
 
             Assert.False(component.Instance.Validate(null));
         }
+        [Fact]
+        public void Returns_True_If_Value_Is_Null_And_AllowNull_Is_True()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenNumericRangeValidatorTestDouble>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                component.SetParametersAndRender(parameters => parameters.Add(p => p.Min, 0).Add(p => p.Max, 10).Add(p => p.AllowNull, true));
+            });
+
+            Assert.True(component.Instance.Validate(null));
+        }
 
         [Fact]
         public void Returns_False_If_Value_Overflows()
