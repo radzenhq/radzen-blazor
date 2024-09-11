@@ -119,11 +119,29 @@ More info is available in the <RadzenLink Text="rendering mode article" Path="ht
             @Additional(CurrentVersion)
             </div>
         </RadzenTabsItem>
+        <RadzenTabsItem Text="Content Security Policy (CSP)">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
+                <RadzenText>
+                    To use Radzen Blazor components with strict CSP mode, the following directives must be included in the CSP meta tag in the <code>&lt;head&gt;</code> element:
+<pre class="rz-p-4">
+<code>&lt;meta http-equiv="Content-Security-Policy"
+               content="base-uri 'self';
+               default-src 'self';
+               img-src data: https:;
+               object-src 'none';
+               script-src 'self' 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-inline';
+               style-src 'self' 'unsafe-inline';
+               upgrade-insecure-requests;"&gt
+</code>
+</pre>
+                </RadzenText>
+            </div>
+        </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>
 
 @code {
-    private static readonly string[] versions = ["net8", "net7-server", "net7-wasm", "net6-server", "net6-wasm", "wasm"];
+    private static readonly string[] versions = ["net8", "net7-server", "net7-wasm", "net6-server", "net6-wasm", "wasm", "csp"];
 
     private int selectedIndex = 0;
 
