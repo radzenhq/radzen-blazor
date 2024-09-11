@@ -7,6 +7,17 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="Content-Security-Policy"
+          content="base-uri 'self';
+        default-src 'self' unsafe-inline http://localhost:* ws://localhost:*;
+        connect-src 'self' https: wss: http://localhost:* ws://localhost:*;
+        img-src data: https:;
+        object-src 'none';
+        script-src 'self' 'unsafe-eval' 'unsafe-inline' http://localhost:* cdnjs.cloudflare.com cdn.syndication.twimg.com platform.linkedin.com www.linkedin.com analytics.radzen.com;
+        style-src 'self' 'unsafe-inline' cdnjs.cloudflare.com;
+        font-src 'self' data: cdnjs.cloudflare.com;
+        frame-src www.youtube.com platform.twitter.com platform.linkedin.com www.linkedin.com;
+        upgrade-insecure-requests;">
     <base href="/" />
     <link href="css/site.css" rel="stylesheet" />
     <HeadOutlet @rendermode="InteractiveServer" />
