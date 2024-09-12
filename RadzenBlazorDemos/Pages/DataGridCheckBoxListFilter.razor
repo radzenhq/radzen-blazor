@@ -15,7 +15,7 @@
     FilterMode="FilterMode.CheckBoxList" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@orders">
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
-        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" />
+        <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" AllowCheckBoxListVirtualization="false" />
         <RadzenDataGridColumn Property="ProductDiscontinued" Title="Discontinued" />
         <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
             <Template Context="order">
