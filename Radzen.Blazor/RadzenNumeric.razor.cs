@@ -308,7 +308,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
-        public override bool AutoComplete { get; set; } = false;
+        public override object AutoComplete { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether up down buttons are shown.

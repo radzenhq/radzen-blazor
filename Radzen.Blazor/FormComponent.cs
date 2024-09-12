@@ -21,7 +21,7 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
         [Parameter]
-        public virtual bool AutoComplete { get; set; } = true;
+        public virtual object AutoComplete { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating the type of built-in autocomplete
@@ -44,7 +44,7 @@ namespace Radzen
         /// AutoCompleteType.</value>
         public virtual string AutoCompleteAttribute
         {
-            get => !AutoComplete ? DefaultAutoCompleteAttribute :
+            get => object.Equals(AutoComplete, false) ? DefaultAutoCompleteAttribute :
                 autoComplete as string ?? AutoCompleteType.GetAutoCompleteValue();
         }
 
