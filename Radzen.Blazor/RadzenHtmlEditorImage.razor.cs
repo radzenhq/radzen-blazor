@@ -107,6 +107,8 @@ namespace Radzen.Blazor
             {
                 DialogService.Close(true);
             }
+
+            await Editor.RaiseUploadComplete(args);
         }
 
         async Task OnUploadError(UploadErrorEventArgs args)
