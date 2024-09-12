@@ -441,7 +441,54 @@ $justify-content: normal, stretch, center, start, end, flex-start, flex-end, lef
 $align-items: normal, stretch, center, start, end, flex-start, flex-end;
 @include rz-utility-list-css('align-items', $align-items);
 
-//---- CSS classes
+// Overflow
+// Example .rz-overflow-auto
+$overflow: auto, scroll, visible, hidden;
+@include rz-utility-list-css('overflow', $overflow);
+
+// Width Percentage
+// Example .rz-w-25
+$width: 25, 50, 75, 100;
+@include rz-utility-list-css('width', $width, 'w', 'percent');
+
+// Width Viewport
+// Example .rz-vw-25
+@include rz-utility-list-css('width', $width, 'vw', 'vw');
+
+// Width Keywords
+// Example .rz-w-auto
+$width-k: auto, fit-content, min-content, max-content, stretch;
+@include rz-utility-list-css('width', $width-k, 'w');
+
+// Min-width Percentage
+// Example .rz-min-w-25
+@include rz-utility-list-css('min-width', $width, 'min-w', 'percent');
+
+// Max-width Percentage
+// Example .rz-max-w-25
+@include rz-utility-list-css('max-width', $width, 'max-w', 'percent');
+
+// Height Percentage
+// Example .rz-h-25
+$height: 25, 50, 75, 100;
+@include rz-utility-list-css('height', $height, 'h', 'percent');
+
+// Height Viewport
+// Example .rz-vh-25
+@include rz-utility-list-css('height', $height, 'vh', 'vh');
+
+// Height Keywords
+// Example .rz-h-auto
+$height-k: auto;
+@include rz-utility-list-css('height', $height-k, 'h');
+
+// Min-height Percentage
+// Example .rz-min-h-25
+@include rz-utility-list-css('min-height', $height, 'min-h', 'percent');
+
+// Max-height Percentage
+// Example .rz-max-h-25
+@include rz-utility-list-css('max-height', $height, 'max-h', 'percent');
 
 // Color
 // Example .rz-color-primary
@@ -451,19 +498,51 @@ $align-items: normal, stretch, center, start, end, flex-start, flex-end;
 // Example .rz-background-color-primary
 @include rz-color-css('background-color', $rz-theme-colors-map);
 
-// Border Color
-// Example .rz-border-color-primary
-@include rz-color-css('border-color', $rz-theme-colors-map);
+// Border base
+// Example .rz-border-start
+$border: border, border-start, border-end, border-left, border-right, border-top, border-bottom;
+@each $value in $border {
+  .rz-#{$value} {
+    border-width: 0;
+    @if $value == 'border-start' {
+      border-inline-start-width: var(--rz-border-width);
+    }
+    @else if $value == 'border-end' {
+      border-inline-end-width: var(--rz-border-width);
+    }
+    @else {
+      #{$value}-width: var(--rz-border-width);
+    }
+    border-style: solid;
+    border-color: var(--rz-base);
+  }
 
-// Border
+  .rz-#{$value}-0 {
+    @if $value == 'border-start' {
+      border-inline-start-width: 0 !important;
+    }
+    @else if $value == 'border-end' {
+      border-inline-end-width: 0 !important;
+    }
+    @else {
+      #{$value}-width: 0 !important;
+    }
+  }
+}
+
+// Border with color
 // Example .rz-border-primary
 @each $color, $value in $rz-theme-colors-map {
   .rz-border-#{$color} {
     border-width: var(--rz-border-width);
     border-style: solid;
-    border-color:  var(--rz-#{$color}) !important;
+    border-color: var(--rz-#{$color}) !important;
   }
 }
+
+// Border Color
+// Example .rz-border-color-primary. Use in combination with .rz-border base classes.
+@include rz-color-css('border-color', $rz-theme-colors-map);
 
 // Ripple
 .rz-ripple {

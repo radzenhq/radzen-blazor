@@ -16,20 +16,64 @@
   }
 }
 
-@mixin rz-utility-list-css($property, $list) {
+@mixin rz-utility-list-css($property, $list, $shorthand: 'none', $unit: 'none') {
   @each $value in $list {
-    .rz-#{$property}-#{$value} {
-      #{$property}: #{$value} !important;
+    @if $shorthand != none {
+      .rz-#{$shorthand}-#{$value} {
+        @if $unit != 'none' {
+          @if $unit == 'percent' {
+            #{$property}: #{$value}#{'%'} !important;
+          } @else {
+            #{$property}: #{$value}#{$unit} !important;
+          }
+        } @else {
+          #{$property}: #{$value} !important;
+        }
+      }
+    } @else {
+      .rz-#{$property}-#{$value} {
+        @if $unit != 'none' {
+          @if $unit == 'percent' {
+            #{$property}: #{$value}#{'%'} !important;
+          } @else {
+            #{$property}: #{$value}#{$unit} !important;
+          }
+        } @else {
+          #{$property}: #{$value} !important;
+        }
+      }
     }
   }
 }
 
-@mixin rz-utility-list-breakpoints-css($property, $list, $breakpoints) {
+@mixin rz-utility-list-breakpoints-css($property, $list, $breakpoints, $shorthand: 'none', $unit: 'none') {
   @each $breakpoint, $breakpoint-value in $breakpoints {
     @media (min-width: #{$breakpoint-value}) {
       @each $value in $list {
-        .rz-#{$property}-#{$breakpoint}-#{$value} {
-          #{$property}: #{$value} !important;
+        @if $shorthand != 'none' {
+          .rz-#{$shorthand}-#{$breakpoint}-#{$value} {
+            @if $unit != 'none' {
+              @if $unit == 'percent' {
+                #{$property}: #{$value}#{'%'} !important;
+              } @else {
+                #{$property}: #{$value}#{$unit} !important;
+              }
+            } @else {
+              #{$property}: #{$value} !important;
+            }
+          }
+        } @else {
+          .rz-#{$property}-#{$breakpoint}-#{$value} {
+            @if $unit != 'none' {
+              @if $unit == 'percent' {
+                #{$property}: #{$value}#{'%'} !important;
+              } @else {
+                #{$property}: #{$value}#{$unit} !important;
+              }
+            } @else {
+              #{$property}: #{$value} !important;
+            }
+          }
         }
       }
     }

@@ -92,70 +92,45 @@
     </div>
 </div>
 
-<RadzenText Anchor="borders#utility-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Border utility CSS classes
+<RadzenText Anchor="borders#add-remove-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Add or remove borders arbitrarily
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    The following CSS classes add <code>1px solid</code> border with its respective color. E.g. <code>class="rz-border-primary"</code>.
+    The following CSS classes help you add or remove borders. For example <code>class="rz-border-right"</code> adds a solid border with the theme's base color to the right side of an element. Use <code>rz-{border-side}-0</code> to remove a border. 
 </RadzenText>
-<RadzenRow class="borders">
-    <RadzenColumn Size="12" SizeMD="4">
-        <div class="rz-border-white"><span>.rz-border-white</span></div>
-        <div class="rz-border-base-50"><span>.rz-border-base-50</span></div>
-        <div class="rz-border-base-100"><span>.rz-border-base-100</span></div>
-        <div class="rz-border-base-200"><span>.rz-border-base-200</span></div>
-        <div class="rz-border-base-300"><span>.rz-border-base-300</span></div>
-        <div class="rz-border-base-400"><span>.rz-border-base-400</span></div>
-        <div class="rz-border-base-500"><span>.rz-border-base-500</span></div>
-        <div class="rz-border-base-600"><span>.rz-border-base-600</span></div>
-        <div class="rz-border-base-700"><span>.rz-border-base-700</span></div>
-        <div class="rz-border-base-800"><span>.rz-border-base-800</span></div>
-        <div class="rz-border-base-900"><span>.rz-border-base-900</span></div>
-        <div class="rz-border-black"><span>.rz-border-black</span></div>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeMD="4">
-        <div class="rz-border-primary-lighter"><span>.rz-border-primary-lighter</span></div>
-        <div class="rz-border-primary-light"><span>.rz-border-primary-light</span></div>
-        <div class="rz-border-primary"><span>.rz-border-primary</span></div>
-        <div class="rz-border-primary-dark"><span>.rz-border-primary-dark</span></div>
-        <div class="rz-border-primary-darker"><span>.rz-border-primary-darker</span></div>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeMD="4">
-        <div class="rz-border-secondary-lighter"><span>.rz-border-secondary-lighter</span></div>
-        <div class="rz-border-secondary-light"><span>.rz-border-secondary-light</span></div>
-        <div class="rz-border-secondary"><span>.rz-border-secondary</span></div>
-        <div class="rz-border-secondary-dark"><span>.rz-border-secondary-dark</span></div>
-        <div class="rz-border-secondary-darker"><span>.rz-border-secondary-darker</span></div>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeMD="3">
-        <div class="rz-border-info-lighter"><span>.rz-border-info-lighter</span></div>
-        <div class="rz-border-info-light"><span>.rz-border-info-light</span></div>
-        <div class="rz-border-info"><span>.rz-border-info</span></div>
-        <div class="rz-border-info-dark"><span>.rz-border-info-dark</span></div>
-        <div class="rz-border-info-darker"><span>.rz-border-info-darker</span></div>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeMD="3">
-        <div class="rz-border-success-lighter"><span>.rz-border-success-lighter</span></div>
-        <div class="rz-border-success-light"><span>.rz-border-success-light</span></div>
-        <div class="rz-border-success"><span>.rz-border-success</span></div>
-        <div class="rz-border-success-dark"><span>.rz-border-success-dark</span></div>
-        <div class="rz-border-success-darker"><span>.rz-border-success-darker</span></div>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeMD="3">
-        <div class="rz-border-warning-lighter"><span>.rz-border-warning-lighter</span></div>
-        <div class="rz-border-warning-light"><span>.rz-border-warning-light</span></div>
-        <div class="rz-border-warning"><span>.rz-border-warning</span></div>
-        <div class="rz-border-warning-dark"><span>.rz-border-warning-dark</span></div>
-        <div class="rz-border-warning-darker"><span>.rz-border-warning-darker</span></div>
-    </RadzenColumn>
-    <RadzenColumn Size="12" SizeMD="3">
-        <div class="rz-border-danger-lighter"><span>.rz-border-danger-lighter</span></div>
-        <div class="rz-border-danger-light"><span>.rz-border-danger-light</span></div>
-        <div class="rz-border-danger"><span>.rz-border-danger</span></div>
-        <div class="rz-border-danger-dark"><span>.rz-border-danger-dark</span></div>
-        <div class="rz-border-danger-darker"><span>.rz-border-danger-darker</span></div>
-    </RadzenColumn>
-</RadzenRow>
+<RadzenExample Example="BorderAddRemove">
+    <BorderAddRemove />
+</RadzenExample>
+
+<RadzenText Anchor="borders#color-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Border color utility CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following CSS classes help you add color to a border. For example <code>class="rz-border-right rz-border-color-success"</code> adds a solid border with the theme's success color to the right side of an element.
+</RadzenText>
+<RadzenExample Example="BorderAddRemove">
+    <BorderColor />
+</RadzenExample>
+
+<RadzenText Anchor="borders#utility-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Border with color utility CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following CSS classes add a border with its respective color <strong>on all sides</strong> of an element. E.g. <code>class="rz-border-primary"</code>. You can think of it as the shorthand of <code>class="rz-border rz-border-color-primary"</code>
+</RadzenText>
+<RadzenExample Example="BorderColorAllSides">
+    <BorderColorAllSides />
+</RadzenExample>
+
+<RadzenText Anchor="borders#border-width" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Set border width via CSS variable
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>--rz-border-width</code> CSS variable to set the width of a border.
+</RadzenText>
+<RadzenExample Example="BorderWidth">
+    <BorderWidth />
+</RadzenExample>
 
 <RadzenText Anchor="borders#css-variables" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Borders with CSS variables
@@ -166,10 +141,3 @@
 <div class="rz-p-12" style="border: 10px dotted var(--rz-success)">
     <p><code>style="border: 10px dotted var(--rz-success)"</code></p>
 </div>
-
-<style>
-    .borders div div {
-        margin: 1rem 0;
-        padding: 0.5rem;
-    }
-</style>

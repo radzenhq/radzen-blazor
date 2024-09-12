@@ -1,0 +1,156 @@
+﻿@page "/sizing"
+
+<PageTitle>Blazor Sizing Utilities | Free UI Components by Radzen</PageTitle>
+<HeadContent>
+    <meta name="description" content="Sizing styles and utility CSS classes for width and height available in Radzen Blazor Components library.">
+</HeadContent>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Sizing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Sizing utility CSS classes for width and height can be used to control the overall layout of elements.
+</RadzenText>
+
+<RadzenText Anchor="sizing#width-percentage-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Width percentage CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    You can use the predefined utility classes for width of 25%, 50%, 75%, 100%.
+</RadzenText>
+<RadzenExample Example="SizingWidthClasses">
+    <SizingWidthClasses />
+</RadzenExample>
+
+<RadzenText Anchor="sizing#width-keyword-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Width keyword CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    There are width keyword values exposed as CSS classes such as fit-content, min-content, max-content, and stretch.  
+</RadzenText>
+<RadzenExample Example="SizingWidthKeywordClasses">
+    <SizingWidthKeywordClasses />
+</RadzenExample>
+
+<RadzenText Anchor="sizing#width-viewport-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Width viewport CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    These are viewport width values exposed as CSS classes.
+</RadzenText>
+<RadzenExample Example="SizingWidthViewportClasses">
+    <SizingWidthViewportClasses />
+</RadzenExample>
+
+<RadzenText Anchor="borders#border-radius" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Max-width and min-width CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    Use these CSS classes to set desired minimum and maximum width <code>class="rz-min-w-100"</code>.
+</RadzenText>
+<div class="rz-data-grid rz-datatable rz-datatable-scrollable rz-mt-8 rz-w-100">
+    <div class="rz-data-grid-data">
+        <table class="rz-grid-table">
+            <thead>
+                <tr>
+                    <th style="padding: var(--rz-grid-cell-padding)">Width value</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">Width CSS class</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">Min-width CSS class</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">Max-width CSS class</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="rz-cell-data">25%</span></td>
+                    <td><span class="rz-cell-data">.rz-w-25</span></td>
+                    <td><span class="rz-cell-data">.rz-min-w-25</span></td>
+                    <td><span class="rz-cell-data">.rz-max-w-25</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data">50%</span></td>
+                    <td><span class="rz-cell-data">.rz-w-50</span></td>
+                    <td><span class="rz-cell-data">.rz-min-w-50</span></td>
+                    <td><span class="rz-cell-data">.rz-max-w-50</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data">75%</span></td>
+                    <td><span class="rz-cell-data">.rz-w-75</span></td>
+                    <td><span class="rz-cell-data">.rz-min-w-75</span></td>
+                    <td><span class="rz-cell-data">.rz-max-w-75</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data">100%</span></td>
+                    <td><span class="rz-cell-data">.rz-w-100</span></td>
+                    <td><span class="rz-cell-data">.rz-min-w-100</span></td>
+                    <td><span class="rz-cell-data">.rz-max-w-100</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<RadzenText Anchor="sizing#height-percentage-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Height percentage CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    You can use the predefined utility classes for height of 25%, 50%, 75%, 100%.
+</RadzenText>
+<RadzenExample Example="SizingHeightClasses">
+    <SizingHeightClasses />
+</RadzenExample>
+
+<RadzenText Anchor="sizing#height-viewport-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Height viewport CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    These are viewport height values exposed as CSS classes.
+</RadzenText>
+<RadzenExample Example="SizingHeightViewportClasses">
+    <SizingHeightViewportClasses />
+</RadzenExample>
+
+<RadzenText Anchor="borders#border-radius" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Max-height and min-height CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    Use these CSS classes to set desired minimum and maximum height <code>class="rz-min-h-100"</code>.
+</RadzenText>
+<div class="rz-data-grid rz-datatable rz-datatable-scrollable rz-mt-8 rz-w-100">
+    <div class="rz-data-grid-data">
+        <table class="rz-grid-table">
+            <thead>
+                <tr>
+                    <th style="padding: var(--rz-grid-cell-padding)">Height value</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">Height CSS class</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">Min-height CSS class</th>
+                    <th style="padding: var(--rz-grid-cell-padding)">Max-height CSS class</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="rz-cell-data">25%</span></td>
+                    <td><span class="rz-cell-data">.rz-h-25</span></td>
+                    <td><span class="rz-cell-data">.rz-min-h-25</span></td>
+                    <td><span class="rz-cell-data">.rz-max-h-25</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data">50%</span></td>
+                    <td><span class="rz-cell-data">.rz-h-50</span></td>
+                    <td><span class="rz-cell-data">.rz-min-h-50</span></td>
+                    <td><span class="rz-cell-data">.rz-max-h-50</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data">75%</span></td>
+                    <td><span class="rz-cell-data">.rz-h-75</span></td>
+                    <td><span class="rz-cell-data">.rz-min-h-75</span></td>
+                    <td><span class="rz-cell-data">.rz-max-h-75</span></td>
+                </tr>
+                <tr>
+                    <td><span class="rz-cell-data">100%</span></td>
+                    <td><span class="rz-cell-data">.rz-h-100</span></td>
+                    <td><span class="rz-cell-data">.rz-min-h-100</span></td>
+                    <td><span class="rz-cell-data">.rz-max-h-100</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
