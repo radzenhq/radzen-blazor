@@ -4,21 +4,14 @@ documentType: index
 ---
 
 <div class="row text-center">
-    <div class="col-md-4">
+    <div class="col-md-6">
         <a href="guides/getting-started/installation.html" class="card-link">
             <img class="illustration" src="images/install.svg">
             <h3>Installation</h3>
             <p>Learn how to add the Radzen.Blazor Nuget package to your application.</p>
         </a>
     </div>
-    <div class="col-md-4">
-        <a href="guides/getting-started/use-component.html" class="card-link">
-            <img class="illustration" src="images/using-a-component.svg">
-            <h3>Using a component</h3>
-            <p>Add a Radzen Blazor component to a page, set its properties and handle its events.</p>
-        </a>
-    </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
         <a href="api/index.html" class="card-link">
             <img class="illustration" src="images/api-reference.svg">
             <h3>API Reference</h3>
