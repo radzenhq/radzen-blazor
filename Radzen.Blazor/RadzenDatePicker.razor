@@ -45,7 +45,11 @@
                                                 Change="@((args) => { SetMonth(int.Parse(args.ToString())); })"/>
                                 <RadzenDropDown @ref="yearDropDown" class="rz-calendar-year-dropdown" TabIndex="@TabIndex"
                                                 TValue="int" Value="@CurrentDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
-                                                Change="@((args) => { SetYear(int.Parse(args.ToString())); })"/>
+                                                Change="@((args) => { SetYear(int.Parse(args.ToString())); })">
+                                        <Template>
+                                            @Culture.Calendar.GetYear(new DateTime(context.Value,1,1))
+                                        </Template>
+                                </RadzenDropDown>
                             </div>
                         </div>
                         @if(ShowDays)
