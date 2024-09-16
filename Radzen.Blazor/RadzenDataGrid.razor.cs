@@ -484,11 +484,20 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Gets or sets key down callback.
+        /// </summary>
+        /// <value>The key down callback.</value>
+        [Parameter]
+        public EventCallback<KeyboardEventArgs> KeyDown { get; set; }
+
+        /// <summary>
         /// Handles the <see cref="E:KeyDown" /> event.
         /// </summary>
         /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
         protected virtual async Task OnKeyDown(KeyboardEventArgs args)
         {
+            await KeyDown.InvokeAsync(args);
+
             var key = args.Code != null ? args.Code : args.Key;
 
             if (key == "ArrowDown" || key == "ArrowUp" || key == "ArrowLeft" || key == "ArrowRight")
