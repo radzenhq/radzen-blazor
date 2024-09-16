@@ -235,6 +235,8 @@ namespace Radzen.Blazor
             {
                 htmlChanged = false;
 
+                _value = Html;
+
                 await ValueChanged.InvokeAsync(Html);
 
                 if (FieldIdentifier.FieldName != null)
