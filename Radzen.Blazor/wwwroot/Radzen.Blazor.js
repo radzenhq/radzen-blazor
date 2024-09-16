@@ -938,10 +938,13 @@ window.Radzen = {
       return;
       }
 
-    if (e.code === 'NumpadDecimal') {
-      e.target.value += decimalSeparator;
-      e.preventDefault();
-      return;
+      if (e.code === 'NumpadDecimal') {
+          var cursorPosition = e.target.selectionEnd;
+          e.target.value = [e.target.value.slice(0, e.target.selectionStart), decimalSeparator, e.target.value.slice(e.target.selectionEnd)].join('');
+          e.target.selectionStart = ++cursorPosition;
+          e.target.selectionEnd = cursorPosition;
+          e.preventDefault();
+          return;
     }
 
     var ch = String.fromCharCode(e.charCode);
