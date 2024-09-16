@@ -1639,6 +1639,14 @@ namespace RadzenBlazorDemos
                     Description = "Demonstration and configuration of Radzen Blazor Google Map component.",
                     Icon = "&#xe55b"
                 },
+                new Example
+                {
+                    Name = "SSRS Viewer",
+                    Path = "ssrsviewer",
+                    Description = "Demonstration and configuration of Radzen SSRS Viewer Radzen Blazor Arc Gauge component.",
+                    Icon = "&#xe9e4",
+                    Tags = new [] { "report", "ssrs" }
+                },
             }
         },
         new Example

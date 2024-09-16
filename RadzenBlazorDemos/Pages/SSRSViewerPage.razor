@@ -1,47 +1,64 @@
-# SSRSViewer component
+﻿@page "/ssrsviewer"
+@page "/docs/guides/components/ssrsviewer.html"
 
-RadzenSSRSViewer displays a repors created in SQL Server Reporting Services (SSRS).
-
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    SSRS Viewer
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    RadzenSSRSViewer displays a report created in SQL Server Reporting Services (SSRS).
+</RadzenText>
+<RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
+    There is no live demo of RadzenSSRSViewer because hosting a public SSRS server is not a trivial task.
+</RadzenAlert>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
 To display a report you should specify:
-
-1. The name of the report via the `ReportName` property.
-1. The URL of your report server via the `ReportServer` property.
-
+</RadzenText>
+<ol>
+    <li>The name of the report via the ReportName property.</li>
+    <li>The URL of your report server via the ReportServer property.</li>
+</ol>
 Here is a minimal example:
-
-```
-<RadzenSSRSViewer ReportName="Untitled" ReportServer="http://myserver/ReportServer/" />
-```
-
-## Parameters
-Often SSRS reports have parameters. You can specify those via the `<Parameters>` collection.
-
-```
-<RadzenSSRSViewer ReportName="Untitled" ReportServer="http://myserver/ReportServer/">
-  <Parameters>
-    <RadzenSSRSViewerParameter ParameterName="Param1" Value="1" />
-    <RadzenSSRSViewerParameter ParameterName="Param2" Value="2" />
-  </Parameters>
-</RadzenSSRSViewer>
-```
-
-## Proxy
-Often your report server won't be exposed to the public Internet or you would want to either hide report parameters or provide
-security credentials. In this case you can use the built-in proxy support in RadzenSSRSViewer.
-
-To enable it set the `UseProxy` property to `true` and add the `ReportController` class below to your Blazor application.
-
-# [Page](#tab/page)
-```
-<RadzenSSRSViewer UseProxy="true" ReportName="Untitled" ReportServer="http://myserver/ReportServer/">
-  <Parameters>
-    <RadzenSSRSViewerParameter ParameterName="Param1" Value="1" />
-    <RadzenSSRSViewerParameter ParameterName="Param2" Value="2" />
-  </Parameters>
-</RadzenSSRSViewer>
-```
-# [ReportController](#tab/controller)
-```cs
+<pre>
+<code>
+&lt;RadzenSSRSViewer ReportName="Untitled" ReportServer="http://myserver/ReportServer/" /&gt;
+</code>
+</pre>
+<RadzenText Anchor="ssrsviewer#parameters" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">Parameters</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+Often SSRS reports have parameters. You can specify those via the <code>Parameters</code> collection:
+</RadzenText>
+<pre>
+<code>
+&lt;RadzenSSRSViewer ReportName="Untitled" ReportServer="http://myserver/ReportServer/"&gt;
+  &lt;Parameters&gt;
+    &lt;RadzenSSRSViewerParameter ParameterName="Param1" Value="1" /&gt;
+    &lt;RadzenSSRSViewerParameter ParameterName="Param2" Value="2" /&gt;
+  &lt;/Parameters&gt;
+&lt;/RadzenSSRSViewer&gt;
+</code>
+</pre>
+<RadzenText Anchor="ssrsviewer#proxy" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">Proxy</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+Often your report server won't be exposed to the public Internet or you would want to either hide report parameters or provide security credentials. In this case you can use the built-in proxy support in RadzenSSRSViewer.
+To enable it set the <code>UseProxy</code> property to <code>true</code>and add the <code>ReportController</code> class below to your Blazor application.
+</RadzenText>
+<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="Page">
+<pre>
+<code>
+&lt;RadzenSSRSViewer UseProxy="true" ReportName="Untitled" ReportServer="http://myserver/ReportServer/"&gt;
+  &lt;Parameters&gt;
+    &lt;RadzenSSRSViewerParameter ParameterName="Param1" Value="1" /&gt;
+    &lt;RadzenSSRSViewerParameter ParameterName="Param2" Value="2" /&gt;
+  &lt;/Parameters&gt;
+&lt;/RadzenSSRSViewer&gt;
+</code>
+</pre>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text="ReportController">
+<pre>
+<code>
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http.Extensions;
@@ -130,7 +147,7 @@ public namespace YourAppNamespace.Controllers
 
         partial void OnReportRequest(ref HttpRequestMessage requestMessage);
 
-        async Task<HttpResponseMessage> ForwardRequest(HttpClient httpClient, HttpRequest currentReqest, string url)
+        async Task&lt;HttpResponseMessage&gt; ForwardRequest(HttpClient httpClient, HttpRequest currentReqest, string url)
         {
             var proxyRequestMessage = new HttpRequestMessage(new HttpMethod(currentReqest.Method), url);
 
@@ -203,7 +220,7 @@ public namespace YourAppNamespace.Controllers
                 var id = "";
                 var content = "";
 
-                while (index < result.Length)
+                while (index &lt; result.Length)
                 {
                     delimiterIndex = result.IndexOf("|", index);
                     if (delimiterIndex == -1)
@@ -230,7 +247,7 @@ public namespace YourAppNamespace.Controllers
                     }
                     id = result.Substring(index, delimiterIndex - index);
                     index = delimiterIndex + 1;
-                    if ((index + length) >= result.Length)
+                    if ((index + length) &gt;= result.Length)
                     {
                         break;
                     }
@@ -278,35 +295,44 @@ public namespace YourAppNamespace.Controllers
         }
     }
 }
-```
-
-> [!Warning]
-> Make sure your Blazor application has controller support enabled. Your `Program.cs` should contain `builder.Services.AddControllers();` and `app.MapControllers();`
-
-### Provide credentials
-To provide user credentials when making the proxy requests you can implement the `OnHttpClientHandlerCreate` partial method of `ReportController`.
-
-1. Add a new file e.g. `ReportController.Credentials.cs`
-1. Implement the `OnHttpClientHandlerCreate` partial method:
-   ```
-   using System.Net;
-   using System.Text;
-   using Microsoft.AspNetCore.Http.Extensions;
-   using Microsoft.AspNetCore.Mvc;
-   public namespace YourAppNamespace.Controllers
+</code>
+</pre>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+<RadzenText Anchor="ssrsviewer#credentials" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">Provide credentials</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To provide user credentials when making the proxy requests you can implement the OnHttpClientHandlerCreate partial method of ReportController.
+</RadzenText>
+<ol>
+    <li>Add a new file e.g. <code>ReportController.Credentials.cs</code></li>
+    <li>Implement the <code>OnHttpClientHandlerCreate</code> partial method:
+<pre>
+<code>
+using System.Net;
+using System.Text;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
+public namespace YourAppNamespace.Controllers
+{
+   public partial class ReportController
    {
-      public partial class ReportController
-      {
-          void OnHttpClientHandlerCreate(ref httpClientHandler);
-          {
-            httpClientHandler.Credentials = new NetworkCredential("username", "password", "domain");
-          }
-      }
+       void OnHttpClientHandlerCreate(ref httpClientHandler);
+       {
+         httpClientHandler.Credentials = new NetworkCredential("username", "password", "domain");
+       }
    }
-   ```
-
-Alternatively you can set the `Credentials` property of `httpClientHandler` directly in the `CreateHttpClient` method of the `ReportController` class:
-```
+}
+</code>
+</pre>
+     </li>
+</ol>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Alternatively you can set the <code>Credentials</code> property of <code>httpClientHandler</code> directly in the <code>CreateHttpClient</code> method of the
+    <code>ReportController</code> class:
+</RadzenText>
+<pre>
+<code>
 private HttpClient CreateHttpClient()
 {
     var httpClientHandler = new HttpClientHandler();
@@ -326,8 +352,12 @@ private HttpClient CreateHttpClient()
 
     return new HttpClient(httpClientHandler);
 }
-```
-
-In some setups authenticating the request like this could fail with exceptions such as:
-- `HttpRequestException: Authentication failed because the connection could not be reused.`. If this happens check [this forum thread](https://forum.radzen.com/t/radzenssrsviewer-authentication-failed-because-the-connection-could-not-be-reused/3065/4)
-- `System.ComponentModel.Win32Exception (0x80090302): The function requested is not supported`. If this happens check [this forum thread](https://forum.radzen.com/t/passing-authentication-to-ssrs-report-viewer-net-5/6148/8)
+</code>
+</pre>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    In some setups authenticating the request like this could fail with exceptions such as:
+</RadzenText>
+<ul>
+    <li><code>HttpRequestException: Authentication failed because the connection could not be reused.</code>. If this happens check <a href="https://forum.radzen.com/t/radzenssrsviewer-authentication-failed-because-the-connection-could-not-be-reused/3065/4">this forum thread</a></li>
+    <li><code>System.ComponentModel.Win32Exception (0x80090302): The function requested is not supported</code>. If this happens check <a href="https://forum.radzen.com/t/passing-authentication-to-ssrs-report-viewer-net-5/6148/8">this forum thread</a></li>
+</ul>
