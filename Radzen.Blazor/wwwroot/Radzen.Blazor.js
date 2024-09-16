@@ -1888,6 +1888,7 @@ window.Radzen = {
                         } else {
                           document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
                         }
+                        instance.invokeMethodAsync('OnUploadComplete', xhr.responseText);
                     } else {
                         instance.invokeMethodAsync('OnError', xhr.responseText);
                     }

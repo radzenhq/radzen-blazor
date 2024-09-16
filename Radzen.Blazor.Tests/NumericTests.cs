@@ -216,12 +216,12 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
             Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
 
             Assert.Contains(@$"autocomplete=""on""", component.Markup);
             Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
@@ -232,7 +232,7 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
 
             component.Instance.DefaultAutoCompleteAttribute = "autocomplete-custom";
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
 
             Assert.Contains(@$"autocomplete=""autocomplete-custom""", component.Markup);
             Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
@@ -245,22 +245,22 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
             component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.On));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
             component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.Off));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
             component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.BdayMonth));
 
             Assert.Contains(@$"autocomplete=""{AutoCompleteType.BdayMonth.GetAutoCompleteValue()}""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
             component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.BdayYear));
 
             Assert.Contains(@$"autocomplete=""{AutoCompleteType.BdayYear.GetAutoCompleteValue()}""", component.Markup);

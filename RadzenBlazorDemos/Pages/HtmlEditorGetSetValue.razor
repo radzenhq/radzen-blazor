@@ -1,4 +1,4 @@
-﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput Change=@OnChange Paste=@OnPaste Execute=@OnExecute UploadUrl="upload/image" />
+﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput Change=@OnChange Paste=@OnPaste UploadComplete=@OnUploadComplete Execute=@OnExecute UploadUrl="upload/image" />
 
 <EventConsole @ref=@console />
 
@@ -33,5 +33,10 @@
     void OnExecute(HtmlEditorExecuteEventArgs args)
     {
         console.Log($"Execute: {args.CommandName}");
+    }
+
+    void OnUploadComplete(UploadCompleteEventArgs args)
+    {
+        console.Log($"Upload complete: {args.RawResponse}");
     }
 }

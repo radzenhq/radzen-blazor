@@ -12,7 +12,7 @@
 *@
 
 <RadzenDataGrid TItem="Order" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
-                Data="@orders" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())" 
+                Data="@orders" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())"
                 ColumnWidth="200px" CellClick="@OnCellClick">
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
@@ -22,7 +22,7 @@
                 <RadzenText Text="@(order.Customer?.CompanyName)" />
             </Template>
             <EditTemplate Context="order">
-                <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width:100%; display: block;"
+                <RadzenDropDown @ref="editor" Change="@(args => Update())" @bind-Value="order.CustomerID" Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width:100%; display: block;"
                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -35,7 +35,7 @@
                 </RadzenStack>
             </Template>
             <EditTemplate Context="order">
-                <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
+                <RadzenDropDown @ref="editor" Change="@(args => Update())" @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
                     <Template>
                         <RadzenImage Path="@context.Photo" style="width: 20px; height: 20px; border-radius: 16px; margin-right: 6px;" />
@@ -50,7 +50,7 @@
                 <RadzenText Text="@(String.Format("{0:d}", order.OrderDate))" />
             </Template>
             <EditTemplate Context="order">
-                <RadzenDatePicker @bind-Value="order.OrderDate" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order date" }})" />
+                <RadzenDatePicker @ref="editor" Change="@(args => Update())" @bind-Value="order.OrderDate" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select order date" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
 
@@ -59,7 +59,7 @@
                 <RadzenText Text="@(String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight))" />
             </Template>
             <EditTemplate Context="order">
-                <RadzenNumeric @bind-Value="order.Freight" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select freight" }})" />
+                <RadzenNumeric @ref="editor" Change="@((decimal? args) => Update())" @bind-Value="order.Freight" Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select freight" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
 
@@ -68,7 +68,7 @@
                 <RadzenText Text="@(order.ShipName)" />
             </Template>
             <EditTemplate Context="order">
-                <RadzenTextBox @bind-Value="order.ShipName" Style="width:200px; display: block" Name="ShipName" aria-label="Enter ship name" />
+                <RadzenTextBox @ref="editor" Change="@(args => Update())" @bind-Value="order.ShipName" Style="width:200px; display: block" Name="ShipName" aria-label="Enter ship name" />
                 <RadzenRequiredValidator Text="ShipName is required" Component="ShipName" Popup="true" />
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -78,7 +78,7 @@
                 <RadzenText Text="@(order.ShipCountry)" />
             </Template>
             <EditTemplate Context="order">
-                <RadzenTextBox @bind-Value="order.ShipCountry" Style="width:200px; display: block" Name="ShipCountry" aria-label="Enter ship country" />
+                <RadzenTextBox @ref="editor" Change="@(args => Update())" @bind-Value="order.ShipCountry" Style="width:200px; display: block" Name="ShipCountry" aria-label="Enter ship country" />
                 <RadzenRequiredValidator Text="ShipCountry is required" Component="ShipCountry" Popup="true" />
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -88,7 +88,7 @@
                 <RadzenText Text="@(order.ShipCity)" />
             </Template>
             <EditTemplate Context="order">
-                <RadzenTextBox @bind-Value="order.ShipCity" Style="width:200px; display: block" Name="ShipCity" aria-label="Enter ship city" />
+                <RadzenTextBox @ref="editor" Change="@(args => Update())" @bind-Value="order.ShipCity" Style="width:200px; display: block" Name="ShipCity" aria-label="Enter ship city" />
                 <RadzenRequiredValidator Text="ShipCity is required" Component="ShipCity" Popup="true" />
             </EditTemplate>
         </RadzenDataGridColumn>
@@ -160,7 +160,7 @@
     }
 
     /// <summary>
-    /// 
+    /// Handles the CellClick event of the RadzenDataGrid.
     /// </summary>
     /// <param name="args"></param>
     void OnCellClick(DataGridCellMouseEventArgs<Order> args)
@@ -186,6 +186,8 @@
 
     void Reset(Order order = null)
     {
+        editorFocused = false;
+
         if (order != null)
         {
             ordersToUpdate.Remove(order);
@@ -196,13 +198,25 @@
         }
     }
 
+    void Update()
+    {
+        editorFocused = false;
+
+        if (ordersToUpdate.Any())
+        {
+            OnUpdateRow(ordersToUpdate.First());
+        }
+
+        Reset();
+    }
+
     void EditRow(Order order)
     {
         Reset();
 
         ordersToUpdate.Add(order);
     }
-
+    
     /// <summary>
     /// Saves the changes from the Order to the database.
     /// </summary>
@@ -223,5 +237,26 @@
         // clear edits for the current record.
 
         //editedFields = editedFields.Where(c => c.Key != order.OrderID).ToList();
+    }
+
+    IRadzenFormComponent editor;
+    bool editorFocused;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (!editorFocused && editor != null)
+        {
+            editorFocused = true;
+
+            try
+            {
+                await editor.FocusAsync();
+            }
+            catch
+            {
+                //
+            }
+        }
     }
 }

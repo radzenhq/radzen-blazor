@@ -338,6 +338,60 @@ namespace Radzen.Blazor
             }
         }
 
+        async Task OnFirstPageClick()
+        {
+            focusedIndex = -2;
+
+            await FirstPage();
+
+            if (skip == 0)
+            {
+                focusedIndex = focusedIndex + 2;
+            }
+        }
+
+        async Task OnPrevPageClick()
+        {
+            focusedIndex = -1;
+
+            await PrevPage();
+
+            if (skip == 0)
+            {
+                focusedIndex++;
+            }
+        }
+
+        async Task OnPageClick(int i, int startPage)
+        {
+            focusedIndex = i - startPage;
+            await GoToPage(i);
+        }
+
+        async Task OnNextPageClick(int endPage)
+        {
+            focusedIndex = Math.Min(endPage + 1, PageNumbersCount);
+
+            await NextPage();
+
+            if (CurrentPage == numberOfPages - 1)
+            {
+                focusedIndex--;
+            }
+        }
+
+        async Task OnLastPageClick(int endPage)
+        {
+            focusedIndex = Math.Min(endPage + 1, PageNumbersCount) + 1;
+
+            await LastPage();
+
+            if (CurrentPage == numberOfPages - 1)
+            {
+                focusedIndex = focusedIndex - 2;
+            }
+        }
+
         internal void SetCurrentPage(int page)
         {
             if (CurrentPage != page)
