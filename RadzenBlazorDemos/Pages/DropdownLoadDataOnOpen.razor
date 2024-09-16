@@ -1,0 +1,33 @@
+﻿@page "/dropdown-load-data-on-open"
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
+    <RadzenLabel Text="Select Value" Component="DropDownLoadOnOpen" />
+    <RadzenDropDown Data="@Data"
+                    @bind-Value=@Values
+                    AllowClear
+                    AllowFiltering
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    Style="width: 100%; max-width: 400px;"
+                    Name="DropDownLoadOnOpen"
+                    Multiple
+                    LoadData="@LoadData"
+                    LoadDataOnOpen>
+    </RadzenDropDown>
+</RadzenStack>
+<EventConsole @ref="console" />
+
+@code {
+    private List<string> Data { get; set; } = [];
+    private List<string> Values { get; set; } = [];
+
+    private EventConsole console { get; set; }
+
+    private void LoadData(LoadDataArgs args)
+    {
+        console.Log("loaded");
+
+        Data = ["Value 1", "Value 2", "Value 3", "Value 4", "Value 5"];
+
+        StateHasChanged();
+    }
+}

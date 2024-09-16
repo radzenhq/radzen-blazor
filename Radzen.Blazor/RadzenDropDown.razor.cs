@@ -79,10 +79,10 @@ namespace Radzen.Blazor
         {
             var disabled = !string.IsNullOrEmpty(DisabledProperty) ? GetItemOrValueFromProperty(item.Item, DisabledProperty) : false;
 
-            var args = new DropDownItemRenderEventArgs<TValue>() 
-            { 
-                DropDown = this, 
-                Item = item.Item, 
+            var args = new DropDownItemRenderEventArgs<TValue>()
+            {
+                DropDown = this,
+                Item = item.Item,
                 Disabled = disabled is bool ? (bool)disabled : false,
             };
 
@@ -130,6 +130,13 @@ namespace Radzen.Blazor
         {
             if (Disabled)
                 return;
+
+            if (LoadDataOnOpen && !dataLoaded && LoadData.HasDelegate)
+            {
+                await LoadData.InvokeAsync(await GetLoadDataArgs());
+                dataLoaded = true;
+                StateHasChanged();
+            }
 
             await JSRuntime.InvokeVoidAsync(OpenOnFocus ? "Radzen.openPopup" : "Radzen.togglePopup", Element, PopupID, true);
             await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
@@ -191,6 +198,14 @@ namespace Radzen.Blazor
         [Parameter]
         public string SelectAllText { get; set; }
 
+        /// <summary>
+        /// Gets or sets the if the data should be loaded only when the popup is opened.
+        /// </summary>
+        /// <value><c>true</c> to load only when it's oppened; otherwise, <c>false</c> to load on component Initialization.</value>
+        [Parameter]
+        public bool LoadDataOnOpen { get; set; } = false;
+
+        private bool dataLoaded = false;
         private bool visibleChanged = false;
         private bool disabledChanged = false;
         private bool firstRender = true;
@@ -240,7 +255,7 @@ namespace Radzen.Blazor
                 if (Visible)
                 {
                     bool reload = false;
-                    if (LoadData.HasDelegate && Data == null)
+                    if (LoadData.HasDelegate && Data == null && !LoadDataOnOpen)
                     {
                         await LoadData.InvokeAsync(await GetLoadDataArgs());
                         reload = true;
