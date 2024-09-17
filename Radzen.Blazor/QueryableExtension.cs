@@ -259,11 +259,21 @@ namespace Radzen
         /// Converts a RadzenDataFilter to a Linq-compatibly filter string
         /// </summary>
         /// <typeparam name="T">The type that is being filtered</typeparam>
-        /// <param name="filter">The RadzenDataFilter component</param>
+        /// <param name="dataFilter">The RadzenDataFilter component</param>
         /// <returns>A Linq-compatible filter string</returns>
-        public static string ToFilterString<T>(this RadzenDataFilter<T> filter)
+        public static string ToFilterString<T>(this RadzenDataFilter<T> dataFilter)
         {
-            return CompositeFilterToFilterString<T>(filter.Filters, filter, filter.LogicalFilterOperator);
+            Func<CompositeFilterDescriptor, bool> canFilter = (c) => dataFilter.properties.Where(col => col.Property == c.Property).FirstOrDefault()?.FilterPropertyType != null &&
+               (!(c.FilterValue == null || c.FilterValue as string == string.Empty)
+                || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
+                || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
+               && c.Property != null;
+
+            if (dataFilter.Filters.Concat(dataFilter.Filters.SelectManyRecursive(i => i.Filters ?? Enumerable.Empty<CompositeFilterDescriptor>())).Where(canFilter).Any())
+            {
+                return CompositeFilterToFilterString<T>(dataFilter.Filters, dataFilter, dataFilter.LogicalFilterOperator);
+            }
+            return "";
         }
 
         /// <summary>
