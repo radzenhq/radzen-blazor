@@ -12,7 +12,7 @@
 
 @code {
     IEnumerable<Customer> customers;
-    string value;
+    string value = "NORTS";
     int count;
 
     string lastfilter;
@@ -36,5 +36,12 @@
         count = await Task.FromResult(query.Count());
 
         customers = await Task.FromResult(query.Skip(args.Skip.HasValue ? args.Skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : 10).ToList());
+    
+        // Load selected items if outside of visible range
+        if (!string.IsNullOrEmpty(value) && !customers.Any(c => c.CustomerID == value))
+        {
+            var selected = await Task.FromResult(query.Where(c => c.CustomerID == value));
+            customers = customers.Concat(selected);
+        }
     }
 }
