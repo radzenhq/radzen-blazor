@@ -346,93 +346,104 @@ window.Radzen = {
     Radzen[id] = null;
   },
   createSecurityCode: function (id, ref, el, isNumber) {
-      if (!el || !ref) return;
+    if (!el || !ref) return;
 
-      var hidden = el.querySelector('input[type="hidden"]');
-      var inputs = [...el.querySelectorAll('.rz-security-code-input')];
+    var hidden = el.querySelector('input[type="hidden"]');
 
-      Radzen[id] = {};
+    function initializeInputs() {
+        var inputs = [...el.querySelectorAll('.rz-security-code-input')];
 
-      Radzen[id].paste = function (e) {
-          if (e.clipboardData) {
-              var value = e.clipboardData.getData('text');
+        Radzen[id].inputs = inputs;
 
-              if (value) {
-                  for (var i = 0; i < value.length; i++) {
-                      if (isNumber && isNaN(+value[i])) {
-                          continue;
-                      }
-                      inputs[i].value = value[i];
-                  }
+        for (var i = 0; i < inputs.length; i++) {
+            inputs[i].removeEventListener(navigator.userAgent.match(/Android/i) ? 'textInput' : 'keypress', Radzen[id].keyPress);
+            inputs[i].removeEventListener(navigator.userAgent.match(/Android/i) ? 'textInput' : 'keydown', Radzen[id].keyDown);
+            inputs[i].removeEventListener('paste', Radzen[id].paste);
 
-                  var code = inputs.map(i => i.value).join('').trim();
-                  hidden.value = code;
+            inputs[i].addEventListener(navigator.userAgent.match(/Android/i) ? 'textInput' : 'keypress', Radzen[id].keyPress);
+            inputs[i].addEventListener(navigator.userAgent.match(/Android/i) ? 'textInput' : 'keydown', Radzen[id].keyDown);
+            inputs[i].addEventListener('paste', Radzen[id].paste);
+        }
+    }
 
-                  ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', code);
+    Radzen[id] = Radzen[id] || {};
 
-                  inputs[inputs.length - 1].focus();
-              }
+    Radzen[id].paste = function (e) {
+        if (e.clipboardData) {
+            var value = e.clipboardData.getData('text');
 
-              e.preventDefault();
-          }
-      }
-      Radzen[id].keyPress = function (e) {
-          var keyCode = e.data ? e.data.charCodeAt(0) : e.which;
-          var ch = e.data || String.fromCharCode(e.which);
+            if (value) {
+                for (var i = 0; i < value.length; i++) {
+                    if (isNumber && isNaN(+value[i])) {
+                        continue;
+                    }
+                    Radzen[id].inputs[i].value = value[i];
+                }
 
-          if (e.metaKey ||
-              e.ctrlKey ||
-              keyCode == 9 ||
-              keyCode == 8 ||
-              keyCode == 13
-          ) {
-              return;
-          }
+                var code = Radzen[id].inputs.map(i => i.value).join('').trim();
+                hidden.value = code;
 
-          if (isNumber && (keyCode < 48 || keyCode > 57)) {
-              e.preventDefault();
-              return;
-          }
+                ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', code);
 
-          if (e.currentTarget.value == ch) {
-              return;
-          }
+                Radzen[id].inputs[Radzen[id].inputs.length - 1].focus();
+            }
 
-          e.currentTarget.value = ch;
+            e.preventDefault();
+        }
+    }
+    Radzen[id].keyPress = function (e) {
+        var keyCode = e.data ? e.data.charCodeAt(0) : e.which;
+        var ch = e.data || String.fromCharCode(e.which);
 
-          var value = inputs.map(i => i.value).join('').trim();
-          hidden.value = value;
+        if (e.metaKey ||
+            e.ctrlKey ||
+            keyCode == 9 ||
+            keyCode == 8 ||
+            keyCode == 13
+        ) {
+            return;
+        }
 
-          ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value);
+        if (isNumber && (keyCode < 48 || keyCode > 57)) {
+            e.preventDefault();
+            return;
+        }
 
-          var index = inputs.indexOf(e.currentTarget);
-          if (index < inputs.length - 1) {
-              inputs[index + 1].focus();
-          }
-      }
+        if (e.currentTarget.value == ch) {
+            return;
+        }
 
-      Radzen[id].keyDown = function (e) {
-          var keyCode = e.data ? e.data.charCodeAt(0) : e.which;
-          if (keyCode == 8) {
-              e.currentTarget.value = '';
+        e.currentTarget.value = ch;
 
-              var value = inputs.map(i => i.value).join('').trim();
-              hidden.value = value;
+        var value = Radzen[id].inputs.map(i => i.value).join('').trim();
+        hidden.value = value;
 
-              ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value);
+        ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value);
 
-              var index = inputs.indexOf(e.currentTarget);
-              if (index > 0) {
-                  inputs[index - 1].focus();
-              }
-          }
-      }
+        var index = Radzen[id].inputs.indexOf(e.currentTarget);
+        if (index < Radzen[id].inputs.length - 1) {
+            Radzen[id].inputs[index + 1].focus();
+        }
+    }
 
-      for (var i = 0; i < inputs.length; i++) {
-          inputs[i].addEventListener(navigator.userAgent.match(/Android/i) ? 'textInput' : 'keypress', Radzen[id].keyPress);
-          inputs[i].addEventListener(navigator.userAgent.match(/Android/i) ? 'textInput' : 'keydown', Radzen[id].keyDown);
-          inputs[i].addEventListener('paste', Radzen[id].paste);
-      }
+    Radzen[id].keyDown = function (e) {
+        var keyCode = e.data ? e.data.charCodeAt(0) : e.which;
+        if (keyCode == 8) {
+            e.currentTarget.value = '';
+
+            var value = Radzen[id].inputs.map(i => i.value).join('').trim();
+            hidden.value = value;
+
+            ref.invokeMethodAsync('RadzenSecurityCode.OnValueChange', value);
+
+            var index = Radzen[id].inputs.indexOf(e.currentTarget);
+            if (index > 0) {
+                Radzen[id].inputs[index - 1].focus();
+            }
+        }
+    }
+
+    initializeInputs();
   },
   createSlider: function (
     id,
