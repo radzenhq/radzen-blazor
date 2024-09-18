@@ -4,8 +4,8 @@
 
 @inherits DbContextPage
 
-<RadzenDataGrid @ref="ordersGrid" ColumnWidth="220px" AllowGrouping="false" AllowFiltering="true" AllowPaging="true" AllowSorting="true" 
-        Data="@orders" Render="@OnRender">
+<RadzenDataGrid @ref="ordersGrid" ColumnWidth="220px" AllowGrouping="false" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
+                ShowPagingSummary="true" Data="@orders" Render="@OnRender">
     <GroupHeaderTemplate>
         @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
     </GroupHeaderTemplate>
