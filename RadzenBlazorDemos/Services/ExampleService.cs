@@ -1147,6 +1147,14 @@ namespace RadzenBlazorDemos
                     Path = "tabs",
                     Icon = "&#xe8d8",
                     Tags = new [] { "tabstrip", "tabview", "container" }
+                },
+                new Example
+                {
+                    Name = "Carousel",
+                    Description = "Demonstration and configuration of the Radzen Blazor Carousel component.",
+                    Path = "carousel",
+                    Icon = "&#xe03f",
+                    Tags = new [] { "carousel", "galery", "container" }
                 }
             }
         },

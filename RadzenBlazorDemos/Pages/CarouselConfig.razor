@@ -1,0 +1,98 @@
+﻿<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Interval
+                <RadzenNumeric @bind-Value=@interval aria-label="interval" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                <RadzenLabel Text="Pager Position:" Component="PagerPosition" />
+                <RadzenDropDown @bind-Value="@pagerPosition" TextProperty="Text" Name="PagerPosition" ValueProperty="Value"
+                                Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Auto-cycle
+                <RadzenSwitch @bind-Value="@auto" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "auto-cycle" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Allow paging
+                <RadzenSwitch @bind-Value="@allowPaging" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow paging" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Allow navigation
+                <RadzenSwitch @bind-Value="@allowNavigation" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow navigation" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
+                <RadzenToggleButton Text="@toggleText" Click="@Toggle" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenCarousel @ref=carousel @bind-SelectedIndex="@SelectedIndex" Auto="@auto" Interval="@interval" 
+            AllowPaging="@allowPaging" PagerPosition="@pagerPosition" AllowNavigation="@allowNavigation" Style="height:500px">
+            <Items>
+                @foreach (var theme in Themes.All)
+                {
+                <RadzenCarouselItem>
+                    <RadzenCard>
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Stretch" Gap="0.25rem">
+                            @theme.Text
+                            @MainLayout.RenderTheme(theme, false)
+                        </RadzenStack>
+                    </RadzenCard>
+                </RadzenCarouselItem>
+                }
+            </Items>
+        </RadzenCarousel>
+     </RadzenCard>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    RadzenCarousel carousel;
+
+    bool allowPaging = true;
+    bool allowNavigation = true;
+    bool auto = true;
+    double interval = 4000;
+    PagerPosition pagerPosition = PagerPosition.Bottom;
+    string toggleText = "Stop";
+
+    bool started = true;
+    void Toggle()
+    {
+        if (started)
+        {
+            carousel.Stop();
+            toggleText = "Start";
+        }
+        else
+        {
+            carousel.Start();
+            toggleText = "Stop";
+        }
+
+        started = !started;
+    }
+
+    EventConsole console;
+
+    int _selectedIndex;
+    public int SelectedIndex
+    {
+        get
+        {
+            return _selectedIndex;
+        }
+        set
+        {
+            if (_selectedIndex != value)
+            {
+                _selectedIndex = value;
+
+                console.Log($"SelectedIndex changed to {value}");
+            }
+        }
+    }
+}

@@ -1,0 +1,39 @@
+﻿@inherits RadzenComponent
+@using System.Linq
+@using Microsoft.JSInterop
+<CascadingValue Value=this>
+@if (Visible)
+{
+    <section @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0">
+        @if(AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
+        {
+        <aside class="rz-carousel-navigation">
+            <ol class="rz-carousel-navigation-list">
+            @foreach (var item in items)
+            {
+            <li class="rz-carousel-navigation-item">
+                <a @onclick="@(args => Navigate(items.IndexOf(item)))" class="rz-carousel-navigation-button"></a>
+            </li>
+            }
+            </ol>
+        </aside>
+        }
+        <ol class="rz-carousel-slide-list">
+            @Items
+        </ol>
+        @if(AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
+        {
+        <aside class="rz-carousel-navigation">
+            <ol class="rz-carousel-navigation-list">
+            @foreach (var item in items)
+            {
+            <li class="rz-carousel-navigation-item">
+                <a @onclick="@(args => Navigate(items.IndexOf(item)))" class="rz-carousel-navigation-button"></a>
+            </li>
+            }
+            </ol>
+        </aside>
+        }
+        </section>
+}
+</CascadingValue>
