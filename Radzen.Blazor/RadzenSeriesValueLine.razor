@@ -1,6 +1,7 @@
 ﻿@using Radzen.Blazor.Rendering
 @inherits RadzenGridLines
 @implements IChartSeriesOverlay
+@implements IDisposable
 
 @code {
     public RadzenSeriesValueLine()
@@ -122,4 +123,5 @@
             builder.CloseComponent();
         };
     }
+    public void Dispose() => series?.Overlays.Remove(this);
 }

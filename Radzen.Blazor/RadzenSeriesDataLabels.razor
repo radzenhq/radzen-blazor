@@ -1,13 +1,14 @@
 ﻿@using Radzen.Blazor.Rendering
 @inherits RadzenChartComponentBase
 @implements IChartSeriesOverlay
+@implements IDisposable
 
 @code {
     IChartSeries series;
 
     [CascadingParameter]
-    protected IChartSeries Series 
-    { 
+    protected IChartSeries Series
+    {
         get
         {
             return series;
@@ -33,7 +34,7 @@
                 {
                     builder.AddContent(1,
                             @<g>
-                                <Text @key="@($"{label.Position}-{Chart.Series.IndexOf(series)}")" 
+                                <Text @key="@($"{label.Position}-{Chart.Series.IndexOf(series)}")"
                                     Value="@label.Text" Position="@label.Position" TextAnchor="@label.TextAnchor" class="rz-series-data-label" />
                             </g>
                     );
@@ -47,7 +48,7 @@
     {
         return parameters.DidParameterChange(nameof(Visible), Visible);
     }
-    
+
     public bool Contains(double mouseX, double mouseY, int tolerance)
     {
         return false;
@@ -57,4 +58,6 @@
     {
         return null;
     }
+
+    public void Dispose() => series?.Overlays.Remove(this);
 }

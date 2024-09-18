@@ -1,6 +1,7 @@
 ﻿@using Radzen.Blazor.Rendering
 @inherits RadzenGridLines
 @implements IChartSeriesOverlay
+@implements IDisposable
 
 @code {
     public RadzenSeriesTrendLine()
@@ -76,4 +77,6 @@
     {
         return null;
     }
+
+    public void Dispose() => series?.Overlays.Remove(this);
 }
