@@ -81,7 +81,7 @@
             @for (var day = 0; day < 7; day ++)
             {
                 var dayOfWeek = StartDate.AddDays(days++);
-                <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
+                <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
                     <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")">
                         @dayOfWeek.Day
                     </div>
