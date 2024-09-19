@@ -36,7 +36,7 @@
                             {
                                 <div class="rz-group-header-item">
                                     <span class="rz-group-header-item-title">@gd.GetTitle()</span>
-                                    <a id="@(GetId() + "rg")" aria-label="@RemoveGroupArialLabel" @onclick:preventDefault="true" @onclick=@(args => RemoveGroupAsync(gd)) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                                    <a id="@(GetId() + "rg")" aria-label="@RemoveGroupAriaLabel" @onclick:preventDefault="true" @onclick=@(args => RemoveGroupAsync(gd)) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
                                         <span class="rzi rzi-times"></span>
                                     </a>
                                 </div>
@@ -53,7 +53,7 @@
                 {
                     <div class="rz-column-picker">
                         <RadzenDropDown SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
-                            MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectVisibleColumnsArialLabel }})"
+                            MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectVisibleColumnsAriaLabel }})"
                             SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
                             @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                             Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
@@ -271,7 +271,7 @@
                                                                                 </div>
                                                                             </div>
 
-                                                                            <RadzenDatePicker TValue="@object" AllowInput=@(AllowFilterDateInput) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", column.Title + FilterValueArialLabel  + column.GetFilterValue() }})"
+                                                                            <RadzenDatePicker TValue="@object" AllowInput=@(AllowFilterDateInput) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", column.Title + FilterValueAriaLabel  + column.GetFilterValue() }})"
                                                                   ShowTime="@column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
                                                                   Value="@column.GetFilterValue()" Change="@(args => { column.SetFilterValue(PropertyAccess.IsDateOnly(column.FilterPropertyType) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value); SaveSettings(); })" />
 
@@ -287,7 +287,7 @@
                                                             else
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
-                                                                <RadzenDatePicker Disabled=@(!column.CanSetFilterValue()) TValue="@object" Style="width:100%" AllowInput=@(AllowFilterDateInput) AllowClear="true" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", column.Title + FilterValueArialLabel  + column.GetFilterValue() }})"
+                                                                <RadzenDatePicker Disabled=@(!column.CanSetFilterValue()) TValue="@object" Style="width:100%" AllowInput=@(AllowFilterDateInput) AllowClear="true" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", column.Title + FilterValueAriaLabel  + column.GetFilterValue() }})"
                                                       ShowTime="false" ShowTimeOkButton="false" DateFormat="@getFilterDateFormat(column)"
                                                       Value="@column.GetFilterValue()" Change="@(args => { if(!args.HasValue) { InvokeAsync(() => ClearFilter(column, true)); } else {column.SetFilterValue(PropertyAccess.IsDateOnly(column.FilterPropertyType) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value); InvokeAsync(() => ApplyFilter(column, true));} })" />
                                                             }
@@ -319,7 +319,7 @@
                                                             {
                                                                 <RadzenDataGridFilterMenu Grid="@this" Column="@column" />
                                                             }
-                                                            <input autocomplete="off" aria-label=@(column.Title + FilterValueArialLabel + column.GetFilterValue()) disabled=@(!column.CanSetFilterValue()) id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
+                                                            <input autocomplete="off" aria-label=@(column.Title + FilterValueAriaLabel + column.GetFilterValue()) disabled=@(!column.CanSetFilterValue()) id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
                                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                                             {
                                                                 <i @onclick="@((args) => ClearFilter(column))" class="rzi rz-cell-filter-clear" style="position:absolute;inset-inline-end:10px;">close</i>
