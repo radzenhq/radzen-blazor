@@ -978,7 +978,7 @@ namespace Radzen
         {
             get
             {
-                return _size != default(long) ? _size : source.Size;
+                return _size != default(long) ? _size : source != null ? source.Size : 0;
             }
             set
             {
