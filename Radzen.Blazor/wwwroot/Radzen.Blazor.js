@@ -59,6 +59,12 @@ window.Radzen = {
               return formatted;
           }
 
+          if (window.safari !== undefined) {
+              el.onblur = function (e) {
+                  el.dispatchEvent(new Event('change'));
+              };
+          }
+
           var start = el.selectionStart != el.value.length ? el.selectionStart : -1;
           var end = el.selectionEnd != el.value.length ? el.selectionEnd : -1;
 
