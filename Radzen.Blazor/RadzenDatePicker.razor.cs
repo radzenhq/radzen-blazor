@@ -1183,8 +1183,11 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = false;
 
-                await ClosePopup();
-                await FocusAsync();
+                if (!Inline)
+                {
+                    await ClosePopup();
+                    await FocusAsync();
+                }
             }
             else if (key == "Tab")
             {
@@ -1202,7 +1205,7 @@ namespace Radzen.Blazor
         async Task OnPopupKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
-            if(key == "Escape")
+            if(key == "Escape" && !Inline)
             {
                 preventKeyPress = false;
 
@@ -1239,8 +1242,11 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = false;
 
-                await ClosePopup();
-                await FocusAsync();
+                if (!Inline)
+                {
+                    await ClosePopup();
+                    await FocusAsync();
+                }
             }
             else
             {
