@@ -516,6 +516,8 @@ namespace Radzen.Blazor
                 {
                     await UpdateValueWithStep(false);
                 }
+
+                preventKeyPress = false;
             }
             else
             {
