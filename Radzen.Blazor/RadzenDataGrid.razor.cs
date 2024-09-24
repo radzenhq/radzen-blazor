@@ -2194,7 +2194,7 @@ namespace Radzen.Blazor
 
         internal string ExpandedGroupItemStyle(RadzenDataGridGroupRow<TItem> item, bool? expandedOnLoad)
         {
-            return collapsedGroupItems.Keys.Contains(item) || expandedOnLoad == false ? "rz-row-toggler rzi-grid-sort rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort rzi-chevron-circle-down";
+            return collapsedGroupItems.Keys.Contains(item) || expandedOnLoad == false ? "notranslate rz-row-toggler rzi-grid-sort rzi-chevron-circle-right" : "rz-row-toggler rzi-grid-sort rzi-chevron-circle-down";
         }
 
         internal bool IsGroupItemExpanded(RadzenDataGridGroupRow<TItem> item)
@@ -2266,7 +2266,7 @@ namespace Radzen.Blazor
 
         internal string ExpandedItemStyle(TItem item)
         {
-            return expandedItems.Keys.Any(i => ItemEquals(i, item)) ? "rz-row-toggler rzi-chevron-circle-down" : "rz-row-toggler rzi-chevron-circle-right";
+            return expandedItems.Keys.Any(i => ItemEquals(i, item)) ? "notranslate rz-row-toggler rzi-chevron-circle-down" : "rz-row-toggler rzi-chevron-circle-right";
         }
 
         internal Dictionary<TItem, bool> selectedItems = new Dictionary<TItem, bool>();

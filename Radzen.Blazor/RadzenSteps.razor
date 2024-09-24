@@ -62,11 +62,11 @@
         <a id="@(GetId() + "prev")" title="@PreviousTitle" arial-label="@PreviousAriaLabel" tabindex="@(IsFirstVisibleStep() ? -1 : 0)"
            class='@($"rz-steps-prev {(IsFirstVisibleStep() ?  "rz-state-disabled" : "")}")'
                    @onkeypress="@(args => OnKeyPress(args, PrevStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
-           @onclick="@PrevStep" @onclick:preventDefault="true"><span class="rzi"></span>@PreviousText</a>
+           @onclick="@PrevStep" @onclick:preventDefault="true"><span class="notranslate rzi"></span>@PreviousText</a>
         <a id="@(GetId() + "next")" title="@NextTitle" arial-label="@NextAriaLabel" tabindex="@(IsLastVisibleStep() ? -1 : 0)"
            class='@($"rz-steps-next {(IsLastVisibleStep() ?  "rz-state-disabled" : "")}")' 
                    @onkeypress="@(args => OnKeyPress(args, NextStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
-           @onclick="@NextStep" @onclick:preventDefault="true">@NextText<span class="rzi"></span></a>
+           @onclick="@NextStep" @onclick:preventDefault="true">@NextText<span class="notranslate rzi"></span></a>
     </div>
     }
 </div>

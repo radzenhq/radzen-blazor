@@ -5,11 +5,11 @@
     <NavLink style="@Style" href="@Path" @attributes="Attributes" class="@GetCssClass()" target="@Target" id="@GetId()" Match="@Match">
         @if (!string.IsNullOrEmpty(Icon))
         {
-            <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
         }
         @if (!string.IsNullOrEmpty(Image))
         {
-            <img class="rzi" src="@Image" alt="@ImageAlternateText" />
+            <img class="notranslate rzi" src="@Image" alt="@ImageAlternateText" />
         }
         <span @ref="@Element" class="rz-link-text">@if (ChildContent != null) {@ChildContent} else {@Text}</span>
     </NavLink>

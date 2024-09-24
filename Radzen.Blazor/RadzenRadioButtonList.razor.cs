@@ -29,7 +29,7 @@ namespace Radzen.Blazor
                                                                             .AddDisabled(Disabled || item.Disabled);
 
         ClassList IconClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
-                                                                            .Add("rzi rzi-circle-on", IsSelected(item));
+                                                                            .Add("notranslate rzi rzi-circle-on", IsSelected(item));
         /// <summary>
         /// Gets or sets the value property.
         /// </summary>

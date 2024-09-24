@@ -108,7 +108,7 @@
         }
 
         <div class="rz-dropdown-trigger  rz-corner-right">
-            <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>
+            <span class="notranslate rz-dropdown-trigger-icon rzi rzi-chevron-down"></span>
         </div>
 
         <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
@@ -127,13 +127,13 @@
                         @if (ShowSearch)
                         {
                             <button tabindex="0" class="rz-button rz-button-md rz-button-icon-only rz-primary" type="button" title="@SearchTextPlaceholder" @onclick="@((args) => OnFilter(new ChangeEventArgs()))">
-                                <i class="rz-button-icon-left rzi">search</i>
+                                <i class="notranslate rz-button-icon-left rzi">search</i>
                             </button>
                         }
                         @if (ShowAdd)
                         {
                             <button tabindex="0" class="rz-button rz-button-md rz-button-icon-only rz-primary" style="margin-left: 5px" type="button" title="@AddAriaLabel" @onclick="@OnAddClick">
-                                <i class="rz-button-icon-left rzi">add</i>
+                                <i class="notranslate rz-button-icon-left rzi">add</i>
                             </button>
                         }
                     </div>
@@ -189,7 +189,7 @@
 
         @if (AllowClear && (!Multiple && HasValue || Multiple && (selectedItems.Count > 0 || SelectedValue is IEnumerable)))
         {
-            <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
+            <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
         }
     </div>
 }

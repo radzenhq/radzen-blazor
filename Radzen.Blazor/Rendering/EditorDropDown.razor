@@ -11,7 +11,7 @@
             @Placeholder
         }
     </div>
-    <button @onclick:preventDefault tabindex="-1" class="rz-html-editor-dropdown-trigger" disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))><i class="rzi" /></button>
+    <button @onclick:preventDefault tabindex="-1" class="rz-html-editor-dropdown-trigger" disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))><i class="notranslate rzi" /></button>
     <Popup @ref=Popup class="rz-html-editor-dropdown-items" Style=@PopupStyle PreventDefault=true>
         <CascadingValue Value=@this>
             @ChildContent

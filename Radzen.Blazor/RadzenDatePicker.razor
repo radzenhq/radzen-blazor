@@ -24,7 +24,7 @@
             }
             @if (AllowClear && HasValue)
             {
-                <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
+                <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
             }
         }
 
@@ -34,10 +34,10 @@
                     {
                         <div class="rz-calendar-header">
                             <a id="@(GetId() + "pm")" tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
-                                <span class="rzi rz-calendar-prev-icon"></span>
+                                <span class="notranslate rzi rz-calendar-prev-icon"></span>
                             </a>
                             <a id="@(GetId() + "nm")" tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
-                                <span class="rzi rz-calendar-next-icon"></span>
+                                <span class="notranslate rzi rz-calendar-next-icon"></span>
                             </a>
                             <div class="rz-calendar-title">
                                 <RadzenDropDown @ref="monthDropDown" class="rz-calendar-month-dropdown" TabIndex="@TabIndex"
@@ -135,11 +135,11 @@
                         {
                             <div class="rz-ampm-picker">
                                 <a id="@(GetId() + "ampmup")" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
-                                    <span class="rzi rzi-chevron-up"></span>
+                                    <span class="notranslate rzi rzi-chevron-up"></span>
                                 </a>
                                 <span>@CurrentDate.ToString("tt")</span>
                                 <a id="@(GetId() + "ampmdown")" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
-                                    <span class="rzi rzi-chevron-down"></span>
+                                    <span class="notranslate rzi rzi-chevron-down"></span>
                                 </a>
                             </div>
                         }

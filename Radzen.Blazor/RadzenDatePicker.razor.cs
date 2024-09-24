@@ -697,7 +697,7 @@ namespace Radzen.Blazor
 
         private string ButtonClasses
         {
-            get => $"rz-button-icon-left rzi rzi-{(TimeOnly ? "time" : "calendar")}";
+            get => $"notranslate rz-button-icon-left rzi rzi-{(TimeOnly ? "time" : "calendar")}";
         }
 
         /// <summary>

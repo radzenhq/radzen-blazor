@@ -24,7 +24,7 @@ namespace Radzen.Blazor
         ClassList ContentClassList => ClassList.Create("rz-treenode-content")
                                                .Add("rz-treenode-content-selected", selected)
                                                .Add("rz-state-focused", Tree.IsFocused(this));
-        ClassList IconClassList => ClassList.Create("rz-tree-toggler rzi")
+        ClassList IconClassList => ClassList.Create("notranslate rz-tree-toggler rzi")
                                                .Add("rzi-caret-down", clientExpanded)
                                                .Add("rzi-caret-right", !clientExpanded);
         /// <summary>

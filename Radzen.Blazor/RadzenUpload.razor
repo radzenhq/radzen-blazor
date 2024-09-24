@@ -12,7 +12,7 @@
             @RenderInput()
             @if (!string.IsNullOrEmpty(Icon))
             {
-            <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
             }
             <span class="rz-button-text">@ChooseText</span>
         </span>

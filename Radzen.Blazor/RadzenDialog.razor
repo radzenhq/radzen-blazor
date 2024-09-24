@@ -23,7 +23,7 @@
                 @if (sideDialogOptions.ShowClose)
                 {
                     <a id="@(sideDialogOptions.GetHashCode() + "cl")" aria-label="@CloseSideDialogAriaLabel" @onclick:preventDefault="true" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service.CloseSide(null))" role="button" tabindex="@sideDialogOptions.CloseTabIndex">
-                        <span class="rzi rzi-times"></span>
+                        <span class="notranslate rzi rzi-times"></span>
                     </a>
                 }
             </div>

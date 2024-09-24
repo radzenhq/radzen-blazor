@@ -9,11 +9,11 @@
                 <NavLink tabindex="-1" target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {
-                        <img class="rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
+                        <img class="notranslate rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
                     }
                     <span class="rz-navigation-item-text">@Text</span>
                 </NavLink>
@@ -23,11 +23,11 @@
                 <div class="rz-navigation-item-link" >
                     @if (!string.IsNullOrEmpty(Icon))
                     {
-                        <i class="rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
+                        <i class="notranslate rzi rz-navigation-item-icon">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {
-                        <img class="rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
+                        <img class="notranslate rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
                     }
                     <span class="rz-navigation-item-text">@Text</span>
                 </div>

@@ -12,7 +12,7 @@ Disabled = itemArgs.Disabled;
     {
         <div class="rz-chkbox ">
             <div class="@(ListBox.IsSelected(Item) ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
-                <span class="@(ListBox.IsSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon ")"></span>
+                <span class="@(ListBox.IsSelected(Item) ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon ")"></span>
             </div>
         </div>
     }

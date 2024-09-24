@@ -7,13 +7,13 @@
    <div aria-live="polite" class="rz-notification-item-wrapper @classes.Item1" style="@(Message.Click != null || Message.CloseOnClick ? "cursor: pointer;" : "") @Style">
       <div class="rz-notification-item">
          <div class="rz-notification-message-wrapper">
-            <span class="rzi rz-notification-icon @classes.Item2" @onclick="NotificationClicked"></span>
+            <span class="notranslate rzi rz-notification-icon @classes.Item2" @onclick="NotificationClicked"></span>
             <div class="rz-notification-message" @onclick="NotificationClicked">
                <div class="rz-notification-title">@if (Message.SummaryContent != null) { @Message.SummaryContent(Service); } else { @((MarkupString)Message.Summary); }</div>
                <div class="rz-notification-content">@if (Message.DetailContent != null) { @Message.DetailContent(Service); } else { @((MarkupString)Message.Detail); }</div>
             </div>
          </div>
-         <div class="rzi rz-notification-close" @onclick="@Close"></div>
+         <div class="notranslate rzi rz-notification-close" @onclick="@Close"></div>
       </div>
    </div>
 }
@@ -22,19 +22,19 @@
    {
       if (Message.Severity == NotificationSeverity.Error)
       {
-         return new Tuple<string, string>("rz-notification-error", "rzi-times");
+         return new Tuple<string, string>("rz-notification-error", "notranslate rzi-times");
       }
       else if (Message.Severity == NotificationSeverity.Info)
       {
-         return new Tuple<string, string>("rz-notification-info", "rzi-info-circle");
+         return new Tuple<string, string>("rz-notification-info", "notranslate rzi-info-circle");
       }
       else if (Message.Severity == NotificationSeverity.Success)
       {
-         return new Tuple<string, string>("rz-notification-success", "rzi-check");
+         return new Tuple<string, string>("rz-notification-success", "notranslate rzi-check");
       }
       else if (Message.Severity == NotificationSeverity.Warning)
       {
-         return new Tuple<string, string>("rz-notification-warn", "rzi-exclamation-triangle");
+         return new Tuple<string, string>("rz-notification-warn", "notranslate rzi-exclamation-triangle");
       }
 
       return new Tuple<string, string>("", "");

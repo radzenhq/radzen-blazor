@@ -9,7 +9,7 @@
             <a id="@(GetId() + "cl")" aria-label="@ClearAriaLabel" @onclick="@(args => SetValue(0))" @onclick:preventDefault="true" class="rz-rating-cancel" 
                 tabindex="@(Disabled ? "-1" : $"{TabIndex}")" 
                 @onkeypress="@(args => OnKeyPress(args, SetValue(0)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
-                <span class="rz-rating-icon rzi rzi-ban"></span>
+                <span class="notranslate rz-rating-icon rzi rzi-ban"></span>
             </a>
         }
         @foreach (var index in Enumerable.Range(1, Stars))
@@ -17,7 +17,7 @@
             <a id="@(GetId() + index.ToString() + "r")" aria-label="@RateAriaLabel" @onclick="@(args => SetValue(index))" @onclick:preventDefault="true" 
                 tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                @onkeypress="@(args => OnKeyPress(args, SetValue(index)))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
-                <span class="rz-rating-icon rzi @(index <= Value ? "rzi-star": "rzi-star-o")"></span>
+                <span class="notranslate rz-rating-icon rzi @(index <= Value ? "rzi-star": "rzi-star-o")"></span>
             </a>
         }
     </div>

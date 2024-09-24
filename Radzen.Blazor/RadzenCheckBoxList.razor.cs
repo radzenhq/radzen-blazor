@@ -30,7 +30,7 @@ namespace Radzen.Blazor
                                                                             .AddDisabled(Disabled || item.Disabled);
 
         ClassList IconClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
-                                                                            .Add("rzi rzi-check", IsSelected(item));
+                                                                            .Add("notranslate rzi rzi-check", IsSelected(item));
 
         /// <summary>
         /// Gets or sets the value property.

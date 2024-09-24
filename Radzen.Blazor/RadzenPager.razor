@@ -9,11 +9,11 @@
         <span class="rz-pager-summary">@((MarkupString)string.Format(PagingSummaryFormat, CurrentPage + 1, numberOfPages, Count))</span>        
         }
         <a d="@(GetId() + "fp")" class="rz-pager-first rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -2 ? "rz-state-focused": "")" @onclick:preventDefault="true" @onclick="@(() => OnFirstPageClick())" aria-label="@FirstPageAriaLabel" role="button" title="@FirstPageTitle" disabled="@(CurrentPage <= 0)">
-            <span class="rz-pager-icon rzi rzi-step-backward"></span>
+            <span class="notranslate rz-pager-icon rzi rzi-step-backward"></span>
         </a>
 
             <a id="@(GetId() + "pp")" class="rz-pager-prev rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -1 ? "rz-state-focused": "")" @onclick:preventDefault="true" @onclick="@(() => OnPrevPageClick())" aria-label="@PrevPageAriaLabel" role="button" title="@PrevPageTitle" disabled="@(CurrentPage <= 0)">
-            <span class="rz-pager-icon rzi rzi-caret-left"></span>
+            <span class="notranslate rz-pager-icon rzi rzi-caret-left"></span>
             @if (PrevPageLabel != null)
             {
                 <span class="rz-pager-label">@PrevPageLabel</span>
@@ -32,11 +32,11 @@
             {
                 <span class="rz-pager-label">@NextPageLabel</span>
             }
-            <span class="rz-pager-icon rzi rzi-caret-right"></span>
+            <span class="notranslate rz-pager-icon rzi rzi-caret-right"></span>
         </a>
 
         <a id="@(GetId() + "lp")" class="rz-pager-last rz-pager-element  @((CurrentPage != numberOfPages - 1) ? "": "rz-state-disabled") @(focusedIndex == Math.Min(endPage + 1, PageNumbersCount) + 1 ? "rz-state-focused": "")" @onclick:preventDefault="true" @onclick="@(() => OnLastPageClick(endPage))" aria-label="@LastPageAriaLabel" role="button" title="@LastPageTitle" disabled="@(CurrentPage >= (numberOfPages - 1))">
-            <span class="rz-pager-icon rzi rzi-step-forward"></span>
+            <span class="notranslate rz-pager-icon rzi rzi-step-forward"></span>
         </a>
 
         @if(PageSizeOptions != null && PageSizeOptions.Any())

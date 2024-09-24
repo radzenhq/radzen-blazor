@@ -3,7 +3,7 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
  <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()" onclick="@($"Radzen.togglePopup(this.parentNode, '{Grid.PopupID}{Column.GetFilterProperty()}')")">
-     <i class="rzi">@Grid.FilterIcon</i>
+     <i class="notranslate rzi">@Grid.FilterIcon</i>
     @if (Column.GetFilterOperator() == FilterOperator.DoesNotContain)
     {
         <s>@Column.GetFilterOperatorSymbol(Column.GetFilterOperator())</s>

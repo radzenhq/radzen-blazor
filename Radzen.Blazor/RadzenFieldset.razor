@@ -14,16 +14,16 @@
                        tabindex="0" @onkeypress="@(args => OnKeyPress(args, Toggle(new EventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
                 @if (collapsed)
                 {
-                    <span class="rz-fieldset-toggler rzi rzi-w rzi-plus"></span>
+                    <span class="notranslate rz-fieldset-toggler rzi rzi-w rzi-plus"></span>
                 }
                 else
                 {
-                    <span class="rz-fieldset-toggler rzi rzi-w rzi-minus"></span>
+                    <span class="notranslate rz-fieldset-toggler rzi rzi-w rzi-minus"></span>
                 }
 
                 @if (!string.IsNullOrEmpty(Icon))
                 {
-                    <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i><span>@Text</span>
+                    <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i><span>@Text</span>
                 }
                 else
                 {
@@ -36,7 +36,7 @@
             {
                 @if (!string.IsNullOrEmpty(Icon))
                 {
-                    <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i><span>@Text</span>
+                    <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i><span>@Text</span>
                 }
                 else
                 {

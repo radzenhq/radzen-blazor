@@ -14,8 +14,8 @@ Disabled = itemArgs.Disabled;
         @onclick:preventDefault @onclick="args=>SelectItem(args,true)" 
         @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
         <div class="rz-chkbox ">
-            <div class="@(DropDown.IsSelected(Item) ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
-                <span class="@(DropDown.IsSelected(Item) ? "rz-chkbox-icon  rzi rzi-check" : "rz-chkbox-icon")"></span>
+            <div class="@(DropDown.IsSelected(Item) ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
+                <span class="@(DropDown.IsSelected(Item) ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
             </div>
         </div>
         <span class="rz-multiselect-item-content">

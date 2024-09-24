@@ -24,15 +24,15 @@
                id="@($"rz-accordiontab-{items.IndexOf(item)}")" aria-controls="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-expanded="true">
                 @if (IsSelected(i, item))
                 {
-                    <span class="rz-accordion-toggle-icon rzi rzi-chevron-down"></span>
+                    <span class="notranslate rz-accordion-toggle-icon rzi rzi-chevron-down"></span>
                 }
                 else
                 {
-                    <span class="rz-accordion-toggle-icon rzi rzi-chevron-right"></span>
+                    <span class="notranslate rz-accordion-toggle-icon rzi rzi-chevron-right"></span>
                 }
                 @if (!string.IsNullOrEmpty(item.Icon))
                 {
-            <i class="rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@((MarkupString)item.Icon)</i>
+            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@((MarkupString)item.Icon)</i>
                 }
                 @if (item.Template != null)
                 {

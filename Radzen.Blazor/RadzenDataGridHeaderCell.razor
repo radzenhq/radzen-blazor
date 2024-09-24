@@ -31,7 +31,7 @@
         {
             @if (Column.GetSortOrder() == SortOrder.Ascending)
             {
-                <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
+                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
                 @if(Grid.ShowMultiColumnSortingIndex)
                 {
                     <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" IsPill=true Text="@Column.getSortIndexAsString()" />
@@ -39,7 +39,7 @@
             }
             else if (Column.GetSortOrder() == SortOrder.Descending)
             {
-                <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
+                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
                 @if(Grid.ShowMultiColumnSortingIndex)
                 {
                             <RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" IsPill=true Text="@Column.getSortIndexAsString()" />
@@ -47,7 +47,7 @@
             }
             else
             {
-                <span class="rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
+                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
             }
         }
         </span>
@@ -380,7 +380,7 @@ else
     private string getFilterIconCss(RadzenDataGridColumn<TItem> column)
     {
         var additionalStyle = Column.HasActiveFilter() ? "rz-grid-filter-active" : "";
-        return $"rzi rz-grid-filter-icon {additionalStyle}";
+        return $"notranslate rzi rz-grid-filter-icon {additionalStyle}";
     }
 
     private Task OnSortKeyPressed(KeyboardEventArgs args)
