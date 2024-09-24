@@ -1138,21 +1138,22 @@ namespace Radzen.Blazor
         /// </summary>
         public void ClearFilters()
         {
-            ClearFilterValues();
-            SetFilterValue(null);
-            SetFilterValue(null, false);
-            SetFilterOperator(null);
-            SetSecondFilterOperator(null);
-
-            FilterValue = null;
-            SecondFilterValue = null;
-            FilterOperator = FilterOperator == FilterOperator.Custom
+            var fo = FilterOperator == FilterOperator.Custom
                 ? FilterOperator.Custom
                 : typeof(System.Collections.IEnumerable).IsAssignableFrom(FilterPropertyType)
                     ? !string.IsNullOrEmpty(FilterProperty) && FilterProperty != Property ? FilterOperator.In : FilterOperator.Contains
                     : default(FilterOperator);
-            SecondFilterOperator = default(FilterOperator);
+
+            SetFilterOperator(fo);
+            SetSecondFilterOperator(null);
+
+            filterValue = null;
+            secondFilterValue = null;
+
+            ClearFilterValues();
+
             LogicalFilterOperator = default(LogicalFilterOperator);
+
         }
 
         FilterOperator? _filterOperator;
