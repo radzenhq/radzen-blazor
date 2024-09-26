@@ -275,7 +275,7 @@ $tabs-transition: var(--rz-transition-all) !default;
   }
 }
 
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+@media screen and (forced-colors: active), (forced-colors: none) {
   .rz-tabview-panels {
     flex: auto;
   }
