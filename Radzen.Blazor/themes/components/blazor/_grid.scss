@@ -1042,6 +1042,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-data-grid-data {
   overflow: auto;
   flex: 1;
+  outline: var(--rz-outline-normal);
   box-shadow: var(--rz-grid-data-border-shadow);
 }
 
