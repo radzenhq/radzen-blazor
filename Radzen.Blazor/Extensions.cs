@@ -35,7 +35,8 @@ namespace Radzen.Blazor
         /// </summary>
         public static IEnumerable<object> EnumAsKeyValuePair(Type enumType, Func<string, string> translationFunction = null)
         {
-            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new { Value = Convert.ToInt32(val), Text = val.GetDisplayDescription(translationFunction) });
+            Type underlyingType = Enum.GetUnderlyingType(enumType);
+            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new { Value = Convert.ChangeType(val, underlyingType), Text = val.GetDisplayDescription(translationFunction) });
         }
 
         /// <summary>
