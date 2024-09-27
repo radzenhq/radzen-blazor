@@ -3104,13 +3104,7 @@ namespace Radzen.Blazor
                 var functionName = $"Radzen['{getColumnUniqueId(indexOfColumnToReoder.Value)}end']";
                 await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
 
-                RadzenDataGridColumn<TItem> column;
-
-                column = columns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
-
-                //may be its a child column
-                if (column == null)
-                    column = allColumns.Where(c => c.GetVisible()).ElementAtOrDefault(indexOfColumnToReoder.Value);
+                var column = allColumns.ElementAtOrDefault(indexOfColumnToReoder.Value);
 
                 if (column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
                 {
