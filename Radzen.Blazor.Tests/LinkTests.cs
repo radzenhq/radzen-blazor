@@ -47,7 +47,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
 
-            Assert.Contains(@$"<i class=""rzi"">{icon}</i>", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rzi"">{icon}</i>", component.Markup);
         }
 
         [Fact]

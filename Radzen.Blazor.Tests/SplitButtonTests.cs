@@ -45,7 +45,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
 
-            Assert.Contains(@$"<i class=""rz-button-icon-left rzi"">{icon}</i>", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rz-button-icon-left rzi"">{icon}</i>", component.Markup);
         }
 
         [Fact]
@@ -63,7 +63,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Icon, icon);
             });
 
-            Assert.Contains(@$"<i class=""rz-button-icon-left rzi"">{icon}</i>", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rz-button-icon-left rzi"">{icon}</i>", component.Markup);
             Assert.Contains(@$"<span class=""rz-button-text"">{text}</span>", component.Markup);
         }
 
@@ -78,7 +78,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Image, image));
 
-            Assert.Contains(@$"<img class=""rz-button-icon-left rzi"" src=""{image}"" alt=""image"" />", component.Markup);
+            Assert.Contains(@$"<img class=""notranslate rz-button-icon-left rzi"" src=""{image}"" alt=""image"" />", component.Markup);
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.ImageAlternateText, text);
             });
 
-            Assert.Contains(@$"<img class=""rz-button-icon-left rzi"" src=""{image}"" alt=""{text}"" />", component.Markup);
+            Assert.Contains(@$"<img class=""notranslate rz-button-icon-left rzi"" src=""{image}"" alt=""{text}"" />", component.Markup);
             Assert.Contains(@$"<span class=""rz-button-text"">{text}</span>", component.Markup);
         }
 
