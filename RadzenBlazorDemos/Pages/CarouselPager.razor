@@ -1,6 +1,6 @@
 ﻿<RadzenStack class="rz-p-0 rz-p-md-12">
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenCarousel @ref=carousel Auto="false" AllowPaging="false" AllowNavigation="false" Style="height:500px">
+        <RadzenCarousel @bind-SelectedIndex=@selectedIndex Auto="false" AllowPaging="false" AllowNavigation="false" Style="height:500px">
             <Items>
                 @foreach (var theme in Themes.All)
                 {
@@ -17,10 +17,10 @@
         </RadzenCarousel>
      </RadzenCard>
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenPager Count="@Themes.All.Count()" PageSize="1" PageChanged="@(args => carousel.Navigate(args.PageIndex))"/>
+        <RadzenPager Count="@Themes.All.Count()" PageSize="1" PageChanged="@(args => selectedIndex = args.PageIndex)" />
     </RadzenCard>
 </RadzenStack>
 
 @code {
-    RadzenCarousel carousel;
+    int selectedIndex;
 }

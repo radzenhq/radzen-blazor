@@ -2,6 +2,10 @@
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Selected index
+                <RadzenNumeric @bind-Value=@selectedIndex Min="0" Max="@(Themes.All.Count() - 1)" aria-label="selected index" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Interval
                 <RadzenNumeric @bind-Value=@interval aria-label="interval" />
             </RadzenStack>
@@ -24,12 +28,15 @@
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
                 <RadzenToggleButton Text="@toggleText" Click="@Toggle" />
+                <RadzenButton Text="Go to first" Click="@(args => carousel.Navigate(0))" Disabled="@(selectedIndex == 0)" />
+                <RadzenButton Text="Go to last" Click="@(args => carousel.Navigate(Themes.All.Count() - 1))" Disabled="@(selectedIndex == Themes.All.Count() - 1)" />
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenCarousel @ref=carousel @bind-SelectedIndex="@SelectedIndex" Auto="@auto" Interval="@interval" 
-            AllowPaging="@allowPaging" PagerPosition="@pagerPosition" AllowNavigation="@allowNavigation" Style="height:500px">
+        <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" 
+            AllowPaging="@allowPaging" PagerPosition="@pagerPosition" AllowNavigation="@allowNavigation" Style="height:500px"
+                Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
             <Items>
                 @foreach (var theme in Themes.All)
                 {
@@ -78,21 +85,5 @@
 
     EventConsole console;
 
-    int _selectedIndex;
-    public int SelectedIndex
-    {
-        get
-        {
-            return _selectedIndex;
-        }
-        set
-        {
-            if (_selectedIndex != value)
-            {
-                _selectedIndex = value;
-
-                console.Log($"SelectedIndex changed to {value}");
-            }
-        }
-    }
+    int selectedIndex;
 }

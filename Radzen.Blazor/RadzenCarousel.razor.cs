@@ -143,9 +143,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            var shouldUpdate = false;
             if (parameters.DidParameterChange(nameof(SelectedIndex), SelectedIndex))
             {
                 selectedIndex = parameters.GetValueOrDefault<int>(nameof(SelectedIndex));
+                shouldUpdate = true;
             }
 
             if (parameters.DidParameterChange(nameof(Auto), Auto) ||
@@ -162,6 +164,11 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
+
+            if (shouldUpdate)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
+            }
         }
 
         /// <summary>
