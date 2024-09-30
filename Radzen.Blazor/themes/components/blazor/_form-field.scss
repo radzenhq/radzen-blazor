@@ -57,6 +57,10 @@ $form-field-helper-padding: 0 0.5rem !default;
 
         flex: 1;
     }
+    
+    & > input {
+        width: 100%;
+    }
 
     .rz-form-field-start,
     .rz-form-field-end {

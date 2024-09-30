@@ -46,7 +46,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, value));
 
-            Assert.Contains(@$"<i class=""rzi"">{value}</i>", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rzi"">{value}</i>", component.Markup);
         }
 
         [Fact]
@@ -104,11 +104,11 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AllowCollapse, true));
 
-            Assert.Contains(@"<span class=""rz-fieldset-toggler rzi rzi-w rzi-minus""></span>", component.Markup);
+            Assert.Contains(@"<span class=""notranslate rz-fieldset-toggler rzi rzi-w rzi-minus""></span>", component.Markup);
 
             component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.Collapsed, true));
 
-            Assert.Contains(@"<span class=""rz-fieldset-toggler rzi rzi-w rzi-plus""></span>", component.Markup);
+            Assert.Contains(@"<span class=""notranslate rz-fieldset-toggler rzi rzi-w rzi-plus""></span>", component.Markup);
         }
 
         [Fact]

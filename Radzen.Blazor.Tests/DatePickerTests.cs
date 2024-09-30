@@ -155,7 +155,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add<bool>(p => p.AllowClear, true);
             });
 
-            Assert.Contains(@$"<i class=""rz-dropdown-clear-icon rzi rzi-times""", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rz-dropdown-clear-icon rzi rzi-times""", component.Markup);
         }
 
         [Fact]
