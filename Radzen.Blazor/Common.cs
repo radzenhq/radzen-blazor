@@ -3272,7 +3272,10 @@ namespace Radzen
                 var part = property.Split('.').FirstOrDefault();
                 return GetPropertyType(GetPropertyTypeIncludeInterface(type, part), property.ReplaceFirst($"{part}.", ""));
             }
-
+            if (property.Contains("["))
+            {
+                return DynamicExpressionParser.ParseLambda(type, null, property).ReturnType;
+            }
             return GetPropertyTypeIncludeInterface(type, property);
         }
 

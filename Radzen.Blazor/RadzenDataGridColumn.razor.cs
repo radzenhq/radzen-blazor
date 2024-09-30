@@ -18,6 +18,12 @@ namespace Radzen.Blazor
     public partial class RadzenDataGridColumn<TItem> : ComponentBase, IDisposable
     {
         /// <summary>
+        /// Added by Dave
+        /// </summary>
+        [Parameter]
+        public RenderFragment<Group> GroupHeaderTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the grid.
         /// </summary>
         /// <value>The grid.</value>
