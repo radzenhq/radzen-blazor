@@ -152,13 +152,14 @@ namespace Radzen
                     }
                     else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
                     {
+                        Type enumType = Enum.GetUnderlyingType(column.FilterPropertyType);
                         if (v != null)
                         {
-                            value = ((int)v).ToString();
+                            value = Convert.ChangeType(v, enumType).ToString();
                         }
                         if (sv != null)
                         {
-                            secondValue = ((int)sv).ToString();
+                            secondValue = Convert.ChangeType(sv, enumType).ToString();
                         }
                     }
                     else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
