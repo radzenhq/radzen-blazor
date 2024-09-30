@@ -1052,7 +1052,7 @@ namespace Radzen.Blazor
 
             if (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType)))
             {
-                Type enumType = Enum.GetUnderlyingType(FilterPropertyType);
+                Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(FilterPropertyType) ?? FilterPropertyType);
                 value = value is not null ? Convert.ChangeType(value, enumType) : null;
             }
 

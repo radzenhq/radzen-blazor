@@ -152,7 +152,7 @@ namespace Radzen
                     }
                     else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
                     {
-                        Type enumType = Enum.GetUnderlyingType(column.FilterPropertyType);
+                        Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(column.FilterPropertyType) ?? column.FilterPropertyType);
                         if (v != null)
                         {
                             value = Convert.ChangeType(v, enumType).ToString();
