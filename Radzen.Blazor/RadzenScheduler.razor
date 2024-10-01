@@ -20,10 +20,17 @@
         </div>
         <div class="rz-scheduler-nav-title">@SelectedView?.Title</div>
         <div class="rz-scheduler-nav-views">
-        @foreach (var view in Views)
-        {
-            <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text class="@($"{(IsSelected(view)? " rz-state-active" : "")}")" />
-        }
+            @if (NavigationTemplate != null)
+            {
+                @NavigationTemplate
+            }
+            else
+            {
+                @foreach (var view in Views)
+                {
+                    <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text class="@($"{(IsSelected(view) ? " rz-state-active" : "")}")" />
+                }
+            }
         </div>
     </div>
     @SelectedView?.Render()
