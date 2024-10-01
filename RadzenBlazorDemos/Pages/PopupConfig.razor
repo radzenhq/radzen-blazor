@@ -4,14 +4,26 @@
 @using Radzen.Blazor.Rendering
 
 @inherits DbContextPage
-@inject IJSRuntime JSRuntime
+
+<style type="text/css">
+    .my-popup {
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        height: 360px;
+        width: 600px;
+        border: var(--rz-panel-border);
+        background-color: var(--rz-panel-background-color);
+        box-shadow: var(--rz-panel-shadow);
+        border-radius: var(--rz-border-radius)
+    }
+ </style>
 
 <div class="rz-p-12 rz-text-align-center">
     <RadzenButton @ref=button Text="@(orderId != null ? "Selected order: " + orderId.ToString() : "Select order")" Click="@(args => popup.ToggleAsync(button.Element))" />
 </div>
 
-<Popup @ref=popup Lazy=true Open="@OnOpen"
-    Style="display: none; position: absolute; overflow: hidden; height: 360px; width: 600px; border: var(--rz-panel-border); background-color: var(--rz-panel-background-color); box-shadow: var(--rz-panel-shadow); border-radius: var(--rz-border-radius)">
+<Popup @ref=popup Lazy=true class="my-popup">
     <RadzenStack Orientation="Orientation.Vertical" Gap="1rem" class="rz-h-100 rz-p-4">
     <RadzenTextBox id="search" Placeholder="Type to search..." @oninput=@(args => searchString = $"{args.Value}") Value="@searchString" />
     <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" Style="flex: 1; --rz-datalist-padding: 0.5rem 0; --rz-datalist-item-margin-inline: 0; overflow:auto;">
@@ -67,10 +79,5 @@
     {
         orderId = order.OrderID; 
         await popup.CloseAsync();
-    }
-
-    async Task OnOpen()
-    {
-        await JSRuntime.InvokeVoidAsync("eval", "setTimeout(function(){ document.getElementById('search').focus(); }, 200)"); 
     }
 }

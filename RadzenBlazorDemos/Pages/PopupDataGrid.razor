@@ -1,0 +1,64 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using Radzen.Blazor.Rendering
+
+@inherits DbContextPage
+
+<style type="text/css">
+    .my-popup {
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        height: 360px;
+        width: 600px;
+        border: var(--rz-panel-border);
+        background-color: var(--rz-panel-background-color);
+        box-shadow: var(--rz-panel-shadow);
+        border-radius: var(--rz-border-radius)
+    }
+ </style>
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenTextBox @ref=textBox Value="@customerId" @oninput=@(args => customerId = value = $"{args.Value}")
+        @onclick="@(args => popup.ToggleAsync(textBox.Element))" />
+</div>
+
+<Popup @ref=popup Lazy=true AutoFocusFirstElement="false" class="my-popup">
+    <RadzenDataGrid TItem="Customer" Data="@customers" RowSelect="@RowSelect" AllowVirtualization="true" AllowSorting="true" Style="height:360px">
+        <Columns>
+            <RadzenDataGridColumn Property="CustomerID" Title="CustomerID" />
+            <RadzenDataGridColumn Property="CompanyName" Title="CompanyName" />
+            <RadzenDataGridColumn Property="ContactName" Title="ContactName" />
+            <RadzenDataGridColumn Property="City" Title="City" />
+            <RadzenDataGridColumn Property="Country" Title="Country" />
+        </Columns>
+    </RadzenDataGrid>
+</Popup>
+
+@code {
+    RadzenTextBox textBox;
+    string value = "";
+    string customerId;
+    IEnumerable<Customer> customers;
+    Popup popup;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers
+            .Where(c => c.CustomerID.ToString().Contains(value)
+                || c.CompanyName.ToLowerInvariant().Contains(value)
+                    || c.ContactName.ToLowerInvariant().Contains(value)
+                        || c.City.ToLowerInvariant().Contains(value)
+                            || c.Country.ToLowerInvariant().Contains(value));
+    }
+
+    async Task RowSelect(Customer customer)
+    {
+        value = "";
+        customerId = customer.CustomerID;
+        await popup.CloseAsync();
+    }
+}
