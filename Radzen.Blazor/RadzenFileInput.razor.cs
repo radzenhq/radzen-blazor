@@ -153,6 +153,11 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenUpload.OnChange")]
         public async System.Threading.Tasks.Task OnChange(IEnumerable<PreviewFileInfo> files)
         {
+            if(files == null || !files.Any())
+            {
+                return;
+            }
+
             var file = files.FirstOrDefault();
 
             FileSize = file.Size;
