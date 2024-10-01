@@ -24,6 +24,7 @@
         {
             <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text class="@($"{(IsSelected(view)? " rz-state-active" : "")}")" />
         }
+        @AdditionalContent 
         </div>
     </div>
     @SelectedView?.Render()

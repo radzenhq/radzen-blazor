@@ -63,6 +63,14 @@ namespace Radzen.Blazor
         /// <value>The template.</value>
         [Parameter]
         public RenderFragment<TItem> Template { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the additional content to be rendered next to the year, month, and day buttons in the scheduler.
+        /// Use this to add custom content, such as additional controls or information.
+        /// </summary>
+        /// <value>The additional content.</value>
+        [Parameter]
+        public RenderFragment AdditionalContent { get; set; }
 
         /// <summary>
         /// Gets or sets the data of RadzenScheduler. It will display an appointment for every item of the collection which is within the current view date range.
