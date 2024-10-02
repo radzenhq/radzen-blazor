@@ -2,8 +2,10 @@
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 @using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
 
 @inherits DbContextPage
+@inject IJSRuntime JSRuntime
 
 <style type="text/css">
     .my-popup {
@@ -21,11 +23,11 @@
 
 <div class="rz-p-12 rz-text-align-center">
     <RadzenTextBox @ref=textBox Value="@customerId" @oninput=@(args => customerId = value = $"{args.Value}")
-        @onclick="@(args => popup.ToggleAsync(textBox.Element))" />
+                   @onclick="@(args => popup.ToggleAsync(textBox.Element))" @onkeydown=@OnKeyDown />
 </div>
 
-<Popup @ref=popup Lazy=true AutoFocusFirstElement="false" class="my-popup">
-    <RadzenDataGrid TItem="Customer" Data="@customers" RowSelect="@RowSelect" AllowVirtualization="true" AllowSorting="true" Style="height:360px">
+<Popup @ref=popup id="popup" Lazy=true AutoFocusFirstElement="false" class="my-popup">
+    <RadzenDataGrid id="grid" TItem="Customer" Data="@customers" RowSelect="@RowSelect" AllowVirtualization="true" AllowSorting="true" Style="height:360px">
         <Columns>
             <RadzenDataGridColumn Property="CustomerID" Title="CustomerID" />
             <RadzenDataGridColumn Property="CompanyName" Title="CompanyName" />
@@ -60,5 +62,51 @@
         value = "";
         customerId = customer.CustomerID;
         await popup.CloseAsync();
+    }
+
+    int selectedIndex = -1;
+    async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        var items = customers;
+
+        var key = args.Code != null ? args.Code : args.Key;
+
+        if (!args.AltKey && (key == "ArrowDown" || key == "ArrowUp"))
+        {
+            var newSelectedIndex = Math.Clamp(selectedIndex + (key == "ArrowUp" ? -1 : 1), 0, items.Count() - 1);
+            var shouldChange = newSelectedIndex != selectedIndex;
+
+            if (shouldChange)
+            {
+                selectedIndex = newSelectedIndex;
+                await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", "grid", key, selectedIndex - 1, null);
+            }
+
+            var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", "popup");
+
+            if (shouldChange && !popupOpened)
+            {
+                customerId = items.ElementAtOrDefault(selectedIndex)?.CustomerID;
+            }
+        }
+        else if (key == "Enter" || key == "NumpadEnter")
+        {
+            var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", "popup");
+
+            if (popupOpened)
+            {
+                customerId = items.ElementAtOrDefault(selectedIndex)?.CustomerID;
+            }
+
+            await popup.ToggleAsync(textBox.Element);
+        }
+        else if (args.AltKey && key == "ArrowDown")
+        {
+            await popup.ToggleAsync(textBox.Element);
+        }
+        else if (key == "Escape" || key == "Tab")
+        {
+            await popup.CloseAsync();
+        }
     }
 }
