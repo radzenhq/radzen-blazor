@@ -693,13 +693,13 @@ window.Radzen = {
     } else if (key == 'ArrowRight') {
         while (table.nextSelectedCellIndex < rows[table.nextSelectedIndex].cells.length - 1) {
             table.nextSelectedCellIndex++;
-            if (!rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
+            if (!rows[table.nextSelectedIndex] || !rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex] || !rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
                 break;
         }
     } else if (key == 'ArrowLeft') {
         while (table.nextSelectedCellIndex > 0) {
             table.nextSelectedCellIndex--;
-            if (!rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
+            if (!rows[table.nextSelectedIndex] || !rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex] || !rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
                 break;
         }
     } else if (isVirtual && (key == 'PageDown' || key == 'End')) {
