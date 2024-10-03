@@ -708,7 +708,7 @@ window.Radzen = {
         table.nextSelectedIndex = 1;
     }
 
-    if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
+    if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && cellIndex != null && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
         var highlightedCells = rows[table.nextSelectedIndex].querySelectorAll('.rz-state-focused');
         if (highlightedCells.length) {
             for (var i = 0; i < highlightedCells.length; i++) {
