@@ -9,11 +9,12 @@
 
     void DateRender(DateRenderEventArgs args)
     {
-        if (dates.Contains(args.Date))
+        var special = dates.Select(d => d.Date).Contains(args.Date.Date);
+        if (special)
         {
             args.Attributes.Add("style", "background-color: #ff6d41; border-color: white;");
         }
 
-        args.Disabled = args.Disabled || args.Date.DayOfWeek == DayOfWeek.Sunday || args.Date.DayOfWeek == DayOfWeek.Saturday;
+        args.Disabled = special || args.Disabled || args.Date.DayOfWeek == DayOfWeek.Sunday || args.Date.DayOfWeek == DayOfWeek.Saturday;
     }
 }

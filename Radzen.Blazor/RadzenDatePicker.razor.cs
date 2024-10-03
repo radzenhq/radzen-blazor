@@ -1174,10 +1174,13 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                await SetDay(FocusedDate);
+                if (!DateAttributes(FocusedDate).Disabled)
+                {
+                    await SetDay(FocusedDate);
 
-                await ClosePopup();
-                await FocusAsync();
+                    await ClosePopup();
+                    await FocusAsync();
+                }
             }
             else if (key == "Escape")
             {
