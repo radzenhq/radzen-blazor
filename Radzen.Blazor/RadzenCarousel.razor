@@ -10,12 +10,18 @@
         <RadzenStack class="rz-carousel-pager" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
             @foreach (var item in items)
             {
-                <a @onclick="@(args => Navigate(items.IndexOf(item)))" class="rz-carousel-pager-button"></a>
+                var index = items.IndexOf(item);
+                <a @onclick="@(args => Navigate(index))" class="rz-carousel-pager-button @(index == selectedIndex ? "rz-state-active" : "")"></a>
             }
         </RadzenStack>
         }
-        <RadzenButton class="rz-carousel-prev" Icon="@PrevIcon" Text="@PrevText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
-        <RadzenButton class="rz-carousel-next" Icon="@NextIcon" Text="@NextText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
+        @if(AllowNavigation)
+        {
+        <RadzenButton class="rz-carousel-prev" Icon="@PrevIcon" Text="@PrevText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
+            Click=@(args => Navigate(selectedIndex == 0 ? items.Count - 1 : selectedIndex - 1)) />
+        <RadzenButton class="rz-carousel-next" Icon="@NextIcon" Text="@NextText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
+            Click=@(args => Navigate(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1))/>
+        }
         <div class="rz-carousel-items">
             @Items
         </div>

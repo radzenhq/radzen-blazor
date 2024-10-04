@@ -2,33 +2,7 @@
 @implements IDisposable
 @inject IJSRuntime JSRuntime
 
-<div @ref="element" class=@ClassList tabindex="0" @attributes=@Attributes>
+<div @ref="element" @attributes=@Attributes class=@ClassList tabindex="0">
     @ChildContent
-    @if (itemIndex == 0)
-    {
-        <div class="rz-carousel-snapper">
-            @RenderNavigation()
-        </div>
-    }
-    else
-    {
-        <div class="rz-carousel-snapper"></div>
-        @RenderNavigation()
-    }
+    <div class="rz-carousel-snapper"></div>
 </div>
-
-@code {
-    internal RenderFragment RenderNavigation()
-    {
-        return __builder =>
-        {
-            <text>
-                @if (Carousel.AllowNavigation)
-                {
-                    <a @onclick="@(args => Carousel.Navigate(itemIndex == 0 ? Carousel.items.Count - 1 : itemIndex - 1))" class="rz-carousel-prev"></a>
-                    <a @onclick="@(args => Carousel.Navigate(itemIndex == Carousel.items.Count - 1 ? 0 : itemIndex + 1))" class="rz-carousel-next"></a>
-                }
-            </text>
-        };
-    }
-}
