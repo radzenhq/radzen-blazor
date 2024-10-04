@@ -2,7 +2,7 @@
 @implements IDisposable
 @inject IJSRuntime JSRuntime
 
-<li @ref="element" class="rz-carousel-slide" tabindex="0" @attributes=@Attributes>
+<div @ref="element" class=@ClassList tabindex="0" @attributes=@Attributes>
     @ChildContent
     @if (itemIndex == 0)
     {
@@ -15,7 +15,7 @@
         <div class="rz-carousel-snapper"></div>
         @RenderNavigation()
     }
-</li>
+</div>
 
 @code {
     internal RenderFragment RenderNavigation()

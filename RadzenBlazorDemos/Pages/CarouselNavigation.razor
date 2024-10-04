@@ -1,0 +1,54 @@
+﻿<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Style
+                <RadzenDropDown @bind-Value="@style" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons style" }})"
+                            Data="@(Enum.GetValues(typeof(ButtonStyle)).Cast<ButtonStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Variant
+                <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons variant" }})"
+                            Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Shade
+                <RadzenDropDown @bind-Value="@shade" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons shade" }})"
+                            Data="@(Enum.GetValues(typeof(Shade)).Cast<Shade>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Buttons Size
+                <RadzenDropDown @bind-Value="@size" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons size" }})"
+                            Data="@(Enum.GetValues(typeof(ButtonSize)).Cast<ButtonSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="false" 
+            AllowPaging="true" PagerPosition="PagerPosition.Bottom" AllowNavigation="true" Style="height:500px"
+                Change="@(args => console.Log($"SelectedIndex changed to {args}"))" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant" NextText="Next" PrevText="Previous">
+            <Items>
+                <RadzenCarouselItem class="rz-p-4 rz-background-color-primary">Test</RadzenCarouselItem>
+            </Items>
+        </RadzenCarousel>
+     </RadzenCard>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    RadzenCarousel carousel;
+    Variant variant = Variant.Outlined;
+    ButtonStyle style = ButtonStyle.Secondary;
+    Shade shade = Shade.Default;
+    ButtonSize size = ButtonSize.Medium;
+
+    bool allowPaging = true;
+    bool allowNavigation = true;
+    bool auto = false;
+    PagerPosition pagerPosition = PagerPosition.Bottom;
+
+    EventConsole console;
+
+    int selectedIndex;
+}

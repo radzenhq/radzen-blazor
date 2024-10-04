@@ -33,25 +33,23 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
-    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" 
-            AllowPaging="@allowPaging" PagerPosition="@pagerPosition" AllowNavigation="@allowNavigation" Style="height:500px"
-                Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
-            <Items>
-                @foreach (var theme in Themes.All)
-                {
-                <RadzenCarouselItem>
-                    <RadzenCard>
-                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Stretch" Gap="0.25rem">
-                            @theme.Text
-                            @MainLayout.RenderTheme(theme, false)
-                        </RadzenStack>
-                    </RadzenCard>
-                </RadzenCarouselItem>
-                }
-            </Items>
-        </RadzenCarousel>
-     </RadzenCard>
+    <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" 
+        AllowPaging="@allowPaging" PagerPosition="@pagerPosition" AllowNavigation="@allowNavigation" Style="height:500px"
+            Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
+        <Items>
+            @foreach (var theme in Themes.All)
+            {
+            <RadzenCarouselItem>
+                <RadzenCard class="rz-h-100">
+                    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Stretch" Gap="0.25rem">
+                        @theme.Text
+                        @MainLayout.RenderTheme(theme, false)
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenCarouselItem>
+            }
+        </Items>
+    </RadzenCarousel>
 </RadzenStack>
 
 <EventConsole @ref=@console />
@@ -61,7 +59,7 @@
 
     bool allowPaging = true;
     bool allowNavigation = true;
-    bool auto = true;
+    bool auto = false;
     double interval = 4000;
     PagerPosition pagerPosition = PagerPosition.Bottom;
     string toggleText = "Stop";

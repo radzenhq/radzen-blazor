@@ -205,6 +205,62 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AllowNavigation { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets the buttons style
+        /// </summary>
+        /// <value>The buttons style.</value>
+        [Parameter]
+        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Dark;
+
+        /// <summary>
+        /// Gets or sets the design variant of the buttons.
+        /// </summary>
+        /// <value>The variant of the buttons.</value>
+        [Parameter]
+        public Variant ButtonVariant { get; set; } = Variant.Text;
+
+        /// <summary>
+        /// Gets or sets the color shade of the buttons.
+        /// </summary>
+        /// <value>The color shade of the buttons.</value>
+        [Parameter]
+        public Shade ButtonShade { get; set; } = Shade.Default;
+
+        /// <summary>
+        /// Gets or sets the buttons size.
+        /// </summary>
+        /// <value>The buttons size.</value>
+        [Parameter]
+        public ButtonSize ButtonSize { get; set; } = ButtonSize.Large;
+
+        /// <summary>
+        /// Gets or sets the next button text.
+        /// </summary>
+        /// <value>The next button text.</value>
+        [Parameter]
+        public string NextText { get; set; } = "";
+
+        /// <summary>
+        /// Gets or sets the previous button text.
+        /// </summary>
+        /// <value>The previous button text.</value>
+        [Parameter]
+        public string PrevText { get; set; } = "";
+
+        /// <summary>
+        /// Gets or sets the next button icon.
+        /// </summary>
+        /// <value>The next button icon.</value>
+        [Parameter]
+        public string NextIcon { get; set; } = "arrow_forward_ios";
+
+        /// <summary>
+        /// Gets or sets the previous button icon.
+        /// </summary>
+        /// <value>The previous button icon.</value>
+        [Parameter]
+        public string PrevIcon { get; set; } = "arrow_back_ios_new";
+
         System.Threading.Timer timer;
 
         /// <inheritdoc />

@@ -1,39 +1,33 @@
-.rz-carousel-navigation-list, .rz-carousel-navigation-item, .rz-carousel-slide-list, .rz-carousel-slide {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
+$rz-carousel-pager-button-width: 1rem;
+$rz-carousel-pager-button-height: 1rem;
+$rz-carousel-pager-button-border: none;
+$rz-carousel-pager-button-border-radius: 1rem;
+$rz-carousel-pager-gap: 0.25rem;
+$rz-carousel-prev-next-button-border-radius: var(--rz-button-border-radius);
+$rz-carousel-prev-next-button-inset: 1rem;
+
+// Carousel
 
 .rz-carousel {
-    filter: drop-shadow(0 0 10px #0003);
-    perspective: 100px;
+    position: relative;
     scrollbar-color: transparent transparent;
     scrollbar-width: 0;
 }
 
-.rz-carousel-slide-list {
-    height: 90%;
+.rz-carousel-items {
+    height: 100%;
     display: flex;
-    overflow-x: scroll;
+    overflow-x: hidden;
     counter-reset: item;
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
 }
 
-.rz-carousel-slide {
+.rz-carousel-item {
     position: relative;
     flex: 0 0 100%;
     width: 100%;
     counter-increment: item;
-}
-
-.rz-carousel-slide:before {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%,-40%,70px);
-    color: #fff;
-    font-size: 2em;
 }
 
 .rz-carousel-snapper {
@@ -45,70 +39,41 @@
     scroll-snap-align: center;
 }
 
-.rz-carousel-navigation {
-    text-align: center;
+// Carousel Pager
+
+.rz-carousel-pager {
+    gap: var(--rz-carousel-pager-gap);
 }
 
-.rz-carousel-navigation-list,
-.rz-carousel-navigation-item {
-    display: inline-block;
+.rz-carousel-pager-button {
+    cursor: pointer;
+    width: var(--rz-carousel-pager-button-width);
+    height: var(--rz-carousel-pager-button-height);
+    border: var(--rz-carousel-pager-button-border);
+    border-radius: var(--rz-carousel-pager-button-border-radius);
+    background-color: var(--rz-base);
+    color: var(--rz-on-base);
 }
 
-.rz-carousel-navigation-button {
-    display: inline-block;
-    width: 1.5rem;
-    height: 1.5rem;
-    background-color: #333;
-    background-clip: content-box;
-    border: 0.25rem solid transparent;
-    border-radius: 50%;
-    font-size: 0;
-    transition: transform 0.1s;
-}
+// Carousel Navigation
 
-.rz-carousel::before,
-.rz-carousel::after,
 .rz-carousel-prev,
 .rz-carousel-next {
     position: absolute;
-    top: 50%;
-    width: 4rem;
-    height: 4rem;
-    transform: translateY(-50%);
-    border-radius: 50%;
-    font-size: 0;
-    outline: 0;
-}
-
-.rz-carousel::before,
-.rz-carousel-prev {
-    left: -1rem;
-}
-
-.rz-carousel::after,
-.rz-carousel-next {
-    right: -1rem;
-}
-
-.rz-carousel:not(.rz-carousel-no-navigation)::before,
-.rz-carousel:not(.rz-carousel-no-navigation)::after {
-    content: '';
     z-index: 1;
-    background-color: #333;
-    background-size: 1.5rem 1.5rem;
-    background-repeat: no-repeat;
-    background-position: center center;
-    color: #fff;
-    font-size: 2.5rem;
-    line-height: 4rem;
-    text-align: center;
-    pointer-events: none;
+    inset-block-start: 50%;
+    transform: translateY(-50%);
+    border-radius: var(--rz-carousel-prev-next-button-border-radius);
 }
 
-.rz-carousel:not(.rz-carousel-no-navigation)::before {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='0,50 80,100 80,0' fill='%23fff'/%3E%3C/svg%3E");
+.rz-carousel-prev {
+    inset-inline-start: var(--rz-carousel-prev-next-button-inset);
 }
 
-.rz-carousel:not(.rz-carousel-no-navigation)::after {
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='100,50 20,100 20,0' fill='%23fff'/%3E%3C/svg%3E");
+.rz-carousel-next {
+    inset-inline-end: var(--rz-carousel-prev-next-button-inset);
+
+    .rzi {
+        order: 2;
+    }
 }

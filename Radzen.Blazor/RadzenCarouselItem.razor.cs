@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +11,15 @@ namespace Radzen.Blazor
     /// RadzenCarouselItem component.
     /// </summary>
     public partial class RadzenCarouselItem : IDisposable
-    {
+    {        
+        /// <summary>
+        /// Gets the class list.
+        /// </summary>
+        /// <value>The class list.</value>
+        ClassList ClassList => ClassList.Create()
+                                        .Add("rz-carousel-item")
+                                        .Add(Attributes);
+        
         /// <summary>
         /// Gets or sets the arbitrary attributes.
         /// </summary>

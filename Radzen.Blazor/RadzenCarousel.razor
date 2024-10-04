@@ -4,36 +4,30 @@
 <CascadingValue Value=this>
 @if (Visible)
 {
-    <section @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0">
+    <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0">
         @if(AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
         {
-        <aside class="rz-carousel-navigation">
-            <ol class="rz-carousel-navigation-list">
+        <RadzenStack class="rz-carousel-pager" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
             @foreach (var item in items)
             {
-            <li class="rz-carousel-navigation-item">
-                <a @onclick="@(args => Navigate(items.IndexOf(item)))" class="rz-carousel-navigation-button"></a>
-            </li>
+                <a @onclick="@(args => Navigate(items.IndexOf(item)))" class="rz-carousel-pager-button"></a>
             }
-            </ol>
-        </aside>
+        </RadzenStack>
         }
-        <ol class="rz-carousel-slide-list">
+        <RadzenButton class="rz-carousel-prev" Icon="@PrevIcon" Text="@PrevText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
+        <RadzenButton class="rz-carousel-next" Icon="@NextIcon" Text="@NextText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade" />
+        <div class="rz-carousel-items">
             @Items
-        </ol>
+        </div>
         @if(AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
-        <aside class="rz-carousel-navigation">
-            <ol class="rz-carousel-navigation-list">
+        <RadzenStack class="rz-carousel-pager" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
             @foreach (var item in items)
             {
-            <li class="rz-carousel-navigation-item">
-                <a @onclick="@(args => Navigate(items.IndexOf(item)))" class="rz-carousel-navigation-button"></a>
-            </li>
+                <a @onclick="@(args => Navigate(items.IndexOf(item)))" class="rz-carousel-pager-button"></a>
             }
-            </ol>
-        </aside>
+        </RadzenStack>
         }
-        </section>
+    </div>
 }
 </CascadingValue>
