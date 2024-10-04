@@ -161,7 +161,7 @@
                                             }
                                             else
                                             {
-                                                @(!string.IsNullOrEmpty(Column.FormatString) ? string.Format(Column.FormatProvider ?? Grid?.Culture ?? CultureInfo.CurrentCulture, Column.FormatString, context is bool ? context.GetHashCode() : context ?? "") : Convert.ToString(context ?? "", Grid?.Culture ?? CultureInfo.CurrentCulture))
+                                                @(!string.IsNullOrEmpty(Column.FormatString) ? string.Format(Column.FormatProvider ?? Grid?.Culture ?? CultureInfo.CurrentCulture, Column.FormatString, context ?? "") : Convert.ToString(context ?? "", Grid?.Culture ?? CultureInfo.CurrentCulture))
                                             }
                                         </Template>
                                     </RadzenListBox>
