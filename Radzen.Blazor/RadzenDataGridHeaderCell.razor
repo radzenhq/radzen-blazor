@@ -248,11 +248,11 @@ else
                 query = query
                     .SelectMany(DynamicLinqCustomTypeProvider.ParsingConfig, property)
                     .Select(DynamicLinqCustomTypeProvider.ParsingConfig, Column.FilterProperty)
-                    .Distinct().Cast(typeof(object));
+                    .Distinct().OrderBy("it").Cast(typeof(object));
             }
             else
             {
-                query = query.Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+                query = query.Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().OrderBy("it").Cast(propertyType ?? typeof(object));
             }
 
             filterValuesCount = query.Count();
