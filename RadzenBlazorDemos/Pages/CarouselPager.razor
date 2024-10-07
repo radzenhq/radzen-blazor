@@ -1,15 +1,18 @@
-﻿<RadzenStack class="rz-p-0 rz-p-md-12">
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenCarousel @bind-SelectedIndex=@selectedIndex Auto="false" AllowPaging="false" AllowNavigation="false" Style="height:500px">
+        <RadzenCarousel Auto="false" AllowPaging="false" AllowNavigation="false" Style="height:500px">
             <Items>
-                @foreach (var theme in Themes.All)
+                @if(orderID != default(int))
                 {
                 <RadzenCarouselItem>
-                    <RadzenCard>
-                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Stretch" Gap="0.25rem">
-                            @theme.Text
-                            @MainLayout.RenderTheme(theme, false)
-                        </RadzenStack>
+                    <RadzenCard class="rz-h-100">
+                        <DialogCardPage OrderID=@orderID ShowClose=false />
                     </RadzenCard>
                 </RadzenCarouselItem>
                 }
@@ -17,10 +20,35 @@
         </RadzenCarousel>
      </RadzenCard>
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenPager Count="@Themes.All.Count()" PageSize="1" PageChanged="@(args => selectedIndex = args.PageIndex)" />
+        <RadzenPager Count="@dbContext.Orders.Count()" PageSize="1" PageChanged="@OnPageChanged" />
     </RadzenCard>
 </RadzenStack>
 
 @code {
     int selectedIndex;
+
+    int orderID;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orderID = await GetOrderID(selectedIndex);
+    }
+
+    async Task<int> GetOrderID(int index)
+    {
+        return await Task.FromResult(dbContext.Orders
+            .Select(o => o.OrderID)
+            .Skip(selectedIndex)
+            .Take(1)
+            .FirstOrDefault());
+    }
+
+    async Task OnPageChanged(PagerEventArgs args)
+    {
+        selectedIndex = args.PageIndex;
+
+        orderID = await GetOrderID(selectedIndex);
+    }
 }

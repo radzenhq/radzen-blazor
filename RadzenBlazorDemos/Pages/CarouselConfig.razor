@@ -1,9 +1,15 @@
-﻿<RadzenStack class="rz-p-0 rz-p-md-12">
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Selected index
-                <RadzenNumeric @bind-Value=@selectedIndex Min="0" Max="@(Themes.All.Count() - 1)" aria-label="selected index" />
+                <RadzenNumeric @bind-Value=@selectedIndex Min="0" Max="@(orderIDs.Count() - 1)" aria-label="selected index" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Interval
@@ -29,7 +35,7 @@
             <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
                 <RadzenToggleButton Text="@toggleText" Click="@Toggle" />
                 <RadzenButton Text="Go to first" Click="@(args => carousel.Navigate(0))" Disabled="@(selectedIndex == 0)" />
-                <RadzenButton Text="Go to last" Click="@(args => carousel.Navigate(Themes.All.Count() - 1))" Disabled="@(selectedIndex == Themes.All.Count() - 1)" />
+                <RadzenButton Text="Go to last" Click="@(args => carousel.Navigate(orderIDs.Count() - 1))" Disabled="@(selectedIndex == orderIDs.Count() - 1)" />
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
@@ -37,14 +43,11 @@
         AllowPaging="@allowPaging" PagerPosition="@pagerPosition" AllowNavigation="@allowNavigation" Style="height:500px"
             Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
         <Items>
-            @foreach (var theme in Themes.All)
+            @foreach (var orderID in orderIDs)
             {
             <RadzenCarouselItem>
                 <RadzenCard class="rz-h-100">
-                    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Stretch" Gap="0.25rem">
-                        @theme.Text
-                        @MainLayout.RenderTheme(theme, false)
-                    </RadzenStack>
+                    <DialogCardPage OrderID=@orderID />
                 </RadzenCard>
             </RadzenCarouselItem>
             }
@@ -59,7 +62,7 @@
 
     bool allowPaging = true;
     bool allowNavigation = true;
-    bool auto = false;
+    bool auto = true;
     double interval = 4000;
     PagerPosition pagerPosition = PagerPosition.Bottom;
     string toggleText = "Stop";
@@ -84,4 +87,13 @@
     EventConsole console;
 
     int selectedIndex;
+
+    IQueryable<int> orderIDs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orderIDs = dbContext.Orders.Select(o => o.OrderID).Take(10);
+    }
 }
