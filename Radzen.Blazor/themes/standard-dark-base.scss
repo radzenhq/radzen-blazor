@@ -358,6 +358,12 @@ $panel-menu-toggle-icon-opacity: 0.4 !default;
 $card-shadow: $rz-shadow-2 !default;
 $card-flat-background-color: var(--rz-base-800) !default;
 
+// Carousel
+$rz-carousel-pager-button-border: none !default;
+$rz-carousel-pager-button-active-border: none !default;
+$rz-carousel-pager-button-hover-background-color: var(--rz-base-dark) !default;
+$rz-carousel-pager-gap: 0.75rem !default;
+
 // Steps
 $steps-number-background-color: var(--rz-base-700) !default;
 $steps-number-selected-background: var(--rz-primary) !default;

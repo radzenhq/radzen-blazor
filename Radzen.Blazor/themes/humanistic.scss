@@ -100,6 +100,15 @@ $rz-outline-offset: 2px !default;
 $rz-outline-width: 2px !default;
 $rz-outline-color: var(--rz-secondary) !default;
 
+// Carousel
+$rz-carousel-pager-button-width: 1.25rem !default;
+$rz-carousel-pager-button-height: 0.5rem !default;
+$rz-carousel-pager-button-border: none !default;
+$rz-carousel-pager-button-border-radius: var(--rz-border-radius) !default;
+$rz-carousel-pager-button-hover-background-color: var(--rz-base-400) !default;
+$rz-carousel-pager-button-active-border: none !default;
+$rz-carousel-pager-gap: 0.125rem !default;
+
 // Timeline
 $rz-timeline-line-border-radius: 0 !default;
 
