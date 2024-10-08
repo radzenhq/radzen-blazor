@@ -26,7 +26,7 @@
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
         <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="false" 
             AllowPaging="true" PagerPosition="PagerPosition.Bottom" AllowNavigation="true" Style="height:500px"
-                Change="@(args => console.Log($"SelectedIndex changed to {args}"))" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant" NextText="Next" PrevText="Previous">
+                Change="@(args => console.Log($"SelectedIndex changed to {args}"))" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant" NextText="Next" NextIcon="keyboard_double_arrow_right" PrevText="Previous" PrevIcon="keyboard_double_arrow_left">
             <Items>
                 <RadzenCarouselItem class="rz-p-4 rz-background-color-primary">Test</RadzenCarouselItem>
             </Items>
@@ -38,10 +38,10 @@
 
 @code {
     RadzenCarousel carousel;
-    Variant variant = Variant.Outlined;
-    ButtonStyle style = ButtonStyle.Secondary;
-    Shade shade = Shade.Default;
-    ButtonSize size = ButtonSize.Medium;
+    Variant variant = Variant.Flat;
+    ButtonStyle style = ButtonStyle.Base;
+    Shade shade = Shade.Darker;
+    ButtonSize size = ButtonSize.Large;
 
     bool allowPaging = true;
     bool allowNavigation = true;

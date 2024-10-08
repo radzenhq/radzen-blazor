@@ -29,6 +29,10 @@
                 <RadzenSwitch @bind-Value="@allowPaging" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow paging" }})" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Pager Overlay
+                <RadzenSwitch @bind-Value="@pagerOverlay" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "pager overlay" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Allow navigation
                 <RadzenSwitch @bind-Value="@allowNavigation" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow navigation" }})" />
             </RadzenStack>
@@ -40,7 +44,7 @@
         </RadzenStack>
     </RadzenCard>
     <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" 
-        AllowPaging="@allowPaging" PagerPosition="@pagerPosition" AllowNavigation="@allowNavigation" Style="height:500px"
+        AllowPaging="@allowPaging" PagerPosition="@pagerPosition" PagerOverlay="@pagerOverlay" AllowNavigation="@allowNavigation" Style="height:500px"
             Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
         <Items>
             @foreach (var orderID in orderIDs)
@@ -61,6 +65,7 @@
     RadzenCarousel carousel;
 
     bool allowPaging = true;
+    bool pagerOverlay = true;
     bool allowNavigation = true;
     bool auto = true;
     double interval = 4000;
