@@ -40,7 +40,7 @@
                 Data="@(orderDetails.Where(o => o.OrderID == OrderID))" ColumnWidth="200px" Density="Density.Compact" AllowAlternatingRows="false">
         <Columns>
             <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
-            <RadzenDataGridColumn Property="Order.OrderDate" Title="Order Date" />
+            <RadzenDataGridColumn Property="Order.OrderDate" Title="Order Date" FormatString="{0:d}" />
             <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount" FormatString="{0:P}" />
         </Columns>
     </RadzenDataGrid>
