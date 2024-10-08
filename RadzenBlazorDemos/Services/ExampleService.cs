@@ -1153,8 +1153,8 @@ namespace RadzenBlazorDemos
                     Name = "Carousel",
                     Description = "Demonstration and configuration of the Radzen Blazor Carousel component.",
                     Path = "carousel",
-                    Icon = "&#xe03f",
-                    Tags = new [] { "carousel", "galery", "container" }
+                    Icon = "&#xe8eb",
+                    Tags = new [] { "carousel", "gallery", "slide", "deck", "container" }
                 }
             }
         },
