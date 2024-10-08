@@ -73,7 +73,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-carousel {(AllowNavigation ? "" : "rz-carousel-no-navigation")}".Trim();
+            return $"rz-carousel {(AllowNavigation ? "" : "rz-carousel-no-navigation")} {(PagerOverlay ? "rz-carousel-pager-overlay" : "")}".Trim();
         }
 
         /// <summary>
@@ -192,6 +192,13 @@ namespace Radzen.Blazor
         public PagerPosition PagerPosition { get; set; } = PagerPosition.Bottom;
 
         /// <summary>
+        /// Gets or sets a value indicating whether pager overlays the carousel items. Set to <c>true</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if pager overlay is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool PagerOverlay { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether paging is allowed. Set to <c>true</c> by default.
         /// </summary>
         /// <value><c>true</c> if paging is allowed; otherwise, <c>false</c>.</value>
@@ -210,7 +217,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The buttons style.</value>
         [Parameter]
-        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Dark;
+        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Light;
 
         /// <summary>
         /// Gets or sets the design variant of the buttons.

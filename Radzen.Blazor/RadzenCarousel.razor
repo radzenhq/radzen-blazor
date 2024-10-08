@@ -7,7 +7,7 @@
     <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0">
         @if(AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
         {
-        <RadzenStack class="rz-carousel-pager" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
+        <RadzenStack class="rz-carousel-pager rz-carousel-pager-top" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
             @foreach (var item in items)
             {
                 var index = items.IndexOf(item);
@@ -27,10 +27,11 @@
         </div>
         @if(AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
-        <RadzenStack class="rz-carousel-pager" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
+        <RadzenStack class="rz-carousel-pager rz-carousel-pager-bottom" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
             @foreach (var item in items)
             {
-                <a @onclick="@(args => Navigate(items.IndexOf(item)))" class="rz-carousel-pager-button"></a>
+                var index = items.IndexOf(item);
+                <a @onclick="@(args => Navigate(index))" class="rz-carousel-pager-button @(index == selectedIndex ? "rz-state-active" : "")"></a>
             }
         </RadzenStack>
         }
