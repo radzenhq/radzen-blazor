@@ -6,7 +6,7 @@ using System.Text;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenCard component.
+    /// RadzenStack component.
     /// </summary>
     public partial class RadzenStack : RadzenFlexComponent
     {
