@@ -758,6 +758,11 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if expandable; otherwise, <c>false</c>.</value>
         public bool Expandable { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating row index.
+        /// </summary>
+        public int Index { get; set; }
     }
 
     /// <summary>

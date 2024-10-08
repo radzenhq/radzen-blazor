@@ -3,7 +3,7 @@
 @implements IRadzenForm
  <CascadingValue Value=@EditContext>
     <CascadingValue Value=this>
-@{var rowArgs = Grid?.RowAttributes(Item); }
+@{var rowArgs = Grid?.RowAttributes(Item, Index); }
 @{var firstLevel = Grid.AllowCompositeDataCells ? 0 : Grid.deepestChildColumnLevel; }
 @for(var i = firstLevel; i < Grid.deepestChildColumnLevel + 1; i++)
 {
