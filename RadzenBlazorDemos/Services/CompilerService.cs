@@ -180,7 +180,7 @@ namespace RadzenBlazorDemos
 
             var csharpDocument = codeDocument.GetCSharpDocument();
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(csharpDocument.GeneratedCode, CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp10));
+            var syntaxTree = CSharpSyntaxTree.ParseText(csharpDocument.GeneratedCode.Replace("<Radzen.Group>", "<global::Radzen.Group>"), CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp10));
 
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(syntaxTree);
 
