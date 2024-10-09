@@ -1023,16 +1023,17 @@ window.Radzen = {
           }
       };
 
+      var input = el.querySelector('.rz-inputtext');
       var button = el.querySelector('.rz-datepicker-trigger');
       if (button) {
           button.onclick = function (e) {
-              handler(e, !e.currentTarget.classList.contains('rz-state-disabled'));
+              handler(e, !e.currentTarget.classList.contains('rz-state-disabled') && (input ? !input.classList.contains('rz-readonly') : true));
           };
       }
-      var input = el.querySelector('.rz-inputtext');
+  
       if (input) {
           input.onclick = function (e) {
-              handler(e, e.currentTarget.classList.contains('rz-readonly') || e.currentTarget.classList.contains('rz-input-trigger') );
+              handler(e, e.currentTarget.classList.contains('rz-input-trigger') && !e.currentTarget.classList.contains('rz-readonly'));
           };
       }
   },
