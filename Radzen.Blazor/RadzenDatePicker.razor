@@ -18,7 +18,7 @@
                    class="rz-inputtext @InputClass @(IsReadonly ? "rz-readonly" : "") @(!ShowButton ? "rz-input-trigger" : "")" id="@Name" placeholder="@Placeholder" />
             @if (ShowButton)
             {
-                <button aria-label="@ToggleAriaLabel" @onmousedown=@OnToggle class="@($"rz-datepicker-trigger rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")} {InputClass}")" tabindex="-1" type="button">
+                <button aria-label="@ToggleAriaLabel" @onmousedown=@OnToggle class="@($"rz-datepicker-trigger rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")} {ButtonClass}")" tabindex="-1" type="button">
                     <span aria-hidden="true" class="@ButtonClasses"></span><span class="rz-button-text"></span>
                 </button>
             }
