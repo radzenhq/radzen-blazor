@@ -1,54 +1,105 @@
 ﻿<RadzenStack class="rz-p-0 rz-p-md-12">
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                Buttons Style
-                <RadzenDropDown @bind-Value="@style" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons style" }})"
-                            Data="@(Enum.GetValues(typeof(ButtonStyle)).Cast<ButtonStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+        <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    Allow navigation
+                    <RadzenSwitch @bind-Value="@allowNavigation" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow navigation" }})" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    Buttons Style
+                    <RadzenSelectBar @bind-Value="@style" TextProperty="Text" ValueProperty="Value" 
+                            Data="@(Enum.GetValues(typeof(ButtonStyle)).Cast<ButtonStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex" />
+                    <RadzenDropDown @bind-Value="@style" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons style" }})"
+                                Data="@(Enum.GetValues(typeof(ButtonStyle)).Cast<ButtonStyle>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-flex rz-display-xl-none" Style="width: 200px;" />
+                </RadzenStack>
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                Buttons Variant
-                <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons variant" }})"
-                            Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    Buttons Variant
+                    <RadzenSelectBar @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" 
+                            Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex" />
+                    <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons variant" }})"
+                                Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-flex rz-display-xl-none" Style="width: 200px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    Buttons Shade
+                    <RadzenSelectBar @bind-Value="@shade" TextProperty="Text" ValueProperty="Value" 
+                            Data="@(Enum.GetValues(typeof(Shade)).Cast<Shade>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex" />
+                    <RadzenDropDown @bind-Value="@shade" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons shade" }})"
+                                Data="@(Enum.GetValues(typeof(Shade)).Cast<Shade>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-flex rz-display-xl-none" Style="width: 200px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    Buttons Size
+                    <RadzenSelectBar @bind-Value="@size" TextProperty="Text" ValueProperty="Value" 
+                            Data="@(Enum.GetValues(typeof(ButtonSize)).Cast<ButtonSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" class="rz-display-none rz-display-xl-flex" />
+                    <RadzenDropDown @bind-Value="@size" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons size" }})"
+                                Data="@(Enum.GetValues(typeof(ButtonSize)).Cast<ButtonSize>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-flex rz-display-xl-none" Style="width: 200px;" />
+                </RadzenStack>
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                Buttons Shade
-                <RadzenDropDown @bind-Value="@shade" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons shade" }})"
-                            Data="@(Enum.GetValues(typeof(Shade)).Cast<Shade>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                Buttons Size
-                <RadzenDropDown @bind-Value="@size" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons size" }})"
-                            Data="@(Enum.GetValues(typeof(ButtonSize)).Cast<ButtonSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    PrevText
+                    <RadzenTextBox @bind-Value="@prevText" Style="width: 200px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    PrevIcon
+                    <RadzenTextBox @bind-Value="@prevIcon" Style="width: 200px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    NextText
+                    <RadzenTextBox @bind-Value="@nextText" Style="width: 200px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    NextIcon
+                    <RadzenTextBox @bind-Value="@nextIcon" Style="width: 200px;" />
+                </RadzenStack>
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
-    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="false" 
-            AllowPaging="true" PagerPosition="PagerPosition.Bottom" AllowNavigation="true" Style="height:500px"
-                Change="@(args => console.Log($"SelectedIndex changed to {args}"))" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant" NextText="Next" NextIcon="keyboard_double_arrow_right" PrevText="Previous" PrevIcon="keyboard_double_arrow_left">
-            <Items>
-                <RadzenCarouselItem class="rz-p-4 rz-background-color-primary">Test</RadzenCarouselItem>
-            </Items>
-        </RadzenCarousel>
-     </RadzenCard>
+    <RadzenCarousel @ref=carousel Auto="false" AllowNavigation="@allowNavigation"
+        Style="height: 400px; max-width: 600px;" class="rz-mx-auto"
+        ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant"
+        NextText="@nextText" NextIcon="@nextIcon" PrevText="@prevText" PrevIcon="@prevIcon">
+        <Items>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/3.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/2.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/7.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/4.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/5.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/6.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/1.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/8.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+        </Items>
+    </RadzenCarousel>
 </RadzenStack>
-
-<EventConsole @ref=@console />
 
 @code {
     RadzenCarousel carousel;
-    Variant variant = Variant.Flat;
+    bool allowNavigation = true;
+    Variant variant = Variant.Text;
     ButtonStyle style = ButtonStyle.Base;
-    Shade shade = Shade.Darker;
+    Shade shade = Shade.Lighter;
     ButtonSize size = ButtonSize.Large;
 
-    bool allowPaging = true;
-    bool allowNavigation = true;
-    bool auto = false;
-    PagerPosition pagerPosition = PagerPosition.Bottom;
-
-    EventConsole console;
-
-    int selectedIndex;
+    string prevText = "Prev";
+    string prevIcon = "arrow_back";
+    string nextText = "Next";
+    string nextIcon = "arrow_forward";
 }

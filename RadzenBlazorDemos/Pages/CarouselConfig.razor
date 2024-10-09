@@ -15,42 +15,27 @@
                 Interval
                 <RadzenNumeric @bind-Value=@interval aria-label="interval" />
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                <RadzenLabel Text="Pager Position:" Component="PagerPosition" />
-                <RadzenDropDown @bind-Value="@pagerPosition" TextProperty="Text" Name="PagerPosition" ValueProperty="Value"
-                                Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="8px">
                 Auto-cycle
-                <RadzenSwitch @bind-Value="@auto" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "auto-cycle" }})" />
+                <RadzenSwitch @bind-Value="@auto" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "auto-cycle" }})" />
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                Allow paging
-                <RadzenSwitch @bind-Value="@allowPaging" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow paging" }})" />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                Pager Overlay
-                <RadzenSwitch @bind-Value="@pagerOverlay" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "pager overlay" }})" />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                Allow navigation
-                <RadzenSwitch @bind-Value="@allowNavigation" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow navigation" }})" />
-            </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
-                <RadzenToggleButton Text="@toggleText" Click="@Toggle" />
-                <RadzenButton Text="Go to first" Click="@(args => carousel.Navigate(0))" Disabled="@(selectedIndex == 0)" />
-                <RadzenButton Text="Go to last" Click="@(args => carousel.Navigate(orderIDs.Count() - 1))" Disabled="@(selectedIndex == orderIDs.Count() - 1)" />
+            <RadzenStack Orientation="Orientation.Vertical" Gap="8px">
+                Navigate
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="16px">
+                    <RadzenToggleButton Text="@toggleText" Click="@Toggle" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" />
+                    <RadzenButton Text="Go to first" Click="@(args => carousel.Navigate(0))" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" Disabled="@(selectedIndex == 0)" />
+                    <RadzenButton Text="Go to last" Click="@(args => carousel.Navigate(orderIDs.Count() - 1))" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small"  Disabled="@(selectedIndex == orderIDs.Count() - 1)" />
+                </RadzenStack>
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
-    <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" 
-        AllowPaging="@allowPaging" PagerPosition="@pagerPosition" PagerOverlay="@pagerOverlay" AllowNavigation="@allowNavigation" Style="height:500px"
+    <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" PagerOverlay="false" ButtonShade="Shade.Default" Style="height:500px"
             Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
         <Items>
             @foreach (var orderID in orderIDs)
             {
             <RadzenCarouselItem>
-                <RadzenCard class="rz-h-100">
+                <RadzenCard class="rz-w-75">
                     <DialogCardPage OrderID=@orderID />
                 </RadzenCard>
             </RadzenCarouselItem>
@@ -59,17 +44,15 @@
     </RadzenCarousel>
 </RadzenStack>
 
-<EventConsole @ref=@console />
+<EventConsole @ref=@console Style="min-height: 230px;" />
 
 @code {
     RadzenCarousel carousel;
 
     bool allowPaging = true;
-    bool pagerOverlay = true;
     bool allowNavigation = true;
     bool auto = true;
     double interval = 4000;
-    PagerPosition pagerPosition = PagerPosition.Bottom;
     string toggleText = "Stop";
 
     bool started = true;

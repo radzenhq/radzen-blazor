@@ -217,7 +217,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The buttons style.</value>
         [Parameter]
-        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Light;
+        public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Base;
 
         /// <summary>
         /// Gets or sets the design variant of the buttons.
@@ -231,7 +231,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The color shade of the buttons.</value>
         [Parameter]
-        public Shade ButtonShade { get; set; } = Shade.Default;
+        public Shade ButtonShade { get; set; } = Shade.Lighter;
 
         /// <summary>
         /// Gets or sets the buttons size.

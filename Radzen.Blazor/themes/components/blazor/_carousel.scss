@@ -20,6 +20,7 @@ $rz-carousel-pager-gap: 0.5rem !default;
 $rz-carousel-pager-height: 3rem !default;
 $rz-carousel-prev-next-button-border-radius: var(--rz-button-border-radius) !default;
 $rz-carousel-prev-next-button-inset: 1rem !default;
+$rz-carousel-border-radius: var(--rz-card-border-radius) !default;
 
 // Carousel
 
@@ -27,6 +28,7 @@ $rz-carousel-prev-next-button-inset: 1rem !default;
     position: relative;
     overflow: hidden;
     scrollbar-color: transparent transparent;
+    border-radius: var(--rz-carousel-border-radius);
 
     &:not(.rz-carousel-pager-overlay) {
         .rz-carousel-pager-top ~ .rz-carousel-items,
@@ -47,6 +49,7 @@ $rz-carousel-prev-next-button-inset: 1rem !default;
     counter-reset: item;
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
+    border-radius: var(--rz-carousel-border-radius);
     scrollbar-width: none;
     -ms-overflow-style: none;
 
@@ -56,14 +59,21 @@ $rz-carousel-prev-next-button-inset: 1rem !default;
 }
 
 .rz-carousel-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     flex: 0 0 100%;
     width: 100%;
     counter-increment: item;
+    scrollbar-color: initial;
+    scrollbar-width: initial;
+    -ms-overflow-style: initial;
 }
 
 .rz-carousel-snapper {
     position: absolute;
+    z-index: -1;
     top: 0;
     left: 0;
     width: 100%;
@@ -108,7 +118,7 @@ $rz-carousel-prev-next-button-inset: 1rem !default;
 
     .rz-carousel-pager {
         position: absolute;
-        z-index: 1;
+        z-index: 998;
         inset-inline: 0;
         opacity: var(--rz-carousel-pager-overlay-opacity);
     }
@@ -127,7 +137,7 @@ $rz-carousel-prev-next-button-inset: 1rem !default;
 .rz-carousel-prev,
 .rz-carousel-next {
     position: absolute;
-    z-index: 1;
+    z-index: 999;
     inset-block-start: 50%; /* calc(50% - var(--rz-carousel-pager-height)/2) */
     transform: translateY(-50%);
     border-radius: var(--rz-carousel-prev-next-button-border-radius);
@@ -143,4 +153,10 @@ $rz-carousel-prev-next-button-inset: 1rem !default;
     .rzi {
         order: 2;
     }
+}
+
+// Right-to-left icons
+*[dir="rtl"] .rz-carousel-prev .rzi,
+*[dir="rtl"] .rz-carousel-next .rzi {
+    transform: rotate(180deg);
 }

@@ -5,20 +5,18 @@
 @inherits DbContextPage
 
 <RadzenStack class="rz-p-0 rz-p-md-12">
-    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenCarousel Auto="false" AllowPaging="false" AllowNavigation="false" Style="height:500px">
-            <Items>
-                @if(orderID != default(int))
-                {
-                <RadzenCarouselItem>
-                    <RadzenCard class="rz-h-100">
-                        <DialogCardPage OrderID=@orderID ShowClose=false />
-                    </RadzenCard>
-                </RadzenCarouselItem>
-                }
-            </Items>
-        </RadzenCarousel>
-     </RadzenCard>
+    <RadzenCarousel Auto="false" AllowPaging="false" AllowNavigation="false" Style="height:500px">
+        <Items>
+            @if(orderID != default(int))
+            {
+            <RadzenCarouselItem>
+                <RadzenCard class="rz-h-100">
+                    <DialogCardPage OrderID=@orderID ShowClose=false />
+                </RadzenCard>
+            </RadzenCarouselItem>
+            }
+        </Items>
+    </RadzenCarousel>
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
         <RadzenPager Count="@dbContext.Orders.Count()" PageSize="1" PageChanged="@OnPageChanged" />
     </RadzenCard>
