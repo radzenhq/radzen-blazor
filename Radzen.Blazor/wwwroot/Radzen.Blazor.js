@@ -991,6 +991,7 @@ window.Radzen = {
     }
   },
   closeTooltip(id) {
+    Radzen.activeElement = null;
     Radzen.closePopup(id);
 
     if (Radzen[id + 'delay']) {
