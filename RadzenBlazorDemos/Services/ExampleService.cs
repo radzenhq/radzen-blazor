@@ -1087,6 +1087,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Carousel",
+                    Description = "Demonstration and configuration of the Radzen Blazor Carousel component.",
+                    Path = "carousel",
+                    Icon = "&#xe8eb",
+                    New = true,
+                    Tags = new [] { "carousel", "gallery", "slide", "deck", "container" }
+                },
+                new Example
+                {
                     Name = "ContextMenu",
                     Description = "Demonstration and configuration of the Radzen Blazor Context Menu component.",
                     Path = "contextmenu",

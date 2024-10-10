@@ -1,0 +1,35 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenCarousel @ref=carousel PagerPosition="PagerPosition.Bottom" PagerOverlay="false" ButtonShade="Shade.Default" Style="height:500px">
+            <Items>
+                @foreach (var orderID in orderIDs)
+                {
+                <RadzenCarouselItem>
+                    <RadzenCard class="rz-w-75">
+                        <DialogCardPage OrderID=@orderID />
+                    </RadzenCard>
+                </RadzenCarouselItem>
+                }
+            </Items>
+        </RadzenCarousel>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    RadzenCarousel carousel;
+
+    IQueryable<int> orderIDs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orderIDs = dbContext.Orders.Select(o => o.OrderID).Take(10);
+    }
+}
