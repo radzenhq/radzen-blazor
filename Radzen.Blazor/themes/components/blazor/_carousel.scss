@@ -39,10 +39,28 @@ $rz-carousel-border-radius: var(--rz-card-border-radius) !default;
         .rz-carousel-pager-top ~ .rz-carousel-items:has(+ .rz-carousel-pager-bottom) {
             height: calc(100% - (2 * var(--rz-carousel-pager-height)));
         }
+
+        .rz-carousel-pager-top ~ .rz-carousel-prev,
+        .rz-carousel-pager-top ~ .rz-carousel-next {
+            inset-block-start: calc(50% + var(--rz-carousel-pager-height)/2);
+        }
+
+        .rz-carousel-prev:has(~ .rz-carousel-pager-bottom),
+        .rz-carousel-next:has(~ .rz-carousel-pager-bottom) {
+            inset-block-start: calc(50% - var(--rz-carousel-pager-height)/2);
+        }
+
+        .rz-carousel-pager-top ~ .rz-carousel-prev:has(~ .rz-carousel-pager-bottom),
+        .rz-carousel-pager-top ~ .rz-carousel-next:has(~ .rz-carousel-pager-bottom) {
+            inset-block-start: 50%;
+        }
     }
 }
 
 .rz-carousel-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     height: 100%;
     display: flex;
     overflow-x: scroll;
@@ -59,6 +77,8 @@ $rz-carousel-border-radius: var(--rz-card-border-radius) !default;
 }
 
 .rz-carousel-item {
+    margin: 0;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;

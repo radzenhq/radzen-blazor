@@ -4,7 +4,7 @@
 <CascadingValue Value=this>
 @if (Visible)
 {
-    <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0">
+    <section @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0">
         @if(AllowPaging && (PagerPosition == PagerPosition.Top || PagerPosition == PagerPosition.TopAndBottom))
         {
         <RadzenStack class="rz-carousel-pager rz-carousel-pager-top" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
@@ -22,9 +22,9 @@
         <RadzenButton class="rz-carousel-next" Icon="@NextIcon" Text="@NextText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
             Click=@(args => Navigate(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1))/>
         }
-        <div class="rz-carousel-items">
+        <ul class="rz-carousel-items">
             @Items
-        </div>
+        </ul>
         @if(AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
         {
         <RadzenStack class="rz-carousel-pager rz-carousel-pager-bottom" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
@@ -35,6 +35,6 @@
             }
         </RadzenStack>
         }
-    </div>
+    </section>
 }
 </CascadingValue>
