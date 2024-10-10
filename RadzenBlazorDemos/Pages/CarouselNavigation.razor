@@ -1,6 +1,6 @@
 ﻿<RadzenStack class="rz-p-0 rz-p-md-12">
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+        <RadzenStack Orientation="Orientation.Vertical">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
                 <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                     Allow navigation
@@ -37,30 +37,11 @@
                                 Data="@(Enum.GetValues(typeof(ButtonSize)).Cast<ButtonSize>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-flex rz-display-xl-none" Style="width: 200px;" />
                 </RadzenStack>
             </RadzenStack>
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
-                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                    PrevText
-                    <RadzenTextBox @bind-Value="@prevText" Style="width: 200px;" />
-                </RadzenStack>
-                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                    PrevIcon
-                    <RadzenTextBox @bind-Value="@prevIcon" Style="width: 200px;" />
-                </RadzenStack>
-                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                    NextText
-                    <RadzenTextBox @bind-Value="@nextText" Style="width: 200px;" />
-                </RadzenStack>
-                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
-                    NextIcon
-                    <RadzenTextBox @bind-Value="@nextIcon" Style="width: 200px;" />
-                </RadzenStack>
-            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
     <RadzenCarousel @ref=carousel Auto="false" AllowNavigation="@allowNavigation"
         Style="height: 400px; max-width: 600px;" class="rz-mx-auto"
-        ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant"
-        NextText="@nextText" NextIcon="@nextIcon" PrevText="@prevText" PrevIcon="@prevIcon">
+        ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant">
         <Items>
             <RadzenCarouselItem>
                 <RadzenImage Path="images/gallery/3.jpg" class="rz-h-100" />
@@ -97,9 +78,4 @@
     ButtonStyle style = ButtonStyle.Base;
     Shade shade = Shade.Lighter;
     ButtonSize size = ButtonSize.Large;
-
-    string prevText = "Prev";
-    string prevIcon = "arrow_back";
-    string nextText = "Next";
-    string nextIcon = "arrow_forward";
 }

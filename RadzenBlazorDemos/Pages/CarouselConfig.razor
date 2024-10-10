@@ -29,19 +29,21 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
-    <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" PagerOverlay="false" ButtonShade="Shade.Default" Style="height:500px"
-            Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
-        <Items>
-            @foreach (var orderID in orderIDs)
-            {
-            <RadzenCarouselItem>
-                <RadzenCard class="rz-w-75">
-                    <DialogCardPage OrderID=@orderID />
-                </RadzenCard>
-            </RadzenCarouselItem>
-            }
-        </Items>
-    </RadzenCarousel>
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" PagerOverlay="false" ButtonShade="Shade.Default" Style="height:500px"
+                Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
+            <Items>
+                @foreach (var orderID in orderIDs)
+                {
+                <RadzenCarouselItem>
+                    <RadzenCard class="rz-w-75">
+                        <DialogCardPage OrderID=@orderID />
+                    </RadzenCard>
+                </RadzenCarouselItem>
+                }
+            </Items>
+        </RadzenCarousel>
+    </RadzenCard>
 </RadzenStack>
 
 <EventConsole @ref=@console Style="min-height: 230px;" />
