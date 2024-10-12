@@ -1425,9 +1425,19 @@ namespace Radzen.Blazor
         public bool AllowColumnPicking { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating wherer column picker is a button with popup or dropdown
+        /// </summary>
+        /// <value><c>true</c> if column picker is button with popup; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public ColumnPickerMode ColumnPickerMode { get; set; } = ColumnPickerMode.Dropdown;
+        Rendering.Popup columnPickerPopup;
+        RadzenButton columnPickerButton;
+
+        /// <summary>
         /// Gets or sets a value indicating whether cell data should be shown as tooltip.
         /// </summary>
         /// <value><c>true</c> if cell data is shown as tooltip; otherwise, <c>false</c>.</value>
+        /// 
         [Parameter]
         public bool ShowCellDataAsTooltip { get; set; } = true;
 

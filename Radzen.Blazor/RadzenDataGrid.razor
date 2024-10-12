@@ -3,8 +3,32 @@
 @using Radzen
 @typeparam TItem
 @inherits PagedDataBoundComponent<TItem>
-
+<style type="text/css">
+    .colpicker-popup {
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        right: 10px;
+        max-width: 226px;
+        border: var(--rz-panel-border);
+        background-color: var(--rz-panel-background-color);
+        box-shadow: var(--rz-panel-shadow);
+        border-radius: var(--rz-border-radius)
+    }
+</style>
 <CascadingValue Value=this>
+    <Radzen.Blazor.Rendering.Popup @ref=@columnPickerPopup class="colpicker-popup">
+        <div class="rz-column-picker">
+            <RadzenDropDown Style="width: 100%" SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
+                            MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectVisibleColumnsAriaLabel }})"
+                            SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
+                            @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                            Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
+                            Placeholder="@ColumnsText"
+                            Data="allPickableColumns"
+                            TextProperty="ColumnPickerTitle" />
+        </div>
+    </Radzen.Blazor.Rendering.Popup>
 @if (Columns != null)
 {
         @Columns
@@ -16,7 +40,7 @@
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()"
         @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="true" tabindex=0
-        @onfocus=@(args => focusedIndex = focusedIndex == -1 ? 0: focusedIndex)
+        @onfocus=@(args => focusedIndex = focusedIndex == -1 ? 0 : focusedIndex)
         @onblur=@(args => JSRuntime.InvokeVoidAsync("Radzen.clearFocusedHeaderCell", UniqueID))>
         @if (AllowGrouping || AllowColumnPicking)
         {
@@ -51,17 +75,23 @@
 
                 @if (AllowColumnPicking)
                 {
-                    <div class="rz-column-picker">
-                        <RadzenDropDown SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
-                            MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectVisibleColumnsAriaLabel }})"
-                            SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
-                            @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
-                            Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
-                            Placeholder="@ColumnsText"
-                            Data="allPickableColumns"
-                            TextProperty="ColumnPickerTitle" />
-                    </div>
-
+                    @if (ColumnPickerMode == ColumnPickerMode.PopupButton)
+                    {
+                            <RadzenButton ButtonStyle="ButtonStyle.Secondary" Icon="add_column_right" @ref=@columnPickerButton Click="@(args => columnPickerPopup.ToggleAsync(columnPickerButton.Element))" />
+                    }
+                    @if (ColumnPickerMode == ColumnPickerMode.Dropdown)
+                    {
+                            <div class="rz-column-picker">
+                                <RadzenDropDown SelectAllText="@AllColumnsText" AllowSelectAll="@AllowPickAllColumns"
+                                                MaxSelectedLabels="@ColumnsPickerMaxSelectedLabels" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectVisibleColumnsAriaLabel }})"
+                                                SelectedItemsText="@ColumnsShowingText" Change=@ToggleColumns
+                                                @bind-Value="@selectedColumns" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
+                                                Multiple="true" AllowFiltering="@ColumnsPickerAllowFiltering"
+                                                Placeholder="@ColumnsText"
+                                                Data="allPickableColumns"
+                                                TextProperty="ColumnPickerTitle" />
+                            </div>
+                    }
                 }
             </div>
         }
