@@ -1111,6 +1111,21 @@ window.Radzen = {
 
     var smartPosition = !position || position == 'bottom';
 
+    var scrollbarSize = 20;
+    var el = parent;
+    while (el && el != document.documentElement) {
+        if (el.scrollWidth > el.clientWidth) {
+            scrollbarSize = el.scrollWidth - el.clientWidth;
+            break;
+        }
+
+        if (el.scrollHeight > el.clientHeight) {
+            scrollbarSize = el.scrollHeight - el.clientHeight;
+            break;
+        }
+        el = el.parentElement;
+    }
+
     if (smartPosition && top + rect.height > window.innerHeight && parentRect.top > rect.height) {
         if (disableSmartPosition !== true) {
             top = parentRect.top - rect.height;
@@ -1127,7 +1142,7 @@ window.Radzen = {
       }
     }
 
-    if (smartPosition && left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
+    if (smartPosition && left + rect.width > window.innerWidth + scrollbarSize && window.innerWidth + scrollbarSize > rect.width) {
       left = window.innerWidth - rect.width;
 
       if (position) {
