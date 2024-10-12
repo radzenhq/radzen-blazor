@@ -3758,4 +3758,19 @@ namespace Radzen
         /// </summary>
         Right
     }
+
+    /// <summary>
+    /// Column picker mode enum
+    /// </summary>
+    public enum ColumnPickerMode
+    {
+        /// <summary>
+        /// Shows as dropdown column picker
+        /// </summary>
+        Dropdown,
+        /// <summary>
+        /// Shows as button with popup column picker
+        /// </summary>
+        PopupButton
+    }
 }
