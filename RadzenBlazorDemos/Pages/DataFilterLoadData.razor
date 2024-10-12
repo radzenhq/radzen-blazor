@@ -119,6 +119,12 @@
         // This demo is using https://dynamic-linq.net
         var query = dbContext.Orders.Include("Customer").Include("Employee").AsQueryable();
 
+        // Use in-memory LINQ to Objects since complex expressions with collections cannot be translated to SQL.
+        if (dataFilter.Filters.Any(f => f.Property == "Employee.Title"))
+        {
+            query = query.ToList().AsQueryable();
+        }
+
         // Filter via the Where method
         query = query.Where(dataFilter);
 
