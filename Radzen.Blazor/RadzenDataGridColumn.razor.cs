@@ -139,7 +139,11 @@ namespace Radzen.Blazor
                 {
                     if (Type == null)
                     {
-                        _filterPropertyType = typeof(IEnumerable<object>);
+                        var fp = GetFilterProperty();
+                        var pt = !string.IsNullOrEmpty(fp) ?
+                                PropertyAccess.GetPropertyType(typeof(TItem), fp) : typeof(object);
+
+                        _filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
                     }
 
                     if (GetFilterOperator() == FilterOperator.Equals)
