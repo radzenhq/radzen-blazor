@@ -68,7 +68,7 @@
                             MaxSelectedLabels="@grid.ColumnsPickerMaxSelectedLabels" 
                             SelectedItemsText="@grid.ColumnsShowingText" FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                             Multiple="true" AllowFiltering="@grid.ColumnsPickerAllowFiltering"
-                            Placeholder="@grid.ColumnsText"
+                            Placeholder="@grid.AllColumnsText"
                             Data="@grid.ColumnsCollection"
                             TextProperty="ColumnPickerTitle"
                             Value="@(grid.ColumnsCollection.Where(c => c.GetVisible()))"
