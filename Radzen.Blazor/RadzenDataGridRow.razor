@@ -25,7 +25,7 @@
     {
         <td class="rz-col-icon" rowspan="@(Grid.AllowCompositeDataCells ? (Grid.deepestChildColumnLevel + 1) : 1)">
             <span class="rz-column-title"></span>
-            @if (rowArgs.Item1.Expandable)
+            @if (rowArgs.Item1.Expandable && !Grid.LoadChildData.HasDelegate)
             {
                 <a id="@(Grid.GridId() + Item.GetHashCode())" aria-label="@Grid.ExpandChildItemAriaLabel" @onclick:preventDefault="true" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
                     <span class="@(Grid.ExpandedItemStyle(Item))"></span>
