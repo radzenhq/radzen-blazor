@@ -235,7 +235,7 @@ $rz-text-title-color: var(--rz-base-900) !default;
 $rz-text-color: var(--rz-base-800) !default;
 $rz-text-secondary-color: var(--rz-base-700) !default;
 $rz-text-tertiary-color: var(--rz-base-600) !default;
-$rz-text-disabled-color: var(--rz-base-500) !default;
+$rz-text-disabled-color: var(--rz-base-400) !default;
 $rz-text-contrast-color: var(--rz-white) !default;
 
 // Borders
@@ -618,11 +618,11 @@ $checkbox-label-margin-inline: 1rem !default;
 $checkbox-checked-background-color: var(--rz-primary) !default;
 $checkbox-checked-color: var(--rz-on-primary) !default;
 $checkbox-checked-hover-background-color: var(--rz-primary-light) !default;
-$checkbox-checked-disabled-background-color: var(--rz-base-500) !default;
+$checkbox-checked-disabled-background-color: var(--rz-base-400) !default;
 $checkbox-checked-shadow: none !default;
 $checkbox-checked-border: var(--rz-border-primary) !default;
 $checkbox-checked-hover-border: var(--rz-border-primary) !default;
-$checkbox-checked-disabled-border: var(--rz-border-base-500) !default;
+$checkbox-checked-disabled-border: var(--rz-border-base-400) !default;
 
 .rz-chkbox-box {
   &:after {
