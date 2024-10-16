@@ -87,6 +87,7 @@ namespace Radzen.Blazor
                 await SelectedIndexChanged.InvokeAsync(selectedIndex);
                 await Change.InvokeAsync(selectedIndex);
                 await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
+                StateHasChanged();
             }
         }
 
