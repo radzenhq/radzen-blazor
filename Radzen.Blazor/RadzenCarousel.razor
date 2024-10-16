@@ -11,16 +11,16 @@
             @foreach (var item in items)
             {
                 var index = items.IndexOf(item);
-                <a @onclick="@(args => Navigate(index))" class="rz-carousel-pager-button @(index == selectedIndex ? "rz-state-active" : "")"></a>
+                <a @onclick="@(args => GoTo(index))" class="rz-carousel-pager-button @(index == selectedIndex ? "rz-state-active" : "")"></a>
             }
         </RadzenStack>
         }
         @if(AllowNavigation)
         {
         <RadzenButton class="rz-carousel-prev" Icon="@PrevIcon" Text="@PrevText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
-            Click=@(args => Navigate(selectedIndex == 0 ? items.Count - 1 : selectedIndex - 1)) />
+            Click=@Prev />
         <RadzenButton class="rz-carousel-next" Icon="@NextIcon" Text="@NextText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
-            Click=@(args => Navigate(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1))/>
+            Click=@Next/>
         }
         <ul class="rz-carousel-items">
             @Items

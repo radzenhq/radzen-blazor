@@ -91,6 +91,26 @@ namespace Radzen.Blazor
             }
         }
 
+        async Task Prev()
+        {
+            await GoTo(selectedIndex == 0 ? items.Count - 1 : selectedIndex - 1);
+        }
+
+        async Task Next()
+        {
+            await GoTo(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1);
+        }
+
+        async Task GoTo(int index)
+        {
+            if (Auto)
+            {
+                await Reset();
+            }
+
+            await Navigate(index);
+        }
+
         /// <summary>
         /// Stops the auto-cycle timer.
         /// </summary>
