@@ -11,7 +11,7 @@
             @foreach (var item in items)
             {
                 var index = items.IndexOf(item);
-                <a @onclick="@(args => GoTo(index))" class="rz-carousel-pager-button @(index == selectedIndex ? "rz-state-active" : "")"></a>
+                <a @onclick="@(args => Navigate(index))" class="rz-carousel-pager-button @(index == selectedIndex ? "rz-state-active" : "")"></a>
             }
         </RadzenStack>
         }

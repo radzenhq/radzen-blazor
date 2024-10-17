@@ -81,6 +81,26 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Navigate(int index)
         {
+            if (Auto)
+            {
+                await Reset();
+            }
+
+            await GoTo(index);
+        }
+
+        async Task Prev()
+        {
+            await Navigate(selectedIndex == 0 ? items.Count - 1 : selectedIndex - 1);
+        }
+
+        async Task Next()
+        {
+            await Navigate(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1);
+        }
+
+        async Task GoTo(int index)
+        {
             if (selectedIndex != index)
             {
                 selectedIndex = index == items.Count ? 0 : index;
@@ -89,26 +109,6 @@ namespace Radzen.Blazor
                 await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
                 StateHasChanged();
             }
-        }
-
-        async Task Prev()
-        {
-            await GoTo(selectedIndex == 0 ? items.Count - 1 : selectedIndex - 1);
-        }
-
-        async Task Next()
-        {
-            await GoTo(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1);
-        }
-
-        async Task GoTo(int index)
-        {
-            if (Auto)
-            {
-                await Reset();
-            }
-
-            await Navigate(index);
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace Radzen.Blazor
             if (firstRender)
             {
                 var ts = TimeSpan.FromMilliseconds(Interval);
-                timer = new System.Threading.Timer(state => InvokeAsync(() => Navigate(selectedIndex + 1)), 
+                timer = new System.Threading.Timer(state => InvokeAsync(() => GoTo(selectedIndex + 1)), 
                     null, Auto ? ts : Timeout.InfiniteTimeSpan, ts);
             }
         }
