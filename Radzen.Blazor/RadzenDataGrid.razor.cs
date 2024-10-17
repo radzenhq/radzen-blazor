@@ -1587,10 +1587,12 @@ namespace Radzen.Blazor
         }
 
         int? indexOfColumnToReoder;
+        string uniqueIDOfColumnToReoder;
 
-        internal async Task StartColumnReorder(MouseEventArgs args, int columnIndex)
+        internal async Task StartColumnReorder(MouseEventArgs args, int columnIndex, string uniqueID)
         {
             indexOfColumnToReoder = columnIndex;
+            uniqueIDOfColumnToReoder = uniqueID;
             await JSRuntime.InvokeVoidAsync("Radzen.startColumnReorder", getColumnUniqueId(columnIndex));
         }
 
@@ -3099,12 +3101,12 @@ namespace Radzen.Blazor
 
         internal async Task EndColumnDropToGroup()
         {
-            if(indexOfColumnToReoder != null && AllowGrouping)
+            if(indexOfColumnToReoder != null && uniqueIDOfColumnToReoder != null && AllowGrouping)
             {
                 var functionName = $"Radzen['{getColumnUniqueId(indexOfColumnToReoder.Value)}end']";
                 await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
 
-                var column = allColumns.Where(c => c.Visible).ToList().ElementAtOrDefault(indexOfColumnToReoder.Value);
+                var column = allColumns.Where(c => (c.UniqueID ?? c.Property) == uniqueIDOfColumnToReoder).FirstOrDefault();
 
                 if (column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
                 {
@@ -3125,6 +3127,7 @@ namespace Radzen.Blazor
                 }
 
                 indexOfColumnToReoder = null;
+                uniqueIDOfColumnToReoder = null;
             }
         }
 
