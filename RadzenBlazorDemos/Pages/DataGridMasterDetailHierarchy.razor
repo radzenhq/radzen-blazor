@@ -30,6 +30,17 @@
                 <Tabs>
                     <RadzenTabsItem Text="Order Details">
                         <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@order.OrderDetails">
+                            <Template Context="detail">
+                                <RadzenCard Variant="Variant.Text" class="rz-background-color-primary-lighter rz-color-on-primary-lighter rz-m-4">
+                                    Employee territories and regions
+                                </RadzenCard>
+                                <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" Data="@detail.Order.Employee.EmployeeTerritories.Where(et => et.Territory != null)">
+                                    <Columns>
+                                        <RadzenDataGridColumn Property="Territory.TerritoryDescription" Title="Territory" />
+                                        <RadzenDataGridColumn Property="Territory.Region.RegionDescription" Title="Region" />
+                                    </Columns>
+                                </RadzenDataGrid>
+                            </Template>
                             <Columns>
                                 <RadzenDataGridColumn Property="Order.CustomerID" Title="Order" />
                                 <RadzenDataGridColumn Property="Product.ProductName" Title="Product" />
@@ -61,7 +72,7 @@
             </RadzenTabs>
         </Template>
         <Columns>
-            <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" />
+            <RadzenDataGridColumn Property="@nameof(Order.OrderID)" Title="Order ID" Width="120px" />
             <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="200px" />
             <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="200px">
                 <Template Context="order">
@@ -69,10 +80,10 @@
                     @order.Employee?.FirstName @order.Employee?.LastName
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn Property="OrderDate" Title="Order Date" FormatString="{0:d}" Width="140px" />
+            <RadzenDataGridColumn Property="@nameof(Order.OrderDate)" Title="Order Date" FormatString="{0:d}" Width="140px" />
             <RadzenDataGridColumn Property="@nameof(Order.RequiredDate)" Title="Required Date" FormatString="{0:d}" Width="140px" />
             <RadzenDataGridColumn Property="@nameof(Order.ShippedDate)" Title="Shipped Date" FormatString="{0:d}" Width="140px" />
-            <RadzenDataGridColumn Property="ShipName" Title="Ship Name" />
+            <RadzenDataGridColumn Property="@nameof(Order.ShipName)" Title="Ship Name" />
             <RadzenDataGridColumn Property="@nameof(Order.ShipCountry)" Title="Ship Country" />
         </Columns>
     </RadzenDataGrid>
@@ -103,7 +114,7 @@
     {
         await base.OnInitializedAsync();
 
-        orders = dbContext.Orders.Include("Customer").Include("Employee").Include("OrderDetails").Include("OrderDetails.Product").ToList();
+        orders = dbContext.Orders.Include("Customer").Include("Employee.EmployeeTerritories.Territory.Region").Include("OrderDetails").Include("OrderDetails.Product").ToList();
     }
 
     void RowRender(RowRenderEventArgs<Order> args)
