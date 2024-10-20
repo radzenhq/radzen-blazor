@@ -1723,9 +1723,6 @@ window.Radzen = {
     var inside = false;
     ref.mouseMoveHandler = this.throttle(function (e) {
       if (inside) {
-        if (e.target.matches('.rz-chart-tooltip-content') || e.target.closest('.rz-chart-tooltip-content')) {
-            return
-        }
         var rect = ref.getBoundingClientRect();
         var x = e.clientX - rect.left;
         var y = e.clientY - rect.top;
@@ -1735,7 +1732,10 @@ window.Radzen = {
     ref.mouseEnterHandler = function () {
         inside = true;
     };
-    ref.mouseLeaveHandler = function () {
+    ref.mouseLeaveHandler = function (e) {
+        if (e.relatedTarget && (e.relatedTarget.matches('.rz-chart-tooltip') || e.relatedTarget.closest('.rz-chart-tooltip'))) {
+            return;
+        }
         inside = false;
         instance.invokeMethodAsync('MouseMove', -1, -1);
     };
@@ -2417,5 +2417,11 @@ window.Radzen = {
         } else {
             start();
         }
+    },
+    openChartTooltip: function (chart, x, y, id, instance, callback) {
+        Radzen.closeTooltip(id);
+
+        var chartRect = chart.getBoundingClientRect();
+        Radzen.openPopup(chart, id, false, null, chartRect.left + x, chartRect.top + y, instance, callback, true, false, false);
     }
 };
