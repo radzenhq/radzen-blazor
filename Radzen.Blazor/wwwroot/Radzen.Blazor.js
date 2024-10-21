@@ -185,7 +185,7 @@ window.Radzen = {
         }
     }
   },
-  loadGoogleMaps: function (defaultView, apiKey, resolve, reject) {
+  loadGoogleMaps: function (defaultView, apiKey, resolve, reject, language) {
     resolveCallbacks.push(resolve);
     rejectCallbacks.push(reject);
 
@@ -204,6 +204,7 @@ window.Radzen = {
 
     script.src =
       'https://maps.googleapis.com/maps/api/js?' +
+      (language ? 'language=' + language + '&' : '') +
       (apiKey ? 'key=' + apiKey + '&' : '') +
       'callback=rz_map_init&libraries=marker';
 
@@ -217,7 +218,7 @@ window.Radzen = {
 
     document.body.appendChild(script);
   },
-  createMap: function (wrapper, ref, id, apiKey, mapId, zoom, center, markers, options, fitBoundsToMarkersOnUpdate) {
+  createMap: function (wrapper, ref, id, apiKey, mapId, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language) {
     var api = function () {
       var defaultView = document.defaultView;
 
@@ -226,7 +227,7 @@ window.Radzen = {
           return resolve(defaultView.google);
         }
 
-        Radzen.loadGoogleMaps(defaultView, apiKey, resolve, reject);
+        Radzen.loadGoogleMaps(defaultView, apiKey, resolve, reject, language);
       });
     };
 
@@ -246,10 +247,10 @@ window.Radzen = {
         });
       });
 
-      Radzen.updateMap(id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate);
+      Radzen.updateMap(id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language);
     });
   },
-  updateMap: function (id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate) {
+  updateMap: function (id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language) {
     var api = function () {
         var defaultView = document.defaultView;
 
@@ -258,7 +259,7 @@ window.Radzen = {
                 return resolve(defaultView.google);
             }
 
-            Radzen.loadGoogleMaps(defaultView, apiKey, resolve, reject);
+            Radzen.loadGoogleMaps(defaultView, apiKey, resolve, reject, language);
         });
     };
     api().then(function (google) {
