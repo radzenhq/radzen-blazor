@@ -75,6 +75,8 @@ namespace Radzen.Blazor
             }
         }
 
+        internal IEnumerable<RadzenDataGridColumn<TItem>> VisibleColumns => ColumnsCollection.Where(c => c.GetVisible());
+
         internal int GetLevel()
         {
             int i = 0;
@@ -93,11 +95,11 @@ namespace Radzen.Blazor
             if (!Grid.AllowCompositeDataCells && isDataCell || Columns == null)
                 return 1;
 
-            var span = ColumnsCollection.Concat(ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection)).Sum(c => c.ColumnsCollection.Count())
-                - ColumnsCollection.SelectManyRecursive(c => c.ColumnsCollection).Count(c => c.ColumnsCollection.Any())
-                + ColumnsCollection.Where(c => c.ColumnsCollection.Count() == 0).Count();
+            var span = VisibleColumns.Concat(VisibleColumns.SelectManyRecursive(c => c.VisibleColumns)).Sum(c => c.VisibleColumns.Count())
+                - VisibleColumns.SelectManyRecursive(c => c.VisibleColumns).Count(c => c.VisibleColumns.Any())
+                + VisibleColumns.Where(c => c.VisibleColumns.Count() == 0).Count();
 
-            return span != 0 ? span : ColumnsCollection.Count;
+            return span != 0 ? span : VisibleColumns.Count();
         }
 
         internal int GetRowSpan(bool isDataCell = false)

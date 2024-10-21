@@ -5,7 +5,7 @@
     <CascadingValue Value=this>
 @{var rowArgs = Grid?.RowAttributes(Item, Index); }
 @{var firstLevel = Grid.AllowCompositeDataCells ? 0 : Grid.deepestChildColumnLevel; }
-@for(var i = firstLevel; i < Grid.deepestChildColumnLevel + 1; i++)
+@for(var i = firstLevel; i <= Grid.deepestChildColumnLevel + 1; i++)
 {
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
     @if (Grid.ShowGroupExpandColumn)
