@@ -69,12 +69,6 @@ namespace Radzen.Blazor
         public string FilterPlaceholder { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or Sets the input box autocomplete type.
-        /// </summary>
-        [Parameter]
-        public AutoCompleteType InputAutoCompleteType { get; set; } = AutoCompleteType.Off;
-
-        /// <summary>
         /// Gets or Sets the filter autocomplete type.
         /// </summary>
         /// <value>The filter autocomplete type. Default: Off</value>

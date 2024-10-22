@@ -13,7 +13,7 @@
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
                    name="@Name" value="@(internalValue != null ? internalValue : "")" id="@Name"
-                   aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes="InputAttributes" autocomplete="@InputAutoCompleteType"/>
+                   aria-label="@(!Multiple && internalValue != null ? internalValue : EmptyAriaLabel)" @attributes="InputAttributes"/>
         </div>
 
         @if (ValueTemplate != null && selectedItem != null)
