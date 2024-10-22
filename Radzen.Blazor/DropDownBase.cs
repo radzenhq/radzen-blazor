@@ -228,11 +228,25 @@ namespace Radzen
         public RenderFragment<dynamic> Template { get; set; }
 
         /// <summary>
+        /// Gets or sets the template in drop down.
+        /// </summary>
+        /// <value>The template in drop down.</value>
+        [Parameter]
+        public RenderFragment<dynamic> DropDownTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the value property.
         /// </summary>
         /// <value>The value property.</value>
         [Parameter]
         public string ValueProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value property.
+        /// </summary>
+        /// <value>The value property.</value>
+        [Parameter]
+        public string DropDownTextProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the disabled property.
@@ -449,6 +463,11 @@ namespace Radzen
                     textPropertyGetter = GetGetter(TextProperty, type);
                 }
 
+                if (!string.IsNullOrEmpty(DropDownTextProperty))
+                {
+                    dropDownTextPropertyGetter = GetGetter(DropDownTextProperty, type);
+                }
+
                 if (!string.IsNullOrEmpty(DisabledProperty))
                 {
                     disabledPropertyGetter = GetGetter(DisabledProperty, type);
@@ -471,6 +490,7 @@ namespace Radzen
 
         internal Func<object, object> valuePropertyGetter;
         internal Func<object, object> textPropertyGetter;
+        internal Func<object, object> dropDownTextPropertyGetter;
         internal Func<object, object> disabledPropertyGetter;
 
         /// <summary>
@@ -492,6 +512,10 @@ namespace Radzen
                 if (property == TextProperty)
                 {
                     return textPropertyGetter != null ? textPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
+                }
+                else if (property == DropDownTextProperty)
+                {
+                    return dropDownTextPropertyGetter != null ? dropDownTextPropertyGetter(item) : PropertyAccess.GetItemOrValueFromProperty(item, property);
                 }
                 else if (property == ValueProperty)
                 {
@@ -678,7 +702,7 @@ namespace Radzen
                     var itemToSelect = items.ElementAtOrDefault(selectedIndex);
 
                     await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, $"{searchText}".Trim());
-                    
+
                     if (itemToSelect != null)
                     {
                         await OnSelectItem(itemToSelect, true);

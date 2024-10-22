@@ -5,49 +5,65 @@
 @{var itemArgs = DropDown?.ItemAttributes(this); }
 @if (itemArgs.Visible)
 {
-Disabled = itemArgs.Disabled;
-@if (DropDown.Multiple)
-{
-    <li class="@GetComponentCssClass("rz-multiselect")"
-        aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
+    Disabled = itemArgs.Disabled;
+    @if (DropDown.Multiple)
+    {
+        <li class="@GetComponentCssClass("rz-multiselect")"
+            aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
         @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
-        @onclick:preventDefault @onclick="args=>SelectItem(args,true)" 
-        @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
-        <div class="rz-chkbox ">
-            <div class="@(DropDown.IsSelected(Item) ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
-                <span class="@(DropDown.IsSelected(Item) ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
+        @onclick:preventDefault @onclick="args=>SelectItem(args,true)"
+            @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
+            <div class="rz-chkbox ">
+                <div class="@(DropDown.IsSelected(Item) ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
+                    <span class="@(DropDown.IsSelected(Item) ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
+                </div>
             </div>
-        </div>
-        <span class="rz-multiselect-item-content">
-            @if (DropDown.Template != null)
-            {
-                @DropDown.Template(Item)
-            }
-            else
-            {
-                @DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
-            }
-        </span>
-    </li>
-}
-else
-{
-    <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
-    @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
-    @onclick:preventDefault @onclick="args=>SelectItem(args,true)"
-    @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
-        <span>
-            @if (DropDown.Template != null)
-            {
-                @DropDown.Template(Item)
-            }
-            else
-            {
-                @DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
-            }
-       </span>
-    </li>
-}
+            <span class="rz-multiselect-item-content">
+                @if (DropDown.DropDownTemplate != null)
+                {
+                    @DropDown.DropDownTemplate(Item)
+                }
+                else if (DropDown.Template != null)
+                {
+                    @DropDown.Template(Item)
+                }
+                else if (!string.IsNullOrEmpty(DropDown.DropDownTextProperty))
+                {
+                    @DropDown.GetItemOrValueFromProperty(Item, DropDown.DropDownTextProperty)
+                }
+                else
+                {
+                    @DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+                }
+            </span>
+        </li>
+    }
+    else
+    {
+        <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
+        @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
+        @onclick:preventDefault @onclick="args=>SelectItem(args,true)"
+            @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
+            <span>
+                @if (DropDown.DropDownTemplate != null)
+                {
+                    @DropDown.DropDownTemplate(Item)
+                }
+                else if (DropDown.Template != null)
+                {
+                    @DropDown.Template(Item)
+                }
+                else if (!string.IsNullOrEmpty(DropDown.DropDownTextProperty))
+                {
+                    @DropDown.GetItemOrValueFromProperty(Item, DropDown.DropDownTextProperty)
+                }
+                else
+                {
+                    @DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+                }
+            </span>
+        </li>
+    }
 }
 @code {
     [Parameter(CaptureUnmatchedValues = true)]
