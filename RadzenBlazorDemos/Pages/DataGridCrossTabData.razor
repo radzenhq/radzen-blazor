@@ -20,7 +20,7 @@
         @foreach (var column in columns)
         {
             <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
-                                  Property="@GetColumnPropertyExpression(column.Key, column.Value)">
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
                 <Template>
                     @(context.Values.All(v => v is string) ? context[column.Key] : String.Format("{0:C}", context[column.Key]))
                 </Template>
@@ -33,26 +33,6 @@
     public IEnumerable<IDictionary<string, object>> data { get; set; }
 
     public IDictionary<string, Type> columns { get; set; } = new Dictionary<string, Type>();
-
-    public string GetColumnPropertyExpression(string name, Type type)
-    {
-        var expression = $@"it[""{name}""].ToString()";
-
-        if (type == typeof(int))
-        {
-            return $"int.Parse({expression})";
-        }
-        else if (type == typeof(DateTime))
-        {
-            return $"DateTime.Parse({expression})";
-        }
-        else if (type.IsEnum)
-        {
-            return $@"Int32(Enum.Parse(it[""{name}""].GetType(), {expression}))";
-        }
-
-        return expression;
-    }
 
     protected override async Task OnInitializedAsync()
     {
