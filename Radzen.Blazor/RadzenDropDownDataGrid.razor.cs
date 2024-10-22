@@ -207,7 +207,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>Row selection preservation on pageing.</value>
         [Parameter]
-        public bool PreserveRowSelectionOnPageing { get; set; } = false;
+        public bool PreserveRowSelectionOnPaging { get; set; } = false;
 
         /// <summary>
         /// Gets or sets the page numbers count.
@@ -525,7 +525,7 @@ namespace Radzen.Blazor
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = args.Top, OrderBy = args.OrderBy, Filter = searchText });
             }
             
-            if(PreserveRowSelectionOnPageing && selectedIndex != -1)
+            if(PreserveRowSelectionOnPaging && selectedIndex != -1)
             {	
                 var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (pagedData != null ? pagedData : Enumerable.Empty<object>())).OfType<object>().ToList();
                 selectedIndex = Math.Clamp(selectedIndex, 0, items.Count - 1);
