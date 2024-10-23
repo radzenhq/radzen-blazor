@@ -88,19 +88,15 @@
         }
     }
 
-    public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+    public RenderFragment RenderTooltip(double mouseX, double mouseY)
     {
         string text;
         if (Chart.ShouldInvertAxes())
         {
-            mouseX = Chart.CategoryScale.Scale(Value) + marginLeft;
-            mouseY = Math.Max(marginTop, Math.Min(Chart.ValueScale.OutputSize + marginTop, mouseY));
             text = Chart.ValueAxis.Format(Chart.CategoryScale, Value);
         }
         else
         {
-            mouseY = Chart.ValueScale.Scale(Value) + marginTop;
-            mouseX = Math.Max(marginLeft, Math.Min(Chart.CategoryScale.OutputSize + marginLeft, mouseX));
             text = Chart.ValueAxis.Format(Chart.ValueScale, Value);
         }
 
@@ -108,20 +104,35 @@
         {
             builder.OpenComponent<ChartTooltip>(0);
 
-            builder.AddAttribute(1, nameof(ChartTooltip.X), mouseX);
-            builder.AddAttribute(2, nameof(ChartTooltip.Y), mouseY);
+            builder.AddAttribute(1, nameof(ChartTooltip.ChildContent), TooltipTemplate?.Invoke(Value));
 
-            builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate == null ? null : TooltipTemplate(Value));
+            builder.AddAttribute(6, nameof(ChartTooltip.Title), series.GetTitle());
+            builder.AddAttribute(2, nameof(ChartTooltip.Label), Name);
+            builder.AddAttribute(3, nameof(ChartTooltip.Value), text);
 
-            builder.AddAttribute(8, nameof(ChartTooltip.Title), series.GetTitle());
-            builder.AddAttribute(4, nameof(ChartTooltip.Label), Name);
-            builder.AddAttribute(5, nameof(ChartTooltip.Value), text);
-
-            builder.AddAttribute(6, nameof(ChartTooltip.Style), $"border: 1px solid {Stroke};");
-            builder.AddAttribute(7, nameof(ChartTooltip.Class), "");
+            builder.AddAttribute(4, nameof(ChartTooltip.Style), $"border: 1px solid {Stroke};");
+            builder.AddAttribute(5, nameof(ChartTooltip.Class), "");
 
             builder.CloseComponent();
         };
     }
+
+    /// <inheritdoc />
+    public Point GetTooltipPosition(double mouseX, double mouseY)
+    {
+        if (Chart.ShouldInvertAxes())
+        {
+            mouseX = Chart.CategoryScale.Scale(Value);
+            mouseY = Math.Max(0, Math.Min(Chart.ValueScale.OutputSize, mouseY));
+        }
+        else
+        {
+            mouseY = Chart.ValueScale.Scale(Value);
+            mouseX = Math.Max(0, Math.Min(Chart.CategoryScale.OutputSize, mouseX));
+        }
+
+        return new Point { X = mouseX, Y = mouseY };
+    }
+
     public void Dispose() => series?.Overlays.Remove(this);
 }

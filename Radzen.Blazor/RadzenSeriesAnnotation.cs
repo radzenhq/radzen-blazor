@@ -152,9 +152,15 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc/>
-        public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+        public RenderFragment RenderTooltip(double mouseX, double mouseY)
         {
             return null;
+        }
+
+        /// <inheritdoc />
+        public Point GetTooltipPosition(double mouseX, double mouseY)
+        {
+            return new Point { X = mouseX, Y = mouseY };
         }
 
         /// <inheritdoc/>

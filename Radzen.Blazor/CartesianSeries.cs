@@ -478,38 +478,30 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public virtual RenderFragment RenderTooltip(object data, double marginLeft, double marginTop, double chartHeight)
+        public virtual RenderFragment RenderTooltip(object data)
         {
             var item = (TItem)data;
-
-            var x = TooltipX(item);
-            var y = TooltipY(item);
-
+            
             return builder =>
             {
-
                 if (Chart.Tooltip.Shared)
                 {
                     var category = PropertyAccess.GetValue(item, CategoryProperty);
                     builder.OpenComponent<ChartSharedTooltip>(0);
-                    builder.AddAttribute(1, nameof(ChartSharedTooltip.X), x + marginLeft);
-                    builder.AddAttribute(2, nameof(ChartSharedTooltip.Y), y + marginTop);
-                    builder.AddAttribute(3, nameof(ChartSharedTooltip.Class), TooltipClass(item));
-                    builder.AddAttribute(4, nameof(ChartSharedTooltip.Title), TooltipTitle(item));
-                    builder.AddAttribute(4, nameof(ChartSharedTooltip.ChildContent), RenderSharedTooltipItems(category));
+                    builder.AddAttribute(1, nameof(ChartSharedTooltip.Class), TooltipClass(item));
+                    builder.AddAttribute(2, nameof(ChartSharedTooltip.Title), TooltipTitle(item));
+                    builder.AddAttribute(3, nameof(ChartSharedTooltip.ChildContent), RenderSharedTooltipItems(category));
                     builder.CloseComponent();
                 }
                 else
                 {
                     builder.OpenComponent<ChartTooltip>(0);
-                    builder.AddAttribute(1, nameof(ChartTooltip.X), x + marginLeft);
-                    builder.AddAttribute(2, nameof(ChartTooltip.Y), y + marginTop);
-                    builder.AddAttribute(3, nameof(ChartTooltip.ChildContent), TooltipTemplate?.Invoke(item));
-                    builder.AddAttribute(4, nameof(ChartTooltip.Title), TooltipTitle(item));
-                    builder.AddAttribute(5, nameof(ChartTooltip.Label), TooltipLabel(item));
-                    builder.AddAttribute(6, nameof(ChartTooltip.Value), TooltipValue(item));
-                    builder.AddAttribute(7, nameof(ChartTooltip.Class), TooltipClass(item));
-                    builder.AddAttribute(8, nameof(ChartTooltip.Style), TooltipStyle(item));
+                    builder.AddAttribute(1, nameof(ChartTooltip.ChildContent), TooltipTemplate?.Invoke(item));
+                    builder.AddAttribute(2, nameof(ChartTooltip.Title), TooltipTitle(item));
+                    builder.AddAttribute(3, nameof(ChartTooltip.Label), TooltipLabel(item));
+                    builder.AddAttribute(4, nameof(ChartTooltip.Value), TooltipValue(item));
+                    builder.AddAttribute(5, nameof(ChartTooltip.Class), TooltipClass(item));
+                    builder.AddAttribute(6, nameof(ChartTooltip.Style), TooltipStyle(item));
                     builder.CloseComponent();
                 }
             };
@@ -544,6 +536,16 @@ namespace Radzen.Blazor
                     builder.CloseComponent();
                 }
             };
+        }
+
+        /// <inheritdoc />
+        public Point GetTooltipPosition(object data)
+        {
+            var item = (TItem)data;
+            var x = TooltipX(item);
+            var y = TooltipY(item);
+
+            return new Point { X = x, Y = y };
         }
 
         /// <summary>

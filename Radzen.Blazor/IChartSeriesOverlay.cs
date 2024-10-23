@@ -28,6 +28,12 @@ namespace Radzen.Blazor
         /// <summary>
         /// Renders tooltip
         /// </summary>
-        RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop);
+        RenderFragment RenderTooltip(double mouseX, double mouseY);
+
+        /// <summary>
+        /// Get position of the overlay tooltip.
+        /// </summary>
+        /// <returns>Position.</returns>
+        Point GetTooltipPosition(double mouseX, double mouseY);
     }
 }

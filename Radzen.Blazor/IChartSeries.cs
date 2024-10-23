@@ -50,19 +50,23 @@ namespace Radzen.Blazor
         /// <param name="valueScale">The value scale.</param>
         /// <returns>RenderFragment.</returns>
         RenderFragment RenderOverlays(ScaleBase categoryScale, ScaleBase valueScale);
+
         /// <summary>
         /// Renders the series tooltip.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// <param name="marginLeft">The left margin.</param>
-        /// <param name="marginTop">The right margin.</param>
-        /// <param name="chartHeight">Height of the whole char area.</param>
         /// <returns>RenderFragment.</returns>
-        RenderFragment RenderTooltip(object data, double marginLeft, double marginTop, double chartHeight);
+        RenderFragment RenderTooltip(object data);
         /// <summary>
         /// Renders a tooltip item with the specified data to be displayed in a shared tooltip
         /// </summary>
         RenderFragment RenderSharedTooltipItem(object category);
+        /// <summary>
+        /// Get position of the series tooltip.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns>Position.</returns>
+        Point GetTooltipPosition(object data);
         /// <summary>
         /// Renders the legend item.
         /// </summary>

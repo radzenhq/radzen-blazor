@@ -176,9 +176,9 @@ The Radzen Blazor components are distributed via the <a href="">Radzen.Blazor</a
 }
 </code>
 </pre>
-<h3 id="outlets"><a href="#outlets">Dialog, context menu, tooltip and notification</a></h3>
+<h3 id="outlets"><a href="#outlets">Dialog, context menu, tooltip, chart tooltip and notification</a></h3>
 <p>
-To use RadzenDialog, RadzenContextMenu, RadzenTooltip and RadzenNotification you need to perform a few additional steps.
+To use RadzenDialog, RadzenContextMenu, RadzenTooltip, RadzenChartTooltip and RadzenNotification you need to perform a few additional steps.
 </p>
 <ol>
   <li>Open <code>MainLayout.razor</code> and add this code
