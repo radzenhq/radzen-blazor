@@ -211,7 +211,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, null, null,
+                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, ApiKey, null, null,
                              data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
             }
         }

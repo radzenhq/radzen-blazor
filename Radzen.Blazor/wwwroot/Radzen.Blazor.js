@@ -247,10 +247,10 @@ window.Radzen = {
         });
       });
 
-      Radzen.updateMap(id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language);
+      Radzen.updateMap(id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language);
     });
   },
-  updateMap: function (id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language) {
+  updateMap: function (id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language) {
     var api = function () {
         var defaultView = document.defaultView;
 
