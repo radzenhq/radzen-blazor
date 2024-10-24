@@ -236,6 +236,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Real-time data",
+                            Path = "datagrid-realtime",
+                            Title = "Blazor DataGrid Component - Real-time Data | Free UI Components by Radzen",
+                            Description = "Blazor Data Grid with real-time data sources.",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "real-time" }
+                        },
+                        new Example
+                        {
                             Name = "Crosstab data",
                             Path = "datagrid-crosstab",
                             Title = "Blazor DataGrid Component - Crosstab Data | Free UI Components by Radzen",

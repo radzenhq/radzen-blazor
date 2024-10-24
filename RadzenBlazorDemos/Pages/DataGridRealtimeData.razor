@@ -1,0 +1,63 @@
+﻿@using System.Linq.Dynamic.Core
+
+<RadzenDataGrid @ref=grid Data="@data" TItem="IDictionary<string, object>" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
+    <Columns>
+        @foreach (var column in columns)
+        {
+            <RadzenDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
+                <Template>
+                    @context[@column.Key]
+                </Template>
+            </RadzenDataGridColumn>
+        }
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    RadzenDataGrid<IDictionary<string, object>> grid;
+
+    public IEnumerable<IDictionary<string, object>> data 
+    { 
+        get
+        {
+            return Enumerable.Range(0, 20).Select(i =>
+            {
+                var row = new Dictionary<string, object>();
+
+                foreach (var column in columns)
+                {
+                    row.Add(
+                        column.Key,
+                        column.Value == typeof(Guid) ? Guid.NewGuid()
+                            : column.Value == typeof(DateTime) ? DateTime.Now.AddMonths(i)
+                                : $"{column.Key}{i}"
+                    );
+                }
+
+                return row;
+            });
+        }
+    }
+
+    public IDictionary<string, Type> columns { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        columns = new Dictionary<string, Type>()
+        {
+            { "ID", typeof(Guid) },
+            { "Date", typeof(DateTime) },
+        };
+
+        var timer = new System.Timers.Timer(1000);
+        timer.Elapsed += (s, e) =>
+        {
+            InvokeAsync(grid.Reload);
+        };
+
+        timer.Start();
+    }
+}
