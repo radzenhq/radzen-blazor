@@ -57,12 +57,12 @@ $card-heading-margin-bottom: 0.5rem !default;
     border-radius: 0;
   }  
 
-  > .rz-card:first-child {
+  > .rz-card:first-of-type {
     border-start-start-radius: var(--rz-card-border-radius);
     border-end-start-radius: var(--rz-card-border-radius);
   }
 
-  > .rz-card:last-child {
+  > .rz-card:last-of-type {
     border-start-end-radius: var(--rz-card-border-radius);
     border-end-end-radius: var(--rz-card-border-radius);
   }
@@ -82,16 +82,16 @@ $card-heading-margin-bottom: 0.5rem !default;
 
 @if $theme-name == material3 or $theme-name == material3-dark {
   .rz-card-group {
-    > .rz-card:first-child,
-    > .rz-card + .rz-card:not(:last-child) {
+    > .rz-card:first-of-type,
+    > .rz-card + .rz-card:not(:last-of-type) {
       clip-path: inset(-32px 0 -32px -32px);
     }
   }
 
   // RTL CardGroup
   *[dir=rtl] .rz-card-group {
-    > .rz-card:first-child,
-    > .rz-card + .rz-card:not(:last-child) {
+    > .rz-card:first-of-type,
+    > .rz-card + .rz-card:not(:last-of-type) {
       clip-path: inset(-32px -32px -32px 0);
     }
   }
@@ -107,12 +107,12 @@ $card-heading-margin-bottom: 0.5rem !default;
       border-radius: 0;
     }
   
-    > .rz-card:first-child {
+    > .rz-card:first-of-type {
       border-start-start-radius: var(--rz-card-border-radius);
       border-start-end-radius: var(--rz-card-border-radius);
     }
   
-    > .rz-card:last-child {
+    > .rz-card:last-of-type {
       border-end-start-radius: var(--rz-card-border-radius);
       border-end-end-radius: var(--rz-card-border-radius);
     }
@@ -122,8 +122,8 @@ $card-heading-margin-bottom: 0.5rem !default;
         clip-path: none;
       }
 
-      > .rz-card:first-child,
-      > .rz-card + .rz-card:not(:last-child) {
+      > .rz-card:first-of-type,
+      > .rz-card + .rz-card:not(:last-of-type) {
         clip-path: inset(-32px -32px 0 -32px);
       }
     }
