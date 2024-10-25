@@ -16,6 +16,13 @@ if (!Element.prototype.closest) {
   };
 }
 
+if (document.fonts) {
+  document.body.classList.add('rz-icons-loading');
+  document.fonts.load('16px Material Symbols').then(() => {
+      document.body.classList.remove('rz-icons-loading');
+  })
+}
+
 var resolveCallbacks = [];
 var rejectCallbacks = [];
 var radzenRecognition;
