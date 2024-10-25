@@ -459,27 +459,31 @@ window.Radzen = {
     min,
     max,
     value,
-    step
+    step,
+    isVertical
   ) {
     Radzen[id] = {};
     Radzen[id].mouseMoveHandler = function (e) {
-      if (!slider.canChange) return;
       e.preventDefault();
+
       var handle = slider.isMin ? minHandle : maxHandle;
+
+      if (!slider.canChange) return;
+
       var offsetX =
         e.targetTouches && e.targetTouches[0]
           ? e.targetTouches[0].pageX - e.target.getBoundingClientRect().left
-          : e.pageX - handle.getBoundingClientRect().left;
-      var percent = (Radzen.isRTL(handle) ? parent.offsetWidth - handle.offsetLeft - offsetX
-            : handle.offsetLeft + offsetX) / parent.offsetWidth;
+                : e.pageX - handle.getBoundingClientRect().left;
 
-      if (percent > 1) {
-          percent = 1;
-      } else if (percent < 0) {
-          percent = 0;
-      }
+      var offsetY =
+        e.targetTouches && e.targetTouches[0]
+          ? e.targetTouches[0].pageY - e.target.getBoundingClientRect().top
+              : e.pageY - handle.getBoundingClientRect().top;
 
-      var newValue = percent * (max - min) + min;
+      var percent = isVertical ? (parent.offsetHeight - handle.offsetTop - offsetY) / parent.offsetHeight
+        : (Radzen.isRTL(handle) ? parent.offsetWidth - handle.offsetLeft - offsetX : handle.offsetLeft + offsetX) / parent.offsetWidth;
+
+      var newValue = Math.max(min, Math.min(percent, max)) * (max - min) + min;
 
       if (
         slider.canChange &&
@@ -500,11 +504,14 @@ window.Radzen = {
         slider.canChange = true;
         slider.isMin = minHandle == e.target;
       } else {
+
         var offsetX =
           e.targetTouches && e.targetTouches[0]
             ? e.targetTouches[0].pageX - e.target.getBoundingClientRect().left
-            : e.offsetX;
+                  : e.offsetX;
+
         var percent = offsetX / parent.offsetWidth;
+
         var newValue = percent * (max - min) + min;
         var oldValue = range ? value[slider.isMin ? 0 : 1] : value;
         if (newValue >= min && newValue <= max && newValue != oldValue) {

@@ -54,6 +54,11 @@ $slider-disabled-handle-border: none !default;
   width: var(--rz-slider-horizontal-width);
 }
 
+.rz-slider-vertical {
+    width: var(--rz-slider-horizontal-height);
+    height: var(--rz-slider-horizontal-width);
+}
+
 .rz-slider-range {
   position: absolute;
   inset-block-start: -1px;
@@ -69,7 +74,6 @@ $slider-disabled-handle-border: none !default;
 .rz-slider-handle {
   position: absolute;
   transform: translateY(-50%);
-  top: 50%;
   margin-inline-start: calc(var(--rz-slider-handle-width) / -2);
   background-color: var(--rz-slider-handle-background-color);
   border: var(--rz-slider-handle-border);
@@ -78,6 +82,14 @@ $slider-disabled-handle-border: none !default;
   width: var(--rz-slider-handle-width);
   height: var(--rz-slider-handle-height);
   transition: var(--rz-slider-handle-transition);
+}
+
+.rz-slider-handle-horizontal {
+  top: 50%;
+}
+
+.rz-slider-handle-vertical {
+    left: 50%;
 }
 
 .rz-slider:not(.rz-state-disabled) {
