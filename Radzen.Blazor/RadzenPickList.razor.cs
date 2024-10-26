@@ -43,6 +43,27 @@ namespace Radzen.Blazor
         public RenderFragment TargetHeader { get; set; }
 
         /// <summary>
+        /// Gets or sets the common placeholder
+        /// </summary>
+        /// <value>The common placeholder.</value>
+        [Parameter]
+        public string Placeholder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the source placeholder
+        /// </summary>
+        /// <value>The source placeholder.</value>
+        [Parameter]
+        public string SourcePlaceholder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the target placeholder
+        /// </summary>
+        /// <value>The target placeholder.</value>
+        [Parameter]
+        public string TargetPlaceholder { get; set; }
+
+        /// <summary>
         /// Gets or sets the text property
         /// </summary>
         /// <value>The text property.</value>
