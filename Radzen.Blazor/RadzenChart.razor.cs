@@ -54,7 +54,7 @@ namespace Radzen.Blazor
         public EventCallback<LegendClickEventArgs> LegendClick { get; set; }
         
         [Inject]
-        ChartTooltipService TooltipService { get; set; }
+        TooltipService TooltipService { get; set; }
 
         /// <summary>
         /// Gets the runtime width of the chart.
@@ -374,7 +374,7 @@ namespace Radzen.Blazor
                                 tooltipData = null;
                                 tooltip = overlay.RenderTooltip(queryX, queryY);
                                 var tooltipPosition = overlay.GetTooltipPosition(queryX, queryY);
-                                TooltipService.Open(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+                                TooltipService.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
                                 {
                                     ColorScheme = ColorScheme
                                 });
@@ -407,7 +407,7 @@ namespace Radzen.Blazor
                         tooltipData = closestSeriesData;
                         tooltip = closestSeries.RenderTooltip(closestSeriesData);
                         var tooltipPosition = closestSeries.GetTooltipPosition(closestSeriesData);
-                        TooltipService.Open(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+                        TooltipService.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
                         {
                             ColorScheme = ColorScheme
                         });

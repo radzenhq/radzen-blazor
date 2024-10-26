@@ -14,7 +14,7 @@
 @code {
     public string UniqueID { get; set; }
 
-    [Inject] private ChartTooltipService Service { get; set; }
+    [Inject] private TooltipService Service { get; set; }
 
     List<ChartTooltip> tooltips = new List<ChartTooltip>();
 
@@ -129,7 +129,7 @@
             }
         }
 
-        Service.OnOpen -= OnOpen;
+        Service.OnOpenChartTooltip -= OnOpen;
         Service.OnClose -= OnClose;
         Service.OnNavigate -= OnNavigate;
     }
@@ -138,7 +138,7 @@
     {
         UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
 
-        Service.OnOpen += OnOpen;
+        Service.OnOpenChartTooltip += OnOpen;
         Service.OnClose += OnClose;
         Service.OnNavigate += OnNavigate;
     }

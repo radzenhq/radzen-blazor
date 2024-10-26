@@ -290,7 +290,6 @@ namespace Radzen
             services.AddScoped<DialogService>();
             services.AddScoped<NotificationService>();
             services.AddScoped<TooltipService>();
-            services.AddScoped<ChartTooltipService>();
             services.AddScoped<ContextMenuService>();
             services.AddScoped<ThemeService>();
 

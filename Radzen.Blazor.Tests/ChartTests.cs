@@ -24,7 +24,7 @@ public class ChartTests
         using var ctx = new TestContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.Setup<Rect>("Radzen.createChart", _ => true).SetResult(new Rect {Left = 0, Top = 0, Width = 200, Height = 200});
-        ctx.Services.AddScoped<ChartTooltipService>();
+        ctx.Services.AddScoped<TooltipService>();
         ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
         ctx.RenderComponent<RadzenChartTooltip>();
 
