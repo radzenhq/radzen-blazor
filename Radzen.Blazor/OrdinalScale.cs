@@ -22,8 +22,6 @@ namespace Radzen.Blazor
             var start = - step;
             var end = count + step;
 
-            Console.WriteLine($"Ticks: {ticks} Start: {start} End: {end} Step: {step}");
-
             return (start, end, step);
         }
     }
