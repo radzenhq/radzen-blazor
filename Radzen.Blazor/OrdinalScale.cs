@@ -15,9 +15,14 @@ namespace Radzen.Blazor
 
         public override (double Start, double End, double Step) Ticks(int distance)
         {
-            var start = -1;
-            var end = Data.Count;
-            var step = 1;
+            var count = Data.Count - 1;
+            var ticks = Math.Min(Math.Ceiling(Math.Abs((Output.End - Padding) - (Output.Start + Padding)) / distance), count);
+            var step = (count) / ticks;
+
+            var start = - step;
+            var end = count + step;
+
+            Console.WriteLine($"Ticks: {ticks} Start: {start} End: {end} Step: {step}");
 
             return (start, end, step);
         }
