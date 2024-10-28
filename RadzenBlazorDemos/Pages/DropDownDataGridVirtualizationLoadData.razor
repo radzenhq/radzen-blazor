@@ -1,6 +1,7 @@
 ﻿@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
+@using System.Linq.Dynamic.Core
 
 @inherits DbContextPage
 
@@ -31,6 +32,11 @@
         {
             lastfilter = args.Filter;
             query = query.Where(c => c.CustomerID.ToLower().Contains(args.Filter.ToLower()) || c.ContactName.ToLower().Contains(args.Filter.ToLower()) || c.CompanyName.ToLower().Contains(args.Filter.ToLower()));
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
         }
 
         count = await Task.FromResult(query.Count());

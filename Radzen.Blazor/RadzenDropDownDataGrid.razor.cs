@@ -514,6 +514,11 @@ namespace Radzen.Blazor
                     query = query.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, args.OrderBy);
                 }
 
+                if (IsVirtualizationAllowed())
+                {
+                    await Task.Yield();
+                }
+
                 count = await Task.FromResult(query.Count());
 
                 pagedData = await Task.FromResult(QueryableExtension.ToList(query.Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>());
