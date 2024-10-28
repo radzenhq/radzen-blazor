@@ -1,0 +1,30 @@
+@page "/chart-label-rotation"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Chart label rotation
+</RadzenText>
+<RadzenText Anchor="chart-label-rotation#auto-rotation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Auto Rotation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The Radzen Blazor Chart component can automatically rotate the labels of the category axis when they overlap.
+    To enable that set the <strong>LabelAutoRotation</strong> property: <code>LabelAutoRotation="-45"</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Try changing the angle and the width of the chart to see the effect.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="ChartLabelAutoRotation" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <ChartLabelAutoRotation />
+</RadzenExample>
+<RadzenText Anchor="chart-label-rotation#rotation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Predefined Rotation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To always rotate the labels of the category axis set the <strong>LabelRotation</strong> property: <code>LabelRotation="-45"</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Try changing the angle and the width of the chart to see the effect.
+</RadzenText>
+<RadzenExample ComponentName="Chart" Example="ChartLabelAutoRotation" DocumentationLink="https://blazor.radzen.com/docs/guides/components/chart.html">
+    <ChartLabelRotation />
+</RadzenExample>

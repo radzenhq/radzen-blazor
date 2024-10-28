@@ -144,10 +144,6 @@ $chart-color-schemes: (
   }
 }
 
-.rz-category-axis .rz-tick-text {
-  text-anchor: middle;
-}
-
 .rz-axis .rz-axis-title {
   stroke: none;
   text-anchor: middle;
@@ -330,7 +326,7 @@ $chart-color-schemes: (
     gap: 1rem;
     padding: 0.125rem 0.5rem;
     border-radius: var(--rz-chart-tooltip-item-border-radius);
-  
+
     &:hover {
       background-color: var(--rz-chart-tooltip-item-hover-background-color);
     }

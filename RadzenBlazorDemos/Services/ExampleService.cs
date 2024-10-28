@@ -1584,6 +1584,15 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Label Rotation",
+                            Path = "chart-label-rotation",
+                            Title = "Blazor Chart Component - Label Rotation | Free UI Components by Radzen",
+                            Description = "The Radzen Blazor Chart can rotate the labels of the horizontal axis.",
+                            New = true,
+                            Tags = new [] { "chart", "label", "rotate", "rotation" }
+                        },
+                        new Example
+                        {
                             Name = "Trends",
                             Path = "chart-trends",
                             Title = "Blazor Chart Component - Trends | Free UI Components by Radzen",
