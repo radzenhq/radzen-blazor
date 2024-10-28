@@ -8,7 +8,7 @@ using Radzen.Blazor;
 namespace Radzen
 {
     /// <summary>
-    /// Class TooltipService. Contains various methods with options to open and close tooltips. 
+    /// Class TooltipService. Contains various methods with options to open and close tooltips.
     /// Should be added as scoped service in the application services and RadzenTooltip should be added in application main layout.
     /// Implements the <see cref="IDisposable" />
     /// </summary>
@@ -174,7 +174,7 @@ namespace Radzen
 
             OpenTooltip<object>(element, options);
         }
-        
+
         /// <summary>
         /// Opens the specified chart tooltip.
         /// </summary>
@@ -311,11 +311,8 @@ namespace Radzen
         /// <value>The element.</value>
         public ElementReference Element { get; set; }
     }
-    
-    /// <summary>
-    /// Class ChartTooltipOptions.
-    /// </summary>
-    public class ChartTooltipOptions
+
+    internal class ChartTooltipOptions
     {
         /// <summary>
         /// Gets or sets the color scheme used to render the tooltip.

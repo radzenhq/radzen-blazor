@@ -18,7 +18,7 @@
 
     List<ChartTooltip> tooltips = new List<ChartTooltip>();
 
-    public async Task Open(ElementReference chart, double x, double y, ChartTooltipOptions options)
+    async Task Open(ElementReference chart, double x, double y, ChartTooltipOptions options)
     {
         tooltips.Clear();
         tooltips.Add(new ChartTooltip { Options = options, Chart = chart, X = x, Y = y });
@@ -95,14 +95,14 @@
                 try
                 {
                     tooltips.Remove(lastTooltip);
-                    await JSRuntime.InvokeVoidAsync("Radzen.closeTooltip", UniqueID);   
+                    await JSRuntime.InvokeVoidAsync("Radzen.closeTooltip", UniqueID);
                 }
                 catch
                 {
                     // ignored
                 }
             }
-            
+
         }
 
         await InvokeAsync(StateHasChanged);
