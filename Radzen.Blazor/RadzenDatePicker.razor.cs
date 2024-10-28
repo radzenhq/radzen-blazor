@@ -316,6 +316,12 @@ namespace Radzen.Blazor
         /// <value>The input CSS class.</value>
         [Parameter]
         public string InputClass { get; set; }
+        /// <summary>
+        /// Gets or sets the button CSS class.
+        /// </summary>
+        /// <value>The button CSS class.</value>
+        [Parameter]
+        public string ButtonClass { get; set; }
 
         /// <summary>
         /// Gets or sets the Minimum Selectable Date.
@@ -1174,10 +1180,13 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                await SetDay(FocusedDate);
+                if (!DateAttributes(FocusedDate).Disabled)
+                {
+                    await SetDay(FocusedDate);
 
-                await ClosePopup();
-                await FocusAsync();
+                    await ClosePopup();
+                    await FocusAsync();
+                }
             }
             else if (key == "Escape")
             {

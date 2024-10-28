@@ -63,6 +63,16 @@ namespace Radzen.Blazor
         /// <value>The template.</value>
         [Parameter]
         public RenderFragment<TItem> Template { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the additional content to be rendered in place of the default navigation buttons in the scheduler.
+        /// This property allows for complete customization of the navigation controls, replacing the native date navigation buttons (such as year, month, and day) with user-defined content or buttons.
+        /// Use this to add custom controls or interactive elements that better suit your application's requirements.
+        /// </summary>
+        /// <value>The custom navigation template to replace default navigation buttons.</value>
+        [Parameter]
+        public RenderFragment NavigationTemplate { get; set; }
+
 
         /// <summary>
         /// Gets or sets the data of RadzenScheduler. It will display an appointment for every item of the collection which is within the current view date range.

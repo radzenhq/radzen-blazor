@@ -4,12 +4,38 @@
 <Line class="rz-tick-line" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" X1="@X" Y1="@Y" X2="@X" Y2="@(Y+6)" />
 @if (ChildContent == null)
 {
-  <g>
-    <text class="rz-tick-text" x="@X.ToInvariantString()" dy="1em" y="@((Y + 6).ToInvariantString())">@Text</text>
-  </g>
+  @if (Rotate != null)
+  {
+  <text>
+    <text class="rz-tick-text" x="@x" text-anchor=@textAnchor dy="1em" y="@y" transform="rotate(@angle, @x, @y)">@Text</text>
+  </text>
+  }
+  else
+  {
+    <text>
+      <text class="rz-tick-text" text-anchor=@textAnchor x="@x" dy="1em" y="@y">@Text</text>
+    </text>
+  }
 }
 else
 {
   @ChildContent
 }
 </g>
+
+@code {
+  [Parameter]
+  public double? Rotate { get; set; }
+
+  string x => X.ToInvariantString();
+  string y => (Y + 6).ToInvariantString();
+
+  string angle => Rotate?.ToInvariantString();
+
+  string textAnchor => Rotate switch
+  {
+    > 0 => "start",
+    < 0 => "end",
+    _ => "middle"
+  };
+}

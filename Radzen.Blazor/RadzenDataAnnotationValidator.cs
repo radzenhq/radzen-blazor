@@ -48,11 +48,13 @@ namespace Radzen.Blazor
         {
             var validationResults = new List<ValidationResult>();
 
-            var getter = PropertyAccess.Getter<object>(EditContext.Model, component.FieldIdentifier.FieldName);
+            var model = component.FieldIdentifier.Model;
 
-            var value = getter(EditContext.Model);
+            var getter = PropertyAccess.Getter<object>(model, component.FieldIdentifier.FieldName);
 
-            var validationContext = new ValidationContext(EditContext.Model)
+            var value = getter(model);
+
+            var validationContext = new ValidationContext(model)
             {
                 MemberName = component.FieldIdentifier.FieldName
             };

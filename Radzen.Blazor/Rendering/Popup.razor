@@ -12,6 +12,12 @@
     [Parameter]
     public bool Lazy { get; set; }
 
+    /// <summary>
+    /// Gets or sets a value indicating whether to focus the first focusable HTML element. Set to <c>true</c> by default.
+    /// </summary>
+    [Parameter]
+    public bool AutoFocusFirstElement { get; set; } = true;
+
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
@@ -32,7 +38,7 @@
         if (open)
         {
             await Open.InvokeAsync(null);
-            await JSRuntime.InvokeVoidAsync("Radzen.openPopup", target, GetId(), false, null, null, null, Reference, nameof(OnClose), true, true, disableSmartPosition);
+            await JSRuntime.InvokeVoidAsync("Radzen.openPopup", target, GetId(), false, null, null, null, Reference, nameof(OnClose), true, AutoFocusFirstElement, disableSmartPosition);
         }
         else
         {

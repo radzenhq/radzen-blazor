@@ -228,7 +228,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   border-top: var(--rz-grid-cell-border);
 }
 
-.rz-datatable-thead,
 .rz-grid-table thead {
 
   th {
@@ -273,6 +272,10 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+
+      &:has(.rz-column-title-content > .rz-chkbox) {
+        overflow: visible;
+      }
     }
 
     .rz-column-title-content {

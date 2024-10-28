@@ -115,9 +115,24 @@ $upload-button-background-color: var(--rz-primary) !default;
       color: var(--rz-upload-cancel-color);
     }
   }
+
+  // Upload in a FormField
+  .rz-form-field & {
+    background-color: inherit;
+  }
+
+  .rz-form-field.rz-variant-flat &,
+  .rz-form-field.rz-variant-filled & {
+    --rz-upload-button-bar-padding: calc(var(--rz-form-field-label-floating-top) + 1.5rem) calc(var(--rz-form-field-label-inset-inline-start) + 0.25rem) calc(var(--rz-form-field-label-inset-inline-start) + 0.25rem);
+  }
 }
 
 .rz-fileupload-files {
   background-color: var(--rz-upload-files-background-color);
   padding: var(--rz-upload-files-padding);
+
+  // Files in a FormField
+  .rz-form-field & {
+    background-color: inherit;
+  }
 }

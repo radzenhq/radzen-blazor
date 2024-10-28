@@ -15,7 +15,7 @@
             <span id="@(Grid.getColumnUniqueId(ColumnIndex) + "-drag")" class="rz-column-drag"
                     @onclick:preventDefault="true" @onclick:stopPropagation="true"
                     @onmousedown:preventDefault="true"
-                    @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex))></span>
+                    @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex, Column.UniqueID ?? Column.Property))></span>
         }
         <span class="rz-column-title" title="@(Grid.ShowColumnTitleAsTooltip ? @Column.GetTitle() : Column.HeaderTooltip)">
             @if (Column.HeaderTemplate != null)
@@ -248,11 +248,11 @@ else
                 query = query
                     .SelectMany(DynamicLinqCustomTypeProvider.ParsingConfig, property)
                     .Select(DynamicLinqCustomTypeProvider.ParsingConfig, Column.FilterProperty)
-                    .Distinct().Cast(typeof(object));
+                    .Distinct().OrderBy("it").Cast(typeof(object));
             }
             else
             {
-                query = query.Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().Cast(propertyType ?? typeof(object));
+                query = query.Select(DynamicLinqCustomTypeProvider.ParsingConfig, property).Distinct().OrderBy("it").Cast(propertyType ?? typeof(object));
             }
 
             filterValuesCount = query.Count();
@@ -267,7 +267,7 @@ else
                 query = query.Take(loadDataArgs.Top.Value);
             }
 
-            filterValues = query;
+            filterValues = query.Select("it => it.ToString() == string.Empty ? null : it");
 
             if (!Column.AllowCheckBoxListVirtualization)
             {

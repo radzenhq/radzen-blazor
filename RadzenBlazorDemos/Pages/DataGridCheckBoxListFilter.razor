@@ -16,7 +16,7 @@
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" />
         <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" AllowCheckBoxListVirtualization="false" />
-        <RadzenDataGridColumn Property="ProductDiscontinued" Title="Discontinued" />
+        <RadzenDataGridColumn Property="ProductDiscontinued" Title="Discontinued" FormatString="{0}" FormatProvider="@myBooleanProvider" />
         <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">
             <Template Context="order">
                 <RadzenImage Path="@order.Employee?.Photo" Style="width: 32px; height: 32px;" class="rz-border-radius-4 rz-me-2" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
@@ -40,6 +40,7 @@
 @code {
     IEnumerable<Order> orders;
     RadzenDataGrid<Order> grid;
+    MyBooleanProvider myBooleanProvider = new MyBooleanProvider();
 
     protected override async Task OnInitializedAsync()
     {
@@ -50,5 +51,23 @@
                 o.ProductDiscontinued = o.OrderDetails.FirstOrDefault()?.Product?.Discontinued;
                 return o;
             }).AsQueryable());
+    }
+
+    public class MyBooleanProvider : IFormatProvider, ICustomFormatter
+    {
+        public string Format(string format, object arg, IFormatProvider formatProvider)
+        {
+            return object.Equals(arg, true) ? "Yes" : object.Equals(arg, false) ? "No" : "No value";
+        }
+
+        public object GetFormat(Type formatType)
+        {
+            if (formatType == typeof(ICustomFormatter))
+            {
+                return this;
+            }
+
+            return null;
+        }
     }
 }

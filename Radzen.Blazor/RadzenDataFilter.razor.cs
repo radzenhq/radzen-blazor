@@ -228,6 +228,20 @@ namespace Radzen.Blazor
         public string DoesNotContainText { get; set; } = "Does not contain";
 
         /// <summary>
+        /// Gets or sets the in operator text.
+        /// </summary>
+        /// <value>The in operator text.</value>
+        [Parameter]
+        public string InText { get; set; } = "In";
+
+        /// <summary>
+        /// Gets or sets the not in operator text.
+        /// </summary>
+        /// <value>The not in operator text.</value>
+        [Parameter]
+        public string NotInText { get; set; } = "Not in";
+
+        /// <summary>
         /// Gets or sets the starts with text.
         /// </summary>
         /// <value>The starts with text.</value>

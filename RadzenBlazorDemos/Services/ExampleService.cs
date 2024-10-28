@@ -236,6 +236,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Real-time data",
+                            Path = "datagrid-realtime",
+                            Title = "Blazor DataGrid Component - Real-time Data | Free UI Components by Radzen",
+                            Description = "Blazor Data Grid with real-time data sources.",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "real-time" }
+                        },
+                        new Example
+                        {
                             Name = "Crosstab data",
                             Path = "datagrid-crosstab",
                             Title = "Blazor DataGrid Component - Crosstab Data | Free UI Components by Radzen",
@@ -1018,7 +1026,16 @@ namespace RadzenBlazorDemos
                     Description = "Use the Blazor RadzenCard component to display a piece of content, like an image and text.",
                     Path = "card",
                     Icon = "&#xefad",
-                    Tags = new [] { "container" }
+                    Tags = new [] { "card", "container" }
+                },
+                new Example
+                {
+                    Name = "CardGroup",
+                    Description = "Use the Blazor RadzenCardGroup component to visually stick RadzenCards next to each other.",
+                    Path = "card-group",
+                    Icon = "&#xe8f3",
+                    New = true,
+                    Tags = new [] { "card", "group", "deck", "container" }
                 },
                 new Example
                 {
@@ -1084,6 +1101,15 @@ namespace RadzenBlazorDemos
                     Path = "breadcrumb",
                     Icon = "&#xea50",
                     Tags = new [] { "breadcrumb", "navigation", "menu" }
+                },
+                new Example
+                {
+                    Name = "Carousel",
+                    Description = "Demonstration and configuration of the Radzen Blazor Carousel component.",
+                    Path = "carousel",
+                    Icon = "&#xe8eb",
+                    New = true,
+                    Tags = new [] { "carousel", "gallery", "slide", "deck", "container" }
                 },
                 new Example
                 {
@@ -1555,6 +1581,15 @@ namespace RadzenBlazorDemos
                             Title = "Blazor Chart Component - ToolTip Configuration | Free UI Components by Radzen",
                             Description = "The Radzen Blazor Chart displays a tooltip when the user hovers series with the mouse. The tooltip by default includes the series category, value and series name.",
                             Tags = new [] { "chart", "graph", "legend" }
+                        },
+                        new Example
+                        {
+                            Name = "Label Rotation",
+                            Path = "chart-label-rotation",
+                            Title = "Blazor Chart Component - Label Rotation | Free UI Components by Radzen",
+                            Description = "The Radzen Blazor Chart can rotate the labels of the horizontal axis.",
+                            New = true,
+                            Tags = new [] { "chart", "label", "rotate", "rotation" }
                         },
                         new Example
                         {

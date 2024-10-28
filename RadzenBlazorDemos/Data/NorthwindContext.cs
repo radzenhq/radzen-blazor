@@ -264,6 +264,11 @@ namespace RadzenBlazorDemos.Data
                 Employees.AddRange(EmployeesData.Data);
             }
 
+            if (!EmployeeTerritories.Any())
+            {
+                EmployeeTerritories.AddRange(EmployeeTerritorysData.Data);
+            }
+
             if (!Orders.Any())
             {
                 Orders.AddRange(OrdersData.Data);

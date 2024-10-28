@@ -69,6 +69,13 @@ namespace Radzen.Blazor
         public string FilterPlaceholder { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or Sets the filter autocomplete type.
+        /// </summary>
+        /// <value>The filter autocomplete type. Default: Off</value>
+        [Parameter]
+        public AutoCompleteType FilterAutoCompleteType { get; set; } = AutoCompleteType.Off;
+
+        /// <summary>
         /// Gets or sets the row render callback. Use it to set row attributes.
         /// </summary>
         /// <value>The row render callback.</value>

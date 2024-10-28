@@ -1,0 +1,87 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Selected index
+                <RadzenNumeric @bind-Value=@selectedIndex Min="0" Max="@(orderIDs.Count() - 1)" aria-label="selected index" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Interval
+                <RadzenNumeric @bind-Value=@interval aria-label="interval" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="8px">
+                Auto-cycle
+                <RadzenSwitch @bind-Value="@auto" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "auto-cycle" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="8px">
+                Navigate
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="16px">
+                    <RadzenToggleButton Text="@toggleText" Click="@Toggle" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" />
+                    <RadzenButton Text="Go to first" Click="@(args => carousel.Navigate(0))" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" Disabled="@(selectedIndex == 0)" />
+                    <RadzenButton Text="Go to last" Click="@(args => carousel.Navigate(orderIDs.Count() - 1))" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small"  Disabled="@(selectedIndex == orderIDs.Count() - 1)" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="@auto" Interval="@interval" PagerOverlay="false" ButtonShade="Shade.Default" Style="height:500px"
+                Change="@(args => console.Log($"SelectedIndex changed to {args}"))">
+            <Items>
+                @foreach (var orderID in orderIDs)
+                {
+                <RadzenCarouselItem>
+                    <RadzenCard class="rz-w-75">
+                        <DialogCardPage OrderID=@orderID />
+                    </RadzenCard>
+                </RadzenCarouselItem>
+                }
+            </Items>
+        </RadzenCarousel>
+    </RadzenCard>
+</RadzenStack>
+
+<EventConsole @ref=@console Style="min-height: 230px;" />
+
+@code {
+    RadzenCarousel carousel;
+
+    bool auto = true;
+    double interval = 4000;
+    string toggleText = "Stop";
+
+    bool started = true;
+    void Toggle()
+    {
+        if (started)
+        {
+            carousel.Stop();
+            toggleText = "Start";
+        }
+        else
+        {
+            carousel.Start();
+            toggleText = "Stop";
+        }
+
+        started = !started;
+    }
+
+    EventConsole console;
+
+    int selectedIndex;
+
+    IQueryable<int> orderIDs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        orderIDs = dbContext.Orders.Select(o => o.OrderID).Take(10);
+    }
+}

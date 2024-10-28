@@ -280,25 +280,27 @@ namespace Radzen.Blazor
         {
             var key = args.Code != null ? args.Code : args.Key;
 
+            var item  = tabs.ElementAtOrDefault(focusedIndex) ?? tabs[0];
+
             if (key == "ArrowLeft" || key == "ArrowRight")
             {
                 preventKeyPress = true;
 
-                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, tabs.Where(t => t.Visible).Count() - 1);
+                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
             }
             else if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
 
-                focusedIndex = key == "Home" ? 0 : tabs.Where(t => t.Visible).Count() - 1;
+                focusedIndex = key == "Home" ? 0 : tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
 
-                if (focusedIndex >= 0 && focusedIndex < tabs.Where(t => t.Visible).Count())
+                if (focusedIndex >= 0 && focusedIndex < tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
                 {
-                    await tabs.Where(t => t.Visible).ToList()[focusedIndex].OnClick();
+                    await tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex].OnClick();
                 }
             }
             else
@@ -308,7 +310,12 @@ namespace Radzen.Blazor
         }
         internal bool IsFocused(RadzenTabsItem item)
         {
-            return tabs.Where(t => t.Visible).ToList().IndexOf(item) == focusedIndex && focusedIndex != -1;
+            return tabs.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList().IndexOf(item) == focusedIndex && focusedIndex != -1;
+        }
+
+        internal bool HasInvisibleBefore(RadzenTabsItem item)
+        {
+            return tabs.Take(tabs.IndexOf(item)).Any(t => !t.Visible);
         }
     }
 }

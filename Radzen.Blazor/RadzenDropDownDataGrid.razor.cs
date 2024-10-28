@@ -203,6 +203,13 @@ namespace Radzen.Blazor
         public bool ShowAdd { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets preserving the selected row index on pageing.
+        /// </summary>
+        /// <value>Row selection preservation on pageing.</value>
+        [Parameter]
+        public bool PreserveRowSelectionOnPaging { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the page numbers count.
         /// </summary>
         /// <value>The page numbers count.</value>
@@ -507,6 +514,11 @@ namespace Radzen.Blazor
                     query = query.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, args.OrderBy);
                 }
 
+                if (IsVirtualizationAllowed())
+                {
+                    await Task.Yield();
+                }
+
                 count = await Task.FromResult(query.Count());
 
                 pagedData = await Task.FromResult(QueryableExtension.ToList(query.Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>());
@@ -517,6 +529,17 @@ namespace Radzen.Blazor
             {
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = args.Top, OrderBy = args.OrderBy, Filter = searchText });
             }
+            
+            if(PreserveRowSelectionOnPaging && selectedIndex != -1)
+            {	
+                var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (pagedData != null ? pagedData : Enumerable.Empty<object>())).OfType<object>().ToList();
+                selectedIndex = Math.Clamp(selectedIndex, 0, items.Count - 1);
+                
+                await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", selectedIndex - 1, null);
+
+                await grid.OnRowSelect(items[selectedIndex], false);
+            }
+
         }
 
         IEnumerable _internalView = Enumerable.Empty<object>();
@@ -669,7 +692,7 @@ namespace Radzen.Blazor
                     if (shouldChange)
                     {
                         selectedIndex = newSelectedIndex;
-                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), key, selectedIndex - 1, null);
+                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), key, selectedIndex + (key == "ArrowUp" ? 1 : -1), null);
                         await grid.OnRowSelect(items[selectedIndex], false);
                     }
 

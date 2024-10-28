@@ -344,6 +344,10 @@ namespace Radzen.Blazor
                     return DataFilter?.ContainsText;
                 case FilterOperator.DoesNotContain:
                     return DataFilter?.DoesNotContainText;
+                case FilterOperator.In:
+                    return DataFilter?.InText;
+                case FilterOperator.NotIn:
+                    return DataFilter?.NotInText;
                 case FilterOperator.EndsWith:
                     return DataFilter?.EndsWithText;
                 case FilterOperator.Equals:

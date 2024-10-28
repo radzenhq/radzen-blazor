@@ -166,14 +166,20 @@ namespace Radzen
                     {
                         var enumerableValue = ((IEnumerable)(v != null ? v : Enumerable.Empty<object>())).AsQueryable();
                         var enumerableSecondValue = ((IEnumerable)(sv != null ? sv : Enumerable.Empty<object>())).AsQueryable();
+                        
+                        var enumerableValueAsString = "(" + String.Join(",",
+                                (enumerableValue.ElementType == typeof(string) ? 
+                                        enumerableValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() 
+                                            : PropertyAccess.IsDate(enumerableValue.ElementType) ?
+                                                enumerableValue.Cast<object>().Select(i => $@"DateTime(""{i}"")").Cast<object>() 
+                                                    : enumerableValue.Cast<object>())) + ")";
 
-                        string baseType = column.FilterPropertyType.GetGenericArguments().Count() == 1 ? column.FilterPropertyType.GetGenericArguments()[0].Name : "";
-
-                        var enumerableValueAsString = "new " + baseType + "[]{" + String.Join(",",
-                                (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() : enumerableValue.Cast<object>())) + "}";
-
-                        var enumerableSecondValueAsString = "new " + baseType + "[]{" + String.Join(",",
-                                (enumerableSecondValue.ElementType == typeof(string) ? enumerableSecondValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() : enumerableSecondValue.Cast<object>())) + "}";
+                        var enumerableSecondValueAsString = "(" + String.Join(",",
+                                (enumerableSecondValue.ElementType == typeof(string) ?
+                                        enumerableSecondValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>()
+                                            : PropertyAccess.IsDate(enumerableSecondValue.ElementType) ?
+                                                enumerableSecondValue.Cast<object>().Select(i => $@"DateTime(""{i}"")").Cast<object>()
+                                                    : enumerableSecondValue.Cast<object>())) + ")";
 
                         if (enumerableValue?.Any() == true)
                         {
@@ -198,7 +204,7 @@ namespace Radzen
                             {
                                 if (columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain)
                                 {
-                                    whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableValueAsString}).Contains({property})");
+                                    whereList.Add($@"{property} {(columnFilterOperator == FilterOperator.DoesNotContain ? "not " : "in")} {enumerableValueAsString}");
                                 }
                                 else if (columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn)
                                 {
@@ -433,10 +439,12 @@ namespace Radzen
                 var v = column.FilterValue;
                 var enumerableValue = ((IEnumerable)(v ?? Enumerable.Empty<object>())).AsQueryable();
 
-                string baseType = columnType.GetGenericArguments().Count() == 1 ? columnType.GetGenericArguments()[0].Name : "";
-
-                var enumerableValueAsString = "new " + baseType + "[]{" + String.Join(",",
-                        (enumerableValue.ElementType == typeof(string) ? enumerableValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() : enumerableValue.Cast<object>())) + "}";
+                var enumerableValueAsString = "(" + String.Join(",",
+                                (enumerableValue.ElementType == typeof(string) ?
+                                        enumerableValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>()
+                                            : PropertyAccess.IsDate(enumerableValue.ElementType) ?
+                                                enumerableValue.Cast<object>().Select(i => $@"DateTime(""{i}"")").Cast<object>()
+                                                    : enumerableValue.Cast<object>())) + ")";
 
 
                 if (enumerableValue?.Any() == true)
@@ -448,7 +456,7 @@ namespace Radzen
 
                     if (columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain)
                     {
-                        return $@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "!" : "")}({enumerableValueAsString}).Contains({property})";
+                        return $@"{property} {(columnFilterOperator == FilterOperator.DoesNotContain ? "not " : "in")} {enumerableValueAsString}";
                     }
                     else if (columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn)
                     {

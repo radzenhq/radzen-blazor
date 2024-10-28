@@ -16,6 +16,13 @@ if (!Element.prototype.closest) {
   };
 }
 
+if (document.fonts) {
+  document.body.classList.add('rz-icons-loading');
+  document.fonts.load('16px Material Symbols').then(() => {
+      document.body.classList.remove('rz-icons-loading');
+  })
+}
+
 var resolveCallbacks = [];
 var rejectCallbacks = [];
 var radzenRecognition;
@@ -185,7 +192,7 @@ window.Radzen = {
         }
     }
   },
-  loadGoogleMaps: function (defaultView, apiKey, resolve, reject) {
+  loadGoogleMaps: function (defaultView, apiKey, resolve, reject, language) {
     resolveCallbacks.push(resolve);
     rejectCallbacks.push(reject);
 
@@ -204,6 +211,7 @@ window.Radzen = {
 
     script.src =
       'https://maps.googleapis.com/maps/api/js?' +
+      (language ? 'language=' + language + '&' : '') +
       (apiKey ? 'key=' + apiKey + '&' : '') +
       'callback=rz_map_init&libraries=marker';
 
@@ -217,7 +225,7 @@ window.Radzen = {
 
     document.body.appendChild(script);
   },
-  createMap: function (wrapper, ref, id, apiKey, mapId, zoom, center, markers, options, fitBoundsToMarkersOnUpdate) {
+  createMap: function (wrapper, ref, id, apiKey, mapId, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language) {
     var api = function () {
       var defaultView = document.defaultView;
 
@@ -226,7 +234,7 @@ window.Radzen = {
           return resolve(defaultView.google);
         }
 
-        Radzen.loadGoogleMaps(defaultView, apiKey, resolve, reject);
+        Radzen.loadGoogleMaps(defaultView, apiKey, resolve, reject, language);
       });
     };
 
@@ -246,10 +254,10 @@ window.Radzen = {
         });
       });
 
-      Radzen.updateMap(id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate);
+      Radzen.updateMap(id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language);
     });
   },
-  updateMap: function (id, zoom, center, markers, options, fitBoundsToMarkersOnUpdate) {
+  updateMap: function (id, apiKey, zoom, center, markers, options, fitBoundsToMarkersOnUpdate, language) {
     var api = function () {
         var defaultView = document.defaultView;
 
@@ -258,7 +266,7 @@ window.Radzen = {
                 return resolve(defaultView.google);
             }
 
-            Radzen.loadGoogleMaps(defaultView, apiKey, resolve, reject);
+            Radzen.loadGoogleMaps(defaultView, apiKey, resolve, reject, language);
         });
     };
     api().then(function (google) {
@@ -561,6 +569,9 @@ window.Radzen = {
       el.focus();
     }
   },
+  scrollCarouselItem: function (el) {
+    el.parentElement.scroll(el.offsetLeft, 0);
+  },
   scrollIntoViewIfNeeded: function (ref, selector) {
     var el = selector ? ref.getElementsByClassName(selector)[0] : ref;
     if (el && el.scrollIntoViewIfNeeded) {
@@ -609,9 +620,9 @@ window.Radzen = {
                 break;
         }
     } else {
-        while (ul.nextSelectedIndex > 0) {
+        while (ul.nextSelectedIndex >= 0) {
             ul.nextSelectedIndex--;
-            if (!childNodes[ul.nextSelectedIndex].classList.contains('rz-state-disabled'))
+            if (!childNodes[ul.nextSelectedIndex] || !childNodes[ul.nextSelectedIndex].classList.contains('rz-state-disabled'))
                 break;
         }
     }
@@ -681,25 +692,25 @@ window.Radzen = {
     if (key == 'ArrowDown') {
         while (table.nextSelectedIndex < rows.length - 1) {
             table.nextSelectedIndex++;
-            if (!rows[table.nextSelectedIndex].classList.contains('rz-state-disabled'))
+            if (!rows[table.nextSelectedIndex] || !rows[table.nextSelectedIndex].classList.contains('rz-state-disabled'))
                 break;
         }
     } else if (key == 'ArrowUp') {
         while (table.nextSelectedIndex > 0) {
             table.nextSelectedIndex--;
-            if (!rows[table.nextSelectedIndex].classList.contains('rz-state-disabled'))
+            if (!rows[table.nextSelectedIndex] || !rows[table.nextSelectedIndex].classList.contains('rz-state-disabled'))
                 break;
         }
     } else if (key == 'ArrowRight') {
         while (table.nextSelectedCellIndex < rows[table.nextSelectedIndex].cells.length - 1) {
             table.nextSelectedCellIndex++;
-            if (!rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
+            if (!rows[table.nextSelectedIndex] || !rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex] || !rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
                 break;
         }
     } else if (key == 'ArrowLeft') {
         while (table.nextSelectedCellIndex > 0) {
             table.nextSelectedCellIndex--;
-            if (!rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
+            if (!rows[table.nextSelectedIndex] || !rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex] || !rows[table.nextSelectedIndex].cells[table.nextSelectedCellIndex].classList.contains('rz-state-disabled'))
                 break;
         }
     } else if (isVirtual && (key == 'PageDown' || key == 'End')) {
@@ -708,7 +719,7 @@ window.Radzen = {
         table.nextSelectedIndex = 1;
     }
 
-    if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
+    if (key == 'ArrowLeft' || key == 'ArrowRight' || (key == 'ArrowUp' && cellIndex != null && table.nextSelectedIndex == 0 && table.parentNode.scrollTop == 0)) {
         var highlightedCells = rows[table.nextSelectedIndex].querySelectorAll('.rz-state-focused');
         if (highlightedCells.length) {
             for (var i = 0; i < highlightedCells.length; i++) {
@@ -991,6 +1002,7 @@ window.Radzen = {
     }
   },
   closeTooltip(id) {
+    Radzen.activeElement = null;
     Radzen.closePopup(id);
 
     if (Radzen[id + 'delay']) {
@@ -1022,16 +1034,17 @@ window.Radzen = {
           }
       };
 
+      var input = el.querySelector('.rz-inputtext');
       var button = el.querySelector('.rz-datepicker-trigger');
       if (button) {
           button.onclick = function (e) {
-              handler(e, !e.currentTarget.classList.contains('rz-state-disabled'));
+              handler(e, !e.currentTarget.classList.contains('rz-state-disabled') && (input ? !input.classList.contains('rz-readonly') : true));
           };
       }
-      var input = el.querySelector('.rz-inputtext');
+  
       if (input) {
           input.onclick = function (e) {
-              handler(e, e.currentTarget.classList.contains('rz-readonly') || e.currentTarget.classList.contains('rz-input-trigger') );
+              handler(e, e.currentTarget.classList.contains('rz-input-trigger') && !e.currentTarget.classList.contains('rz-readonly'));
           };
       }
   },
@@ -1106,6 +1119,21 @@ window.Radzen = {
 
     var smartPosition = !position || position == 'bottom';
 
+    var scrollbarSize = 20;
+    var el = parent;
+    while (el && el != document.documentElement) {
+        if (el.scrollWidth > el.clientWidth) {
+            scrollbarSize = el.scrollWidth - el.clientWidth;
+            break;
+        }
+
+        if (el.scrollHeight > el.clientHeight) {
+            scrollbarSize = el.scrollHeight - el.clientHeight;
+            break;
+        }
+        el = el.parentElement;
+    }
+
     if (smartPosition && top + rect.height > window.innerHeight && parentRect.top > rect.height) {
         if (disableSmartPosition !== true) {
             top = parentRect.top - rect.height;
@@ -1122,7 +1150,7 @@ window.Radzen = {
       }
     }
 
-    if (smartPosition && left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
+    if (smartPosition && left + rect.width > window.innerWidth + scrollbarSize && window.innerWidth + scrollbarSize > rect.width) {
       left = window.innerWidth - rect.width;
 
       if (position) {
@@ -1718,9 +1746,6 @@ window.Radzen = {
     var inside = false;
     ref.mouseMoveHandler = this.throttle(function (e) {
       if (inside) {
-        if (e.target.matches('.rz-chart-tooltip-content') || e.target.closest('.rz-chart-tooltip-content')) {
-            return
-        }
         var rect = ref.getBoundingClientRect();
         var x = e.clientX - rect.left;
         var y = e.clientY - rect.top;
@@ -1730,7 +1755,10 @@ window.Radzen = {
     ref.mouseEnterHandler = function () {
         inside = true;
     };
-    ref.mouseLeaveHandler = function () {
+    ref.mouseLeaveHandler = function (e) {
+        if (e.relatedTarget && (e.relatedTarget.matches('.rz-chart-tooltip') || e.relatedTarget.closest('.rz-chart-tooltip'))) {
+            return;
+        }
         inside = false;
         instance.invokeMethodAsync('MouseMove', -1, -1);
     };
@@ -2412,5 +2440,27 @@ window.Radzen = {
         } else {
             start();
         }
+    },
+    openChartTooltip: function (chart, x, y, id, instance, callback) {
+        Radzen.closeTooltip(id);
+
+        var chartRect = chart.getBoundingClientRect();
+        x = Math.max(2, chartRect.left + x);
+        y = Math.max(2, chartRect.top + y);
+        Radzen.openPopup(chart, id, false, null, x, y, instance, callback, true, false, false);
+        
+        var popup = document.getElementById(id);
+        if (!popup) {
+            return;
+        }
+        var tooltipContent = popup.children[0];
+        var tooltipContentRect = tooltipContent.getBoundingClientRect();
+        var tooltipContentClassName = 'rz-top-chart-tooltip';
+        if (y - tooltipContentRect.height < 0) {
+            tooltipContentClassName = 'rz-bottom-chart-tooltip';
+        }
+        tooltipContent.classList.remove('rz-top-chart-tooltip');
+        tooltipContent.classList.remove('rz-bottom-chart-tooltip');
+        tooltipContent.classList.add(tooltipContentClassName);
     }
 };

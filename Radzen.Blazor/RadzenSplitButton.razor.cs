@@ -188,7 +188,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return $"popup{UniqueID}";
+                return $"popup{GetId()}";
             }
         }
 

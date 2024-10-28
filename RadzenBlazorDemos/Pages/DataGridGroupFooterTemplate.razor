@@ -4,8 +4,17 @@
 
 @inherits DbContextPage
 
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem;" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+            <RadzenSwitch @bind-Value="@alwaysShowGroupFooter" Name="alwaysShowGroupFooter" Change="@(args => allGroupsExpanded = !alwaysShowGroupFooter)" />
+            <RadzenLabel Text="Always show group footers" Component="alwaysShowGroupFooter" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenCard>
+
 <RadzenDataGrid @ref="ordersGrid" ColumnWidth="220px" AllowGrouping="false" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
-                ShowPagingSummary="true" Data="@orders" Render="@OnRender">
+                ShowPagingSummary="true" Data="@orders" Render="@OnRender" GroupFootersAlwaysVisible="@alwaysShowGroupFooter" @bind-AllGroupsExpanded="@allGroupsExpanded">
     <GroupHeaderTemplate>
         @context.GroupDescriptor.GetTitle(): @(context.Data.Key ?? ""), Group items count: @context.Data.Count, Last order date: @(context.Data.Items.Cast<Order>().OrderByDescending(o => o.OrderDate).FirstOrDefault()?.OrderDate)
     </GroupHeaderTemplate>
@@ -54,6 +63,8 @@
 </RadzenDataGrid>
 
 @code {
+    bool? allGroupsExpanded;
+    bool alwaysShowGroupFooter = false;
     IList<Order> orders;
     RadzenDataGrid<Order> ordersGrid;
 

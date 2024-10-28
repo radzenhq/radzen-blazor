@@ -405,7 +405,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-html-editor";
+            return GetClassList("rz-html-editor").ToString();
         }
 
         /// <inheritdoc />

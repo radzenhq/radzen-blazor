@@ -101,6 +101,17 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Visible { get; set; } = true;
+    /// <summary>
+        /// Specifies the label rotation angle in degrees. Set to <c>null</c> by default which means no rotation is applied. Has higher precedence than <see cref="LabelAutoRotation"/>.
+        /// </summary>
+        [Parameter]
+        public double? LabelRotation { get; set; } = null;
+
+        /// <summary>
+        /// Specifies the automatic label rotation angle in degrees. If set RadzenChart will automatically rotate the labels to fit the available space by the specified value. Has lower precedence than <see cref="LabelRotation"/>.
+        /// </summary>
+        [Parameter]
+        public double? LabelAutoRotation { get; set; } = null;
 
         /// <inheritdoc />
         protected override bool ShouldRefreshChart(ParameterView parameters)
@@ -108,6 +119,8 @@ namespace Radzen.Blazor
             return DidParameterChange(parameters, nameof(Min), Min) ||
                    DidParameterChange(parameters, nameof(Max), Max) ||
                    DidParameterChange(parameters, nameof(Visible), Visible) ||
+                   DidParameterChange(parameters, nameof(LabelRotation), LabelRotation) ||
+                   DidParameterChange(parameters, nameof(LabelAutoRotation), LabelAutoRotation) ||
                    DidParameterChange(parameters, nameof(Step), Step);
         }
 

@@ -456,6 +456,15 @@ $card-flat-background-color: var(--rz-base-background-color) !default;
 $card-shadow: var(--rz-shadow-1) !default;
 $card-border: var(--rz-border-base-500) !default;
 
+// Carousel
+$rz-carousel-pager-gap: 0.5rem !default;
+$rz-carousel-pager-button-border: none !default;
+$rz-carousel-pager-button-hover-background-color: var(--rz-base-200) !default;
+$rz-carousel-pager-button-hover-color: var(--rz-on-base) !default;
+$rz-carousel-pager-button-active-border: none !default;
+$rz-carousel-pager-button-active-background-color: var(--rz-base-50) !default;
+$rz-carousel-pager-button-active-color: var(--rz-on-base-light) !default;
+
 // Accordion
 $accordion-item-padding-block: 1rem !default;
 $accordion-item-padding-inline: 1rem !default;
