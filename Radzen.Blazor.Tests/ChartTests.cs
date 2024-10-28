@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Bunit;
+using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor.Rendering;
 using Xunit;
 using Xunit.Abstractions;
@@ -23,6 +24,9 @@ public class ChartTests
         using var ctx = new TestContext();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         ctx.JSInterop.Setup<Rect>("Radzen.createChart", _ => true).SetResult(new Rect {Left = 0, Top = 0, Width = 200, Height = 200});
+        ctx.Services.AddScoped<TooltipService>();
+        ctx.JSInterop.SetupVoid("Radzen.openChartTooltip", _ => true);
+        ctx.RenderComponent<RadzenChartTooltip>();
 
         var seriesData = Enumerable.Range(0, 5000).Select(i => new Point { X = i, Y = i });
         var chart = ctx.RenderComponent<RadzenChart>(chartParameters =>
@@ -42,12 +46,12 @@ public class ChartTests
                         })));
 
         var stopwatch = Stopwatch.StartNew();
-        foreach (var _ in Enumerable.Range(0, 10))
+        foreach (var invocation in Enumerable.Range(0, 10))
         {
             await chart.InvokeAsync(() => chart.Instance.MouseMove(100, 80));
-            Assert.Contains("<div class=\"rz-chart-tooltip", chart.Markup);
+            Assert.Equal((invocation + 1) * 2, ctx.JSInterop.Invocations.Count(x => x.Identifier == "Radzen.openChartTooltip"));
             await chart.InvokeAsync(() => chart.Instance.MouseMove(0, 0));
-            Assert.DoesNotContain("<div class=\"rz-chart-tooltip", chart.Markup);
+            Assert.Equal(invocation + 1, ctx.JSInterop.Invocations.Count(x => x.Identifier == "Radzen.closeTooltip"));
         }
         output.WriteLine($"Time took: {stopwatch.Elapsed}");
     }

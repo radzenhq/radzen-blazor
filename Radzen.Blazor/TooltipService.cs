@@ -3,11 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Radzen.Blazor;
 
 namespace Radzen
 {
     /// <summary>
-    /// Class TooltipService. Contains various methods with options to open and close tooltips. 
+    /// Class TooltipService. Contains various methods with options to open and close tooltips.
     /// Should be added as scoped service in the application services and RadzenTooltip should be added in application main layout.
     /// Implements the <see cref="IDisposable" />
     /// </summary>
@@ -74,6 +75,11 @@ namespace Radzen
         /// Occurs when [on open].
         /// </summary>
         public event Action<ElementReference, Type, TooltipOptions> OnOpen;
+
+        /// <summary>
+        /// Occurs when [on open chart tooltip].
+        /// </summary>
+        internal event Action<ElementReference, double, double, ChartTooltipOptions> OnOpenChartTooltip;
 
         /// <summary>
         /// Opens the specified element.
@@ -167,6 +173,23 @@ namespace Radzen
             options.Position = TooltipPosition.Right;
 
             OpenTooltip<object>(element, options);
+        }
+
+        /// <summary>
+        /// Opens the specified chart tooltip.
+        /// </summary>
+        /// <param name="element">The chart element.</param>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="childContent">Content of the chart tooltip.</param>
+        /// <param name="o">The options of the chart tooltip.</param>
+        internal void OpenChartTooltip(ElementReference element, double x, double y, RenderFragment<TooltipService> childContent, ChartTooltipOptions o = null)
+        {
+            var options = o ?? new ChartTooltipOptions();
+
+            options.ChildContent = childContent;
+
+            OnOpenChartTooltip?.Invoke(element, x, y, options);
         }
 
         /// <summary>
@@ -287,5 +310,19 @@ namespace Radzen
         /// </summary>
         /// <value>The element.</value>
         public ElementReference Element { get; set; }
+    }
+
+    internal class ChartTooltipOptions
+    {
+        /// <summary>
+        /// Gets or sets the color scheme used to render the tooltip.
+        /// </summary>
+        /// <value>The color scheme.</value>
+        public ColorScheme ColorScheme { get; set; }
+        /// <summary>
+        /// Gets or sets the child content.
+        /// </summary>
+        /// <value>The child content.</value>
+        public RenderFragment<TooltipService> ChildContent { get; set; }
     }
 }

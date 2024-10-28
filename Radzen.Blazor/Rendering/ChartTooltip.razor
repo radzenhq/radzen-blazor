@@ -1,4 +1,4 @@
-<div class="rz-chart-tooltip @Class" style="left: @(X.ToInvariantString())px; top: @(Y.ToInvariantString())px">
+<div class="rz-chart-tooltip @Class">
     <div class="rz-chart-tooltip-content" style="@Style">
     @if (ChildContent != null)
     {
@@ -20,12 +20,6 @@
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
-
-    [Parameter]
-    public double X { get; set; }
-
-    [Parameter]
-    public double Y { get; set; }
 
     [Parameter]
     public string Title { get; set; }
