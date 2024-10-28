@@ -18,6 +18,7 @@ using Radzen.Blazor;
 using RadzenBlazorDemos.Shared;
 using MetadataReferenceService.Abstractions.Types;
 using MetadataReferenceService.BlazorWasm;
+using System.ComponentModel;
 
 namespace RadzenBlazorDemos
 {
@@ -165,6 +166,7 @@ namespace RadzenBlazorDemos
                  typeof(RadzenButton).Assembly,
                  typeof(ExpandoObject).Assembly,
                  typeof(EventConsole).Assembly,
+                 typeof(Component).Assembly
              };
 
              return  referenceAssemblyRoots
