@@ -2,12 +2,10 @@
 
 <RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
     <RadzenCard Variant="Variant.Outlined">
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenLabel Text="Rotation" Component="rotation" />
-                <RadzenSlider @bind-Value="@rotation" Name="rotation" Min="-90" Max="90" />
-                <RadzenText>@(rotation)<sup>&deg;</sup></RadzenText>
-            </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Rotation" Component="rotation" />
+            <RadzenSlider @bind-Value="@rotation" Name="rotation" Min="-90" Max="90" />
+            <RadzenText>@(rotation)<sup>&deg;</sup></RadzenText>
         </RadzenStack>
     </RadzenCard>
 
