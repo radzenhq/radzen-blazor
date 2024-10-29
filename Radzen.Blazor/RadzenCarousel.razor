@@ -22,7 +22,10 @@
         <RadzenButton class="rz-carousel-next" Icon="@NextIcon" Text="@NextText" ButtonStyle="@ButtonStyle" Size="@ButtonSize" Variant="@ButtonVariant" Shade="@ButtonShade"
             Click=@Next/>
         }
-        <ul class="rz-carousel-items">
+        <ul class="rz-carousel-items" 
+                 @ontouchstart="OnTouchStart" @ontouchstart:stopPropagation @ontouchstart:preventDefault
+                 @ontouchend="OnTouchEnd" @ontouchend:stopPropagation @ontouchend:preventDefault
+                 @ontouchcancel="OnTouchCancel" @ontouchcancel:stopPropagation @ontouchcancel:preventDefault>
             @Items
         </ul>
         @if(AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))
