@@ -447,6 +447,7 @@ namespace Radzen.Blazor
         }
 
         string prevSearch;
+        string prevOrder;
         int? skip;
         async Task OnLoadData(LoadDataArgs args)
         {
@@ -514,16 +515,17 @@ namespace Radzen.Blazor
                     query = query.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, args.OrderBy);
                 }
 
-                if (IsVirtualizationAllowed())
-                {
-                    await Task.Yield();
-                }
-
                 count = await Task.FromResult(query.Count());
 
                 pagedData = await Task.FromResult(QueryableExtension.ToList(query.Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>());
 
                 _internalView = query;
+
+                if (prevOrder != args.OrderBy)
+                {
+                    prevOrder = args.OrderBy;
+                    await JSRuntime.InvokeVoidAsync("eval");
+                }
             }
             else
             {
