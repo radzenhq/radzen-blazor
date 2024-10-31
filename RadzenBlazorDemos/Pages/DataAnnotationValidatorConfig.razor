@@ -17,7 +17,7 @@
                         <RadzenLabel Text="Username" Component="Username" />
                      </RadzenColumn>
                      <RadzenColumn Size="12" SizeMD="8">
-                        <RadzenTextBox style="display: block" Name="Username" @bind-Value=@model.Username class="w-100" />
+                        <RadzenTextBox style="display: block" Name="Username" @bind-Value=@model.Username class="rz-w-100" />
                         <RadzenDataAnnotationValidator Component="Username" Popup=@popup Style="position: absolute" />
                      </RadzenColumn>
                  </RadzenRow>
@@ -26,7 +26,7 @@
                         <RadzenLabel Text="Password" Component="Password" />
                      </RadzenColumn>
                      <RadzenColumn Size="12" SizeMD="8">
-                        <RadzenPassword style="display: block" Name="Password" Placeholder="Enter password..." @bind-Value=@model.Password class="w-100" aria-label="enter password" />
+                        <RadzenPassword style="display: block" Name="Password" Placeholder="Enter password..." @bind-Value=@model.Password class="rz-w-100" aria-label="enter password" />
                         <RadzenDataAnnotationValidator Component="Password" Popup=@popup Style="position: absolute" />
                      </RadzenColumn>
                  </RadzenRow>
@@ -35,7 +35,7 @@
                         <RadzenLabel Text="Confirm Password" Component="ConfirmPassword" />
                      </RadzenColumn>
                      <RadzenColumn Size="12" SizeMD="8">
-                        <RadzenPassword style="display: block" Name="ConfirmPassword" Placeholder="Confirm password..." @bind-Value=@model.ConfirmPassword class="w-100" aria-label="confirm password" />
+                        <RadzenPassword style="display: block" Name="ConfirmPassword" Placeholder="Confirm password..." @bind-Value=@model.ConfirmPassword class="rz-w-100" aria-label="confirm password" />
                         <RadzenDataAnnotationValidator Component="ConfirmPassword" Popup=@popup Style="position: absolute" />
                      </RadzenColumn>
                  </RadzenRow>
