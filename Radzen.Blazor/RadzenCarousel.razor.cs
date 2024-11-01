@@ -124,7 +124,7 @@ namespace Radzen.Blazor
         /// </summary>
         public void Start()
         {
-            timer?.Change(TimeSpan.Zero, TimeSpan.FromMilliseconds(Interval));
+            timer?.Change(TimeSpan.FromMilliseconds(Interval), TimeSpan.FromMilliseconds(Interval));
         }
 
         /// <summary>
