@@ -2043,6 +2043,7 @@ namespace Radzen.Blazor
                 });
                 selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
                 sorts.Clear();
+                columns = allColumns.Where(c => c.Parent == null).ToList();
            }
         }
 
