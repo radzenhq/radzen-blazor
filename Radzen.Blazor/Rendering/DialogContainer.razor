@@ -1,5 +1,6 @@
 @using Microsoft.JSInterop
 @using System.Reflection;
+@using Radzen.Blazor
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 <div class="@WrapperCssClass">
@@ -17,11 +18,13 @@
                         @((MarkupString)Dialog.Title)
                     }
                 </div>
+                @if (Dialog.Options.ShowHelp)
+                {
+                    <RadzenButton Icon="question_mark" Disabled="@String.IsNullOrEmpty(Dialog.Options.HelpUrl)" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click="@(() => JSRuntime.InvokeVoidAsync("Radzen.openInNewTab", Dialog.Options.HelpUrl))" class="rz-dialog-titlebar-icon" />
+                }
                 @if (Dialog.Options.ShowClose)
                 {
-                    <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
-                        <span class="notranslate rzi rzi-times"></span>
-                    </a>
+                    <RadzenButton Icon="close" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Click="@Close" @onkeydown="@OnKeyPress" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex />
                 }
             </div>
         }

@@ -2462,5 +2462,9 @@ window.Radzen = {
         tooltipContent.classList.remove('rz-top-chart-tooltip');
         tooltipContent.classList.remove('rz-bottom-chart-tooltip');
         tooltipContent.classList.add(tooltipContentClassName);
+    },
+
+    openInNewTab: function (url) {
+        window.open(url, '_blank');
     }
 };

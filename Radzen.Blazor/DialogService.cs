@@ -282,7 +282,9 @@ namespace Radzen
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
                 ContentCssClass = options != null ? options.ContentCssClass : "",
                 Resize = options?.Resize,
-                Drag = options?.Drag
+                Drag = options?.Drag,
+                ShowHelp = options != null ? options.ShowHelp : false,
+                HelpUrl = options != null ? options.HelpUrl : ""
             });
         }
 
@@ -346,6 +348,8 @@ namespace Radzen
                 CssClass = options != null ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm",
                 WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
+                ShowHelp = options != null ? options.ShowHelp : false,
+                HelpUrl = options != null ? options.HelpUrl : ""
             };
 
             return await OpenAsync(title, ds =>
@@ -444,6 +448,16 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if title bar is shown; otherwise, <c>false</c>.</value>
         public bool ShowTitle { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to show the help button. Set to <c>false</c> by default.
+        /// </summary>
+        public bool ShowHelp { get; set; } = true;
+
+        /// <summary>
+        /// Get or sets a value indicating which url to open in new tab on help button click.
+        /// </summary>
+        public string HelpUrl { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to show the close button. Set to <c>true</c> by default.
