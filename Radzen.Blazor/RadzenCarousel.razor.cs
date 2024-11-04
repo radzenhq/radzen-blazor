@@ -96,14 +96,14 @@ namespace Radzen.Blazor
 
         async Task Next()
         {
-            await Navigate(selectedIndex == items.Count - 1 ? 0 : selectedIndex + 1);
+            await Navigate(selectedIndex + 1);
         }
 
         async Task GoTo(int index)
         {
             if (selectedIndex != index)
             {
-                selectedIndex = index == items.Count ? 0 : index;
+                selectedIndex = index >= items.Count ? 0 : index;
                 await SelectedIndexChanged.InvokeAsync(selectedIndex);
                 await Change.InvokeAsync(selectedIndex);
                 await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
