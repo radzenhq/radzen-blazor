@@ -656,7 +656,9 @@ namespace Radzen
             var value = IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)
                 ? null
                 : (string)Convert.ChangeType(filterValue is DateTimeOffset ?
-                            ((DateTimeOffset)filterValue).UtcDateTime : filterValue, typeof(string), CultureInfo.InvariantCulture);
+                            ((DateTimeOffset)filterValue).UtcDateTime : filterValue is DateOnly ?
+                                ((DateOnly)filterValue).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : 
+                                    filterValue, typeof(string), CultureInfo.InvariantCulture);
 
             if (column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && column.FilterPropertyType == typeof(string))
             {
