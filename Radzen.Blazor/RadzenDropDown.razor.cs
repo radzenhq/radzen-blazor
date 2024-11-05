@@ -364,6 +364,9 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Called when popup is closed.
+        /// </summary>
         [JSInvokable]
         public async Task OnClose()
         {
