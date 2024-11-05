@@ -220,7 +220,7 @@ else
 
         if (Column.Grid.LoadColumnFilterData.HasDelegate)
         {
-            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column, Filter = loadDataArgs.Filter };
+            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column, Filter = loadDataArgs.Filter, Skip = loadDataArgs.Skip, Top = loadDataArgs.Top };
 
             await Column.Grid.LoadColumnFilterData.InvokeAsync(args);
 
