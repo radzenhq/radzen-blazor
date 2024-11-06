@@ -299,7 +299,7 @@ namespace Radzen.Blazor
             if (firstRender)
             {
                 var ts = TimeSpan.FromMilliseconds(Interval);
-                timer = new System.Threading.Timer(state => InvokeAsync(() => GoTo(selectedIndex + 1)), 
+                timer = new System.Threading.Timer(state => InvokeAsync(Next), 
                     null, Auto ? ts : Timeout.InfiniteTimeSpan, ts);
             }
         }
