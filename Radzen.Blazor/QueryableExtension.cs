@@ -934,7 +934,7 @@ namespace Radzen
                                 }
                                 else
                                 {
-                                    whereList.Add($@"(@{index}).Contains({property})", new object[] { column.GetFilterValue() });
+                                    whereList.Add($@"(@{index}).Contains({column.GetFilterProperty()})", new object[] { column.GetFilterValue() });
                                 }
                             }
                             else
