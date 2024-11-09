@@ -107,10 +107,14 @@ More info is available in the <RadzenLink Text="rendering mode article" Path="ht
             @Import(CurrentVersion)
             <RadzenText Anchor="@($"get-started/{CurrentVersion}#theme")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">3. Set the theme</RadzenText>
             <RadzenText>
-                Open the <code>index.html</code> file of your application. Add this code within the <code>&lt;head&gt;</code> element:
+                Open the <code>MainLayout.razor</code> file of your application. Add this code
             </RadzenText>
 <pre class="rz-p-4">
-<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css"&gt;</code>
+<code>
+&lt;HeadContent&gt;
+    &lt;RadzenTheme Theme="material" /&gt;
+&lt;/HeadContent&gt;
+</code>
 </pre>
             <RadzenText Anchor="@($"get-started/{CurrentVersion}#js")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">4. Include Radzen.Blazor.js</RadzenText>
             <RadzenText>
