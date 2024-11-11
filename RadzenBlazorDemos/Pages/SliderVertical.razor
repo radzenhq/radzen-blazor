@@ -1,0 +1,9 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceAround">
+    <RadzenSlider @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" />
+    <RadzenSlider Range="true" @bind-Value=@values TValue="IEnumerable<int>" Orientation="Orientation.Vertical" />
+</RadzenStack>
+
+@code {
+    int value = 33;
+    IEnumerable<int> values = new int[] { 14, 78 };
+}
