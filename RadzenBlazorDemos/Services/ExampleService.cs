@@ -1416,6 +1416,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Slider",
                     Path = "slider",
+                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor Slider component.",
                     Icon = "&#xe429",
                     Tags = new [] { "form", "slider" }
