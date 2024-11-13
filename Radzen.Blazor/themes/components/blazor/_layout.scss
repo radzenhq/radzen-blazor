@@ -61,6 +61,10 @@ $layout-background-color: var(--rz-body-background-color) !default;
     overflow-x: hidden;
   }
   
+  .rz-layout {
+    height: 100dvh;
+  }
+
   .rz-header,
   .rz-footer,
   .rz-body {
