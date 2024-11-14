@@ -9,7 +9,11 @@
                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" TItem="Employee" FilterCleared=@FilterCleared
     LogicalFilterOperator="LogicalFilterOperator.Or" FilterPopupRenderMode="PopupRenderMode.OnDemand">
     <Columns>
-        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" FilterValue="@employeeID" Filterable="true" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center">
+            <FilterValueTemplate>
+                <RadzenNumeric @bind-Value=@employeeID />
+            </FilterValueTemplate>
+        </RadzenDataGridColumn>
         <RadzenDataGridColumn Title="Photo" Sortable="false" Filterable="false" Width="200px" >
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
@@ -37,6 +41,7 @@
     </Columns>
 </RadzenDataGrid>
 @code {
+    int? employeeID;
     RadzenDataGrid<Employee> grid;
     IEnumerable<Employee> employees;
 
