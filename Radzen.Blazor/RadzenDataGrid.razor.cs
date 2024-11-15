@@ -807,34 +807,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(3, "Change", eventCallbackGenericCreate.Invoke(this,
                     new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action }) }));
 
-                if (FilterMode == FilterMode.Advanced)
-                {
-                    builder.AddAttribute(4, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args =>
-                    {
-                        var value = $"{args.Value}";
-                        object filterValue = null;
-
-                        if (!string.IsNullOrWhiteSpace(value))
-                        {
-                            try
-                            {
-                                filterValue = Convert.ChangeType(value, Nullable.GetUnderlyingType(type));
-                            }
-                            catch (Exception)
-                            {
-                                filterValue = null;
-                            }
-                        }
-
-                        column.SetFilterValue(filterValue, isFirst);
-                        SaveSettings();
-                    }));
-                    builder.AddAttribute(5, "Disabled", !column.CanSetFilterValue());
-                }
-                else if (FilterMode == FilterMode.SimpleWithMenu)
-                {
-                    builder.AddAttribute(4, "Disabled", !column.CanSetFilterValue());
-                }
+                builder.AddAttribute(4, "Disabled", !column.CanSetFilterValue());
 
                 builder.CloseComponent();
             });
