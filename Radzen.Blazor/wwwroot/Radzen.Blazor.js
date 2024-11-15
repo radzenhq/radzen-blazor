@@ -16,7 +16,7 @@ if (!Element.prototype.closest) {
   };
 }
 
-if (document.fonts) {
+if (document.fonts && document.body) {
   document.body.classList.add('rz-icons-loading');
   document.fonts.load('16px Material Symbols').then(() => {
       document.body.classList.remove('rz-icons-loading');
@@ -1048,7 +1048,7 @@ window.Radzen = {
               handler(e, !e.currentTarget.classList.contains('rz-state-disabled') && (input ? !input.classList.contains('rz-readonly') : true));
           };
       }
-  
+
       if (input) {
           input.onclick = function (e) {
               handler(e, e.currentTarget.classList.contains('rz-input-trigger') && !e.currentTarget.classList.contains('rz-readonly'));
@@ -2455,7 +2455,7 @@ window.Radzen = {
         x = Math.max(2, chartRect.left + x);
         y = Math.max(2, chartRect.top + y);
         Radzen.openPopup(chart, id, false, null, x, y, instance, callback, true, false, false);
-        
+
         var popup = document.getElementById(id);
         if (!popup) {
             return;
