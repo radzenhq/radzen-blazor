@@ -317,6 +317,8 @@ namespace Radzen.Blazor
         [Parameter]
         public TextAlign TextAlign { get; set; } = TextAlign.Left;
 
+        TypeConverter validator = TypeDescriptor.GetConverter(typeof(decimal));
+
         /// <summary>
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
@@ -446,8 +448,13 @@ namespace Radzen.Blazor
                 return default;
 
             var converter = TypeDescriptor.GetConverter(typeof(TValue));
+            
+
             if (converter.CanConvertTo(typeof(decimal)))
-                return (decimal)converter.ConvertTo(null, Culture, input, typeof(decimal));
+                if (!validator.IsValid(input))
+                    return 0;
+                else
+                    return (decimal)converter.ConvertTo(null, Culture, input, typeof(decimal));
             
             return (decimal)ConvertType.ChangeType(input, typeof(decimal));
         }
