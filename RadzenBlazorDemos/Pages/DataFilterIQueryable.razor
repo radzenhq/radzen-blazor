@@ -11,7 +11,7 @@
         <RadzenButton Text="Apply Filter" Click="@ApplyFilter" Disabled="@auto" Size="ButtonSize.Small" />
     </RadzenStack>
 
-    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@ViewChanged>
+    <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@ViewChanged FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
         <Properties>
             <RadzenDataFilterProperty Property="@nameof(Order.OrderID)" Title="Order ID" FilterValue="@finalSelectedIds" 
                 Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
@@ -27,6 +27,8 @@
                                     Change=@OnSelectedProductIdsChange Data="@(productIds)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </RadzenDataFilterProperty>
+            <RadzenDataFilterProperty Property="OrderDetails" FilterProperty="Product.ProductName" Title="Products"
+                                      Type="typeof(IEnumerable<OrderDetail>)" FilterOperator="FilterOperator.Contains"/>
             <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
             <MyCustomDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date">
                 <FilterTemplate>
@@ -45,6 +47,11 @@
                 <FooterTemplate>
                     Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
                 </FooterTemplate>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn Property="OrderDetails" FilterProperty="Product.ProductName" Title="Products" Type="typeof(IEnumerable<OrderDetail>)" Sortable="false">
+                <Template>
+                    @(string.Join(',', context.OrderDetails.Select(od => od.Product.ProductName)))
+                </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn Width="200px" Property="Customer.CompanyName" Title="Customer" />
             <RadzenDataGridColumn Property="Employee.LastName" Title="Employee">

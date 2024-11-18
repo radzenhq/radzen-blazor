@@ -1133,8 +1133,16 @@ namespace Radzen
 
                     if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "Contains")
                     {
-                        filterExpressions.Add($@"(@{index}).Contains({property})");
-                        filterValues.Add(new object[] { filter.FilterValue  });
+                        if (column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
+                        {
+                            filterExpressions.Add($@"{column.Property}.Any(i => i.{column.FilterProperty}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator}))");
+                            filterValues.Add(new object[] { filter.FilterValue });
+                        }
+                        else
+                        {
+                            filterExpressions.Add($@"(@{index}).Contains({property})");
+                            filterValues.Add(new object[] { filter.FilterValue });
+                        }
                     }
                     else
                     {
@@ -1153,8 +1161,16 @@ namespace Radzen
 
                     if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && comparison == "DoesNotContain")
                     {
-                        filterExpressions.Add($@"!(@{index}).Contains({property})");
-                        filterValues.Add(new object[] { filter.FilterValue });
+                        if (column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
+                        {
+                            filterExpressions.Add($@"!{column.Property}.Any(i => i.{column.FilterProperty}{filterCaseSensitivityOperator}.Contains(@{index}{filterCaseSensitivityOperator}))");
+                            filterValues.Add(new object[] { filter.FilterValue });
+                        }
+                        else
+                        {
+                            filterExpressions.Add($@"!(@{index}).Contains({property})");
+                            filterValues.Add(new object[] { filter.FilterValue });
+                        }
                     }
                     else
                     {
@@ -1173,6 +1189,21 @@ namespace Radzen
 
                         index++;
                     }
+                    else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
+                        column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
+                    {
+                        filterExpressions.Add($@"{(comparison == "NotIn" ? "!" : "")}{column.Property}.Any(i => i.{column.FilterProperty} in @{index})");
+                        filterValues.Add(new object[] { filter.FilterValue });
+
+                        index++;
+                    }
+                }
+                else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) && column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
+                {
+                    filterExpressions.Add($@"{column.Property}.Any(i => i.{column.FilterProperty}{filterCaseSensitivityOperator} {comparison} @{index}{filterCaseSensitivityOperator})");
+                    filterValues.Add(new object[] { filter.FilterValue });
+
+                    index++;
                 }
                 else if (!(IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string)))
                 {

@@ -119,6 +119,13 @@ namespace Radzen.Blazor
         public string Property { get; set; }
 
         /// <summary>
+        /// Gets or sets the filter property name.
+        /// </summary>
+        /// <value>The filter property name.</value>
+        [Parameter]
+        public string FilterProperty { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this property is selected in the filter.
         /// </summary>
         /// <value><c>true</c>, if already selected; otherwise <c>false</c>.</value>
