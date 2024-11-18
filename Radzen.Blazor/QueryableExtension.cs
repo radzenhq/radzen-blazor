@@ -166,20 +166,34 @@ namespace Radzen
                     {
                         var enumerableValue = ((IEnumerable)(v != null ? v : Enumerable.Empty<object>())).AsQueryable();
                         var enumerableSecondValue = ((IEnumerable)(sv != null ? sv : Enumerable.Empty<object>())).AsQueryable();
-                        
-                        var enumerableValueAsString = "(" + String.Join(",",
-                                (enumerableValue.ElementType == typeof(string) ? 
-                                        enumerableValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>() 
-                                            : PropertyAccess.IsDate(enumerableValue.ElementType) ?
-                                                enumerableValue.Cast<object>().Select(i => $@"DateTime(""{i}"")").Cast<object>() 
-                                                    : enumerableValue.Cast<object>())) + ")";
 
-                        var enumerableSecondValueAsString = "(" + String.Join(",",
-                                (enumerableSecondValue.ElementType == typeof(string) ?
-                                        enumerableSecondValue.Cast<string>().Select(i => $@"""{i}""").Cast<object>()
-                                            : PropertyAccess.IsDate(enumerableSecondValue.ElementType) ?
-                                                enumerableSecondValue.Cast<object>().Select(i => $@"DateTime(""{i}"")").Cast<object>()
-                                                    : enumerableSecondValue.Cast<object>())) + ")";
+
+                        string baseType = column.FilterPropertyType.GetGenericArguments().Count() == 1
+                                              ? column.FilterPropertyType.GetGenericArguments()[0].Name
+                                              : "";
+                        var enumerableValueAsString = "new " + baseType + "[]{" + String.Join(",",
+                                                          (enumerableValue.ElementType == typeof(string)
+                                                               ? enumerableValue.Cast<string>().Select(i => $@"""{i}""")
+                                                                   .Cast<object>()
+                                                               : PropertyAccess.IsDate(enumerableValue.ElementType)
+                                                                   ? enumerableValue.Cast<object>()
+                                                                       .Select(i => $@"DateTime.Parse(""{i}"")")
+                                                                       .Cast<object>()
+                                                                   : enumerableValue.Cast<object>()
+                                                          )) + "}";
+
+
+                        var enumerableSecondValueAsString = "new " + baseType + "[]{" + String.Join(",",
+                                                                (enumerableSecondValue.ElementType == typeof(string)
+                                                                     ? enumerableSecondValue.Cast<string>()
+                                                                         .Select(i => $@"""{i}""").Cast<object>()
+                                                                     : PropertyAccess.IsDate(
+                                                                         enumerableSecondValue.ElementType)
+                                                                         ? enumerableSecondValue.Cast<object>()
+                                                                             .Select(i => $@"DateTime.Parse(""{i}"")")
+                                                                             .Cast<object>()
+                                                                         : enumerableSecondValue.Cast<object>()
+                                                                )) + "}";
 
                         if (enumerableValue?.Any() == true)
                         {
