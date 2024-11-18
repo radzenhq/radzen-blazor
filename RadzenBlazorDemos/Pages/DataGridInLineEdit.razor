@@ -6,7 +6,7 @@
 
 <style>
     .rz-grid-table {
-        width: unset;
+    width: unset;
     }
 </style>
 
@@ -14,13 +14,13 @@
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
         <div>Edit Mode:</div>
         <RadzenSelectBar @bind-Value="@editMode" TextProperty="Text" ValueProperty="Value"
-                        Data="@(Enum.GetValues(typeof(DataGridEditMode)).Cast<DataGridEditMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small"
-                        Disabled="@(editMode == DataGridEditMode.Multiple && ordersToInsert.Count() > 1)" />
+        Data="@(Enum.GetValues(typeof(DataGridEditMode)).Cast<DataGridEditMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small"
+        Disabled="@(editMode == DataGridEditMode.Multiple && ordersToInsert.Count() > 1)" />
     </RadzenStack>
 </RadzenCard>
 
 <RadzenDataGrid @ref="ordersGrid" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true" EditMode="@editMode"
-                Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
+Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" Sort="@Reset" Page="@Reset" Filter="@Reset" ColumnWidth="200px">
     <HeaderTemplate>
         <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Add New Order" Click="@InsertRow" Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
     </HeaderTemplate>
@@ -29,7 +29,7 @@
         <RadzenDataGridColumn Property="Customer.CompanyName" Title="Customer" Width="280px">
             <EditTemplate Context="order">
                 <RadzenDropDown @bind-Value="order.CustomerID" Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width:100%; display: block;"
-                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="Employee.LastName" Title="Employee" Width="220px">
@@ -39,7 +39,7 @@
             </Template>
             <EditTemplate Context="order">
                 <RadzenDropDown @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
-                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
                     <Template>
                         <RadzenImage Path="@context.Photo" Style="width: 20px; height: 20px;" class="rz-border-radius-4 rz-me-2" />
                         @context.FirstName @context.LastName
@@ -135,7 +135,9 @@
 
     async Task EditRow(Order order)
     {
-        if (editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)
+        if (!ordersGrid.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
         {
             Reset();
         }
@@ -193,6 +195,8 @@
 
     async Task InsertRow()
     {
+        if (!ordersGrid.IsValid) return;
+
         if (editMode == DataGridEditMode.Single)
         {
             Reset();

@@ -35,6 +35,23 @@ namespace Radzen.Blazor
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
         /// <summary>
+        /// Returns the validity of the DataGrid.
+        /// </summary>
+        /// <value><c>true</c> if all validators in the DataGrid a valid; otherwise, <c>false</c>.</value>
+        public bool IsValid
+        {
+            get
+            {
+                if (!editContexts.Any())
+                {
+                    return true;
+                }
+
+                return editContexts.All(c => !c.Value.GetValidationMessages().Any());
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this instance is virtualized.
         /// </summary>
         /// <value><c>true</c> if this instance is virtualized; otherwise, <c>false</c>.</value>
