@@ -18,18 +18,29 @@ namespace Radzen.Blazor
         [CascadingParameter]
         RadzenDropZoneContainer<TItem> Container { get; set; }
 
-        void OnDragStart()
+        void EnsurePayload(DragEventArgs args = null)
         {
-            dragCssClass = "rz-dragging";
             Container.Payload = new RadzenDropZoneItemEventArgs<TItem>()
             {
                 FromZone = Zone,
-                Item = Item
+                Item = Item,
+                DataTransfer = args?.DataTransfer
             };
+        }
+
+        void OnDragStart()
+        {
+            dragCssClass = "rz-dragging";
+            EnsurePayload();
         }
 
         void OnDragOver(DragEventArgs args)
         {
+            if (Container.Payload == null)
+            {
+                EnsurePayload(args);
+            }
+
             Container.Payload.ToItem = Item;
 
             var canDrop = Zone.CanDrop();
@@ -51,6 +62,10 @@ namespace Radzen.Blazor
 
         async Task OnDrop(DragEventArgs args)
         {
+            if (Container.Payload == null)
+            {
+                EnsurePayload(args);
+            }
             cssClass = "";
             Container.Payload.ToItem = Item;
             await Zone.OnDropInternal();

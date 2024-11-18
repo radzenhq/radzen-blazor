@@ -530,6 +530,12 @@ namespace Radzen
         /// Gets the dropped item.
         /// </summary>
         public TItem ToItem { get; internal set; }
+
+        /// <summary>
+        /// The data that underlies a drag-and-drop operation, known as the drag data store.
+        /// See <see cref="DataTransfer"/>.
+        /// </summary>
+        public DataTransfer DataTransfer { get; set; } = default!;
     }
 
     /// <summary>
