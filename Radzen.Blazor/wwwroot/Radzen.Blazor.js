@@ -500,6 +500,17 @@ window.Radzen = {
 
     Radzen[id].mouseDownHandler = function (e) {
       if (parent.classList.contains('rz-state-disabled')) return;
+
+      document.addEventListener('mousemove', Radzen[id].mouseMoveHandler);
+      document.addEventListener('touchmove', Radzen[id].mouseMoveHandler, {
+        passive: false, capture: true
+      });
+
+      document.addEventListener('mouseup', Radzen[id].mouseUpHandler);
+      document.addEventListener('touchend', Radzen[id].mouseUpHandler, {
+        passive: true
+      });
+
       if (minHandle == e.target || maxHandle == e.target) {
         slider.canChange = true;
         slider.isMin = minHandle == e.target;
@@ -526,17 +537,15 @@ window.Radzen = {
 
     Radzen[id].mouseUpHandler = function (e) {
       slider.canChange = false;
+      document.removeEventListener('mousemove', Radzen[id].mouseMoveHandler);
+      document.removeEventListener('touchmove', Radzen[id].mouseMoveHandler, {
+        passive: false, capture: true
+      });
+      document.removeEventListener('mouseup', Radzen[id].mouseUpHandler);
+      document.removeEventListener('touchend', Radzen[id].mouseUpHandler, {
+        passive: true
+      });
     };
-
-    document.addEventListener('mousemove', Radzen[id].mouseMoveHandler);
-    document.addEventListener('touchmove', Radzen[id].mouseMoveHandler, {
-      passive: false, capture: true
-    });
-
-    document.addEventListener('mouseup', Radzen[id].mouseUpHandler);
-    document.addEventListener('touchend', Radzen[id].mouseUpHandler, {
-      passive: true
-    });
 
     parent.addEventListener('mousedown', Radzen[id].mouseDownHandler);
     parent.addEventListener('touchstart', Radzen[id].mouseDownHandler, {
