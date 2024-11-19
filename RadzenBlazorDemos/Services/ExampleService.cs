@@ -20,7 +20,7 @@ namespace RadzenBlazorDemos
             Updated = true,
             Title = "Sample Dashboard | Free UI Components by Radzen",
             Description = "Rich dashboard created with the Radzen Blazor Components library.",
-            Icon = "&#xe871"
+            Icon = "&#xe868"
         },
         new Example
         {
@@ -188,6 +188,48 @@ namespace RadzenBlazorDemos
                     Icon = "&#xf773",
                     Tags = new [] { "spacing", "margin", "padding", "gutter", "gap", "utility", "css", "var"}
                 }
+            }
+        },
+
+        new Example
+        {
+            Name = "UI Blocks",
+            Pro = true,
+            New = true,
+            Title = "Blazor UI Blocks",
+            Description = "Ready to use UI building blocks and templates",
+            Icon = "&#xf51d",
+            Children = new[] {
+                new Example
+                {
+                    Name = "Page Headers",
+                    Title = "Blazor Page Header | UI Blocks by Radzen",
+                    New = true,
+                    Icon = "&#xe9ea",
+                    Description = "Preconfigured Page Header UI Blocks",
+                    Path = "ui-blocks-page-headers",
+                    Tags = new [] { "headers", "header", "page", "title" }
+                },
+                new Example
+                {
+                    Name = "Call-to-Action",
+                    Title = "Blazor Call-to-Action | UI Blocks by Radzen",
+                    New = true,
+                    Icon = "&#xe06c",
+                    Description = "Examples of CTA UI Blocks",
+                    Path = "ui-blocks-cta",
+                    Tags = new [] { "cta", "call-to-action", "call", "action", "button" }
+                },
+                new Example
+                {
+                    Name = "Footers",
+                    Title = "Blazor Footer | UI Blocks by Radzen",
+                    New = true,
+                    Icon = "&#xf7e6",
+                    Description = "Preconfigured Footer UI Blocks",
+                    Path = "ui-blocks-footers",
+                    Tags = new [] { "footer" }
+                },
             }
         },
 

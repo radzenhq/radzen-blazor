@@ -1,0 +1,192 @@
+﻿@page "/ui-blocks-cta"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Call-to-Action blocks
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    A CTA block (Call-to-Action block) is a section of a webpage, advertisement, or any form of content designed to prompt users to take a specific action. It's a focused and visually distinct area that guides users toward the next step, aligning with the goals of the page or campaign.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-cta#centered-cta" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Centered CTA
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A call-to-action block with centered content.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Primary">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-primary" >
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                    <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+                        <RadzenText Text="CRUD Operations Simplified" TextStyle="Radzen.Blazor.TextStyle.Overline" TextAlign="Radzen.TextAlign.Center" class="rz-color-on-primary" Style="font-size: 1rem" />
+                        <RadzenText Text="Effortless Development with Radzen" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="rz-color-on-primary"/>
+                        <RadzenText Text="Exhausted by repetitive coding tasks? Radzen Blazor Studio streamlines your workflow with advanced data scaffolding, and efficient data management." TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-primary"  />
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-12">
+                            <RadzenButton Text="Download now" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ButtonStyle="Radzen.ButtonStyle.Base" Shade="Radzen.Shade.Lighter"></RadzenButton>
+                            <RadzenButton Text="See benefits" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Shade="Radzen.Shade.Lighter" Icon="arrow_right_alt"></RadzenButton>
+                        </RadzenStack>
+                    </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Edit Source" Title="View and edit example source code">
+                <RadzenRow style="max-width: 600px;" class="rz-my-12 rz-mx-auto">
+                    <RadzenColumn Size="12">
+                        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" TextAlign="TextAlign.Center" class="rz-pt-8">
+                            UI Blocks <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription." BadgeStyle="BadgeStyle.Danger" Style="vertical-align: top;">PRO</RadzenBadge>
+                        </RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" TextAlign="TextAlign.Center" class="rz-mb-6" Style="line-height: 1.5">
+                            UI Blocks are a premium feature of Radzen Blazor Studio and can be used with an active <RadzenLink Text="Radzen Professional or Enterprise subscription" Path="https://www.radzen.com/blazor-studio/pricing/" title="See Radzen Pricing" target="_blank" />.
+                        </RadzenText>
+                        <RadzenText TextAlign="TextAlign.Center">
+                            <a class="rz-button rz-button-lg rz-primary rz-variant-flat rz-m-4" href="https://www.radzen.com/blazor-studio/pricing/">See Pricing</a>
+                        </RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-cta#left-aligned-cta" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Left-aligned CTA
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A call-to-action block with content aligned to the left.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Dark">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-base-darker" >
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                    <RadzenStack AlignItems="Radzen.AlignItems.Normal" Gap="0" class="rz-my-6 rz-my-sm-12">
+                        <RadzenText Text="CRUD Operations Simplified" TextStyle="Radzen.Blazor.TextStyle.Overline" Style="max-width: 800px; font-size: 1rem" class="rz-color-primary-light" />
+                        <RadzenText Text="Effortless Development with Radzen" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" Style="max-width: 800px" class="rz-color-on-base-darker" />
+                        <RadzenText Text="Exhausted by repetitive coding tasks? Radzen Blazor Studio streamlines your workflow with advanced data scaffolding, and efficient data management." TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-base-darker" />
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-12">
+                            <RadzenButton Text="Download now" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ></RadzenButton>
+                            <RadzenButton Text="See benefits" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Shade="Radzen.Shade.Lighter" Icon="arrow_right_alt"></RadzenButton>
+                        </RadzenStack>
+                    </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Edit Source" Title="View and edit example source code">
+                <RadzenRow style="max-width: 600px;" class="rz-my-12 rz-mx-auto">
+                    <RadzenColumn Size="12">
+                        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" TextAlign="TextAlign.Center" class="rz-pt-8">
+                            UI Blocks <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription." BadgeStyle="BadgeStyle.Danger" Style="vertical-align: top;">PRO</RadzenBadge>
+                        </RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" TextAlign="TextAlign.Center" class="rz-mb-6" Style="line-height: 1.5">
+                            UI Blocks are a premium feature of Radzen Blazor Studio and can be used with an active <RadzenLink Text="Radzen Professional or Enterprise subscription" Path="https://www.radzen.com/blazor-studio/pricing/" title="See Radzen Pricing" target="_blank" />.
+                        </RadzenText>
+                        <RadzenText TextAlign="TextAlign.Center">
+                            <a class="rz-button rz-button-lg rz-primary rz-variant-flat rz-m-4" href="https://www.radzen.com/blazor-studio/pricing/">See Pricing</a>
+                        </RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-cta#image-to-the-left" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Image to the left
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A call-to-action block with an image to the left hand side.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Dark">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-base-darker" >
+                    <RadzenColumn Size="12" SizeMD="6">
+                        <RadzenImage class="rz-w-100 rz-h-100" Path="images/gallery/6.jpg"></RadzenImage>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="6" class="rz-py-12 rz-px-6 rz-px-sm-12">
+                    <RadzenStack Gap="0" class="rz-h-100" JustifyContent="Radzen.JustifyContent.Center">
+                        <RadzenText Text="What's New" TextStyle="Radzen.Blazor.TextStyle.Overline" Style="max-width: 800px; font-size: 1rem" class="rz-color-primary-light" />
+                        <RadzenText Text="Cacti and Succulents" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" Style="max-width: 800px" class="rz-color-on-base-darker"/>
+                        <RadzenText Text="Cactus Coloring Book" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-base-darker"  />
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-12">
+                            <RadzenButton Text="Get now" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ></RadzenButton>
+                            <RadzenButton Text="See more" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Shade="Radzen.Shade.Lighter" Icon="arrow_right_alt"></RadzenButton>
+                        </RadzenStack>
+                    </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Edit Source" Title="View and edit example source code">
+                <RadzenRow style="max-width: 600px;" class="rz-my-12 rz-mx-auto">
+                    <RadzenColumn Size="12">
+                        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" TextAlign="TextAlign.Center" class="rz-pt-8">
+                            UI Blocks <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription." BadgeStyle="BadgeStyle.Danger" Style="vertical-align: top;">PRO</RadzenBadge>
+                        </RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" TextAlign="TextAlign.Center" class="rz-mb-6" Style="line-height: 1.5">
+                            UI Blocks are a premium feature of Radzen Blazor Studio and can be used with an active <RadzenLink Text="Radzen Professional or Enterprise subscription" Path="https://www.radzen.com/blazor-studio/pricing/" title="See Radzen Pricing" target="_blank" />.
+                        </RadzenText>
+                        <RadzenText TextAlign="TextAlign.Center">
+                            <a class="rz-button rz-button-lg rz-primary rz-variant-flat rz-m-4" href="https://www.radzen.com/blazor-studio/pricing/">See Pricing</a>
+                        </RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-cta#image-to-the-right" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Image to the right
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A call-to-action block with an image to the right hand side.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-" >
+                    <RadzenColumn Size="12" SizeMD="6" Order="1" OrderMD="2">
+                        <RadzenImage class="rz-w-100 rz-h-100" Path="images/gallery/1.jpg"></RadzenImage>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="6" Order="2" OrderMD="1" class="rz-py-12 rz-px-6 rz-px-sm-12">
+                    <RadzenStack Gap="0" class="rz-h-100" JustifyContent="Radzen.JustifyContent.Center">
+                        <RadzenText Text="Yellow Clivia" TextStyle="Radzen.Blazor.TextStyle.Overline" Style="max-width: 800px; font-size: 1rem" class="rz-color-primary" />
+                        <RadzenText Text="Clivia miniata var. citrina" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" Style="max-width: 800px" />
+                        <RadzenText Text="Easily grown in bright light and well-drained soils" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color"  />
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-12">
+                            <RadzenButton Text="Learn more" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ></RadzenButton>
+                            <RadzenButton Text="Find similar" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base"  Icon="arrow_right_alt"></RadzenButton>
+                        </RadzenStack>
+                    </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Edit Source" Title="View and edit example source code">
+                <RadzenRow style="max-width: 600px;" class="rz-my-12 rz-mx-auto">
+                    <RadzenColumn Size="12">
+                        <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H2" TextAlign="TextAlign.Center" class="rz-pt-8">
+                            UI Blocks <RadzenBadge title="To use it in your application you need an active Radzen Professional or Enterprise subscription." BadgeStyle="BadgeStyle.Danger" Style="vertical-align: top;">PRO</RadzenBadge>
+                        </RadzenText>
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" TextAlign="TextAlign.Center" class="rz-mb-6" Style="line-height: 1.5">
+                            UI Blocks are a premium feature of Radzen Blazor Studio and can be used with an active <RadzenLink Text="Radzen Professional or Enterprise subscription" Path="https://www.radzen.com/blazor-studio/pricing/" title="See Radzen Pricing" target="_blank" />.
+                        </RadzenText>
+                        <RadzenText TextAlign="TextAlign.Center">
+                            <a class="rz-button rz-button-lg rz-primary rz-variant-flat rz-m-4" href="https://www.radzen.com/blazor-studio/pricing/">See Pricing</a>
+                        </RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+
+
+
+
