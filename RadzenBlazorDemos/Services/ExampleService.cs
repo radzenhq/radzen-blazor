@@ -451,6 +451,7 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            New = true,
                             Name = "Filter Value Template",
                             Path = "datagrid-filtervalue-template",
                             Title = "Blazor DataGrid Component - Custom Filtering template | Free UI Components by Radzen",
