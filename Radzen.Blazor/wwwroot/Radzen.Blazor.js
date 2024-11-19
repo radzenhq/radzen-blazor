@@ -1137,21 +1137,6 @@ window.Radzen = {
 
     var smartPosition = !position || position == 'bottom';
 
-    var scrollbarSize = 20;
-    var el = parent;
-    while (el && el != document.documentElement) {
-        if (el.scrollWidth > el.clientWidth) {
-            scrollbarSize = el.scrollWidth - el.clientWidth;
-            break;
-        }
-
-        if (el.scrollHeight > el.clientHeight) {
-            scrollbarSize = el.scrollHeight - el.clientHeight;
-            break;
-        }
-        el = el.parentElement;
-    }
-
     if (smartPosition && top + rect.height > window.innerHeight && parentRect.top > rect.height) {
         if (disableSmartPosition !== true) {
             top = parentRect.top - rect.height;
@@ -1168,8 +1153,9 @@ window.Radzen = {
       }
     }
 
-    if (smartPosition && left + rect.width > window.innerWidth + scrollbarSize && window.innerWidth + scrollbarSize > rect.width) {
-      left = window.innerWidth - rect.width;
+    if (smartPosition && left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
+      left = x ? window.innerWidth - rect.width : rect.left;
+      top = y || parentRect.top;
 
       if (position) {
         var tooltipContent = popup.children[0];
@@ -1177,8 +1163,10 @@ window.Radzen = {
         if (tooltipContent.classList.contains(tooltipContentClassName)) {
           tooltipContent.classList.remove(tooltipContentClassName);
           tooltipContent.classList.add('rz-left-tooltip-content');
-          left = parentRect.left - rect.width - 5;
-          top = parentRect.top - parentRect.height;
+          position = 'left';
+          left = rect.left;
+          top = parentRect.top;
+          smartPosition = false;
         }
       }
     }
