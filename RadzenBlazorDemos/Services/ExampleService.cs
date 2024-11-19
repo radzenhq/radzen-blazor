@@ -334,14 +334,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Filter Template",
-                            Path = "datagrid-filter-template",
-                            Title = "Blazor DataGrid Component - Custom Filtering | Free UI Components by Radzen",
-                            Description = "This example demonstrates how to define custom RadzenDataGrid column filter template.",
-                            Tags = new [] { "datagrid", "column", "filter", "template" }
-                        },
-                        new Example
-                        {
                             Name = "Frozen Columns",
                             Path = "datagrid-frozen-columns",
                             Title = "Blazor DataGrid Component - Frozen Columns | Free UI Components by Radzen",
@@ -448,6 +440,22 @@ namespace RadzenBlazorDemos
                             Title = "Blazor DataGrid Component - Filter API | Free UI Components by Radzen",
                             Description = "Set the initial filter of your RadzenDataGrid via the FilterValue and FilterOperator column properties.",
                             Tags = new [] { "filter", "api", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
+                            Name = "Filter Template",
+                            Path = "datagrid-filter-template",
+                            Title = "Blazor DataGrid Component - Custom Filtering | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to define custom RadzenDataGrid column filter template.",
+                            Tags = new [] { "datagrid", "column", "filter", "template" }
+                        },
+                        new Example
+                        {
+                            Name = "Filter Value Template",
+                            Path = "datagrid-filtervalue-template",
+                            Title = "Blazor DataGrid Component - Custom Filtering template | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to define custom RadzenDataGrid column filter value template.",
+                            Tags = new [] { "datagrid", "column", "filter", "template", "value" }
                         },
                     }
                 },

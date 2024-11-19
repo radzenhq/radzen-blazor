@@ -898,7 +898,7 @@ namespace Radzen.Blazor
             {
                 filterValue = parameters.GetValueOrDefault<object>(nameof(FilterValue));
 
-                if (FilterTemplate != null)
+                if (FilterTemplate != null || FilterValueTemplate != null)
                 {
                     FilterValue = filterValue;
                     Grid.SaveSettings();
@@ -922,7 +922,7 @@ namespace Radzen.Blazor
             {
                 secondFilterValue = parameters.GetValueOrDefault<object>(nameof(SecondFilterValue));
 
-                if (FilterTemplate != null)
+                if (FilterTemplate != null || SecondFilterValueTemplate != null)
                 {
                     SecondFilterValue = secondFilterValue;
                     Grid.SaveSettings();
@@ -1181,6 +1181,24 @@ namespace Radzen.Blazor
             }
         }
 
+        IEnumerable<FilterOperator> _filterOperators;
+        /// <summary>
+        /// Gets or sets the filter operators.
+        /// </summary>
+        /// <value>The filter operators.</value>
+        [Parameter]
+        public IEnumerable<FilterOperator> FilterOperators
+        {
+            get
+            {
+                return _filterOperators;
+            }
+            set
+            {
+                _filterOperators = value;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the second filter operator.
         /// </summary>
@@ -1272,6 +1290,8 @@ namespace Radzen.Blazor
         /// </summary>
         public virtual IEnumerable<FilterOperator> GetFilterOperators()
         {
+            if (FilterOperators != null) return FilterOperators;
+
             if (PropertyAccess.IsEnum(FilterPropertyType) || FilterPropertyType == typeof(bool))
                 return new FilterOperator[] { FilterOperator.Equals, FilterOperator.NotEquals };
 
@@ -1366,6 +1386,10 @@ namespace Radzen.Blazor
                     return "= ''";
                 case FilterOperator.IsNotEmpty:
                     return "≠ ''";
+                case FilterOperator.In:
+                    return "∈";
+                case FilterOperator.NotIn:
+                    return "∉";
                 default:
                     return $"{filterOperator}";
             }

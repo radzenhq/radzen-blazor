@@ -148,6 +148,12 @@
                                 }
                                 else
                                 {
+                                    @if (Column.FilterValueTemplate != null)
+                                    {
+                                        @Column.FilterValueTemplate(Column)
+                                    } 
+                                    else
+                                    {
                                     <RadzenListBox AllowVirtualization="@Column.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
                                                    TValue="IEnumerable<object>" Value=@Column.GetFilterValue() Change="@ListBoxChange" 
                                                    Data=@filterValues Count=@filterValuesCount LoadData="@LoadFilterValues" 
@@ -165,6 +171,7 @@
                                             }
                                         </Template>
                                     </RadzenListBox>
+                                    }
                                 }
                             </form>
                             }
