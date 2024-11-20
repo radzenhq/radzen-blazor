@@ -1170,9 +1170,6 @@ window.Radzen = {
           tooltipContent.classList.remove(tooltipContentClassName);
           tooltipContent.classList.add('rz-left-tooltip-content');
           position = 'left';
-          left = rect.left;
-          top = parentRect.top;
-          smartPosition = false;
         }
       }
     }
