@@ -1155,9 +1155,9 @@ window.Radzen = {
 
     if (smartPosition && left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
       left = x ? window.innerWidth - rect.width : rect.left;
-      top = y || parentRect.top;
 
       if (position) {
+        top = y || parentRect.top;
         var tooltipContent = popup.children[0];
         var tooltipContentClassName = 'rz-' + position + '-tooltip-content';
         if (tooltipContent.classList.contains(tooltipContentClassName)) {
