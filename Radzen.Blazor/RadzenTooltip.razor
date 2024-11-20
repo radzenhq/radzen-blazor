@@ -38,19 +38,6 @@
         tooltips.Add(new Tooltip() { Type = type, Options = options, Element = element });
 
         await InvokeAsync(() => { StateHasChanged(); });
-
-        var tooltip = tooltips.LastOrDefault();
-
-        if (tooltip != null)
-        {
-            await JSRuntime.InvokeVoidAsync("Radzen.openTooltip",
-                tooltip.Element,
-                UniqueID,
-                tooltip.Options.Delay,
-                tooltip.Options.Duration,
-                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
-                tooltip.Options.CloseTooltipOnDocumentClick);
-        }
     }
 
     bool IsJSRuntimeAvailable { get; set; }
