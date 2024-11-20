@@ -202,19 +202,35 @@ namespace RadzenBlazorDemos
             Children = new[] {
                 new Example
                 {
-                    Name = "Page Headers",
-                    Title = "Blazor Page Header | UI Blocks by Radzen",
-                    New = true,
+                    Name = "Cards",
+                    Title = "Blazor Cards | UI Blocks by Radzen",
+                    Icon = "&#xe991",
+                    Description = "Examples of Card Blocks",
+                    Path = "ui-blocks-cards",
+                    Tags = new [] { "card", "stats", "products" }
+                },
+                new Example
+                {
+                    Name = "Page Headings",
+                    Title = "Blazor Page Heading | UI Blocks by Radzen",
                     Icon = "&#xe9ea",
-                    Description = "Preconfigured Page Header UI Blocks",
-                    Path = "ui-blocks-page-headers",
-                    Tags = new [] { "headers", "header", "page", "title" }
+                    Description = "Preconfigured Page Heading UI Blocks",
+                    Path = "ui-blocks-page-headings",
+                    Tags = new [] { "headings", "heading", "page", "title" }
+                },
+                new Example
+                {
+                    Name = "Features",
+                    Title = "Blazor Features | UI Blocks by Radzen",
+                    Icon = "&#xe031",
+                    Description = "Examples of Features Blocks",
+                    Path = "ui-blocks-features",
+                    Tags = new [] { "feature", "list" }
                 },
                 new Example
                 {
                     Name = "Call-to-Action",
                     Title = "Blazor Call-to-Action | UI Blocks by Radzen",
-                    New = true,
                     Icon = "&#xe06c",
                     Description = "Examples of CTA UI Blocks",
                     Path = "ui-blocks-cta",
@@ -224,7 +240,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Footers",
                     Title = "Blazor Footer | UI Blocks by Radzen",
-                    New = true,
                     Icon = "&#xf7e6",
                     Description = "Preconfigured Footer UI Blocks",
                     Path = "ui-blocks-footers",
