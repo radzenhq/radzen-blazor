@@ -1132,8 +1132,8 @@ window.Radzen = {
     popup.style.display = 'block';
 
     var rect = popup.getBoundingClientRect();
-    rect.width = rect.width + 20;
-    rect.height = rect.height + 20;
+    rect.width = x ? rect.width + 20 : rect.width;
+    rect.height = y ? rect.height + 20 : rect.height;
 
     var smartPosition = !position || position == 'bottom';
 
