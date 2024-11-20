@@ -654,6 +654,8 @@ namespace Radzen.Blazor
             if (Disabled)
                 return;
 
+            var canRequest = searchText != null;
+
             searchText = null;
             internalValue = default(TValue);
             selectedItem = null;
@@ -669,7 +671,12 @@ namespace Radzen.Blazor
                 await grid.SelectRow(null);
             }
 
-            StateHasChanged();           
+            if (canRequest)
+            {
+                await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, OrderBy = "" });
+            }
+
+            StateHasChanged();
         }
 
         string previousSearch;
