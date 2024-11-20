@@ -483,7 +483,13 @@ window.Radzen = {
       var percent = isVertical ? (parent.offsetHeight - handle.offsetTop - offsetY) / parent.offsetHeight
         : (Radzen.isRTL(handle) ? parent.offsetWidth - handle.offsetLeft - offsetX : handle.offsetLeft + offsetX) / parent.offsetWidth;
 
-      var newValue = Math.max(min, Math.min(percent, max)) * (max - min) + min;
+      if (percent > 1) {
+        percent = 1;
+      } else if (percent < 0) {
+        percent = 0;
+      }
+
+     var newValue = percent * (max - min) + min;
 
       if (
         slider.canChange &&
