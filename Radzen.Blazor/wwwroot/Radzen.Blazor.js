@@ -1160,7 +1160,7 @@ window.Radzen = {
     }
 
     if (smartPosition && left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
-      left = x ? window.innerWidth - rect.width : rect.left;
+      left = !position ? window.innerWidth - rect.width : rect.left;
 
       if (position) {
         top = y || parentRect.top;
