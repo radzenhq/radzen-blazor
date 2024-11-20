@@ -669,9 +669,7 @@ namespace Radzen.Blazor
                 await grid.SelectRow(null);
             }
 
-            await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, OrderBy = "" });
-
-            StateHasChanged();
+            StateHasChanged();           
         }
 
         string previousSearch;
