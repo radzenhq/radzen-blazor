@@ -19,7 +19,7 @@
 
 <RadzenTabs SelectedIndex=@selectedIndex Change="@OnTabChange">
     <Tabs>
-        <RadzenTabsItem Text=".NET 8 &amp; 9">
+        <RadzenTabsItem Text=".NET 8">
             <div class="rz-py-0 rz-py-sm-4 rz-px-0 rz-px-sm-2 rz-px-lg-12">
             <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
 All interactive features of the Radzen Blazor components require interactivity of the container <code>.razor</code> file to be enabled or the <code>@@rendermode</code>
@@ -60,6 +60,46 @@ More info is available in the <RadzenLink Text="rendering mode article" Path="ht
 </pre>
         @Next
         </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 7 Server">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            @IncludeTheme(("_Host.cshtml", "ServerPrerendered", CurrentVersion))
+            @IncludeJavaScript(("_Host.cshtml", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 7 WebAssembly (hosted)">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            @IncludeTheme(("_Host.cshtml", "WebAssemblyPrerendered", CurrentVersion))
+            @IncludeJavaScript(("_Host.cshtml", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 6 Server">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            @IncludeTheme(("_Layout.cshtml", "ServerPrerendered", CurrentVersion))
+            @IncludeJavaScript(("_Layout.cshtml", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
+        </RadzenTabsItem>
+        <RadzenTabsItem Text=".NET 6 WebAssembly (hosted)">
+            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
+            @Installation(CurrentVersion)
+            @Import(CurrentVersion)
+            @IncludeTheme(("_Layout.cshtml", "WebAssemblyPrerendered", CurrentVersion))
+            @IncludeJavaScript(("_Layout.cshtml", CurrentVersion))
+            @UseComponent(CurrentVersion)
+            @Additional(CurrentVersion)
+            </div>
         </RadzenTabsItem>
         <RadzenTabsItem Text="WebAssembly (standalone)">
             <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
@@ -110,14 +150,14 @@ More info is available in the <RadzenLink Text="rendering mode article" Path="ht
 </RadzenTabs>
 
 @code {
-    private static readonly string[] versions = ["net9", "wasm", "csp"];
+    private static readonly string[] versions = ["net8", "net7-server", "net7-wasm", "net6-server", "net6-wasm", "wasm", "csp"];
 
     private int selectedIndex = 0;
 
     [Parameter]
     public string Version { get; set; }
 
-    private string CurrentVersion => Version ?? "net9";
+    private string CurrentVersion => Version ?? "net8";
 
     protected override void OnParametersSet()
     {
