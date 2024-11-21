@@ -25,8 +25,12 @@
                         <RadzenText Text="Effortless Development with Radzen" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="rz-color-on-primary"/>
                         <RadzenText Text="Exhausted by repetitive coding tasks? Radzen Blazor Studio streamlines your workflow with advanced data scaffolding, and efficient data management." TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-primary"  />
                         <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-12">
-                            <RadzenButton Text="Download now" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ButtonStyle="Radzen.ButtonStyle.Base" Shade="Radzen.Shade.Lighter"></RadzenButton>
-                            <RadzenButton Text="See benefits" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Shade="Radzen.Shade.Lighter" Icon="arrow_right_alt"></RadzenButton>
+                            <RadzenLink Text="Download now" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-base rz-shade-lighter" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta" />
+                            <RadzenLink class="rz-button rz-button-lg rz-variant-text rz-base rz-text-align-center rz-shade-lighter" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta">
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.25rem">
+                                    <RadzenIcon Icon="arrow_right_alt" Style="font-size: 1.5rem" /> See benefits
+                                </RadzenStack>
+                            </RadzenLink>
                         </RadzenStack>
                     </RadzenStack>
                     </RadzenColumn>
@@ -54,8 +58,12 @@
                         <RadzenText Text="Effortless Development with Radzen" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" Style="max-width: 800px" class="rz-color-on-base-darker" />
                         <RadzenText Text="Exhausted by repetitive coding tasks? Radzen Blazor Studio streamlines your workflow with advanced data scaffolding, and efficient data management." TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-base-darker" />
                         <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-12">
-                            <RadzenButton Text="Download now" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ></RadzenButton>
-                            <RadzenButton Text="See benefits" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Shade="Radzen.Shade.Lighter" Icon="arrow_right_alt"></RadzenButton>
+                            <RadzenLink Text="Download now" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta" />
+                            <RadzenLink class="rz-button rz-button-lg rz-variant-text rz-base rz-text-align-center rz-shade-lighter" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta">
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.25rem">
+                                    <RadzenIcon Icon="arrow_right_alt" Style="font-size: 1.5rem" /> See benefits
+                                </RadzenStack>
+                            </RadzenLink>
                         </RadzenStack>
                     </RadzenStack>
                     </RadzenColumn>
@@ -85,8 +93,8 @@
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="6" class="rz-p-6 rz-p-sm-12">
                         <RadzenStack Gap="1rem" Orientation="Radzen.Orientation.Horizontal" class="rz-h-100 rz-justify-content-end" AlignItems="Radzen.AlignItems.Center" JustifyContent="Radzen.JustifyContent.Normal" Wrap="Radzen.FlexWrap.Wrap">
-                            <RadzenButton Text="Read more" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ButtonStyle="Radzen.ButtonStyle.Base"></RadzenButton>
-                            <RadzenButton Text="Start Now" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ></RadzenButton>
+                            <RadzenLink Text="Read more" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-base rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta" />
+                            <RadzenLink Text="Start now" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta" />
                         </RadzenStack>
                     </RadzenColumn>
                 </RadzenRow>
@@ -117,8 +125,12 @@
                         <RadzenText Text="Cacti and Succulents" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" Style="max-width: 800px" class="rz-color-on-base-darker"/>
                         <RadzenText Text="Cactus Coloring Book" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-base-darker"  />
                         <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-12">
-                            <RadzenButton Text="Get now" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ></RadzenButton>
-                            <RadzenButton Text="See more" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base" Shade="Radzen.Shade.Lighter" Icon="arrow_right_alt"></RadzenButton>
+                            <RadzenLink Text="Get now" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta" />
+                            <RadzenLink class="rz-button rz-button-lg rz-variant-text rz-base rz-text-align-center rz-shade-lighter" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta">
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.25rem">
+                                    <RadzenIcon Icon="arrow_right_alt" Style="font-size: 1.5rem" /> See more
+                                </RadzenStack>
+                            </RadzenLink>
                         </RadzenStack>
                     </RadzenStack>
                     </RadzenColumn>
@@ -149,8 +161,12 @@
                         <RadzenText Text="Clivia miniata var. citrina" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" Style="max-width: 800px" />
                         <RadzenText Text="Easily grown in bright light and well-drained soils" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color"  />
                         <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" Wrap="Radzen.FlexWrap.Wrap" class="rz-mt-12">
-                            <RadzenButton Text="Learn more" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Flat" ></RadzenButton>
-                            <RadzenButton Text="Find similar" Size="Radzen.ButtonSize.Large" Variant="Radzen.Variant.Text" ButtonStyle="Radzen.ButtonStyle.Base"  Icon="arrow_right_alt"></RadzenButton>
+                            <RadzenLink Text="Learn more" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta" />
+                            <RadzenLink class="rz-button rz-button-lg rz-variant-text rz-base rz-text-align-center rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-cta">
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.25rem">
+                                    <RadzenIcon Icon="arrow_right_alt" Style="font-size: 1.5rem" /> Find similar
+                                </RadzenStack>
+                            </RadzenLink>
                         </RadzenStack>
                     </RadzenStack>
                     </RadzenColumn>
