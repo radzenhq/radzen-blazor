@@ -211,12 +211,12 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Page Headings",
-                    Title = "Blazor Page Heading | UI Blocks by Radzen",
-                    Icon = "&#xe9ea",
-                    Description = "Preconfigured Page Heading UI Blocks",
-                    Path = "ui-blocks-page-headings",
-                    Tags = new [] { "headings", "heading", "page", "title" }
+                    Name = "Call-to-Action",
+                    Title = "Blazor Call-to-Action | UI Blocks by Radzen",
+                    Icon = "&#xe06c",
+                    Description = "Examples of CTA UI Blocks",
+                    Path = "ui-blocks-cta",
+                    Tags = new [] { "cta", "call-to-action", "call", "action", "button" }
                 },
                 new Example
                 {
@@ -229,15 +229,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Call-to-Action",
-                    Title = "Blazor Call-to-Action | UI Blocks by Radzen",
-                    Icon = "&#xe06c",
-                    Description = "Examples of CTA UI Blocks",
-                    Path = "ui-blocks-cta",
-                    Tags = new [] { "cta", "call-to-action", "call", "action", "button" }
-                },
-                new Example
-                {
                     Name = "Footers",
                     Title = "Blazor Footer | UI Blocks by Radzen",
                     Icon = "&#xf7e6",
@@ -245,6 +236,15 @@ namespace RadzenBlazorDemos
                     Path = "ui-blocks-footers",
                     Tags = new [] { "footer" }
                 },
+                new Example
+                {
+                    Name = "Page Headings",
+                    Title = "Blazor Page Heading | UI Blocks by Radzen",
+                    Icon = "&#xe9ea",
+                    Description = "Preconfigured Page Heading UI Blocks",
+                    Path = "ui-blocks-page-headings",
+                    Tags = new [] { "headings", "heading", "page", "title" }
+                }
             }
         },
 
