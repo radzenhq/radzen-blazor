@@ -44,6 +44,8 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
+
         IsJSRuntimeAvailable = true;
 
         var tooltip = tooltips.LastOrDefault();
@@ -85,9 +87,22 @@
     /// Closes this instance.
     /// </summary>
     [JSInvokable("RadzenTooltip.CloseTooltip")]
-    public void CloseTooltip()
+    public async Task CloseTooltip(string position = null)
     {
-        Service.Close();
+        if (position == null)
+        {
+            Service.Close();
+        }
+        else
+        {
+            var tooltip = tooltips.LastOrDefault();
+
+            if (tooltip != null)
+            {
+                tooltip.Options.Position = (TooltipPosition)Enum.Parse(typeof(TooltipPosition), position, true);
+                await InvokeAsync(() => { StateHasChanged(); });
+            }
+        }
     }
 
     public async Task Close()

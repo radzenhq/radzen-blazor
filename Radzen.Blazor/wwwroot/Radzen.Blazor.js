@@ -1155,6 +1155,10 @@ window.Radzen = {
         if (tooltipContent.classList.contains(tooltipContentClassName)) {
           tooltipContent.classList.remove(tooltipContentClassName);
           tooltipContent.classList.add('rz-top-tooltip-content');
+            position = 'top';
+            if (instance && callback) {
+                instance.invokeMethodAsync(callback, position);
+            }
         }
       }
     }
@@ -1170,6 +1174,9 @@ window.Radzen = {
           tooltipContent.classList.remove(tooltipContentClassName);
           tooltipContent.classList.add('rz-left-tooltip-content');
           position = 'left';
+          if (instance && callback) {
+            instance.invokeMethodAsync(callback, position);
+          }
         }
       }
     }
