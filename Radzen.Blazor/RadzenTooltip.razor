@@ -5,7 +5,7 @@
 @foreach (var tooltip in tooltips)
 {
     <div id="@UniqueID" class="rz-tooltip @tooltip.Options.CssClass" style="display: none; top: 0px; left: 0px; z-index: 1001; position: absolute;">
-        <div class="rz-tooltip-content @getCssClass(tooltip)" style="@tooltip.Options.Style">
+        <div class="rz-tooltip-content" style="@tooltip.Options.Style">
             @if (!string.IsNullOrEmpty(tooltip.Options.Text))
             {
                 <div>
@@ -21,11 +21,6 @@
 }
 
 @code {
-    string getCssClass(Tooltip tooltip)
-    {
-        return $"rz-{Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant()}-tooltip-content";
-    }
-
     public string UniqueID { get; set; }
 
     [Inject] private TooltipService Service { get; set; }

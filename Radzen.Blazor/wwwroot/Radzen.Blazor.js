@@ -1119,87 +1119,81 @@ window.Radzen = {
     var top = y ? y : parentRect.bottom;
     var left = x ? x : parentRect.left;
 
-      if (syncWidth) {
-        popup.style.width = parentRect.width + 'px';
-        if (!popup.style.minWidth) {
-            popup.minWidth = true;
-            popup.style.minWidth = parentRect.width + 'px';
-        }
+    if (syncWidth) {
+      popup.style.width = parentRect.width + 'px';
+      if (!popup.style.minWidth) {
+        popup.minWidth = true;
+        popup.style.minWidth = parentRect.width + 'px';
+      }
     }
 
     if (window.chrome) {
-        var closestFrozenCell = popup.closest('.rz-frozen-cell');
-        if (closestFrozenCell) {
-            Radzen[id + 'FZL'] = { cell: closestFrozenCell, left: closestFrozenCell.style.left };
-            closestFrozenCell.style.left = '';
-        }
+      var closestFrozenCell = popup.closest('.rz-frozen-cell');
+      if (closestFrozenCell) {
+        Radzen[id + 'FZL'] = { cell: closestFrozenCell, left: closestFrozenCell.style.left };
+        closestFrozenCell.style.left = '';
+      }
     }
 
     popup.style.display = 'block';
 
-    var rect = popup.getBoundingClientRect();
-    rect.width = x ? rect.width + 20 : rect.width;
-    rect.height = y ? rect.height + 20 : rect.height;
-
     var smartPosition = !position || position == 'bottom';
+    var popupRect = popup.getBoundingClientRect();
 
-    if (smartPosition && top + rect.height > window.innerHeight && parentRect.top > rect.height) {
-        if (disableSmartPosition !== true) {
-            top = parentRect.top - rect.height;
-        }
-
-      if (position) {
-        top = top - 40;
-        var tooltipContent = popup.children[0];
-        var tooltipContentClassName = 'rz-' + position + '-tooltip-content';
-        if (tooltipContent.classList.contains(tooltipContentClassName)) {
-          tooltipContent.classList.remove(tooltipContentClassName);
-          tooltipContent.classList.add('rz-top-tooltip-content');
-            position = 'top';
-            if (instance && callback) {
-                instance.invokeMethodAsync(callback, position);
-            }
-        }
-      }
+    var tooltipContent = popup.children[0];
+    if (tooltipContent) {
+      tooltipContent.classList.remove('rz-bottom-left-tooltip-content');
+      tooltipContent.classList.remove('rz-bottom-right-tooltip-content');
+      tooltipContent.classList.remove('rz-top-left-tooltip-content');
+      tooltipContent.classList.remove('rz-top-right-tooltip-content');
+      tooltipContent.classList.remove('rz-left-bottom-tooltip-content');
+      tooltipContent.classList.remove('rz-left-top-tooltip-content');
+      tooltipContent.classList.remove('rz-right-bottom-tooltip-content');
+      tooltipContent.classList.remove('rz-right-top-tooltip-content');
     }
 
-    if (smartPosition && left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
-      left = !position ? window.innerWidth - rect.width : rect.left;
-
-      if (position) {
-        top = y || parentRect.top;
-        var tooltipContent = popup.children[0];
-        var tooltipContentClassName = 'rz-' + position + '-tooltip-content';
-        if (tooltipContent.classList.contains(tooltipContentClassName)) {
-          tooltipContent.classList.remove(tooltipContentClassName);
-          tooltipContent.classList.add('rz-left-tooltip-content');
-          position = 'left';
-          if (instance && callback) {
-            instance.invokeMethodAsync(callback, position);
-          }
-        }
-      }
+    if (position == 'bottom') {
+      tooltipContent.classList.add('rz-bottom-left-tooltip-content');
+      top = parentRect.bottom + 10;
     }
 
-    if (smartPosition) {
-      if (position) {
-        top = top + 20;
-      }
+    if (position == 'top') {
+      tooltipContent.classList.add('rz-top-left-tooltip-content');
+      top = parentRect.top - popupRect.height - 10;
     }
 
     if (position == 'left') {
-      left = parentRect.left - rect.width - 5;
-      top =  parentRect.top;
+      tooltipContent.classList.add('rz-left-top-tooltip-content');
+      left = parentRect.left - popupRect.width - 10;
+      top = parentRect.top;
     }
 
     if (position == 'right') {
+      tooltipContent.classList.add('rz-right-top-tooltip-content');
       left = parentRect.right + 10;
       top = parentRect.top;
     }
 
-    if (position == 'top') {
-      top = parentRect.top - rect.height + 5;
-      left = parentRect.left;
+    if (smartPosition && top + popupRect.height > window.innerHeight && parentRect.top > popupRect.height && disableSmartPosition !== true) {
+      top = parentRect.top - popupRect.height - 10;
+      tooltipContent.classList.remove('rz-bottom-left-tooltip-content');
+      tooltipContent.classList.add('rz-top-left-tooltip-content');
+    }
+
+    if (smartPosition && left + popupRect.width > window.innerWidth && window.innerWidth > popupRect.width && disableSmartPosition !== true) {
+      left = !position ? window.innerWidth - popupRect.width : popupRect.left;
+    }
+
+    if ((position == 'left' || position == 'right') && top + popupRect.height > window.innerHeight && parentRect.bottom > popupRect.height) {
+      top = parentRect.bottom - popupRect.height;
+      tooltipContent.classList.remove('rz-' + position + '-top-tooltip-content');
+      tooltipContent.classList.add('rz-' + position + '-bottom-tooltip-content');    
+    }
+
+    if ((position == 'bottom' || position == 'top') && left + popupRect.width > window.innerWidth && parentRect.right > popupRect.width) {
+      left = parentRect.right - popupRect.width;
+      tooltipContent.classList.remove('rz-' + position + '-left-tooltip-content');
+      tooltipContent.classList.add('rz-' + position + '-right-tooltip-content');
     }
 
     popup.style.zIndex = 2000;
@@ -1207,45 +1201,45 @@ window.Radzen = {
     popup.style.top = top + scrollTop + 'px';
 
     if (!popup.classList.contains('rz-overlaypanel')) {
-        popup.classList.add('rz-popup');
+      popup.classList.add('rz-popup');
     }
 
     Radzen[id] = function (e) {
-        var lastPopup = Radzen.popups && Radzen.popups[Radzen.popups.length - 1];
-        var currentPopup = lastPopup != null && document.getElementById(lastPopup.id) || popup;
+      var lastPopup = Radzen.popups && Radzen.popups[Radzen.popups.length - 1];
+      var currentPopup = lastPopup != null && document.getElementById(lastPopup.id) || popup;
 
-        if (lastPopup) {
-            currentPopup.instance = lastPopup.instance;
-            currentPopup.callback = lastPopup.callback;
-            currentPopup.parent = lastPopup.parent;
-        }
+      if (lastPopup) {
+        currentPopup.instance = lastPopup.instance;
+        currentPopup.callback = lastPopup.callback;
+        currentPopup.parent = lastPopup.parent;
+      }
 
-        if(e.type == 'contextmenu' || !e.target || !closeOnDocumentClick) return;
-        if (!/Android/i.test(navigator.userAgent) &&
-            !['input', 'textarea'].includes(document.activeElement ? document.activeElement.tagName.toLowerCase() : '') && e.type == 'resize') {
-            Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
-            return;
-        }
+      if (e.type == 'contextmenu' || !e.target || !closeOnDocumentClick) return;
+      if (!/Android/i.test(navigator.userAgent) &&
+        !['input', 'textarea'].includes(document.activeElement ? document.activeElement.tagName.toLowerCase() : '') && e.type == 'resize') {
+        Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
+        return;
+      }
 
-        var closestLink = e.target.closest && (e.target.closest('.rz-link') || e.target.closest('.rz-navigation-item-link'));
-        if (closestLink && closestLink.closest && closestLink.closest('a')) {
-            if (Radzen.closeAllPopups) {
-                Radzen.closeAllPopups();
-            }
+      var closestLink = e.target.closest && (e.target.closest('.rz-link') || e.target.closest('.rz-navigation-item-link'));
+      if (closestLink && closestLink.closest && closestLink.closest('a')) {
+        if (Radzen.closeAllPopups) {
+          Radzen.closeAllPopups();
         }
-        if (currentPopup.parent) {
-          if (e.type == 'mousedown' && !currentPopup.parent.contains(e.target) && !currentPopup.contains(e.target)) {
-              Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
-          }
-        } else {
-          if (!currentPopup.contains(e.target)) {
-              Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
-          }
+      }
+      if (currentPopup.parent) {
+        if (e.type == 'mousedown' && !currentPopup.parent.contains(e.target) && !currentPopup.contains(e.target)) {
+          Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
         }
+      } else {
+        if (!currentPopup.contains(e.target)) {
+          Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
+        }
+      }
     };
 
     if (!Radzen.popups) {
-        Radzen.popups = [];
+      Radzen.popups = [];
     }
 
     Radzen.popups.push({ id, instance, callback, parent });
@@ -1258,29 +1252,29 @@ window.Radzen = {
 
     var p = parent;
     while (p && p != document.body) {
-        if (p.scrollWidth > p.clientWidth || p.scrollHeight > p.clientHeight) {
-            p.removeEventListener('scroll', Radzen.closeAllPopups);
-            p.addEventListener('scroll', Radzen.closeAllPopups);
-        }
-        p = p.parentElement;
+      if (p.scrollWidth > p.clientWidth || p.scrollHeight > p.clientHeight) {
+        p.removeEventListener('scroll', Radzen.closeAllPopups);
+        p.addEventListener('scroll', Radzen.closeAllPopups);
+      }
+      p = p.parentElement;
     }
 
     if (!parent) {
-        document.removeEventListener('contextmenu', Radzen[id]);
-        document.addEventListener('contextmenu', Radzen[id]);
+      document.removeEventListener('contextmenu', Radzen[id]);
+      document.addEventListener('contextmenu', Radzen[id]);
     }
 
     if (autoFocusFirstElement) {
-        setTimeout(function () {
-            popup.removeEventListener('keydown', Radzen.focusTrap);
-            popup.addEventListener('keydown', Radzen.focusTrap);
+      setTimeout(function () {
+        popup.removeEventListener('keydown', Radzen.focusTrap);
+        popup.addEventListener('keydown', Radzen.focusTrap);
 
-            var focusable = Radzen.getFocusableElements(popup);
-            var firstFocusable = focusable[0];
-            if (firstFocusable) {
-                firstFocusable.focus();
-            }
-        }, 500);
+        var focusable = Radzen.getFocusableElements(popup);
+        var firstFocusable = focusable[0];
+        if (firstFocusable) {
+          firstFocusable.focus();
+        }
+      }, 500);
     }
   },
   closeAllPopups: function (e, id) {
