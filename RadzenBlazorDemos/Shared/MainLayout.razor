@@ -11,7 +11,7 @@
 
 <RadzenComponents />
 
-<RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar' 'rz-footer rz-footer rz-footer'">
+<RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
 <RadzenHeader>
     <ChildContent>
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
@@ -160,9 +160,6 @@
         </RadzenListBox>
     </RadzenStack>
 </RadzenSidebar>
-    <RadzenFooter>
-        Footer
-    </RadzenFooter>
 </RadzenLayout>
 
 @if (!rendered)
