@@ -1190,6 +1190,7 @@ window.Radzen = {
       if(tooltipContent) {
         tooltipContent.classList.remove('rz-bottom-left-tooltip-content');
         tooltipContent.classList.add('rz-top-left-tooltip-content');
+        position = 'top';
       }    
     }
 
