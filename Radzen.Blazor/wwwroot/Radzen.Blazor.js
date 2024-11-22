@@ -1176,8 +1176,6 @@ window.Radzen = {
 
     if (smartPosition && top + popupRect.height > window.innerHeight && parentRect.top > popupRect.height && disableSmartPosition !== true) {
       top = parentRect.top - popupRect.height - 10;
-      tooltipContent.classList.remove('rz-bottom-left-tooltip-content');
-      tooltipContent.classList.add('rz-top-left-tooltip-content');
     }
 
     if (smartPosition && left + popupRect.width > window.innerWidth && window.innerWidth > popupRect.width && disableSmartPosition !== true) {
