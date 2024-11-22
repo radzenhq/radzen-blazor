@@ -1187,6 +1187,10 @@ window.Radzen = {
 
     if (smartPosition && popupOverflowsBottom && disableSmartPosition !== true) {
       top = parentRect.top - popupRect.height - 10;
+      if(tooltipContent) {
+        tooltipContent.classList.remove('rz-bottom-left-tooltip-content');
+        tooltipContent.classList.add('rz-top-left-tooltip-content');
+      }    
     }
 
     if (smartPosition && popupOverflowsRight && disableSmartPosition !== true) {
@@ -1198,7 +1202,7 @@ window.Radzen = {
       tooltipContent.classList.remove('rz-' + position + '-top-tooltip-content');
       tooltipContent.classList.add('rz-' + position + '-bottom-tooltip-content');    
     }
-
+    
     if (tooltipContent && (position == 'bottom' || position == 'top') && popupOverflowsRight) {
       left = parentRect.right - popupRect.width;
       tooltipContent.classList.remove('rz-' + position + '-left-tooltip-content');
