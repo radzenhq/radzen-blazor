@@ -1153,42 +1153,53 @@ window.Radzen = {
     }
 
     if (position == 'bottom') {
-      tooltipContent.classList.add('rz-bottom-left-tooltip-content');
+      if(tooltipContent) {
+        tooltipContent.classList.add('rz-bottom-left-tooltip-content');
+      }
       top = parentRect.bottom + 10;
     }
 
     if (position == 'top') {
-      tooltipContent.classList.add('rz-top-left-tooltip-content');
+      if(tooltipContent) {
+        tooltipContent.classList.add('rz-top-left-tooltip-content');
+      }
       top = parentRect.top - popupRect.height - 10;
     }
 
     if (position == 'left') {
-      tooltipContent.classList.add('rz-left-top-tooltip-content');
+      if(tooltipContent) {
+        tooltipContent.classList.add('rz-left-top-tooltip-content');
+      }
       left = parentRect.left - popupRect.width - 10;
       top = parentRect.top;
     }
 
     if (position == 'right') {
-      tooltipContent.classList.add('rz-right-top-tooltip-content');
+      if(tooltipContent) {
+        tooltipContent.classList.add('rz-right-top-tooltip-content');
+      }    
       left = parentRect.right + 10;
       top = parentRect.top;
     }
 
-    if (smartPosition && top + popupRect.height > window.innerHeight && parentRect.top > popupRect.height && disableSmartPosition !== true) {
+    var popupOverflowsBottom = top + popupRect.height > window.innerHeight && parentRect.top > popupRect.height;
+    var popupOverflowsRight = left + popupRect.width > window.innerWidth && window.innerWidth > popupRect.width;
+
+    if (smartPosition && popupOverflowsBottom && disableSmartPosition !== true) {
       top = parentRect.top - popupRect.height - 10;
     }
 
-    if (smartPosition && left + popupRect.width > window.innerWidth && window.innerWidth > popupRect.width && disableSmartPosition !== true) {
+    if (smartPosition && popupOverflowsRight && disableSmartPosition !== true) {
       left = !position ? window.innerWidth - popupRect.width : popupRect.left;
     }
 
-    if ((position == 'left' || position == 'right') && top + popupRect.height > window.innerHeight && parentRect.bottom > popupRect.height) {
+    if (tooltipContent && (position == 'left' || position == 'right') && popupOverflowsBottom) {
       top = parentRect.bottom - popupRect.height;
       tooltipContent.classList.remove('rz-' + position + '-top-tooltip-content');
       tooltipContent.classList.add('rz-' + position + '-bottom-tooltip-content');    
     }
 
-    if ((position == 'bottom' || position == 'top') && left + popupRect.width > window.innerWidth && parentRect.right > popupRect.width) {
+    if (tooltipContent && (position == 'bottom' || position == 'top') && popupOverflowsRight) {
       left = parentRect.right - popupRect.width;
       tooltipContent.classList.remove('rz-' + position + '-left-tooltip-content');
       tooltipContent.classList.add('rz-' + position + '-right-tooltip-content');
