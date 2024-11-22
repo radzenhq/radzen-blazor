@@ -1333,8 +1333,12 @@ window.Radzen = {
     window.removeEventListener('resize', Radzen[id]);
     Radzen[id] = null;
 
-    if (instance) {
-      instance.invokeMethodAsync(callback);
+    if (instance && callback) {
+        if (callback.includes('RadzenTooltip')) {
+            instance.invokeMethodAsync(callback, null);
+        } else {
+            instance.invokeMethodAsync(callback);
+        }
     }
     Radzen.popups = (Radzen.popups || []).filter(function (obj) {
         return obj.id !== id;
