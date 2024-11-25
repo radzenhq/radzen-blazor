@@ -1601,6 +1601,13 @@ window.Radzen = {
           }
       }
   },
+  getNumericValue: function (arg) {
+    var el =
+      arg instanceof Element || arg instanceof HTMLDocument
+        ? arg
+        : document.getElementById(arg);
+    return el ? Radzen.getInputValue(el.children[0]) : null;
+  },
   getInputValue: function (arg) {
     var input =
       arg instanceof Element || arg instanceof HTMLDocument

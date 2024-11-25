@@ -338,6 +338,15 @@ else
 
     async Task ApplyFilter()
     {
+        if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
+        {
+            var inputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column));
+            if (!object.Equals($"{Column.GetFilterValue()}", inputValue))
+            {
+                Column.SetFilterValue(inputValue);
+            }
+        }
+
         if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
         {
             await popup.CloseAsync();
