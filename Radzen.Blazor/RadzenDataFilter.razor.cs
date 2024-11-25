@@ -294,15 +294,16 @@ namespace Radzen.Blazor
         /// Gets the properties collection.
         /// </summary>
         /// <value>The properties collection.</value>
-        public IList<RadzenDataFilterProperty<TItem>> PropertiesCollection
+        public List<RadzenDataFilterProperty<TItem>> PropertiesCollection
         {
             get
             {
-                return properties;
+                return properties.OrderBy(r => r.FilterSortOrder).ToList();
             }
         }
         
         internal List<RadzenDataFilterProperty<TItem>> properties = new List<RadzenDataFilterProperty<TItem>>();
+        
         internal void AddProperty(RadzenDataFilterProperty<TItem> property)
         {
             if (!properties.Contains(property))

@@ -13,13 +13,15 @@
 
     <RadzenDataFilter @ref="dataFilter" Auto=auto Data="@orders" TItem="Order" ViewChanged=@ViewChanged FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
         <Properties>
-            <RadzenDataFilterProperty Property="@nameof(Order.OrderID)" Title="Order ID" FilterValue="@finalSelectedIds" 
-                Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains">
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderID)" Title="Order ID" FilterValue="@finalSelectedIds"
+                                      Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.Contains"
+                                      FilterSortOrder="1">
                 <FilterTemplate>
-                        <RadzenDropDown @bind-Value=@selectedIds Style="width:100%;"
-                        Change=@OnSelectedIdsChange Data="@(orderIds)" AllowClear="true" Multiple="true" />
+                    <RadzenDropDown @bind-Value=@selectedIds Style="width:100%;"
+                                    Change=@OnSelectedIdsChange Data="@(orderIds)" AllowClear="true" Multiple="true"/>
                 </FilterTemplate>
             </RadzenDataFilterProperty>
+            
             <RadzenDataFilterProperty Property="@nameof(Order.ProductIds)" Title="ProductIds" FilterValue="@finalSelectedProductIds"
                                       Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.In">
                 <FilterTemplate>
@@ -30,7 +32,7 @@
             <RadzenDataFilterProperty Property="OrderDetails" FilterProperty="Product.ProductName" Title="Products"
                                       Type="typeof(IEnumerable<OrderDetail>)" FilterOperator="FilterOperator.Contains"/>
             <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
-            <MyCustomDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date">
+            <MyCustomDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date" FilterSortOrder="200">
                 <FilterTemplate>
                     <RadzenDatePicker @bind-Value="@context.FilterValue" Style="width:100%" ShowTime=false DateFormat="d"
                                       Change="@ApplyOrderDateFilter" />

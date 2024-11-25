@@ -27,7 +27,7 @@
 }
 else
 {
-    <RadzenDropDown @bind-Value="@Filter.Property" Data="@(DataFilter?.properties)" TextProperty="Title" ValueProperty="Property" TValue="string"
+    <RadzenDropDown @bind-Value="@Filter.Property" Data="@(DataFilter?.PropertiesCollection)" TextProperty="Title" ValueProperty="Property" TValue="string"
                     DisabledProperty="@(DataFilter?.UniqueFilters == true ? nameof(property.IsSelected) : null)"
                     Change="@OnPropertyChange" AllowFiltering="@(DataFilter?.AllowColumnFiltering ?? false)" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" class="rz-datafilter-property">
         <Template>

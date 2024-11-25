@@ -153,6 +153,14 @@ namespace Radzen.Blazor
         [Parameter]
         public Type Type { get; set; }
 
+        /// <summary>
+        /// Gets or sets the FilterSortOrder.
+        /// Determines the sorting order of the filters.
+        /// </summary>
+        /// <value>The FilterSortOrder. Default value is 100.</value>
+        [Parameter]
+        public int FilterSortOrder { get; set; } = 100;
+
         Func<TItem, object> propertyValueGetter;
 
         internal object GetHeader()
