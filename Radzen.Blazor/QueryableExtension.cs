@@ -434,6 +434,11 @@ namespace Radzen
             }
             else if (PropertyAccess.IsDate(columnType))
             {
+                if (columnType.GetGenericTypeDefinition() == typeof(Nullable<>))
+                {
+                    property = $"{property}.Value";
+                }
+                
                 var v = column.FilterValue;
                 if (v != null)
                 {
