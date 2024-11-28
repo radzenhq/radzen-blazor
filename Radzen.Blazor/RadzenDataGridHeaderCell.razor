@@ -343,7 +343,7 @@ else
             var inputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column));
             if (!object.Equals($"{Column.GetFilterValue()}", inputValue))
             {
-                Column.SetFilterValue(inputValue);
+                Column.SetFilterValue(!string.IsNullOrEmpty(inputValue) ? Convert.ChangeType(inputValue, Column.FilterPropertyType) : null);
             }
         }
 
