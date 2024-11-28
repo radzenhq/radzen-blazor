@@ -1258,7 +1258,7 @@ namespace Radzen
 
                 if (!string.IsNullOrEmpty(property))
                 {
-                    query.Add(property);
+                    query.Add($@"({property} == null ? """" : {property})");
                 }
 
                 if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
