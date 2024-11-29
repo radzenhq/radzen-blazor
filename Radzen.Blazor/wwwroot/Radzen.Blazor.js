@@ -1238,7 +1238,7 @@ window.Radzen = {
               Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
           }
         } else {
-          if (!currentPopup.contains(e.target)) {
+          if (e.target.nodeType && !currentPopup.contains(e.target)) {
               Radzen.closePopup(currentPopup.id, currentPopup.instance, currentPopup.callback, e);
           }
         }
