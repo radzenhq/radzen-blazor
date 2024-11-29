@@ -5,9 +5,9 @@
 @inherits DbContextPage
 
 <RadzenDataGrid @ref="grid" AllowFiltering="true" AllowColumnResize="true"
-                FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="300px"
-                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" TItem="Employee" FilterCleared=@FilterCleared
-    LogicalFilterOperator="LogicalFilterOperator.Or" FilterPopupRenderMode="PopupRenderMode.OnDemand">
+FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="300px"
+FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" TItem="Employee" FilterCleared=@FilterCleared
+LogicalFilterOperator="LogicalFilterOperator.Or" FilterPopupRenderMode="PopupRenderMode.OnDemand">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" FilterValue="@employeeID" Filterable="true" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center">
             <FilterValueTemplate>
@@ -22,17 +22,17 @@
         <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" />
         <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="150px"/>
         <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" 
-                              Type="typeof(IEnumerable<string>)" LogicalFilterOperator=LogicalFilterOperator.Or
-                              FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains"
-                              SecondFilterValue="@selectedSecondTitles" SecondFilterOperator="FilterOperator.Contains"
-                              Width="200px">
+        Type="typeof(IEnumerable<string>)" LogicalFilterOperator=LogicalFilterOperator.Or
+        FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains"
+        SecondFilterValue="@selectedSecondTitles" SecondFilterOperator="FilterOperator.Contains"
+        Width="200px">
             <FilterValueTemplate>
                 <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%"
-                                Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+                Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
             </FilterValueTemplate>
             <SecondFilterValueTemplate>
                 <RadzenDropDown @bind-Value=@selectedSecondTitles Style="width:100%"
-                                Change=@OnSelectedSecondTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
+                Change=@OnSelectedSecondTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
             </SecondFilterValueTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" />
@@ -81,6 +81,7 @@
     {
         selectedTitles = null;
         selectedSecondTitles = null;
+        employeeID = null;
         await grid.FirstPage();
     }
 }
