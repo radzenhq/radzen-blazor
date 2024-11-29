@@ -788,6 +788,7 @@ namespace Radzen
                     column.FilterPropertyType == typeof(DateTime?) ||
                     column.FilterPropertyType == typeof(DateTimeOffset) ||
                     column.FilterPropertyType == typeof(DateTimeOffset?) ||
+                    column.FilterPropertyType == typeof(DateOnly) || 
                     column.FilterPropertyType == typeof(DateOnly?))
             {
                 if (columnFilterOperator == FilterOperator.IsNull || columnFilterOperator == FilterOperator.IsNotNull)
