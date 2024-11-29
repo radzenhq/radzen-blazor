@@ -807,7 +807,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(2, "ShowUpDown", column.ShowUpDownForNumericFilter());
                 builder.AddAttribute(3, "Style", "width:100%");
                 builder.AddAttribute(4, "InputAttributes", new Dictionary<string,object>(){ { "aria-label", column.Title + $"{(!isFirst ? " second " : " ")}filter value " + (isFirst ? column.GetFilterValue() : column.GetSecondFilterValue()) } });
-                builder.AddAttribute(5, "id", getFilterInputId(column));
+                builder.AddAttribute(5, "id", getFilterInputId(column) + (isFirst ? "f" : "s"));
 
                 Action<object> action;
                 if (force)

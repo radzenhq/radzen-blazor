@@ -340,10 +340,16 @@ else
     {
         if (PropertyAccess.IsNumeric(Column.FilterPropertyType) && !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
         {
-            var inputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column));
-            if (!object.Equals($"{Column.GetFilterValue()}", inputValue))
+            var firstInputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column)  + "f");
+            if (!object.Equals($"{Column.GetFilterValue()}", firstInputValue))
             {
-                Column.SetFilterValue(!string.IsNullOrEmpty(inputValue) ? Convert.ChangeType(inputValue, Column.FilterPropertyType) : null);
+                Column.SetFilterValue(!string.IsNullOrEmpty(firstInputValue) ? Convert.ChangeType(firstInputValue, Column.FilterPropertyType) : null);
+            }
+
+            var secondInputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column) + "s");
+            if (!object.Equals($"{Column.GetSecondFilterValue()}", secondInputValue))
+            {
+                Column.SetFilterValue(!string.IsNullOrEmpty(secondInputValue) ? Convert.ChangeType(secondInputValue, Column.FilterPropertyType) : null, false);
             }
         }
 
