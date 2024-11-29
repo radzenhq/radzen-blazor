@@ -338,7 +338,7 @@ else
 
     async Task ApplyFilter()
     {
-        if (PropertyAccess.IsNumeric(Column.FilterPropertyType))
+        if (PropertyAccess.IsNumeric(Column.FilterPropertyType) && !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
         {
             var inputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column));
             if (!object.Equals($"{Column.GetFilterValue()}", inputValue))
