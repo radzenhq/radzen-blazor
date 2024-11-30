@@ -338,7 +338,9 @@ else
 
     async Task ApplyFilter()
     {
-        if (PropertyAccess.IsNumeric(Column.FilterPropertyType) && !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
+        if (Grid.FilterMode == FilterMode.Advanced &&
+            PropertyAccess.IsNumeric(Column.FilterPropertyType) && 
+                !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
         {
             if (Column.FilterValueTemplate == null)
             {
