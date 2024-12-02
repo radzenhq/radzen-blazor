@@ -801,7 +801,12 @@ namespace Radzen
                 }
                 else
                 {
-                    return $"{property} {odataFilterOperator} {(column.FilterPropertyType == typeof(DateOnly?) ? value : DateTime.Parse(value, CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture))}";
+
+                    if (column.FilterPropertyType == typeof(DateOnly?) || column.FilterPropertyType == typeof(DateOnly))
+                    {
+                        return $"{property} {odataFilterOperator} {value}";
+                    }
+                    return $"{property} {odataFilterOperator} {DateTime.Parse(value, CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)}";
                 }
             }
             else if (column.FilterPropertyType == typeof(Guid) || column.FilterPropertyType == typeof(Guid?))
