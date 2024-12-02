@@ -43,7 +43,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's first page button's title attribute.
         /// </summary>
         [Parameter]
-        public string FirstPageTitle { get; set; } = "First page.";
+        public string FirstPageTitle { get; set; } = "First page";
 
         /// <summary>
         /// Gets or sets the pager's first page button's aria-label attribute.
