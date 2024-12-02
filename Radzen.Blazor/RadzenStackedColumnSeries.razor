@@ -21,7 +21,7 @@
 
         return
         @<g class="@className">
-            @foreach(var data in Items)
+            @foreach (var data in Items)
             {
                 var x = GetColumnLeft(data, category);
                 var y = GetColumnTop(data, columnIndex, category, stackedColumnSeries);
@@ -29,23 +29,35 @@
                 var radius = Chart.ColumnOptions.Radius;
                 var y0 = GetColumnBottom(data, columnIndex, category, stackedColumnSeries);
 
+                // Adjust radius only if it's greater than zero
                 if (radius > 0)
                 {
                     var height = Math.Abs(y0 - y);
-                    var items = stackedColumnSeries.SelectMany(series => series.ItemsForCategory(category(data))).ToList();
+
+                    var items = stackedColumnSeries
+                        .SelectMany(series => series.ItemsForCategory(category(data)))
+                        .OfType<TItem>()
+                        .ToList();
+
                     var index = items.IndexOf(data);
-                    if (radius > width / 2 || index < items.Count - 1 || radius > height)
+
+                    // Determine the value of the next item in the stack
+                    var nextValue = (index < items.Count - 1) ? Value(items[index + 1]) : 0;
+
+                    // Conditions to reset the radius
+                    if (radius > width / 2 || radius > height || (index < items.Count - 1 && nextValue != 0))
                     {
                         radius = 0;
                     }
                 }
 
-                var path = $"M {x.ToInvariantString()} {(y+radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y+radius).ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
+                var path = $"M {x.ToInvariantString()} {(y + radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + radius).ToInvariantString()} {y.ToInvariantString()} L {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width).ToInvariantString()} {(y + radius).ToInvariantString()} L {(x + width).ToInvariantString()} {y0.ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
 
                 if (y > y0)
                 {
-                    path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {y0.ToInvariantString()} L {(x+width).ToInvariantString()} {(y-radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y-radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
+                    path = $"M {x.ToInvariantString()} {y0.ToInvariantString()} L {(x + width).ToInvariantString()} {y0.ToInvariantString()} L {(x + width).ToInvariantString()} {(y - radius).ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {(x + width - radius).ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {radius.ToInvariantString()} {radius.ToInvariantString()} 0 0 1 {x.ToInvariantString()} {(y - radius).ToInvariantString()} L {x.ToInvariantString()} {y0.ToInvariantString()} Z";
                 }
+
                 var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
                 var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
 
