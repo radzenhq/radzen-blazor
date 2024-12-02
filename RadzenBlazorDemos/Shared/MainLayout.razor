@@ -53,17 +53,41 @@
                                 </RadzenText>
                             </RadzenAlert>
                             @Body
-                            <RadzenCard class="rz-mt-12 rz-display-block rz-p-0 rz-p-md-12">
+                            <RadzenCard class="rz-mt-12 rz-display-block rz-p-6 rz-p-md-12">
                                 <RadzenRow AlignItems="AlignItems.Center" Gap="0px">
-                                    <RadzenColumn SizeMD="12" SizeLG="6" class="rz-px-8 rz-py-5 rz-text-align-start">
-                                        <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-mb-4" Style="line-height: 1.2; text-wrap: balance;">Supercharge your Blazor development with Radzen Blazor Studio</RadzenText>
-                                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" class="rz-text-secondary-color" Style="line-height: 1.5; text-wrap: balance;">Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</RadzenText>
-                                        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-mt-8 rz-mb-4">
-                                            <RadzenButton Text="See in Action" Icon="play_circle" ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Large" Click=@ShowVideoDialog />
-                                            <NavLink class="rz-button rz-button-lg rz-base rz-shade-default rz-text-align-center" href="https://www.radzen.com/blazor-studio/" target="_blank"><RadzenIcon Icon="open_in_new" /> Learn More</NavLink>
-                                        </RadzenStack>
+                                    <RadzenColumn SizeMD="12" SizeLG="7" class="rz-p-0 rz-pe-4 rz-pt-lg-8 rz-pb-lg-8 rz-ps-lg-8 rz-pe-lg-0">
+                                        <RadzenRow>
+                                            <RadzenColumn Size="12">
+                                                <RadzenStack Orientation="Orientation.Vertical">
+                                                    <RadzenText TextStyle="TextStyle.DisplayH4" TagName="TagName.H2" class="rz-mb-4" Style="line-height: 1.2; text-wrap: balance;">Supercharge your Blazor development with Radzen</RadzenText>
+                                                    <RadzenText TextStyle="TextStyle.H6" TagName="TagName.P" class="rz-text-secondary-color" Style="line-height: 1.5; max-width: 720px;">Whether you prefer a standalone environment or integration directly within Visual Studio, Radzen provides a powerful toolkit to increase development speed, reduce repetitive coding, and focus on building exceptional applications.</RadzenText>
+                                                </RadzenStack>
+                                            </RadzenColumn>
+                                            <RadzenColumn Size="12" SizeMD="6" class="rz-py-5 rz-pe-6 rz-text-align-start">
+                                                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.5rem" Wrap="FlexWrap.Wrap" class="rz-mb-2">
+                                                    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Pro" />
+                                                    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-m-0" Style="line-height: 1.2; text-wrap: balance;">Radzen Blazor Studio</RadzenText>
+                                                </RadzenStack>
+                                                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-secondary-color" Style="line-height: 1.5; text-wrap: balance;">Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles.</RadzenText>
+                                                <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-my-4">
+                                                    <RadzenButton Text="See in Action" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Medium" Click=@ShowVideoDialog />
+                                                    <NavLink class="rz-button rz-button-md rz-base rz-shade-default rz-variant-flat rz-text-align-center" href="https://www.radzen.com/blazor-studio/" target="_blank">Learn More</NavLink>
+                                                </RadzenStack>
+                                            </RadzenColumn>
+                                            <RadzenColumn Size="12" SizeMD="6" class="rz-py-5 rz-pe-4 rz-text-align-start ">
+                                                <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Gap="0.5rem" Wrap="FlexWrap.Wrap" class="rz-mb-2">
+                                                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text="New" />
+                                                    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H3" class="rz-m-0" Style="line-height: 1.2; text-wrap: balance;">Radzen Blazor for Visual Studio</RadzenText>
+                                                </RadzenStack>
+                                                <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-secondary-color" Style="line-height: 1.5; text-wrap: balance;">Radzen Blazor for Visual Studio extension streamlines Blazor development within the Visual Studio environment. The Blazor extension you need to boost productivity!</RadzenText>
+                                                <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-my-4">
+                                                    <NavLink class="rz-button rz-button-md rz-primary rz-shade-default rz-variant-flat rz-text-align-center" href="https://www.radzen.com/blazor-visual-studio/download/" target="_blank">Download</NavLink>
+                                                    <NavLink class="rz-button rz-button-md rz-base rz-shade-default rz-variant-flat rz-text-align-center" href="https://www.radzen.com/blazor-visual-studio/" target="_blank">Learn More</NavLink>
+                                                </RadzenStack>
+                                            </RadzenColumn>
+                                        </RadzenRow>
                                     </RadzenColumn>
-                                    <RadzenColumn SizeMD="12" SizeLG="6" class="rz-px-8 rz-pb-5 rz-py-xl-12 rz-pr-xl-12">
+                                    <RadzenColumn SizeMD="12" SizeLG="5" class="rz-pb-5 rz-py-xl-12">
                                         <RadzenImage Path="images/radzen-blazor-studio.png" class="rz-m-0" Style="width: 100%" AlternateText=">Radzen Blazor Studio" Click=@ShowVideoDialog />
                                     </RadzenColumn>
                                 </RadzenRow>
