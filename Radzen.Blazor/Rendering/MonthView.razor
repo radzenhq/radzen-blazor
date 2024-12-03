@@ -167,7 +167,8 @@
             return Array.Empty<AppointmentData>();
         }
 
-        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderByDescending(item => item.End.Subtract(item.Start))
+                           .ThenBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
     }
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
