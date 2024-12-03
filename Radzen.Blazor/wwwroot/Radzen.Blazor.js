@@ -1624,6 +1624,12 @@ window.Radzen = {
       input.value = value;
     }
   },
+  blur: function (el, e) { 
+    if (el) {
+        e.preventDefault();
+        el.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, keyCode: 9 }));
+    }
+  },
   readFileAsBase64: function (fileInput, maxFileSize, maxWidth, maxHeight) {
     var calculateWidthAndHeight = function (img) {
       var width = img.width;

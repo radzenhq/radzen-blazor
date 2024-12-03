@@ -180,7 +180,7 @@
                         {
                             <div class="rz-grid-filter-buttons">
                                 <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-clear-filter" Click="@ClearFilter" Text=@Grid.ClearFilterText title="@Grid.ClearFilterText" />
-                                <RadzenButton onmousedown="this.focus()" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
+                                <RadzenButton onmousedown="Radzen.blur(this, event)" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
                             </div>
                         }
                     </Popup>
