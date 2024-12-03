@@ -732,7 +732,9 @@ namespace Radzen
             }
             else
             {
-                var filteredItems = Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive)
+                var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
+                    Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
+                    Query)
                     .Cast<object>()
                     .ToList();
 
