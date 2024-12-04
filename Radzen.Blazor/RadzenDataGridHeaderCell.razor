@@ -339,15 +339,17 @@ else
     async Task ApplyFilter()
     {
         if (Grid.FilterMode == FilterMode.Advanced &&
-            PropertyAccess.IsNumeric(Column.FilterPropertyType) && 
-                !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
+            PropertyAccess.IsNumeric(Column.FilterPropertyType) &&
+            !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
         {
+
             if (Column.FilterValueTemplate == null)
             {
-                var firstInputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column)  + "f");
+                var firstInputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column) + "f");
                 if (!object.Equals($"{Column.GetFilterValue()}", $"{firstInputValue}"))
                 {
-                    Column.SetFilterValue(!string.IsNullOrEmpty(firstInputValue) ? Convert.ChangeType(firstInputValue, Column.FilterPropertyType) : null);
+                    var targetType = Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType;
+                    Column.SetFilterValue(!string.IsNullOrEmpty(firstInputValue) ? Convert.ChangeType(firstInputValue, targetType) : null);
                 }
             }
 
@@ -356,7 +358,8 @@ else
                 var secondInputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column) + "s");
                 if (!object.Equals($"{Column.GetSecondFilterValue()}", $"{secondInputValue}"))
                 {
-                    Column.SetFilterValue(!string.IsNullOrEmpty(secondInputValue) ? Convert.ChangeType(secondInputValue, Column.FilterPropertyType) : null, false);
+                    var targetType = Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType;
+                    Column.SetFilterValue(!string.IsNullOrEmpty(secondInputValue) ? Convert.ChangeType(secondInputValue, targetType) : null, false);
                 }
             }
         }
@@ -365,6 +368,7 @@ else
         {
             await popup.CloseAsync();
         }
+
         await Grid.ApplyFilter(Column, true);
     }
 
