@@ -340,9 +340,8 @@ else
     {
         if (Grid.FilterMode == FilterMode.Advanced &&
             PropertyAccess.IsNumeric(Column.FilterPropertyType) &&
-            !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
+                !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
         {
-
             if (Column.FilterValueTemplate == null)
             {
                 var firstInputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column) + "f");
@@ -368,7 +367,6 @@ else
         {
             await popup.CloseAsync();
         }
-
         await Grid.ApplyFilter(Column, true);
     }
 
