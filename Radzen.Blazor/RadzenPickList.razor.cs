@@ -15,6 +15,27 @@ namespace Radzen.Blazor
     public partial class RadzenPickList<TItem> : RadzenComponent
     {
         /// <summary>
+        /// Gets or sets a value indicating whether it is allowed to move all items.
+        /// </summary>
+        /// <value><c>true</c> if c allowed to move all items; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowMoveAll { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether it is allowed to move all items from source to target.
+        /// </summary>
+        /// <value><c>true</c> if c allowed to move all items from source to target; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowMoveAllSourceToTarget { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether it is allowed to move all items from target to source.
+        /// </summary>
+        /// <value><c>true</c> if c allowed to move all items from target to source; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowMoveAllTargetToSource { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether multiple selection is allowed.
         /// </summary>
         /// <value><c>true</c> if multiple selection is allowed; otherwise, <c>false</c>.</value>
