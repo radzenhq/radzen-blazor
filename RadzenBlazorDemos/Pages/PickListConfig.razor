@@ -8,32 +8,32 @@
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Orientation
                 <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "orientation" }})"
-                            Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Buttons JustifyContent
                 <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons justify content" }})"
-                            Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Buttons Style
                 <RadzenDropDown @bind-Value="@style" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons style" }})"
-                            Data="@(Enum.GetValues(typeof(ButtonStyle)).Cast<ButtonStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                Data="@(Enum.GetValues(typeof(ButtonStyle)).Cast<ButtonStyle>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Buttons Variant
                 <RadzenDropDown @bind-Value="@variant" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons variant" }})"
-                            Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                Data="@(Enum.GetValues(typeof(Variant)).Cast<Variant>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Buttons Shade
                 <RadzenDropDown @bind-Value="@shade" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons shade" }})"
-                            Data="@(Enum.GetValues(typeof(Shade)).Cast<Shade>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                Data="@(Enum.GetValues(typeof(Shade)).Cast<Shade>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Buttons Size
                 <RadzenDropDown @bind-Value="@size" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "buttons size" }})"
-                            Data="@(Enum.GetValues(typeof(ButtonSize)).Cast<ButtonSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+                Data="@(Enum.GetValues(typeof(ButtonSize)).Cast<ButtonSize>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
             </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Buttons Gap
@@ -55,12 +55,17 @@
                 Disabled
                 <RadzenSwitch @bind-Value="@disabled" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "disabled" }})" />
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Allow move all items
+                <RadzenSwitch @bind-Value="@allowMoveAll" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "disabled" }})" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
     <RadzenCard>
         <RadzenPickList @bind-Source="@Source" @bind-Target="@Target" Style="height:500px; width:100%;" Orientation="@orientation"
-            TextProperty="@nameof(Customer.CompanyName)" AllowFiltering="@allowFilter" Multiple="@multiple" ShowHeader="@showHeader" Disabled="@disabled"
-            ButtonGap="@gap" ButtonJustifyContent="@justifyContent" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant">
+        TextProperty="@nameof(Customer.CompanyName)" AllowFiltering="@allowFilter" Multiple="@multiple" ShowHeader="@showHeader" Disabled="@disabled"
+        ButtonGap="@gap" ButtonJustifyContent="@justifyContent" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant"
+        AllowMoveAllItems="@allowMoveAll">
             <SourceHeader>
                 Customers:
             </SourceHeader>
@@ -87,10 +92,11 @@
     bool multiple = false;
     bool showHeader = true;
     bool disabled;
+    bool allowMoveAll = true;
 
     IEnumerable<Customer> _source;
     IEnumerable<Customer> Source
-    { 
+    {
         get
         {
             return _source;

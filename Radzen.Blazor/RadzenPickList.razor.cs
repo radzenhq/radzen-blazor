@@ -29,6 +29,13 @@ namespace Radzen.Blazor
         public bool Disabled { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether it is allowed to move all items.
+        /// </summary>
+        /// <value><c>true</c> if c allowed to move all items; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowMoveAllItems { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the source header
         /// </summary>
         /// <value>The source header.</value>
