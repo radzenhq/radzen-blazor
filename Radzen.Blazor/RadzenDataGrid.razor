@@ -606,9 +606,26 @@
                         <span class="rz-cell-data" @attributes="@spanAttributes">
                             @if (Item != null)
                             {
-                                @if ((column.IsInEditMode(column.Property, Item) || this.IsRowInEditMode(Item)) && column.EditTemplate is not null)
+                                @if (this.IsRowInEditMode(Item) && column.EditTemplate != null)
                                 {
-                                    @column.EditTemplate(Item)
+                                    var isDefault = column.IsInEditMode == RadzenDataGridColumn<TItem>.DefaultIsInEditMode;
+
+                                    @if(isDefault)
+                                    {
+                                        @column.EditTemplate(Item)
+                                    }
+                                    else if (column.IsInEditMode(column.Property, Item))
+                                    {
+                                        @column.EditTemplate(Item)
+                                    }
+                                    else if (column.Template != null)
+                                    {
+                                        @column.Template(Item)
+                                    }
+                                    else
+                                    {
+                                        @column.GetValue(Item)
+                                    }
                                 }
                                 else if (column.Template != null)
                                 {

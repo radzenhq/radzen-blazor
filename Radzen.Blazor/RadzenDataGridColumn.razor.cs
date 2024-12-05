@@ -510,7 +510,9 @@ namespace Radzen.Blazor
         /// Allows the column to override whether or not this column's the <see cref="EditTemplate" /> is visible at runtime.
         /// </summary>
         [Parameter]
-        public Func<string, TItem, bool> IsInEditMode { get; set; } = (property, item) => false;
+        public Func<string, TItem, bool> IsInEditMode { get; set; } = DefaultIsInEditMode;
+
+        internal static Func<string, TItem, bool> DefaultIsInEditMode { get; set; } = (property, item) => false;
 
         /// <summary>
         /// Gets or sets the header template.
