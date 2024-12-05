@@ -1149,14 +1149,20 @@ namespace Radzen.Blazor
 
         string GetDayCssClass(DateTime date, DateRenderEventArgs dateArgs, bool forCell = true)
         {
-            return ClassList.Create()
+            var list = ClassList.Create()
                                .Add("rz-state-default", !forCell)
                                .Add("rz-calendar-other-month", CurrentDate.Month != date.Month)
                                .Add("rz-state-active", !forCell && DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)
                                .Add("rz-calendar-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-focused", !forCell && FocusedDate.Date.CompareTo(date.Date) == 0)
-                               .Add("rz-state-disabled", !forCell && dateArgs.Disabled)
-                               .ToString();
+                               .Add("rz-state-disabled", !forCell && dateArgs.Disabled);
+
+            if (dateArgs.Attributes != null && dateArgs.Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
+            {
+                list.Add($"{@class}", true);
+            }
+
+            return list.ToString();
         }
         async Task OnCalendarKeyPress(KeyboardEventArgs args)
         {
