@@ -557,7 +557,6 @@ namespace Radzen
         /// Gets or sets a value indicating whether this item is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        [Parameter]
         public bool Visible { get; set; } = true;
 
         /// <summary>
@@ -580,14 +579,12 @@ namespace Radzen
         /// Gets or sets a value indicating whether this item is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        [Parameter]
         public bool Visible { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether this item is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        [Parameter]
         public bool Disabled { get; set; }
 
         /// <summary>
@@ -616,6 +613,34 @@ namespace Radzen
         /// Gets the DropDown.
         /// </summary>
         public RadzenListBox<TValue> ListBox { get; internal set; }
+    }
+
+    /// <summary>
+    /// Supplies information about RadzenPickList ItemRender event.
+    /// </summary>
+    public class PickListItemRenderEventArgs<TItem>
+    {
+        /// <summary>
+        /// Gets the data item.
+        /// </summary>
+        public TItem Item { get; internal set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this item is visible.
+        /// </summary>
+        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
+        public bool Visible { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this item is visible.
+        /// </summary>
+        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
+        public bool Disabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the row HTML attributes.
+        /// </summary>
+        public IDictionary<string, object> Attributes { get; private set; } = new Dictionary<string, object>();
     }
 
     /// <summary>

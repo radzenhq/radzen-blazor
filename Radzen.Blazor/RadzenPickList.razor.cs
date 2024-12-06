@@ -98,6 +98,39 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment<TItem> Template { get; set; }
 
+        /// <summary>
+        /// Gets or sets the row render callback. Use it to set row attributes.
+        /// </summary>
+        /// <value>The row render callback.</value>
+        [Parameter]
+        public Action<PickListItemRenderEventArgs<TItem>> ItemRender { get; set; }
+
+        void OnSourceItemRender(ListBoxItemRenderEventArgs<object> args)
+        {
+            if (ItemRender != null)
+            {
+                var newArgs = new PickListItemRenderEventArgs<TItem>();
+                newArgs.Item = args.Item != null ? (TItem)args.Item : default(TItem);
+                ItemRender(newArgs);
+                newArgs.Attributes.ToList().ForEach(k => args.Attributes.Add(k.Key, k.Value));
+                args.Visible = newArgs.Visible;
+                args.Disabled = newArgs.Disabled;
+            }
+        }
+
+        void OnTargetItemRender(ListBoxItemRenderEventArgs<object> args)
+        {
+            if (ItemRender != null)
+            {
+                var newArgs = new PickListItemRenderEventArgs<TItem>();
+                newArgs.Item = args.Item != null ? (TItem)args.Item : default(TItem);
+                ItemRender(newArgs);
+                newArgs.Attributes.ToList().ForEach(k => args.Attributes.Add(k.Key, k.Value));
+                args.Visible = newArgs.Visible;
+                args.Disabled = newArgs.Disabled;
+            }
+        }
+
         private RenderFragment<dynamic> ListBoxTemplate => Template != null ? item => Template((TItem)item) : null;
 
         /// <summary>

@@ -76,16 +76,17 @@
     <RadzenCard>
         <RadzenPickList AllowMoveAll="@allowMoveAll" AllowMoveAllSourceToTarget="@allowMoveSourceToTarget" AllowMoveAllTargetToSource="@allowMoveTargetToSource" @bind-Source="@Source" @bind-Target="@Target" Style="height:500px; width:100%;" Orientation="@orientation"
             TextProperty="@nameof(Customer.CompanyName)" AllowFiltering="@allowFilter" Multiple="@multiple" ShowHeader="@showHeader" Disabled="@disabled"
-            ButtonGap="@gap" ButtonJustifyContent="@justifyContent" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant">
-            <SourceHeader>
-                Customers:
-            </SourceHeader>
-            <TargetHeader>
-                Selected Customers:
-            </TargetHeader>
-            <Template>
-                Company: @context.CompanyName
-            </Template>
+            ButtonGap="@gap" ButtonJustifyContent="@justifyContent" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant"
+            ItemRender="OnItemRender">
+                <SourceHeader>
+                    Customers:
+                </SourceHeader>
+                <TargetHeader>
+                    Selected Customers:
+                </TargetHeader>
+                <Template>
+                    Company: @context.CompanyName
+                </Template>
         </RadzenPickList>
     </RadzenCard>
 </RadzenStack>
@@ -148,5 +149,10 @@
         await base.OnInitializedAsync();
 
         Source = dbContext.Customers;
+    }
+
+    void OnItemRender(PickListItemRenderEventArgs<Customer> args)
+    {
+        args.Disabled = args.Item.CompanyName.Contains("a");
     }
 }
