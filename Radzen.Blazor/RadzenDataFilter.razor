@@ -12,7 +12,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <RadzenSelectBar @bind-Value="LogicalFilterOperator" Change="EventCallback.Factory.Create<LogicalFilterOperator>(this, OnFilterOperatorChanged)" Size="ButtonSize.Small" class="rz-datafilter-operator-bar">
+        <RadzenSelectBar @bind-Value=LogicalFilterOperator Change="EventCallback.Factory.Create<LogicalFilterOperator>(this, OnFilterOperatorChanged)" Size="ButtonSize.Small" class="rz-datafilter-operator-bar">
             <Items>
                 <RadzenSelectBarItem Text="@AndOperatorText" Value="LogicalFilterOperator.And" title="@AndOperatorText" />
                 <RadzenSelectBarItem Text="@OrOperatorText" Value="LogicalFilterOperator.Or" title="@OrOperatorText" />
