@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System;
+using Microsoft.JSInterop;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -421,6 +421,20 @@ namespace Radzen.Blazor
             if (Auto)
             {
                 await Filter();
+            }
+        }
+
+        private async Task OnFilterOperatorChanged(LogicalFilterOperator _)
+        {
+            var inputValues = await JSRuntime.InvokeAsync<Dictionary<string, object>>("Radzen.getNumericInputValues");
+
+            await InvokeAsync(ChangeState);
+
+            await JSRuntime.InvokeVoidAsync("Radzen.setNumericInputValues", inputValues);
+
+            if (Auto)
+            {
+                await InvokeAsync(Filter);
             }
         }
     }
