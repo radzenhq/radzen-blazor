@@ -248,6 +248,11 @@ namespace Radzen.Blazor
         /// <returns>System.Boolean.</returns>
         public bool GetVisible()
         {
+            if (Columns != null && ColumnsCollection.Any() && VisibleColumns.Count() == 0)
+            {
+                return false;
+            }
+
             return _visible ?? Visible;
         }
 
