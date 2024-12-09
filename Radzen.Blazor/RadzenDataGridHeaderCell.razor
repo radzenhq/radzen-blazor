@@ -180,7 +180,7 @@
                         {
                             <div class="rz-grid-filter-buttons">
                                 <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-clear-filter" Click="@ClearFilter" Text=@Grid.ClearFilterText title="@Grid.ClearFilterText" />
-                                <RadzenButton onmousedown="Radzen.blur(this, event)" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
+                                <RadzenButton onmousedown="@getBlur()" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
                             </div>
                         }
                     </Popup>
@@ -336,11 +336,21 @@ else
         await Grid.ClearFilter(Column, true);
     }
 
+    string getBlur()
+    {
+        return IsAdvancedNumeric() ? "Radzen.blur(this, event)" : null;
+    }
+
+    bool IsAdvancedNumeric()
+    {
+        return Grid.FilterMode == FilterMode.Advanced &&
+            PropertyAccess.IsNumeric(Column.FilterPropertyType) &&
+                !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType));
+    }
+
     async Task ApplyFilter()
     {
-        if (Grid.FilterMode == FilterMode.Advanced &&
-            PropertyAccess.IsNumeric(Column.FilterPropertyType) &&
-                !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType)))
+        if (IsAdvancedNumeric())
         {
             var targetType = Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType;
 
