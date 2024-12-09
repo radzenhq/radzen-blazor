@@ -289,9 +289,14 @@ else
             var eventCallbackGenericCreate = typeof(NumericFilterEventCallback).GetMethod("Create").MakeGenericMethod(type);
             var eventCallbackGenericAction = typeof(NumericFilterEventCallback).GetMethod("Action").MakeGenericMethod(type);
 
-            builder.AddAttribute(3, "Change", eventCallbackGenericCreate.Invoke(this,
+            builder.AddAttribute(4, "Change", eventCallbackGenericCreate.Invoke(this,
                 new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action }) }));
 
+            builder.AddAttribute(5, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args =>
+            {
+                var v = $"{args.Value}";
+                Filter.FilterValue = !string.IsNullOrWhiteSpace(v) ? Convert.ChangeType(v, Nullable.GetUnderlyingType(property.FilterPropertyType) ?? property.FilterPropertyType) : null;
+            }));
             builder.CloseComponent();
         });
     }
