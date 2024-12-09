@@ -295,7 +295,21 @@ else
             builder.AddAttribute(5, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args =>
             {
                 var v = $"{args.Value}";
-                Filter.FilterValue = !string.IsNullOrWhiteSpace(v) ? Convert.ChangeType(v, Nullable.GetUnderlyingType(property.FilterPropertyType) ?? property.FilterPropertyType) : null;
+                if (!string.IsNullOrWhiteSpace(v))
+                {
+                    try
+                    {
+                        Filter.FilterValue = Convert.ChangeType(v, Nullable.GetUnderlyingType(property.FilterPropertyType) ?? property.FilterPropertyType);
+                    }
+                    catch
+                    {
+                        Filter.FilterValue = null;
+                    }
+                }
+                else
+                {
+                    Filter.FilterValue = null;
+                }
             }));
             builder.CloseComponent();
         });
