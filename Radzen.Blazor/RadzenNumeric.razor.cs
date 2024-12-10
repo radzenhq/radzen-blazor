@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.Extensions.Primitives;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -226,22 +227,22 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (Value != null)
+                if (_value != null)
                 {
                     if (Format != null)
                     {
-                        if (Value is IFormattable formattable)
+                        if (_value is IFormattable formattable)
                         {
                             return formattable.ToString(Format, Culture);
                         }
-                        decimal decimalValue = ConvertToDecimal(Value);
+                        decimal decimalValue = ConvertToDecimal(_value);
                         return decimalValue.ToString(Format, Culture);
                     }
-                    return Value.ToString();
+                    return _value.ToString();
                 }
                 else
                 {
-                    return "";
+                    return stringValue;
                 }
             }
             set
@@ -324,6 +325,13 @@ namespace Radzen.Blazor
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
             await InternalValueChanged(args.Value);
+        }
+
+        string stringValue;
+        async Task SetValue(string value)
+        {
+            stringValue = value;
+            await InternalValueChanged(value);
         }
 
         private string RemoveNonNumericCharacters(object value)

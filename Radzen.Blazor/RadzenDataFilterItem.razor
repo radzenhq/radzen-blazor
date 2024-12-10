@@ -292,25 +292,6 @@ else
             builder.AddAttribute(4, "Change", eventCallbackGenericCreate.Invoke(this,
                 new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action }) }));
 
-            builder.AddAttribute(5, "oninput", EventCallback.Factory.Create<ChangeEventArgs>(this, args =>
-            {
-                var v = $"{args.Value}";
-                if (!string.IsNullOrWhiteSpace(v))
-                {
-                    try
-                    {
-                        Filter.FilterValue = Convert.ChangeType(v, Nullable.GetUnderlyingType(property.FilterPropertyType) ?? property.FilterPropertyType);
-                    }
-                    catch
-                    {
-                        Filter.FilterValue = null;
-                    }
-                }
-                else
-                {
-                    Filter.FilterValue = null;
-                }
-            }));
             builder.CloseComponent();
         });
     }
