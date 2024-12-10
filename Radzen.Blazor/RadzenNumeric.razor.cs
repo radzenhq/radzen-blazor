@@ -324,6 +324,7 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
+            stringValue = $"{args.Value}";
             await InternalValueChanged(args.Value);
         }
 
