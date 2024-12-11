@@ -99,6 +99,13 @@ namespace Radzen.Blazor
         public RenderFragment<TItem> Template { get; set; }
 
         /// <summary>
+        /// Gets or sets the select all text.
+        /// </summary>
+        /// <value>The select all text.</value>
+        [Parameter]
+        public string SelectAllText { get; set; }
+
+        /// <summary>
         /// Gets or sets the row render callback. Use it to set row attributes.
         /// </summary>
         /// <value>The row render callback.</value>
