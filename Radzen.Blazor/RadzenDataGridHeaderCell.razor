@@ -321,7 +321,7 @@ else
             await popup.ToggleAsync(filterButton);
 
             Grid.allColumns
-            .Where(c => c.GetVisible() && c != Column && c.headerCell != null && c.headerCell != this)
+            .Where(c => c.GetVisible() && c.UniqueID != Column.UniqueID)
             .Select(c => c.headerCell).ToList()
             .ForEach(cell => InvokeAsync(cell.CloseFilter));
         }
