@@ -1815,7 +1815,7 @@ window.Radzen = {
     return this.createResizable(ref, instance);
   },
   destroyScheduler: function (ref) {
-    if (ref.resizeHandler) {
+    if (ref && ref.resizeHandler) {
       window.removeEventListener('resize', ref.resizeHandler);
       delete ref.resizeHandler;
     }
