@@ -435,60 +435,73 @@ $display: none, block, inline, inline-block, flex, inline-flex, grid, inline-gri
 // Example .rz-justify-content-center
 $justify-content: normal, stretch, center, start, end, flex-start, flex-end, left, right, space-between, space-around, space-evenly;
 @include rz-utility-list-css('justify-content', $justify-content);
+@include rz-utility-list-breakpoints-css('justify-content', $justify-content, $rz-breakpoints-map);
 
 // Align-items
 // Example .rz-align-items-center
 $align-items: normal, stretch, center, start, end, flex-start, flex-end;
 @include rz-utility-list-css('align-items', $align-items);
+@include rz-utility-list-breakpoints-css('align-items', $align-items, $rz-breakpoints-map);
 
 // Overflow
 // Example .rz-overflow-auto
 $overflow: auto, scroll, visible, hidden;
 @include rz-utility-list-css('overflow', $overflow);
+@include rz-utility-list-breakpoints-css('overflow', $overflow, $rz-breakpoints-map);
 
 // Width Percentage
 // Example .rz-w-25
 $width: 25, 50, 75, 100;
 @include rz-utility-list-css('width', $width, 'w', 'percent');
+@include rz-utility-list-breakpoints-css('width', $width, $rz-breakpoints-map, 'w', 'percent');
 
 // Width Viewport
 // Example .rz-vw-25
 @include rz-utility-list-css('width', $width, 'vw', 'vw');
+@include rz-utility-list-breakpoints-css('width', $width, $rz-breakpoints-map, 'vw', 'vw');
 
 // Width Keywords
 // Example .rz-w-auto
 $width-k: auto, fit-content, min-content, max-content, stretch;
 @include rz-utility-list-css('width', $width-k, 'w');
+@include rz-utility-list-breakpoints-css('width', $width-k, $rz-breakpoints-map, 'w');
 
 // Min-width Percentage
 // Example .rz-min-w-25
 @include rz-utility-list-css('min-width', $width, 'min-w', 'percent');
+@include rz-utility-list-breakpoints-css('min-width', $width, $rz-breakpoints-map, 'min-w', 'percent');
 
 // Max-width Percentage
 // Example .rz-max-w-25
 @include rz-utility-list-css('max-width', $width, 'max-w', 'percent');
+@include rz-utility-list-breakpoints-css('max-width', $width, $rz-breakpoints-map, 'max-w', 'percent');
 
 // Height Percentage
 // Example .rz-h-25
 $height: 25, 50, 75, 100;
 @include rz-utility-list-css('height', $height, 'h', 'percent');
+@include rz-utility-list-breakpoints-css('height', $height, $rz-breakpoints-map, 'h', 'percent');
 
 // Height Viewport
 // Example .rz-vh-25
 @include rz-utility-list-css('height', $height, 'vh', 'vh');
+@include rz-utility-list-breakpoints-css('height', $height, $rz-breakpoints-map, 'vh', 'vh');
 
 // Height Keywords
 // Example .rz-h-auto
 $height-k: auto;
 @include rz-utility-list-css('height', $height-k, 'h');
+@include rz-utility-list-breakpoints-css('height', $height-k, $rz-breakpoints-map, 'h');
 
 // Min-height Percentage
 // Example .rz-min-h-25
 @include rz-utility-list-css('min-height', $height, 'min-h', 'percent');
+@include rz-utility-list-breakpoints-css('min-height', $height, $rz-breakpoints-map, 'min-h', 'percent');
 
 // Max-height Percentage
 // Example .rz-max-h-25
 @include rz-utility-list-css('max-height', $height, 'max-h', 'percent');
+@include rz-utility-list-breakpoints-css('max-height', $height, $rz-breakpoints-map, 'max-h', 'percent');
 
 // Color
 // Example .rz-color-primary
