@@ -365,7 +365,7 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   
     &:first-child {
       position: sticky;
-      z-index: 9998;
+      z-index: 1;
       inset-inline-start: 0;
       justify-content: center;
       align-items: center;
@@ -473,7 +473,7 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     position: sticky;
     inset-block-start: 0px;
     min-height: 2.25rem;
-    z-index: 9999;
+    z-index: 2;
   }
 
   &:focus-visible {
@@ -545,7 +545,7 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     position: sticky;
     inset-block-start: 0px;
     min-height: 36px;
-    z-index: 9999;
+    z-index: 2;
 
     .rz-slot-header {
       min-width: var(--rz-scheduler-timeline-slot-width);
