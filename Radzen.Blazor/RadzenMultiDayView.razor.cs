@@ -67,7 +67,6 @@ namespace Radzen.Blazor
         {
             get
             {
-                //delaci
                 return Scheduler.CurrentDate.Date;
             }
         }
