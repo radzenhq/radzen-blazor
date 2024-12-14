@@ -37,7 +37,7 @@
         }
         else if ((selectedItems.Count > 0 || SelectedValue is IEnumerable && !(SelectedValue is string)) && Multiple)
         {
-            var itemsToUse = SelectedValue is IEnumerable && !(SelectedValue is string) ? ((IEnumerable)SelectedValue).Cast<object>().ToList() : selectedItems;
+            var itemsToUse = SelectedValue is IEnumerable && !(SelectedValue is string) ? ((IEnumerable)SelectedValue).Cast<object>().ToHashSet() : selectedItems;
             @if (itemsToUse.Count < MaxSelectedLabels && Chips)
             {
                 <div class="rz-dropdown-chips-wrapper">

@@ -1,0 +1,27 @@
+﻿@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
+    <RadzenLabel Text="Select Values" Component="DropDownMultiple" />
+    <RadzenDropDown @bind-Value=@values Data=@products TextProperty="@nameof(Product.ProductName)" Name="DropDownMultiple"
+                    Multiple=true AllowClear=true Placeholder="Select products" Style="width: 100%; max-width: 400px;"
+                    ItemComparer="@Product.Comparer"/>
+</RadzenStack>
+
+@code {
+    IEnumerable<Product> values = [];
+    IEnumerable<Product> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        products = dbContext.Products;
+        values =
+        [
+            new Product { ProductName = "Chai" },
+            new Product { ProductName = "Aniseed Syrup" }
+        ];
+    }
+}
