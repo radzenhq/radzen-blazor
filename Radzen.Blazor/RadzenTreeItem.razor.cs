@@ -23,10 +23,17 @@ namespace Radzen.Blazor
 
         ClassList ContentClassList => ClassList.Create("rz-treenode-content")
                                                .Add("rz-treenode-content-selected", selected)
-                                               .Add("rz-state-focused", Tree.IsFocused(this));
+                                               .Add("rz-state-focused", Tree.IsFocused(this))
+                                               .Add(Tree.ItemContentCssClass)
+                                               .Add(ContentCssClass);
         ClassList IconClassList => ClassList.Create("notranslate rz-tree-toggler rzi")
                                                .Add("rzi-caret-down", clientExpanded)
-                                               .Add("rzi-caret-right", !clientExpanded);
+                                               .Add("rzi-caret-right", !clientExpanded)
+                                               .Add(Tree.ItemIconCssClass)
+                                               .Add(IconCssClass);
+        private ClassList LabelClassList => ClassList.Create("rz-treenode-label")
+                                               .Add(Tree.ItemLabelCssClass)
+                                               .Add(LabelCssClass);
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
@@ -97,6 +104,24 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public IEnumerable Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the content.
+        /// </summary>
+        [Parameter]
+        public string ContentCssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the icon.
+        /// </summary>
+        [Parameter]
+        public string IconCssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the label.
+        /// </summary>
+        [Parameter]
+        public string LabelCssClass { get; set; }
 
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 

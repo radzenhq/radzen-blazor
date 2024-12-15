@@ -15,10 +15,10 @@
         }
         @if (Template != null)
         {
-            <div class="rz-treenode-label" @onkeydown:stopPropagation>@Template(this)</div>
+            <div class="@LabelClassList" @onkeydown:stopPropagation>@Template(this)</div>
         } else
         {
-            <label for="@(GetHashCode())" class="rz-treenode-label">@Text</label>
+            <label for="@(GetHashCode())" class="@LabelClassList">@Text</label>
         }
     </div>
     @if (ChildContent != null && expanded)
