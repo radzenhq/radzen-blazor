@@ -196,6 +196,25 @@ namespace Radzen.Blazor
         [Parameter]
         public IEnumerable<object> CheckedValues { get; set; } = Enumerable.Empty<object>();
 
+        /// <summary>
+        /// Gets or sets the CSS classes added to the item content.
+        /// </summary>
+        [Parameter]
+        public string ItemContentCssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the item icon.
+        /// </summary>
+        [Parameter]
+        public string ItemIconCssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the item label.
+        /// </summary>
+        [Parameter]
+
+        public string ItemLabelCssClass { get; set; }
+
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
         internal void AddItem(RadzenTreeItem item)
@@ -260,7 +279,7 @@ namespace Radzen.Blazor
                 {
                     if (text == null)
                     {
-                        text = level.Text ?? 
+                        text = level.Text ??
                             (!string.IsNullOrEmpty(level.TextProperty) ? Getter<string>(data, level.TextProperty) : null) ??
                             (o => "");
                     }
