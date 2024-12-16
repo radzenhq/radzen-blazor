@@ -1299,6 +1299,9 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// For lists of objects, an IEqualityComparer to control how selected items are determined
+        /// </summary>
         [Parameter] public IEqualityComparer<object> ItemComparer { get; set; }
 
         internal bool IsItemSelectedByValue(object v)
