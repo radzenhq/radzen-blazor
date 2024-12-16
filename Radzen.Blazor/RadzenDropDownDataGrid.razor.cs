@@ -628,10 +628,7 @@ namespace Radzen.Blazor
                         {
                             foreach (object v in valueList)
                             {
-                                if (selectedItems.IndexOf(v) == -1)
-                                {
-                                    selectedItems.Add(v);
-                                }
+                                selectedItems.Add(v);
                             }
                         }
 
