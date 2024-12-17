@@ -68,6 +68,13 @@ namespace Radzen.Blazor
         public EventCallback<int> Collapse { get; set; }
 
         /// <summary>
+        /// Gets or sets a property to prevent collapse expanded item.
+        /// </summary>
+        /// <value><c>true</c> Close the clicked accordion item if it is open; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AutoClose { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the items.
         /// </summary>
         /// <value>The items.</value>
@@ -169,13 +176,18 @@ namespace Radzen.Blazor
 
             var selected = item.GetSelected();
 
-            if (selected)
+            if (selected && AutoClose)
             {
                 await Collapse.InvokeAsync(itemIndex);
             }
             else
             {
                 await Expand.InvokeAsync(itemIndex);
+            }
+
+            if (selected && !AutoClose)
+            {
+                selected = false;
             }
 
             item.SetSelected(value ?? !selected);
