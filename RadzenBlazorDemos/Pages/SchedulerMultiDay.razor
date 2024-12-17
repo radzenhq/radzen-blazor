@@ -8,6 +8,14 @@
     {
         <RadzenText TextStyle="TextStyle.Caption" Text="@($"(default)")" Style="margin-left:0.1rem;margin-top:0.5rem;" />
     }
+    <div class="rz-w-25" />
+    <RadzenLabel Text="Advance days:" />
+    <RadzenSlider @bind-Value=@sliderAdvanceDays TValue="int" Min="1" Max="14" Style="margin-left:1.5rem;margin-right:1.5rem;" />
+    <RadzenLabel Text="@($"{sliderAdvanceDays}")" />
+    @if (sliderAdvanceDays == 1)
+    {
+        <RadzenText TextStyle="TextStyle.Caption" Text="@($"(default)")" Style="margin-left:0.1rem;margin-top:0.5rem;" />
+    }
 </RadzenStack>
 
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
@@ -16,7 +24,7 @@ SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRende
 AppointmentMove=@OnAppointmentMove >
     <RadzenDayView />
     <RadzenWeekView />
-    <RadzenMultiDayView NumberOfDays="@sliderNumberOfDays" />
+    <RadzenMultiDayView NumberOfDays="@sliderNumberOfDays" AdvanceDays="@sliderAdvanceDays" />
     <RadzenMonthView />
 </RadzenScheduler>
 
@@ -28,6 +36,7 @@ AppointmentMove=@OnAppointmentMove >
     Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
 
     int sliderNumberOfDays { get; set; } = 2;
+    int sliderAdvanceDays { get; set; } = 1;
 
     IList<Appointment> appointments = new List<Appointment>
     {
@@ -42,7 +51,7 @@ AppointmentMove=@OnAppointmentMove >
 
     async Task NumberOfDaysChange()
     {
-        await scheduler.Reload();
+        StateHasChanged();
     }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)

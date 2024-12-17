@@ -15,7 +15,7 @@ namespace Radzen.Blazor
     public partial class RadzenMultiDayView : SchedulerViewBase
     {
         /// <inheritdoc />
-        public override string Icon => "calendar_view_week";
+        public override string Icon => "width_normal";
 
         /// <inheritdoc />
         [Parameter]
@@ -62,6 +62,13 @@ namespace Radzen.Blazor
         /// <value>The number of days.</value>
         [Parameter]
         public int NumberOfDays { get; set; } = 2;
+
+        /// <summary>
+        /// Gets or sets number of days to advance when using prev / next. Set to <c>1</c> by default.
+        /// </summary>
+        /// <value>The number of days to advance.</value>
+        [Parameter]
+        public int AdvanceDays { get; set; } = 1;
         /// <inheritdoc />
         public override DateTime StartDate
         {
@@ -85,7 +92,14 @@ namespace Radzen.Blazor
         {
             get
             {
-                return $"{StartDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)} - {EndDate.AddDays(-1).ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)}";
+                if (StartDate == EndDate.AddDays(-1))
+                {
+                    return $"{StartDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)}";
+                }
+                else
+                {
+                    return $"{StartDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)} - {EndDate.AddDays(-1).ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)}";
+                }
             }
         }
 
@@ -93,13 +107,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override DateTime Next()
         {
-            return Scheduler.CurrentDate.Date.AddDays(NumberOfDays);
+            return Scheduler.CurrentDate.Date.AddDays(AdvanceDays);
         }
 
         /// <inheritdoc />
         public override DateTime Prev()
         {
-            return Scheduler.CurrentDate.Date.AddDays(-NumberOfDays);
+            return Scheduler.CurrentDate.Date.AddDays(-AdvanceDays);
         }
     }
 }
