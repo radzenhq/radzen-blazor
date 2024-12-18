@@ -37,6 +37,13 @@ namespace Radzen.Blazor
         public bool Selected { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is disabled.
+        /// </summary>
+        /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
+
+        /// <summary>
         /// Gets or sets the title attribute of the expand button.
         /// </summary>
         /// <value>The title attribute value of the expand button.</value>

@@ -163,6 +163,8 @@ namespace Radzen.Blazor
         
         internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item, bool? value = null)
         {
+            if(item.Disabled) return;
+
             await CollapseAll(item);
 
             var itemIndex = items.IndexOf(item);

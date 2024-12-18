@@ -1,0 +1,26 @@
+﻿
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+            <RadzenLabel Text="Expand/Collapse enabled:" />
+            <RadzenSwitch @bind-Value="canCollapse" />
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenAccordion>
+        <Items>
+            <RadzenAccordionItem Disabled="@(!canCollapse)" Text="Orders" Icon="account_balance_wallet">
+                Details for Orders
+            </RadzenAccordionItem>
+            <RadzenAccordionItem Disabled="@(!canCollapse)" Text="Employees" Icon="account_box">
+                Details for Employees
+            </RadzenAccordionItem>
+            <RadzenAccordionItem Disabled="@(!canCollapse)" Text="Customers" Icon="accessibility">
+                Details for Customers
+            </RadzenAccordionItem>
+        </Items>
+    </RadzenAccordion>
+</RadzenStack>
+
+@code {
+    bool canCollapse = true;
+}
