@@ -978,7 +978,7 @@ window.Radzen = {
       return;
       }
 
-      if (e.code === 'NumpadDecimal') {
+      if (e.code === 'NumpadDecimal' && !isInteger) {
           var cursorPosition = e.target.selectionEnd;
           e.target.value = [e.target.value.slice(0, e.target.selectionStart), decimalSeparator, e.target.value.slice(e.target.selectionEnd)].join('');
           e.target.selectionStart = ++cursorPosition;
