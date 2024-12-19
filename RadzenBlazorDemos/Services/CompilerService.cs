@@ -18,6 +18,7 @@ using Radzen.Blazor;
 using RadzenBlazorDemos.Shared;
 using MetadataReferenceService.Abstractions.Types;
 using MetadataReferenceService.BlazorWasm;
+using System.ComponentModel;
 
 namespace RadzenBlazorDemos
 {
@@ -104,29 +105,30 @@ namespace RadzenBlazorDemos
 
         private async Task<IEnumerable<MetadataReference>> GetReferencesAsync(IEnumerable<Assembly> assemblies)
         {
-            var referenceAssemblies = new List<MetadataReference>();
+            var syncAssemblies = new List<Assembly>();
+
+            var asyncAssemblies = new List<Assembly>();
 
             foreach (var assembly in assemblies)
             {
-                var reference = await GetReferenceAsync(assembly);
-
-                referenceAssemblies.Add(reference);
-            }
-
-            return referenceAssemblies;
-        }
-
-        private async Task<MetadataReference> GetReferenceAsync(Assembly assembly)
-        {
-            if (string.IsNullOrEmpty(assembly.Location))
-            {
-                return await metadataReferenceService.CreateAsync(new AssemblyDetails
+                if (string.IsNullOrEmpty(assembly.Location))
                 {
-                    Name = assembly.GetName().Name
-                });
+                    asyncAssemblies.Add(assembly);
+                }
+                else
+                {
+                    syncAssemblies.Add(assembly);
+                }
             }
 
-            return MetadataReference.CreateFromFile(assembly.Location);
+            var syncReferences = syncAssemblies.Select(a => MetadataReference.CreateFromFile(a.Location)).ToList();
+
+            var asyncReferences = await Task.WhenAll(asyncAssemblies.Select(assembly => metadataReferenceService.CreateAsync(new AssemblyDetails
+            {
+                Name = assembly.GetName().Name
+            })));
+
+            return syncReferences.Concat(asyncReferences).ToList();
         }
 
         private async Task InitializeAsync()
@@ -165,6 +167,7 @@ namespace RadzenBlazorDemos
                  typeof(RadzenButton).Assembly,
                  typeof(ExpandoObject).Assembly,
                  typeof(EventConsole).Assembly,
+                 typeof(Component).Assembly
              };
 
              return  referenceAssemblyRoots

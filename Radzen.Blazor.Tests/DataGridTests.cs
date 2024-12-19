@@ -824,8 +824,12 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters =>
             {
-                parameters.Add<int>(p => p.PageSize, 20);
                 parameters.Add<LoadDataArgs>(p => p.LoadData, args => { raised = true; newArgs = args; });
+            });
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add<int>(p => p.PageSize, 20);
             });
 
             component.Find(".rz-pager-next").Click();

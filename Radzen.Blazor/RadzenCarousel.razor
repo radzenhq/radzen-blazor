@@ -23,9 +23,9 @@
             Click=@Next/>
         }
         <ul class="rz-carousel-items" 
-                 @ontouchstart="OnTouchStart" @ontouchstart:stopPropagation @ontouchstart:preventDefault
-                 @ontouchend="OnTouchEnd" @ontouchend:stopPropagation @ontouchend:preventDefault
-                 @ontouchcancel="OnTouchCancel" @ontouchcancel:stopPropagation @ontouchcancel:preventDefault>
+                 @ontouchstart="OnTouchStart"
+                 @ontouchend="OnTouchEnd" 
+                 @ontouchcancel="OnTouchCancel">
             @Items
         </ul>
         @if(AllowPaging && (PagerPosition == PagerPosition.Bottom || PagerPosition == PagerPosition.TopAndBottom))

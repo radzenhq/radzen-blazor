@@ -19,12 +19,17 @@
 
 <RadzenTabs SelectedIndex=@selectedIndex Change="@OnTabChange">
     <Tabs>
-        <RadzenTabsItem Text=".NET 8">
+        <RadzenTabsItem Text=".NET 8 &amp; 9">
             <div class="rz-py-0 rz-py-sm-4 rz-px-0 rz-px-sm-2 rz-px-lg-12">
             <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
 All interactive features of the Radzen Blazor components require interactivity of the container <code>.razor</code> file to be enabled or the <code>@@rendermode</code>
 attribute of the component to be set to one of the following values: <code>InteractiveServer</code>, <code>InteractiveAuto</code> or <code>InteractiveWebAssembly</code>.
 More info is available in the <RadzenLink Text="rendering mode article" Path="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes?view=aspnetcore-8.0" target="_blank" /> from the official Blazor documentation.
+            </RadzenAlert>
+            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
+                If you have upgraded your application to .NET 8 or .NET 9 follow the getting started instructions for the version you initially used - e.g.
+                <RadzenLink Path="get-started/net7-server" Text=".NET 7" /> or <RadzenLink Path="get-started/net6-server" Text=".NET 6"/>.
+These instructions assume the new application layout which uses rendering modes and was introduced with .NET 8.
             </RadzenAlert>
             @Installation(CurrentVersion)
             @Import(CurrentVersion)
@@ -107,10 +112,14 @@ More info is available in the <RadzenLink Text="rendering mode article" Path="ht
             @Import(CurrentVersion)
             <RadzenText Anchor="@($"get-started/{CurrentVersion}#theme")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">3. Set the theme</RadzenText>
             <RadzenText>
-                Open the <code>index.html</code> file of your application. Add this code within the <code>&lt;head&gt;</code> element:
+                Open the <code>MainLayout.razor</code> file of your application. Add this code
             </RadzenText>
 <pre class="rz-p-4">
-<code>&lt;link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css"&gt;</code>
+<code>
+&lt;HeadContent&gt;
+    &lt;RadzenTheme Theme="material" /&gt;
+&lt;/HeadContent&gt;
+</code>
 </pre>
             <RadzenText Anchor="@($"get-started/{CurrentVersion}#js")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">4. Include Radzen.Blazor.js</RadzenText>
             <RadzenText>
@@ -146,14 +155,14 @@ More info is available in the <RadzenLink Text="rendering mode article" Path="ht
 </RadzenTabs>
 
 @code {
-    private static readonly string[] versions = ["net8", "net7-server", "net7-wasm", "net6-server", "net6-wasm", "wasm", "csp"];
+    private static readonly string[] versions = ["net9", "net7-server", "net7-wasm", "net6-server", "net6-wasm", "wasm", "csp"];
 
     private int selectedIndex = 0;
 
     [Parameter]
     public string Version { get; set; }
 
-    private string CurrentVersion => Version ?? "net8";
+    private string CurrentVersion => Version ?? "net9";
 
     protected override void OnParametersSet()
     {

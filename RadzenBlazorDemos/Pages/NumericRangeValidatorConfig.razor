@@ -19,7 +19,8 @@
                     </RadzenColumn>
                     <RadzenColumn Size="12" SizeMD="8">
                         <RadzenNumeric Name="Quantity" @bind-Value=@model.Quantity @oninput=@OnInput Style="display: block; width: 100%;" />
-                        <RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Popup=@popup Style="position: absolute" />
+                        <!-- Use 'm' (decimal), 'f' (float) or 'd' (double) as numeric literal suffix when setting Min and Max -->
+                        <RadzenNumericRangeValidator Component="Quantity" Min="1m" Max="10m" Text="Quantity should be between 1 and 10" Popup=@popup Style="position: absolute" />
                     </RadzenColumn>
                 </RadzenRow>
                 <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">

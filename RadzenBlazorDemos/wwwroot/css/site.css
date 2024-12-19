@@ -459,6 +459,12 @@ svg.illustration {
     border-inline-start-color: var(--rz-tabs-tab-hover-color);
 }
 
+/* Promo */
+
+.promo-alert {
+    background: linear-gradient(110deg, rgba(0,0,0,0.4) 100%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.4) 100%),linear-gradient(110deg, #000 20%, #AA01E4 75%, #534EEB 100%);
+}
+
 /* Responsive */
 
 @media (max-width: 1024px) {

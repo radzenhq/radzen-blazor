@@ -5,7 +5,7 @@
     // ----------------------------------
     // Rendering Algorithm - See Layout()
     // ----------------------------------
-    // Note - Column, a property of the AppointmentDataExtended class, and colunCount are values that are set depending on todays overlapping appointments.
+    // Note - Column, a property of the AppointmentDataExtended class, and columnCount are values that are set depending on todays overlapping appointments.
     // i.e., if there are no overlapping appointments, all appointments will be assigned a Column value of 1
     // *** definition "Can fit in Column" - if an appointments "Start" is equal to or later than the last chronological appointments "End" in a column, this appointment can "fit in column" ***
     
@@ -15,7 +15,7 @@
 
     // 1. Loop through all the appointments and assign which column they will be assigned (either existing or new)
     //  1.1 If the appointment can fit in a column, it will be assigned that column value, otherwise a new column must be created to accomodate it
-    //  1.2 As the loop matures, there could be multiple columns that an appointment can fit in. It will select the one with the latest End time. This helps the view render more asthetically.
+    //  1.2 As the loop matures, there could be multiple columns that an appointment can fit in. It will select the one with the earliest End time. This helps the view render more asthetically.
 
     // Once we know how many columns are required, we can set the width of each column (columnWidth = 90.0 / columnCount).
 

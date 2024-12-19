@@ -1,0 +1,139 @@
+﻿@page "/ui-blocks-footers"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Footers
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    A Footer block is the section at the bottom of a webpage or a dashboard, typically serving as a navigational and informational hub. It's an essential UI component, offering users access to key information, links, and resources that might not fit naturally in other parts of the screen.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-footers#footer-with-sitemap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Footer with a sitemap
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A footer with navigation links in four columns.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Dark footer">
+                <section class="rz-background-color-base-darker rz-p-6 rz-p-sm-12" Style="min-height: 400px">
+                <RadzenRow RowGap="3rem" Gap="1rem">
+                    <RadzenColumn Size="12" SizeXS="6" SizeLG="4">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Start">
+                            <RadzenImage Path="data:image/png;base64,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" AlternateText="Company Logo" />
+                            <RadzenText Text="It's easier than you think." TextStyle="Radzen.Blazor.TextStyle.H5" class="rz-text-tertiary-color" />
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeLG="8" SizeXL="6" OffsetXL="2">
+                        <RadzenRow Gap="1rem" RowGap="3rem">
+                            <RadzenColumn Size="12" SizeXS="6" SizeMD="3">
+                                <RadzenStack AlignItems="Radzen.AlignItems.Start" Gap="1rem">
+                                    <RadzenText Text="Products" class="rz-color-on-base-darker" TextStyle="Radzen.Blazor.TextStyle.H6" />
+                                    <RadzenLink Text="Product 1" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Product 2" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Product 3" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Product 4" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                </RadzenStack>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeXS="6" SizeMD="3">
+                                <RadzenStack AlignItems="Radzen.AlignItems.Start" Gap="1rem">
+                                    <RadzenText Text="Solutions" class="rz-color-on-base-darker" TextStyle="Radzen.Blazor.TextStyle.H6" />
+                                    <RadzenLink Text="Solution 1" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Solution 2" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Solution 3" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Solution 4" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Solution 5" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                </RadzenStack>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeXS="6" SizeMD="3">
+                                <RadzenStack AlignItems="Radzen.AlignItems.Start" Gap="1rem">
+                                    <RadzenText Text="Company" class="rz-color-on-base-darker" TextStyle="Radzen.Blazor.TextStyle.H6" />
+                                    <RadzenLink Text="About us" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Blogs" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Support" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Jobs" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                </RadzenStack>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeXS="6" SizeMD="3">
+                                <RadzenStack AlignItems="Radzen.AlignItems.Start" Gap="1rem">
+                                    <RadzenText Text="Legal" class="rz-color-on-base-darker" TextStyle="Radzen.Blazor.TextStyle.H6" />
+                                    <RadzenLink Text="Privacy policy" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                    <RadzenLink Text="Terms of use" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                                </RadzenStack>
+                            </RadzenColumn>
+                    </RadzenRow>
+                    </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow class="rz-border-top rz-border-color-base-800 rz-mt-12 rz-pt-8">
+                    <RadzenColumn Size="12" Style="height: fit-content">
+                        <RadzenText Text="Copyright &copy; 2024, Company Name Inc. All rights reserved." TextStyle="Radzen.Blazor.TextStyle.Body2" class="rz-m-0 rz-text-disabled-color" />
+                    </RadzenColumn>
+                </RadzenRow>
+                </section>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Centered Footer
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A simple centered footer containing main navigation links and copyright info.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Dark footer">
+                <RadzenRow RowGap="3rem" Gap="1rem" class="rz-background-color-base-darker rz-p-6 rz-p-sm-12" Style="min-height: 300px">
+                    <RadzenColumn Size="12" >
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-my-12">
+                            <RadzenImage Path="data:image/png;base64,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" AlternateText="Company Logo"></RadzenImage>
+                        </RadzenStack>
+                        <RadzenStack Gap="2rem" Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.Center" Wrap="Radzen.FlexWrap.Wrap" class="rz-my-12">
+                            <RadzenLink Text="Home" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                            <RadzenLink Text="Products" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                            <RadzenLink Text="Solutions" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                            <RadzenLink Text="Blog" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                            <RadzenLink Text="Partners" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                            <RadzenLink Text="Company" Path="/ui-blocks-footers" class="rz-text-tertiary-color"></RadzenLink>
+                        </RadzenStack>
+                        <RadzenText Text="Copyright &copy; 2024, Company Name Inc. All rights reserved." TextStyle="Radzen.Blazor.TextStyle.Body2" class="rz-text-disabled-color rz-my-12" TextAlign="Radzen.TextAlign.Center" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+
+<RadzenText Anchor="ui-blocks-footers#simple-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Simple Footer
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A basic footer containing copyright info.
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Theme's default">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-p-6 rz-p-sm-12 " >
+                    <RadzenColumn Size="12">
+                        <RadzenText Text="Copyright &copy; 2024, Company Name Inc. All rights reserved." TextStyle="Radzen.Blazor.TextStyle.Body2" class="rz-m-0 rz-text-tertiary-color" />
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+
+
+
+
+

@@ -20,7 +20,7 @@ namespace RadzenBlazorDemos
             Updated = true,
             Title = "Sample Dashboard | Free UI Components by Radzen",
             Description = "Rich dashboard created with the Radzen Blazor Components library.",
-            Icon = "&#xe871"
+            Icon = "&#xe868"
         },
         new Example
         {
@@ -193,6 +193,63 @@ namespace RadzenBlazorDemos
 
         new Example
         {
+            Name = "UI Blocks",
+            Pro = true,
+            New = true,
+            Title = "Blazor UI Blocks",
+            Description = "Ready to use UI building blocks and templates",
+            Icon = "&#xf51d",
+            Children = new[] {
+                new Example
+                {
+                    Name = "Cards",
+                    Title = "Blazor Cards | UI Blocks by Radzen",
+                    Icon = "&#xe991",
+                    Description = "Examples of Card Blocks",
+                    Path = "ui-blocks-cards",
+                    Tags = new [] { "card", "stats", "products" }
+                },
+                new Example
+                {
+                    Name = "Call-to-Action",
+                    Title = "Blazor Call-to-Action | UI Blocks by Radzen",
+                    Icon = "&#xe06c",
+                    Description = "Examples of CTA UI Blocks",
+                    Path = "ui-blocks-cta",
+                    Tags = new [] { "cta", "call-to-action", "call", "action", "button" }
+                },
+                new Example
+                {
+                    Name = "Features",
+                    Title = "Blazor Features | UI Blocks by Radzen",
+                    Icon = "&#xe031",
+                    Description = "Examples of Features Blocks",
+                    Path = "ui-blocks-features",
+                    Tags = new [] { "feature", "list" }
+                },
+                new Example
+                {
+                    Name = "Footers",
+                    Title = "Blazor Footer | UI Blocks by Radzen",
+                    Icon = "&#xf7e6",
+                    Description = "Preconfigured Footer UI Blocks",
+                    Path = "ui-blocks-footers",
+                    Tags = new [] { "footer" }
+                },
+                new Example
+                {
+                    Name = "Page Headings",
+                    Title = "Blazor Page Heading | UI Blocks by Radzen",
+                    Icon = "&#xe9ea",
+                    Description = "Preconfigured Page Heading UI Blocks",
+                    Path = "ui-blocks-page-headings",
+                    Tags = new [] { "headings", "heading", "page", "title" }
+                }
+            }
+        },
+
+        new Example
+        {
             Name = "DataGrid",
             Updated = true,
             Icon = "&#xf191",
@@ -334,14 +391,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Filter Template",
-                            Path = "datagrid-filter-template",
-                            Title = "Blazor DataGrid Component - Custom Filtering | Free UI Components by Radzen",
-                            Description = "This example demonstrates how to define custom RadzenDataGrid column filter template.",
-                            Tags = new [] { "datagrid", "column", "filter", "template" }
-                        },
-                        new Example
-                        {
                             Name = "Frozen Columns",
                             Path = "datagrid-frozen-columns",
                             Title = "Blazor DataGrid Component - Frozen Columns | Free UI Components by Radzen",
@@ -448,6 +497,23 @@ namespace RadzenBlazorDemos
                             Title = "Blazor DataGrid Component - Filter API | Free UI Components by Radzen",
                             Description = "Set the initial filter of your RadzenDataGrid via the FilterValue and FilterOperator column properties.",
                             Tags = new [] { "filter", "api", "grid", "datagrid", "table"}
+                        },
+                        new Example
+                        {
+                            Name = "Filter Template",
+                            Path = "datagrid-filter-template",
+                            Title = "Blazor DataGrid Component - Custom Filtering | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to define custom RadzenDataGrid column filter template.",
+                            Tags = new [] { "datagrid", "column", "filter", "template" }
+                        },
+                        new Example
+                        {
+                            New = true,
+                            Name = "Filter Value Template",
+                            Path = "datagrid-filtervalue-template",
+                            Title = "Blazor DataGrid Component - Custom Filtering template | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to define custom RadzenDataGrid column filter value template.",
+                            Tags = new [] { "datagrid", "column", "filter", "template", "value" }
                         },
                     }
                 },
@@ -1416,6 +1482,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Slider",
                     Path = "slider",
+                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor Slider component.",
                     Icon = "&#xe429",
                     Tags = new [] { "form", "slider" }

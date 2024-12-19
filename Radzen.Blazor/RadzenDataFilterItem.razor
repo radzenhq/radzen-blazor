@@ -289,7 +289,7 @@ else
             var eventCallbackGenericCreate = typeof(NumericFilterEventCallback).GetMethod("Create").MakeGenericMethod(type);
             var eventCallbackGenericAction = typeof(NumericFilterEventCallback).GetMethod("Action").MakeGenericMethod(type);
 
-            builder.AddAttribute(3, "Change", eventCallbackGenericCreate.Invoke(this,
+            builder.AddAttribute(4, "ValueChanged", eventCallbackGenericCreate.Invoke(this,
                 new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action }) }));
 
             builder.CloseComponent();

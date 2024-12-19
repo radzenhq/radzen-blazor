@@ -1,0 +1,133 @@
+﻿@page "/ui-blocks-cards"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Cards
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    A Card block is a modular UI component used in web and app design to present information in a visually compact and organized manner. It groups related content, such as text, images, and actions, into a single container, making it easy for users to scan and interact with.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-footers#footer-with-sitemap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Simple stats
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Outlined card">
+                <RadzenCard Variant="Radzen.Variant.Outlined" class="rz-my-12 rz-mx-auto" Style="width: 300px;">
+                    <RadzenText Text="Unique visitors" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                    <RadzenText Text="31,861" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                </RadzenCard>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Simple stats with icon
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Filled card">
+                <RadzenCard class="rz-my-12 rz-mx-auto" Style="width: 400px;">
+                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                        <RadzenIcon Icon="account_circle" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-height: 56px; min-width: 56px"></RadzenIcon>
+                        <RadzenStack Gap="0">
+                            <RadzenText Text="Unique visitors" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1 rz-overflow-hidden" />
+                            <RadzenText Text="31,861" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Stats with trends
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Outlined card">
+                <RadzenCard Variant="Radzen.Variant.Outlined" class="rz-my-12 rz-mx-auto" Style="width: 400px;">
+                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                        <RadzenIcon Icon="web_traffic" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-width: 56px; min-height: 56px"></RadzenIcon>
+                        <RadzenStack Gap="0">
+                            <RadzenText Text="Avg. Click Rate" TextStyle="Radzen.Blazor.TextStyle.Overline" TagName="Radzen.Blazor.TagName.H4" class="rz-mb-1" />
+                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.End" Wrap="Radzen.FlexWrap.Wrap">
+                                <RadzenText Text="13.56%" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0" />
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.25rem" AlignItems="Radzen.AlignItems.Center">
+                                    <RadzenIcon Icon="trending_up" class="rz-color-success"></RadzenIcon>
+                                    <RadzenText Text="23%" TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-color-success rz-m-0" />
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Stats with trends to the right
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Flat card">
+                <RadzenCard Variant="Radzen.Variant.Flat" class="rz-my-12 rz-mx-auto" Style="width: 400px;">
+                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Center">
+                        <RadzenIcon Icon="timer" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-10" Style="font-size: 32px; min-width: 64px; min-height: 64px"></RadzenIcon>
+                        <RadzenStack Gap="0" class="rz-w-100">
+                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" JustifyContent="Radzen.JustifyContent.SpaceBetween" AlignItems="Radzen.AlignItems.Start" Wrap="Radzen.FlexWrap.Wrap">
+                                <RadzenText Text="Time on site" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" class="rz-m-0" />
+                                <RadzenBadge BadgeStyle="Radzen.BadgeStyle.Success" Shade="Radzen.Shade.Light" IsPill="true">
+                                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.125rem" Style="padding: 0.25rem; text-transform: none;">
+                                        <RadzenIcon Icon="south" Style="font-size: 0.75rem"></RadzenIcon><span style="font-size: 0.75rem">12s</span>
+                                    </RadzenStack>
+                                </RadzenBadge>
+                            </RadzenStack>
+                            <RadzenText Text="2m 31s" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" class="rz-m-0" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Stats with square icon
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Outlined card">
+                <RadzenCard Variant="Radzen.Variant.Outlined" class="rz-my-12 rz-mx-auto" Style="width: 400px;">
+                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="1rem" AlignItems="Radzen.AlignItems.Start">
+                        <RadzenIcon Icon="timer" class="rz-background-color-primary-light rz-color-on-primary-light rz-border-radius-2" Style="font-size: 32px; min-width: 64px; min-height: 64px"></RadzenIcon>
+                        <RadzenStack Gap="0">
+                            <RadzenText Text="Avg. Visit Duration" TextStyle="Radzen.Blazor.TextStyle.Subtitle1" TagName="Radzen.Blazor.TagName.H4" class="rz-m-0" />
+                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.End">
+                                <RadzenText Text="2m 31s" TagName="Radzen.Blazor.TagName.P" TextStyle="Radzen.Blazor.TextStyle.H3" class="rz-m-0" />
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.25rem" AlignItems="Radzen.AlignItems.Center">
+                                    <RadzenIcon Icon="trending_down" class="rz-color-danger"></RadzenIcon>
+                                    <RadzenText Text="12s" TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-color-danger rz-m-0" />
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>

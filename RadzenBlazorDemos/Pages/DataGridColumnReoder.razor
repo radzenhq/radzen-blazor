@@ -4,8 +4,9 @@
 
 @inherits DbContextPage
 
-<RadzenButton Text="Change page state" Click="@((args) => { StateHasChanged(); })" class="rz-my-4" />
-<RadzenDataGrid AllowColumnReorder="true" ColumnReordering="@OnColumnReordering" ColumnReordered="@OnColumnReordered" TItem="Employee"
+<RadzenButton Text="Reset" Click="@((args) => { grid.Reset(); })" class="rz-my-4" />
+
+<RadzenDataGrid @ref=grid AllowColumnReorder="true" ColumnReordering="@OnColumnReordering" ColumnReordered="@OnColumnReordered" TItem="Employee"
     AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true" AllowSorting="true" Data="@employees" ColumnWidth="160px" LogicalFilterOperator="LogicalFilterOperator.Or">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" Reorderable="false" Resizable="false" />
@@ -34,7 +35,7 @@
 
 @code {
     EventConsole console;
-
+    RadzenDataGrid<Employee> grid;
     IEnumerable<Employee> employees;
 
     protected override async Task OnInitializedAsync()

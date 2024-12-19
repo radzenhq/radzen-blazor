@@ -1,5 +1,5 @@
 @inject NavigationManager navigationManager;
-@if (!Example.New && !Example.Updated)
+@if (!Example.New && !Example.Updated && !Example.Pro)
 {
     <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@GetUrl()" Icon="@Example.Icon" aria-label="@Example.Name">
         @ChildContent
@@ -12,6 +12,7 @@ else
             @Example.Name
             <RadzenBadge Text="Updated" Visible=@Example.Updated BadgeStyle="BadgeStyle.Info"/>
             <RadzenBadge Text="New" Visible=@Example.New BadgeStyle="BadgeStyle.Success"/>
+            <RadzenBadge Text="Pro" Visible=@Example.Pro BadgeStyle="BadgeStyle.Danger"/>
         </Template>
         <ChildContent>@ChildContent</ChildContent>
     </RadzenPanelMenuItem>

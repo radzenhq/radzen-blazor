@@ -15,6 +15,27 @@ namespace Radzen.Blazor
     public partial class RadzenPickList<TItem> : RadzenComponent
     {
         /// <summary>
+        /// Gets or sets a value indicating whether it is allowed to move all items.
+        /// </summary>
+        /// <value><c>true</c> if c allowed to move all items; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowMoveAll { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether it is allowed to move all items from source to target.
+        /// </summary>
+        /// <value><c>true</c> if c allowed to move all items from source to target; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowMoveAllSourceToTarget { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether it is allowed to move all items from target to source.
+        /// </summary>
+        /// <value><c>true</c> if c allowed to move all items from target to source; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowMoveAllTargetToSource { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether multiple selection is allowed.
         /// </summary>
         /// <value><c>true</c> if multiple selection is allowed; otherwise, <c>false</c>.</value>
@@ -76,6 +97,46 @@ namespace Radzen.Blazor
         /// <value>The source template.</value>
         [Parameter]
         public RenderFragment<TItem> Template { get; set; }
+
+        /// <summary>
+        /// Gets or sets the select all text.
+        /// </summary>
+        /// <value>The select all text.</value>
+        [Parameter]
+        public string SelectAllText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the row render callback. Use it to set row attributes.
+        /// </summary>
+        /// <value>The row render callback.</value>
+        [Parameter]
+        public Action<PickListItemRenderEventArgs<TItem>> ItemRender { get; set; }
+
+        void OnSourceItemRender(ListBoxItemRenderEventArgs<object> args)
+        {
+            if (ItemRender != null)
+            {
+                var newArgs = new PickListItemRenderEventArgs<TItem>();
+                newArgs.Item = args.Item != null ? (TItem)args.Item : default(TItem);
+                ItemRender(newArgs);
+                newArgs.Attributes.ToList().ForEach(k => args.Attributes.Add(k.Key, k.Value));
+                args.Visible = newArgs.Visible;
+                args.Disabled = newArgs.Disabled;
+            }
+        }
+
+        void OnTargetItemRender(ListBoxItemRenderEventArgs<object> args)
+        {
+            if (ItemRender != null)
+            {
+                var newArgs = new PickListItemRenderEventArgs<TItem>();
+                newArgs.Item = args.Item != null ? (TItem)args.Item : default(TItem);
+                ItemRender(newArgs);
+                newArgs.Attributes.ToList().ForEach(k => args.Attributes.Add(k.Key, k.Value));
+                args.Visible = newArgs.Visible;
+                args.Disabled = newArgs.Disabled;
+            }
+        }
 
         private RenderFragment<dynamic> ListBoxTemplate => Template != null ? item => Template((TItem)item) : null;
 

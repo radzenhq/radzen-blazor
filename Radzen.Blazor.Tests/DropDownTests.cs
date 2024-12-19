@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Bunit;
@@ -112,6 +113,34 @@ namespace Radzen.Blazor.Tests
             items = component.FindAll(".rz-dropdown-item");
 
             Assert.Contains("rz-state-highlight", items[0].ClassList);
+        }
+
+        [Fact]
+        public void DropDown_Respects_ItemEqualityComparer()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            List<DataItem> boundCollection = [new() { Text = "Item 2" }];
+
+            var component = DropDown<string>(ctx, parameters => {
+                parameters.Add(p => p.ItemComparer, new DataItemComparer());
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, boundCollection);
+            });
+
+            var selectedItems = component.FindAll(".rz-state-highlight");
+            Assert.Equal(1, selectedItems.Count);
+            Assert.Equal("Item 2", selectedItems[0].TextContent.Trim());
+
+            // select Item 1 in list
+            var items = component.FindAll(".rz-multiselect-item");
+            items[0].Click();
+            component.Render();
+
+            selectedItems = component.FindAll(".rz-state-highlight");
+            Assert.Equal(2, selectedItems.Count);
+            Assert.Equal("Item 1", selectedItems[0].TextContent.Trim());
         }
 
         [Fact]
@@ -244,6 +273,35 @@ namespace Radzen.Blazor.Tests
             var selectedItems = component.FindAll(".rz-chip-text");
 
             Assert.Collection(selectedItems, item => Assert.Contains("value: Item 1", item.Text()), item => Assert.Contains("value: Item 2", item.Text()));
+        }
+
+
+        class DataItemComparer : IEqualityComparer<DataItem>, IEqualityComparer<object>
+        {
+            public bool Equals(DataItem x, DataItem y)
+            {
+                if (ReferenceEquals(x, y)) return true;
+                if (x is null) return false;
+                if (y is null) return false;
+                if (x.GetType() != y.GetType()) return false;
+                return x.Text == y.Text;
+            }
+
+            public int GetHashCode(DataItem obj)
+            {
+                return obj.Text.GetHashCode();
+            }
+
+            public bool Equals(object x, object y)
+            {
+                return Equals((DataItem)x, (DataItem)y);
+            }
+
+            public int GetHashCode(object obj)
+            {
+                return GetHashCode((DataItem)obj);
+
+            }
         }
     }
 }

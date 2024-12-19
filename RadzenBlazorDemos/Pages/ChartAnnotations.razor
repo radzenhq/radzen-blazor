@@ -9,8 +9,9 @@
     </RadzenCard>
 
     <RadzenChart>
-        <RadzenLineSeries Smooth="true" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
-            <RadzenSeriesAnnotation Visible="@annotation" TItem="DataItem" Data="@revenue2023[7]" OffsetY="-16" Text="Acquisition" />
+        <RadzenLineSeries Smooth="true" Data="@revenue2024" CategoryProperty="Date" Title="2024" ValueProperty="Revenue" RenderingOrder="1">
+            <RadzenSeriesAnnotation Visible="@annotation" TItem="DataItem" Data="@revenue2024[7]" OffsetY="-16" Text="Acquisition" />
+            <RadzenSeriesAnnotation Visible="@annotation" TItem="DataItem" Data="@revenue2024[5]" OffsetY="-16" Text="IPO" Fill="#ff504d" />
             <RadzenMarkers MarkerType="MarkerType.Circle" />
         </RadzenLineSeries>
         <RadzenCategoryAxis Padding="20" />
@@ -35,7 +36,7 @@
         return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
     }
 
-    DataItem[] revenue2023 = new DataItem[] {
+    DataItem[] revenue2024 = new DataItem[] {
         new DataItem
         {
             Date = "Jan",

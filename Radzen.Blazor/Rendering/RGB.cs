@@ -6,14 +6,11 @@ using System.Text.RegularExpressions;
 namespace Radzen.Blazor.Rendering
 {
     /// <summary>
-    /// Class RGB.
+    /// Utility class used to parse and convert RGB colors.
     /// </summary>
     public class RGB
     {
-        /// <summary>
-        /// The known colors
-        /// </summary>
-        private static Dictionary<string, string> knownColors = new Dictionary<string, string>(StringComparer.InvariantCultureIgnoreCase)
+        private static readonly Dictionary<string, string> knownColors = new()
         {
             ["black"] = "000000",
             ["silver"] = "c0c0c0",
@@ -238,7 +235,7 @@ namespace Radzen.Blazor.Rendering
                 return new RGB { Red = red, Green = green, Blue = blue };
             }
 
-            if (knownColors.TryGetValue(color, out var knownColor))
+            if (knownColors.TryGetValue(color.ToLowerInvariant(), out var knownColor))
             {
                 return Parse(knownColor);
             }

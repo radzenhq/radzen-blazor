@@ -272,7 +272,7 @@ namespace Radzen
         /// <summary>
         /// The selected items
         /// </summary>
-        protected IList<object> selectedItems = new List<object>();
+        protected ISet<object> selectedItems = new HashSet<object>();
         /// <summary>
         /// The selected item
         /// </summary>
@@ -288,10 +288,10 @@ namespace Radzen
                 return;
             }
 
-            if (selectedItems.Count != View.Cast<object>().ToList().Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).Count())
+            if (selectedItems.Count != View.Cast<object>().ToList().Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true).Count())
             {
                 selectedItems.Clear();
-                selectedItems = View.Cast<object>().ToList().Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).ToList();
+                selectedItems = View.Cast<object>().ToList().Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true).ToHashSet(ItemComparer);
             }
             else
             {
@@ -453,6 +453,8 @@ namespace Radzen
                 {
                     disabledPropertyGetter = GetGetter(DisabledProperty, type);
                 }
+
+                selectedItems = new HashSet<object>(ItemComparer);
             }
         }
 
@@ -678,7 +680,7 @@ namespace Radzen
                     var itemToSelect = items.ElementAtOrDefault(selectedIndex);
 
                     await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, $"{searchText}".Trim());
-                    
+
                     if (itemToSelect != null)
                     {
                         await OnSelectItem(itemToSelect, true);
@@ -732,7 +734,9 @@ namespace Radzen
             }
             else
             {
-                var filteredItems = Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive)
+                var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
+                    Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
+                    Query)
                     .Cast<object>()
                     .ToList();
 
@@ -988,7 +992,7 @@ namespace Radzen
             {
                 if (Multiple)
                 {
-                    return selectedItems.IndexOf(item) != -1;
+                    return selectedItems.Contains(item);
                 }
                 else
                 {
@@ -1214,18 +1218,14 @@ namespace Radzen
                 }
                 else
                 {
-                    selectedItems = selectedItems.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"!object.Equals(it.{ValueProperty},@0)", value).ToList();
+                    selectedItems = selectedItems.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"!object.Equals(it.{ValueProperty},@0)", value).ToHashSet(ItemComparer);
                 }
             }
             else
             {
-                if (!selectedItems.Any(i => object.Equals(i, item)))
+                if (!selectedItems.Add(item))
                 {
-                    selectedItems.Add(item);
-                }
-                else
-                {
-                    selectedItems = selectedItems.Where(i => !object.Equals(i, item)).ToList();
+                    selectedItems.Remove(item);
                 }
             }
         }
@@ -1287,7 +1287,7 @@ namespace Radzen
                         }
                         else
                         {
-                            selectedItems = ((IEnumerable)values).Cast<object>().ToList();
+                            selectedItems = values.Cast<object>().ToHashSet(ItemComparer);
                         }
 
                     }
@@ -1298,6 +1298,11 @@ namespace Radzen
                 selectedItem = null;
             }
         }
+
+        /// <summary>
+        /// For lists of objects, an IEqualityComparer to control how selected items are determined
+        /// </summary>
+        [Parameter] public IEqualityComparer<object> ItemComparer { get; set; }
 
         internal bool IsItemSelectedByValue(object v)
         {

@@ -6,6 +6,7 @@ namespace RadzenBlazorDemos
     {
         public bool New { get; set; }
         public bool Updated { get; set; }
+        public bool Pro { get; set; }
         public string Name { get; set; }
         public string Icon { get; set; }
         public string Path { get; set; }

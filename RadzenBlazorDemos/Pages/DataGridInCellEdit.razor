@@ -11,9 +11,9 @@
     The 'CellClick' event handler is used to trigger the column edit mode.
 *@
 
-<RadzenDataGrid TItem="Order" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
-                Data="@orders" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())"
-                ColumnWidth="200px" CellClick="@OnCellClick">
+<RadzenDataGrid @ref=grid TItem="Order" AllowAlternatingRows="false" AllowFiltering="true" AllowPaging="true" PageSize="5" AllowSorting="true"
+Data="@orders" RowUpdate="@OnUpdateRow" Sort="@(args => Reset())" Page="@(args => Reset())" Filter="@(args => Reset())"
+ColumnWidth="200px" CellClick="@OnCellClick">
     <Columns>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID" Width="120px" Frozen="true" />
 
@@ -23,7 +23,7 @@
             </Template>
             <EditTemplate Context="order">
                 <RadzenDropDown @ref="editor" Change="@(args => Update())" @bind-Value="order.CustomerID" Data="@customers" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width:100%; display: block;"
-                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select customer" }})" />
             </EditTemplate>
         </RadzenDataGridColumn>
 
@@ -36,7 +36,7 @@
             </Template>
             <EditTemplate Context="order">
                 <RadzenDropDown @ref="editor" Change="@(args => Update())" @bind-Value="order.EmployeeID" Data="@employees" ValueProperty="EmployeeID" Style="width:100%; display: block;"
-                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
+                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Select employee" }})">
                     <Template>
                         <RadzenImage Path="@context.Photo" style="width: 20px; height: 20px; border-radius: 16px; margin-right: 6px;" />
                         @context.FirstName @context.LastName
@@ -97,22 +97,23 @@
 
 <style>
     .table-cell-edited {
-        position: relative;
+    position: relative;
     }
 
-        .table-cell-edited::after {
-            content: "";
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 0;
-            height: 0;
-            border-top: 10px solid red;
-            border-left: 10px solid transparent;
-        }
+    .table-cell-edited::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 10px solid red;
+    border-left: 10px solid transparent;
+    }
 </style>
 
 @code {
+    RadzenDataGrid<Order> grid;
     string columnEditing;
 
     IEnumerable<Order> orders;
@@ -163,25 +164,23 @@
     /// Handles the CellClick event of the RadzenDataGrid.
     /// </summary>
     /// <param name="args"></param>
-    void OnCellClick(DataGridCellMouseEventArgs<Order> args)
+    async Task OnCellClick(DataGridCellMouseEventArgs<Order> args)
     {
+        if (!grid.IsValid || 
+            (ordersToUpdate.Contains(args.Data) && columnEditing == args.Column.Property)) return;
+
         // Record the previous edited field, if you're not using IRevertibleChangeTracking to track object changes
         if (ordersToUpdate.Any())
         {
             editedFields.Add(new(ordersToUpdate.First().OrderID, columnEditing));
+            await Update();
         }
 
         // This sets which column is currently being edited.
         columnEditing = args.Column.Property;
 
-        // This triggers a save on the previous edit. This can be removed if you are going to batch edits through another method.
-        if (ordersToUpdate.Any())
-        {
-            OnUpdateRow(ordersToUpdate.First());
-        }
-
         // This sets the Item to be edited.
-        EditRow(args.Data);
+        await EditRow(args.Data);
     }
 
     void Reset(Order order = null)
@@ -198,25 +197,25 @@
         }
     }
 
-    void Update()
+    async Task Update()
     {
         editorFocused = false;
 
         if (ordersToUpdate.Any())
         {
-            OnUpdateRow(ordersToUpdate.First());
+            await grid.UpdateRow(ordersToUpdate.First());
         }
-
-        Reset();
     }
 
-    void EditRow(Order order)
+    async Task EditRow(Order order)
     {
         Reset();
 
         ordersToUpdate.Add(order);
+
+        await grid.EditRow(order);
     }
-    
+
     /// <summary>
     /// Saves the changes from the Order to the database.
     /// </summary>

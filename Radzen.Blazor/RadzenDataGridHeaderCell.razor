@@ -105,7 +105,7 @@
                                 }
                                 else if (Column.FilterPropertyType == typeof(bool) || Column.FilterPropertyType == typeof(bool?))
                                 {
-                                    <RadzenCheckBox Disabled="@(!Column.CanSetFilterValue())" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueAriaLabel  + Column.GetFilterValue() }})" TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => { Column.SetFilterValue(null); Column.SetFilterValue(args); Grid.SaveSettings(); InvokeAsync(() => Grid.Reload()); })" />
+                                    <RadzenCheckBox Disabled="@(!Column.CanSetFilterValue())" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.FilterValueAriaLabel  + Column.GetFilterValue() }})" TriState="true" TValue="@object" Value="@Column.GetFilterValue()" Change="@(args => { Column.SetFilterValue(null); Column.SetFilterValue(args); Grid.SaveSettings(); })" />
                                 }
                                 else
                                 {
@@ -148,6 +148,12 @@
                                 }
                                 else
                                 {
+                                    @if (Column.FilterValueTemplate != null)
+                                    {
+                                        @Column.FilterValueTemplate(Column)
+                                    } 
+                                    else
+                                    {
                                     <RadzenListBox AllowVirtualization="@Column.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
                                                    TValue="IEnumerable<object>" Value=@Column.GetFilterValue() Change="@ListBoxChange" 
                                                    Data=@filterValues Count=@filterValuesCount LoadData="@LoadFilterValues" 
@@ -165,6 +171,7 @@
                                             }
                                         </Template>
                                     </RadzenListBox>
+                                    }
                                 }
                             </form>
                             }
@@ -173,7 +180,7 @@
                         {
                             <div class="rz-grid-filter-buttons">
                                 <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-clear-filter" Click="@ClearFilter" Text=@Grid.ClearFilterText title="@Grid.ClearFilterText" />
-                                <RadzenButton ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
+                                <RadzenButton onmousedown="@getBlur()" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
                             </div>
                         }
                     </Popup>
@@ -220,7 +227,7 @@ else
 
         if (Column.Grid.LoadColumnFilterData.HasDelegate)
         {
-            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column, Filter = loadDataArgs.Filter };
+            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column, Filter = loadDataArgs.Filter, Skip = loadDataArgs.Skip, Top = loadDataArgs.Top };
 
             await Column.Grid.LoadColumnFilterData.InvokeAsync(args);
 
@@ -314,7 +321,7 @@ else
             await popup.ToggleAsync(filterButton);
 
             Grid.allColumns
-            .Where(c => c != Column && c.headerCell != null)
+            .Where(c => c.GetVisible() && c.UniqueID != Column.UniqueID)
             .Select(c => c.headerCell).ToList()
             .ForEach(cell => InvokeAsync(cell.CloseFilter));
         }
@@ -329,8 +336,43 @@ else
         await Grid.ClearFilter(Column, true);
     }
 
+    string getBlur()
+    {
+        return IsAdvancedNumeric() ? "Radzen.blur(this, event)" : null;
+    }
+
+    bool IsAdvancedNumeric()
+    {
+        return Grid.FilterMode == FilterMode.Advanced &&
+            PropertyAccess.IsNumeric(Column.FilterPropertyType) &&
+                !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType));
+    }
+
     async Task ApplyFilter()
     {
+        if (IsAdvancedNumeric())
+        {
+            var targetType = Nullable.GetUnderlyingType(Column.FilterPropertyType) ?? Column.FilterPropertyType;
+
+            if (Column.FilterValueTemplate == null)
+            {
+                var firstInputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column) + "f");
+                if (!object.Equals($"{Column.GetFilterValue()}", $"{firstInputValue}"))
+                {
+                    Column.SetFilterValue(!string.IsNullOrEmpty(firstInputValue) ? Convert.ChangeType(firstInputValue, targetType) : null);
+                }
+            }
+
+            if (Column.SecondFilterValueTemplate == null)
+            {
+                var secondInputValue = await Grid.GetJSRuntime().InvokeAsync<string>("Radzen.getNumericValue", Grid.getFilterInputId(Column) + "s");
+                if (!object.Equals($"{Column.GetSecondFilterValue()}", $"{secondInputValue}"))
+                {
+                    Column.SetFilterValue(!string.IsNullOrEmpty(secondInputValue) ? Convert.ChangeType(secondInputValue, targetType) : null, false);
+                }
+            }
+        }
+
         if (Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand)
         {
             await popup.CloseAsync();

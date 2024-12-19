@@ -130,7 +130,7 @@ namespace Radzen.Blazor
         {
             if (!firstRender)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, Zoom, Center);
+                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, ApiKey, Zoom, Center);
             }
         }
 

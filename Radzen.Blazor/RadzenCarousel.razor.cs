@@ -101,9 +101,9 @@ namespace Radzen.Blazor
 
         async Task GoTo(int index)
         {
-            if (selectedIndex != index)
+            if (index >= 0 && index <= items.Count - 1 && selectedIndex != index)
             {
-                selectedIndex = index == items.Count ? 0 : index;
+                selectedIndex = index;
                 await SelectedIndexChanged.InvokeAsync(selectedIndex);
                 await Change.InvokeAsync(selectedIndex);
                 await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
@@ -124,7 +124,7 @@ namespace Radzen.Blazor
         /// </summary>
         public void Start()
         {
-            timer?.Change(TimeSpan.Zero, TimeSpan.FromMilliseconds(Interval));
+            timer?.Change(TimeSpan.FromMilliseconds(Interval), TimeSpan.FromMilliseconds(Interval));
         }
 
         /// <summary>
@@ -299,7 +299,7 @@ namespace Radzen.Blazor
             if (firstRender)
             {
                 var ts = TimeSpan.FromMilliseconds(Interval);
-                timer = new System.Threading.Timer(state => InvokeAsync(() => GoTo(selectedIndex + 1)), 
+                timer = new System.Threading.Timer(state => InvokeAsync(Next), 
                     null, Auto ? ts : Timeout.InfiniteTimeSpan, ts);
             }
         }

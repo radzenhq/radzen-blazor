@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
 
@@ -167,7 +166,7 @@ namespace Radzen.Blazor
             }
         }
 
-        void UpdateColorUsingHsvHandles()
+        async Task UpdateColorUsingHsvHandles()
         {
             var hsv = new HSV {
                 Hue = HueHandleLeft,
@@ -175,45 +174,59 @@ namespace Radzen.Blazor
                 Value = 1 - SaturationHandleTop,
                 Alpha = AlphaHandleLeft
             };
+
             Color = hsv.ToRGB().ToCSS();
-            TriggerChange();
+
+            await TriggerChange();
         }
 
         Rect lastHslRect;
-        void OnSaturationMove(DraggableEventArgs args)
+
+        async Task OnSaturationMove(DraggableEventArgs args)
         {
             lastHslRect = args.Rect; ;
 
             SaturationHandleLeft = Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1);
             SaturationHandleTop = Math.Clamp((args.ClientY - args.Rect.Top) / args.Rect.Height, 0, 1);
 
-            UpdateColorUsingHsvHandles();
+            await UpdateColorUsingHsvHandles();
         }
 
-        void TriggerChange()
+        async Task TriggerChange()
         {
             if (!ShowButton)
             {
-                ValueChanged.InvokeAsync(Color);
-                Change.InvokeAsync(Color);
+                await OnChanged();
             }
 
             StateHasChanged();
         }
 
-        void ChangeRGB(object value)
+        async Task OnChanged()
+        {
+            await ValueChanged.InvokeAsync(Color);
+
+            if (FieldIdentifier.FieldName != null)
+            {
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
+            }
+
+            await Change.InvokeAsync(Color);
+        }
+
+        async Task ChangeRGB(object value)
         {
             var rgb = RGB.Parse(value as string);
             if (rgb != null)
             {
                 rgb.Alpha = AlphaHandleLeft;
-                UpdateColor(rgb);
+                await UpdateColor(rgb);
             }
         }
 
         internal async Task SelectColor(string value)
         {
-            UpdateColor(RGB.Parse(value));
+            await UpdateColor(RGB.Parse(value));
 
             if (!ShowButton)
             {
@@ -221,7 +234,7 @@ namespace Radzen.Blazor
             }
         }
 
-        void UpdateColor(RGB rgb)
+        async Task UpdateColor(RGB rgb)
         {
             Color = rgb.ToCSS();
 
@@ -232,10 +245,10 @@ namespace Radzen.Blazor
             HueHandleLeft = hsv.Hue;
             AlphaHandleLeft = hsv.Alpha;
 
-            TriggerChange();
+            await TriggerChange();
         }
 
-        void ChangeAlpha(double value)
+        async Task ChangeAlpha(double value)
         {
             if (value >= 0 && value <= 100)
             {
@@ -244,19 +257,19 @@ namespace Radzen.Blazor
 
                 Color = rgb.ToCSS();
 
-                TriggerChange();
+                await TriggerChange();
             }
         }
 
-        void ChangeAlpha(object alpha)
+        async Task ChangeAlpha(object alpha)
         {
             if (Double.TryParse((string)alpha, out var value))
             {
-                ChangeAlpha(value);
+                await ChangeAlpha(value);
             }
         }
 
-        void ChangeColor(double value, Action<RGB, double> update)
+        async Task ChangeColor(double value, Action<RGB, double> update)
         {
             if (value >= 0 && value <= 255)
             {
@@ -264,42 +277,42 @@ namespace Radzen.Blazor
 
                 update(rgb, value);
 
-                UpdateColor(rgb);
+                await UpdateColor(rgb);
             }
         }
 
-        void ChangeColor(object color, Action<RGB, double> update)
+        async Task ChangeColor(object color, Action<RGB, double> update)
         {
             if (Double.TryParse((string)color, out var value))
             {
-                ChangeColor(value, update);
+                await ChangeColor(value, update);
             }
         }
 
         Rect lastAlphaRect;
-        void OnAlphaMove(DraggableEventArgs args)
+
+        async Task OnAlphaMove(DraggableEventArgs args)
         {
             lastAlphaRect = args.Rect;
 
             AlphaHandleLeft = Math.Round(Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1), 2);
 
-            UpdateColorUsingHsvHandles();
+            await UpdateColorUsingHsvHandles();
         }
 
         Rect lastHueRect;
-        void OnHueMove(DraggableEventArgs args)
+        async Task OnHueMove(DraggableEventArgs args)
         {
             lastHueRect = args.Rect;
 
             HueHandleLeft = Math.Clamp((args.ClientX - args.Rect.Left) / args.Rect.Width, 0, 1);
 
-            UpdateColorUsingHsvHandles();
+            await UpdateColorUsingHsvHandles();
         }
 
         async Task OnClick()
         {
-            await ValueChanged.InvokeAsync(Color);
-            await Change.InvokeAsync(Color);
+            await OnChanged();
             await Popup.CloseAsync();
         }
 
@@ -309,6 +322,7 @@ namespace Radzen.Blazor
             {
                 SetInitialValue();
             }
+
             await Close.InvokeAsync(null);
         }
 
@@ -370,14 +384,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            var classList = new List<string>() { "rz-colorpicker" };
-
-            if (Disabled)
-            {
-                classList.Add("rz-state-disabled");
-            }
-
-            return string.Join(" ", classList);
+            return GetClassList("rz-colorpicker").ToString();
         }
 
         /// <inheritdoc />
@@ -435,7 +442,7 @@ namespace Radzen.Blazor
                     lastHueRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", (GetId() + "hue"));
                 }
 
-                OnHueMove(new DraggableEventArgs() { Rect = lastHueRect, ClientX = lastHueRect.Left + lastHueRect.Width * HueHandleLeft + (key == "ArrowLeft" ? -1 : 1) });
+                await OnHueMove(new DraggableEventArgs() { Rect = lastHueRect, ClientX = lastHueRect.Left + lastHueRect.Width * HueHandleLeft + (key == "ArrowLeft" ? -1 : 1) });
             }
             else if (key == "Escape")
             {
@@ -460,7 +467,7 @@ namespace Radzen.Blazor
                     lastAlphaRect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", (GetId() + "alpha"));
                 }
 
-                OnAlphaMove(new DraggableEventArgs() { Rect = lastAlphaRect, ClientX = lastAlphaRect.Left + lastAlphaRect.Width * AlphaHandleLeft + (key == "ArrowLeft" ? -3 : 3) });
+                await OnAlphaMove(new DraggableEventArgs() { Rect = lastAlphaRect, ClientX = lastAlphaRect.Left + lastAlphaRect.Width * AlphaHandleLeft + (key == "ArrowLeft" ? -3 : 3) });
             }
             else if (key == "Escape")
             {
@@ -485,9 +492,9 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                OnSaturationMove(new DraggableEventArgs() 
-                { 
-                    Rect = lastHslRect, 
+                await OnSaturationMove(new DraggableEventArgs()
+                {
+                    Rect = lastHslRect,
                     ClientX = lastHslRect.Left + lastHslRect.Width * SaturationHandleLeft + (key == "ArrowLeft" ? -1 : key == "ArrowRight" ? 1 : 0),
                     ClientY = lastHslRect.Top + lastHslRect.Height * SaturationHandleTop + (key == "ArrowUp" ? -1 : key == "ArrowDown" ? 1 : 0)
                 });

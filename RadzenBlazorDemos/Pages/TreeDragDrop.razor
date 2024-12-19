@@ -45,7 +45,9 @@
         args.Attributes.Add("ondragover", "event.preventDefault()");
         args.Attributes.Add("ondrop", EventCallback.Factory.Create<DragEventArgs>(this, () =>
         {
-            if (draggedItem != null && draggedItem.ReportsTo != employee.EmployeeID)
+            if (draggedItem != null && draggedItem != employee &&
+                    draggedItem.ReportsTo != employee.EmployeeID && 
+                    draggedItem.EmployeeID != employee.ReportsTo)
             {
                 draggedItem.ReportsTo = employee.EmployeeID;
                 dbContext.SaveChanges();
