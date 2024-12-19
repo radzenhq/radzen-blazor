@@ -118,7 +118,7 @@ Register CookieThemeService in all <code>Program.cs</code> files of your applica
 <code>
 @@inject Radzen.ThemeService ThemeService
 @@{
-    var theme = HttpContext.Request.Cookies["MuApplicationTheme"];
+    var theme = HttpContext.Request.Cookies["MyApplicationTheme"];
 
     if (!string.IsNullOrEmpty(theme))
     {
