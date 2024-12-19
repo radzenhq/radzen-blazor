@@ -90,6 +90,28 @@ namespace Radzen
             return (IList)genericToList.Invoke(null, new[] { query });
         }
 
+        static string EnumerableAsString(IQueryable enumerableValue, string baseType)
+        {
+            Func<IQueryable, IEnumerable<object>> values = (items) => {
+                if (items.ElementType == typeof(string))
+                {
+                    return items.Cast<string>().Select(i => $@"""{i}""");
+                }
+                else if (PropertyAccess.IsDate(items.ElementType))
+                {
+                    return items.Cast<object>().Select(i => $@"DateTime.Parse(""{i}"")");
+                }
+                else if (PropertyAccess.IsEnum(items.ElementType) || PropertyAccess.IsNullableEnum(items.ElementType))
+                {
+                    return items.Cast<object>().Select(i => Convert.ChangeType(i,typeof(int)));
+                }
+
+                return items.Cast<object>();
+
+            };
+            return "new " + baseType + "[]{" + String.Join(",", values(enumerableValue)) + "}";
+        }
+
         /// <summary>
         /// Converts to filterstring.
         /// </summary>
@@ -177,29 +199,9 @@ namespace Radzen
                             baseType = "";
                         }
 
-                        var enumerableValueAsString = "new " + baseType + "[]{" + String.Join(",",
-                                                          (enumerableValue.ElementType == typeof(string)
-                                                               ? enumerableValue.Cast<string>().Select(i => $@"""{i}""")
-                                                                   .Cast<object>()
-                                                               : PropertyAccess.IsDate(enumerableValue.ElementType)
-                                                                   ? enumerableValue.Cast<object>()
-                                                                       .Select(i => $@"DateTime.Parse(""{i}"")")
-                                                                       .Cast<object>()
-                                                                   : enumerableValue.Cast<object>()
-                                                          )) + "}";
+                        var enumerableValueAsString = EnumerableAsString(enumerableValue, baseType);
 
-
-                        var enumerableSecondValueAsString = "new " + baseType + "[]{" + String.Join(",",
-                                                                (enumerableSecondValue.ElementType == typeof(string)
-                                                                     ? enumerableSecondValue.Cast<string>()
-                                                                         .Select(i => $@"""{i}""").Cast<object>()
-                                                                     : PropertyAccess.IsDate(
-                                                                         enumerableSecondValue.ElementType)
-                                                                         ? enumerableSecondValue.Cast<object>()
-                                                                             .Select(i => $@"DateTime.Parse(""{i}"")")
-                                                                             .Cast<object>()
-                                                                         : enumerableSecondValue.Cast<object>()
-                                                                )) + "}";
+                        var enumerableSecondValueAsString = EnumerableAsString(enumerableSecondValue, baseType);
 
                         if (enumerableValue?.Any() == true)
                         {
