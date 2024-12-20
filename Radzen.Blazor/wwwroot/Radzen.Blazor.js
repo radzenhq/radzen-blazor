@@ -1157,7 +1157,7 @@ window.Radzen = {
           tooltipContent.classList.add('rz-top-tooltip-content');
             position = 'top';
             if (instance && callback) {
-                instance.invokeMethodAsync(callback, position);
+                try { instance.invokeMethodAsync(callback, position); } catch { }
             }
         }
       }
@@ -1175,7 +1175,7 @@ window.Radzen = {
           tooltipContent.classList.add('rz-left-tooltip-content');
           position = 'left';
           if (instance && callback) {
-            instance.invokeMethodAsync(callback, position);
+              try { instance.invokeMethodAsync(callback, position); } catch { }
           }
         }
       }
@@ -1335,9 +1335,9 @@ window.Radzen = {
 
     if (instance && callback) {
         if (callback.includes('RadzenTooltip')) {
-            instance.invokeMethodAsync(callback, null);
+            try { instance.invokeMethodAsync(callback, null); } catch { }
         } else {
-            instance.invokeMethodAsync(callback);
+            try { instance.invokeMethodAsync(callback); } catch { }
         }
     }
     Radzen.popups = (Radzen.popups || []).filter(function (obj) {
