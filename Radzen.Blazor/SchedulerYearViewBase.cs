@@ -11,7 +11,7 @@ namespace Radzen.Blazor
     public abstract class SchedulerYearViewBase : SchedulerViewBase
     {
         /// <summary>
-        /// Gets the StartMonth of the view. It is used in rendering Year Views.
+        /// Gets the StartMonth of the view.
         /// </summary>
         /// <value>The start month.</value>
         public abstract Month StartMonth { get; set; }
