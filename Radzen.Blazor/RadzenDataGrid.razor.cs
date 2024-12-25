@@ -322,11 +322,20 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if DataGrid data cells will follow the header cells structure in composite columns; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool AllowCompositeDataCells { get; set; } = false;
+
         /// <summary>
         /// Gets or sets a value indicating whether DataGrid data body show empty message.
         /// </summary>
         [Parameter]
         public bool ShowEmptyMessage { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets value if headers are shown.
+        /// </summary>
+        /// <value>If headers are shown value.</value>
+        [Parameter]
+        public bool ShowHeader { get; set; } = true;
+
         /// <summary>
         /// Gets or sets a value indicating whether DataGrid is responsive.
         /// </summary>
