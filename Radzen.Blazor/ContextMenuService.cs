@@ -66,10 +66,7 @@ namespace Radzen
         /// <param name="e">The <see cref="Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs"/> instance containing the event data.</param>
         private void UriHelper_OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
-            if (this.OnNavigate != null)
-            {
-                this.OnNavigate();
-            }
+            this.OnNavigate?.Invoke();
         }
 
         /// <summary>
