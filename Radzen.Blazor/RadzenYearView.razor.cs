@@ -15,7 +15,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenScheduler&gt;
     /// </code>
     /// </example>
-    public partial class RadzenYearView : SchedulerViewBase
+    public partial class RadzenYearView : SchedulerYearViewBase
     {
         /// <inheritdoc />
         public override string Icon => "calendar_month";
@@ -89,7 +89,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The start month.</value>
         [Parameter]
-        public Month StartMonth { get; set; } = Month.January;
+        public override Month StartMonth { get; set; } = Month.January;
 
         /// <inheritdoc />
         public override DateTime Next()
