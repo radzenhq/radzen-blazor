@@ -81,16 +81,15 @@
                             }
                         }
 
-                    }
-
-                    @if (excessCount > 0)
-                    {
-                        var slotIndex = start.Subtract(date).Days;
-                        var slotWidth = (SLOT_WIDTH / CALENDAR_WIDTH) * 100;
-                        var left = ((slotIndex + 1) * slotWidth) + (100.0 / 85.0);
-                        var top = ((MaxAppointmentsInSlot + 1) * 1.5) + 1.7;
-                        var listDate = start;
-                        <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
+                        @if (excessCount > 0)
+                        {
+                            var slotIndex = start.Subtract(date).Days;
+                            var slotWidth = (SLOT_WIDTH / CALENDAR_WIDTH) * 100;
+                            var left = ((slotIndex + 1) * slotWidth) + (100.0 / 85.0);
+                            var top = ((MaxAppointmentsInSlot + 1) * 1.5) + 1.7;
+                            var listDate = start;
+                            <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
+                        }
                     }
                 }
             </div>
