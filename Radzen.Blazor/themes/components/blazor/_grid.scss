@@ -670,7 +670,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
           }
         }
 
-        &.rz-frozen-cell-right {
+        &.rz-frozen-cell-right,
+        &.rz-frozen-cell-right-inner {
           &:before {
             z-index: -2;
             background-color: var(--rz-grid-frozen-cell-background-color);
@@ -693,7 +694,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             }
           }
 
-          &.rz-frozen-cell-right {
+          &.rz-frozen-cell-right,
+          &.rz-frozen-cell-right-inner {
             &:after {
               background-color: var(--rz-grid-selected-background-color);
             }
@@ -722,7 +724,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
             }
           }
 
-          &.rz-frozen-cell-right {
+          &.rz-frozen-cell-right,
+          &.rz-frozen-cell-right-inner {
             &:after {
               background-color: var(--rz-grid-cell-focus-background-color);
               color: var(--rz-grid-cell-focus-color);
@@ -760,7 +763,8 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
               }
             }
 
-            &.rz-frozen-cell-right {
+            &.rz-frozen-cell-right,
+            &.rz-frozen-cell-right-inner {
               &:after {
                 background-color: var(--rz-grid-hover-background-color);
               }
