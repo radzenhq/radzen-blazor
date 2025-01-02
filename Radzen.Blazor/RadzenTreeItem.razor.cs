@@ -229,7 +229,7 @@ namespace Radzen.Blazor
 
                 if (Tree.SingleExpand)
                 {
-                    var siblings = ParentItem?.items ?? Tree.items;
+                    var siblings = (ParentItem?.items ?? Tree.items).ToList();
 
                     foreach (var sibling in siblings)
                     {
