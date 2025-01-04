@@ -83,18 +83,14 @@ Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" S
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
             <Template Context="order">
-                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@(args => EditRow(order))" @onclick:stopPropagation="true">
-                </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(order))" @onclick:stopPropagation="true">
-                </RadzenButton>
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" Click="@(() => InsertAfterRow(order))" title="Add new row after this row" Disabled="@(editMode == DataGridEditMode.Single && ordersToInsert.Count() > 0)" />
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => EditRow(order))" @onclick:stopPropagation="true" />
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(order))" @onclick:stopPropagation="true" />
             </Template>
             <EditTemplate Context="order">
-                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(order))" aria-label="Save">
-                </RadzenButton>
-                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@((args) => CancelEdit(order))" aria-label="Cancel">
-                </RadzenButton>
-                <RadzenButton ButtonStyle="ButtonStyle.Danger" Icon="delete" Variant="Variant.Flat" Shade="Shade.Lighter" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(order))" aria-label="Delete">
-                </RadzenButton>
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Click="@((args) => SaveRow(order))" aria-label="Save"/>
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1" Click="@((args) => CancelEdit(order))" aria-label="Cancel"/>
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter" class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(order))" aria-label="Delete" />
             </EditTemplate>
         </RadzenDataGridColumn>
     </Columns>
@@ -205,6 +201,20 @@ Data="@orders" TItem="Order" RowUpdate="@OnUpdateRow" RowCreate="@OnCreateRow" S
         var order = new Order();
         ordersToInsert.Add(order);
         await ordersGrid.InsertRow(order);
+    }
+
+    async Task InsertAfterRow(Order row)
+    {
+        if (!ordersGrid.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var order = new Order();
+        ordersToInsert.Add(order);
+        await ordersGrid.InsertAfterRow(order, row);
     }
 
     void OnCreateRow(Order order)
