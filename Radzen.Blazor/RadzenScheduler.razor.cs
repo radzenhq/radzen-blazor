@@ -146,6 +146,13 @@ namespace Radzen.Blazor
         public string TextProperty { get; set; }
 
         /// <summary>
+        /// Specifies whether to Show or Hide the Scheduler Header. Defaults to true />.
+        /// </summary>
+        /// <value>Show / hide header</value>
+        [Parameter]
+        public bool ShowHeader { get; set; } = true;
+
+        /// <summary>
         /// A callback that will be invoked when the user clicks a slot in the current view. Commonly used to add new appointments.
         /// </summary>
         /// <example>
