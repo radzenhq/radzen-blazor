@@ -216,6 +216,8 @@ namespace Radzen.Blazor
                 {
                     _value = value;
                 }
+
+                stringValue = $"{value}";
             }
         }
 
