@@ -159,6 +159,11 @@ namespace RadzenBlazorDemos
                             if (value != null)
                             {
                                 stringValue = Convert.ToString(value, CultureInfo.InvariantCulture);
+
+                                if (value is Enum enumValue)
+                                {
+                                    stringValue = Radzen.Blazor.EnumExtensions.GetDisplayDescription(enumValue);
+                                }
                             }
                             cell.CellValue = new CellValue(stringValue);
                             cell.DataType = new EnumValue<CellValues>(CellValues.Number);
