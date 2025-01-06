@@ -53,7 +53,7 @@ namespace Radzen.Blazor
 
         protected virtual double CalculateTickCount(int distance)
         {
-            return Math.Ceiling(Math.Abs(Output.End - Output.Start) / distance);
+            return  Math.Max(1, Math.Ceiling(Math.Abs(Output.End - Output.Start) / distance));
         }
 
         public override (double Start, double End, double Step) Ticks(int distance)
