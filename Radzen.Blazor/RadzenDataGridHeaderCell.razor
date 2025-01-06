@@ -154,6 +154,7 @@
                                     } 
                                     else
                                     {
+                                    <RadzenProgressBarCircular Style="position:absolute;width:100%;" Visible="@isLoading" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
                                     <RadzenListBox AllowVirtualization="@Column.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
                                                    TValue="IEnumerable<object>" Value=@Column.GetFilterValue() Change="@ListBoxChange" 
                                                    Data=@filterValues Count=@filterValuesCount LoadData="@LoadFilterValues" 
@@ -205,9 +206,14 @@ else
     int filterValuesCount;
     internal IEnumerable filterValues;
     string loadDataArgsString;
+    bool isLoading = false;
 
     async Task LoadFilterValues(LoadDataArgs loadDataArgs)
     {
+        isLoading = true;
+
+        await Task.Yield();
+
         var property = Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty) ? Column.Property :
             Column.GetFilterProperty();
 
@@ -281,6 +287,8 @@ else
                 await InvokeAsync(StateHasChanged);
             }
         }
+
+        isLoading = false;
     }
 
     void ListBoxChange(object args)
