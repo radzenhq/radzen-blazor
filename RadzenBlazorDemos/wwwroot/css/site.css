@@ -462,7 +462,7 @@ svg.illustration {
 /* Promo */
 
 .promo-alert {
-    background: url("../images/2025.jpg") no-repeat, linear-gradient(110deg, rgba(0,0,0,0.4) 100%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.4) 100%),linear-gradient(110deg, #000 20%, #AA01E4 75%, #534EEB 100%);
+    background: linear-gradient(110deg, rgba(0,0,0,0.4) 100%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.4) 100%),linear-gradient(110deg, #000 20%, #AA01E4 75%, #534EEB 100%);
     background-size: cover;
     padding: 2rem !important;
 }
