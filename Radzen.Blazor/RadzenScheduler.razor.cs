@@ -587,7 +587,7 @@ namespace Radzen.Blazor
         {
             if (SelectedView != null)
             {
-                await LoadData.InvokeAsync(new SchedulerLoadDataEventArgs { Start = SelectedView.StartDate, End = SelectedView.EndDate });
+                await LoadData.InvokeAsync(new SchedulerLoadDataEventArgs { Start = SelectedView.StartDate, End = SelectedView.EndDate, View = SelectedView });
             }
         }
 
