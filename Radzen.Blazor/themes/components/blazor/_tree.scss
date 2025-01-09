@@ -91,7 +91,7 @@ $tree-transition: var(--rz-transition-all), width 0, height 0 !default;
     padding-block: var(--rz-tree-node-padding-block);
     padding-inline: var(--rz-tree-node-padding-inline);
 
-    .rzi:first-child {
+    & > .rzi:first-child {
       margin-inline-end: 0.25rem;
     }
   }
