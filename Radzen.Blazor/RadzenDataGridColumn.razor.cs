@@ -738,15 +738,6 @@ namespace Radzen.Blazor
             }
         }
 
-        internal string GetSortOrderAsString(bool isOData)
-        {
-            var property = GetSortProperty();
-            if (string.IsNullOrEmpty(property))
-                return "";
-            var p = isOData ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
-            return $"{p} {(GetSortOrder() == Radzen.SortOrder.Ascending ? "asc" : "desc")}";
-        }
-
         internal void SetSortOrder(SortOrder? order)
         {
             var descriptor = Grid.sorts.Where(d => d.Property == GetSortProperty()).FirstOrDefault();

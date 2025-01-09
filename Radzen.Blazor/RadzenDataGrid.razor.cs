@@ -1680,7 +1680,16 @@ namespace Radzen.Blazor
 
         internal string GetOrderBy()
         {
-            return string.Join(",", sorts.Select(d => allColumns.ToList().Where(c => c.GetSortProperty() == d.Property).FirstOrDefault()).Where(c => c != null).Select(c => c.GetSortOrderAsString(IsOData())));
+            return string.Join(",", sorts.Select(d => GetSortOrderAsString(d, IsOData())));
+        }
+
+        internal string GetSortOrderAsString(SortDescriptor d, bool isOData)
+        {
+            var property = d.Property;
+            if (string.IsNullOrEmpty(property))
+                return "";
+            var p = isOData ? property.Replace('.', '/') : PropertyAccess.GetProperty(property);
+            return $"{p} {(d.SortOrder == Radzen.SortOrder.Ascending ? "asc" : "desc")}";
         }
 
         /// <summary>
