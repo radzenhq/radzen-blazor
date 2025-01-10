@@ -10,7 +10,7 @@
         <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin-top:20px">
-        <div>Density:</div>
+        <div>Filter Mode:</div>
         <RadzenSelectBar @bind-Value="@filterMode" TextProperty="Text" ValueProperty="Value"
                          Data="@(Enum.GetValues(typeof(FilterMode)).Cast<FilterMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
     </RadzenStack>
