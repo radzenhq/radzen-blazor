@@ -2127,7 +2127,7 @@ window.Radzen = {
       visual.style.height = cell.offsetHeight + 'px';
       visual.style.width = cell.offsetWidth + 'px';
       visual.style.zIndex = 2000;
-      visual.innerHTML = cell.innerHTML;
+      visual.innerHTML = cell.firstChild.outerHTML;
       visual.id = id + 'visual';
       document.body.appendChild(visual);
 

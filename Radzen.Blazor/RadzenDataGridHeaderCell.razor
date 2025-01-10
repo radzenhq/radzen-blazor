@@ -187,6 +187,10 @@
                     </Popup>
         }
     </div>
+    @if (Grid.allColumns.Any(c => c.Parent != null) && Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Simple || filterMode == FilterMode.SimpleWithMenu))
+    {
+        @Grid.RenderSimpleFilter(Column, filterMode)
+    }
 </th>
 }
 else
