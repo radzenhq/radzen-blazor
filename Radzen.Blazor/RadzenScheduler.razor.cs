@@ -328,6 +328,32 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<SchedulerAppointmentMoveEventArgs> AppointmentMove { get; set; }
 
+        /// <summary>
+        /// A callback that will be invoked when an appointment is being resized to change it's date / time.
+        /// Commonly used to change the appointments length.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments AppointmentResize=@OnAppointmentResize&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        ///   async Task OnAppointmentResize(SchedulerAppointmentResizeEventArgs resized)
+        ///   {
+        ///     var draggedAppointment = appointments.SingleOrDefault(x => x == (Appointment)resized.Appointment.Data);
+        ///     if (draggedAppointment != null)
+        ///     {
+        ///         draggedAppointment.Start = resized.Start;
+        ///         draggedAppointment.End = resized.End;
+        ///         await scheduler.Reload();
+        ///     }
+        ///   }
+        /// }
+        /// </code>
+        /// </example>
+        /// <value></value>
+        [Parameter]
+        public EventCallback<SchedulerAppointmentResizeEventArgs> AppointmentResize { get; set; }
+
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
         /// <summary>
@@ -709,6 +735,11 @@ namespace Radzen.Blazor
             await AppointmentMouseLeave.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = (TItem)data.Data });
         }
 
+        async Task IScheduler.ResizeAppointment(SchedulerAppointmentResizeEventArgs args)
+        {
+            await AppointmentResize.InvokeAsync(args);
+        }
+
         bool IScheduler.HasMouseEnterAppointmentDelegate()
         {
             return AppointmentMouseEnter.HasDelegate;
@@ -717,6 +748,11 @@ namespace Radzen.Blazor
         bool IScheduler.HasAppointmentMoveDelegate()
         {
             return AppointmentMove.HasDelegate;
+        }
+
+        bool IScheduler.HasAppointmentResizeDelegate()
+        {
+            return AppointmentResize.HasDelegate;
         }
     }
 }

@@ -739,6 +739,27 @@ namespace Radzen
     }
 
     /// <summary>
+    /// Supplies information about a <see cref="DropableViewBase.AppointmentMove" /> event that is being raised.
+    /// </summary>
+    public class SchedulerAppointmentResizeEventArgs
+    {
+        /// <summary>
+        /// Gets or sets the appointment data.
+        /// </summary>
+        public AppointmentData Appointment { get; set; }
+
+        /// <summary>
+        /// Gets or sets the start DateTime.
+        /// </summary>
+        public DateTime Start { get; set; }
+
+        /// <summary>
+        /// Gets or sets the end DateTime.
+        /// </summary>
+        public DateTime End { get; set; }
+    }
+
+    /// <summary>
     /// Supplies information about a <see cref="RadzenMenu.Click" /> event that is being raised.
     /// </summary>
     public class MenuItemEventArgs : MouseEventArgs

@@ -16,7 +16,10 @@
             @for (var date = StartDate; date < EndDate; date = date.AddMinutes(MinutesPerSlot))
             {
                 var slotDate = date;
-                    <div @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(date)></div>
+                @* The following is to cap off any drags to "today" 23:59 as this always overruns past midnight. Going into next day will require a manual edit of the appointment *@
+                var slotDateSouth = slotDate.AddMinutes(MinutesPerSlot).Date > date.Date ? slotDate.Date.AddHours(23).AddMinutes(59) : slotDate.AddMinutes(MinutesPerSlot);
+                @* Pass the slotDate as an attribute so JavaScript can grab it to send it back on completion of the resize *@
+                <div data-slotdate-north="@slotDate" data-slotdate-south="@slotDateSouth" @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(date)></div>
             }
         </div>
     </div>

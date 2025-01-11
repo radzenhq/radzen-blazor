@@ -26,6 +26,9 @@ if (document.fonts && document.body) {
 var resolveCallbacks = [];
 var rejectCallbacks = [];
 var radzenRecognition;
+var appointmentResizeEelement;
+var appointmentResizeSlotDate;
+var appointmentResizeCurrentSlot;
 
 window.Radzen = {
     isRTL: function (el) {
@@ -2495,5 +2498,76 @@ window.Radzen = {
         tooltipContent.classList.remove('rz-top-chart-tooltip');
         tooltipContent.classList.remove('rz-bottom-chart-tooltip');
         tooltipContent.classList.add(tooltipContentClassName);
+  },
+  startResizeAppointment: function (dotNetHelper, elementId, direction) {
+
+    dotNet = dotNetHelper;
+    appointmentResizeEelement = document.getElementById(elementId);
+
+    window.addEventListener('mousemove', Radzen.moveResizeAppointment)
+    window.appointmentMoveDirection = direction;
+    /* The cursor has a tendancy to change to the AppointMove "Hand" 
+       Here we save the current cursor and then retrieve it in stopResizeAppointment */
+    window.appointmentResizeCursorSave = appointmentResizeEelement.style.cursor;
+    window.addEventListener('mouseup', Radzen.stopResizeAppointment)
+    /* The following is used to capture the impending Click event and throw it away after MouseUp 
+       so that the SlotClick event is not fired */
+    window.addEventListener('click', Radzen.captureClickAndIgnore, true); 
+  },
+  moveResizeAppointment: function (e) {
+    if (dotNet != null) {
+      appointmentResizeEelement.style.cursor = "row-resize";
+      /* Get the Slot that is beneath the mouse pointer and run the routine if it is a Slot */
+      var hoverElements = document.elementsFromPoint(e.clientX, e.clientY);
+      var slots = Array.from(hoverElements).filter((dom) => dom.classList.contains("rz-slot"));
+      if (slots.length > 0) {
+        var slot = slots[0];
+        /* Only run this if we are hovering over a new Slot */
+        if ((slot != appointmentResizeCurrentSlot)) {
+          appointmentResizeCurrentSlot = slot;
+          if (e.currentTarget.appointmentMoveDirection == "south") {
+            /* For southbound resizes, we only need alter the height */
+            var newHeight = (slot.offsetTop - slot.parentElement.offsetTop) - appointmentResizeEelement.offsetTop + slot.offsetHeight;
+            /* We will only set the new Height and store the Slot Date if the mouse is at least a slot height away (south) */
+            if (newHeight >= slot.offsetHeight) {
+              appointmentResizeEelement.style.height = newHeight + 'px'
+              appointmentResizeSlotDate = slot.getAttribute("data-slotdate-south");
+              dotNet.invokeMethodAsync('ResizeShowTooltip', appointmentResizeSlotDate, e.currentTarget.appointmentMoveDirection);
+            }
+          }
+          else {
+            /* For northbound resizes, we must change both the Top and the Height */
+            var newTop = slot.offsetTop - slot.parentElement.offsetTop;
+            var topDiff = appointmentResizeEelement.offsetTop - newTop;
+            var newHeight = appointmentResizeEelement.offsetHeight + topDiff;
+            /* We will only set the new Top and Height and store the Slot Date if the mouse is at least a slot height away (north) */
+            if (newHeight >= slot.offsetHeight) {
+              appointmentResizeEelement.style.top = newTop + 'px'
+              appointmentResizeEelement.style.height = newHeight + 'px'
+              appointmentResizeSlotDate = slot.getAttribute("data-slotdate-north");
+              dotNet.invokeMethodAsync('ResizeShowTooltip', appointmentResizeSlotDate, e.currentTarget.appointmentMoveDirection);
+            }
+          }
+        }
+      }
     }
+  },
+  stopResizeAppointment: function () {
+    /* Clean up code */
+    window.removeEventListener('mousemove', Radzen.moveResizeAppointment);
+    window.removeEventListener('mouseup', Radzen.stopResizeAppointment)
+
+    appointmentResizeEelement.style.cursor =window.appointmentResizeCursorSave;
+
+    /* Callback to Radzen with the SlotDate from the data attribute and the resize direction */
+    if (dotNet != null) {
+      dotNet.invokeMethodAsync('EndResize', appointmentResizeSlotDate, window.appointmentMoveDirection);
+      dotNet.dispose();
+      dotNet = null;
+    }
+  },
+  captureClickAndIgnore: function (e) {
+    e.stopPropagation();
+    window.removeEventListener('click', Radzen.captureClickAndIgnore, true);
+  }
 };

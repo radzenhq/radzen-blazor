@@ -17,6 +17,11 @@ namespace Radzen.Blazor
         /// <value>The appointment move event callback.</value>
         EventCallback<SchedulerAppointmentMoveEventArgs> AppointmentMove { get; set; }
         /// <summary>
+        /// Gets or sets the appointment resize event callback.
+        /// </summary>
+        /// <value>The appointment resize event callback.</value>
+        EventCallback<SchedulerAppointmentResizeEventArgs> AppointmentResize { get; set; }
+        /// <summary>
         /// Gets the appointments in the specified range.
         /// </summary>
         /// <param name="start">The start of the range.</param>
@@ -121,12 +126,24 @@ namespace Radzen.Blazor
         bool HasAppointmentMoveDelegate();
 
         /// <summary>
+        /// Returns true if the scheduler has an AppointmentResize listener.
+        /// </summary>
+        bool HasAppointmentResizeDelegate();
+
+        /// <summary>
         /// Notifies the scheduler that the user has moved the mouse out of the specified appointment.
         /// </summary>
         /// <param name="reference"></param>
         /// <param name="data"></param>
         /// <returns></returns>
         Task MouseLeaveAppointment(ElementReference reference, AppointmentData data);
+
+        /// <summary>
+        /// Notifies the scheduler that the user has resized an appointment.
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        Task ResizeAppointment(SchedulerAppointmentResizeEventArgs args);
         /// <summary>
         /// Reloads this instance.
         /// </summary>

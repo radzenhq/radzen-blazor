@@ -29,9 +29,15 @@
 
     foreach (var appointment in Layout())
     {
+        var canResizeNorth = StartDate <= appointment.Appointment.Start;
+        var canResizeSouth = EndDate >= appointment.Appointment.End;
+
+        @* Only Day, Multiday and Week views will allow resizing and only if Appointment Starts and Ends are within StartDate and EndDate *@
         <Appointment Data=@(appointment.Appointment) Top=@appointment.Top Left=@appointment.Left Width=@appointment.Width Height=@appointment.Height Click=@OnAppointmentSelect
                 CssClass="@(CurrentDate.Date >= appointment.Start.Date && CurrentDate.Date <= appointment.End.Date && object.Equals(Appointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),appointment.Appointment) ? " rz-state-focused" : "" )"
-                DragStart=@OnAppointmentDragStart />
+                DragStart=@OnAppointmentDragStart
+                CanResizeNorth="@(canResizeNorth)"
+                CanResizeSouth="@(canResizeSouth)" />
     }
 }
 </div>

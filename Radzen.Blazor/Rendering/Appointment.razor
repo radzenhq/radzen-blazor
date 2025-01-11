@@ -1,22 +1,68 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
+@using System.Globalization
 
-    <div @ref=@element class="@($"{"rz-event"} {CssClass}".Trim())" draggable=@DraggableAttribute style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave @ondrag=@OnDragStart ondragstart=@OnDragStartAttribute>
-        <div class="rz-event-content" title=@Title @attributes=@Attributes>
-            @if (ShowAppointmentContent)
-            {
-                @Scheduler.RenderAppointment(Data)
-            }
-        </div>
+@inject IJSRuntime JSRuntime
+@inject TooltipService TooltipService
+
+@* These classes are to style the handles for the resize operation. Not sure how you guys do this now with all the theming and such. So I'll just park it here and I'll leave it with you :) *@
+
+<style type="text/css">
+    .resizer {
+    width: 100%;
+    height: 6px;
+    left: 0;
+    background-color: transparent;
+    position: absolute;
+    cursor: row-resize;
+    }
+
+    .resizer-south {
+    bottom: -1px;
+    }
+
+    .resizer-north {
+    top: -1px;
+    }
+</style>
+
+@* Added id in order to reference from JavaScript *@
+
+<div @ref=@element id="@UniqueId" class="@($"{"rz-event"} {CssClass}".Trim())" draggable=@DraggableAttribute style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave @ondrag=@OnDragStart ondragstart=@OnDragStartAttribute>
+    @* The CanResize properties are internal and used to indicate whether to show the resize elements. We don't want them (yet?) for the Month and Year views. Only Day View sets it to true 
+       and only if the Start (North) or End (South) are within the CurrentDate
+    *@
+    @if (Scheduler?.HasAppointmentResizeDelegate() ?? false)
+    {
+        if (CanResizeNorth)
+        {
+            <div class="resizer resizer-north" @onmousedown=@((args) => OnResizeMouseDown(args, "north")) />
+        }
+        if (CanResizeSouth)
+        {
+            <div class="resizer resizer-south" @onmousedown=@((args) => OnResizeMouseDown(args, "south")) />
+        }
+    }
+    <div class="rz-event-content" title=@Title @attributes=@Attributes>
+        @if (ShowAppointmentContent)
+        {
+            @Scheduler.RenderAppointment(Data)
+        }
     </div>
+</div>
 @code {
     private ElementReference element;
 
     private string Title => Scheduler.HasMouseEnterAppointmentDelegate() ? null : Data?.Text;
 
-    private string DraggableAttribute => Scheduler?.HasAppointmentMoveDelegate() == true ? "true" : null;
+    @* Changed this to a normal property that is set in OnParametersAsync and elsewhere. 
+    We need to disable dragging when a resize is in operation, so this is set along with new property AppointmentResizing to achieve this. *@
+    private string DraggableAttribute { get; set; }
 
     private string OnDragStartAttribute => Scheduler?.HasAppointmentMoveDelegate() == true ? "event.dataTransfer.setData('', event.target.id)" : null;
+
+    private bool AppointmentResizing { get; set; }
 
     [Parameter]
     public string CssClass { get; set; }
@@ -47,13 +93,27 @@
     [Parameter]
     public bool ShowAppointmentContent { get; set; } = true;
 
+    [Parameter]
+    public bool CanResizeNorth { get; set; } = false;
+
+    [Parameter]
+    public bool CanResizeSouth { get; set; } = false;
+
     [CascadingParameter]
     public IScheduler Scheduler { get; set; }
 
     string Style { get; set; }
 
+    @* UniqueId for JavaScript to identify <div> *@
+    private string UniqueId { get; set; }
+
+    protected override void OnInitialized()
+    {
+        UniqueId = Guid.NewGuid().ToString();
+    }
     protected override void OnParametersSet()
     {
+        DraggableAttribute = Scheduler?.HasAppointmentMoveDelegate() == true && !AppointmentResizing ? "true" : null;
         Attributes = Scheduler.GetAppointmentAttributes(Data);
 
         var style = new List<string>();
@@ -99,5 +159,53 @@
     public async Task OnDragStart(DragEventArgs args)
     {
         await DragStart.InvokeAsync(Data);
+    }
+
+    @* Initialtes the Resize operation *@
+    async Task OnResizeMouseDown(MouseEventArgs args, string direction)
+    {        
+        @* Disable dragging while we are resizing *@
+        AppointmentResizing = true;
+        DraggableAttribute = Scheduler?.HasAppointmentMoveDelegate() == true && !AppointmentResizing ? "true" : null;
+
+        @* Setup and call into JavaScript *@
+        var reference = DotNetObjectReference.Create(this);
+
+        await JSRuntime.InvokeAsync<string>("Radzen.startResizeAppointment", reference, UniqueId, direction);
+    }
+
+    @* This is the callback from JavaScript when the resize operation ends *@
+    [JSInvokable("EndResize")]
+    public async Task OnResize(string dateTime, string direction)
+    {
+        var dateTimeParsed = DateTime.Parse(dateTime);
+
+        @* Re-enable dragging *@
+        AppointmentResizing = false;
+        DraggableAttribute = Scheduler?.HasAppointmentMoveDelegate() == true && !AppointmentResizing ? "true" : null;
+
+        @* Initiate Resize EventCallback with parameters dependant on direction of resize *@
+        if (direction == "south")
+        {
+            await Scheduler.ResizeAppointment(new SchedulerAppointmentResizeEventArgs { Appointment = Data, Start = Data.Start, End = dateTimeParsed });
+        }
+        else
+        {
+            await Scheduler.ResizeAppointment(new SchedulerAppointmentResizeEventArgs { Appointment = Data, Start = dateTimeParsed, End = Data.End });
+        }
+
+        TooltipService.Close();
+    }
+
+    @* This is the callback from JavaScript when the resize changes slot *@
+    [JSInvokable("ResizeShowTooltip")]
+    public async Task ShowTooltip( string dateTime, string direction)
+    {
+        var dateTimeParsed = DateTime.Parse(dateTime);
+
+        string time = dateTimeParsed.ToString("hh:mm tt", CultureInfo.InvariantCulture);
+        string prefix = direction == "south" ? "End at" : "Start at";
+        var toolPos = direction == "south" ? TooltipPosition.Bottom : TooltipPosition.Top;
+        TooltipService.Open(element, $"{prefix} {time}", new TooltipOptions() { Position = toolPos });
     }
 }
