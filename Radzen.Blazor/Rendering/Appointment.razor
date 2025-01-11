@@ -9,7 +9,7 @@
 @* These classes are to style the handles for the resize operation. Not sure how you guys do this now with all the theming and such. So I'll just park it here and I'll leave it with you :) *@
 
 <style type="text/css">
-    .resizer {
+    .rz-appointment-resize {
     width: 100%;
     height: 6px;
     left: 0;
@@ -18,11 +18,11 @@
     cursor: row-resize;
     }
 
-    .resizer-south {
+    .rz-appointment-resize-south {
     bottom: -1px;
     }
 
-    .resizer-north {
+    .rz-appointment-resize-north {
     top: -1px;
     }
 </style>
@@ -37,11 +37,11 @@
     {
         if (CanResizeNorth)
         {
-            <div class="resizer resizer-north" @onmousedown=@((args) => OnResizeMouseDown(args, "north")) />
+            <div class="rz-appointment-resize rz-appointment-resize-north" @onmousedown=@((args) => OnResizeMouseDown(args, "north")) />
         }
         if (CanResizeSouth)
         {
-            <div class="resizer resizer-south" @onmousedown=@((args) => OnResizeMouseDown(args, "south")) />
+            <div class="rz-appointment-resize rz-appointment-resize-south" @onmousedown=@((args) => OnResizeMouseDown(args, "south")) />
         }
     }
     <div class="rz-event-content" title=@Title @attributes=@Attributes>
