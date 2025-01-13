@@ -29,12 +29,24 @@ namespace Radzen.Blazor
         [Parameter]
         public string IconColor { get; set; }
 
+        bool _selected;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is selected.
         /// </summary>
         /// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Selected { get; set; }
+        public bool Selected 
+        {
+            get
+            {
+                return _selected;
+            }
+            set
+            {
+                _selected = value;
+                selected = value;
+            }
+        }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is disabled.
