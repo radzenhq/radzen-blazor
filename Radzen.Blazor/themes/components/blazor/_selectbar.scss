@@ -12,6 +12,14 @@ $selectbar-sizes: xs, sm, md, lg;
   box-sizing: border-box;
   display: inline-flex;
 
+  &.rz-selectbutton-horizontal {
+      flex-direction: row;
+  }
+
+  &.rz-selectbutton-vertical {
+      flex-direction: column;
+  }
+
   .rz-button {
     &:focus-visible {
       z-index: 1;
@@ -19,30 +27,58 @@ $selectbar-sizes: xs, sm, md, lg;
   }
 }
 
-@each $size in $selectbar-sizes {  //.rz-selectbutton .rz-button.rz-button-md
-  .rz-selectbutton .rz-button.rz-button-#{$size} {
-    margin-inline-start: -1px;
-    display: inline-block;
-    background-color: var(--rz-selectbar-background-color);
-    color: var(--rz-selectbar-color);
-    border: var(--rz-selectbar-border);
-    border-radius: 0;
-
-    &:first-child {
-      margin-inline-start: 0;
-      border-start-start-radius: var(--rz-selectbar-border-radius);
-      border-end-start-radius: var(--rz-selectbar-border-radius);
+@each $size in $selectbar-sizes {
+  .rz-selectbutton {
+    .rz-button.rz-button-#{$size} {
+      display: inline-block;
+      background-color: var(--rz-selectbar-background-color);
+      color: var(--rz-selectbar-color);
+      border: var(--rz-selectbar-border);
+      border-radius: 0;
+    
+      &.rz-state-active {
+        background-color: var(--rz-selectbar-selected-background-color);
+        color: var(--rz-selectbar-selected-color);
+        border: var(--rz-selectbar-selected-border);
+      }
     }
 
-    &:last-child {
-      border-start-end-radius: var(--rz-selectbar-border-radius);
-      border-end-end-radius: var(--rz-selectbar-border-radius);
+    &.rz-selectbutton-horizontal {
+      .rz-button.rz-button-#{$size} {
+        &:first-child {
+          border-start-start-radius: var(--rz-selectbar-border-radius);
+          border-end-start-radius: var(--rz-selectbar-border-radius);
+        }
+
+        &:not(:first-child) {
+          border-inline-start: none;
+        }
+      
+        &:last-child {
+          border-start-end-radius: var(--rz-selectbar-border-radius);
+          border-end-end-radius: var(--rz-selectbar-border-radius);
+        }
+      }
     }
 
-    &.rz-state-active {
-      background-color: var(--rz-selectbar-selected-background-color);
-      color: var(--rz-selectbar-selected-color);
-      border: var(--rz-selectbar-selected-border);
+    &.rz-selectbutton-vertical {
+      .rz-button.rz-button-#{$size} {
+        text-align: center;
+
+        &:first-child {
+          border-top-left-radius: var(--rz-selectbar-border-radius);
+          border-top-right-radius: var(--rz-selectbar-border-radius);
+        }
+
+        &:not(:first-child) {
+          border-top: none;
+        }
+      
+        &:last-child {
+          border-bottom-left-radius: var(--rz-selectbar-border-radius);
+          border-bottom-right-radius: var(--rz-selectbar-border-radius);
+        }
+      }
     }
   }
 }

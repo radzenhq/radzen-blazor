@@ -1474,6 +1474,7 @@ namespace RadzenBlazorDemos
                 {
                     Name = "SelectBar",
                     Path = "selectbar",
+                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor SelectBar component.",
                     Icon = "&#xf8e8",
                     Tags = new [] { "form", "edit" }
