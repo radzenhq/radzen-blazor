@@ -28,6 +28,8 @@ namespace Radzen.Blazor.Tests
                 throw new NotImplementedException();
             }
 
+            public bool Disabled { get; set; }
+
             public object Value { get; set; }
         }
 

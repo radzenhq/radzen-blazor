@@ -3405,6 +3405,11 @@ namespace Radzen
         /// Sets the focus.
         /// </summary>
         ValueTask FocusAsync();
+
+        /// <summary>
+        /// Sets the Disabled state of the component
+        /// </summary>
+        bool Disabled { get; set; }
     }
 
     /// <summary>
