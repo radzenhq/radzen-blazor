@@ -1,0 +1,30 @@
+﻿<RadzenCard>
+    <RadzenButton Text="Collpse all" Click="@(args => items.ForEach(i => i.Selected = false) )" />
+    <RadzenButton Text="Expand all" Click="@(args => items.ForEach(i => i.Selected = true) )" />
+</RadzenCard>
+<div class="rz-p-sm-12">
+    <RadzenAccordion Multiple="true">
+        <Items>
+            @foreach (var item in items)
+            {
+                <RadzenAccordionItem Text="@item.Text" @bind-Selected=@item.Selected>
+                    Details for @(item.Text)
+                </RadzenAccordionItem>
+            }
+        </Items>
+    </RadzenAccordion>
+</div>
+@code {
+    List<MyItem> items = Enumerable.Range(0, 5).Select(i => 
+        new MyItem() 
+        { 
+            Text =  $"Item{i}", 
+            Selected = i == 0 ? true : false 
+        }).ToList();
+
+    class MyItem
+    { 
+        public string Text { get; set; }
+        public bool Selected { get; set; }
+    }
+}
