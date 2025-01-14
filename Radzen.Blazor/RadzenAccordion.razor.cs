@@ -180,7 +180,7 @@ namespace Radzen.Blazor
                 await Expand.InvokeAsync(itemIndex);
             }
 
-            item.SetSelected(value ?? !selected);
+            await item.SetSelected(value ?? !selected);
 
             if (!Multiple)
             {
@@ -198,7 +198,7 @@ namespace Radzen.Blazor
                 {
                     if (i.GetSelected())
                     {
-                        i.SetSelected(false);
+                        await i.SetSelected(false);
                         await Collapse.InvokeAsync(items.IndexOf(i));
                     }
                 }

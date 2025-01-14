@@ -49,7 +49,7 @@ AppointmentMove=@OnAppointmentMove >
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
 
-    async Task NumberOfDaysChange()
+    void NumberOfDaysChange()
     {
         StateHasChanged();
     }

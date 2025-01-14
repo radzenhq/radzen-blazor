@@ -292,7 +292,7 @@ namespace Radzen.Blazor.Tests
                 return obj.Text.GetHashCode();
             }
 
-            public bool Equals(object x, object y)
+            public new bool Equals(object x, object y)
             {
                 return Equals((DataItem)x, (DataItem)y);
             }

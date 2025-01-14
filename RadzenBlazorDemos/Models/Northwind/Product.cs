@@ -33,7 +33,7 @@ namespace RadzenBlazorDemos.Models.Northwind
         return (obj.ProductName != null ? obj.ProductName.GetHashCode() : 0);
       }
 
-      public bool Equals(object x, object y)
+      public new bool Equals(object x, object y)
       {
         return Equals((Product)x, (Product)y);
       }
