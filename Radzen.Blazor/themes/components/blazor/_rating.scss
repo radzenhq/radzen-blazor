@@ -46,7 +46,8 @@ $rating-ban-icon-color: $rating-color !default;
     opacity: var(--rz-rating-opacity);
 
     &:before {
-      content: "star_border";
+      content: "star";
+      font-variation-settings: "FILL" 0;
     }
   }
 
@@ -55,34 +56,19 @@ $rating-ban-icon-color: $rating-color !default;
 
     &:before {
       content: "star";
+      font-variation-settings: "FILL" 1;
     }
   }
 
   &:not(.rz-state-disabled):not(.rz-state-readonly) {
 
-    a:hover {
+    a:hover, a:focus-visible {
       cursor: pointer;
 
       .rzi-star,
       .rzi-star-o,
       .rzi-ban {
-        color: var(--rz-rating-selected-color);
-      }
-
-      .rzi-star-o:before {
-        content: "star";
-      }
-    }
-
-    a:focus-visible {
-      .rzi-star,
-      .rzi-star-o,
-      .rzi-ban {
         color: var(--rz-rating-focus-color);
-      }
-
-      .rzi-star-o:before {
-        content: "star";
       }
     }
   }
