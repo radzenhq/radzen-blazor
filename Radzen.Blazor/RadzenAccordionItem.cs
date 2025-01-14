@@ -29,7 +29,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string IconColor { get; set; }
 
-        bool _selected;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is selected.
         /// </summary>
@@ -39,14 +38,20 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _selected;
+                return selected != null ? selected.Value : false;
             }
             set
             {
-                _selected = value;
                 selected = value;
             }
         }
+
+        /// <summary>
+        /// Gets or sets the value changed.
+        /// </summary>
+        /// <value>The value changed.</value>
+        [Parameter]
+        public EventCallback<bool> SelectedChanged { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is disabled.
@@ -151,9 +156,11 @@ namespace Radzen.Blazor
             return selected ?? Selected;
         }
 
-        internal void SetSelected(bool? value)
+        internal async Task SetSelected(bool? value)
         {
             selected = value;
+
+            await SelectedChanged.InvokeAsync(Selected);
         }
 
         /// <summary>
@@ -163,12 +170,19 @@ namespace Radzen.Blazor
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            bool shouldRefresh = false;
             if (parameters.DidParameterChange(nameof(Selected), Selected))
             {
-                Accordion?.SelectItem(this, parameters.GetValueOrDefault<bool>(nameof(Selected)));
+                selected = parameters.GetValueOrDefault<bool>(nameof(Selected));
+                shouldRefresh = true;
             }
 
             await base.SetParametersAsync(parameters);
+
+            if (shouldRefresh)
+            {
+                Accordion.Refresh();
+            }
         }
 
         /// <summary>
