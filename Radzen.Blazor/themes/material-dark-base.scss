@@ -866,6 +866,7 @@ $slider-disabled-handle-background-color: $slider-disabled-range-background-colo
 // Rating
 $rating-color: var(--rz-text-secondary-color) !default;
 $rating-opacity: 1 !default;
+$rating-focus-color: var(--rz-primary-light) !default;
 $rating-selected-color: var(--rz-primary) !default;
 $rating-disabled-color: var(--rz-text-disabled-color) !default;
 $rating-disabled-opacity: 0.5 !default;

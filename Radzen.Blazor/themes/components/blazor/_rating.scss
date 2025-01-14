@@ -71,5 +71,10 @@ $rating-ban-icon-color: $rating-color !default;
         color: var(--rz-rating-focus-color);
       }
     }
+
+    a:focus-visible > span {
+      outline: var(--rz-outline-focus);
+      border-radius: var(--rz-border-radius)
+    }
   }
 }
