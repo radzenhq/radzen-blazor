@@ -1,0 +1,31 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Set the first item as selected" Click="@(args => selectedItem = customers.FirstOrDefault())" />
+</div>
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenAutoComplete @bind-Value=@companyName @bind-SelectedItem=@selectedItem
+                        Data=@customers TextProperty="@nameof(Customer.CompanyName)"
+                        Style="width: 13rem" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Company Name" }})" />
+    <RadzenText TextStyle="TextStyle.Body2">
+        Start typing e.g. France
+        @((MarkupString)(selectedItem != null ? $", CustomerID is: <strong>{((Customer)selectedItem).CustomerID}</strong>" : ""))
+        @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))
+    </RadzenText>
+</div>
+
+@code {
+    string companyName;
+    object selectedItem;
+
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+    }
+}
