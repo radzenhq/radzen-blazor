@@ -187,7 +187,6 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the side dialog.</param>
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T"/></param>
         /// <param name="options">The side dialog options.</param>
-        /// <returns>A task that completes when the dialog is closed or a new one opened</returns>
         public void OpenSide<T>(string title, Dictionary<string, object> parameters = null, SideDialogOptions options = null)
             where T : ComponentBase
         {
