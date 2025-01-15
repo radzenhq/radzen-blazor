@@ -206,6 +206,24 @@ namespace Radzen.Blazor
         public EventCallback<SchedulerMonthSelectEventArgs> MonthSelect { get; set; }
 
         /// <summary>
+        /// A callback that will be invoked when the user clicks a month header button.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments MonthSelect=@OnMonthSelect&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        /// void OnMonthSelect(SchedulerTodaySelectEventArgs args)
+        /// {
+        ///     args.Month = DateTime.Month.AddMonth(1);
+        /// }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<SchedulerDaySelectEventArgs> DaySelect { get; set; }
+
+        /// <summary>
         /// A callback that will be invoked when the user clicks an appointment in the current view. Commonly used to edit existing appointments.
         /// </summary>
         /// <example>
@@ -392,6 +410,12 @@ namespace Radzen.Blazor
         public async Task SelectMonth(DateTime monthStart, IEnumerable<AppointmentData> appointments)
         {
             await MonthSelect.InvokeAsync(new SchedulerMonthSelectEventArgs { MonthStart = monthStart, Appointments = appointments, View = SelectedView });
+        }
+
+        /// <inheritdoc />
+        public async Task SelectDay(DateTime day, IEnumerable<AppointmentData> appointments)
+        {
+            await DaySelect.InvokeAsync(new SchedulerDaySelectEventArgs { Day = day, Appointments = appointments, View = SelectedView });
         }
 
         /// <inheritdoc />
