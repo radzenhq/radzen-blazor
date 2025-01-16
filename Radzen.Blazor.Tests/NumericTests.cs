@@ -538,6 +538,44 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Numeric_Supports_ValueStringEsCLCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "12,50";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.GetCultureInfo("es-CL"))
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_ValueStringEnUSCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "12.50";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest}\"", component.Markup);
+        }
+
+        [Fact]
         public void Numeric_Supports_IComparable()
         {
             using var ctx = new TestContext();
