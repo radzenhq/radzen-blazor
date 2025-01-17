@@ -1228,7 +1228,7 @@ window.Radzen = {
         }
 
         var closestLink = e.target.closest && (e.target.closest('.rz-link') || e.target.closest('.rz-navigation-item-link'));
-        if (e.type == 'resize' || closestLink && closestLink.closest && closestLink.closest('a')) {
+        if (e.type == 'resize' && !/Android/i.test(navigator.userAgent) || closestLink && closestLink.closest && closestLink.closest('a')) {
             if (Radzen.closeAllPopups) {
                 Radzen.closeAllPopups();
             }
