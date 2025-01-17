@@ -463,10 +463,11 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var value = new Dollars(11m);
-            Dollars? ConvertFunc(string s) => decimal.TryParse(s, out var val) ? new Dollars(val) : null;
+            Dollars? ConvertFunc(string s) => decimal.TryParse(s, System.Globalization.CultureInfo.InvariantCulture, out var val) ? new Dollars(val) : null;
             var component = ctx.RenderComponent<RadzenNumeric<Dollars?>>(
                 ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.ConvertValue), (Func<string, Dollars?>)ConvertFunc),
-                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.Value), value)
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.Value), value),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
             );
 
             component.Render();
@@ -494,7 +495,101 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
+            Assert.Contains($" value=\"{valueToTest.ToString(format, System.Globalization.CultureInfo.CurrentCulture)}\"", component.Markup);
+        }
+        [Fact]
+        public void Numeric_Supports_TypeConverterWithCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = new Dollars(100.234m);
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest.ToString(format, System.Globalization.CultureInfo.InvariantCulture)}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_EmptyString()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"0.00\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_ValueString()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "12.50";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_ValueStringEsCLCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "12,50";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.GetCultureInfo("es-CL"))
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_ValueStringEnUSCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "12.50";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest}\"", component.Markup);
         }
 
         [Fact]
