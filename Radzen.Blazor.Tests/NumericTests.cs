@@ -490,13 +490,30 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenNumeric<Dollars>>(
                 ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Value), valueToTest)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest.ToString(format, System.Globalization.CultureInfo.CurrentCulture)}\"", component.Markup);
+        }
+        [Fact]
+        public void Numeric_Supports_TypeConverterWithCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = new Dollars(100.234m);
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Format), format),
                 ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Value), valueToTest),
                 ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
             );
 
             component.Render();
 
-            Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
+            Assert.Contains($" value=\"{valueToTest.ToString(format, System.Globalization.CultureInfo.InvariantCulture)}\"", component.Markup);
         }
 
         [Fact]
