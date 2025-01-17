@@ -9,7 +9,7 @@
     @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
     {
         var loopDay = day;
-        <div class="rz-slot-header" style="cursor: pointer;" @onclick=@(args => OnDayClick(@loopDay))>
+        <div class="rz-slot-header" @onclick=@(args => OnDayClick(@loopDay))>
             @day.ToString(HeaderFormat, Scheduler.Culture)
         </div>
     }
@@ -81,7 +81,9 @@
 
     async Task OnDayClick(DateTime day)
     {
-        await Scheduler.SelectDay(day, AppointmentsInSlot(day.StartOfDay(), day.EndOfDay()));
+        var dayStart = day.Date.Add(StartTime);
+        var dayEnd = day.Date.Add(EndTime);
+        await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd));
     }
 
     IDictionary<string, object> Attributes(DateTime date)

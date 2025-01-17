@@ -54,25 +54,5 @@ namespace Radzen.Blazor.Rendering
         {
             return date.StartOfWeek().AddDays(6);
         }
-
-        /// <summary>
-        /// Start of the day.
-        /// </summary>
-        /// <param name="date">The date.</param>
-        /// <returns>DateTime.</returns>
-        public static DateTime StartOfDay(this DateTime date)
-        {
-            return date.Date;
-        }
-
-        /// <summary>
-        /// End of the day.
-        /// </summary>
-        /// <param name="date">The date.</param>
-        /// <returns>DateTime.</returns>
-        public static DateTime EndOfDay(this DateTime date)
-        {
-            return date.AddHours(23).AddMinutes(59).AddSeconds(59);
-        }
     }
 }

@@ -34,10 +34,9 @@
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
 
-    async Task OnDaySelect(SchedulerDaySelectEventArgs args)
+    void OnDaySelect(SchedulerDaySelectEventArgs args)
     {
         console.Log($"DaySelect: Day={args.Day} AppointmentCount={args.Appointments.Count()}");
-        await Task.CompletedTask;
     }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)

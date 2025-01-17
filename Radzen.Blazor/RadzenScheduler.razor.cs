@@ -206,16 +206,16 @@ namespace Radzen.Blazor
         public EventCallback<SchedulerMonthSelectEventArgs> MonthSelect { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user clicks a month header button.
+        /// A callback that will be invoked when the user clicks a day header button or the day number in a MonthView.
         /// </summary>
         /// <example>
         /// <code>
-        /// &lt;RadzenScheduler Data=@appointments MonthSelect=@OnMonthSelect&gt;
+        /// &lt;RadzenScheduler Data=@appointments MonthSelect=@OnDaySelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
         /// void OnMonthSelect(SchedulerTodaySelectEventArgs args)
         /// {
-        ///     args.Month = DateTime.Month.AddMonth(1);
+        ///     args.Day = DateTime.Date();
         /// }
         /// }
         /// </code>

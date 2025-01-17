@@ -82,7 +82,7 @@
             {
                 var dayOfWeek = StartDate.AddDays(days++);
                 <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
-                    <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" style="cursor: pointer;" @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation>
+                    <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation>
                         @dayOfWeek.Day
                     </div>
                 </div>
@@ -127,7 +127,7 @@
 
     async Task OnDayClick(DateTime day)
     {
-        await Scheduler.SelectDay(day, AppointmentsInSlot(day.StartOfDay(), day.EndOfDay()));
+        await Scheduler.SelectDay(day, AppointmentsInSlot(day.Date, day.Date.AddHours(23).AddMinutes(59).AddSeconds(59)));
     }
 
     double DetermineTop(HashSet<double> existingTops)
