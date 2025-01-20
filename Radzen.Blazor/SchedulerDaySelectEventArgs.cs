@@ -5,12 +5,12 @@ using Radzen.Blazor;
 namespace Radzen
 {
     /// <summary>
-    /// Supplies information about a <see cref="RadzenScheduler{TItem}.MonthSelect" /> event that is being raised.
+    /// Supplies information about a <see cref="RadzenScheduler{TItem}.DaySelect" /> event that is being raised.
     /// </summary>
     public class SchedulerDaySelectEventArgs
     {
         /// <summary>
-        /// Monthg start date. You can change this value to navigate to a different date.
+        /// Selected date.
         /// </summary>
         public DateTime Day { get; set; }
         /// <summary>

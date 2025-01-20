@@ -195,9 +195,9 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments MonthSelect=@OnMonthSelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        /// void OnMonthSelect(SchedulerTodaySelectEventArgs args)
+        /// void OnMonthSelect(SchedulerMonthSelectEventArgs args)
         /// {
-        ///     args.Month = DateTime.Month.AddMonth(1);
+        ///     var selectedMonth = args.MonthStart.Month;
         /// }
         /// }
         /// </code>
@@ -210,12 +210,12 @@ namespace Radzen.Blazor
         /// </summary>
         /// <example>
         /// <code>
-        /// &lt;RadzenScheduler Data=@appointments MonthSelect=@OnDaySelect&gt;
+        /// &lt;RadzenScheduler Data=@appointments DaySelect=@OnDaySelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        /// void OnMonthSelect(SchedulerTodaySelectEventArgs args)
+        /// void OnDaySelect(SchedulerDaySelectEventArgs args)
         /// {
-        ///     args.Day = DateTime.Date();
+        ///     var selectedDay = args.Day;
         /// }
         /// }
         /// </code>
