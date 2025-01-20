@@ -351,6 +351,11 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
+            if (parameters.DidParameterChange(nameof(Value), Value))
+            {
+                Value = parameters.GetValueOrDefault<object>(nameof(Value));
+            }
+
             if (shouldClose && !firstRender)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
