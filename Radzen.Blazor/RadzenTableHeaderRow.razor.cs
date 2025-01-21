@@ -6,44 +6,38 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenTableRow component.
     /// </summary>
-    public partial class RadzenTableRow : RadzenComponentWithChildren
+    public partial class RadzenTableHeaderRow : RadzenComponentWithChildren
     {
-        /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            return "rz-data-row";
-        }
-
-        RadzenTableBody _body;
+        RadzenTableHeader _header;
 
         /// <summary>
         /// Gets or sets the table body.
         /// </summary>
         /// <value>The table body.</value>
         [CascadingParameter]
-        public RadzenTableBody Body
+        public RadzenTableHeader Header
         {
             get
             {
-                return _body;
+                return _header;
             }
             set
             {
-                if (_body != value)
+                if (_header != value)
                 {
-                    _body = value;
-                    _body.AddRow(this);
+                    _header = value;
+                    _header.AddRow(this);
                 }
             }
         }
 
-        List<RadzenTableCell> cells = new List<RadzenTableCell>();
+        List<RadzenTableHeaderCell> cells = new List<RadzenTableHeaderCell>();
 
         /// <summary>
         /// Adds the cell.
         /// </summary>
         /// <param name="cell">The cell.</param>
-        public void AddCell(RadzenTableCell cell)
+        public void AddCell(RadzenTableHeaderCell cell)
         {
             if (cells.IndexOf(cell) == -1)
             {
@@ -56,7 +50,7 @@ namespace Radzen.Blazor
         /// Removes the cell.
         /// </summary>
         /// <param name="cell">The cell.</param>
-        public void RemoveCell(RadzenTableCell cell)
+        public void RemoveCell(RadzenTableHeaderCell cell)
         {
             if (cells.IndexOf(cell) != -1)
             {

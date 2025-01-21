@@ -11,8 +11,8 @@
 </RadzenCard>
 
 <RadzenTable GridLines="@gridLines" AllowAlternatingRows="@allowAlternatingRows">
-    <thead>
-        <RadzenTableRow>
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
             @for (var i = 0; i < cols; i++)
             {
                 var col = i;
@@ -20,9 +20,9 @@
                     @($"Column {col}")
                 </RadzenTableHeaderCell>
             }
-        </RadzenTableRow>
-    </thead>
-    <tbody>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
     @for (var i = 0; i < rows; i++)
     {
         var row = i;
@@ -36,7 +36,7 @@
             }
         </RadzenTableRow>
     }
-    </tbody>
+    </RadzenTableBody>
 </RadzenTable>
 @code{
     Radzen.DataGridGridLines gridLines = Radzen.DataGridGridLines.Default;
