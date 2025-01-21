@@ -1105,6 +1105,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Table",
+                    Description = "Blazor RadzenTable component is used to create a HTML table with rows and cells.",
+                    Path = "table",
+                    Icon = "&#xf101",
+                    Tags = new [] { "table", "cells", "row", "grid" }
+                },
+                new Example
+                {
                     Name = "Dialog",
                     Description = "Demonstration and configuration of the Blazor RadzenDialog component.",
                     Path = "dialog",
