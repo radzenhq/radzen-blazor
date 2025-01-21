@@ -24,6 +24,20 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenTable : RadzenComponentWithChildren
     {
+        /// <summary>
+        /// Gets or sets the grid lines.
+        /// </summary>
+        /// <value>The grid lines.</value>
+        [Parameter]
+        public DataGridGridLines GridLines { get; set; } = DataGridGridLines.Default;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether RadzenTable should use alternating row styles.
+        /// </summary>
+        /// <value><c>true</c> if RadzenTable is using alternating row styles; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowAlternatingRows { get; set; } = true;
+
         List<RadzenTableRow> rows = new List<RadzenTableRow>();
 
         /// <summary>
@@ -55,7 +69,19 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-grid-table";
+            var styles = new List<string>(new string[] { "rz-grid-table" });
+
+            if (AllowAlternatingRows)
+            {
+                styles.Add("rz-grid-table-striped");
+            }
+
+            if (GridLines != DataGridGridLines.Default)
+            { 
+                styles.Add($"rz-grid-gridlines-{Enum.GetName(typeof(DataGridGridLines), GridLines).ToLower()}");
+            }
+
+            return string.Join(" ", styles);
         }
     }
 }

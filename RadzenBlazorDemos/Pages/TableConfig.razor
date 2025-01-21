@@ -1,14 +1,28 @@
-﻿
-<RadzenTable>
-    <RadzenTableRow>
-        @for (var i = 0; i < cols; i++)
-        {
-            var col = i;
-            <RadzenTableHeaderCell>
-                @($"Column {col}")
-            </RadzenTableHeaderCell>
-        }
-    </RadzenTableRow>
+﻿<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenCheckBox @bind-Value=@allowAlternatingRows Name="CheckBox1" TValue="bool" />
+        <RadzenLabel Text="Allow alternating rows" Component="CheckBox1" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin-top:20px">
+        <div>GridLines:</div>
+        <RadzenSelectBar @bind-Value="@gridLines" TextProperty="Text" ValueProperty="Value"
+        Data="@(Enum.GetValues(typeof(Radzen.DataGridGridLines)).Cast<Radzen.DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenTable GridLines="@gridLines" AllowAlternatingRows="@allowAlternatingRows">
+    <thead>
+        <RadzenTableRow>
+            @for (var i = 0; i < cols; i++)
+            {
+                var col = i;
+                <RadzenTableHeaderCell>
+                    @($"Column {col}")
+                </RadzenTableHeaderCell>
+            }
+        </RadzenTableRow>
+    </thead>
+    <tbody>
     @for (var i = 0; i < rows; i++)
     {
         var row = i;
@@ -22,8 +36,12 @@
             }
         </RadzenTableRow>
     }
+    </tbody>
 </RadzenTable>
 @code{
+    Radzen.DataGridGridLines gridLines = Radzen.DataGridGridLines.Default;
+    bool allowAlternatingRows = true;
+
     int rows = 10;
     int cols = 10;
 }
