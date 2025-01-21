@@ -94,37 +94,15 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor AutoComplete component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to the component.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Down arrow" /></span></td>
-                    <td><span class="rz-cell-data">Focus the next AutoComplete list item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Up arrow" /></span></td>
-                    <td><span class="rz-cell-data">Focus the previous AutoComplete list item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /></span></td>
-                    <td><span class="rz-cell-data">Select the focused AutoComplete list item and close the AutoComplete popup.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Esc" /></span></td>
-                    <td><span class="rz-cell-data">Close the opened AutoComplete popup.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to the component." },
+        new KeyboardShortcut { Key = "DownArrow", Action = "Focus the next AutoComplete list item." },
+        new KeyboardShortcut { Key = "UpArrow", Action = "Focus the previous AutoComplete list item." },
+        new KeyboardShortcut { Key = "Enter", Action = "Select the focused AutoComplete list item and close the AutoComplete popup." },
+        new KeyboardShortcut { Key = "Esc", Action = "Close the opened AutoComplete popup." }
+    };
+}

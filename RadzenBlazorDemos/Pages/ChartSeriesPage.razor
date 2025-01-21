@@ -56,29 +56,13 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Chart component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate forward across Chart legend items.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Shift" /> + <RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate backward across Chart legend items.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> or <RadzenBadge Text="Space" /></span></td>
-                    <td><span class="rz-cell-data">Show/hide the focused Chart legend item serie.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate forward across Chart legend items." },
+        new KeyboardShortcut { Key = "Shift + Tab", Action = "Navigate backward across Chart legend items." },
+        new KeyboardShortcut { Key = "Enter or Space", Action = "Show/hide the focused Chart legend item serie." }
+    };
+}

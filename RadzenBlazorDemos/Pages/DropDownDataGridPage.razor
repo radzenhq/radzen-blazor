@@ -107,57 +107,20 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor DropDownDataGrid component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a DropDownDataGrid.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Alt" /> + <RadzenBadge Text="Down arrow" /></span></td>
-                    <td><span class="rz-cell-data">Open DropDownDataGrid popup.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Down Arrow" /> on closed popup</span></td>
-                    <td><span class="rz-cell-data">Select next DropDownDataGrid item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Up Arrow" /> on closed popup</span></td>
-                    <td><span class="rz-cell-data">Select previous DropDownDataGrid item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Down Arrow" /> in an opened popup</span></td>
-                    <td><span class="rz-cell-data">Focus next DropDownDataGrid item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Up Arrow" /> in an opened popup</span></td>
-                    <td><span class="rz-cell-data">Focus previous DropDownDataGrid item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Left Arrow" /> in an opened popup</span></td>
-                    <td><span class="rz-cell-data">Goes to previous DropDownDataGrid page.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Right Arrow" /> in an opened popup</span></td>
-                    <td><span class="rz-cell-data">Goes to next DropDownDataGrid page.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> in an opened popup</span></td>
-                    <td><span class="rz-cell-data">Select the focused DropDownDataGrid item and close the popup.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Esc" /> or <RadzenBadge Text="Alt" /> + <RadzenBadge Text="Down arrow" /> in an opened popup</span></td>
-                    <td><span class="rz-cell-data">Close the DropDownDataGrid popup.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DropDownDataGrid." },
+        new KeyboardShortcut { Key = "Alt + DownArrow", Action = "Open DropDownDataGrid popup." },
+        new KeyboardShortcut { Key = "DownArrow on closed popup", Action = "Select next DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "UpArrow on closed popup", Action = "Select previous DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "DownArrow in an opened popup", Action = "Focus next DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "UpArrow in an opened popup", Action = "Focus previous DropDownDataGrid item." },
+        new KeyboardShortcut { Key = "LeftArrow in an opened popup", Action = "Goes to previous DropDownDataGrid page." },
+        new KeyboardShortcut { Key = "RightArrow in an opened popup", Action = "Goes to next DropDownDataGrid page." },
+        new KeyboardShortcut { Key = "Enter in an opened popup", Action = "Select the focused DropDownDataGrid item and close the popup." },
+        new KeyboardShortcut { Key = "Esc or Alt + DownArrow in an opened popup", Action = "Close the DropDownDataGrid popup." }
+    };
+}
