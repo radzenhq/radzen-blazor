@@ -41,7 +41,15 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            var styles = new List<string>(new string[] { "rz-grid-table" });
+            return "rz-data-grid rz-datatable rz-datatable-scrollable";
+        }
+
+        /// <summary>
+        /// Gets the table CSS classes.
+        /// </summary>
+        protected virtual string GetTableCssClass()
+        {
+            var styles = new List<string>(new string[] { "rz-grid-table", "rz-grid-table-fixed" });
 
             if (AllowAlternatingRows)
             {
@@ -49,7 +57,7 @@ namespace Radzen.Blazor
             }
 
             if (GridLines != DataGridGridLines.Default)
-            { 
+            {
                 styles.Add($"rz-grid-gridlines-{Enum.GetName(typeof(DataGridGridLines), GridLines).ToLower()}");
             }
 

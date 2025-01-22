@@ -1,26 +1,22 @@
 ﻿@using System.Linq.Dynamic.Core
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <RadzenTable class="rz-grid-table">
-            <RadzenTableHeader>
-                <RadzenTableHeaderRow>
-                    <RadzenTableHeaderCell style="padding: var(--rz-grid-cell-padding)">Press this key</RadzenTableHeaderCell>
-                    <RadzenTableHeaderCell style="padding: var(--rz-grid-cell-padding)">To do this</RadzenTableHeaderCell>
-                </RadzenTableHeaderRow>
-            </RadzenTableHeader>
-            <RadzenTableBody>
-                @foreach (var item in Data)
-                {
-                    <RadzenTableRow>
-                        <RadzenTableCell><span class="rz-cell-data">@GetString(item.Key)</span></RadzenTableCell>
-                        <RadzenTableCell><span class="rz-cell-data">@item.Action</span></RadzenTableCell>
-                    </RadzenTableRow>
-                }
-            </RadzenTableBody>
-        </RadzenTable>
-    </div>
-</div>
+<RadzenTable>
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell>Press this key</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>To do this</RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        @foreach (var item in Data)
+        {
+            <RadzenTableRow>
+                <RadzenTableCell>@GetString(item.Key)</RadzenTableCell>
+                <RadzenTableCell>@item.Action</RadzenTableCell>
+            </RadzenTableRow>
+        }
+    </RadzenTableBody>
+</RadzenTable>
 
 
 @code {

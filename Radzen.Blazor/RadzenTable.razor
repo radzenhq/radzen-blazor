@@ -1,9 +1,13 @@
 ﻿@inherits RadzenComponentWithChildren
 @if (Visible)
 {
-    <table @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
-        <CascadingValue Value=this>
-            @ChildContent
-        </CascadingValue>
-    </table>
+    <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <div class="rz-data-grid-data">
+            <table class="@GetTableCssClass()">
+                <CascadingValue Value=this>
+                    @ChildContent
+                </CascadingValue>
+            </table>
+        </div>
+    </div>
 }
