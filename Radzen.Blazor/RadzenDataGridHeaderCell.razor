@@ -355,7 +355,7 @@ else
 
     bool IsAdvancedNumeric()
     {
-        return Grid.FilterMode == FilterMode.Advanced &&
+        return (Column.FilterMode ?? Grid.FilterMode) == FilterMode.Advanced &&
             PropertyAccess.IsNumeric(Column.FilterPropertyType) &&
                 !(PropertyAccess.IsEnum(Column.FilterPropertyType) || PropertyAccess.IsNullableEnum(Column.FilterPropertyType));
     }
