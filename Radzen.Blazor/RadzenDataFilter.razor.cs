@@ -277,6 +277,13 @@ namespace Radzen.Blazor
         public string IsNotEmptyText { get; set; } = "Is not empty";
 
         /// <summary>
+        /// Gets or sets the custom filter operator text.
+        /// </summary>
+        /// <value>The custom filter operator text.</value>
+        [Parameter]
+        public string CustomText { get; set; } = "Custom";
+
+        /// <summary>
         /// Gets or sets a value indicating whether the columns can be filtered.
         /// </summary>
         /// <value><c>true</c> if columns can be filtered; otherwise, <c>false</c>.</value>

@@ -1318,6 +1318,8 @@ namespace Radzen.Blazor
         {
             switch (filterOperator)
             {
+                case FilterOperator.Custom:
+                    return Grid?.CustomText;
                 case FilterOperator.Contains:
                     return Grid?.ContainsText;
                 case FilterOperator.DoesNotContain:

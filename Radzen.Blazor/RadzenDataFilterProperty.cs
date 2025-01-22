@@ -347,6 +347,8 @@ namespace Radzen.Blazor
         {
             switch (filterOperator)
             {
+                case FilterOperator.Custom:
+                    return DataFilter?.CustomText;
                 case FilterOperator.Contains:
                     return DataFilter?.ContainsText;
                 case FilterOperator.DoesNotContain:

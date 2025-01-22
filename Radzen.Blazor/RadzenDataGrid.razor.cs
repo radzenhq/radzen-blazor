@@ -1302,6 +1302,13 @@ namespace Radzen.Blazor
         [Parameter]
         public string IsNotEmptyText { get; set; } = "Is not empty";
 
+        /// <summary>
+        /// Gets or sets the custom filter operator text.
+        /// </summary>
+        /// <value>The custom filter operator text.</value>
+        [Parameter]
+        public string CustomText { get; set; } = "Custom";
+
         internal class NumericFilterEventCallback
         {
             public static EventCallback<T> Create<T>(object receiver, Action<T> action)
