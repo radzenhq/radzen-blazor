@@ -16,81 +16,78 @@
 <RadzenExample Example="BorderRadius">
     <BorderRadius />
 </RadzenExample>
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable rz-mt-12" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Border-radius value</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">CSS class</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">CSS variable</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data">theme specific</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">0</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-0</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-0</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">0.25rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-1</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-1</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">0.5rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-2</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-2</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">0.75rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-3</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-3</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">1rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-4</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-4</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">1.25rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-5</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-5</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">1.5rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-6</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-6</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">1.75rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-7</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-7</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">2rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-8</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-8</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">2.25rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-9</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-9</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data">2.5rem</span></td>
-                    <td><span class="rz-cell-data">.rz-border-radius-10</span></td>
-                    <td><span class="rz-cell-data">--rz-border-radius-10</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+
+<RadzenTable>
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell>Border-radius value</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>CSS class</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>CSS variable</RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        <RadzenTableRow>
+            <RadzenTableCell>theme specific</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>0</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-0</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-0</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>0.25rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-1</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-1</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>0.5rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-2</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-2</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>0.75rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-3</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-3</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>1rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-4</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-4</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>1.25rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-5</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-5</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>1.5rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-6</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-6</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>1.75rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-7</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-7</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>2rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-8</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-8</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>2.25rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-9</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-9</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>2.5rem</RadzenTableCell>
+            <RadzenTableCell>.rz-border-radius-10</RadzenTableCell>
+            <RadzenTableCell>--rz-border-radius-10</RadzenTableCell>
+        </RadzenTableRow>
+    </RadzenTableBody>
+</RadzenTable>
 
 <RadzenText Anchor="borders#add-remove-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Add or remove borders arbitrarily

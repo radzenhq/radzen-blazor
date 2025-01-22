@@ -93,71 +93,67 @@ The Radzen HtmlEditor supports the following tools:
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor HTMLEditor component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)" colspan="2">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)" rowspan="2">To do this</th>
-                </tr>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Windows, Chrome OS</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">Mac</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a HTMLEditor component.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="A" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="A" /></span></td>
-                    <td><span class="rz-cell-data">Select all text.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="C" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="C" /></span></td>
-                    <td><span class="rz-cell-data">Copy.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="V" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="V" /></span></td>
-                    <td><span class="rz-cell-data">Paste.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="B" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="B" /></span></td>
-                    <td><span class="rz-cell-data">Bold.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="I" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="I" /></span></td>
-                    <td><span class="rz-cell-data">Italic.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="U" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="U" /></span></td>
-                    <td><span class="rz-cell-data">Underline.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="K" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="K" /></span></td>
-                    <td><span class="rz-cell-data">Insert or edit a link.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="Z" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="Z" /></span></td>
-                    <td><span class="rz-cell-data">Undo.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="Shift" /> + <RadzenBadge Text="Z" /></span></td>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="⌘" /> + <RadzenBadge Text="Shift" /> + <RadzenBadge Text="Z" /></span></td>
-                    <td><span class="rz-cell-data">Redo.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<RadzenTable>
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell colspan="2">Press this key</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell rowspan="2">To do this</RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell>Windows, Chrome OS</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>Mac</RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Tab" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="Tab" /></RadzenTableCell>
+            <RadzenTableCell>Navigate to a HTMLEditor component.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="A" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="A" /></RadzenTableCell>
+            <RadzenTableCell>Select all text.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="C" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="C" /></RadzenTableCell>
+            <RadzenTableCell>Copy.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="V" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="V" /></RadzenTableCell>
+            <RadzenTableCell>Paste.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="B" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="B" /></RadzenTableCell>
+            <RadzenTableCell>Bold.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="I" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="I" /></RadzenTableCell>
+            <RadzenTableCell>Italic.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="U" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="U" /></RadzenTableCell>
+            <RadzenTableCell>Underline.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="K" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="K" /></RadzenTableCell>
+            <RadzenTableCell>Insert or edit a link.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="Z" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="Z" /></RadzenTableCell>
+            <RadzenTableCell>Undo.</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell><RadzenBadge Text="Ctrl" /> + <RadzenBadge Text="Shift" /> + <RadzenBadge Text="Z" /></RadzenTableCell>
+            <RadzenTableCell><RadzenBadge Text="⌘" /> + <RadzenBadge Text="Shift" /> + <RadzenBadge Text="Z" /></RadzenTableCell>
+            <RadzenTableCell>Redo.</RadzenTableCell>
+        </RadzenTableRow>
+    </RadzenTableBody>
+</RadzenTable>
