@@ -13,35 +13,54 @@
 <RadzenTable GridLines="@gridLines" AllowAlternatingRows="@allowAlternatingRows">
     <RadzenTableHeader>
         <RadzenTableHeaderRow>
-            @for (var i = 0; i < cols; i++)
-            {
-                var col = i;
-                <RadzenTableHeaderCell>
-                    @($"Column {col}")
-                </RadzenTableHeaderCell>
-            }
+            <RadzenTableHeaderCell>
+                Column 1
+            </RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>
+                Column 2
+            </RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>
+                Column 3
+            </RadzenTableHeaderCell>
         </RadzenTableHeaderRow>
     </RadzenTableHeader>
     <RadzenTableBody>
-    @for (var i = 0; i < rows; i++)
-    {
-        var row = i;
         <RadzenTableRow>
-            @for (var j = 0; j < cols; j++)
-            {
-                var cell = j;
-                <RadzenTableCell>
-                    @($"Cell {row}{cell}")
-                </RadzenTableCell>
-            }
+            <RadzenTableCell>
+                Cell 0 1
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 0 2
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 0 3
+            </RadzenTableCell>
         </RadzenTableRow>
-    }
+        <RadzenTableRow>
+            <RadzenTableCell>
+                Cell 1 1
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 1 2
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 1 3
+            </RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>
+                Cell 2 1
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 2 2
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 2 3
+            </RadzenTableCell>
+        </RadzenTableRow>
     </RadzenTableBody>
 </RadzenTable>
 @code{
     Radzen.DataGridGridLines gridLines = Radzen.DataGridGridLines.Default;
     bool allowAlternatingRows = true;
-
-    int rows = 10;
-    int cols = 10;
 }

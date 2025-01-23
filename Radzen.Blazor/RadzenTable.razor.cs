@@ -31,7 +31,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-data-grid rz-datatable rz-datatable-scrollable";
+            return $"rz-data-grid rz-datatable rz-datatable-scrollable {(CurrentStyle.ContainsKey("height") ? "rz-has-height" : "")}".Trim();
         }
 
         /// <summary>
