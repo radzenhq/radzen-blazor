@@ -12,16 +12,6 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenTable component.
     /// </summary>
-    /// <example>
-    /// <code>
-    /// &lt;RadzenTable&gt;
-    ///     &lt;RadzenTableRow&gt;
-    ///         &lt;RadzenTableCell&gt;
-    ///         &lt;/RadzenTableCell&gt;
-    ///     &lt;/RadzenTableRow&gt;
-    /// &lt;/RadzenTable&gt;
-    /// </code>
-    /// </example>
     public partial class RadzenTable : RadzenComponentWithChildren
     {
         /// <summary>
