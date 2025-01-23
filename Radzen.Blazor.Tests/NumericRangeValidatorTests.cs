@@ -29,6 +29,8 @@ namespace Radzen.Blazor.Tests
             }
 
             public bool Disabled { get; set; }
+            public bool Visible { get; set; }
+            public IFormFieldContext FormFieldContext => null;
 
             public object Value { get; set; }
         }
