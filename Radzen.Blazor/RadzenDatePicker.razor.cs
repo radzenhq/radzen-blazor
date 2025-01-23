@@ -750,6 +750,9 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Disabled { get; set; }
 
+        /// <summary>
+        /// Gets or sets the FormFieldContext of the component
+        /// </summary>
         public IFormFieldContext FormFieldContext { get; set; } = null;
 
         /// <summary>
