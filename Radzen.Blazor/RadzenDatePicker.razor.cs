@@ -750,6 +750,8 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Disabled { get; set; }
 
+        public IFormFieldContext FormFieldContext { get; set; } = null;
+
         /// <summary>
         /// Gets or sets a value indicating whether days part is shown.
         /// </summary>

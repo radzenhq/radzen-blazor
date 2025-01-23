@@ -3416,6 +3416,16 @@ namespace Radzen
         /// Sets the Disabled state of the component
         /// </summary>
         bool Disabled { get; set; }
+
+        /// <summary>
+        /// Sets the Visible state of the component
+        /// </summary>
+        bool Visible { get; set; }
+
+        /// <summary>
+        /// Sets the FormFieldContext of the component
+        /// </summary>
+        IFormFieldContext FormFieldContext { get; }
     }
 
     /// <summary>
