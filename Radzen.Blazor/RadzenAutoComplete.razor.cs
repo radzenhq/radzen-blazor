@@ -256,7 +256,7 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
-            Value = args.Value;
+            Value = (string)args.Value;
 
             await ValueChanged.InvokeAsync($"{Value}");
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
@@ -269,11 +269,11 @@ namespace Radzen.Blazor
         {
             if (!string.IsNullOrEmpty(TextProperty))
             {
-                Value = PropertyAccess.GetItemOrValueFromProperty(item, TextProperty);
+                Value = (string)PropertyAccess.GetItemOrValueFromProperty(item, TextProperty);
             }
             else
             {
-                Value = item;
+                Value = (string)item;
             }
 
             await ValueChanged.InvokeAsync($"{Value}");
@@ -344,7 +344,7 @@ namespace Radzen.Blazor
             {
                 var item = parameters.GetValueOrDefault<object>(nameof(SelectedItem));
                 if (item != null)
-                { 
+                {
                     await SelectItem(item);
                 }
             }
@@ -353,7 +353,7 @@ namespace Radzen.Blazor
 
             if (parameters.DidParameterChange(nameof(Value), Value))
             {
-                Value = parameters.GetValueOrDefault<object>(nameof(Value));
+                Value = parameters.GetValueOrDefault<string>(nameof(Value));
             }
 
             if (shouldClose && !firstRender)

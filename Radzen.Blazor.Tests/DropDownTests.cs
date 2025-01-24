@@ -123,7 +123,7 @@ namespace Radzen.Blazor.Tests
 
             List<DataItem> boundCollection = [new() { Text = "Item 2" }];
 
-            var component = DropDown<string>(ctx, parameters => {
+            var component = DropDown<List<DataItem>>(ctx, parameters => {
                 parameters.Add(p => p.ItemComparer, new DataItemComparer());
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Value, boundCollection);
