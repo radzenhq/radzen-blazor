@@ -43,7 +43,7 @@
 
     public string GetColumnPropertyExpression(string name, Type type)
     {
-        var expression = $@"it[""{name}""].ToString()";
+        var expression = $@"Convert.ToString(it[""{name}""])";
 
         if (type == typeof(int))
         {

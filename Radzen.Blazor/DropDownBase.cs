@@ -436,7 +436,11 @@ namespace Radzen
 
                 if (type == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
                 {
-                    type = query.FirstOrDefault().GetType();
+                    var firstElement = query.Cast<object>().FirstOrDefault(i => i != null);
+                    if (firstElement != null)
+                    {
+                        type = firstElement.GetType();
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(ValueProperty))
@@ -1141,7 +1145,11 @@ namespace Radzen
 
                     if (elementType == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
                     {
-                        elementType = query.FirstOrDefault().GetType();
+                        var firstElement = query.Cast<object>().FirstOrDefault(i => i != null);
+                        if (firstElement != null)
+                        {
+                            elementType = firstElement.GetType();
+                        }
                     }
 
                     if (elementType != null)
@@ -1221,7 +1229,7 @@ namespace Radzen
                 }
                 else
                 {
-                    selectedItems = selectedItems.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"!object.Equals(it.{ValueProperty},@0)", value).ToHashSet(ItemComparer);
+                    selectedItems = selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), value)).ToHashSet(ItemComparer);
                 }
             }
             else
@@ -1282,7 +1290,7 @@ namespace Radzen
                                     item = view.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", v).FirstOrDefault();
                                 }
 
-                                if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"object.Equals(it.{ValueProperty},@0)", v).Any())
+                                if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())
                                 {
                                     selectedItems.Add(item);
                                 }

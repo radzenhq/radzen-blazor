@@ -1276,12 +1276,21 @@ namespace Radzen
 
                 if (!string.IsNullOrEmpty(property))
                 {
-                    query.Add($@"({property} == null ? """" : {property})");
+                    if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
+                    {
+                        query.Add($@"({property} == null ? """" : Convert.ToString({property}))");
+                    }
+                    else
+                    {
+                        query.Add($@"({property} == null ? """" : {property})");
+                    }
                 }
-
-                if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
+                else
                 {
-                    query.Add("ToString()");
+                    if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
+                    {
+                        query.Add("Convert.ToString(it)");
+                    }
                 }
 
                 if (ignoreCase)

@@ -284,7 +284,8 @@ else
                 query = query.Take(loadDataArgs.Top.Value);
             }
 
-            filterValues = query.Select("it => it.ToString() == string.Empty ? null : it");
+            filterValues = propertyType == typeof(string) ?
+                query.Select("it => it == string.Empty ? null : it") : query;
 
             if (!Column.AllowCheckBoxListVirtualization)
             {
