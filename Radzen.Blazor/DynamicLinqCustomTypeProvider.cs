@@ -13,6 +13,6 @@ namespace Radzen.Blazor
         public Dictionary<Type, List<MethodInfo>> GetExtensionMethods() => new Dictionary<Type, List<MethodInfo>>();
         public Type ResolveType(string typeName) => throw new NotSupportedException();
         public Type ResolveTypeBySimpleName(string simpleTypeName) => throw new NotSupportedException();
-        public static ParsingConfig ParsingConfig = new() { CustomTypeProvider = new DynamicLinqCustomTypeProvider() };
+        public static ParsingConfig ParsingConfig = new() { CustomTypeProvider = new DynamicLinqCustomTypeProvider(), AllowEqualsAndToStringMethodsOnObject = true };
     }
 }
