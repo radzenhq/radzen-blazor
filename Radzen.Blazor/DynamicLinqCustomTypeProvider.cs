@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Radzen.Blazor
 {
-    class DynamicLinqCustomTypeProvider : IDynamicLinkCustomTypeProvider
+    class DynamicLinqCustomTypeProvider : IDynamicLinqCustomTypeProvider
     {
         static readonly HashSet<Type> empty = [];
         public HashSet<Type> GetCustomTypes() => empty;
