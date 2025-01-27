@@ -95,7 +95,7 @@
             </div>
             <div class="rz-slots">
                 <div @attributes=@Attributes(realstart, "rz-slot", false)>
-                    <div class="rz-slot-header" style="cursor: pointer;" @onclick=@(args => OnMonthClick(startMonth))>
+                    <div class="rz-slot-header" @onclick=@(args => OnMonthClick(startMonth))>
                         @realstart.ToString("MMM", Scheduler.Culture)
                     </div>
                 </div>
@@ -126,7 +126,7 @@
                     }
                 }
                 <div @attributes=@Attributes(realstart, "rz-slot", false)>
-                    <div class="rz-slot-header" style="cursor: pointer;" @onclick=@(args => OnMonthClick(startMonth))>
+                    <div class="rz-slot-header" @onclick=@(args => OnMonthClick(startMonth))>
                         @realstart.ToString("MMM", Scheduler.Culture)
                     </div>
                 </div>

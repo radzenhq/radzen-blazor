@@ -8,7 +8,8 @@
         <div class="rz-slot-hour-header"></div>
     @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
     {
-        <div class="rz-slot-header">
+        var loopDay = day;
+        <div class="rz-slot-header" @onclick=@(args => OnDayClick(@loopDay))>
             @day.ToString(HeaderFormat, Scheduler.Culture)
         </div>
     }
@@ -76,6 +77,13 @@
     async Task OnSlotClick(DateTime date)
     {
         await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)));
+    }
+
+    async Task OnDayClick(DateTime day)
+    {
+        var dayStart = day.Date.Add(StartTime);
+        var dayEnd = day.Date.Add(EndTime);
+        await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd));
     }
 
     IDictionary<string, object> Attributes(DateTime date)

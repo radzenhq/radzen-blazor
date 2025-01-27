@@ -195,15 +195,33 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments MonthSelect=@OnMonthSelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        /// void OnMonthSelect(SchedulerTodaySelectEventArgs args)
+        /// void OnMonthSelect(SchedulerMonthSelectEventArgs args)
         /// {
-        ///     args.Month = DateTime.Month.AddMonth(1);
+        ///     var selectedMonth = args.MonthStart.Month;
         /// }
         /// }
         /// </code>
         /// </example>
         [Parameter]
         public EventCallback<SchedulerMonthSelectEventArgs> MonthSelect { get; set; }
+
+        /// <summary>
+        /// A callback that will be invoked when the user clicks a day header button or the day number in a MonthView.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments DaySelect=@OnDaySelect&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        /// void OnDaySelect(SchedulerDaySelectEventArgs args)
+        /// {
+        ///     var selectedDay = args.Day;
+        /// }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<SchedulerDaySelectEventArgs> DaySelect { get; set; }
 
         /// <summary>
         /// A callback that will be invoked when the user clicks an appointment in the current view. Commonly used to edit existing appointments.
@@ -392,6 +410,12 @@ namespace Radzen.Blazor
         public async Task SelectMonth(DateTime monthStart, IEnumerable<AppointmentData> appointments)
         {
             await MonthSelect.InvokeAsync(new SchedulerMonthSelectEventArgs { MonthStart = monthStart, Appointments = appointments, View = SelectedView });
+        }
+
+        /// <inheritdoc />
+        public async Task SelectDay(DateTime day, IEnumerable<AppointmentData> appointments)
+        {
+            await DaySelect.InvokeAsync(new SchedulerDaySelectEventArgs { Day = day, Appointments = appointments, View = SelectedView });
         }
 
         /// <inheritdoc />

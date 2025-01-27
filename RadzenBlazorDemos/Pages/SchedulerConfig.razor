@@ -7,7 +7,7 @@
 
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End" ShowHeader=@showHeader
                  TextProperty="Text" SelectedIndex="2"
-    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender
+    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender DaySelect="@OnDaySelect"
     AppointmentMove=@OnAppointmentMove >
     <RadzenDayView />
     <RadzenWeekView />
@@ -33,6 +33,11 @@
         new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
         new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
     };
+
+    void OnDaySelect(SchedulerDaySelectEventArgs args)
+    {
+        console.Log($"DaySelect: Day={args.Day} AppointmentCount={args.Appointments.Count()}");
+    }
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
     {

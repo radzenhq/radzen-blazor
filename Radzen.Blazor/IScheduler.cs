@@ -77,6 +77,12 @@ namespace Radzen.Blazor
         /// <param name="appointments">The appointments for this range.</param>
         Task SelectMonth(DateTime monthStart, IEnumerable<AppointmentData> appointments);
         /// <summary>
+        /// Selects the specified day.
+        /// </summary>
+        /// <param name="day">The selected day.</param>
+        /// <param name="appointments">The appointments for this range.</param>
+        Task SelectDay(DateTime day, IEnumerable<AppointmentData> appointments);
+        /// <summary>
         /// Selects the specified more link.
         /// </summary>
         /// <param name="start">The start.</param>

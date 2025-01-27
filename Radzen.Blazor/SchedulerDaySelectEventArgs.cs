@@ -5,14 +5,14 @@ using Radzen.Blazor;
 namespace Radzen
 {
     /// <summary>
-    /// Supplies information about a <see cref="RadzenScheduler{TItem}.MonthSelect" /> event that is being raised.
+    /// Supplies information about a <see cref="RadzenScheduler{TItem}.DaySelect" /> event that is being raised.
     /// </summary>
-    public class SchedulerMonthSelectEventArgs
+    public class SchedulerDaySelectEventArgs
     {
         /// <summary>
-        /// Month start date.
+        /// Selected date.
         /// </summary>
-        public DateTime MonthStart { get; set; }
+        public DateTime Day { get; set; }
         /// <summary>
         /// List of appointments.
         /// </summary>

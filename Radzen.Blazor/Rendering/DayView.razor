@@ -2,7 +2,7 @@
 @inherits DropableViewBase
 
 <div class="rz-view rz-day-view">
-    <div class="rz-view-header">
+    <div class="rz-view-header" @onclick=@(args => OnDayClick(@StartDate))>
         <div class="rz-slot-hour-header"></div>
         <div class="rz-slot-header">
             @StartDate.ToString("ddd", Scheduler.Culture)
@@ -64,6 +64,13 @@
         await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)));
     }
 
+    async Task OnDayClick(DateTime day)
+    {
+        var dayStart = day.Date.Add(StartTime);
+        var dayEnd = day.Date.Add(EndTime);
+        await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd));
+    }
+
     IDictionary<string, object> Attributes(DateTime date)
     {
         var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot));
@@ -84,7 +91,9 @@
         var updown = key == "ArrowUp" || key == "ArrowDown";
         var leftright = key == "ArrowLeft" || key == "ArrowRight";
 
-        currentAppointments = AppointmentsInSlot(CurrentDate, CurrentDate.AddDays(1));
+        var dayStart = CurrentDate.Date.Add(StartTime);
+        var dayEnd = CurrentDate.Date.Add(EndTime);
+        currentAppointments = AppointmentsInSlot(dayStart, dayEnd);
 
         if (arrow && currentAppointments.Any())
         {
