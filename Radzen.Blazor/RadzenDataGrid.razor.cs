@@ -2209,18 +2209,18 @@ namespace Radzen.Blazor
         /// Called when parameters set asynchronous.
         /// </summary>
         /// <returns>Task.</returns>
-        protected override Task OnParametersSetAsync()
+        protected override async Task OnParametersSetAsync()
         {
             if (Visible && !LoadData.HasDelegate && _view == null)
             {
-                InvokeAsync(Reload);
+                await InvokeAsync(Reload);
             }
             else
             {
                 CalculatePager();
             }
 
-            return Task.CompletedTask;
+            await Task.CompletedTask;
         }
 
         internal Dictionary<RadzenDataGridGroupRow<TItem>, bool> collapsedGroupItems = new Dictionary<RadzenDataGridGroupRow<TItem>, bool>();
