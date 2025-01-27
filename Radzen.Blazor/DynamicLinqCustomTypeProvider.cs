@@ -11,6 +11,7 @@ namespace Radzen.Blazor
         static DynamicLinqCustomTypeProvider()
         {
             System.Linq.Dynamic.Core.ParsingConfig.Default.AllowEqualsAndToStringMethodsOnObject = true;
+            System.Linq.Dynamic.Core.ParsingConfig.Default.RestrictOrderByToPropertyOrField = false;
         }
 
         static readonly HashSet<Type> empty = [];
@@ -18,6 +19,6 @@ namespace Radzen.Blazor
         public Dictionary<Type, List<MethodInfo>> GetExtensionMethods() => new Dictionary<Type, List<MethodInfo>>();
         public Type ResolveType(string typeName) => throw new NotSupportedException();
         public Type ResolveTypeBySimpleName(string simpleTypeName) => throw new NotSupportedException();
-        public static ParsingConfig ParsingConfig = new() { CustomTypeProvider = new DynamicLinqCustomTypeProvider(), AllowEqualsAndToStringMethodsOnObject = true };
+        public static ParsingConfig ParsingConfig = new() { CustomTypeProvider = new DynamicLinqCustomTypeProvider(), AllowEqualsAndToStringMethodsOnObject = true, RestrictOrderByToPropertyOrField = false };
     }
 }
