@@ -44,6 +44,10 @@ $switch-focus-outline-offset: var(--rz-outline-offset) !default;
   cursor: initial;
 }
 
+.rz-switch-circle.rz-readonly {
+  cursor: initial;
+}
+
 .rz-switch .rz-switch-circle {
   background: var(--rz-switch-background-color);
   transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s;

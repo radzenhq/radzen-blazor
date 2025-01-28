@@ -8,6 +8,6 @@
     <div class="rz-helper-hidden-accessible">
             <input type="checkbox" name="@Name" id="@Name" checked="@Value" value="@ValueAsString" tabindex="-1" aria-checked="@(Value.ToString().ToLowerInvariant())" @attributes=@InputAttributes>
     </div>
-    <span class="rz-switch-circle@(Disabled ? " rz-disabled" : "")"></span>
+    <span class="rz-switch-circle@(Disabled ? " rz-disabled" : ReadOnly ? " rz-readonly" : "")"></span>
 </div>
 }
