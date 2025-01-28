@@ -43,98 +43,100 @@
                    class="rz-timespanpicker-popup-container">
         <div class="rz-timespanpicker-panel"
              @onkeydown="@PopupKeyDown" @onmousedown:stopPropagation>
-            <RadzenSelectBar TValue="bool" Visible="@_canBeEitherPositiveOrNegative"
-                                Orientation="Orientation.Vertical" Size="ButtonSize.Small"
-                                Value="@_isUnconfirmedValueNegative"
-                                ValueChanged="@UpdateSign">
-                <Items>
-                    <RadzenSelectBarItem Text="@PositiveButtonLabel" Value="false" />
-                    <RadzenSelectBarItem Text="@NegativeButtonLabel" Value="true" />
-                </Items>
-            </RadzenSelectBar>
+             <div class="rz-timespanpicker-panel-fieldcontainer">
+                <RadzenSelectBar TValue="bool" Visible="@_canBeEitherPositiveOrNegative"
+                                    Orientation="Orientation.Vertical" Size="ButtonSize.Small"
+                                    Value="@_isUnconfirmedValueNegative"
+                                    ValueChanged="@UpdateSign">
+                    <Items>
+                        <RadzenSelectBarItem Text="@PositiveButtonLabel" Value="false" />
+                        <RadzenSelectBarItem Text="@NegativeButtonLabel" Value="true" />
+                    </Items>
+                </RadzenSelectBar>
 
-            @if (_canBeEitherPositiveOrNegative is false)
-            {
-                <div class="rz-sign">
-                    <span>@(_isUnconfirmedValueNegative ? NegativeValueText : PositiveValueText)</span>
-                </div>
-            }
-            @if (FieldPrecision >= TimeSpanUnit.Day && TimeFieldsMaxValues[TimeSpanUnit.Day] > 0)
-            {
-                <div class="rz-timespanpicker-panel-fieldwithunit">
-                    <label for="@($"{UniqueID}-d")" class="rz-unit">@DaysUnitText</label>
-                    <RadzenNumeric TValue="int" Name="@($"{UniqueID}-d")"
-                                   Value="@Math.Abs(UnconfirmedValue.Days)"
-                                   Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Day]" Step="@DaysStep"
-                                   Disabled="@Disabled" ReadOnly="@ReadOnly"
-                                   class="rz-timespanpicker-days"
-                                   Change="@UpdateDays" />
-                </div>
-            }
-            @if (FieldPrecision >= TimeSpanUnit.Hour && TimeFieldsMaxValues[TimeSpanUnit.Hour] > 0)
-            {
-                <div class="rz-timespanpicker-panel-fieldwithunit">
-                    <label for="@($"{UniqueID}-h")" class="rz-unit">@HoursUnitText</label>
-                    <RadzenNumeric TValue="int" Name="@($"{UniqueID}-h")"
-                                   Value="@Math.Abs(UnconfirmedValue.Hours)"
-                                   Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Hour]" Step="@HoursStep"
-                                   Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
-                                   class="rz-timespanpicker-hours"
-                                   Change="@UpdateHours" />
-                </div>
-            }
-            @if (FieldPrecision >= TimeSpanUnit.Minute && TimeFieldsMaxValues[TimeSpanUnit.Minute] > 0)
-            {
-                <div class="rz-timespanpicker-panel-fieldwithunit">
-                    <label for="@($"{UniqueID}-m")" class="rz-unit">@MinutesUnitText</label>
-                    <RadzenNumeric TValue="int" Name="@($"{UniqueID}-m")"
-                                   Value="@Math.Abs(UnconfirmedValue.Minutes)"
-                                   Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Minute]" Step="@MinutesStep"
-                                   Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
-                                   class="rz-timespanpicker-minutes"
-                                   Change="@UpdateMinutes" />
-                </div>
-            }
-            @if (FieldPrecision >= TimeSpanUnit.Second && TimeFieldsMaxValues[TimeSpanUnit.Second] > 0)
-            {
-                <div class="rz-timespanpicker-panel-fieldwithunit">
-                    <label for="@($"{UniqueID}-s")" class="rz-unit">@SecondsUnitText</label>
-                    <RadzenNumeric TValue="int" Name="@($"{UniqueID}-s")"
-                                   Value="@Math.Abs(UnconfirmedValue.Seconds)"
-                                   Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Second]" Step="@SecondsStep"
-                                   Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
-                                   class="rz-timespanpicker-seconds"
-                                   Change="@UpdateSeconds" />
-                </div>
-            }
-            @if (FieldPrecision >= TimeSpanUnit.Millisecond && TimeFieldsMaxValues[TimeSpanUnit.Millisecond] > 0)
-            {
-                <div class="rz-timespanpicker-panel-fieldwithunit">
-                    <label for="@($"{UniqueID}-ms")" class="rz-unit">@MillisecondsUnitText</label>
-                    <RadzenNumeric TValue="int" Name="@($"{UniqueID}-ms")"
-                                   Value="@Math.Abs(UnconfirmedValue.Milliseconds)"
-                                   Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Millisecond]" Step="@MillisecondsStep"
-                                   Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
-                                   class="rz-timespanpicker-milliseconds"
-                                   Change="@UpdateMilliseconds" />
-                </div>
-            }
-            @{
-                #if NET7_0_OR_GREATER
-                if (FieldPrecision >= TimeSpanUnit.Microsecond && TimeFieldsMaxValues[TimeSpanUnit.Microsecond] > 0)
+                @if (_canBeEitherPositiveOrNegative is false)
                 {
-                    <div class="rz-timespanpicker-panel-fieldwithunit">
-                        <label for="@($"{UniqueID}-us")" class="rz-unit">@MicrosecondsUnitText</label>
-                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-us")"
-                                       Value="@Math.Abs(UnconfirmedValue.Microseconds)"
-                                       Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Microsecond]" Step="@MicrosecondsStep"
-                                       Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
-                                       class="rz-timespanpicker-microseconds"
-                                       Change="@UpdateMicroseconds" />
+                    <div class="rz-sign">
+                        <span>@(_isUnconfirmedValueNegative ? NegativeValueText : PositiveValueText)</span>
                     </div>
                 }
-                #endif
-            }
+                @if (FieldPrecision >= TimeSpanUnit.Day && TimeFieldsMaxValues[TimeSpanUnit.Day] > 0)
+                {
+                    <div class="rz-timespanpicker-panel-fieldwithunit">
+                        <label for="@($"{UniqueID}-d")" class="rz-unit">@DaysUnitText</label>
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-d")"
+                                       Value="@Math.Abs(UnconfirmedValue.Days)"
+                                       Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Day]" Step="@DaysStep"
+                                       Disabled="@Disabled" ReadOnly="@ReadOnly"
+                                       class="rz-timespanpicker-days"
+                                       Change="@UpdateDays" />
+                    </div>
+                }
+                @if (FieldPrecision >= TimeSpanUnit.Hour && TimeFieldsMaxValues[TimeSpanUnit.Hour] > 0)
+                {
+                    <div class="rz-timespanpicker-panel-fieldwithunit">
+                        <label for="@($"{UniqueID}-h")" class="rz-unit">@HoursUnitText</label>
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-h")"
+                                       Value="@Math.Abs(UnconfirmedValue.Hours)"
+                                       Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Hour]" Step="@HoursStep"
+                                       Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
+                                       class="rz-timespanpicker-hours"
+                                       Change="@UpdateHours" />
+                    </div>
+                }
+                @if (FieldPrecision >= TimeSpanUnit.Minute && TimeFieldsMaxValues[TimeSpanUnit.Minute] > 0)
+                {
+                    <div class="rz-timespanpicker-panel-fieldwithunit">
+                        <label for="@($"{UniqueID}-m")" class="rz-unit">@MinutesUnitText</label>
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-m")"
+                                       Value="@Math.Abs(UnconfirmedValue.Minutes)"
+                                       Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Minute]" Step="@MinutesStep"
+                                       Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
+                                       class="rz-timespanpicker-minutes"
+                                       Change="@UpdateMinutes" />
+                    </div>
+                }
+                @if (FieldPrecision >= TimeSpanUnit.Second && TimeFieldsMaxValues[TimeSpanUnit.Second] > 0)
+                {
+                    <div class="rz-timespanpicker-panel-fieldwithunit">
+                        <label for="@($"{UniqueID}-s")" class="rz-unit">@SecondsUnitText</label>
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-s")"
+                                       Value="@Math.Abs(UnconfirmedValue.Seconds)"
+                                       Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Second]" Step="@SecondsStep"
+                                       Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
+                                       class="rz-timespanpicker-seconds"
+                                       Change="@UpdateSeconds" />
+                    </div>
+                }
+                @if (FieldPrecision >= TimeSpanUnit.Millisecond && TimeFieldsMaxValues[TimeSpanUnit.Millisecond] > 0)
+                {
+                    <div class="rz-timespanpicker-panel-fieldwithunit">
+                        <label for="@($"{UniqueID}-ms")" class="rz-unit">@MillisecondsUnitText</label>
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-ms")"
+                                       Value="@Math.Abs(UnconfirmedValue.Milliseconds)"
+                                       Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Millisecond]" Step="@MillisecondsStep"
+                                       Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
+                                       class="rz-timespanpicker-milliseconds"
+                                       Change="@UpdateMilliseconds" />
+                    </div>
+                }
+                @{
+                    #if NET7_0_OR_GREATER
+                    if (FieldPrecision >= TimeSpanUnit.Microsecond && TimeFieldsMaxValues[TimeSpanUnit.Microsecond] > 0)
+                    {
+                        <div class="rz-timespanpicker-panel-fieldwithunit">
+                            <label for="@($"{UniqueID}-us")" class="rz-unit">@MicrosecondsUnitText</label>
+                            <RadzenNumeric TValue="int" Name="@($"{UniqueID}-us")"
+                                           Value="@Math.Abs(UnconfirmedValue.Microseconds)"
+                                           Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Microsecond]" Step="@MicrosecondsStep"
+                                           Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
+                                           class="rz-timespanpicker-microseconds"
+                                           Change="@UpdateMicroseconds" />
+                        </div>
+                    }
+                    #endif
+                }
+            </div>
 
             @if (ShowConfirmationButton)
             {

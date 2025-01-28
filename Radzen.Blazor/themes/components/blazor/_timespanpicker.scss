@@ -15,7 +15,7 @@ $timespanpicker-panel-padding-block: 0.5rem !default;
 $timespanpicker-panel-padding-inline: 0.5rem !default;
 $timespanpicker-panel-gap: 0.5rem !default;
 $timespanpicker-panel-unit-color: var(--rz-text-color) !default;
-$timespanpicker-panel-unit-gap: 0 0.25rem !default;
+$timespanpicker-panel-unit-gap: 0 !default;
 $timespanpicker-panel-field-min-width: 4rem !default;
 
 .rz-timespanpicker {
@@ -141,14 +141,16 @@ $timespanpicker-panel-field-min-width: 4rem !default;
 }
 
 .rz-timespanpicker-panel {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: center;
-  gap: var(--rz-timespanpicker-panel-gap);
   padding-block: var(--rz-timespanpicker-panel-padding-block);
   padding-inline: var(--rz-timespanpicker-panel-padding-inline);
   color: var(--rz-timespanpicker-panel-text-color);
+}
+
+.rz-timespanpicker-panel, .rz-timespanpicker-panel-fieldcontainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--rz-timespanpicker-panel-gap);
 }
 
 .rz-timespanpicker-panel-fieldwithunit {
@@ -158,6 +160,7 @@ $timespanpicker-panel-field-min-width: 4rem !default;
   align-items: center;
   justify-content: flex-start;
   gap: var(--rz-timespanpicker-panel-unit-gap);
+  width: min-content;
 
   .rz-unit {
     color: var(--rz-timespanpicker-panel-unit-color);
@@ -171,6 +174,6 @@ $timespanpicker-panel-field-min-width: 4rem !default;
 .rz-timespanpicker-milliseconds,
 .rz-timespanpicker-microseconds {
   background-color: var(--rz-timespanpicker-panel-background-color);
-  width: var(--rz-timespanpicker-panel-field-min-width);
+  width: fit-content;
   min-width: var(--rz-timespanpicker-panel-field-min-width);
 }

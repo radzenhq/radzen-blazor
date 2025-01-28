@@ -962,8 +962,16 @@ $timespanpicker-popup-shadow: var(--rz-shadow-4) !default;
 $timespanpicker-panel-padding-block: 0.75rem !default;
 $timespanpicker-panel-padding-inline: 0.75rem !default;
 $timespanpicker-panel-gap: 0.75rem !default;
-$timespanpicker-panel-unit-gap: 0 0.5rem !default;
+$timespanpicker-panel-unit-gap: 0.25rem !default;
 $timespanpicker-panel-field-min-width: 5rem !default;
+
+.rz-timespanpicker-panel {
+  flex-direction: column;
+
+  > .rz-button {
+    align-self: stretch;
+  }
+}
 
 // Numeric
 $numeric-button-background-color: transparent !default;
