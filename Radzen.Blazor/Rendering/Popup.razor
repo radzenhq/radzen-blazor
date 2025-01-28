@@ -1,14 +1,12 @@
 @inherits RadzenComponent
 @using Microsoft.JSInterop
 <div @ref=@Element @onmousedown:preventDefault=@PreventDefault @attributes=@Attributes style=@Style id=@GetId()>
-    @if (open || !Lazy)
+    @if (IsOpen || !Lazy)
     {
         @ChildContent
     }
 </div>
 @code {
-    bool open;
-
     [Parameter]
     public bool Lazy { get; set; }
 
@@ -30,12 +28,14 @@
     [Parameter]
     public EventCallback Close { get; set; }
 
+    public bool IsOpen { get; private set; }
+
     public async Task ToggleAsync(ElementReference target, bool disableSmartPosition = false)
     {
-        open = !open;
+        IsOpen = !IsOpen;
         this.target = target;
 
-        if (open)
+        if (IsOpen)
         {
             await Open.InvokeAsync(null);
             await JSRuntime.InvokeVoidAsync("Radzen.openPopup", target, GetId(), false, null, null, null, Reference, nameof(OnClose), true, AutoFocusFirstElement, disableSmartPosition);
@@ -48,7 +48,7 @@
 
     public async Task CloseAsync(ElementReference target)
     {
-        open = false;
+        IsOpen = false;
         this.target = target;
 
         await CloseAsync();
@@ -59,7 +59,7 @@
     [JSInvokable]
     public async Task OnClose()
     {
-        open = false;
+        IsOpen = false;
 
         await Close.InvokeAsync(null);
     }

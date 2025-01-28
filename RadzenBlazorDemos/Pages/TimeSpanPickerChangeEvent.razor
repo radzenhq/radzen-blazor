@@ -1,0 +1,18 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Time Span" Component="RadzenTimeSpanPickerChangeEvent"/>
+    <RadzenTimeSpanPicker TValue="TimeSpan" Value="@value" ValueChanged="@(args => OnChange(args))" Name="RadzenTimeSpanPickerChangeEvent"/>
+</RadzenStack>
+
+<EventConsole @ref=@console />
+
+@code {
+    TimeSpan value;
+
+    EventConsole console;
+
+    void OnChange(TimeSpan newValue)
+    {
+        value = newValue;
+        console.Log($"Value changed to {newValue}");
+    }
+}

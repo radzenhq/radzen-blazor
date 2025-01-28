@@ -1,0 +1,39 @@
+﻿@inherits RadzenComponent
+
+@if (Inline)
+{
+    @ChildContent
+}
+else {
+    <Popup @ref="@Popup" Attributes="@Attributes"
+            Lazy="@PopupLazy" AutoFocusFirstElement="@PopupAutoFocusFirstElement" PreventDefault="@PopupPreventDefault"
+            Open="@PopupOpen" Close="@PopupClose">
+        @ChildContent
+    </Popup>
+}
+
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Inline { get; set; }
+
+    [Parameter]
+    public bool PopupLazy { get; set; }
+
+    [Parameter]
+    public bool PopupAutoFocusFirstElement { get; set; } = true;
+
+    [Parameter]
+    public bool PopupPreventDefault { get; set; }
+
+    [Parameter]
+    public EventCallback PopupOpen { get; set; }
+
+    [Parameter]
+    public EventCallback PopupClose { get; set; }
+
+    public Popup Popup { get; private set; }
+}
