@@ -1815,12 +1815,12 @@ namespace Radzen.Blazor
                             var firstItem = view.FirstOrDefault();
                             if (firstItem != null)
                             {
-                                view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                                view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, orderBy).Cast<TItem>();
                             }
                         }
                         else
                         {
-                            view = view.OrderBy(orderBy);
+                            view = view.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, orderBy);
                         }
                     }
                 }
