@@ -61,6 +61,11 @@ $timepicker-border: none !default;
 .rz-datepicker {
   display: inline-block;
   position: relative;
+  border-radius: var(--rz-input-border-radius);
+
+  &:has(>.rz-inputtext:not(:disabled):not(.rz-state-disabled):focus) {
+    outline: none; // unify .invalid styles with other forms components
+  }
 
   .rz-readonly {
       cursor: pointer;

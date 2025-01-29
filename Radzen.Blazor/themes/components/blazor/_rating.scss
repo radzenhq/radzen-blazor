@@ -13,6 +13,7 @@ $rating-ban-icon-color: $rating-color !default;
   display: inline-flex;
   font-size: var(--rz-rating-font-size);
   height: 1em;
+  border-radius: var(--rz-border-radius);
 
   &.rz-state-disabled {
     .rzi {
@@ -22,6 +23,7 @@ $rating-ban-icon-color: $rating-color !default;
   }
 
   a {
+    display: inline-flex;
     width: 1em;
     height: 1em;
     text-decoration: none;
