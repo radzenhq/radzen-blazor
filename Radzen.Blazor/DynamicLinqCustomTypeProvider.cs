@@ -8,12 +8,6 @@ namespace Radzen.Blazor
 {
     class DynamicLinqCustomTypeProvider : IDynamicLinqCustomTypeProvider
     {
-        static DynamicLinqCustomTypeProvider()
-        {
-            System.Linq.Dynamic.Core.ParsingConfig.Default.AllowEqualsAndToStringMethodsOnObject = true;
-            System.Linq.Dynamic.Core.ParsingConfig.Default.RestrictOrderByToPropertyOrField = false;
-        }
-
         static readonly HashSet<Type> empty = [];
         public HashSet<Type> GetCustomTypes() => empty;
         public Dictionary<Type, List<MethodInfo>> GetExtensionMethods() => new Dictionary<Type, List<MethodInfo>>();

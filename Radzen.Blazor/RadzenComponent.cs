@@ -12,6 +12,12 @@ namespace Radzen
     /// </summary>
     public class RadzenComponent : ComponentBase, IDisposable
     {
+        static RadzenComponent()
+        {
+            System.Linq.Dynamic.Core.ParsingConfig.Default.AllowEqualsAndToStringMethodsOnObject = true;
+            System.Linq.Dynamic.Core.ParsingConfig.Default.RestrictOrderByToPropertyOrField = false;
+        }
+
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the component.
         /// </summary>
