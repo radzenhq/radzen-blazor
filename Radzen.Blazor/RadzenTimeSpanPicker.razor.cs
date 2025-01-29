@@ -34,7 +34,7 @@ namespace Radzen.Blazor
             get => _value;
             set
             {
-                if (EqualityComparer<object>.Default.Equals(ConfirmedValue, _value))
+                if (EqualityComparer<object>.Default.Equals(value, _value))
                 {
                     return;
                 }
@@ -506,12 +506,13 @@ namespace Radzen.Blazor
         private async Task OnChange()
         {
             await ValueChanged.InvokeAsync(Value);
-            await Change.InvokeAsync(ConfirmedValue);
 
             if (FieldIdentifier.FieldName != null)
             {
                 EditContext?.NotifyFieldChanged(FieldIdentifier);
             }
+
+            await Change.InvokeAsync(ConfirmedValue);
         }
 
         private void ValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
@@ -567,12 +568,13 @@ namespace Radzen.Blazor
 
             ConfirmedValue = null;
             await ValueChanged.InvokeAsync(Value);
-            await Change.InvokeAsync(ConfirmedValue);
 
             if (FieldIdentifier.FieldName != null)
             {
                 EditContext?.NotifyFieldChanged(FieldIdentifier);
             }
+
+            await Change.InvokeAsync(ConfirmedValue);
 
             StateHasChanged();
         }
@@ -608,13 +610,14 @@ namespace Radzen.Blazor
             if (ConfirmedValue != newValue && (newValue != null || nullable))
             {
                 ConfirmedValue = newValue;
-                await ValueChanged.InvokeAsync(Value);
                 await Change.InvokeAsync(ConfirmedValue);
 
                 if (FieldIdentifier.FieldName != null)
                 {
                     EditContext?.NotifyFieldChanged(FieldIdentifier);
                 }
+
+                await ValueChanged.InvokeAsync(Value);
 
                 StateHasChanged();
             }
