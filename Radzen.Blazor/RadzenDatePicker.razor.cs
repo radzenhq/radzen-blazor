@@ -753,6 +753,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the FormFieldContext of the component
         /// </summary>
+        [CascadingParameter]
         public IFormFieldContext FormFieldContext { get; set; } = null;
 
         /// <summary>
@@ -922,6 +923,9 @@ namespace Radzen.Blazor
             return $"{(Inline ? "overflow:auto;" : "")}{(Style != null ? Style : "")}";
         }
 
+        /// <summary> Gets the current placeholder. Returns empty string if this component is inside a RadzenFormField.</summary>
+        protected string CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
+
         /// <summary>
         /// Closes this instance popup.
         /// </summary>
@@ -982,10 +986,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return ClassList.Create()
+            return ClassList.Create("rz-datepicker")
                             .Add("rz-datepicker-inline", Inline)
+                            .AddDisabled(Disabled)
+                            .Add("rz-state-empty", !HasValue)
                             .Add(FieldIdentifier, EditContext)
                             .ToString();
+
         }
 
         private async Task SetDay(DateTime newValue)
@@ -1062,7 +1069,14 @@ namespace Radzen.Blazor
                 shouldClose = !visible;
             }
 
+            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
+
             await base.SetParametersAsync(parameters);
+
+            if (disabledChanged)
+            {
+                FormFieldContext?.DisabledChanged(Disabled);
+            }
 
             if (shouldClose && !firstRender && IsJSRuntimeAvailable)
             {
