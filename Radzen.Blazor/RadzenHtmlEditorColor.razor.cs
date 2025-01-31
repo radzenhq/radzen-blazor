@@ -24,7 +24,7 @@ namespace Radzen.Blazor
         /// Specifies the default text color. Set to <c>"rgb(255, 0, 0)"</c> by default;
         /// </summary>
         [Parameter]
-        public string Value { get; set; } = "rgb(255, 0, 0)";
+        public override string Value { get; set; } = "rgb(255, 0, 0)";
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Text color"</c> by default.
         /// </summary>
