@@ -30,8 +30,8 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the size. Defaulted to 36 (pixels). 
-        /// <value>The size.</value>
-        /// </summary>
+        /// </summary> 
+        /// <value>The size of the image in pixels.</value>
         [Parameter]
         public int Size { get; set; } = 36;
 
