@@ -40,18 +40,19 @@
 </RadzenFieldset>
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
     <RadzenLabel Text="Select Time Span" Component="RadzenTimeSpanPickerBoolConfig" />
-    <RadzenTimeSpanPicker Name="RadzenTimeSpanPickerBoolConfig" @bind-Value="@value" AllowClear="@allowClear" AllowInput="@allowInput" ReadOnly="@readOnly" Disabled="@disabled" ShowPopupButton="@showPopupButton" FieldPrecision="@fieldPrecision" PadTimeValues="@padTimeValues" ShowConfirmationButton="@showConfirmationButton" />
+    <RadzenTimeSpanPicker @bind-Value="@value" AllowClear="@allowClear" AllowInput="@allowInput" ReadOnly="@readOnly" Disabled="@disabled" ShowPopupButton="@showPopupButton" FieldPrecision="@fieldPrecision" PadTimeValues="@padTimeValues" ShowConfirmationButton="@showConfirmationButton" Name="RadzenTimeSpanPickerBoolConfig"  />
 </RadzenStack>
 
 @code {
-    TimeSpan? value;
+    TimeSpan? value = new TimeSpan(1, 12, 30, 0);
 
     bool allowClear = true;
     bool allowInput = true;
     bool readOnly = false;
     bool disabled = false;
-    bool padTimeValues = false;
-    bool showPopupButton = false;
-    bool showConfirmationButton = false;
+    bool showPopupButton = true;
+
     TimeSpanUnit fieldPrecision = TimeSpanUnit.Second;
+    bool padTimeValues = false;
+    bool showConfirmationButton = false;
 }
