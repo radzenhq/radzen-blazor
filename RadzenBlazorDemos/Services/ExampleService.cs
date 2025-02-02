@@ -1550,6 +1550,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "TimeSpanPicker",
+                    Path = "timespanpicker",
+                    New = true,
+                    Description = "Demonstration and configuration of the Radzen Blazor TimeSpanPicker component.",
+                    Icon = "&#xe422",
+                    Tags = new [] { "duration", "form", "edit" }
+                },
+                new Example
+                {
                     Name = "Upload",
                     Description = "Demonstration and configuration of the Radzen Blazor Upload component.",
                     Path = "example-upload",
