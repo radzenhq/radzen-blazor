@@ -6,8 +6,8 @@
 }
 else {
     <Popup @ref="@Popup" Attributes="@Attributes"
-            Lazy="@PopupLazy" AutoFocusFirstElement="@PopupAutoFocusFirstElement" PreventDefault="@PopupPreventDefault"
-            Open="@PopupOpen" Close="@PopupClose">
+           Lazy="@PopupLazy" AutoFocusFirstElement="@PopupAutoFocusFirstElement" PreventDefault="@PopupPreventDefault"
+           Open="@PopupOpen" Close="@PopupClose">
         @ChildContent
     </Popup>
 }
@@ -36,4 +36,14 @@ else {
     public EventCallback PopupClose { get; set; }
 
     public Popup Popup { get; private set; }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Popup?.IsOpen is true && parameters.DidParameterChange(nameof(Inline), Inline) && parameters.GetValueOrDefault<bool>(nameof(Inline)) is true)
+        {
+            await Popup.CloseAsync();
+        }
+
+        await base.SetParametersAsync(parameters);
+    }
 }
