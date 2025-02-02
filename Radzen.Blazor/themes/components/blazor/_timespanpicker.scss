@@ -14,9 +14,10 @@ $timespanpicker-panel-text-color: var(--rz-text-color) !default;
 $timespanpicker-panel-padding-block: 0.5rem !default;
 $timespanpicker-panel-padding-inline: 0.5rem !default;
 $timespanpicker-panel-gap: 0.5rem !default;
-$timespanpicker-panel-unit-color: var(--rz-text-color) !default;
 $timespanpicker-panel-unit-gap: 0 !default;
 $timespanpicker-panel-field-min-width: 4rem !default;
+
+/* input field */
 
 .rz-timespanpicker {
   display: inline-block;
@@ -65,6 +66,10 @@ $timespanpicker-panel-field-min-width: 4rem !default;
         color: var(--rz-input-disabled-placeholder-color);
       }
     }
+  }
+
+  &:not(:has(.rz-timespanpicker-trigger)) .rz-dropdown-clear-icon {
+    inset-inline-end: 0.5rem;
   }
 }
 
@@ -158,13 +163,8 @@ $timespanpicker-panel-field-min-width: 4rem !default;
   flex-flow: column;
   flex-wrap: nowrap;
   align-items: center;
-  justify-content: flex-start;
   gap: var(--rz-timespanpicker-panel-unit-gap);
   width: min-content;
-
-  .rz-unit {
-    color: var(--rz-timespanpicker-panel-unit-color);
-  }
 }
 
 .rz-timespanpicker-days,

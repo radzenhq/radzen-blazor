@@ -102,8 +102,8 @@ namespace Radzen.Blazor
         /// <summary>
         /// Specifies the time span format in the input field.
         /// For more details, see the documentation of
-        /// <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings">standard</a>
-        /// and <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-timespan-format-strings">custom</a>
+        /// <see href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings">standard</see>
+        /// and <see href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/custom-timespan-format-strings">custom</see>
         /// time span format strings.
         /// </summary>
         [Parameter]
@@ -188,7 +188,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if the confirmation button is shown; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool ShowConfirmationButton { get; set; } = true;
+        public bool ShowConfirmationButton { get; set; } = false;
 
         /// <summary>
         /// Specifies whether the time fields in the panel, except for the days field, are padded with leading zeros.
@@ -672,20 +672,12 @@ namespace Radzen.Blazor
 
             if (key == "Enter")
             {
-                _preventKeyPress = true;
-
                 await TogglePopup();
             }
             else if (key == "Escape")
             {
-                _preventKeyPress = false;
-
                 await ClosePopup();
                 await FocusAsync();
-            }
-            else
-            {
-                _preventKeyPress = false;
             }
         }
         #endregion
@@ -704,11 +696,20 @@ namespace Radzen.Blazor
             var key = args.Code ?? args.Key;
             if (key == "Escape")
             {
-                _preventKeyPress = false;
-
                 await ClosePopup();
                 await FocusAsync();
             }
+        }
+
+        private void OnPopupOpen()
+        {
+            ResetUnconfirmedValue();
+            _preventKeyPress = true;
+        }
+        private void OnPopupClose()
+        {
+            ResetUnconfirmedValue();
+            _preventKeyPress = false;
         }
         #endregion
 
