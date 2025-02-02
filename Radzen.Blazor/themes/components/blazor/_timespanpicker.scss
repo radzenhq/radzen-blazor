@@ -118,7 +118,7 @@ $timespanpicker-panel-field-min-width: 4rem !default;
   }
 
   .rzi-timespan:before {
-    content: 'clock_loader_40';
+    content: 'timelapse';
   }
 
   .rz-button-text {
@@ -176,4 +176,8 @@ $timespanpicker-panel-field-min-width: 4rem !default;
   background-color: var(--rz-timespanpicker-panel-background-color);
   width: fit-content;
   min-width: var(--rz-timespanpicker-panel-field-min-width);
+}
+
+.rz-timespanpicker-sign {
+  line-height: var(--rz-input-height);
 }

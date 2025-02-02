@@ -44,24 +44,23 @@
         <div class="rz-timespanpicker-panel"
              @onkeydown="@PopupKeyDown" @onmousedown:stopPropagation>
              <div class="rz-timespanpicker-panel-fieldcontainer">
-                <RadzenSelectBar TValue="bool" Visible="@_canBeEitherPositiveOrNegative"
-                                    Orientation="Orientation.Vertical" Size="ButtonSize.Small"
-                                    Value="@_isUnconfirmedValueNegative"
-                                    ValueChanged="@UpdateSign">
-                    <Items>
-                        <RadzenSelectBarItem Text="@PositiveButtonLabel" Value="false" />
-                        <RadzenSelectBarItem Text="@NegativeButtonLabel" Value="true" />
-                    </Items>
-                </RadzenSelectBar>
-
-                @if (_canBeEitherPositiveOrNegative is false)
+                @if (_canBeEitherPositiveOrNegative && ReadOnly is false)
                 {
+                    <RadzenSelectBar TValue="bool" Value="@_isUnconfirmedValueNegative"
+                                     Orientation="Orientation.Vertical" Size="ButtonSize.Small"
+                                     Disabled="@Disabled"
+                                     ValueChanged="@UpdateSign">
+                        <Items>
+                            <RadzenSelectBarItem Text="@PositiveButtonLabel" Value="false" />
+                            <RadzenSelectBarItem Text="@NegativeButtonLabel" Value="true" />
+                        </Items>
+                    </RadzenSelectBar>
+                }
+                else {
                     var signText = _isUnconfirmedValueNegative ? NegativeValueText : PositiveValueText;
                     if (string.IsNullOrWhiteSpace(signText) is false)
                     {
-                        <div class="rz-timespanpicker-sign">
-                            <span>@signText</span>
-                        </div>
+                        <div class="rz-timespanpicker-sign">@signText</div>
                     }
                 }
                 @if (FieldPrecision >= TimeSpanUnit.Day && TimeFieldsMaxValues[TimeSpanUnit.Day] > 0)
@@ -119,7 +118,7 @@
                         <RadzenNumeric TValue="int" Name="@($"{UniqueID}-ms")"
                                        Value="@Math.Abs(UnconfirmedValue.Milliseconds)"
                                        Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Millisecond]" Step="@MillisecondsStep"
-                                       Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
+                                       Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "000" : null)"
                                        class="rz-timespanpicker-milliseconds"
                                        Change="@UpdateMilliseconds" />
                     </div>
@@ -133,7 +132,7 @@
                             <RadzenNumeric TValue="int" Name="@($"{UniqueID}-us")"
                                            Value="@Math.Abs(UnconfirmedValue.Microseconds)"
                                            Min="0" Max="TimeFieldsMaxValues[TimeSpanUnit.Microsecond]" Step="@MicrosecondsStep"
-                                           Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
+                                           Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "000" : null)"
                                            class="rz-timespanpicker-microseconds"
                                            Change="@UpdateMicroseconds" />
                         </div>
@@ -142,11 +141,13 @@
                 }
             </div>
 
-            @if (ShowConfirmationButton)
+            @if (ShowConfirmationButton && ReadOnly is false)
             {
-                <button type="button" class="rz-button rz-button-md rz-secondary" tabindex="0" @onclick="@(() => ConfirmValue())">
-                    <span class="rz-button-text">@ConfirmationButtonLabel</span>
-                </button>
+                <RadzenButton Size="ButtonSize.Medium" ButtonStyle="ButtonStyle.Secondary"
+                              Disabled="@Disabled" TabIndex="0"
+                              Click="() => ConfirmValue()">
+                    @ConfirmationButtonLabel
+                </RadzenButton>
             }
         </div>
     </PopupOrInline>
