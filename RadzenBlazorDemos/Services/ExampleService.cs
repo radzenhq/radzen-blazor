@@ -1313,9 +1313,9 @@ namespace RadzenBlazorDemos
                     Name = "DatePicker",
                     Path = "datepicker",
                     Updated = true,
-                    Description = "Demonstration and configuration of the Radzen Blazor Datepicker component with calendar mode.",
+                    Description = "Demonstration and configuration of the Radzen Blazor Datepicker component with calendar mode. Time Picker.",
                     Icon = "&#xe916",
-                    Tags = new [] { "calendar", "form", "edit" }
+                    Tags = new [] { "calendar", "time", "form", "edit" }
                 },
                 new Example
                 {
