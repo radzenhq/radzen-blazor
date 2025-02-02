@@ -354,6 +354,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected ElementReference popup;
 
+        bool isFirstRender;
         /// <summary>
         /// Called when [after render asynchronous].
         /// </summary>
@@ -361,6 +362,8 @@ namespace Radzen.Blazor
         /// <returns>Task.</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            isFirstRender = firstRender;
+
             if (firstRender)
             {
                 if(Visible && LoadData.HasDelegate && Data == null)
@@ -605,6 +608,15 @@ namespace Radzen.Blazor
                         SelectedItemChanged.InvokeAsync(SelectedItem);
                         selectedItems.Clear();
                         selectedItems.Add(SelectedItem);
+                        try
+                        {
+                            if (grid != null && !isFirstRender)
+                            {
+                                InvokeAsync(() => grid.SelectRow(SelectedItem, false));
+                                JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", Items.ToList().IndexOf(SelectedItem) - 1, null);
+                            }
+                        }
+                        catch { }
                     }
                 }
                 else

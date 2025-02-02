@@ -15,6 +15,13 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenSwitch : FormComponent<bool>
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether is read only.
+        /// </summary>
+        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ReadOnly { get; set; }
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
@@ -35,7 +42,7 @@ namespace Radzen.Blazor
         /// </summary>
         public async System.Threading.Tasks.Task Toggle()
         {
-            if (Disabled)
+            if (Disabled || ReadOnly)
             {
                 return;
             }

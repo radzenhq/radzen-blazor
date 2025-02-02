@@ -29,6 +29,13 @@ namespace Radzen.Blazor
         public string AlternateText { get; set; } = "gravatar";
 
         /// <summary>
+        /// Gets or sets the size. Defaulted to 36 (pixels). 
+        /// </summary> 
+        /// <value>The size of the image in pixels.</value>
+        [Parameter]
+        public int Size { get; set; } = 36;
+
+        /// <summary>
         /// Gets gravatar URL.
         /// </summary>
         protected string Url
@@ -38,9 +45,8 @@ namespace Radzen.Blazor
                 var md5Email = MD5.Calculate(System.Text.Encoding.ASCII.GetBytes(Email != null ? Email : ""));
 
                 var style = "retro";
-                var width = "36";
 
-                return $"https://secure.gravatar.com/avatar/{md5Email}?d={style}&s={width}";
+                return $"https://secure.gravatar.com/avatar/{md5Email}?d={style}&s={Size}";
             }
         }
 

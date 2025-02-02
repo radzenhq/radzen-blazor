@@ -84,5 +84,36 @@ namespace Radzen.Blazor
         {
             await Editor.ExecuteCommandAsync(CommandName, value);
         }
+
+        /// <summary>
+        /// The default value of the color picker.
+        /// </summary>
+        public abstract string Value { get; set; }
+
+        /// <summary>
+        /// The internal state of the component.
+        /// </summary>
+        protected string value;
+
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            value = Value;
+
+            base.OnInitialized();
+        }
+
+        /// <inheritdoc />
+        public override async Task SetParametersAsync(ParameterView parameters)
+        {
+            var valueChanged = parameters.DidParameterChange(nameof(Value), Value);
+
+            await base.SetParametersAsync(parameters);
+
+            if (valueChanged)
+            {
+                value = Value;
+            }
+        }
     }
 }
