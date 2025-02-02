@@ -35,11 +35,37 @@
     <TimeSpanPickerFormat />
 </RadzenExample>
 
-<RadzenText Anchor="timespanpicker#min-max-dates" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="timespanpicker#min-max-values" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
     Set Min and Max values
 </RadzenText>
 <RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerMinMax">
     <TimeSpanPickerMinMax />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#inline" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Inline picker
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerInline">
+    <TimeSpanPickerInline />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#various-config" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Various configurations
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerConfig">
+    <TimeSpanPickerConfig />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#custom-input-parsing" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Define custom input parsing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The parameter named <code>ParseInput</code> allows a fully custom input parsing method.<br />
+    This way you can accept inputs like '1d 20h 15min' or '-120s' or support more than one input format.<br />
+    If your method returns null, the default parser is be used instead.
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerParseInput">
+    <TimeSpanPickerParseInput />
 </RadzenExample>
 
 
