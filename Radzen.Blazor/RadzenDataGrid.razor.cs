@@ -7,9 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.Data.Common;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -157,8 +155,8 @@ namespace Radzen.Blazor
 
             if (Groups.Any())
             {
-                query = view.AsQueryable().OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, Groups.Any() ? string.Join(',', Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}")) : "it");
-                _groupedPagedView = await Task.FromResult(query.GroupByMany(DynamicLinqCustomTypeProvider.ParsingConfig, Groups.Any() ? Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}").ToArray() : new string[] { "it" }).ToList());
+                query = view.AsQueryable().OrderBy(Groups.Any() ? string.Join(',', Groups.Select(g => g.Property)) : null);
+                _groupedPagedView = await Task.FromResult(query.GroupByMany(Groups.Any() ? Groups.Select(g => g.Property).ToArray() : new string[] { "it" }).ToList());
 
                 totalItemsCount = await Task.FromResult(_groupedPagedView.Count());
             }
@@ -365,9 +363,9 @@ namespace Radzen.Blazor
                 if (_groupedPagedView == null)
                 {
                     var orderBy = GetOrderBy();
-                    var query = Groups.Count(g => g.SortOrder == null) == Groups.Count || !string.IsNullOrEmpty(orderBy) ? View : View.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(',', Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")} {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
+                    var query = Groups.Count(g => g.SortOrder == null) == Groups.Count || !string.IsNullOrEmpty(orderBy) ? View : View.OrderBy(string.Join(',', Groups.Select(g => $"{g.Property} {(g.SortOrder == null ? "" : g.SortOrder == SortOrder.Ascending ? " asc" : " desc")}")));
                     var v = (AllowPaging && !LoadData.HasDelegate ? query.Skip(skip).Take(PageSize) : query).ToList().AsQueryable();
-                    _groupedPagedView = v.GroupByMany(DynamicLinqCustomTypeProvider.ParsingConfig, Groups.Select(g => $"{(typeof(TItem) == typeof(object) ? g.Property : "np(" + g.Property + ")")}").ToArray()).ToList();
+                    _groupedPagedView = v.GroupByMany(Groups.Select(g => g.Property).ToArray()).ToList();
                 }
                 return _groupedPagedView;
             }
@@ -1729,12 +1727,12 @@ namespace Radzen.Blazor
                     var firstItem = view.FirstOrDefault();
                     if (firstItem != null)
                     {
-                        view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                        view = QueryableExtension.Cast(view, firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
                     }
                 }
                 else
                 {
-                    view = view.OrderBy(orderBy);
+                    view = view.OrderBy<TItem>(orderBy);
                 }
             }
 
@@ -1760,7 +1758,7 @@ namespace Radzen.Blazor
                     var cd = childData[item].Data.AsQueryable();
                     if (!string.IsNullOrEmpty(orderBy))
                     {
-                        cd = cd.OrderBy(orderBy);
+                        cd = cd.OrderBy<TItem>(orderBy);
                     }
 
                     viewList.InsertRange(viewList.IndexOf(item) + 1, cd);
@@ -1815,12 +1813,12 @@ namespace Radzen.Blazor
                             var firstItem = view.FirstOrDefault();
                             if (firstItem != null)
                             {
-                                view = view.Cast(firstItem.GetType()).AsQueryable().OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, orderBy).Cast<TItem>();
+                                view = QueryableExtension.Cast(view, firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
                             }
                         }
                         else
                         {
-                            view = view.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, orderBy);
+                            view = view.OrderBy(orderBy);
                         }
                     }
                 }

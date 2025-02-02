@@ -1,5 +1,4 @@
 @typeparam TItem
-@using System.Linq.Dynamic.Core
 @for (var i = 0; i < Grid.deepestChildColumnLevel + 1; i++)
 {
     <tr>
@@ -32,9 +31,9 @@
         [Parameter]
         public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
 
-        GroupResult _groupResult;
+    GroupResult _groupResult;
         [Parameter]
-        public GroupResult GroupResult
+    public GroupResult GroupResult
         {
             get
             {

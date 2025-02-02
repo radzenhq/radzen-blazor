@@ -1,24 +1,24 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Dynamic.Core;
+﻿using System.Linq.Dynamic.Core;
 using System.Data;
-using System.Collections.Generic;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
-using System.IO;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System.Reflection;
+using System.Linq;
 using Microsoft.AspNetCore.Http;
-using System.Globalization;
+using System.IO;
+using System;
+using System.Collections.Generic;
 
 namespace RadzenBlazorDemos
 {
     public partial class ExportController : Controller
     {
-        public IQueryable ApplyQuery<T>(IQueryable<T> items, IQueryCollection query = null) where T : class
+        public IQueryable ApplyQuery<T>(IQueryable<T> items, IQueryCollection query = null, bool keyless = false) where T : class
         {
             if (query != null)
             {
@@ -34,6 +34,10 @@ namespace RadzenBlazorDemos
                 var filter = query.ContainsKey("$filter") ? query["$filter"].ToString() : null;
                 if (!string.IsNullOrEmpty(filter))
                 {
+                    if (keyless)
+                    {
+                        items = items.ToList().AsQueryable();
+                    }
                     items = items.Where(filter);
                 }
 
@@ -151,18 +155,20 @@ namespace RadzenBlazorDemos
                         }
                         else if (typeCode == TypeCode.Boolean)
                         {
-                            cell.CellValue = new CellValue(stringValue.ToLower());
+                            cell.CellValue = new CellValue(stringValue.ToLowerInvariant());
                             cell.DataType = new EnumValue<CellValues>(CellValues.Boolean);
                         }
                         else if (IsNumeric(typeCode))
                         {
                             if (value != null)
                             {
-                                stringValue = Convert.ToString(value, CultureInfo.InvariantCulture);
-
                                 if (value is Enum enumValue)
                                 {
                                     stringValue = Radzen.Blazor.EnumExtensions.GetDisplayDescription(enumValue);
+                                }
+                                else
+                                {
+                                    stringValue = Convert.ToString(value, CultureInfo.InvariantCulture);
                                 }
                             }
                             cell.CellValue = new CellValue(stringValue);
@@ -213,9 +219,13 @@ namespace RadzenBlazorDemos
                 type.GetGenericTypeDefinition() == typeof(Nullable<>) ?
                 Nullable.GetUnderlyingType(type) : type;
 
-            if (underlyingType == typeof(System.Guid))
+            if (underlyingType == typeof(System.Guid) || underlyingType == typeof(System.DateTimeOffset))
                 return true;
 
+#if NET6_0_OR_GREATER
+            if (underlyingType == typeof(System.DateOnly) || underlyingType == typeof(System.TimeOnly))
+                return true;
+#endif
             var typeCode = Type.GetTypeCode(underlyingType);
 
             switch (typeCode)
@@ -343,7 +353,7 @@ namespace RadzenBlazorDemos
             StylesheetExtension stylesheetExtension2 = new StylesheetExtension() { Uri = "{9260A510-F301-46a8-8635-F512D64BE5F5}" };
             stylesheetExtension2.AddNamespaceDeclaration("x15", "http://schemas.microsoft.com/office/spreadsheetml/2010/11/main");
 
-            OpenXmlUnknownElement openXmlUnknownElement4 = OpenXmlUnknownElement.CreateOpenXmlUnknownElement("<x15:timelineStyles defaultTimelineStyle=\"TimeSlicerStyleLight1\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\" />");
+            OpenXmlUnknownElement openXmlUnknownElement4 = workbookStylesPart1.CreateUnknownElement("<x15:timelineStyles defaultTimelineStyle=\"TimeSlicerStyleLight1\" xmlns:x15=\"http://schemas.microsoft.com/office/spreadsheetml/2010/11/main\" />");
 
             stylesheetExtension2.Append(openXmlUnknownElement4);
 

@@ -9,10 +9,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -2288,6 +2287,18 @@ namespace Radzen
         /// </summary>
         /// <value>The property.</value>
         public string Property { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property type.
+        /// </summary>
+        /// <value>The property type.</value>
+        public Type Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the filtered property.
+        /// </summary>
+        /// <value>The property.</value>
+        public string FilterProperty { get; set; }
         /// <summary>
         /// Gets or sets the value to filter by.
         /// </summary>
@@ -2325,6 +2336,18 @@ namespace Radzen
         /// </summary>
         /// <value>The property.</value>
         public string Property { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property type.
+        /// </summary>
+        /// <value>The property type.</value>
+        public Type Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the filtered property.
+        /// </summary>
+        /// <value>The property.</value>
+        public string FilterProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the value to filter by.
@@ -2427,6 +2450,43 @@ namespace Radzen
         /// </summary>
         /// <value>The level.</value>
         public int Level { get; set; }
+    }
+
+    /// <summary>
+    /// The result of a call to a <see cref="QueryableExtension"/>.GroupByMany() overload.
+    /// </summary>
+    public class GroupResult
+    {
+        /// <summary>
+        /// The key value of the group.
+        /// </summary>
+        public dynamic Key { get; internal set; } = null!;
+
+        /// <summary>
+        /// The number of resulting elements in the group.
+        /// </summary>
+        public int Count { get; internal set; }
+
+        /// <summary>
+        /// The resulting elements in the group.
+        /// </summary>
+        public IEnumerable Items { get; internal set; }
+
+        /// <summary>
+        /// The resulting subgroups in the group.
+        /// </summary>
+        public IEnumerable<GroupResult> Subgroups { get; internal set; }
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> showing the key of the group and the number of items in the group.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", ((object)Key).ToString(), Count);
+        }
     }
 
     /// <summary>
@@ -2959,7 +3019,9 @@ namespace Radzen
         {
             if (propertyName.Contains("["))
             {
-                return DynamicExpressionParser.ParseLambda<TItem, TValue>(null, false, propertyName).Compile();
+                var arg = Expression.Parameter(typeof(TItem));
+
+                return Expression.Lambda<Func<TItem, TValue>>(QueryableExtension.GetNestedPropertyExpression(arg, propertyName, type), arg).Compile();
             }
             else
             {
@@ -3110,11 +3172,6 @@ namespace Radzen
                 // ignore the exception and assume the property start without a type and do not need the '@' prefix
             }
             var propertyName = $"{(type != null ? "@" : "")}{property}";
-
-            if (propertyName.IndexOf(".") != -1)
-            {
-                return $"np({propertyName})";
-            }
 
             return propertyName;
         }
