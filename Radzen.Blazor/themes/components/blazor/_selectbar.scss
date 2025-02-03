@@ -11,6 +11,7 @@ $selectbar-sizes: xs, sm, md, lg;
 .rz-selectbutton {
   box-sizing: border-box;
   display: inline-flex;
+  border-radius: var(--rz-selectbar-border-radius);
 
   &.rz-selectbutton-horizontal {
       flex-direction: row;

@@ -19,6 +19,7 @@ $upload-button-background-color: var(--rz-primary) !default;
 .rz-fileupload {
   box-sizing: border-box;
   display: inline-block;
+  border-radius: var(--rz-upload-button-bar-border-radius);
 
   .rz-button {
     @extend %button-sm;
