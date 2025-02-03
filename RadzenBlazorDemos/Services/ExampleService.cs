@@ -1554,7 +1554,7 @@ namespace RadzenBlazorDemos
                     Path = "timespanpicker",
                     New = true,
                     Description = "Demonstration and configuration of the Radzen Blazor TimeSpanPicker component.",
-                    Icon = "&#xe422",
+                    Icon = "&#xe425",
                     Tags = new [] { "duration", "form", "edit" }
                 },
                 new Example

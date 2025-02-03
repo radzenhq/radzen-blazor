@@ -23,7 +23,7 @@ $timespanpicker-panel-field-min-width: 4rem !default;
   display: inline-block;
   position: relative;
 
-  .rz-readonly {
+  :read-only:not(:disabled) {
     cursor: pointer;
   }
 
@@ -118,7 +118,7 @@ $timespanpicker-panel-field-min-width: 4rem !default;
   }
 
   .rzi-timespan:before {
-    content: 'timelapse';
+    content: 'timer';
   }
 
   .rz-button-text {
@@ -131,6 +131,7 @@ $timespanpicker-panel-field-min-width: 4rem !default;
 .rz-timespanpicker-inline {
   border: var(--rz-input-border);
   background-color: var(--rz-timespanpicker-panel-background-color);
+  overflow: auto;
 }
 
 .rz-timespanpicker-popup-container {

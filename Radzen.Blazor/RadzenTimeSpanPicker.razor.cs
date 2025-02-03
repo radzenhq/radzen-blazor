@@ -663,7 +663,7 @@ namespace Radzen.Blazor
         }
 
         private Task ClickInputField()
-            => ShowPopupButton ? Task.CompletedTask : ClickPopupButton();
+            => ShowPopupButton && AllowInput is false ? Task.CompletedTask : ClickPopupButton();
 
         private bool _preventKeyPress = false;
         private async Task PressKey(KeyboardEventArgs args)
@@ -890,12 +890,11 @@ namespace Radzen.Blazor
         #endregion
 
         #region Internal: styles
-        private string ComponentStyle => $"{(Inline ? "overflow:auto;" : "")}{Style ?? ""}";
-
         /// <inheritdoc />
         protected override string GetComponentCssClass()
-             => ClassList.Create()
+             => ClassList.Create("rz-timespanpicker")
                             .Add("rz-timespanpicker-inline", Inline)
+                            .Add("rz-state-disabled", Disabled)
                             .Add(FieldIdentifier, EditContext)
                             .ToString();
         #endregion
