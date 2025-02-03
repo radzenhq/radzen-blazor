@@ -115,7 +115,10 @@ namespace Radzen.Blazor
         /// </summary>
         public void Dispose()
         {
-            ThemeService.ThemeChanged -= OnThemeChanged;
+            if (ThemeService != null)
+            {
+                ThemeService.ThemeChanged -= OnThemeChanged;
+            }
             persistingSubscription.Dispose();
         }
     }

@@ -85,7 +85,9 @@ input {
   font-family: inherit;
   font-size: var(--rz-input-font-size);
   transition: var(--rz-input-transition);
-  outline: none;
+  &:not(.invalid) {
+    outline: none;
+  }
 
   @extend %input-base;
 

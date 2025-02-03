@@ -8,7 +8,7 @@ using System.Text;
 namespace Radzen
 {
     /// <summary>
-    /// Class NotificationService. Contains various methods with options to open notifications. 
+    /// Class NotificationService. Contains various methods with options to open notifications.
     /// Should be added as scoped service in the application services and RadzenNotification should be added in application main layout.
     /// </summary>
     /// <example>
@@ -49,6 +49,20 @@ namespace Radzen
         /// <param name="summary">The summary.</param>
         /// <param name="detail">The detail.</param>
         /// <param name="duration">The duration.</param>
+        /// <param name="click">The click event.</param>
+        public void Notify(NotificationSeverity severity, string summary,
+            string detail, TimeSpan duration, Action<NotificationMessage> click = null)
+        {
+            Notify(severity, summary, detail, duration.TotalMilliseconds, click);
+        }
+
+        /// <summary>
+        /// Notifies the specified severity.
+        /// </summary>
+        /// <param name="severity">The severity.</param>
+        /// <param name="summary">The summary.</param>
+        /// <param name="detail">The detail.</param>
+        /// <param name="duration">The duration, default of 3 seconds.</param>
         /// <param name="click">The click event.</param>
         /// <param name="closeOnClick">If true, then the notification will be closed when clicked on.</param>
         /// <param name="payload">Used to store a custom payload that can be retreived later in the click event handler.</param>
@@ -108,7 +122,7 @@ namespace Radzen
         /// Gets or sets the click event.
         /// </summary>
         /// <value>This event handler is called when the notification is clicked on.</value>
-        public Action<NotificationMessage> Click { get; set; } 
+        public Action<NotificationMessage> Click { get; set; }
         /// <summary>
         /// Get or set the event for when the notification is closed
         /// </summary>
@@ -146,12 +160,12 @@ namespace Radzen
         public bool Equals(NotificationMessage other)
         {
             if(other == null) return false;
-            
+
             if(object.ReferenceEquals(this, other)) return true;
 
-            return this.Severity == other.Severity 
-                && this.Summary == other.Summary 
-                && this.Detail == other.Detail 
+            return this.Severity == other.Severity
+                && this.Summary == other.Summary
+                && this.Detail == other.Detail
                 && this.Duration == other.Duration
                 && this.Style == other.Style
                 && this.Click == other.Click

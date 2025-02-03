@@ -21,6 +21,9 @@
                 <RadzenFormField Text="RadzenDropDown" Variant="@variant">
                     <RadzenDropDown Data=@companyNames @bind-Value="@dropDownValue" />
                 </RadzenFormField>
+                <RadzenFormField Text="RadzenAutoComplete" Variant="@variant">
+                    <RadzenAutoComplete Data=@companyNames @bind-Value="@autoCompleteValue" />
+                </RadzenFormField>
                 <RadzenFormField Text="RadzenDropDownDataGrid" Variant="@variant">
                     <RadzenDropDownDataGrid Data=@companyNames @bind-Value="@dropDownDataGridValue" />
                 </RadzenFormField>
@@ -28,14 +31,14 @@
         </RadzenColumn>
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
-                <RadzenFormField Text="RadzenAutoComplete" Variant="@variant">
-                    <RadzenAutoComplete Data=@companyNames @bind-Value="@autoCompleteValue" />
+                <RadzenFormField Text="RadzenDatePicker" Variant="@variant">
+                    <RadzenDatePicker @bind-Value="@date" ShowTime="@true" />
                 </RadzenFormField>
                 <RadzenFormField Text="RadzenColorPicker" Variant="@variant">
                     <RadzenColorPicker @bind-Value="@color" />
                 </RadzenFormField>
                 <RadzenFormField Text="RadzenTextArea" Variant="@variant">
-                    <RadzenTextArea @bind-Value="@value" />
+                    <RadzenTextArea @bind-Value="@value" Rows="4" />
                 </RadzenFormField>
                 <RadzenFormField Text="RadzenRadioButtonList" Variant="@variant">
                     <RadzenRadioButtonList @bind-Value=@radioButtonValue TValue="int" class="rz-m-4 rz-mt-8">
@@ -61,6 +64,7 @@
     string dropDownDataGridValue = "";
     string autoCompleteValue = "";
     string color = "rgb(68, 58, 110)";
+    DateTime? date = DateTime.Today;
 
     IEnumerable<string> companyNames;
 
