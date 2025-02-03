@@ -10,7 +10,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>5.9.6</Version>
+    <Version>5.9.7</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Radzen Blazor is a set of 90+ free native Blazor UI controls packed with DataGrid, Scheduler, Charts and robust theming including Material design and Fluent UI.</Description>
@@ -33,7 +33,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.1" />
   </ItemGroup>
 
   <ItemGroup>
