@@ -360,7 +360,8 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-checkbox-list-horizontal  ~ &,
     .rz-chkbox ~ &,
     .rz-fileupload ~ &,
-    .rz-state-empty:has(.rz-placeholder) ~ & {
+    .rz-state-empty:has(.rz-placeholder) ~ &,
+    .rz-form-field.rz-state-focused & {
         inset-inline-end: auto;
         inset-block-start: var(--rz-form-field-label-floating-top);
         padding-block-start: 0;
@@ -383,7 +384,8 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-horizontal  ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-chkbox ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-fileupload ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-state-empty:has(.rz-placeholder) ~ & {
+    .rz-form-field:not(.rz-variant-outlined) .rz-state-empty:has(.rz-placeholder) ~ &,
+    .rz-form-field:not(.rz-variant-outlined).rz-state-focused & {
         background-color: inherit !important;
     }
 
@@ -393,7 +395,8 @@ $form-field-helper-padding: 0 0.5rem !default;
 
     .rz-state-focused &,
     .rz-variant-filled.rz-state-focused &,
-    .rz-variant-flat.rz-state-focused & {
+    .rz-variant-flat.rz-state-focused &,
+    .rz-form-field.rz-state-focused & {
         color: var(--rz-form-field-label-focus-color);
     }
 

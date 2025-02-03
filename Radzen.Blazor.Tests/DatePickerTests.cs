@@ -175,6 +175,34 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void DatePicker_Renders_EmptyCssClass_WhenValueIsEmpty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Value, null));
+
+            Assert.Contains(@$"rz-state-empty", component.Markup);
+        }
+
+        [Fact]
+        public void DatePicker_DoesNotRender_EmptyCssClass_WhenValueIsNotEmpty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenDatePicker<DateTime>>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Value, DateTime.Now));
+
+            Assert.DoesNotContain(@$"rz-state-empty", component.Markup);
+        }
+
+        [Fact]
         public void DatePicker_Renders_DisabledParameter()
         {
             using var ctx = new TestContext();

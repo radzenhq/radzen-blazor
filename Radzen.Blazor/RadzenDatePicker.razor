@@ -1,21 +1,17 @@
 ﻿@using Radzen
 @using Radzen.Blazor.Rendering
-@using Microsoft.AspNetCore.Components.Forms
-@using System.Linq.Expressions
-@using System.Globalization
-@using Microsoft.JSInterop
 
 @typeparam TValue
 @inherits RadzenComponent
 @implements IRadzenFormComponent
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@($"rz-datepicker{(Disabled ? " rz-state-disabled" : "")}") @GetCssClass()" style="@getStyle()" id="@GetId()">
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@getStyle()" id="@GetId()">
         @if (!Inline)
         {
             <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                     @onchange="@ParseDate" autocomplete="off" type="text" name="@Name" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
-                   class="rz-inputtext @InputClass @(ReadOnly ? "rz-readonly" : "") @(!ShowButton ? "rz-input-trigger" : "")" id="@Name" placeholder="@Placeholder" />
+                   class="rz-inputtext @InputClass @(ReadOnly ? "rz-readonly" : "") @(!ShowButton ? "rz-input-trigger" : "")" id="@Name" placeholder="@CurrentPlaceholder" />
             @if (ShowButton)
             {
                 <button aria-label="@ToggleAriaLabel" @onmousedown=@OnToggle class="@($"rz-datepicker-trigger rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")} {ButtonClass}")" tabindex="-1" type="button">
@@ -33,10 +29,10 @@
                     @if (!TimeOnly)
                     {
                         <div class="rz-calendar-header">
-                            <a id="@(GetId() + "pm")" tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                            <a id="@(GetId() + "pm")" tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(() => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
                                 <span class="notranslate rzi rz-calendar-prev-icon"></span>
                             </a>
-                            <a id="@(GetId() + "nm")" tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(async () => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                            <a id="@(GetId() + "nm")" tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(() => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
                                 <span class="notranslate rzi rz-calendar-next-icon"></span>
                             </a>
                             <div class="rz-calendar-title">
@@ -116,19 +112,19 @@
                 {
                 <div class="rz-timepicker" @onmousedown:stopPropagation>
                         <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "hour" }})" TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)"
-                           Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" TValue="double" Step="@HoursStep"
+                           Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" Step="@HoursStep"
                            Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput Format="@(PadHours ? "00" : "")" Name="@($"{UniqueID}-h")" />
                         <div class="rz-separator">
                             <span>:</span>
                         </div>
-                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "minutes" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" TValue="double" Step="@MinutesStep" Min="0" Max="59"
+                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "minutes" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" Step="@MinutesStep" Min="0" Max="59"
                            Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes Format="@(PadMinutes ? "00" : "")" Name="@($"{UniqueID}-m")"/>
                         @if (ShowSeconds)
                         {
                             <div class="rz-separator">
                                 <span>:</span>
                             </div>
-                            <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "seconds" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" TValue="double" Step="@SecondsStep" Min="0" Max="59"
+                            <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "seconds" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" Step="@SecondsStep" Min="0" Max="59"
                                Change="@UpdateSeconds" class="rz-second-picker" @oninput=@OnUpdateHourSeconds Format="@(PadSeconds ? "00" : "")" Name="@($"{UniqueID}-s")"/>
                         }
                         @if (HourFormat == "12")
