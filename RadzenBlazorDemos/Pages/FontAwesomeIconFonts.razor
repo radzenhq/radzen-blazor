@@ -1,0 +1,31 @@
+﻿<style>
+    /* Font Awesome 6 Free font CSS */
+
+    @@font-face {
+        font-family: 'Font Awesome 6 Free';
+        font-style: normal;
+        font-weight: 900;
+        src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/webfonts/fa-solid-900.woff2') format('woff2');
+    }
+
+    .font-awesome {
+      --rz-icon-font-family: 'Font Awesome 6 Free'
+    }
+
+    /* Font Awesome 6 Free font CSS */
+</style>
+<RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" class="rz-m-12" Style="--rz-icon-size: 2rem;">
+    <div style="width: 200px">Material Symbols (default)</div>
+    <RadzenIcon Icon="home"/>
+    <RadzenIcon Icon="help"/>
+    <RadzenIcon Icon="delete"/>
+    <RadzenIcon Icon="folder"/>
+</RadzenStack>
+
+<RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" class="font-awesome rz-m-12" Style="--rz-icon-size: 2rem;">
+    <div style="width: 200px">Font Awesome 6 Free</div>
+    <RadzenIcon Icon="&#xf015"/>
+    <RadzenIcon Icon="&#xf059"/>
+    <RadzenIcon Icon="&#xf2ed"/>
+    <RadzenIcon Icon="&#xf07b"/>
+</RadzenStack>
