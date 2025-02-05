@@ -239,6 +239,34 @@ namespace Radzen.Blazor
         public string SelectedTargetToSourceTitle { get; set; } = "Move selected target items to source collection";
 
         /// <summary>
+        /// Gets or sets the source to target icon
+        /// </summary>
+        /// <value>The source to target icon.</value>
+        [Parameter]
+        public string SourceToTargetIcon { get; set; } = "keyboard_double_arrow_right";
+
+        /// <summary>
+        /// Gets or sets the selected source to target icon
+        /// </summary>
+        /// <value>The selected source to target icon.</value>
+        [Parameter]
+        public string SelectedSourceToTargetIcon { get; set; } = "keyboard_arrow_right";
+
+        /// <summary>
+        /// Gets or sets the target to source icon
+        /// </summary>
+        /// <value>The target to source icon.</value>
+        [Parameter]
+        public string TargetToSourceIcon { get; set; } = "keyboard_double_arrow_left";
+
+        /// <summary>
+        /// Gets or sets the selected target to source  icon
+        /// </summary>
+        /// <value>The selected target to source icon.</value>
+        [Parameter]
+        public string SelectedTargetToSourceIcon { get; set; } = "keyboard_arrow_left";
+
+        /// <summary>
         /// Gets the final CSS style rendered by the component. Combines it with a <c>style</c> custom attribute.
         /// </summary>
         protected string GetStyle()
