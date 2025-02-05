@@ -445,7 +445,11 @@ namespace Radzen.Blazor
 
         private TimeSpan DefaultNonNullValue => AdjustToBounds(TimeSpan.Zero);
 
-        private void ResetUnconfirmedValue() => UnconfirmedValue = ConfirmedValue ?? DefaultNonNullValue;
+        private void ResetUnconfirmedValue()
+        {
+            UnconfirmedValue = ConfirmedValue ?? DefaultNonNullValue;
+            _isUnconfirmedValueNegative = UnconfirmedValue < TimeSpan.Zero;
+        }
         private TimeSpan AdjustToBounds(TimeSpan value) => value < Min ? Min : value > Max ? Max : value;
         #endregion
 
@@ -663,7 +667,7 @@ namespace Radzen.Blazor
         }
 
         private Task ClickInputField()
-            => ShowPopupButton && AllowInput is false ? Task.CompletedTask : ClickPopupButton();
+            => ShowPopupButton ? Task.CompletedTask : ClickPopupButton();
 
         private bool _preventKeyPress = false;
         private async Task PressKey(KeyboardEventArgs args)
@@ -893,10 +897,16 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
              => ClassList.Create("rz-timespanpicker")
-                            .Add("rz-timespanpicker-inline", Inline)
-                            .Add("rz-state-disabled", Disabled)
-                            .Add(FieldIdentifier, EditContext)
-                            .ToString();
+                .Add("rz-timespanpicker-inline", Inline)
+                .Add("rz-state-disabled", Disabled)
+                .Add(FieldIdentifier, EditContext)
+                .ToString();
+
+        private string GetInputClass()
+            => ClassList.Create("rz-inputtext")
+                .Add(InputClass)
+                .Add("rz-readonly", ReadOnly && !Disabled)
+                .ToString();
         #endregion
     }
 }

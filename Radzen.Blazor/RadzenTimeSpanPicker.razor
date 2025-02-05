@@ -18,8 +18,7 @@
     @if (!Inline)
     {
         <input @ref="@input" type="text" name="@Name" id="@Name" value="@FormattedValue"
-               disabled="@Disabled" readonly="@IsInputAllowed" autocomplete="off"
-               class="rz-inputtext @InputClass @(ShowPopupButton is false ? "rz-input-trigger" : "")"
+               disabled="@Disabled" readonly="@IsInputAllowed" autocomplete="off" class="@GetInputClass()"
                placeholder="@Placeholder" tabindex="@(Disabled ? "-1" : TabIndex.ToString())" @attributes="@InputAttributes"
                @onchange="@(() => ParseTimeSpan())"
                @onclick="@(() => ClickInputField())" @onkeydown="@PressKey"
