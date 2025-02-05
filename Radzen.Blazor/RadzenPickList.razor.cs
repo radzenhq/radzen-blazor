@@ -47,7 +47,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if selecting all items is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool AllowSelectAll { get; set; }
+        public bool AllowSelectAll { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether component is disabled.
