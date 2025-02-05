@@ -47,6 +47,10 @@
                 Multiple selection
                 <RadzenSwitch @bind-Value="@multiple" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "enable multiple selection" }})" />
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px" Visible="@multiple">
+                Allow select all
+                <RadzenSwitch @bind-Value="@allowSelectAll" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allowSelectAll" }})" />
+            </RadzenStack>
             <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
                 Show header
                 <RadzenSwitch @bind-Value="@showHeader" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "show header" }})" />
@@ -77,6 +81,7 @@
         <RadzenPickList AllowMoveAll="@allowMoveAll" AllowMoveAllSourceToTarget="@allowMoveSourceToTarget" AllowMoveAllTargetToSource="@allowMoveTargetToSource" @bind-Source="@Source" @bind-Target="@Target" Style="height:500px; width:100%;" Orientation="@orientation"
             TextProperty="@nameof(Customer.CompanyName)" AllowFiltering="@allowFilter" Multiple="@multiple" ShowHeader="@showHeader" Disabled="@disabled"
             ButtonGap="@gap" ButtonJustifyContent="@justifyContent" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant"
+            AllowSelectAll="@allowSelectAll"
             ItemRender="OnItemRender">
                 <SourceHeader>
                     Customers:
@@ -102,6 +107,7 @@
     string gap = "12px";
     bool allowFilter = true;
     bool multiple = false;
+    bool allowSelectAll = true;
     bool showHeader = true;
     bool disabled;
     bool allowMoveAll = true;
@@ -110,7 +116,7 @@
 
     IEnumerable<Customer> _source;
     IEnumerable<Customer> Source
-    { 
+    {
         get
         {
             return _source;
