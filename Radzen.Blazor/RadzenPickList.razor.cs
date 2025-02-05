@@ -99,6 +99,13 @@ namespace Radzen.Blazor
         public string TextProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets the disabled property
+        /// </summary>
+        /// <value>The disabled property.</value>
+        [Parameter]
+        public string DisabledProperty { get; set; }
+
+        /// <summary>
         /// Gets or sets the source template
         /// </summary>
         /// <value>The source template.</value>
