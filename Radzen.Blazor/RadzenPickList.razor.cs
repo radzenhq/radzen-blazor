@@ -43,6 +43,13 @@ namespace Radzen.Blazor
         public bool Multiple { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether selecting all items is allowed.
+        /// </summary>
+        /// <value><c>true</c> if selecting all items is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowSelectAll { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating whether component is disabled.
         /// </summary>
         /// <value><c>true</c> if component is disabled; otherwise, <c>false</c>.</value>
@@ -90,6 +97,13 @@ namespace Radzen.Blazor
         /// <value>The text property.</value>
         [Parameter]
         public string TextProperty { get; set; }
+
+        /// <summary>
+        /// Gets or sets the disabled property
+        /// </summary>
+        /// <value>The disabled property.</value>
+        [Parameter]
+        public string DisabledProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the source template
@@ -230,6 +244,34 @@ namespace Radzen.Blazor
         /// <value>The selected target to source title.</value>
         [Parameter]
         public string SelectedTargetToSourceTitle { get; set; } = "Move selected target items to source collection";
+
+        /// <summary>
+        /// Gets or sets the source to target icon
+        /// </summary>
+        /// <value>The source to target icon.</value>
+        [Parameter]
+        public string SourceToTargetIcon { get; set; } = "keyboard_double_arrow_right";
+
+        /// <summary>
+        /// Gets or sets the selected source to target icon
+        /// </summary>
+        /// <value>The selected source to target icon.</value>
+        [Parameter]
+        public string SelectedSourceToTargetIcon { get; set; } = "keyboard_arrow_right";
+
+        /// <summary>
+        /// Gets or sets the target to source icon
+        /// </summary>
+        /// <value>The target to source icon.</value>
+        [Parameter]
+        public string TargetToSourceIcon { get; set; } = "keyboard_double_arrow_left";
+
+        /// <summary>
+        /// Gets or sets the selected target to source  icon
+        /// </summary>
+        /// <value>The selected target to source icon.</value>
+        [Parameter]
+        public string SelectedTargetToSourceIcon { get; set; } = "keyboard_arrow_left";
 
         /// <summary>
         /// Gets the final CSS style rendered by the component. Combines it with a <c>style</c> custom attribute.

@@ -744,8 +744,7 @@ namespace Radzen
                 var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
                     Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
                     Query)
-                    .Cast<object>()
-                    .ToList();
+                    .Cast(Query.ElementType).ToDynamicList();
 
 
                 if (previousKey != args.Key)
