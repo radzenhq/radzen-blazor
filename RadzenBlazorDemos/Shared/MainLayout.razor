@@ -44,10 +44,10 @@
                         <RadzenColumn Size="12">
                             <RadzenAlert AlertStyle="AlertStyle.Dark" Icon="mode_heat" Size="AlertSize.Large" Variant="Variant.Flat" class="rz-my-lg-12 promo-alert">
                                 <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-3 rz-color-on-base-darker"><strong>NEW: Radzen Blazor for Visual Studio</strong></RadzenText>
-                                <RadzenText TextStyle="TextStyle.Body1" class="rz-color-on-base-darker">The extension brings Radzen’s rich feature set and productivity tools directly into the familiar Visual Studio 2022 environment. Connect to data, design, code seamlessly, and work faster within Visual Studio.</RadzenText>
-                                <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-0 rz-mt-5 rz-color-on-base-darker">
-                                    <RadzenLink Path="https://www.radzen.com/blazor-visual-studio" target="_blank" Style="color: #FFB9FF !important;"><strong>Learn More ↗</strong></RadzenLink>
-                                </RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1" class="rz-color-on-base-darker">The extension brings Radzen’s rich feature set and productivity tools directly into the familiar Visual Studio 2022 environment. Connect to data, design, code seamlessly, and work faster within Visual Studio. <RadzenLink Path="https://www.radzen.com/blazor-visual-studio" target="_blank" Style="color: #FFB9FF !important;">Learn More ↗</RadzenLink></RadzenText>
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" AlignItems="AlignItems.Center" class="rz-mt-6">
+                                    <RadzenButton Text="See in Action" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Medium" Click=@(args => ShowVideoDialog("https://www.youtube.com/embed/VUwy-BX3eCM?&rel=0")) />
+                                </RadzenStack>
                             </RadzenAlert>
                             @Body
                             <RadzenCard class="rz-mt-12 rz-display-block rz-p-6 rz-p-md-12">
@@ -67,7 +67,7 @@
                                                 </RadzenStack>
                                                 <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-secondary-color" Style="line-height: 1.5; text-wrap: balance;">Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles.</RadzenText>
                                                 <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-my-4">
-                                                    <RadzenButton Text="See in Action" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Medium" Click=@ShowVideoDialog />
+                                                    <RadzenButton Text="See in Action" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Medium" Click=@(args => ShowVideoDialog("https://www.youtube.com/embed/_F-CUWxYvCA?&rel=0")) />
                                                     <NavLink class="rz-button rz-button-md rz-base rz-shade-default rz-variant-flat rz-text-align-center" href="https://www.radzen.com/blazor-studio/" target="_blank">Learn More</NavLink>
                                                 </RadzenStack>
                                             </RadzenColumn>
@@ -78,14 +78,14 @@
                                                 </RadzenStack>
                                                 <RadzenText TextStyle="TextStyle.Body2" TagName="TagName.P" class="rz-text-secondary-color" Style="line-height: 1.5; text-wrap: balance;">Radzen Blazor for Visual Studio extension streamlines Blazor development within the Visual Studio environment. The Blazor extension you need to boost productivity!</RadzenText>
                                                 <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-my-4">
-                                                    <NavLink class="rz-button rz-button-md rz-primary rz-shade-default rz-variant-flat rz-text-align-center" href="https://www.radzen.com/blazor-visual-studio/download/" target="_blank">Download</NavLink>
+                                                    <RadzenButton Text="See in Action" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Medium" Click=@(args => ShowVideoDialog("https://www.youtube.com/embed/VUwy-BX3eCM?&rel=0")) />
                                                     <NavLink class="rz-button rz-button-md rz-base rz-shade-default rz-variant-flat rz-text-align-center" href="https://www.radzen.com/blazor-visual-studio/" target="_blank">Learn More</NavLink>
                                                 </RadzenStack>
                                             </RadzenColumn>
                                         </RadzenRow>
                                     </RadzenColumn>
                                     <RadzenColumn SizeMD="12" SizeLG="5" class="rz-pb-5 rz-py-xl-12">
-                                        <RadzenImage Path="images/radzen-blazor-studio.png" class="rz-m-0" Style="width: 100%" AlternateText=">Radzen Blazor Studio" Click=@ShowVideoDialog />
+                                        <RadzenImage Path="images/radzen-blazor-studio.png" class="rz-m-0" Style="width: 100%" AlternateText=">Radzen Blazor Studio" Click=@(args => ShowVideoDialog("https://www.youtube.com/embed/_F-CUWxYvCA?&rel=0")) />
                                     </RadzenColumn>
                                 </RadzenRow>
                             </RadzenCard>
@@ -263,11 +263,11 @@
     </RadzenStack>
 </div>, options);
 
-    async Task ShowVideoDialog()
+    async Task ShowVideoDialog(string url)
     {
         await DialogService.OpenAsync("Create new Blazor app", ds =>
         @<div class="embed-container">
-            <iframe src="https://www.youtube.com/embed/_F-CUWxYvCA?&rel=0" frameborder="0" allowfullscreen=""></iframe>
+            <iframe src="@url" frameborder="0" allowfullscreen=""></iframe>
         </div>, new DialogOptions() {
                   Width = "50%",
                   Resizable = true
