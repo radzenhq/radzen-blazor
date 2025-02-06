@@ -1658,7 +1658,7 @@ window.Radzen = {
         reader.addEventListener(
           'load',
           function () {
-            if (maxWidth > 0 && maxHeight > 0) {
+            if (fileInput.files[0] && fileInput.files[0].type.includes('image') && maxWidth > 0 && maxHeight > 0) {
               var img = document.createElement("img");
               img.onload = function (event) {
                 // Dynamically create a canvas element
