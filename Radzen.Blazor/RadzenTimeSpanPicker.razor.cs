@@ -239,7 +239,7 @@ namespace Radzen.Blazor
         /// Specifies the label of the negative value button.
         /// </summary>
         [Parameter]
-        public string NegativeButtonLabel { get; set; } = "-";
+        public string NegativeButtonLabel { get; set; } = "−";
 
         /// <summary>
         /// Specifies the text displayed before the fields in the panel when the value is positive and there's no value sign picker.
@@ -251,7 +251,7 @@ namespace Radzen.Blazor
         /// Specifies the text displayed before the fields in the panel when the value is negative and there's no value sign picker.
         /// </summary>
         [Parameter]
-        public string NegativeValueText { get; set; } = "-";
+        public string NegativeValueText { get; set; } = "−";
 
         /// <summary>
         /// Specifies the text displayed next to the days field.
@@ -898,7 +898,8 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
              => ClassList.Create("rz-timespanpicker")
                 .Add("rz-timespanpicker-inline", Inline)
-                .Add("rz-state-disabled", Disabled)
+                .AddDisabled(Disabled)
+                .Add("rz-state-empty", !HasValue)
                 .Add(FieldIdentifier, EditContext)
                 .ToString();
 
@@ -906,6 +907,12 @@ namespace Radzen.Blazor
             => ClassList.Create("rz-inputtext")
                 .Add(InputClass)
                 .Add("rz-readonly", ReadOnly && !Disabled)
+                .ToString();
+
+        private string GetTogglePopupButtonClass()
+            => ClassList.Create("rz-timespanpicker-trigger rz-button rz-button-icon-only")
+                .Add(TogglePopupButtonClass)
+                .Add("rz-state-disabled", Disabled)
                 .ToString();
         #endregion
     }

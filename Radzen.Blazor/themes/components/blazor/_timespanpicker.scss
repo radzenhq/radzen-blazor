@@ -169,12 +169,7 @@ $timespanpicker-panel-field-min-width: 4rem !default;
   width: min-content;
 }
 
-.rz-timespanpicker-days,
-.rz-timespanpicker-hours,
-.rz-timespanpicker-minutes,
-.rz-timespanpicker-seconds,
-.rz-timespanpicker-milliseconds,
-.rz-timespanpicker-microseconds {
+.rz-timespanpicker-unitvaluepicker {
   background-color: var(--rz-timespanpicker-panel-background-color);
   width: fit-content;
   min-width: var(--rz-timespanpicker-panel-field-min-width);
