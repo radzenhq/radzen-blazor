@@ -1,0 +1,112 @@
+@using Radzen
+@using Radzen.Blazor.Rendering;
+@using System.Globalization;
+@using Microsoft.JSInterop
+@inherits RadzenComponent
+
+@typeparam TResource
+@typeparam TItem
+@typeparam TLink
+
+@implements IResourceScheduler
+
+@inject TooltipService TooltipService
+
+<style>
+    .rz-resource-schedule-resource-text {
+        flex: 1;
+        text-align: center;
+        font-size: .875rem;
+        font-weight: 800;
+        padding: var(--rz-scheduler-header-padding);
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
+
+    .rz-resource-schedule-container {
+        overflow-x: auto;
+        overflow-y: auto;
+        width: 100%;
+    }
+
+</style>
+
+@if (Visible)
+{    
+    @if (HeaderTemplate != null)
+    {
+        @HeaderTemplate
+    }
+    else
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem" class="rz-resource-schedule-header-sticky rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);height:4rem;">
+            <div class="rz-scheduler-nav" style="width: -webkit-fill-available;">
+                <div class="rz-scheduler-nav-prev-next">
+                    <button tabindex="0" class="rz-button rz-prev" @onclick=@(() => OnPrev()) title="PrevText"><RadzenIcon Icon="chevron_left" /></button>
+                    <button tabindex="0" class="rz-button rz-next" @onclick=@(() => OnNext()) title="NextText"><RadzenIcon Icon="chevron_right" /></button>
+                    <button tabindex="0" class="rz-button rz-today" @onclick=@OnToday title="TodayText">@TodayText</button>
+                </div>
+                <div class="rz-scheduler-nav-title">@SelectedView?.Title</div>
+                <div class="rz-scheduler-nav-views">
+                    @foreach (var view in Views)
+                    {
+                        <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text class="@($"{(IsSelected(view) ? " rz-state-active" : "")}")" />
+                    }
+                </div>
+            </div>
+        </RadzenStack>
+    }
+    @if (ResourceData != null)
+    {
+        <div class="rz-resource-schedule-container">
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                @foreach (var resource in ResourceData)
+                {
+                    TLink resourceId = resourceLinkGetter(resource);
+                    <RadzenStack Orientation="Orientation.Vertical" JustifyContent=" JustifyContent.Start" 
+                                AlignItems="AlignItems.Start" Gap="0.5rem"
+                                Style="@($"height: 100%; width: {ColumnStyles[resourceId].ColumnWidth}; min-width: {ColumnStyles[resourceId].ColumnMinimumWidth}; max-width: {ColumnStyles[resourceId].ColumnMaximumWidth}; visibility: {ColumnStyles[resourceId].ColumnVisibility};")">
+                        <div style="@($"height: {ResourceHeight}; width: {ColumnStyles[resourceId].ResourceWidth}; min-width: {ColumnStyles[resourceId].ResourceMinimumWidth}; max-width: {ColumnStyles[resourceId].ResourceMaximumWidth}; visibility: {ColumnStyles[resourceId].ResourceVisibility};")">
+                            @if (ResourceTemplate != null)
+                            {
+                                @ResourceTemplate(resource)
+                            }
+                            else
+                            {
+                                <RadzenCard Style="width: 100%">
+                                    <div class="rz-resource-schedule-resource-text">@(resourceTextGetter(resource))</div>
+                                </RadzenCard>
+                            }
+                        </div>
+                        <RadzenScheduler @ref=@Schedulers[resourceId]
+                                Date="@CurrentDate" 
+                                Style="@($"height: {SchedulerHeight}; width: {ColumnStyles[resourceId].SchedulerWidth}; min-width: {ColumnStyles[resourceId].SchedulerMinimumWidth}; max-width: {ColumnStyles[resourceId].SchedulerMaximumWidth}; visibility: {ColumnStyles[resourceId].SchedulerVisibility};")"
+                                Data=@(GetAppointmentsForResource(resource)) 
+                                StartProperty=@StartProperty 
+                                EndProperty=@EndProperty 
+                                TextProperty=@AppointmentTextProperty 
+                                ShowHeader=@ShowHeader
+                                SelectedIndex=@selectedIndex
+                                AppointmentRender=@OnAppointmentRender[resourceId]
+                                SlotRender=@OnSlotRender[resourceId]
+                                SlotSelect=@OnSlotSelect[resourceId]
+                                AppointmentSelect=@OnAppointmentSelect[resourceId]
+                                MonthSelect=@OnMonthSelect[resourceId]
+                                DaySelect=@OnDaySelect[resourceId]
+                                MoreSelect=@OnMoreSelect[resourceId]
+                                AppointmentMouseEnter=@OnAppointmentMouseEnter[resourceId]
+                                AppointmentMouseLeave=@OnAppointmentMouseLeave[resourceId]
+                                TItem="TItem">
+                                <ChildContent>
+                                        <CascadingValue Name="ResourceScheduler" Value="@this">
+                                        @ChildContent
+                                    </CascadingValue>
+                                </ChildContent>
+                        </RadzenScheduler>
+                    </RadzenStack>
+                }
+            </RadzenStack>
+        </div>
+    }
+}

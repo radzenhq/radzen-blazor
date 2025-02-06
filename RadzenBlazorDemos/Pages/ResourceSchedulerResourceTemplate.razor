@@ -1,0 +1,305 @@
+@using Radzen.Blazor.Rendering
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using System.Globalization
+
+@inherits DbContextPage
+
+@inject TooltipService TooltipService
+@inject DialogService DialogService
+@inject IJSRuntime JSRuntime
+
+<style>
+    .highlight-slot {
+        background-color: var(--rz-info-light) !important;
+    }
+
+    .employee-rotated-text {
+        transform: rotate(-90deg);
+        width: 190px;
+        position: relative;
+        left: -90px;
+        max-width: 150px;
+        text-align: left;
+        top: 24px;
+    }
+
+    .employee-small-image {
+        width: 28px;
+        height: 28px;
+        position: relative;
+        left: -30px;
+        text-align: center;
+        top: 188px;
+        border-radius: 50%;
+    }
+
+    .rz-slider-horizontal .rz-slider-handle {
+        top: 50%;
+        transform: translateY(-50%);
+        margin-inline-start: -4px;
+        width: 5px;
+        height: var(--rz-slider-handle-height);
+        border-radius: 0;
+    }
+</style>
+
+<RadzenResourceScheduler @ref=@resourceScheduler
+                         Style="@($"height:750px;")"
+                         TItem="AppointmentWithResource"
+                         TResource="Employee"
+                         AppointmentData=@appointments
+                         ResourceData=@employees
+                         TLink="int"
+                         AppointmentLinkProperty="ResourceId"
+                         ResourceLinkProperty="EmployeeID"
+                         AppointmentTextProperty="Text"
+                         StartProperty="Start"
+                         EndProperty="End"
+                         ResourceTextProperty="LastName"
+                         ShowHeader=@showHeader
+                         SelectedIndex=@selectedIndex
+                         AppointmentRender=@OnAppointmentRender
+                         SlotRender=@OnSlotRender
+                         SlotSelect=@OnSlotSelect
+                         AppointmentSelect=@OnAppointmentSelect
+                         AppointmentMove=@OnAppointmentMove
+                         ResourceHeight="@ResourceHeight"
+                         SchedulerHeight="@SchedulerHeight">
+    <ResourceTemplate Context="data">
+        @if (resourceScheduler.ColumnStyles[data.EmployeeID].ColumnExpanded)
+        {
+            <RadzenButton Style="width: 100%;" Click="@(() => SwitchExpanded(data.EmployeeID))"
+                          Text="@($"Collapse")"
+                          Icon="@($"chevron_left")"
+                          Size="ButtonSize.Medium" Variant="Variant.Text" Shade="Shade.Dark" ButtonStyle="ButtonStyle.Info" />
+            <RadzenCard Style="@($"height: 170px; margin-bottom: 8px; min-width: 350px")">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" class="rz-p-4">
+                    <RadzenImage Path="@data.Photo" Style="width: 100px; height: 100px; border-radius: 50%;" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Employee</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@(data.FirstName + " " + data.LastName)</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Department</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@data.Title</b></RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        }
+        else
+        {
+            <RadzenButton Style="width: 100%;" Click="@(() => SwitchExpanded(data.EmployeeID))"
+                          Text="@($"")"
+                          Icon="@($"chevron_right")"
+                          Size="ButtonSize.Medium" Variant="Variant.Text" Shade="Shade.Dark" ButtonStyle="ButtonStyle.Info" />
+            <RadzenCard Style="@($"height: 260px;width: 30px; margin-bottom: 8px;")">
+                <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Start" Gap="1rem" class="rz-p-4">
+                    <RadzenImage class="employee-small-image" Path="@data.Photo" />
+                    <text class="employee-rotated-text"><b>@(data.FirstName + " " + data.LastName)</b></text>
+                </RadzenStack>
+            </RadzenCard>
+        }
+    </ResourceTemplate>
+    <ChildContent>
+        <RadzenDayView StartTime="@(new TimeSpan(8,0,0))" EndTime="@(new TimeSpan(20,0,0))" />
+        <RadzenMultiDayView StartTime="@(new TimeSpan(8,0,0))" EndTime="@(new TimeSpan(20,0,0))" NumberOfDays="4" AdvanceDays="1" />
+        <RadzenWeekView StartTime="@(new TimeSpan(8,0,0))" EndTime="@(new TimeSpan(20,0,0))" />
+        <RadzenMonthView />
+    </ChildContent>
+</RadzenResourceScheduler>
+
+<EventConsole @ref=@console />
+
+@code {
+
+    int selectedIndex { get; set; } = 1;
+
+    EventConsole console;
+    RadzenResourceScheduler<Employee, AppointmentWithResource, int> resourceScheduler { get; set; }
+
+    IList<Employee> employees;
+
+    string ResourceHeight = "100%";
+    string SchedulerHeight = "640px";
+
+    bool showHeader = false;
+
+    // this list is used in the random generation of the appointments
+    IList<AppointmentTextColor> appointmentTextColor = new List<AppointmentTextColor>()
+    {
+    new AppointmentTextColor() {Id=1, Text="Client Meeting", Color="PaleGoldenrod"},
+    new AppointmentTextColor() {Id=2, Text="Conference Call", Color="lightblue"},
+    new AppointmentTextColor() {Id=3, Text="Team Meeting", Color="#cdceff"},
+    new AppointmentTextColor() {Id=4, Text="Sales Call", Color="violet"},
+    new AppointmentTextColor() {Id=5, Text="Department Meeting", Color="salmon"},
+    new AppointmentTextColor() {Id=6, Text="Management Meeting", Color="lightpink"},
+    new AppointmentTextColor() {Id=7, Text="Office Training", Color="palegreen"},
+    new AppointmentTextColor() {Id=8, Text="Progress Report", Color="paleturquoise"},
+    new AppointmentTextColor() {Id=9, Text="IT Training", Color="#bbccff"},
+    new AppointmentTextColor() {Id=10, Text="Research", Color="peru"},
+
+    };
+
+    // how many random appointments to generate
+    const int APPOINTMENT_COUNT = 1200;
+
+    // the following generates a bunch of (APPOINTMENT_COUNT) appointments, spread over nine employees and 60 days
+    IList<AppointmentWithResource> appointments = new List<AppointmentWithResource>();
+    (DateTime start, DateTime end, string text, int res) GetRandomAppointments()
+    {
+        Random random = new Random();
+        int appDay = random.Next(APPOINTMENT_COUNT / 15) - (APPOINTMENT_COUNT / 45);
+        int startHour = 8 + random.Next(9);
+        int endMinutes = (random.Next(6) + 1) * 30;
+        int rnum = (random.Next(10) + 1);
+        string text = appointmentTextColor.Where(a => a.Id == rnum).First().Text;
+        int resource = random.Next(9) + 1;
+        return (DateTime.Now.Date.AddDays(appDay).AddHours(startHour).AddMinutes(30), DateTime.Now.Date.AddDays(appDay).AddHours(startHour).AddMinutes(endMinutes), text, resource);
+    }
+    void SetupAppointments()
+    {
+        (DateTime start, DateTime end, string Text, int res) calcTimes;
+
+        for (int i = 0; i < 900; i++)
+        {
+            calcTimes = GetRandomAppointments();
+            appointments.Add(new AppointmentWithResource() { Start = calcTimes.start, End = calcTimes.end, Text = calcTimes.Text, ResourceId = calcTimes.res });
+        }
+    }
+
+    async Task OnAppointmentMove(ResourceSchedulerAppointmentMoveEventArgs<Employee, AppointmentWithResource> args)
+    {
+        if (args.Resource.LastName == "Fuller" && args.Resource.EmployeeID != args.Data.ResourceId)
+        {
+            await DialogService.Alert($"Cannot assign other work to {args.Resource.FirstName} {args.Resource.LastName}");
+            args.PreventDefault();
+        }
+
+        if (args.View.Text == "Month")
+        {
+            args.DestinationStart = args.DestinationStart.Add(args.Data.Start.TimeOfDay);
+            args.DestinationEnd = args.DestinationStart.Add(args.Data.End - args.Data.Start);
+        }
+
+        console.Log($"AppointmentMove: Start={args.DestinationStart} End={args.DestinationEnd}");
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        SetupAppointments();
+        employees = dbContext.Employees.OrderBy(o => o.LastName).ToList();
+
+    }
+
+    void SwitchExpanded(int ResourceId)
+    {
+        resourceScheduler.ColumnStyles[ResourceId].ColumnExpanded = !resourceScheduler.ColumnStyles[ResourceId].ColumnExpanded;
+
+        if (resourceScheduler.ColumnStyles[ResourceId].ColumnExpanded)
+        {
+            resourceScheduler.ColumnStyles[ResourceId].ColumnWidth = "-webkit-fill-available";
+            resourceScheduler.ColumnStyles[ResourceId].ColumnMinimumWidth = "350px";
+            resourceScheduler.ColumnStyles[ResourceId].ResourceWidth = "100%";
+            resourceScheduler.ColumnStyles[ResourceId].ResourceMaximumWidth = "100%";
+            resourceScheduler.ColumnStyles[ResourceId].ResourceMinimumWidth = "100%";
+            resourceScheduler.ColumnStyles[ResourceId].SchedulerVisibility = "visible";
+        }
+        else
+        {
+            resourceScheduler.ColumnStyles[ResourceId].ColumnWidth = "30px";
+            resourceScheduler.ColumnStyles[ResourceId].ColumnMinimumWidth = "30px";
+            resourceScheduler.ColumnStyles[ResourceId].ResourceWidth = "30px";
+            resourceScheduler.ColumnStyles[ResourceId].ResourceMaximumWidth = "30px";
+            resourceScheduler.ColumnStyles[ResourceId].ResourceMinimumWidth = "30px";
+            resourceScheduler.ColumnStyles[ResourceId].SchedulerVisibility = "hidden";
+        }
+    }
+
+
+    void OnAppointmentRender(ResourceSchedulerAppointmentRenderEventArgs<Employee, AppointmentWithResource> args)
+    {
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+
+        string style = "";
+
+        var colorRecord = appointmentTextColor.Where(a => a.Text == args.Data.Text).FirstOrDefault();
+        style = $"background: {(colorRecord == null ? "lightgrey" : colorRecord.Color)};";
+
+        args.Attributes.Add("style", style);
+    }
+
+    void OnSlotRender(ResourceSchedulerSlotRenderEventArgs<Employee> args)
+    {
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+
+        // Highlight working hours (9-18)
+        if ((args.View.Text == "Week" || args.View.Text == "Day" || args.View.Text == "Multi-Day") && args.Start.Hour > 8 && args.Start.Hour < 18)
+        {
+            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+        }
+    }
+
+    async Task OnSlotSelect(ResourceSchedulerSlotSelectEventArgs<Employee> args)
+    {
+        console.Log($"SlotSelect: Start={args.Start} End={args.End}");
+
+        if (args.View.Text != "Year")
+        {
+            RadzenBlazorDemos.Appointment data = await DialogService.OpenAsync<AddAppointmentPage>($"Add Appointment for {args.Resource.FirstName} {args.Resource.LastName}",
+                new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+
+            if (data != null)
+            {
+                AppointmentWithResource newAppointment = new();
+                newAppointment.ResourceId = args.Resource.EmployeeID;
+                newAppointment.Start = data.Start;
+                newAppointment.End = data.End;
+                newAppointment.Text = data.Text;
+                appointments.Add(newAppointment);
+
+                await resourceScheduler.Reload();
+            }
+        }
+    }
+
+    async Task OnAppointmentSelect(ResourceSchedulerAppointmentSelectEventArgs<Employee, AppointmentWithResource> args)
+    {
+        console.Log($"AppointmentSelect: Appointment={args.Data.Text}");
+
+        var copy = new RadzenBlazorDemos.Appointment
+            {
+                Start = args.Data.Start,
+                End = args.Data.End,
+                Text = args.Data.Text
+            };
+
+        var data = await DialogService.OpenAsync<EditAppointmentPage>($"Edit Appointment for {args.Resource.FirstName} {args.Resource.LastName}", new Dictionary<string, object> { { "Appointment", copy } });
+
+        if (data != null)
+        {
+            // Update the appointment
+            args.Data.Start = data.Start;
+            args.Data.End = data.End;
+            args.Data.Text = data.Text;
+        }
+
+        await resourceScheduler.Reload();
+    }
+
+    // the following functions mainly deal with the custom header control panel that mimics one RadzenScheduler and propogates the changes to the rest
+    // custom classes used by the demo
+    public class AppointmentWithResource : RadzenBlazorDemos.Appointment
+    {
+        public int ResourceId { get; set; }
+    }
+
+    public class AppointmentTextColor
+    {
+        public int Id { get; set; }
+        public string Text { get; set; }
+        public string Color { get; set; }
+    }
+}

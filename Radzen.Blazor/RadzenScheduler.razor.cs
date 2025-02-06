@@ -470,6 +470,22 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        // Used by RadzenResourceScheduler to Select View based on index as opposed to object match
+        internal async Task SelectView(int index)
+        {
+            if (index < 0 && index >= (Views.Count))
+                return;
+
+            if (selectedIndex == index)
+                return;
+
+            selectedIndex = index;
+
+            await InvokeLoadData();
+
+            StateHasChanged();
+        }
+
         /// <summary>
         /// Causes the current scheduler view to render. Enumerates the items of <see cref="Data" /> and creates instances of <see cref="AppointmentData" /> to
         /// display in the current view. Use it when <see cref="Data" /> has changed.

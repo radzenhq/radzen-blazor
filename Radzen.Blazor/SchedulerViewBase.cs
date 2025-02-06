@@ -34,6 +34,12 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public IScheduler Scheduler { get; set; }
 
+        /// <summary>
+        /// Gets or sets the resource scheduler instance.
+        /// </summary>
+        /// <value>The resource scheduler.</value>
+        [CascadingParameter(Name = "ResourceScheduler")]
+        public IResourceScheduler ResourceScheduler { get; set; }
 
         /// <summary>
         /// Disposes this instance.
@@ -41,6 +47,7 @@ namespace Radzen.Blazor
         public void Dispose()
         {
             Scheduler?.RemoveView(this);
+            ResourceScheduler?.RemoveView(this);
         }
 
         /// <summary>
@@ -59,7 +66,14 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            await Scheduler.AddView(this);
+            if (Scheduler != null)
+            {
+                await Scheduler.AddView(this);
+            }
+            if (ResourceScheduler != null)
+            {
+                await ResourceScheduler.AddView(this);
+            }
         }
 
         /// <summary>

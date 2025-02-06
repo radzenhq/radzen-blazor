@@ -18,6 +18,9 @@
     <Content Update="Pages\DataGridRowDragSchedulerPage.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
+    <Content Update="Pages\ResourceSchedulerResourceTemplate.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
     <Content Update="Pages\SelectBarOrientation.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>

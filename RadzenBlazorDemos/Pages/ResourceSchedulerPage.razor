@@ -1,0 +1,52 @@
+@page "/resource-scheduler"
+@page "/docs/guides/components/resource-scheduler.html"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Resource Scheduler
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>ResourceScheduler</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="ResourceScheduler" Example="ResourceSchedulerConfig" AdditionalSourceCodePages=@(new [] { "../Models/Appointment.cs", "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
+    <ResourceSchedulerConfig />
+</RadzenExample>
+
+<RadzenText Anchor="scheduler#timeline" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Resource Template
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Radzen Blazor <strong>ResourceScheduler</strong> component with custom resource template.
+</RadzenText>
+
+<RadzenExample ComponentName="ResourceScheduler" Example="ResourceSchedulerResourceTemplate" AdditionalSourceCodePages=@(new [] { "../Models/Appointment.cs", "AddAppointmentPage.razor", "EditAppointmentPage.razor" })>
+    <ResourceSchedulerResourceTemplate />
+</RadzenExample>
+
+<RadzenText Anchor="scheduler#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Scheduler component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Scheduler component." },
+        new KeyboardShortcut { Key = "Tab on focused Scheduler", Action = "Navigate forward across available scheduler components." },
+        new KeyboardShortcut { Key = "Shift + Tab on focused Scheduler", Action = "Navigate backward across available scheduler components." },
+        new KeyboardShortcut { Key = "RightArrow on week/month view or year view selected month", Action = "Focus previous day." },
+        new KeyboardShortcut { Key = "LeftArrow on week/month view or year view selected month", Action = "Focus next day." },
+        new KeyboardShortcut { Key = "UpArrow on week/month view or year view selected month", Action = "Focus same day from previous week." },
+        new KeyboardShortcut { Key = "DownArrow on week/month view or year view selected month", Action = "Focus same day from next week." },
+        new KeyboardShortcut { Key = "UpArrow on day view", Action = "Focus previous hour." },
+        new KeyboardShortcut { Key = "DownArrow on day view", Action = "Focus next hour." },
+        new KeyboardShortcut { Key = "UpArrow on appointment", Action = "Focus previous appointment." },
+        new KeyboardShortcut { Key = "DownArrow on appointment", Action = "Focus next appointment." },
+        new KeyboardShortcut { Key = "Space on appointment", Action = "Edit appointment." },
+        new KeyboardShortcut { Key = "Enter", Action = "Add appointment." }
+    };
+}

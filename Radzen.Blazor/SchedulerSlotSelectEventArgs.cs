@@ -28,7 +28,7 @@ namespace Radzen
         /// <summary>
         /// Has default action been prevented from occuring?
         /// </summary>
-        public bool IsDefaultPrevented { get; private set; }
+        public bool IsDefaultPrevented { get; internal set; }
         /// <summary>
         /// Prevent default action from occuring.
         /// </summary>

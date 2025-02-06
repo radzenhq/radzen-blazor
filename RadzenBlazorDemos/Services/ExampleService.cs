@@ -960,6 +960,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Resource Scheduler",
+                    Path = "resource-scheduler",
+                    New = true,
+                    Description = "Blazor Resource Scheduler component with daily, weekly and monthly views by resource.",
+                    Icon = "&#xe653",
+                    Tags = new[] { "resource", "scheduler", "calendar", "event", "appointment" }
+                },
+                new Example
+                {
                     Name = "Table",
                     New = true,
                     Description = "Blazor RadzenTable component is used to create a HTML table with rows and cells.",
