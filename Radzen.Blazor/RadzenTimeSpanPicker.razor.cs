@@ -591,20 +591,11 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        private async Task ParseTimeSpan(string inputValue)
+        private async Task SetValueFromInput(string inputValue)
         {
-            TimeSpan? newValue;
             bool valid = TryParseInput(inputValue, out TimeSpan value);
 
-            if (valid)
-            {
-                newValue = value;
-            }
-            else
-            {
-                newValue = null;
-                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
-            }
+            TimeSpan? newValue = valid ? value : null;
 
             if (ConfirmedValue != newValue && (newValue is not null || _isNullable))
             {
@@ -619,6 +610,10 @@ namespace Radzen.Blazor
                 await ValueChanged.InvokeAsync(Value);
 
                 StateHasChanged();
+            }
+            else
+            {
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
             }
         }
 

@@ -20,7 +20,7 @@
         <input @ref="@input" type="text" name="@Name" id="@Name" value="@FormattedValue"
                disabled="@Disabled" readonly="@IsInputAllowed" autocomplete="off" class="@GetInputClass()"
                placeholder="@Placeholder" tabindex="@(Disabled ? "-1" : TabIndex.ToString())" @attributes="@InputAttributes"
-               @onchange="@(args => ParseTimeSpan(args.Value?.ToString()))"
+               @onchange="@(args => SetValueFromInput(args.Value?.ToString()))"
                @onclick="@(() => ClickInputField())" @onkeydown="@PressKey"
                @onkeydown:preventDefault="@_preventKeyPress" @onkeydown:stopPropagation />
         @if (ShowPopupButton)
