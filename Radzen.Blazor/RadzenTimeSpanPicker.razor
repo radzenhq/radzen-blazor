@@ -20,7 +20,7 @@
         <input @ref="@input" type="text" name="@Name" id="@Name" value="@FormattedValue"
                disabled="@Disabled" readonly="@IsInputAllowed" autocomplete="off" class="@GetInputClass()"
                placeholder="@Placeholder" tabindex="@(Disabled ? "-1" : TabIndex.ToString())" @attributes="@InputAttributes"
-               @onchange="@(() => ParseTimeSpan())"
+               @onchange="@(args => ParseTimeSpan(args.Value?.ToString()))"
                @onclick="@(() => ClickInputField())" @onkeydown="@PressKey"
                @onkeydown:preventDefault="@_preventKeyPress" @onkeydown:stopPropagation />
         @if (ShowPopupButton)
@@ -36,7 +36,7 @@
             <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
         }
     }
-    <PopupOrInline @ref="@popupHolder" Inline="@Inline" PopupLazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
+    <PopupOrInline @ref="@_popupHolder" Inline="@Inline" PopupLazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
                    PopupOpen="@OnPopupOpen" PopupClose="@OnPopupClose"
                    class="rz-timespanpicker-popup-container">
         <div class="rz-timespanpicker-panel"

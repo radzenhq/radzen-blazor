@@ -47,7 +47,7 @@ namespace Radzen.Blazor
                     return;
                 }
 
-                ConfirmedValue = (TimeSpan?) (object) value;
+                ConfirmedValue = (TimeSpan?)(object)value;
             }
         }
         /// <summary>
@@ -383,7 +383,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the formatted value.
         /// </summary>
-        public string FormattedValue => HasValue ? string.Format(Culture, "{0:" + TimeSpanFormat + "}", Value) : "";
+        public string FormattedValue => HasValue ? string.Format(Culture, "{0:" + TimeSpanFormat + "}", ConfirmedValue) : "";
 
         /// <summary>
         /// Gets the field identifier.
@@ -455,6 +455,14 @@ namespace Radzen.Blazor
 
 
         #region Methods: component general
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            // initial synchronization: necessary when T is not nullable and Value is default(T)
+            ConfirmedValue = (TimeSpan?)(object)Value;
+            base.OnInitialized();
+        }
+
         private bool _firstRender;
         /// <inheritdoc />
         protected override Task OnAfterRenderAsync(bool firstRender)
@@ -582,16 +590,11 @@ namespace Radzen.Blazor
 
             StateHasChanged();
         }
-        /// <summary>
-        /// Parses the time span.
-        /// </summary>
-        private async Task ParseTimeSpan()
+
+        private async Task ParseTimeSpan(string inputValue)
         {
             TimeSpan? newValue;
-            var inputValue = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
             bool valid = TryParseInput(inputValue, out TimeSpan value);
-
-            var nullable = AllowClear || Nullable.GetUnderlyingType(typeof(TValue)) != null;
 
             if (valid)
             {
@@ -600,18 +603,10 @@ namespace Radzen.Blazor
             else
             {
                 newValue = null;
-
-                if (nullable)
-                {
-                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, "");
-                }
-                else
-                {
-                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
-                }
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
             }
 
-            if (ConfirmedValue != newValue && (newValue != null || nullable))
+            if (ConfirmedValue != newValue && (newValue is not null || _isNullable))
             {
                 ConfirmedValue = newValue;
                 await Change.InvokeAsync(ConfirmedValue);
@@ -687,13 +682,13 @@ namespace Radzen.Blazor
         #endregion
 
         #region Internal: popup general actions
-        private PopupOrInline popupHolder;
+        private PopupOrInline _popupHolder;
 
         private Task TogglePopup()
-            => Inline ? Task.CompletedTask : popupHolder.Popup?.ToggleAsync(Element) ?? Task.CompletedTask;
+            => Inline ? Task.CompletedTask : _popupHolder.Popup?.ToggleAsync(Element) ?? Task.CompletedTask;
 
         private Task ClosePopup()
-            => Inline ? Task.CompletedTask : popupHolder.Popup?.CloseAsync(Element) ?? Task.CompletedTask;
+            => Inline ? Task.CompletedTask : _popupHolder.Popup?.CloseAsync(Element) ?? Task.CompletedTask;
 
         private async Task PopupKeyDown(KeyboardEventArgs args)
         {
