@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Bunit;
@@ -14,18 +15,20 @@ namespace Radzen.Blazor.Tests
         {
             public string Text { get; set; }
             public int Id { get; set; }
+            public bool Disabled { get; set; } = false;
         }
 
         private static IRenderedComponent<RadzenDropDown<T>> DropDown<T>(TestContext ctx, Action<ComponentParameterCollectionBuilder<RadzenDropDown<T>>> configure = null)
         {
-            var data = new [] {
+            var data = new[] {
                 new DataItem { Text = "Item 1", Id = 1 },
                 new DataItem { Text = "Item 2", Id = 2 },
             };
 
             var component = ctx.RenderComponent<RadzenDropDown<T>>();
 
-            component.SetParametersAndRender(parameters => {
+            component.SetParametersAndRender(parameters =>
+            {
                 parameters.Add(p => p.Data, data);
                 parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
 
@@ -100,7 +103,8 @@ namespace Radzen.Blazor.Tests
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = DropDown<string>(ctx, parameters => {
+            var component = DropDown<string>(ctx, parameters =>
+            {
                 parameters.Add(p => p.ValueProperty, nameof(DataItem.Text));
             });
 
@@ -123,7 +127,8 @@ namespace Radzen.Blazor.Tests
 
             List<DataItem> boundCollection = [new() { Text = "Item 2" }];
 
-            var component = DropDown<string>(ctx, parameters => {
+            var component = DropDown<string>(ctx, parameters =>
+            {
                 parameters.Add(p => p.ItemComparer, new DataItemComparer());
                 parameters.Add(p => p.Multiple, true);
                 parameters.Add(p => p.Value, boundCollection);
@@ -150,7 +155,8 @@ namespace Radzen.Blazor.Tests
 
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
-            var component = DropDown<string>(ctx, parameters => {
+            var component = DropDown<string>(ctx, parameters =>
+            {
                 parameters.Add(p => p.ValueProperty, nameof(DataItem.Text));
                 parameters.Add(p => p.Multiple, true);
             });
@@ -275,6 +281,50 @@ namespace Radzen.Blazor.Tests
             Assert.Collection(selectedItems, item => Assert.Contains("value: Item 1", item.Text()), item => Assert.Contains("value: Item 2", item.Text()));
         }
 
+        [Theory]
+        [InlineData(false, true, false, true, "false")]
+        [InlineData(true, false, true, false, "true")]
+        [InlineData(true, false, false, false, "false")]
+        [InlineData(true, false, false, true, "true")]
+        [InlineData(false, false, false, true, "false")]
+        public void DropDown_AllSelectedFalseIfListIsAllDisabled(bool item1Selected, bool item1Disabled, bool item2Selected, bool item2Disabled, string expectedAriaCheckedValue)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new[] {
+                new DataItem { Text = "Item 1", Id = 1, Disabled = item1Disabled },
+                new DataItem { Text = "Item 2", Id = 2, Disabled = item2Disabled },
+            };
+
+            List<int> selectedValues = [];
+            if (item1Selected)
+            {
+                selectedValues.Add(data[0].Id);
+            }
+            if (item2Selected)
+            {
+                selectedValues.Add(data[1].Id);
+            }
+
+            var component = ctx.RenderComponent<RadzenDropDown<DataItem>>(parameters => parameters
+               .Add(p => p.Data, data)
+               .Add(p => p.Value, selectedValues)
+               .Add(p => p.Multiple, true)
+               .Add(p => p.AllowSelectAll, true)
+               .Add(p => p.TextProperty, nameof(DataItem.Text))
+               .Add(p => p.DisabledProperty, nameof(DataItem.Disabled))
+               .Add(p => p.ValueProperty, nameof(DataItem.Id)));
+
+            Assert.NotNull(component);
+            var highlightedItems = component.FindAll(".rz-state-highlight");
+            Assert.Equal(selectedValues.Count, highlightedItems.Count);
+
+
+            var selectAllCheckBox = component.Find(".rz-multiselect-header input[type='checkbox']");
+
+            Assert.Equal(expectedAriaCheckedValue, selectAllCheckBox.GetAttribute("aria-checked"));
+        }
 
         class DataItemComparer : IEqualityComparer<DataItem>, IEqualityComparer<object>
         {

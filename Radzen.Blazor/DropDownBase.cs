@@ -341,15 +341,17 @@ namespace Radzen
 
         internal bool IsAllSelected()
         {
+            List<object> notDisabledItemsInList = View.Cast<object>().ToList()
+                .Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true)
+                .ToList();
+
             if (LoadData.HasDelegate && !string.IsNullOrEmpty(ValueProperty))
             {
-                return View != null && View.Cast<object>().ToList()
-                    .Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true)
+                return View != null && notDisabledItemsInList.Count > 0 && notDisabledItemsInList
                     .All(i => IsItemSelectedByValue(GetItemOrValueFromProperty(i, ValueProperty)));
             }
 
-            return View != null && selectedItems.Count == View.Cast<object>().ToList()
-                    .Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).Count();
+            return View != null && notDisabledItemsInList.Count > 0 && selectedItems.Count == notDisabledItemsInList.Count;
         }
 
         /// <summary>
