@@ -157,7 +157,7 @@ namespace Radzen.Blazor
         bool clientExpanded;
         internal async Task Toggle()
         {
-            if (expanded)
+            if (expanded && !Tree.SingleExpand)
             {
                 clientExpanded = !clientExpanded;
 
