@@ -10,6 +10,7 @@ namespace Radzen.Blazor.Tests
 {
     public class TimeSpanPickerTests
     {
+        #region Component general
         [Fact]
         public void TimeSpanPicker_Renders_CssClass()
         {
@@ -20,6 +21,24 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
 
             Assert.Contains(@$"rz-timespanpicker", component.Markup);
+        }
+
+        [Fact]
+        public void TimeSpanPicker_Renders_StyleParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            var value = "width: 200px";
+
+            component.SetParametersAndRender(parameters => {
+                parameters.Add(p => p.Style, value);
+            });
+
+            Assert.Contains(@$"style=""{value}""", component.Markup);
         }
 
         [Fact]
@@ -50,7 +69,9 @@ namespace Radzen.Blazor.Tests
 
             Assert.DoesNotContain(@$"rz-state-empty", component.Markup);
         }
+        #endregion
 
+        #region Input field
         [Fact]
         public void TimeSpanPicker_Respects_MinParameter_OnInput()
         {
@@ -108,9 +129,31 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
 
-            component.SetParametersAndRender(parameters => parameters.AddUnmatched("autofocus", ""));
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.AddUnmatched("autofocus", "");
+            });
 
-            Assert.Contains(@$"autofocus", component.Markup);
+            Assert.Contains("autofocus", component.Markup);
+        }
+
+        [Fact]
+        public void TimeSpanPicker_Renders_InputClassParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            var inputClass = "test-class";
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.InputClass, inputClass);
+            });
+
+            var inputField = component.Find(".rz-inputtext");
+            Assert.Contains(inputClass, inputField.ClassList);
         }
 
         [Fact]
@@ -128,7 +171,8 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Value, TimeSpan.FromDays(1));
             });
 
-            Assert.Contains(@$"<i class=""notranslate rz-dropdown-clear-icon rzi rzi-times""", component.Markup);
+            var clearButtons = component.FindAll(".rz-dropdown-clear-icon");
+            Assert.Equal(1, clearButtons.Count);
         }
 
         [Fact]
@@ -188,6 +232,59 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void TimeSpanPicker_Renders_ShowPopupButtonParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.ShowPopupButton, true);
+            });
+
+            var triggerButtons = component.FindAll(".rz-timespanpicker-trigger");
+            Assert.Equal(1, triggerButtons.Count);
+        }
+
+        [Fact]
+        public void TimeSpanPicker_Renders_PopupButtonClassParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            var inputClass = "test-class";
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.PopupButtonClass, inputClass);
+            });
+
+            var popupButton = component.Find(".rz-timespanpicker-trigger");
+            Assert.Contains(inputClass, popupButton.ClassList);
+        }
+
+        [Fact]
+        public void TimeSpanPicker_Renders_TabIndexParameter()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            var value = 1;
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.TabIndex, value));
+
+            Assert.Contains(@$"tabindex=""{value}""", component.Markup);
+        }
+
+        [Fact]
         public void TimeSpanPicker_Renders_TimeSpanFormatParameter()
         {
             using var ctx = new TestContext();
@@ -233,6 +330,40 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(expectedValue, component.Instance.Value);
         }
 
+        [Fact]
+        public void TimeSpanPicker_Parses_Input_Using_ParseInput()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan?>>();
+
+            Func<string, TimeSpan?> customParseInput = (input) =>
+            {
+                if (TimeSpan.TryParseExact(input, "'- 'h'h 'm'min 's's'", null, TimeSpanStyles.AssumeNegative, out var result))
+                {
+                    return result;
+                }
+                return null;
+            };
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.ParseInput, customParseInput);
+            });
+
+            var inputElement = component.Find(".rz-inputtext");
+
+            string input = "- 15h 5min 30s";
+            TimeSpan expectedValue = new TimeSpan(15, 5, 30).Negate();
+
+            inputElement.Change(input);
+
+            Assert.Equal(expectedValue, component.Instance.Value);
+        }
+        #endregion
+
+        #region Panel
         [Theory]
         [InlineData(
             TimeSpanUnit.Day,
@@ -271,24 +402,6 @@ namespace Radzen.Blazor.Tests
                 Assert.DoesNotContain(element, component.Markup);
             }
         }
-
-
-
-
-        [Fact]
-        public void TimeSpanPicker_Renders_TabIndexParameter()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
-
-            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
-
-            var value = 1;
-
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.TabIndex, value));
-
-            Assert.Contains(@$"tabindex=""{value}""", component.Markup);
-        }
+        #endregion
     }
 }
