@@ -63,12 +63,18 @@ namespace Radzen.Blazor
         public TimeSpan Max { get; set; } = TimeSpan.MaxValue;
         #endregion
 
-        #region Parameters: input config
+        #region Parameters: input field config
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
+        /// <summary>
+        /// Specifies the input CSS classes, separated with spaces.
+        /// </summary>
+        [Parameter]
+        public string InputClass { get; set; }
 
         /// <summary>
         /// Specifies whether the value can be cleared.
@@ -100,6 +106,20 @@ namespace Radzen.Blazor
         public bool ReadOnly { get; set; }
 
         /// <summary>
+        /// Specifies whether to display popup icon button in the input field.
+        /// </summary>
+        /// <value><c>true</c> to display the button to open the popup;
+        /// <c>false</c> to hide the button to open the popup, clicking the input field opens the popup instead.</value>
+        [Parameter]
+        public bool ShowPopupButton { get; set; } = true;
+
+        /// <summary>
+        /// Specifies the popup toggle button CSS classes, separated with spaces.
+        /// </summary>
+        [Parameter]
+        public string PopupButtonClass { get; set; }
+
+        /// <summary>
         /// Specifies the time span format in the input field.
         /// For more details, see the documentation of
         /// <see href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings">standard</see>
@@ -108,6 +128,48 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string TimeSpanFormat { get; set; }
+
+        /// <summary>
+        /// Specifies the tab index.
+        /// </summary>
+        [Parameter]
+        public int TabIndex { get; set; } = 0;
+
+        /// <summary>
+        /// Specifies custom function to parse the input.
+        /// If it's not defined or the function it returns <c>null</c>, a built-in parser us used instead.
+        /// </summary>
+        [Parameter]
+        public Func<string, TimeSpan?> ParseInput { get; set; }
+        #endregion
+
+        #region Parameters: panel config
+        /// <summary>
+        /// Specifies the render mode of the popup.
+        /// </summary>
+        [Parameter]
+        public PopupRenderMode PopupRenderMode { get; set; } = PopupRenderMode.Initial;
+
+        /// <summary>
+        /// Specifies whether the component is inline or shows a popup.
+        /// </summary>
+        /// <value><c>true</c> if inline; <c>false</c> if shows a popup.</value>
+        [Parameter]
+        public bool Inline { get; set; }
+
+        /// <summary>
+        /// Specifies whether to display the confirmation button in the panel to accept changes.
+        /// </summary>
+        /// <value><c>true</c> if the confirmation button is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowConfirmationButton { get; set; } = false;
+
+        /// <summary>
+        /// Specifies whether the time fields in the panel, except for the days field, are padded with leading zeros.
+        /// </summary>
+        /// <value><c>true</c> if fields are padded; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool PadTimeValues { get; set; }
 
         /// <summary>
         /// Specifies the most precise time unit field in the picker panel. Set to <see cref="TimeSpanUnit.Second"/> by default.
@@ -152,62 +214,6 @@ namespace Radzen.Blazor
         [Parameter]
         public string MicrosecondsStep { get; set; }
         #endif
-
-        /// <summary>
-        /// Specifies the tab index.
-        /// </summary>
-        [Parameter]
-        public int TabIndex { get; set; } = 0;
-
-        /// <summary>
-        /// Specifies custom function to parse the input.
-        /// If it's not defined or the function it returns <c>null</c>, a built-in parser us used instead.
-        /// </summary>
-        [Parameter]
-        public Func<string, TimeSpan?> ParseInput { get; set; }
-        #endregion
-
-        #region Parameters: appearance
-        /// <summary>
-        /// Specifies whether the component is inline or shows a popup.
-        /// </summary>
-        /// <value><c>true</c> if inline; <c>false</c> if shows a popup.</value>
-        [Parameter]
-        public bool Inline { get; set; }
-
-        /// <summary>
-        /// Specifies whether to display popup icon button in the input field.
-        /// </summary>
-        /// <value><c>true</c> to display the button to open the popup;
-        /// <c>false</c> to hide the button to open the popup, clicking the input field opens the popup instead.</value>
-        [Parameter]
-        public bool ShowPopupButton { get; set; } = true;
-
-        /// <summary>
-        /// Specifies whether to display the confirmation button in the panel to accept changes.
-        /// </summary>
-        /// <value><c>true</c> if the confirmation button is shown; otherwise, <c>false</c>.</value>
-        [Parameter]
-        public bool ShowConfirmationButton { get; set; } = false;
-
-        /// <summary>
-        /// Specifies whether the time fields in the panel, except for the days field, are padded with leading zeros.
-        /// </summary>
-        /// <value><c>true</c> if fields are padded; otherwise, <c>false</c>.</value>
-        [Parameter]
-        public bool PadTimeValues { get; set; }
-
-        /// <summary>
-        /// Specifies the input CSS classes, separated with spaces.
-        /// </summary>
-        [Parameter]
-        public string InputClass { get; set; }
-
-        /// <summary>
-        /// Specifies the popup toggle button CSS classes, separated with spaces.
-        /// </summary>
-        [Parameter]
-        public string TogglePopupButtonClass { get; set; }
         #endregion
 
         #region Parameters: labels
@@ -298,12 +304,6 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string Name { get; set; }
-
-        /// <summary>
-        /// Specifies the render mode of the popup.
-        /// </summary>
-        [Parameter]
-        public PopupRenderMode PopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
         /// <summary>
         /// Specifies the value expression used while creating the <see cref="FieldIdentifier"/>.
@@ -901,7 +901,7 @@ namespace Radzen.Blazor
 
         private string GetTogglePopupButtonClass()
             => ClassList.Create("rz-timespanpicker-trigger rz-button rz-button-icon-only")
-                .Add(TogglePopupButtonClass)
+                .Add(PopupButtonClass)
                 .Add("rz-state-disabled", Disabled)
                 .ToString();
         #endregion
