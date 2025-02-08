@@ -65,18 +65,6 @@ namespace Radzen.Blazor
 
         #region Parameters: input field config
         /// <summary>
-        /// Specifies additional custom attributes that will be rendered by the input.
-        /// </summary>
-        [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
-
-        /// <summary>
-        /// Specifies the input CSS classes, separated with spaces.
-        /// </summary>
-        [Parameter]
-        public string InputClass { get; set; }
-
-        /// <summary>
         /// Specifies whether the value can be cleared.
         /// Set to <c>true</c> by default if <typeparamref name="TValue"/> is nullable, <c>false</c> otherwise.
         /// </summary>
@@ -120,6 +108,30 @@ namespace Radzen.Blazor
         public string PopupButtonClass { get; set; }
 
         /// <summary>
+        /// Specifies additional custom attributes that will be rendered by the input.
+        /// </summary>
+        [Parameter]
+        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
+        /// <summary>
+        /// Specifies the input CSS classes, separated with spaces.
+        /// </summary>
+        [Parameter]
+        public string InputClass { get; set; }
+
+        /// <summary>
+        /// Specifies the name of the input field.
+        /// </summary>
+        [Parameter]
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Specifies the tab index.
+        /// </summary>
+        [Parameter]
+        public int TabIndex { get; set; } = 0;
+
+        /// <summary>
         /// Specifies the time span format in the input field.
         /// For more details, see the documentation of
         /// <see href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/standard-timespan-format-strings">standard</see>
@@ -130,17 +142,25 @@ namespace Radzen.Blazor
         public string TimeSpanFormat { get; set; }
 
         /// <summary>
-        /// Specifies the tab index.
-        /// </summary>
-        [Parameter]
-        public int TabIndex { get; set; } = 0;
-
-        /// <summary>
         /// Specifies custom function to parse the input.
         /// If it's not defined or the function it returns <c>null</c>, a built-in parser us used instead.
         /// </summary>
         [Parameter]
         public Func<string, TimeSpan?> ParseInput { get; set; }
+        #endregion
+
+        #region Parameters: input field labels
+        /// <summary>
+        /// Specifies the input placeholder.
+        /// </summary>
+        [Parameter]
+        public string Placeholder { get; set; }
+
+        /// <summary>
+        /// Specifies the aria label for the toggle popup button.
+        /// </summary>
+        [Parameter]
+        public string TogglePopupAriaLabel { get; set; } = "Toggle popup";
         #endregion
 
         #region Parameters: panel config
@@ -216,19 +236,7 @@ namespace Radzen.Blazor
         #endif
         #endregion
 
-        #region Parameters: labels
-        /// <summary>
-        /// Specifies the input placeholder.
-        /// </summary>
-        [Parameter]
-        public string Placeholder { get; set; }
-
-        /// <summary>
-        /// Specifies the aria label for the toggle popup button.
-        /// </summary>
-        [Parameter]
-        public string TogglePopupAriaLabel { get; set; } = "Toggle popup";
-
+        #region Parameters: panel labels
         /// <summary>
         /// Specifies the label of the confirmation button.
         /// </summary>
@@ -299,12 +307,6 @@ namespace Radzen.Blazor
         #endregion
 
         #region Parameters: other config
-        /// <summary>
-        /// Specifies the name of the form component.
-        /// </summary>
-        [Parameter]
-        public string Name { get; set; }
-
         /// <summary>
         /// Specifies the value expression used while creating the <see cref="FieldIdentifier"/>.
         /// </summary>
