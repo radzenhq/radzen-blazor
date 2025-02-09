@@ -11,8 +11,11 @@ namespace Radzen.Blazor.Tests
     public class TimeSpanPickerTests
     {
         const string _pickerClassSelector = ".rz-timespanpicker";
+        const string _popupButtonClassSelector = ".rz-timespanpicker-trigger";
+        const string _clearButtonClassSelector = ".rz-dropdown-clear-icon";
         const string _inputFieldClassSelector = ".rz-inputtext";
         const string _panelClassSelector = ".rz-timespanpicker-panel";
+        static CultureInfo _cultureInfo = CultureInfo.InvariantCulture;
 
         #region Component general look
         [Fact]
@@ -182,7 +185,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Value, TimeSpan.FromDays(1));
             });
 
-            var clearButtons = component.FindAll(".rz-dropdown-clear-icon");
+            var clearButtons = component.FindAll(_clearButtonClassSelector);
             Assert.Equal(1, clearButtons.Count);
         }
 
@@ -260,7 +263,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.ShowPopupButton, true);
             });
 
-            var triggerButtons = component.FindAll(".rz-timespanpicker-trigger");
+            var triggerButtons = component.FindAll(_popupButtonClassSelector);
             Assert.Equal(1, triggerButtons.Count);
         }
 
@@ -300,7 +303,7 @@ namespace Radzen.Blazor.Tests
             });
 
             var inputField = component.Find(_inputFieldClassSelector);
-            Assert.Equal(tabIndex.ToString(), inputField.GetAttribute("tabindex"));
+            Assert.Equal(tabIndex.ToString(_cultureInfo), inputField.GetAttribute("tabindex"));
         }
 
         [Fact]
@@ -314,12 +317,13 @@ namespace Radzen.Blazor.Tests
 
             var format = "d'd 'h'h 'm'min 's's'";
             var value = new TimeSpan(1, 6, 30, 15);
-            var formattedValue = value.ToString(format);
+            var formattedValue = value.ToString(format, _cultureInfo);
 
             component.SetParametersAndRender(parameters =>
             {
                 parameters.Add(p => p.TimeSpanFormat, format);
                 parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.Culture, _cultureInfo);
             });
 
             var inputField = component.Find(_inputFieldClassSelector);
@@ -407,10 +411,11 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters =>
             {
                 parameters.Add(p => p.TimeSpanFormat, format);
+                parameters.Add(p => p.Culture, _cultureInfo);
             });
 
             var expectedValue = new TimeSpan(15, 5, 30);
-            var input = expectedValue.ToString(format);
+            var input = expectedValue.ToString(format, _cultureInfo);
 
             var inputElement = component.Find(_inputFieldClassSelector);
             inputElement.Change(input);
@@ -449,6 +454,88 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal(expectedValue, component.Instance.Value);
         }
+
+        [Fact]
+        public void TimeSpanPicker_Raises_ValueChanged_OnInputChange()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            bool raised = false;
+            TimeSpan newValue = TimeSpan.Zero;
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; });
+                parameters.Add(p => p.Culture, _cultureInfo);
+            });
+
+            TimeSpan inputValue = new TimeSpan(3, 15, 30);
+            var input = inputValue.ToString(null, _cultureInfo);
+
+            var inputElement = component.Find(_inputFieldClassSelector);
+
+            inputElement.Change(input);
+
+            Assert.True(raised);
+            Assert.Equal(inputValue, newValue);
+        }
+
+        [Fact]
+        public void TimeSpanPicker_Raises_Change_OnInputChange()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            bool raised = false;
+            TimeSpan? newValue = null;
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Change, args => { raised = true; newValue = args; });
+                parameters.Add(p => p.Culture, _cultureInfo);
+            });
+
+            TimeSpan inputValue = new TimeSpan(3, 15, 30);
+            var input = inputValue.ToString(null, _cultureInfo);
+
+            var inputElement = component.Find(_inputFieldClassSelector);
+
+            inputElement.Change(input);
+
+            Assert.True(raised);
+            Assert.Equal(inputValue, newValue);
+        }
+
+        // TimeSpanPicker_Opens_Popup_OnPopupButtonClick – I don't know how to test it if I can't check if an element is visible
+
+        [Fact]
+        public void TimeSpanPicker_Raises_ChangeEvent_OnClearButtonClick()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan?>>();
+
+            var raised = false;
+            TimeSpan? value = new TimeSpan(3, 15, 30);
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.Change, args => { raised = true; value = args; });
+            });
+
+            var clearButton = component.Find(_clearButtonClassSelector);
+            clearButton.Click();
+
+            Assert.True(raised);
+            Assert.Null(value);
+        }
         #endregion
 
         #region Panel look
@@ -483,12 +570,12 @@ namespace Radzen.Blazor.Tests
 
             foreach (var element in elementsToRender)
             {
-                var foundElements = component.FindAll(element);
+                var foundElements = component.FindAll($"{_panelClassSelector} {element}");
                 Assert.Equal(1, foundElements.Count);
             }
             foreach (var element in elementsNotToRender)
             {
-                var foundElements = component.FindAll(element);
+                var foundElements = component.FindAll($"{_panelClassSelector} {element}");
                 Assert.Equal(0, foundElements.Count);
             }
         }

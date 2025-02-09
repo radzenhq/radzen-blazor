@@ -646,11 +646,11 @@ namespace Radzen.Blazor
             }
             else
             {
-                valid = TimeSpan.TryParseExact(inputValue, TimeSpanFormat, null, TimeSpanStyles.None, out value);
+                valid = TimeSpan.TryParseExact(inputValue, TimeSpanFormat, Culture, TimeSpanStyles.None, out value);
 
                 if (!valid)
                 {
-                    valid = TimeSpan.TryParse(inputValue, out value);
+                    valid = TimeSpan.TryParse(inputValue, Culture, out value);
                 }
             }
 
