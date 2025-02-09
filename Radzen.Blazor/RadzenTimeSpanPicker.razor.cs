@@ -370,17 +370,20 @@ namespace Radzen.Blazor
         #region Calculated properties and references
         private static readonly bool _isNullable = Nullable.GetUnderlyingType(typeof(TValue)) is not null;
 
-        /// <summary>
-        /// Indicates whether this instance is bound <see cref="ValueChanged"/> callback has delegate).
-        /// </summary>
-        /// <value><c>true</c> if this instance is bound; otherwise, <c>false</c>.</value>
-        public bool IsBound => ValueChanged.HasDelegate;
+        private bool PreventValueChange => Disabled || ReadOnly;
+        private bool PreventPopupToggle => Disabled || ReadOnly || Inline;
 
         /// <summary>
         /// Indicates whether this instance has a confirmed value.
         /// </summary>
         /// <value><c>true</c> if this instance has value; otherwise, <c>false</c>.</value>
         public bool HasValue => ConfirmedValue.HasValue;
+
+        /// <summary>
+        /// Indicates whether this instance is bound <see cref="ValueChanged"/> callback has delegate).
+        /// </summary>
+        /// <value><c>true</c> if this instance is bound; otherwise, <c>false</c>.</value>
+        public bool IsBound => ValueChanged.HasDelegate;
 
         /// <summary>
         /// Gets the formatted value.
@@ -541,8 +544,10 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task Close()
         {
-            if (Disabled || ReadOnly || Inline)
+            if (Inline)
+            {
                 return;
+            }
 
             await ClosePopup();
 
@@ -575,7 +580,7 @@ namespace Radzen.Blazor
 
         private async Task Clear()
         {
-            if (Disabled || ReadOnly)
+            if (PreventValueChange)
             {
                 return;
             }
@@ -595,6 +600,11 @@ namespace Radzen.Blazor
 
         private async Task SetValueFromInput(string inputValue)
         {
+            if (PreventValueChange)
+            {
+                return;
+            }
+
             bool valid = TryParseInput(inputValue, out TimeSpan value);
 
             TimeSpan? newValue = valid ? value : null;
@@ -651,11 +661,13 @@ namespace Radzen.Blazor
         #region Internal: input mouse and keyboard events
         private async Task ClickPopupButton()
         {
-            if (!Disabled && !ReadOnly && !Inline)
+            if (PreventPopupToggle)
             {
-                await TogglePopup();
-                await FocusAsync();
+                return;
             }
+
+            await TogglePopup();
+            await FocusAsync();
         }
 
         private Task ClickInputField()
@@ -664,6 +676,11 @@ namespace Radzen.Blazor
         private bool _preventKeyPress = false;
         private async Task PressKey(KeyboardEventArgs args)
         {
+            if (PreventPopupToggle)
+            {
+                return;
+            }
+
             var key = args.Code ?? args.Key;
 
             if (key == "Enter")
@@ -865,6 +882,11 @@ namespace Radzen.Blazor
 
         private Task UpdateValueFromPanelFields(TimeSpan newValue)
         {
+            if (PreventValueChange)
+            {
+                return Task.CompletedTask;
+            }
+
             UnconfirmedValue = newValue;
 
             if (ShowConfirmationButton)

@@ -1,17 +1,22 @@
 ﻿@inherits RadzenComponent
 
+@if (!Visible)
+{
+    return;
+}
+
 @if (Inline)
 {
     @ChildContent
 }
-else {
+else
+{
     <Popup @ref="@Popup" Attributes="@Attributes"
            Lazy="@PopupLazy" AutoFocusFirstElement="@PopupAutoFocusFirstElement" PreventDefault="@PopupPreventDefault"
            Open="@PopupOpen" Close="@PopupClose">
         @ChildContent
     </Popup>
 }
-
 
 @code {
     [Parameter]

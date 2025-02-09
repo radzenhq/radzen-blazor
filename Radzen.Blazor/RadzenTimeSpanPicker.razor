@@ -36,7 +36,8 @@
             <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
         }
     }
-    <PopupOrInline @ref="@_popupHolder" Inline="@Inline" PopupLazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
+    <PopupOrInline @ref="@_popupHolder" Inline="@Inline" Visible="@(Inline || !PreventPopupToggle)"
+                   PopupLazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
                    PopupOpen="@OnPopupOpen" PopupClose="@OnPopupClose"
                    class="rz-timespanpicker-popup-container">
         <div class="rz-timespanpicker-panel"
