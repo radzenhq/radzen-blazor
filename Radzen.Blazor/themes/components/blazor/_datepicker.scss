@@ -59,62 +59,62 @@ $timepicker-separator-margin: 0 0.5rem !default;
 $timepicker-border: none !default;
 
 .rz-datepicker {
-    display: inline-block;
-    position: relative;
+  display: inline-block;
+  position: relative;
 
-    &:has(>.rz-inputtext:not(:disabled):not(.rz-state-disabled):focus) {
-        outline: none; // unify .invalid styles with other forms components
+  &:has(>.rz-inputtext:not(:disabled):not(.rz-state-disabled):focus) {
+    outline: none; // unify .invalid styles with other forms components
+  }
+
+  .rz-readonly {
+    cursor: pointer;
+  }
+
+  > .rz-inputtext {
+    @extend %input;
+    width: 100%;
+    line-height: var(--rz-datepicker-line-height);
+  }
+
+  &:has(.rz-datepicker-trigger) > .rz-inputtext {
+    padding-inline-end: calc(1rem + var(--rz-datepicker-trigger-icon-width));
+  }
+
+  &:has(.rz-clear-icon) > .rz-inputtext {
+    padding-inline-end: calc(1rem + var(--rz-clear-icon-width));
+  }
+
+  &:has(.rz-datepicker-trigger):has(.rz-clear-icon) > .rz-inputtext {
+    padding-inline-end: calc(1rem + var(--rz-clear-icon-width) + var(--rz-datepicker-trigger-icon-width));
+  }
+
+  &:not(.rz-state-disabled) {
+    &:hover {
+      .rz-datepicker-trigger {
+        box-shadow: none;
+        color: var(--rz-datepicker-trigger-icon-hover-color);
+      }
     }
+  }
 
-    .rz-readonly {
-        cursor: pointer;
-    }
-
+  &.rz-state-disabled {
     > .rz-inputtext {
-        @extend %input;
-        width: 100%;
-        line-height: var(--rz-datepicker-line-height);
-    }
+      color: var(--rz-input-disabled-color);
+      box-shadow: var(--rz-input-disabled-shadow);
+      background-color: var(--rz-input-disabled-background-color);
+      border: var(--rz-input-disabled-border);
+      opacity: var(--rz-input-disabled-opacity);
 
-    &:has(.rz-datepicker-trigger) > .rz-inputtext {
-        padding-inline-end: calc(1rem + var(--rz-datepicker-trigger-icon-width));
+      &::placeholder {
+        color: var(--rz-input-disabled-placeholder-color);
+      }
     }
+  }
 
-    &:has(.rz-clear-icon) > .rz-inputtext {
-        padding-inline-end: calc(1rem + var(--rz-clear-icon-width));
-    }
-
-    &:has(.rz-datepicker-trigger):has(.rz-clear-icon) > .rz-inputtext {
-        padding-inline-end: calc(1rem + var(--rz-clear-icon-width) + var(--rz-datepicker-trigger-icon-width));
-    }
-
-    &:not(.rz-state-disabled) {
-        &:hover {
-            .rz-datepicker-trigger {
-                box-shadow: none;
-                color: var(--rz-datepicker-trigger-icon-hover-color);
-            }
-        }
-    }
-
-    &.rz-state-disabled {
-        > .rz-inputtext {
-            color: var(--rz-input-disabled-color);
-            box-shadow: var(--rz-input-disabled-shadow);
-            background-color: var(--rz-input-disabled-background-color);
-            border: var(--rz-input-disabled-border);
-            opacity: var(--rz-input-disabled-opacity);
-
-            &::placeholder {
-                color: var(--rz-input-disabled-placeholder-color);
-            }
-        }
-    }
-
-    > .rz-field-icon-wrapper {
-        inset-inline-end: 0.625rem;
-        display: flex;
-    }
+  > .rz-field-icon-wrapper {
+    inset-inline-end: 0.625rem;
+    display: flex;
+  }
 }
 
 
