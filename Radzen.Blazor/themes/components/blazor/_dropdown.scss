@@ -70,14 +70,7 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
 }
 
 %dropdown-trigger {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  inset-inline-end: 0;
-  inset-block-start: 0;
-  inset-block-end: 0;
-
-  .rzi {
+  &.rzi {
     width: var(--rz-dropdown-trigger-icon-width);
     height: var(--rz-dropdown-trigger-icon-height);
     font-size: var(--rz-dropdown-trigger-icon-height);
@@ -85,41 +78,16 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
     margin-inline: var(--rz-dropdown-trigger-icon-margin-inline);
   }
 
-  .rzi-chevron-down {
-    &:before {
-      content: $dropdown-trigger-icon;
-    }
+  &.rzi-chevron-down:before {
+    content: $dropdown-trigger-icon;
   }
 }
 
-.rz-dropdown-trigger {
+.rz-dropdown-trigger-icon {
   @extend %dropdown-trigger;
 }
 
-.rz-dropdown-clear-icon {
-  position: absolute;
-  inset-inline-end: calc(var(--rz-dropdown-trigger-icon-width) + 0.5rem);
-  inset-block-start: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  font-size: var(--rz-dropdown-trigger-icon-height);
-  opacity: 0.4;
-
-  &:before {
-    content: 'close';
-  }
-
-  &:hover {
-    opacity: 1;
-  }
-
-  .rz-state-disabled > & {
-    display: none;
-  }
-}
-
-.rz-multiselect-trigger {
+.rz-multiselect-trigger-icon {
   @extend %dropdown-trigger;
 }
 
@@ -290,6 +258,6 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
 .rz-clear {
   .rz-multiselect-label-container,
   .rz-dropdown-label {
-    padding-inline-end: calc(2 * var(--rz-dropdown-trigger-icon-width));
+    padding-inline-end: calc(var(--rz-dropdown-trigger-icon-width) + var(--rz-clear-icon-width));
   }
 }

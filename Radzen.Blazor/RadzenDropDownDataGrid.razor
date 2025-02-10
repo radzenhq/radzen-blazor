@@ -107,7 +107,11 @@
             </span>
         }
 
-        <div class="rz-dropdown-trigger  rz-corner-right">
+        <div class="rz-field-icon-wrapper">
+            @if (AllowClear && !Disabled && (!Multiple && HasValue || Multiple && selectedItems.Count > 0))
+            {
+                <i class="notranslate rz-clear-icon rzi rzi-times" @onclick="@ClearAll" @onclick:stopPropagation="true"></i>
+            }
             <span class="notranslate rz-dropdown-trigger-icon rzi rzi-chevron-down"></span>
         </div>
 
@@ -186,11 +190,6 @@
                 }
             </div>
         </div>
-
-        @if (AllowClear && (!Multiple && HasValue || Multiple && (selectedItems.Count > 0 || SelectedValue is IEnumerable)))
-        {
-            <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
-        }
     </div>
 }
 @code {

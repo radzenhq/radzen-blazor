@@ -31,384 +31,382 @@ $form-field-label-floating-background-color: var(--rz-input-background-color) !d
 $form-field-helper-padding: 0 0.5rem !default;
 
 .rz-form-field-helper {
-    padding: var(--rz-form-field-helper-padding);
+  padding: var(--rz-form-field-helper-padding);
 }
 
 .rz-form-field-content {
-    @extend %input-no-padding;
+  @extend %input-no-padding;
 
-    position: relative;
-    display: inline-flex;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: top;
+  margin-block: var(--rz-form-field-margin-block);
+  margin-inline: var(--rz-form-field-margin-inline);
+  box-shadow: var(--rz-form-field-shadow);
+  transition: var(--rz-input-transition);
+
+  & > *,
+  & > .rz-autocomplete,
+  & > .rz-autocomplete.rz-state-disabled > .rz-inputtext,
+  & input,
+  & .rz-inputtext,
+  & .rz-inputtext.rz-state-disabled,
+  & .rz-datepicker.rz-state-disabled > .rz-inputtext {
+    @extend %input-blank;
+
+    flex: 1;
+  }
+  
+  & > input {
+    width: 100%;
+  }
+
+  .rz-form-field-start,
+  .rz-form-field-end {
+    display: flex;
+    flex: 0;
     align-items: center;
-    vertical-align: top;
-    margin-block: var(--rz-form-field-margin-block);
-    margin-inline: var(--rz-form-field-margin-inline);
-    box-shadow: var(--rz-form-field-shadow);
-    transition: var(--rz-input-transition);
-
-    & > *,
-    & > .rz-autocomplete,
-    & > .rz-autocomplete.rz-state-disabled > .rz-inputtext,
-    & input,
-    & .rz-inputtext,
-    & .rz-inputtext.rz-state-disabled,
-    & .rz-datepicker.rz-state-disabled > .rz-inputtext {
-        @extend %input-blank;
-
-        flex: 1;
-    }
-    
-    & > input {
-        width: 100%;
-    }
-
-    .rz-form-field-start,
-    .rz-form-field-end {
-        display: flex;
-        flex: 0;
-        align-items: center;
-        white-space: nowrap;
-        padding-block: var(--rz-form-field-start-end-padding-block);
-        padding-inline: var(--rz-form-field-start-end-padding-inline);
-    }
-
+    white-space: nowrap;
+    padding-block: var(--rz-form-field-start-end-padding-block);
+    padding-inline: var(--rz-form-field-start-end-padding-inline);
+  }
 }
 
 .rz-form-field {
-    box-sizing: border-box;
-    display: inline-flex;
-    flex-direction: column;
-    vertical-align: top;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-direction: column;
+  vertical-align: top;
 
-    &:hover {
-        .rz-form-field-content {
-            @extend %input-hover;
-            box-shadow: var(--rz-form-field-hover-shadow);
-        }
+  &:hover {
+    .rz-form-field-content {
+      @extend %input-hover;
+      box-shadow: var(--rz-form-field-hover-shadow);
     }
+  }
 
-    &.rz-state-focused {
-        .rz-form-field-content {
-            @extend %input-focus;
-            box-shadow: var(--rz-form-field-focus-shadow);
-        }
+  &.rz-state-focused {
+    .rz-form-field-content {
+      @extend %input-focus;
+      box-shadow: var(--rz-form-field-focus-shadow);
     }
+  }
 
-    &.rz-state-disabled {
-        .rz-form-field-content {
-            color: var(--rz-input-disabled-color);
-            box-shadow: var(--rz-input-disabled-shadow);
-        }
-
-        &.rz-variant-outlined,
-        &.rz-variant-filled,
-        &.rz-variant-flat {
-            .rz-form-field-content {
-                border: var(--rz-input-disabled-border);
-            }
-        }
-
-        :not(.rz-button).rz-state-disabled,
-        :not(.rz-button):disabled {
-            color: var(--rz-input-disabled-color);
-            opacity: 1;
-
-            &::placeholder {
-                color: var(--rz-input-disabled-placeholder-color);
-            }
-        }
+  &.rz-state-disabled {
+    .rz-form-field-content {
+      color: var(--rz-input-disabled-color);
+      box-shadow: var(--rz-input-disabled-shadow);
     }
 
     &.rz-variant-outlined,
     &.rz-variant-filled,
     &.rz-variant-flat {
-        .rz-form-field-start {
-            padding-inline-end: 0;
-        }
-    
-        .rz-form-field-end {
-            padding-inline-start: 0;
-        }
+      .rz-form-field-content {
+        border: var(--rz-input-disabled-border);
+      }
     }
 
-    &.rz-variant-filled,
-    &.rz-variant-flat {
+    :not(.rz-button).rz-state-disabled,
+    :not(.rz-button):disabled {
+      color: var(--rz-input-disabled-color);
+      opacity: 1;
+
+      &::placeholder {
+        color: var(--rz-input-disabled-placeholder-color);
+      }
+    }
+  }
+
+  &.rz-variant-outlined,
+  &.rz-variant-filled,
+  &.rz-variant-flat {
+    .rz-form-field-start {
+      padding-inline-end: 0;
+    }
+  
+    .rz-form-field-end {
+      padding-inline-start: 0;
+    }
+  }
+
+  &.rz-variant-filled,
+  &.rz-variant-flat {
+    .rz-form-field-content {
+      margin: 0;
+      --rz-input-height: var(--rz-form-field-filled-height);
+      --rz-input-padding-block: var(--rz-form-field-filled-padding-block);
+      --rz-input-padding-inline: var(--rz-form-field-filled-padding-inline);
+      --rz-dropdown-chips-padding-block: var(--rz-form-field-filled-padding-block);
+      --rz-dropdown-chips-padding-inline: var(--rz-form-field-filled-padding-inline);
+      --rz-numeric-input-padding-block: var(--rz-form-field-filled-numeric-padding-block);
+      --rz-numeric-input-padding-inline: var(--rz-form-field-filled-numeric-padding-inline);
+      --rz-form-field-label-floating-top: var(--rz-form-field-filled-label-floating-top);
+      box-shadow: var(--rz-input-shadow);
+
+      .rz-numeric-up {
+        top: calc(var(--rz-numeric-button-offset) + 1rem);
+      }
+
+      .rz-form-field-start,
+      .rz-form-field-end {
+        padding-top: 1rem;
+      }
+
+      .rz-textarea {
+        margin-top: 1rem;
+      }
+    }
+  }
+
+  &.rz-variant-flat {
+    &:not(.rz-state-disabled) {
+      &:hover {
         .rz-form-field-content {
-            margin: 0;
-            --rz-input-height: var(--rz-form-field-filled-height);
-            --rz-input-padding-block: var(--rz-form-field-filled-padding-block);
-            --rz-input-padding-inline: var(--rz-form-field-filled-padding-inline);
-            --rz-dropdown-chips-padding-block: var(--rz-form-field-filled-padding-block);
-            --rz-dropdown-chips-padding-inline: var(--rz-form-field-filled-padding-inline);
-            --rz-numeric-input-padding-block: var(--rz-form-field-filled-numeric-padding-block);
-            --rz-numeric-input-padding-inline: var(--rz-form-field-filled-numeric-padding-inline);
-            --rz-form-field-label-floating-top: var(--rz-form-field-filled-label-floating-top);
-            box-shadow: var(--rz-input-shadow);
-
-            .rz-numeric-up {
-                top: calc(var(--rz-numeric-button-offset) + 1rem);
-            }
-
-            .rz-form-field-start,
-            .rz-form-field-end {
-                padding-top: 1rem;
-            }
-
-            .rz-textarea {
-                margin-top: 1rem;
-
-            }
-
-            .rz-datepicker-trigger {
-                top: calc(50% + 0.4375rem);
-            }
+          border: var(--rz-input-hover-border);
+          box-shadow: var(--rz-input-hover-shadow);
         }
-    }
-
-    &.rz-variant-flat {
-        &:not(.rz-state-disabled) {
-            &:hover {
-                .rz-form-field-content {
-                    border: var(--rz-input-hover-border);
-                    box-shadow: var(--rz-input-hover-shadow);
-                }
-            }
-        
-            &.rz-state-focused {
-                .rz-form-field-content {
-                    border: var(--rz-input-focus-border);
-                    box-shadow: var(--rz-input-focus-shadow);
-                }
-            }
-        }
-    }
-
-    &.rz-variant-filled {
-        .rz-form-field-content {
-            border: var(--rz-form-field-filled-border);
-            border-radius: var(--rz-form-field-filled-border-radius);
-            background-color: var(--rz-form-field-filled-background-color);
-
-            &:before,
-            &:after {
-                display: var(--rz-form-field-filled-underline-display);
-            }
-        }
-
-        &:not(.rz-state-disabled) {
-            &:hover {
-                .rz-form-field-content {
-                    border: var(--rz-form-field-filled-hover-border);
-                    box-shadow: var(--rz-form-field-filled-hover-shadow);
-                    background-color: var(--rz-form-field-filled-hover-background-color);
-                }
-            }
-        
-            &.rz-state-focused,
-            &.rz-state-focused:hover {
-                .rz-form-field-content {
-                    border: var(--rz-form-field-filled-focus-border);
-                    box-shadow: var(--rz-form-field-filled-focus-shadow);
-                    background-color: var(--rz-form-field-filled-background-color);
-                }
-            }
-        }
-    }
-
-    &.rz-variant-text {
-        .rz-form-field-content {
-            border-color: transparent;
-            box-shadow: none;
-            --rz-input-background-color: transparent;
-            --rz-input-border-radius: 0;
-            --rz-input-padding-block: 0.4375rem;
-            --rz-input-padding-inline: 0;
-            --rz-numeric-input-padding-block: 0.5rem 0.5rem;
-            --rz-numeric-input-padding-inline: 0 1.25rem;
-            --rz-text-area-padding-block: 0.4375rem;
-            --rz-text-area-padding-inline: 0;
-            --rz-form-field-label-inset-inline-start: 0;
-            --rz-form-field-label-padding: var(--rz-form-field-text-label-padding);
-
-            & ~ .rz-form-field-helper {
-                padding: 0;
-            }
-        }
-
-        .rz-form-field-start {
-            padding-inline-start: 0;
-        }
+      }
     
-        .rz-form-field-end {
-            padding-inline-end: 0;
-        }
-    }
-
-    &.rz-variant-filled,
-    &.rz-variant-text {
+      &.rz-state-focused {
         .rz-form-field-content {
-            &:before {
-                content: "";
-                position: absolute;
-                z-index: 1;
-                inset-inline-start: 50%;
-                inset-inline-end: 50%;
-                bottom: calc(-1 * var(--rz-border-width));
-                height: calc(var(--rz-border-width) + 1px);
-                border: var(--rz-input-focus-border);
-                border-inline-start-width: 0;
-                border-inline-end-width: 0;
-                transition: inset-inline-start var(--rz-transition),
-                            inset-inline-end var(--rz-transition), 
-                            border-width var(--rz-transition);
-            }
-        
-            &:after {
-                content: "";
-                position: absolute;
-                inset: calc(-1 * var(--rz-border-width));
-                top: auto;
-                height: var(--rz-border-width);
-                border-bottom: var(--rz-input-border);
-            }
+          border: var(--rz-input-focus-border);
+          box-shadow: var(--rz-input-focus-shadow);
         }
+      }
+    }
+  }
+
+  &.rz-variant-filled {
+    .rz-form-field-content {
+      border: var(--rz-form-field-filled-border);
+      border-radius: var(--rz-form-field-filled-border-radius);
+      background-color: var(--rz-form-field-filled-background-color);
+
+      &:before,
+      &:after {
+        display: var(--rz-form-field-filled-underline-display);
+      }
+    }
+
+    &:not(.rz-state-disabled) {
+      &:hover {
+        .rz-form-field-content {
+          border: var(--rz-form-field-filled-hover-border);
+          box-shadow: var(--rz-form-field-filled-hover-shadow);
+          background-color: var(--rz-form-field-filled-hover-background-color);
+        }
+      }
     
-        &:hover {
-            .rz-form-field-content:after {
-                border-bottom: var(--rz-input-hover-border);
-            }
+      &.rz-state-focused,
+      &.rz-state-focused:hover {
+        .rz-form-field-content {
+          border: var(--rz-form-field-filled-focus-border);
+          box-shadow: var(--rz-form-field-filled-focus-shadow);
+          background-color: var(--rz-form-field-filled-background-color);
         }
+      }
+    }
+  }
 
-        &.rz-state-disabled,
-        &.rz-state-disabled:hover {
-            .rz-form-field-content:after {
-                border-bottom: var(--rz-input-disabled-border);
-            }
-        }
+  &.rz-variant-text {
+    .rz-form-field-content {
+      border-color: transparent;
+      box-shadow: none;
+      --rz-input-background-color: transparent;
+      --rz-input-border-radius: 0;
+      --rz-input-padding-block: 0.4375rem;
+      --rz-input-padding-inline: 0;
+      --rz-numeric-input-padding-block: 0.5rem 0.5rem;
+      --rz-numeric-input-padding-inline: 0 1.25rem;
+      --rz-text-area-padding-block: 0.4375rem;
+      --rz-text-area-padding-inline: 0;
+      --rz-form-field-label-inset-inline-start: 0;
+      --rz-form-field-label-padding: var(--rz-form-field-text-label-padding);
+
+      & ~ .rz-form-field-helper {
+        padding: 0;
+      }
+    }
+
+    .rz-form-field-start {
+      padding-inline-start: 0;
+    }
+  
+    .rz-form-field-end {
+      padding-inline-end: 0;
+    }
+  }
+
+  &.rz-variant-filled,
+  &.rz-variant-text {
+    .rz-form-field-content {
+      &:before {
+        content: "";
+        position: absolute;
+        z-index: 1;
+        inset-inline-start: 50%;
+        inset-inline-end: 50%;
+        bottom: calc(-1 * var(--rz-border-width));
+        height: calc(var(--rz-border-width) + 1px);
+        border: var(--rz-input-focus-border);
+        border-inline-start-width: 0;
+        border-inline-end-width: 0;
+        transition: inset-inline-start var(--rz-transition),
+                    inset-inline-end var(--rz-transition), 
+                    border-width var(--rz-transition);
+      }
     
-        &.rz-state-focused:not(.rz-state-disabled) {
-            .rz-form-field-content:before {
-                inset-inline-start: calc(-1 * var(--rz-border-width));
-                inset-inline-end: calc(-1 * var(--rz-border-width));
-                border: var(--rz-input-focus-border);
-                border-inline-start-width: var(--rz-border-width);
-                border-inline-end-width: var(--rz-border-width);
-            }
-        }
+      &:after {
+        content: "";
+        position: absolute;
+        inset: calc(-1 * var(--rz-border-width));
+        top: auto;
+        height: var(--rz-border-width);
+        border-bottom: var(--rz-input-border);
+      }
+    }
+  
+    &:hover {
+      .rz-form-field-content:after {
+        border-bottom: var(--rz-input-hover-border);
+      }
     }
 
-    .rz-numeric-button {
-        display: none;
+    &.rz-state-disabled,
+    &.rz-state-disabled:hover {
+      .rz-form-field-content:after {
+        border-bottom: var(--rz-input-disabled-border);
+      }
+    }
+  
+    &.rz-state-focused:not(.rz-state-disabled) {
+      .rz-form-field-content:before {
+        inset-inline-start: calc(-1 * var(--rz-border-width));
+        inset-inline-end: calc(-1 * var(--rz-border-width));
+        border: var(--rz-input-focus-border);
+        border-inline-start-width: var(--rz-border-width);
+        border-inline-end-width: var(--rz-border-width);
+      }
+    }
+  }
+
+  &.rz-variant-outlined,
+  &.rz-variant-filled {
+    .rz-field-icon-wrapper {
+      transition: padding-block var(--rz-transition);
     }
 
-    .rz-numeric:focus-within .rz-numeric-button {
-        display: block;
+    .rz-state-empty:not(:focus-within) > .rz-field-icon-wrapper {
+      padding-block: 0;
     }
+  }
 
+  .rz-numeric-button {
+    display: none;
+  }
+
+  .rz-numeric:focus-within .rz-numeric-button {
+    display: block;
+  }
 }
 
 .rz-form-field-label {
 
-    .rz-state-disabled .rz-form-field-content > & {
-        color: var(--rz-input-disabled-color) !important;
-    }
+  .rz-state-disabled .rz-form-field-content > & {
+    color: var(--rz-input-disabled-color) !important;
+  }
 
-    position: absolute;
-    pointer-events: none;
-    padding: var(--rz-form-field-label-padding);
-    inset-block-start: 50%;
+  position: absolute;
+  pointer-events: none;
+  padding: var(--rz-form-field-label-padding);
+  inset-block-start: 50%;
+  inset-inline-end: auto;
+  border-radius: var(--rz-border-radius);
+  inset-inline-start: var(--rz-form-field-label-inset-inline-start);
+  max-width: calc(100% - 1.5rem);
+  transform: translate(0, -50%);
+  background-color: transparent;
+  transition: inset-block-start var(--rz-transition),
+              transform var(--rz-transition), 
+              color var(--rz-transition),
+              font-size var(--rz-transition), 
+              max-width var(--rz-transition);
+
+  &:last-child {
+    inset-inline-end: 1.5rem;
+  }
+
+  .rz-textarea ~ & {
+    inset-block-start: var(--rz-form-field-label-textarea-top);
+    transform: translate(0, 0);
+
+    .rz-form-field.rz-variant-filled &,
+    .rz-form-field.rz-variant-flat & {
+      transform: translate(0, 0.625rem);
+    }
+  }
+
+  .rz-form-field:not(.rz-floating-label) &,
+  .rz-textbox:focus ~ &,
+  .rz-textarea:focus ~ &,
+  .rz-numeric:focus-within ~ &,
+  .rz-autocomplete:focus-within ~ &,
+  .rz-textbox:not(:placeholder-shown) ~ &,
+  :not(.rz-state-empty) ~ &,
+  .rz-form-field.rz-variant-filled .rz-textarea:focus ~ &,
+  .rz-form-field.rz-variant-flat .rz-textarea:focus ~ &,
+  .rz-form-field.rz-variant-filled :not(.rz-state-empty) ~ &,
+  .rz-form-field.rz-variant-flat :not(.rz-state-empty) ~ &,
+  .rz-radio-button-list-vertical ~ &,
+  .rz-radio-button-list-horizontal ~ &,
+  .rz-checkbox-list-vertical ~ &,
+  .rz-checkbox-list-horizontal ~ &,
+  .rz-chkbox ~ &,
+  .rz-fileupload ~ &,
+  .rz-state-empty:has(.rz-placeholder) ~ &,
+  .rz-form-field.rz-state-focused & {
     inset-inline-end: auto;
-    border-radius: var(--rz-border-radius);
-    inset-inline-start: var(--rz-form-field-label-inset-inline-start);
+    inset-block-start: var(--rz-form-field-label-floating-top);
+    padding-block-start: 0;
+    padding-block-end: 0;
+    transform: translate(0, 0);
+    color: var(--rz-input-placeholder-color);
+    background-color: var(--rz-form-field-label-floating-background-color);
+    font-size: 0.75rem;
+    line-height: 1rem;
     max-width: calc(100% - 1.5rem);
-    transform: translate(0, -50%);
-    background-color: transparent;
-    transition: inset-block-start var(--rz-transition),
-                transform var(--rz-transition), 
-                color var(--rz-transition),
-                font-size var(--rz-transition), 
-                max-width var(--rz-transition);
+  }
 
-    &:last-child {
-        inset-inline-end: 1.5rem;
-    }
+  .rz-form-field:not(.rz-variant-outlined):not(.rz-floating-label) &,
+  .rz-form-field:not(.rz-variant-outlined) *:focus ~ &,
+  .rz-form-field:not(.rz-variant-outlined) *:focus-within ~ &,
+  .rz-form-field:not(.rz-variant-outlined) :not(.rz-state-empty) ~ &,
+  .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-vertical ~ &,
+  .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-horizontal ~ &,
+  .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-vertical ~ &,
+  .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-horizontal ~ &,
+  .rz-form-field:not(.rz-variant-outlined) .rz-chkbox ~ &,
+  .rz-form-field:not(.rz-variant-outlined) .rz-fileupload ~ &,
+  .rz-form-field:not(.rz-variant-outlined) .rz-state-empty:has(.rz-placeholder) ~ &,
+  .rz-form-field:not(.rz-variant-outlined).rz-state-focused & {
+    background-color: inherit !important;
+  }
 
-    .rz-textarea ~ & {
-        inset-block-start: var(--rz-form-field-label-textarea-top);
-        transform: translate(0, 0);
+  .invalid ~ & {
+    color: var(--rz-danger) !important;
+  }
 
-        .rz-variant-filled &,
-        .rz-variant-flat & {
-            transform: translate(0, 0.625rem);
-        }
-    }
-
-    .rz-form-field:not(.rz-floating-label) &,
-    .rz-textbox:focus ~ &,
-    .rz-textarea:focus ~ &,
-    .rz-numeric:focus-within ~ &,
-    .rz-autocomplete:focus-within ~ &,
-    .rz-textbox:not(:placeholder-shown) ~ &,
-    :not(.rz-state-empty) ~ &,
-    .rz-variant-filled .rz-textarea:focus ~ &,
-    .rz-variant-flat .rz-textarea:focus ~ &,
-    .rz-variant-filled :not(.rz-state-empty) ~ &,
-    .rz-variant-flat :not(.rz-state-empty) ~ &,
-    .rz-radio-button-list-vertical ~ &,
-    .rz-radio-button-list-horizontal ~ &,
-    .rz-checkbox-list-vertical ~ &,
-    .rz-checkbox-list-horizontal  ~ &,
-    .rz-chkbox ~ &,
-    .rz-fileupload ~ &,
-    .rz-state-empty:has(.rz-placeholder) ~ &,
-    .rz-form-field.rz-state-focused & {
-        inset-inline-end: auto;
-        inset-block-start: var(--rz-form-field-label-floating-top);
-        padding-block-start: 0;
-        padding-block-end: 0;
-        transform: translate(0, 0);
-        color: var(--rz-input-placeholder-color);
-        background-color: var(--rz-form-field-label-floating-background-color);
-        font-size: 0.75rem;
-        line-height: 1rem;
-        max-width: calc(100% - 1.5rem);
-    }
-
-    .rz-form-field:not(.rz-variant-outlined):not(.rz-floating-label) &,
-    .rz-form-field:not(.rz-variant-outlined) *:focus ~ &,
-    .rz-form-field:not(.rz-variant-outlined) *:focus-within ~ &,
-    .rz-form-field:not(.rz-variant-outlined) :not(.rz-state-empty) ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-vertical ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-horizontal ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-vertical ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-horizontal  ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-chkbox ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-fileupload ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-state-empty:has(.rz-placeholder) ~ &,
-    .rz-form-field:not(.rz-variant-outlined).rz-state-focused & {
-        background-color: inherit !important;
-    }
-
-    .invalid ~ & {
-        color: var(--rz-danger) !important;
-    }
-
-    .rz-state-focused &,
-    .rz-variant-filled.rz-state-focused &,
-    .rz-variant-flat.rz-state-focused &,
-    .rz-form-field.rz-state-focused & {
-        color: var(--rz-form-field-label-focus-color);
-    }
-
-    .rz-textbox:focus ~ &,
-    .rz-textarea:focus ~ &,
-    .rz-numeric:focus-within ~ &,
-    .rz-autocomplete:focus-within ~ &  {
-        color: var(--rz-form-field-label-focus-color);
-
-        .rz-variant-filled &,
-        .rz-variant-flat & {
-            color: var(--rz-form-field-label-focus-color);
-        }
-    }
+  .rz-state-focused &,
+  .rz-form-field.rz-state-focused &,
+  .rz-form-field.rz-variant-filled.rz-state-focused ~ &,
+  .rz-form-field.rz-variant-flat.rz-state-focused ~ &,
+  .rz-textbox:focus ~ &,
+  .rz-textarea:focus ~ &,
+  .rz-numeric:focus-within ~ &,
+  .rz-autocomplete:focus-within ~ &,
+  .rz-form-field.rz-variant-filled .rz-textbox:focus ~ &,
+  .rz-form-field.rz-variant-flat .rz-textbox:focus ~ & {
+    color: var(--rz-form-field-label-focus-color);
+  }
 }
