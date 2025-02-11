@@ -182,8 +182,8 @@ namespace Radzen.Blazor
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
 
             value = $"{value}";
-
-            if (value.Length < MinLength)
+            
+            if (value.Length < MinLength && !OpenOnFocus)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                 return;
@@ -224,7 +224,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Data != null && !string.IsNullOrEmpty(searchText) ? Data.AsQueryable() : null;
+                return Data != null && (OpenOnFocus || !string.IsNullOrEmpty(searchText)) ? Data.AsQueryable() : null;
             }
         }
 
@@ -241,6 +241,9 @@ namespace Radzen.Blazor
                     string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
 
                     string textProperty = string.IsNullOrEmpty(TextProperty) ? string.Empty : $".{TextProperty}";
+
+                    if (OpenOnFocus && string.IsNullOrEmpty(searchText))
+                        return Query;
 
                     return Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"o=>o{textProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
                         FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
