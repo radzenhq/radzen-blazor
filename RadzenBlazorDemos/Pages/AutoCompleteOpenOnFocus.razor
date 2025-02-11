@@ -1,0 +1,23 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenAutoComplete @bind-Value=@companyName Data=@customers TextProperty="@nameof(Customer.CompanyName)" OpenOnFocus="true" Style="width: 13rem" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Company Name" }})" />
+    <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. France
+        @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))</RadzenText>
+</div>
+
+@code {
+    string companyName;
+
+    IEnumerable<Customer> customers;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers;
+    }
+}
