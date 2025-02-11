@@ -76,16 +76,16 @@ $timepicker-border: none !default;
     line-height: var(--rz-datepicker-line-height);
   }
 
-  &:has(.rz-datepicker-trigger) > .rz-inputtext {
+  & > .rz-inputtext:has(~ .rz-field-icon-wrapper > .rz-datepicker-trigger) {
     padding-inline-end: calc(1rem + var(--rz-datepicker-trigger-icon-width));
   }
 
-  &:has(.rz-clear-icon) > .rz-inputtext {
-    padding-inline-end: calc(1rem + var(--rz-clear-icon-width));
+  &.rz-clear > .rz-inputtext {
+    padding-inline-end: calc(1rem + var(--rz-clear-field-icon-width));
   }
 
-  &:has(.rz-datepicker-trigger):has(.rz-clear-icon) > .rz-inputtext {
-    padding-inline-end: calc(1rem + var(--rz-clear-icon-width) + var(--rz-datepicker-trigger-icon-width));
+  &.rz-clear > .rz-inputtext:has(~ .rz-field-icon-wrapper > .rz-datepicker-trigger) {
+    padding-inline-end: calc(0.625rem + var(--rz-clear-field-icon-width) + var(--rz-datepicker-trigger-icon-width));
   }
 
   &:not(.rz-state-disabled) {

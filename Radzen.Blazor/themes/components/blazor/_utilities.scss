@@ -574,10 +574,11 @@ $border: border, border-start, border-end, border-left, border-right, border-top
 }
 
 // Clear field icon
-$clear-icon-width: var(--rz-icon-size) !default;
-$clear-icon-height: $clear-icon-width !default;
+$clear-field-icon: 'close' !default;
+$clear-field-icon-width: var(--rz-icon-size) !default;
+$clear-field-icon-height: $clear-field-icon-width !default;
 
-.rz-clear-icon {
+.rz-clear-field-icon {
   opacity: 0.4;
 
   &:hover {
@@ -585,12 +586,12 @@ $clear-icon-height: $clear-icon-width !default;
   }
 
   &.rzi {
-    width: var(--rz-clear-icon-width);
-    height: var(--rz-clear-icon-width);
-    font-size: var(--clear-icon-width);
+    width: var(--rz-clear-field-icon-width);
+    height: var(--rz-clear-field-icon-width);
+    font-size: var(--rz-clear-field-icon-width);
   }
 
   &.rzi-times:before {
-    content: 'close';
+    content: $clear-field-icon;
   }
 }

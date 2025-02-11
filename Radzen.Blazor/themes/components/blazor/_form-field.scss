@@ -156,6 +156,14 @@ $form-field-helper-padding: 0 0.5rem !default;
       .rz-textarea {
         margin-top: 1rem;
       }
+
+      > * > .rz-field-icon-wrapper {
+        transition: padding-block var(--rz-transition);
+      }
+      
+      > .rz-state-empty:not(:focus-within) > .rz-field-icon-wrapper {
+        padding-block: 0;
+      }
     }
   }
 
@@ -288,17 +296,6 @@ $form-field-helper-padding: 0 0.5rem !default;
         border-inline-start-width: var(--rz-border-width);
         border-inline-end-width: var(--rz-border-width);
       }
-    }
-  }
-
-  &.rz-variant-outlined,
-  &.rz-variant-filled {
-    .rz-field-icon-wrapper {
-      transition: padding-block var(--rz-transition);
-    }
-
-    .rz-state-empty:not(:focus-within) > .rz-field-icon-wrapper {
-      padding-block: 0;
     }
   }
 

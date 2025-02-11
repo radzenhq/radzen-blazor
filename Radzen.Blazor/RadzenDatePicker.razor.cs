@@ -988,6 +988,7 @@ namespace Radzen.Blazor
         {
             return ClassList.Create("rz-datepicker")
                             .Add("rz-datepicker-inline", Inline)
+                            .Add("rz-clear", AllowClear)
                             .AddDisabled(Disabled)
                             .Add("rz-state-empty", !HasValue)
                             .Add(FieldIdentifier, EditContext)

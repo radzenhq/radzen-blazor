@@ -258,6 +258,6 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
 .rz-clear {
   .rz-multiselect-label-container,
   .rz-dropdown-label {
-    padding-inline-end: calc(var(--rz-dropdown-trigger-icon-width) + var(--rz-clear-icon-width));
+    padding-inline-end: calc(var(--rz-dropdown-trigger-icon-width) + var(--rz-clear-field-icon-width));
   }
 }
