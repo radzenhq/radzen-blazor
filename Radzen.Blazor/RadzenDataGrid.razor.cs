@@ -2423,6 +2423,17 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Force load of the DataGrid Settings.
+        /// </summary>
+        public async Task ReloadSettings()
+        {
+            if (settings != null)
+            {
+                await LoadSettingsInternal(settings);
+            }
+        }
+
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
