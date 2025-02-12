@@ -47,7 +47,7 @@
                 {
                     <RadzenSelectBar TValue="bool" Value="@_isUnconfirmedValueNegative"
                                      Orientation="Orientation.Vertical" Size="ButtonSize.Small"
-                                     Disabled="@Disabled"
+                                     Disabled="@Disabled" class="rz-timespanpicker-signpicker"
                                      ValueChanged="@UpdateSign">
                         <Items>
                             <RadzenSelectBarItem Text="@PositiveButtonLabel" Value="false" />
@@ -143,7 +143,7 @@
             @if (ShowConfirmationButton && ReadOnly is false)
             {
                 <RadzenButton Size="ButtonSize.Medium" ButtonStyle="ButtonStyle.Secondary"
-                              Disabled="@Disabled" TabIndex="0"
+                              Disabled="@Disabled" TabIndex="0" class="rz-timespanpicker-confirmationbutton"
                               Click="() => ConfirmValue()">
                     @ConfirmationButtonLabel
                 </RadzenButton>
