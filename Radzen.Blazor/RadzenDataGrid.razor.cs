@@ -1813,7 +1813,8 @@ namespace Radzen.Blazor
                             var firstItem = view.FirstOrDefault();
                             if (firstItem != null)
                             {
-                                view = QueryableExtension.Cast(view, firstItem.GetType()).AsQueryable().OrderBy(orderBy).Cast<TItem>();
+                                view = QueryableExtension.Cast(view, firstItem.GetType());
+                                view = view.OrderBy(orderBy).Cast<TItem>();
                             }
                         }
                         else
