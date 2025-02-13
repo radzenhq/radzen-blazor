@@ -216,26 +216,56 @@ namespace Radzen
         internal static Expression GetNestedPropertyExpression(Expression expression, string property, Type type = null)
         {
             var parts = property.Split(new char[] { '.' }, 2);
-
+            string currentPart = parts[0];
             Expression member;
+
             if (typeof(IDictionary<string, object>).IsAssignableFrom(expression.Type))
             {
-                var key = parts[0].Split("\"")[1];
-                var typeString = parts[0].Split("(")[0];
+                var key = currentPart.Split('"')[1];
+                var typeString = currentPart.Split('(')[0];
 
                 member = Expression.Convert(
                     Expression.Property(expression, expression.Type.GetProperty("Item"), Expression.Constant(key)),
-                        type ?? Type.GetType(typeString.EndsWith("?") ? $"System.Nullable`1[System.{typeString.TrimEnd('?')}]" : $"System.{typeString}") ?? typeof(object));
+                    type ?? Type.GetType(typeString.EndsWith("?") ? $"System.Nullable`1[System.{typeString.TrimEnd('?')}]" : $"System.{typeString}") ?? typeof(object));
+            }
+            else if (currentPart.Contains("[")) // Handle array or list indexing
+            {
+                var indexStart = currentPart.IndexOf('[');
+                var propertyName = currentPart.Substring(0, indexStart);
+                var indexString = currentPart.Substring(indexStart + 1, currentPart.Length - indexStart - 2);
+
+                member = Expression.PropertyOrField(expression, propertyName);
+                if (int.TryParse(indexString, out int index))
+                {
+                    if (member.Type.IsArray)
+                    {
+                        member = Expression.ArrayIndex(member, Expression.Constant(index));
+                    }
+                    else if (member.Type.IsGenericType &&
+                             (member.Type.GetGenericTypeDefinition() == typeof(List<>) ||
+                              typeof(IList<>).IsAssignableFrom(member.Type.GetGenericTypeDefinition())))
+                    {
+                        var itemProperty = member.Type.GetProperty("Item");
+                        if (itemProperty != null)
+                        {
+                            member = Expression.Property(member, itemProperty, Expression.Constant(index));
+                        }
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException($"Invalid index format: {indexString}");
+                }
             }
             else
             {
-                member = Expression.PropertyOrField(expression, parts[0]);
+                member = Expression.PropertyOrField(expression, currentPart);
             }
 
             return parts.Length > 1 ? GetNestedPropertyExpression(member, parts[1], type) :
                 (Nullable.GetUnderlyingType(member.Type) != null || member.Type == typeof(string)) ?
                     Expression.Condition(Expression.Equal(expression, Expression.Constant(null)), Expression.Constant(null, member.Type), member) :
-                        member;
+                    member;
         }
 
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)
