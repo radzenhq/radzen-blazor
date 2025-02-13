@@ -5,7 +5,6 @@
 @using RadzenBlazorDemos.Services
 @using Microsoft.JSInterop
 @using System.Text.Json
-@using System.Linq.Dynamic.Core
 
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
@@ -60,7 +59,7 @@
 
         if (!string.IsNullOrEmpty(args.Filter))
         {
-            query = query.Where(args.Filter);
+            query = query.Where(grid.ColumnsCollection);
         }
 
         if (!string.IsNullOrEmpty(args.OrderBy))

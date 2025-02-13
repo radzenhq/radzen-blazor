@@ -1,7 +1,6 @@
 ﻿using Radzen;
 using Radzen.Blazor.Rendering;
 using System.Collections;
-using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
@@ -182,8 +181,8 @@ namespace Radzen.Blazor
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
 
             value = $"{value}";
-
-            if (value.Length < MinLength)
+            
+            if (value.Length < MinLength && !OpenOnFocus)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                 return;
@@ -224,7 +223,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Data != null && !string.IsNullOrEmpty(searchText) ? Data.AsQueryable() : null;
+                return Data != null && (OpenOnFocus || !string.IsNullOrEmpty(searchText)) ? Data.AsQueryable() : null;
             }
         }
 
@@ -238,12 +237,7 @@ namespace Radzen.Blazor
             {
                 if (Query != null)
                 {
-                    string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
-
-                    string textProperty = string.IsNullOrEmpty(TextProperty) ? string.Empty : $".{TextProperty}";
-
-                    return Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"o=>o{textProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
-                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                    return Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                 }
 
                 return null;

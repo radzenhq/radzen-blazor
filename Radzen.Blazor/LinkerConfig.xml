@@ -3,5 +3,4 @@
   <assembly fullname="System.Core">
     <type fullname="System.Linq.Queryable" preserve="all" />
   </assembly>
-  <assembly fullname="System.Linq.Dynamic.Core" />
 </linker>

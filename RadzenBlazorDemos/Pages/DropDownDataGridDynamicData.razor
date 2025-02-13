@@ -4,7 +4,7 @@
     <RadzenLabel Text="Select Value" Component="DropDownDataGridBindValue" />
     <RadzenDropDownDataGrid @ref=grid Data="@data" ColumnWidth="200px" TValue="IDictionary<string, object>" 
                             AllowFiltering="true" AllowSorting="true" Value="@selectedItem" Change="@OnChange"
-                            TextProperty="@(GetColumnPropertyExpression("LastName", typeof(string)))">
+                            TextProperty="@(PropertyAccess.GetDynamicPropertyExpression("LastName", typeof(string)))">
         <ValueTemplate>
             @string.Join(", ", columns.Where(c => c.Value == typeof(string)).Take(grid.MaxSelectedLabels).Select(c => context[c.Key]))
         </ValueTemplate>
@@ -12,7 +12,7 @@
             @foreach (var column in columns)
             {
                 <RadzenDropDownDataGridColumn @key=@column.Key Title="@column.Key" Type="column.Value"
-                                              Property="@GetColumnPropertyExpression(column.Key, column.Value)">
+                                              Property="@PropertyAccess.GetDynamicPropertyExpression(column.Key, column.Value)">
                     <Template>
                         @context[@column.Key]
                     </Template>
@@ -39,26 +39,6 @@
     void OnChange(object value)
     {
         selectedItem = (IDictionary<string, object>)value;
-    }
-
-    public string GetColumnPropertyExpression(string name, Type type)
-    {
-        var expression = $@"Convert.ToString(it[""{name}""])";
-
-        if (type == typeof(int))
-        {
-            return $"int.Parse({expression})";
-        }
-        else if (type == typeof(DateTime))
-        {
-            return $"DateTime.Parse({expression})";
-        }
-        else if (type.IsEnum)
-        {
-            return $@"Int32(Enum.Parse(it[""{name}""].GetType(), {expression}))";
-        }
-
-        return expression;
     }
 
     protected override async Task OnInitializedAsync()
