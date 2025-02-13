@@ -1,6 +1,4 @@
-﻿@using System.Linq.Dynamic.Core
-
-<RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.SimpleWithMenu" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
+﻿<RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.SimpleWithMenu" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
 ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Employee">
     <Columns>
         <RadzenDataGridColumn Property="ID" Title="ID" FilterValue="@idValue">

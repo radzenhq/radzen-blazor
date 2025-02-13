@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 using RadzenBlazorDemos.Data;
+using RadzenBlazorDemos.Models.Northwind;
 
 namespace RadzenBlazorDemos
 {

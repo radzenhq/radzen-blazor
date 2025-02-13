@@ -1,15 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Data.Common;
 using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor

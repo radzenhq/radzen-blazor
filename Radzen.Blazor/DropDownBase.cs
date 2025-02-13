@@ -6,7 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Radzen
@@ -436,7 +435,7 @@ namespace Radzen
 
                 var type = query.ElementType;
 
-                if (type == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
+                if (type == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Cast<object>().Any())
                 {
                     var firstElement = query.Cast<object>().FirstOrDefault(i => i != null);
                     if (firstElement != null)
@@ -746,7 +745,7 @@ namespace Radzen
                 var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
                     Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
                     Query)
-                    .Cast(Query.ElementType).ToDynamicList();
+                    .Cast(Query.ElementType).Cast<dynamic>().ToList();
 
 
                 if (previousKey != args.Key)
@@ -1144,7 +1143,7 @@ namespace Radzen
                     var query = Data.AsQueryable();
                     var elementType = query.ElementType;
 
-                    if (elementType == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
+                    if (elementType == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Cast<object>().Any())
                     {
                         var firstElement = query.Cast<object>().FirstOrDefault(i => i != null);
                         if (firstElement != null)
@@ -1261,7 +1260,16 @@ namespace Radzen
                         }
                         else
                         {
-                            SelectedItem = view.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", value).FirstOrDefault();
+                            SelectedItem = view.AsQueryable().Where(new FilterDescriptor[] 
+                            { 
+                                new FilterDescriptor() 
+                                { 
+                                    Property = ValueProperty, 
+                                    FilterValue = value 
+                                } 
+                            },
+                            LogicalFilterOperator.And,
+                            FilterCaseSensitivity.Default).FirstOrDefault();
                         }
                     }
                     else
@@ -1278,7 +1286,7 @@ namespace Radzen
                     {
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
-                            foreach (object v in values.ToDynamicList())
+                            foreach (object v in values.Cast<dynamic>().ToList())
                             {
                                 dynamic item;
 
@@ -1288,7 +1296,16 @@ namespace Radzen
                                 }
                                 else
                                 {
-                                    item = view.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", v).FirstOrDefault();
+                                    item = view.AsQueryable().Where(new FilterDescriptor[]
+                                    {
+                                        new FilterDescriptor()
+                                        {
+                                            Property = ValueProperty,
+                                            FilterValue = v
+                                        }
+                                    },
+                                    LogicalFilterOperator.And,
+                                    FilterCaseSensitivity.Default).FirstOrDefault();
                                 }
 
                                 if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())

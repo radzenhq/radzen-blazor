@@ -1,6 +1,4 @@
-﻿@using System.Linq.Dynamic.Core
-
-<RadzenDataGrid @ref=grid Data="@data" TItem="IDictionary<string, object>" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
+﻿<RadzenDataGrid @ref=grid Data="@data" TItem="IDictionary<string, object>" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
     <Columns>
         @foreach (var column in columns)
         {

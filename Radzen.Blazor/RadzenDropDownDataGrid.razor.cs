@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -469,10 +468,13 @@ namespace Radzen.Blazor
                 if (query == null)
                     return;
 
+                var filterOperator = FilterOperator == StringFilterOperator.Contains ?
+                                        Radzen.FilterOperator.Contains :
+                                            FilterOperator == StringFilterOperator.StartsWith ? Radzen.FilterOperator.StartsWith :
+                                               FilterOperator == StringFilterOperator.EndsWith ? Radzen.FilterOperator.EndsWith : Radzen.FilterOperator.Equals;
+
                 if (!string.IsNullOrEmpty(searchText))
                 {
-                    string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
-
                     if (AllowFilteringByAllStringColumns && grid != null)
                     {
                         if (AllowFilteringByWord)
@@ -481,16 +483,16 @@ namespace Radzen.Blazor
 
                             foreach (string word in words)
                             {
-                                query = query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
-                                    .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
-                                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                                query = query.Where(grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                                    .Select(c => new FilterDescriptor() { Property = c.GetFilterProperty(), FilterValue = word, FilterOperator = filterOperator }), 
+                                        LogicalFilterOperator.Or, FilterCaseSensitivity);
                             }
                         }
                         else
                         {
-                            query = query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
-                                .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
-                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                            query = query.Where(grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                                .Select(c => new FilterDescriptor() { Property = c.GetFilterProperty(), FilterValue = searchText, FilterOperator = filterOperator }), 
+                                    LogicalFilterOperator.Or, FilterCaseSensitivity);
                         }
                     }
                     else
@@ -501,26 +503,24 @@ namespace Radzen.Blazor
 
                             foreach (string word in words)
                             {
-                                query = query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
-                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                                query = query.Where(TextProperty, word, FilterOperator, FilterCaseSensitivity);
                             }
                         }
                         else
                         {
-                            query = query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
-                                FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                            query = query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                         }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(args.OrderBy))
                 {
-                    query = query.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, args.OrderBy);
+                    query = query.OrderBy(args.OrderBy);
                 }
 
-                count = await Task.FromResult(query.Count());
+                count = await Task.FromResult(query.Cast<object>().Count());
 
-                pagedData = await Task.FromResult(QueryableExtension.ToList(query.Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>());
+                pagedData = await Task.FromResult(query.Cast<object>().Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize).ToList());
 
                 _internalView = query;
 
@@ -587,7 +587,11 @@ namespace Radzen.Blazor
 
                     if (!string.IsNullOrEmpty(ValueProperty))
                     {
-                        var item = Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", value).FirstOrDefault();
+                        var item = Query.Where(new FilterDescriptor[]
+                            { 
+                                new FilterDescriptor() { Property = ValueProperty, FilterValue = value } 
+                            }, LogicalFilterOperator.And, FilterCaseSensitivity.Default).FirstOrDefault();
+
                         if (item != null && SelectedItem != item)
                         {
                             SelectedItem = item;
@@ -629,7 +633,11 @@ namespace Radzen.Blazor
                         {
                             foreach (object v in valueList)
                             {
-                                var item = Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", v).FirstOrDefault();
+                                var item = Query.Where(new FilterDescriptor[]
+                                    {
+                                        new FilterDescriptor() { Property = ValueProperty, FilterValue = v }
+                                    }, LogicalFilterOperator.And, FilterCaseSensitivity.Default).FirstOrDefault();
+
                                 if (item != null && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())
                                 {
                                     selectedItems.Add(item);

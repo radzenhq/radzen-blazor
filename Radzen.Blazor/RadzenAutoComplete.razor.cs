@@ -1,7 +1,6 @@
 ﻿using Radzen;
 using Radzen.Blazor.Rendering;
 using System.Collections;
-using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
@@ -238,15 +237,7 @@ namespace Radzen.Blazor
             {
                 if (Query != null)
                 {
-                    string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
-
-                    string textProperty = string.IsNullOrEmpty(TextProperty) ? string.Empty : $".{TextProperty}";
-
-                    if (OpenOnFocus && string.IsNullOrEmpty(searchText))
-                        return Query;
-
-                    return Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"o=>o{textProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
-                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                    return Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                 }
 
                 return null;
