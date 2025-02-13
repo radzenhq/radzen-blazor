@@ -11,7 +11,7 @@
         {
             <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                     @onchange="@ParseDate" autocomplete="off" type="text" name="@Name" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
-                   class="rz-inputtext @InputClass @(ReadOnly && !Disabled ? "rz-readonly" : "") @(!ShowButton ? "rz-input-trigger" : "")" id="@Name" placeholder="@CurrentPlaceholder" />
+                   class="rz-inputtext @InputClass @(ReadOnly ? "rz-readonly" : "") @(!ShowButton ? "rz-input-trigger" : "")" id="@Name" placeholder="@CurrentPlaceholder" />
             @if (ShowButton)
             {
                 <button aria-label="@ToggleAriaLabel" @onmousedown=@OnToggle class="@($"rz-datepicker-trigger rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")} {ButtonClass}")" tabindex="-1" type="button">

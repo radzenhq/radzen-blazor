@@ -612,7 +612,7 @@ namespace Radzen.Blazor.Tests
                 });
             });
             
-            component.Find("input").Change(13.53.ToString());
+            component.Find("input").Change("13.53");
 
             var maxDollars = new Dollars(2);
             Assert.Contains($" value=\"{maxDollars.ToString()}\"", component.Markup);
