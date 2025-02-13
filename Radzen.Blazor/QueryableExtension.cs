@@ -1289,8 +1289,8 @@ namespace Radzen
 
             var columnsToFilter = columns.Where(canFilter);
             var grid = columns.FirstOrDefault()?.Grid;
-            var gridLogicalFilterOperator = grid.LogicalFilterOperator;
-            var gridFilterCaseSensitivity = grid.FilterCaseSensitivity;
+            var gridLogicalFilterOperator = grid != null ? grid.LogicalFilterOperator : LogicalFilterOperator.And;
+            var gridFilterCaseSensitivity = grid != null ? grid.FilterCaseSensitivity : FilterCaseSensitivity.Default;
 
             if (columnsToFilter.Any())
             {
