@@ -80,6 +80,12 @@ namespace Radzen.Blazor
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 
+        /// <summary>
+        /// Gets or sets the label text.
+        /// </summary>
+        [Parameter]
+        public string Text { get; set; }
+
         RadzenDropDown<int> monthDropDown;
         RadzenDropDown<int> yearDropDown;
 
