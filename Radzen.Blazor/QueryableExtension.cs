@@ -604,28 +604,23 @@ namespace Radzen
 
                             var property = "it." + PropertyAccess.GetProperty(column.GetFilterProperty());
 
-                            if (property.IndexOf(".") != -1)
-                            {
-                                property = $"({property})";
-                            }
-
                             if (sv == null)
                             {
                                 if (columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain)
                                 {
-                                    whereList.Add($@"{property} {(columnFilterOperator == FilterOperator.DoesNotContain ? "not " : "in")} {enumerableValueAsString}");
+                                    whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "! " : "")}({enumerableValueAsString}).Contains({property})");
                                 }
                                 else if (columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn)
                                 {
                                     if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
                                     IsEnumerable(column.PropertyType) && column.PropertyType != typeof(string))
                                     {
-                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.NotIn ? "!" : "")}{property}.Any(i => i in {enumerableValueAsString})");
+                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.NotIn ? "!" : "")}{property}.Any(i => ({enumerableValueAsString}).Contains(i))");
                                     }
                                     else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
                                         column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
                                     {
-                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.NotIn ? "!" : "")}{column.Property}.Any(i => i.{column.FilterProperty} in {enumerableValueAsString})");
+                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.NotIn ? "!" : "")}{column.Property}.Any(i => ({enumerableValueAsString}).Contains(i.{column.FilterProperty}))");
                                     }
                                 }
                             }
