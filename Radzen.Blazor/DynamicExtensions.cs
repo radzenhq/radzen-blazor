@@ -166,7 +166,7 @@ public static class Linq
 {{ 
     public static IQueryable Select(IQueryable source)
     {{
-        var list = System.Linq.Enumerable.ToList(System.Linq.Queryable.Cast<{typeof(T).FullName}>(source));
+        var list = System.Linq.Enumerable.ToList(System.Linq.Queryable.Cast<{typeof(T).FullName.Replace("+", ".")}>(source));
         return System.Linq.Queryable.AsQueryable(list.Select(it => new {className}() {{ {selector} }}));
     }}
 }}";
