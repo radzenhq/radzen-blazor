@@ -95,7 +95,7 @@ using System.Linq.Expressions;
 namespace Dynamic;
 public static class Linq 
 {{ 
-  public static Expression<Func<{typeof(T).FullName}, bool>> where = {(selector == "true" ? "i => true" : selector).Replace("DateTime", "DateTime.Parse").Replace("DateTimeOffset", "DateTimeOffset.Parse").Replace("DateOnly", "DateOnly.Parse").Replace("Guid", "Guid.Parse").Replace(" = "," == ")};
+  public static Expression<Func<{typeof(T).FullName.Replace("+", ".")}, bool>> where = {(selector == "true" ? "i => true" : selector).Replace("DateTime", "DateTime.Parse").Replace("DateTimeOffset", "DateTimeOffset.Parse").Replace("DateOnly", "DateOnly.Parse").Replace("Guid", "Guid.Parse").Replace(" = "," == ")};
 }}";
 
                 var assembly = Compile(Compilation
@@ -108,7 +108,7 @@ public static class Linq
 
                 return source.Where(whereMethod);
             }
-            catch(Exception ex)
+            catch
             {
                 throw new InvalidOperationException($"Invalid Where selector");
             }
