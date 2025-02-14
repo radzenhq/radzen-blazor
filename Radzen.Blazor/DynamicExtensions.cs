@@ -25,13 +25,13 @@ namespace System.Linq.Dynamic.Core
     /// </summary>
     public static class DynamicExtensions
     {
-        static string rtPath = Path.GetDirectoryName(typeof(object).Assembly.Location) + Path.DirectorySeparatorChar;
+        static string rtPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
         static CSharpCompilation Compilation = CSharpCompilation.Create(Guid.NewGuid().ToString())
               .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
               .WithOptimizationLevel(OptimizationLevel.Debug))
-              .AddReferences(MetadataReference.CreateFromFile(rtPath + "System.Runtime.dll"))
-              .AddReferences(MetadataReference.CreateFromFile(rtPath + "System.Collections.dll"))
+              .AddReferences(MetadataReference.CreateFromFile(Path.Combine(rtPath, "System.Runtime.dll")))
+              .AddReferences(MetadataReference.CreateFromFile(Path.Combine(rtPath, "System.Collections.dll")))
               .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
               .AddReferences(MetadataReference.CreateFromFile(typeof(Expression).Assembly.Location))
               .AddReferences(MetadataReference.CreateFromFile(typeof(Queryable).Assembly.Location))
@@ -94,7 +94,7 @@ using System.Linq.Expressions;
 namespace Dynamic;
 public static class Linq 
 {{ 
-  public static Expression<Func<{typeof(T).FullName}, bool>> where = {(selector == "true" ? "i => true" : selector)};
+  public static Expression<Func<{typeof(T).FullName}, bool>> where = {(selector == "true" ? "i => true" : selector).Replace("DateTime", "DateTime.Parse").Replace("DateTimeOffset", "DateTimeOffset.Parse").Replace("DateOnly", "DateOnly.Parse").Replace("Guid", "Guid.Parse")};
 }}";
 
                 var assembly = Compile(Compilation
@@ -107,7 +107,7 @@ public static class Linq
 
                 return source.Where(whereMethod);
             }
-            catch
+            catch(Exception ex)
             {
                 throw new InvalidOperationException($"Invalid Where selector");
             }
