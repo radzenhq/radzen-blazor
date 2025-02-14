@@ -147,7 +147,7 @@ public static class Linq
                         var original = s.Split(" as ").FirstOrDefault().Trim();
                         var property = QueryableExtension.GetNestedPropertyExpression(parameter, original);
                         var name = s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim() : s.Trim();
-                        return $@"public {property.Type.DisplayName(fullName: false)} {name} {{ get; set; }}";
+                        return $@"public {property.Type.DisplayName(fullName: false) + (original.Contains(".") ? "?" : "")} {name} {{ get; set; }}";
                     }));
 
                 selector = string.Join(", ", properties
