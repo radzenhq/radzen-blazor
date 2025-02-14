@@ -3,6 +3,7 @@ using Bunit;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using Xunit;
 
@@ -17,6 +18,15 @@ namespace Radzen.Blazor.Tests
         const string _panelPopupContainerSelector = ".rz-timespanpicker-popup-container";
         const string _panelSelector = ".rz-timespanpicker-panel";
         const string _confirmationButtonSelector = ".rz-timespanpicker-confirmationbutton";
+        static readonly Dictionary<TimeSpanUnit, string> _unitElementSelectors = new()
+        {
+            { TimeSpanUnit.Day, ".rz-timespanpicker-days" },
+            { TimeSpanUnit.Hour, ".rz-timespanpicker-hours" },
+            { TimeSpanUnit.Minute, ".rz-timespanpicker-minutes" },
+            { TimeSpanUnit.Second, ".rz-timespanpicker-seconds" },
+            { TimeSpanUnit.Millisecond, ".rz-timespanpicker-milliseconds" },
+            { TimeSpanUnit.Microsecond, ".rz-timespanpicker-microseconds" }
+        };
         const string _unitValuePickerSelector = ".rz-timespanpicker-unitvaluepicker";
         const string _signPickerSelector = ".rz-timespanpicker-signpicker";
         const string _positiveSignPickerSelector = $"{_signPickerSelector} > .rz-button:first-child";
@@ -694,11 +704,11 @@ namespace Radzen.Blazor.Tests
         public static TheoryData<string, string> TimeSpanPicker_Renders_PadTimeValuesParameter_Data
             => new()
             {
-                {".rz-timespanpicker-hours", "00"},
-                {".rz-timespanpicker-minutes", "00"},
-                {".rz-timespanpicker-seconds", "00"},
-                {".rz-timespanpicker-milliseconds", "000"},
-                {".rz-timespanpicker-microseconds", "000"}
+                { _unitElementSelectors[TimeSpanUnit.Hour], "00"},
+                { _unitElementSelectors[TimeSpanUnit.Minute], "00"},
+                { _unitElementSelectors[TimeSpanUnit.Second], "00"},
+                { _unitElementSelectors[TimeSpanUnit.Millisecond], "000"},
+                { _unitElementSelectors[TimeSpanUnit.Microsecond], "000"}
             };
         [Theory]
         [MemberData(nameof(TimeSpanPicker_Renders_PadTimeValuesParameter_Data))]
@@ -725,28 +735,11 @@ namespace Radzen.Blazor.Tests
             Assert.Contains($"value=\"{formattedNumber}\"", field.ToMarkup());
         }
 
-        public static TheoryData<TimeSpanUnit, string[], string[]> TimeSpanPicker_Renders_FieldPrecisionParameter_Data
-            => new()
-            {
-                {
-                    TimeSpanUnit.Day,
-                    new string[] { ".rz-timespanpicker-days" },
-                    new string[] { ".rz-timespanpicker-hours", ".rz-timespanpicker-minutes", ".rz-timespanpicker-seconds", ".rz-timespanpicker-milliseconds", ".rz-timespanpicker-microseconds" }
-                },
-                {
-                    TimeSpanUnit.Minute,
-                    new string[] { ".rz-timespanpicker-days", ".rz-timespanpicker-hours", ".rz-timespanpicker-minutes" },
-                    new string[] { ".rz-timespanpicker-seconds", ".rz-timespanpicker-milliseconds", ".rz-timespanpicker-microseconds" }
-                },
-                {
-                    TimeSpanUnit.Microsecond,
-                    new string[] { ".rz-timespanpicker-days", ".rz-timespanpicker-hours", ".rz-timespanpicker-minutes", ".rz-timespanpicker-seconds", ".rz-timespanpicker-milliseconds", ".rz-timespanpicker-microseconds" },
-                    Array.Empty<string>()
-                }
-            };
+        public static IEnumerable<object[]> TimeSpanPicker_Renders_FieldPrecisionParameter_Data
+            => Enum.GetValues<TimeSpanUnit>().Select(x => new object[] { x });
         [Theory]
         [MemberData(nameof(TimeSpanPicker_Renders_FieldPrecisionParameter_Data))]
-        public void TimeSpanPicker_Renders_FieldPrecisionParameter(TimeSpanUnit precision, string[] elementsToRender, string[] elementsNotToRender)
+        public void TimeSpanPicker_Renders_FieldPrecisionParameter(TimeSpanUnit precision)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -759,15 +752,11 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.FieldPrecision, precision);
             });
 
-            foreach (var element in elementsToRender)
+            foreach (var unitSelectorPair in _unitElementSelectors)
             {
-                var foundElements = component.FindAll($"{_panelSelector} {element}");
-                Assert.Equal(1, foundElements.Count);
-            }
-            foreach (var element in elementsNotToRender)
-            {
-                var foundElements = component.FindAll($"{_panelSelector} {element}");
-                Assert.Equal(0, foundElements.Count);
+                var foundElements = component.FindAll($"{_panelSelector} {unitSelectorPair.Value}");
+                var expectedNumberOfElements = unitSelectorPair.Key <= precision ? 1 : 0;
+                Assert.Equal(expectedNumberOfElements, foundElements.Count);
             }
         }
 
@@ -868,16 +857,16 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(text, panel.ToMarkup());
         }
 
-        public static TheoryData< Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>>, string>
+        public static TheoryData<Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>>, string>
             TimeSpanPicker_Renders_UnitTextParameters_Data
             => new()
             {
-                { x => x.DaysUnitText, ".rz-timespanpicker-days" },
-                { x => x.HoursUnitText, ".rz-timespanpicker-hours" },
-                { x => x.MinutesUnitText, ".rz-timespanpicker-minutes" },
-                { x => x.SecondsUnitText, ".rz-timespanpicker-seconds"},
-                { x => x.MillisecondsUnitText, ".rz-timespanpicker-milliseconds" },
-                { x => x.MicrosecondsUnitText, ".rz-timespanpicker-microseconds" }
+                { x => x.DaysUnitText, _unitElementSelectors[TimeSpanUnit.Day] },
+                { x => x.HoursUnitText, _unitElementSelectors[TimeSpanUnit.Hour] },
+                { x => x.MinutesUnitText, _unitElementSelectors[TimeSpanUnit.Minute] },
+                { x => x.SecondsUnitText, _unitElementSelectors[TimeSpanUnit.Second] },
+                { x => x.MillisecondsUnitText, _unitElementSelectors[TimeSpanUnit.Millisecond] },
+                { x => x.MicrosecondsUnitText, _unitElementSelectors[TimeSpanUnit.Microsecond] }
             };
         [Theory]
         [MemberData(nameof(TimeSpanPicker_Renders_UnitTextParameters_Data))]
@@ -905,12 +894,12 @@ namespace Radzen.Blazor.Tests
             TimeSpanPicker_Respects_StepParameter_Data
             => new()
             {
-                { x => x.DaysStep, ".rz-timespanpicker-days", TimeSpan.TicksPerDay },
-                { x => x.HoursStep, ".rz-timespanpicker-hours", TimeSpan.TicksPerHour },
-                { x => x.MinutesStep, ".rz-timespanpicker-minutes", TimeSpan.TicksPerMinute },
-                { x => x.SecondsStep, ".rz-timespanpicker-seconds", TimeSpan.TicksPerSecond },
-                { x => x.MillisecondsStep, ".rz-timespanpicker-milliseconds", TimeSpan.TicksPerMillisecond },
-                { x => x.MicrosecondsStep, ".rz-timespanpicker-microseconds", TimeSpan.TicksPerMicrosecond }
+                { x => x.DaysStep, _unitElementSelectors[TimeSpanUnit.Day], TimeSpan.TicksPerDay },
+                { x => x.HoursStep, _unitElementSelectors[TimeSpanUnit.Hour], TimeSpan.TicksPerHour },
+                { x => x.MinutesStep, _unitElementSelectors[TimeSpanUnit.Minute], TimeSpan.TicksPerMinute },
+                { x => x.SecondsStep, _unitElementSelectors[TimeSpanUnit.Second], TimeSpan.TicksPerSecond },
+                { x => x.MillisecondsStep, _unitElementSelectors[TimeSpanUnit.Millisecond], TimeSpan.TicksPerMillisecond },
+                { x => x.MicrosecondsStep, _unitElementSelectors[TimeSpanUnit.Microsecond], TimeSpan.TicksPerMicrosecond }
             };
         [Theory]
         [MemberData(nameof(TimeSpanPicker_Respects_StepParameter_Data))]
