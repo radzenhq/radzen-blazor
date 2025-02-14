@@ -669,7 +669,8 @@ namespace Radzen
                     }
                 }
 
-                return "it => " + string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i)));
+                return whereList.Any() ? 
+                    "it => " + string.Join($" {gridBooleanOperator} ", whereList.Where(i => !string.IsNullOrEmpty(i))) : "";
             }
 
             return "";
