@@ -283,6 +283,8 @@ namespace Radzen
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)
         {
             Type valueType = filter.FilterValue != null ? filter.FilterValue.GetType() : null;
+            var isEnumerable = valueType != null && IsEnumerable(valueType) && valueType != typeof(string);
+
             Type secondValueType = filter.SecondFilterValue != null ? filter.SecondFilterValue.GetType() : null;
 
             Expression property = GetNestedPropertyExpression(parameter, filter.Property, type);
@@ -300,14 +302,14 @@ namespace Radzen
             }
 
             var isEnum = PropertyAccess.IsEnum(property.Type) || PropertyAccess.IsNullableEnum(property.Type);
-            var caseInsensitive = property.Type == typeof(string) && filterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive;
+            var caseInsensitive = property.Type == typeof(string) && !isEnumerable && filterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive;
 
             var constant = Expression.Constant(caseInsensitive ?
                 $"{filter.FilterValue}".ToLowerInvariant() :
                     isEnum && filter.FilterValue != null ? Enum.ToObject(Nullable.GetUnderlyingType(property.Type) ?? property.Type, filter.FilterValue) : filter.FilterValue,
-                    valueType != null && !isEnum && IsEnumerable(valueType) ? valueType : property.Type);
+                    !isEnum && isEnumerable ? valueType : property.Type);
 
-            if (caseInsensitive)
+            if (caseInsensitive && !isEnumerable)
             {
                 property = Expression.Call(property, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
             }
@@ -326,17 +328,17 @@ namespace Radzen
                 FilterOperator.LessThanOrEquals => Expression.LessThanOrEqual(notNullCheck(property), constant),
                 FilterOperator.GreaterThan => Expression.GreaterThan(notNullCheck(property), constant),
                 FilterOperator.GreaterThanOrEquals => Expression.GreaterThanOrEqual(notNullCheck(property), constant),
-                FilterOperator.Contains => valueType != null && IsEnumerable(valueType) && valueType != typeof(string) ?
+                FilterOperator.Contains => isEnumerable ?
                     Expression.Call(typeof(Queryable), nameof(Queryable.Contains), new Type[] { property.Type }, constant, notNullCheck(property)) :
                         Expression.Call(notNullCheck(property), typeof(string).GetMethod("Contains", new[] { typeof(string) }), constant),
-                FilterOperator.In => valueType != null && IsEnumerable(valueType) && valueType != typeof(string) &&
+                FilterOperator.In => isEnumerable &&
                                     IsEnumerable(property.Type) && property.Type != typeof(string) ?
                     Expression.Call(typeof(Queryable), nameof(Queryable.Any), new Type[] { collectionItemType },
                         Expression.Call(typeof(Queryable), nameof(Queryable.Intersect), new Type[] { collectionItemType }, constant, notNullCheck(property))) : Expression.Constant(true),
-                FilterOperator.DoesNotContain => valueType != null && IsEnumerable(valueType) && valueType != typeof(string) ?
+                FilterOperator.DoesNotContain => isEnumerable ?
                     Expression.Not(Expression.Call(typeof(Queryable), nameof(Queryable.Contains), new Type[] { property.Type }, constant, notNullCheck(property))) :
                         Expression.Not(Expression.Call(notNullCheck(property), typeof(string).GetMethod("Contains", new[] { typeof(string) }), constant)),
-                FilterOperator.NotIn => valueType != null && IsEnumerable(valueType) && valueType != typeof(string) &&
+                FilterOperator.NotIn => isEnumerable &&
                                     IsEnumerable(property.Type) && property.Type != typeof(string) ?
                     Expression.Call(typeof(Queryable), nameof(Queryable.Any), new Type[] { collectionItemType },
                         Expression.Call(typeof(Queryable), nameof(Queryable.Except), new Type[] { collectionItemType }, constant, notNullCheck(property))) : Expression.Constant(true),
