@@ -25,13 +25,13 @@ namespace System.Linq.Dynamic.Core
     /// </summary>
     public static class DynamicExtensions
     {
-        static string rtPath = Path.GetDirectoryName(typeof(object).Assembly.Location) + Path.DirectorySeparatorChar;
+        static string rtPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
 
         static CSharpCompilation Compilation = CSharpCompilation.Create(Guid.NewGuid().ToString())
               .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
               .WithOptimizationLevel(OptimizationLevel.Debug))
-              .AddReferences(MetadataReference.CreateFromFile(rtPath + "System.Runtime.dll"))
-              .AddReferences(MetadataReference.CreateFromFile(rtPath + "System.Collections.dll"))
+              .AddReferences(MetadataReference.CreateFromFile(Path.Combine(rtPath, "System.Runtime.dll")))
+              .AddReferences(MetadataReference.CreateFromFile(Path.Combine(rtPath, "System.Collections.dll")))
               .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
               .AddReferences(MetadataReference.CreateFromFile(typeof(Expression).Assembly.Location))
               .AddReferences(MetadataReference.CreateFromFile(typeof(Queryable).Assembly.Location))
@@ -81,9 +81,10 @@ namespace System.Linq.Dynamic.Core
                     {
                         var value = object.Equals(parameters[i], string.Empty) ? @"""""" :
                             parameters[i] == null ? @"null" :
-                                parameters[i] is string ? @$"""{parameters[i]}""" : parameters[i];
+                                parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}"""  : 
+                                    parameters[i] is bool ? $"{parameters[i]}".ToLower() : parameters[i];
 
-                        selector = selector.Replace($"@{i}", Uri.EscapeDataString($"{value}"));
+                        selector = selector.Replace($"@{i}", $"{value}");
                     }
                 }
 
@@ -94,7 +95,7 @@ using System.Linq.Expressions;
 namespace Dynamic;
 public static class Linq 
 {{ 
-  public static Expression<Func<{typeof(T).FullName}, bool>> where = {(selector == "true" ? "i => true" : selector)};
+  public static Expression<Func<{typeof(T).FullName.Replace("+", ".")}, bool>> where = {(selector == "true" ? "i => true" : selector).Replace("DateTime", "DateTime.Parse").Replace("DateTimeOffset", "DateTimeOffset.Parse").Replace("DateOnly", "DateOnly.Parse").Replace("Guid", "Guid.Parse").Replace(" = "," == ")};
 }}";
 
                 var assembly = Compile(Compilation
@@ -116,7 +117,7 @@ public static class Linq
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
-        public static IQueryable<T> OrderBy<T>(
+        public static IOrderedQueryable<T> OrderBy<T>(
             this IQueryable<T> source,
             string selector,
             object[] parameters = null)
@@ -146,7 +147,7 @@ public static class Linq
                         var original = s.Split(" as ").FirstOrDefault().Trim();
                         var property = QueryableExtension.GetNestedPropertyExpression(parameter, original);
                         var name = s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim() : s.Trim();
-                        return $@"public {property.Type.DisplayName(fullName: false)} {name} {{ get; set; }}";
+                        return $@"public {property.Type.DisplayName(fullName: false) + (original.Contains(".") ? "?" : "")} {name} {{ get; set; }}";
                     }));
 
                 selector = string.Join(", ", properties
@@ -165,7 +166,7 @@ public static class Linq
 {{ 
     public static IQueryable Select(IQueryable source)
     {{
-        var list = System.Linq.Enumerable.ToList(System.Linq.Queryable.Cast<{typeof(T).FullName}>(source));
+        var list = System.Linq.Enumerable.ToList(System.Linq.Queryable.Cast<{typeof(T).FullName.Replace("+", ".")}>(source));
         return System.Linq.Queryable.AsQueryable(list.Select(it => new {className}() {{ {selector} }}));
     }}
 }}";
