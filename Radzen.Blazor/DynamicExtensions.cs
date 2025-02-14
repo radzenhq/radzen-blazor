@@ -81,7 +81,8 @@ namespace System.Linq.Dynamic.Core
                     {
                         var value = object.Equals(parameters[i], string.Empty) ? @"""""" :
                             parameters[i] == null ? @"null" :
-                                parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}"""  : parameters[i];
+                                parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}"""  : 
+                                    parameters[i] is bool ? $"{parameters[i]}".ToLower() : parameters[i];
 
                         selector = selector.Replace($"@{i}", $"{value}");
                     }
@@ -94,7 +95,7 @@ using System.Linq.Expressions;
 namespace Dynamic;
 public static class Linq 
 {{ 
-  public static Expression<Func<{typeof(T).FullName}, bool>> where = {(selector == "true" ? "i => true" : selector).Replace("DateTime", "DateTime.Parse").Replace("DateTimeOffset", "DateTimeOffset.Parse").Replace("DateOnly", "DateOnly.Parse").Replace("Guid", "Guid.Parse")};
+  public static Expression<Func<{typeof(T).FullName}, bool>> where = {(selector == "true" ? "i => true" : selector).Replace("DateTime", "DateTime.Parse").Replace("DateTimeOffset", "DateTimeOffset.Parse").Replace("DateOnly", "DateOnly.Parse").Replace("Guid", "Guid.Parse").Replace(" = "," == ")};
 }}";
 
                 var assembly = Compile(Compilation
