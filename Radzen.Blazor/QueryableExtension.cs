@@ -911,11 +911,6 @@ namespace Radzen
             var property = "it." + PropertyAccess.GetProperty(column.GetFilterProperty());
             var propertyType = !string.IsNullOrEmpty(property) ? PropertyAccess.GetPropertyType(typeof(T), property) : null;
 
-            if (property.IndexOf(".") != -1)
-            {
-                property = $"({property})";
-            }
-
             string npProperty = (propertyType != null ? Nullable.GetUnderlyingType(propertyType) != null : true) ? $@"({property} ?? null)" : property;
 
             var columnFilterOperator = !second ? column.GetFilterOperator() : column.GetSecondFilterOperator();
@@ -983,6 +978,17 @@ namespace Radzen
                 else if (columnFilterOperator == FilterOperator.IsNotNull)
                 {
                     return npProperty + @" != null";
+                }
+            }
+            else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
+            {
+                if (columnFilterOperator == FilterOperator.IsNull || columnFilterOperator == FilterOperator.IsNotNull)
+                {
+                    return $"{property} {linqOperator} null";
+                }
+                else
+                {
+                    return $"{property} {linqOperator} ({column.FilterPropertyType.FullName.Replace("+",".")}){value}";
                 }
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
