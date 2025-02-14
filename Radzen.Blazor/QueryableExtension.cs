@@ -17,7 +17,7 @@ namespace Radzen
     public static class QueryableExtension
     {
         static Expression notNullCheck(Expression property) => Nullable.GetUnderlyingType(property.Type) != null || property.Type == typeof(string) ?
-            Expression.Coalesce(property, Expression.Constant(null, property.Type)) : property;
+            Expression.Coalesce(property, property.Type == typeof(string) ? Expression.Constant(string.Empty) : Expression.Constant(null, property.Type)) : property;
 
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
