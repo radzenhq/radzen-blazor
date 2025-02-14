@@ -71,7 +71,7 @@ namespace Radzen
             var parameter = Expression.Parameter(source.ElementType, "x");
 
             return GroupByMany(source,
-                properties.Select(p => Expression.Lambda<Func<T, object>>(GetNestedPropertyExpression(parameter, p), parameter).Compile()).ToArray(), 
+                properties.Select(p => Expression.Lambda<Func<T, object>>(Expression.Convert(GetNestedPropertyExpression(parameter, p), typeof(object)), parameter).Compile()).ToArray(), 
                     0);
         }
 
