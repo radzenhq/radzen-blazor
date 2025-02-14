@@ -113,7 +113,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Refreshes this instance.
         /// </summary>
-        internal void Refresh()
+        public void Refresh()
         {
             StateHasChanged();
         }
