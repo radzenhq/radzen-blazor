@@ -297,7 +297,7 @@ namespace Radzen
 
             if (caseInsensitive)
             {
-                property = Expression.Call(property, typeof(string).GetMethod("ToLowerInvariant", System.Type.EmptyTypes));
+                property = Expression.Call(property, typeof(string).GetMethod("ToLower", System.Type.EmptyTypes));
             }
 
             var secondConstant = filter.SecondFilterValue != null ?

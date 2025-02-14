@@ -81,9 +81,9 @@ namespace System.Linq.Dynamic.Core
                     {
                         var value = object.Equals(parameters[i], string.Empty) ? @"""""" :
                             parameters[i] == null ? @"null" :
-                                parameters[i] is string ? @$"""{parameters[i]}""" : parameters[i];
+                                parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}"""  : parameters[i];
 
-                        selector = selector.Replace($"@{i}", Uri.EscapeDataString($"{value}"));
+                        selector = selector.Replace($"@{i}", $"{value}");
                     }
                 }
 
