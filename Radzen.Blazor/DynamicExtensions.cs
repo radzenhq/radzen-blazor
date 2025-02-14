@@ -117,7 +117,7 @@ public static class Linq
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
-        public static IQueryable<T> OrderBy<T>(
+        public static IOrderedQueryable<T> OrderBy<T>(
             this IQueryable<T> source,
             string selector,
             object[] parameters = null)

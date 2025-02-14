@@ -91,9 +91,9 @@ namespace Radzen
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
         /// <returns>A <see cref="IQueryable{T}"/> whose elements are sorted according to the specified <paramref name="ordering"/>.</returns>
-        public static IQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering = null)
+        public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering = null)
         {
-            return (IQueryable<T>)OrderBy((IQueryable)source, ordering);
+            return (IOrderedQueryable<T>)OrderBy((IQueryable)source, ordering);
         }
 
         static string RemoveVariableReference(string expression)
