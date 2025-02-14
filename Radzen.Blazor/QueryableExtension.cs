@@ -1296,8 +1296,11 @@ namespace Radzen
             Func<RadzenDataGridColumn<T>, bool> canFilter = (c) => c.Filterable && c.FilterPropertyType != null &&
                (!(c.GetFilterValue() == null || c.GetFilterValue() as string == string.Empty)
                 || c.GetFilterOperator() == FilterOperator.IsNotNull || c.GetFilterOperator() == FilterOperator.IsNull
-                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty
-                || (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null))
+                || c.GetFilterOperator() == FilterOperator.IsEmpty || c.GetFilterOperator() == FilterOperator.IsNotEmpty)
+               && c.GetFilterProperty() != null;
+
+            Func<RadzenDataGridColumn<T>, bool> canFilterCustom = (c) => c.Filterable && c.FilterPropertyType != null &&
+               (c.GetFilterOperator() == FilterOperator.Custom && c.GetCustomFilterExpression() != null)
                && c.GetFilterProperty() != null;
 
             var columnsToFilter = columns.Where(canFilter);
@@ -1307,7 +1310,7 @@ namespace Radzen
 
             if (columnsToFilter.Any())
             {
-                return source.Where(columnsToFilter.Select(c => new FilterDescriptor()
+                source = source.Where(columnsToFilter.Select(c => new FilterDescriptor()
                     {
                         Property = c.Property,
                         FilterProperty = c.FilterProperty,
@@ -1318,6 +1321,15 @@ namespace Radzen
                         SecondFilterOperator = c.GetSecondFilterOperator(),
                         LogicalFilterOperator = c.GetLogicalFilterOperator()
                     }), gridLogicalFilterOperator, gridFilterCaseSensitivity);
+            }
+
+            var columnsWithCustomFilter = columns.Where(canFilterCustom);
+
+            if (columnsToFilter.Any())
+            {
+                var expressions = columnsWithCustomFilter.Select(c => (c.GetCustomFilterExpression() ?? "").Replace(" or ", " || ").Replace(" and ", " && ")).Where(e => !string.IsNullOrEmpty(e)).ToList();
+                source = expressions.Any() ? 
+                    System.Linq.Dynamic.Core.DynamicExtensions.Where(source, "it => " + string.Join($"{(gridLogicalFilterOperator == LogicalFilterOperator.And ? " && " : " || ")}", expressions)) : source;
             }
 
             return source;
