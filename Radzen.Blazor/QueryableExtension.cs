@@ -402,23 +402,6 @@ namespace Radzen
         }
 
         /// <summary>
-        /// The filter operators
-        /// </summary>
-        internal static readonly IDictionary<string, string> FilterOperators = new Dictionary<string, string>
-        {
-            {"eq", "="},
-            {"ne", "!="},
-            {"lt", "<"},
-            {"le", "<="},
-            {"gt", ">"},
-            {"ge", ">="},
-            {"startswith", "StartsWith"},
-            {"endswith", "EndsWith"},
-            {"contains", "Contains"},
-            {"DoesNotContain", "Contains"}
-        };
-
-        /// <summary>
         /// The linq filter operators
         /// </summary>
         internal static readonly IDictionary<FilterOperator, string> LinqFilterOperators = new Dictionary<FilterOperator, string>
