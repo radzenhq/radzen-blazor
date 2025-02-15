@@ -155,7 +155,7 @@ namespace Radzen.Blazor
         }
 
         bool clientExpanded;
-        internal async Task Toggle()
+        async Task Toggle()
         {
             if (expanded && !Tree.SingleExpand)
             {
@@ -167,19 +167,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    if (items.Count > 0)
-                    {
-                        Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
-                    }
-
-                    if (Tree != null)
-                    {
-                        await Tree.Collapse.InvokeAsync(new TreeEventArgs()
-                        {
-                            Text = Text,
-                            Value = Value
-                        });
-                    }
+                    await Collapse();
                 }
 
                 return;
@@ -205,19 +193,36 @@ namespace Radzen.Blazor
             }
             else
             {
-                if (items.Count > 0)
-                {
-                    Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
-                }
+                await Collapse();
+            }
+        }
 
-                if (Tree != null)
+        async Task Collapse()
+        {
+            expanded = false;
+            clientExpanded = false;
+
+            if (items.Count > 0)
+            {
+                Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
+
+                if (ParentItem != null)
                 {
-                    await Tree.Collapse.InvokeAsync(new TreeEventArgs()
-                    {
-                        Text = Text,
-                        Value = Value
-                    });
+                    ParentItem.items = Tree.CurrentItems;
                 }
+                else if (Tree != null)
+                {
+                    Tree.items = Tree.CurrentItems;
+                }
+            }
+
+            if (Tree != null)
+            {
+                await Tree.Collapse.InvokeAsync(new TreeEventArgs()
+                {
+                    Text = Text,
+                    Value = Value
+                });
             }
         }
 
@@ -229,15 +234,14 @@ namespace Radzen.Blazor
 
                 if (Tree.SingleExpand)
                 {
-                    var siblings = (ParentItem?.items ?? Tree.items).ToList();
+                    var siblings = (ParentItem?.items ?? Tree.items).Where(s => s != this && s.expanded).ToList();
 
                     foreach (var sibling in siblings)
                     {
-                        if (sibling != this && sibling.expanded)
-                        {
-                            await sibling.Toggle();
-                        }
+                        await sibling.Collapse();
                     }
+
+                    await Tree.ChangeState();
                 }
             }
         }
