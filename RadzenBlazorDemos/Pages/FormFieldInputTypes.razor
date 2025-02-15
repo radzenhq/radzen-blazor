@@ -19,20 +19,20 @@
                     <RadzenPassword @bind-Value="@value" />
                 </RadzenFormField>
                 <RadzenFormField Text="RadzenDropDown" Variant="@variant">
-                    <RadzenDropDown Data=@companyNames @bind-Value="@dropDownValue" />
+                    <RadzenDropDown Data=@companyNames @bind-Value="@dropDownValue" AllowClear />
                 </RadzenFormField>
                 <RadzenFormField Text="RadzenAutoComplete" Variant="@variant">
                     <RadzenAutoComplete Data=@companyNames @bind-Value="@autoCompleteValue" />
                 </RadzenFormField>
                 <RadzenFormField Text="RadzenDropDownDataGrid" Variant="@variant">
-                    <RadzenDropDownDataGrid Data=@companyNames @bind-Value="@dropDownDataGridValue" />
+                    <RadzenDropDownDataGrid Data=@companyNames @bind-Value="@dropDownDataGridValue" AllowClear />
                 </RadzenFormField>
             </RadzenStack>
         </RadzenColumn>
         <RadzenColumn Size="12" SizeSM="6">
             <RadzenStack>
                 <RadzenFormField Text="RadzenDatePicker" Variant="@variant">
-                    <RadzenDatePicker @bind-Value="@date" ShowTime="@true" />
+                    <RadzenDatePicker @bind-Value="@date" ShowTime="@true" AllowClear />
                 </RadzenFormField>
                 <RadzenFormField Text="RadzenColorPicker" Variant="@variant">
                     <RadzenColorPicker @bind-Value="@color" />
