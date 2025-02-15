@@ -566,5 +566,10 @@ namespace Radzen.Blazor
                 return _currentItems;
             }
         }
+
+        internal async Task ChangeState()
+        {
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }
