@@ -149,7 +149,7 @@ namespace Radzen.Blazor
         public Func<string, TimeSpan?> ParseInput { get; set; }
         #endregion
 
-        #region Parameters: input field labels
+        #region Parameters: input field texts
         /// <summary>
         /// Specifies the input placeholder.
         /// </summary>
@@ -233,73 +233,73 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string MicrosecondsStep { get; set; }
-        #endif
+#endif
         #endregion
 
-        #region Parameters: panel labels
+        #region Parameters: panel texts
         /// <summary>
-        /// Specifies the label of the confirmation button.
+        /// Specifies the text of the confirmation button. Used only if <see cref="ShowConfirmationButton"/> is <code>true</code>.
         /// </summary>
         [Parameter]
-        public string ConfirmationButtonLabel { get; set; } = "OK";
+        public string ConfirmationButtonText { get; set; } = "OK";
 
         /// <summary>
-        /// Specifies the label of the positive value button.
+        /// Specifies the text of the positive value button.
         /// </summary>
         [Parameter]
-        public string PositiveButtonLabel { get; set; } = "+";
+        public string PositiveButtonText { get; set; } = "+";
 
         /// <summary>
-        /// Specifies the label of the negative value button.
+        /// Specifies the text of the negative value button.
         /// </summary>
         [Parameter]
-        public string NegativeButtonLabel { get; set; } = "−";
+        public string NegativeButtonText { get; set; } = "−";
 
         /// <summary>
-        /// Specifies the text displayed before the fields in the panel when the value is positive and there's no value sign picker.
+        /// Specifies the text displayed next to the fields in the panel when the value is positive and there's no sign picker.
         /// </summary>
         [Parameter]
         public string PositiveValueText { get; set; } = string.Empty;
 
         /// <summary>
-        /// Specifies the text displayed before the fields in the panel when the value is negative and there's no value sign picker.
+        /// Specifies the text displayed next to the fields in the panel when the value is negative and there's no sign picker.
         /// </summary>
         [Parameter]
         public string NegativeValueText { get; set; } = "−";
 
         /// <summary>
-        /// Specifies the text displayed next to the days field.
+        /// Specifies the days label text.
         /// </summary>
         [Parameter]
         public string DaysUnitText { get; set; } = "Days";
 
         /// <summary>
-        /// Specifies the text displayed next to the hours field.
+        /// Specifies the hours label text.
         /// </summary>
         [Parameter]
         public string HoursUnitText { get; set; } = "Hours";
 
         /// <summary>
-        /// Specifies the text displayed next to the minutes field.
+        /// Specifies the minutes label text.
         /// </summary>
         [Parameter]
         public string MinutesUnitText { get; set; } = "Minutes";
 
         /// <summary>
-        /// Specifies the text displayed next to the seconds field.
+        /// Specifies the seconds label text.
         /// </summary>
         [Parameter]
         public string SecondsUnitText { get; set; } = "Seconds";
 
         /// <summary>
-        /// Specifies the text displayed next to the milliseconds field.
+        /// Specifies the milliseconds label text.
         /// </summary>
         [Parameter]
         public string MillisecondsUnitText { get; set; } = "Milliseconds";
 
-        #if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER
         /// <summary>
-        /// Specifies the text displayed next to the microseconds field.
+        /// Specifies the microseconds label text.
         /// </summary>
         [Parameter]
         public string MicrosecondsUnitText { get; set; } = "Microseconds";
@@ -759,7 +759,7 @@ namespace Radzen.Blazor
             _positiveTimeFieldsMaxValues = canBePositive ? GetTimeUnitMaxValues(max) : new(_timeUnitZeroValues);
         }
 
-        private Dictionary<TimeSpanUnit, int> GetTimeUnitMaxValues(TimeSpan boundary)
+        private static Dictionary<TimeSpanUnit, int> GetTimeUnitMaxValues(TimeSpan boundary)
         {
             var timeUnitMaxValues = new Dictionary<TimeSpanUnit, int>(_timeUnitMaxAbsoluteValues);
 
