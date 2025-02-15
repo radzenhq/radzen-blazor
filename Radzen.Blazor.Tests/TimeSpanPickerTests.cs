@@ -31,6 +31,7 @@ namespace Radzen.Blazor.Tests
         const string _signPickerSelector = ".rz-timespanpicker-signpicker";
         const string _positiveSignPickerSelector = $"{_signPickerSelector} > .rz-button:first-child";
         const string _negativeSignPickerSelector = $"{_signPickerSelector} > .rz-button:last-child";
+
         static readonly CultureInfo _cultureInfo = CultureInfo.InvariantCulture;
 
         #region Component general look
@@ -125,6 +126,10 @@ namespace Radzen.Blazor.Tests
             var picker = component.Find(_pickerSelector);
             Assert.DoesNotContain("rz-state-empty", picker.ClassList);
         }
+        #endregion
+
+        #region Component general behavior //TO DO
+
         #endregion
 
         #region Input field look
@@ -345,7 +350,9 @@ namespace Radzen.Blazor.Tests
             var inputField = component.Find(_inputFieldSelector);
             Assert.Equal(formattedValue, inputField.GetAttribute("value"));
         }
+        #endregion
 
+        #region Input field labels
         [Fact]
         public void TimeSpanPicker_Renders_PlaceholderParameter()
         {
@@ -683,7 +690,9 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(0, popupContainers.Count);
             Assert.Equal(1, panels.Count);
         }
+        #endregion
 
+        #region Panel labels
         [Fact]
         public void TimeSpanPicker_Renders_ShowConfirmationButtonParameter()
         {
@@ -701,18 +710,18 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(1, confirmationButtons.Count);
         }
 
-        public static TheoryData<string, string> TimeSpanPicker_Renders_PadTimeValuesParameter_Data
+        public static TheoryData<TimeSpanUnit, string> TimeSpanPicker_Renders_PadTimeValuesParameter_Data
             => new()
             {
-                { _unitElementSelectors[TimeSpanUnit.Hour], "00"},
-                { _unitElementSelectors[TimeSpanUnit.Minute], "00"},
-                { _unitElementSelectors[TimeSpanUnit.Second], "00"},
-                { _unitElementSelectors[TimeSpanUnit.Millisecond], "000"},
-                { _unitElementSelectors[TimeSpanUnit.Microsecond], "000"}
+                { TimeSpanUnit.Hour, "00"},
+                { TimeSpanUnit.Minute, "00"},
+                { TimeSpanUnit.Second, "00"},
+                { TimeSpanUnit.Millisecond, "000"},
+                { TimeSpanUnit.Microsecond, "000"}
             };
         [Theory]
         [MemberData(nameof(TimeSpanPicker_Renders_PadTimeValuesParameter_Data))]
-        public void TimeSpanPicker_Renders_PadTimeValuesParameter(string unitSelector, string format)
+        public void TimeSpanPicker_Renders_PadTimeValuesParameter(TimeSpanUnit unit, string format)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -730,7 +739,7 @@ namespace Radzen.Blazor.Tests
 
             var formattedNumber = number.ToString(format, _cultureInfo);
 
-            var field = component.Find($"{unitSelector} > {_unitValuePickerSelector}");
+            var field = component.Find($"{_unitElementSelectors[unit]} > {_unitValuePickerSelector}");
 
             Assert.Contains($"value=\"{formattedNumber}\"", field.ToMarkup());
         }
@@ -857,21 +866,8 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(text, panel.ToMarkup());
         }
 
-        public static TheoryData<Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>>, string>
-            TimeSpanPicker_Renders_UnitTextParameters_Data
-            => new()
-            {
-                { x => x.DaysUnitText, _unitElementSelectors[TimeSpanUnit.Day] },
-                { x => x.HoursUnitText, _unitElementSelectors[TimeSpanUnit.Hour] },
-                { x => x.MinutesUnitText, _unitElementSelectors[TimeSpanUnit.Minute] },
-                { x => x.SecondsUnitText, _unitElementSelectors[TimeSpanUnit.Second] },
-                { x => x.MillisecondsUnitText, _unitElementSelectors[TimeSpanUnit.Millisecond] },
-                { x => x.MicrosecondsUnitText, _unitElementSelectors[TimeSpanUnit.Microsecond] }
-            };
-        [Theory]
-        [MemberData(nameof(TimeSpanPicker_Renders_UnitTextParameters_Data))]
-        public void TimeSpanPicker_Renders_UnitTextParameters(
-            Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>> unitTextParameterSelector, string unitSelector)
+        private static void _TimeSpanPicker_Renders_UnitTextParameter(
+            Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>> unitTextParameterSelector, TimeSpanUnit unit)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -884,27 +880,33 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.FieldPrecision, TimeSpanUnit.Microsecond);
             });
 
-            var unitValuePicker = component.Find(unitSelector);
+            var unitValuePicker = component.Find(_unitElementSelectors[unit]);
             Assert.Contains(unitText, unitValuePicker.ToMarkup());
         }
+        [Fact]
+        public void TimeSpanPicker_Renders_DaysUnitTextParameter()
+            => _TimeSpanPicker_Renders_UnitTextParameter(x => x.DaysUnitText, TimeSpanUnit.Day);
+        [Fact]
+        public void TimeSpanPicker_Renders_HoursUnitTextParameter()
+            => _TimeSpanPicker_Renders_UnitTextParameter(x => x.HoursUnitText, TimeSpanUnit.Hour);
+        [Fact]
+        public void TimeSpanPicker_Renders_MinutesUnitTextParameter()
+            => _TimeSpanPicker_Renders_UnitTextParameter(x => x.MinutesUnitText, TimeSpanUnit.Minute);
+        [Fact]
+        public void TimeSpanPicker_Renders_SecondsUnitTextParameter()
+            => _TimeSpanPicker_Renders_UnitTextParameter(x => x.SecondsUnitText, TimeSpanUnit.Second);
+        [Fact]
+        public void TimeSpanPicker_Renders_MillisecondsUnitTextParameter()
+            => _TimeSpanPicker_Renders_UnitTextParameter(x => x.MillisecondsUnitText, TimeSpanUnit.Millisecond);
+        [Fact]
+        public void TimeSpanPicker_Renders_MicrosecondsUnitTextParameter()
+            => _TimeSpanPicker_Renders_UnitTextParameter(x => x.MicrosecondsUnitText, TimeSpanUnit.Microsecond);
+
         #endregion
 
         #region Panel behavior
-        public static TheoryData<Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>>, string, long>
-            TimeSpanPicker_Respects_StepParameter_Data
-            => new()
-            {
-                { x => x.DaysStep, _unitElementSelectors[TimeSpanUnit.Day], TimeSpan.TicksPerDay },
-                { x => x.HoursStep, _unitElementSelectors[TimeSpanUnit.Hour], TimeSpan.TicksPerHour },
-                { x => x.MinutesStep, _unitElementSelectors[TimeSpanUnit.Minute], TimeSpan.TicksPerMinute },
-                { x => x.SecondsStep, _unitElementSelectors[TimeSpanUnit.Second], TimeSpan.TicksPerSecond },
-                { x => x.MillisecondsStep, _unitElementSelectors[TimeSpanUnit.Millisecond], TimeSpan.TicksPerMillisecond },
-                { x => x.MicrosecondsStep, _unitElementSelectors[TimeSpanUnit.Microsecond], TimeSpan.TicksPerMicrosecond }
-            };
-        [Theory]
-        [MemberData(nameof(TimeSpanPicker_Respects_StepParameter_Data))]
-        public void TimeSpanPicker_Respects_StepParameter(
-            Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>> stepParameterSelector, string unitSelector, long ticksPerUnit)
+        private static void _TimeSpanPicker_Respects_StepParameter(
+            Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>> stepParameterSelector, TimeSpanUnit unit, long ticksPerUnit)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -920,6 +922,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.FieldPrecision, TimeSpanUnit.Microsecond);
             });
 
+            var unitSelector = _unitElementSelectors[unit];
             var expectedValueUp = initialValue.Add(new TimeSpan(2 * stepTicks));
             var fieldUpButton = component.Find($"{unitSelector} > {_unitValuePickerSelector} > .rz-numeric-up");
             fieldUpButton.Click();
@@ -931,6 +934,24 @@ namespace Radzen.Blazor.Tests
             fieldDownButton.Click();
             Assert.Equal(expectedValueDown, component.Instance.Value);
         }
+        [Fact]
+        public void TimeSpanPicker_Respects_DaysStepParameter()
+            => _TimeSpanPicker_Respects_StepParameter(x => x.DaysStep, TimeSpanUnit.Day, TimeSpan.TicksPerDay);
+        [Fact]
+        public void TimeSpanPicker_Respects_HoursStepParameter()
+            => _TimeSpanPicker_Respects_StepParameter(x => x.HoursStep, TimeSpanUnit.Hour, TimeSpan.TicksPerHour);
+        [Fact]
+        public void TimeSpanPicker_Respects_MinutesStepParameter()
+            => _TimeSpanPicker_Respects_StepParameter(x => x.MinutesStep, TimeSpanUnit.Minute, TimeSpan.TicksPerMinute);
+        [Fact]
+        public void TimeSpanPicker_Respects_SecondsStepParameter()
+            => _TimeSpanPicker_Respects_StepParameter(x => x.SecondsStep, TimeSpanUnit.Second, TimeSpan.TicksPerSecond);
+        [Fact]
+        public void TimeSpanPicker_Respects_MillisecondsStepParameter()
+            => _TimeSpanPicker_Respects_StepParameter(x => x.MillisecondsStep, TimeSpanUnit.Millisecond, TimeSpan.TicksPerMillisecond);
+        [Fact]
+        public void TimeSpanPicker_Respects_MicrosecondsStepParameter()
+            => _TimeSpanPicker_Respects_StepParameter(x => x.MicrosecondsStep, TimeSpanUnit.Microsecond, TimeSpan.TicksPerMicrosecond);
         #endregion
     }
 }
