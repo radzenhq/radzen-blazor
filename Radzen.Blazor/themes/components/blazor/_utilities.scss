@@ -561,3 +561,37 @@ $border: border, border-start, border-end, border-left, border-right, border-top
 .rz-ripple {
   @include rz-ripple($pseudo: true);
 }
+
+// Field icon wrapper
+.rz-field-icon-wrapper {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-block: var(--rz-input-padding-block);
+}
+
+// Clear field icon
+$clear-field-icon: 'close' !default;
+$clear-field-icon-width: var(--rz-icon-size) !default;
+$clear-field-icon-height: $clear-field-icon-width !default;
+
+.rz-clear-field-icon {
+  opacity: 0.4;
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.rzi {
+    width: var(--rz-clear-field-icon-width);
+    height: var(--rz-clear-field-icon-width);
+    font-size: var(--rz-clear-field-icon-width);
+  }
+
+  &.rzi-times:before {
+    content: $clear-field-icon;
+  }
+}
