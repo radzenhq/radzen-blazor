@@ -13,12 +13,6 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenLink : RadzenComponent
     {
-        /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            return "rz-link";
-        }
-
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
@@ -81,5 +75,35 @@ namespace Radzen.Blazor
         /// <value>The navigation link match.</value>
         [Parameter]
         public NavLinkMatch Match { get; set; } = NavLinkMatch.Prefix;
+
+        /// <summary>
+        /// Gets or sets whether the link is disabled.
+        /// </summary>
+        [Parameter]
+        public bool Disabled { get; set; }
+
+        /// <inheritdoc />
+        protected override string GetComponentCssClass()
+        {
+            return Disabled ? "rz-link rz-link-disabled" : "rz-link";
+        }
+
+        /// <summary>
+        /// Gets the path.
+        /// </summary>
+        /// <returns></returns>
+        protected string GetPath()
+        {
+            return !Disabled ? Path : null;
+        }
+
+        /// <summary>
+        /// Gets the target.
+        /// </summary>
+        /// <returns></returns>
+        protected string GetTarget()
+        {
+            return !Disabled ? Target : null;
+        }
     }
 }

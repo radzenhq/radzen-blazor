@@ -2,7 +2,7 @@
 @inherits RadzenComponent
 @if (Visible)
 {
-    <NavLink style="@Style" href="@Path" @attributes="Attributes" class="@GetCssClass()" target="@Target" id="@GetId()" Match="@Match">
+    <NavLink style="@Style" href="@GetPath()" @attributes="Attributes" class="@GetCssClass()" target="@GetTarget()" id="@GetId()" Match="@Match" >
         @if (!string.IsNullOrEmpty(Icon))
         {
             <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>

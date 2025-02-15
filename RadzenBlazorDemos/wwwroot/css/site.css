@@ -233,6 +233,12 @@ video {
 .components-list {
     --rz-link-hover-text-decoration: none;
 
+    .rz-link-disabled
+    {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+
     .rz-link {
         display: block;
         width: 100%;
