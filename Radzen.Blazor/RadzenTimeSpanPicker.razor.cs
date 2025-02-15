@@ -326,12 +326,6 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public EventCallback<TimeSpan?> Change { get; set; }
-
-        /// <summary>
-        /// Specifies the callback of the unconfirmed time span (in a panel with a confirmation button) change.
-        /// </summary>
-        [Parameter]
-        public EventCallback<TimeSpan> UnconfirmedValueChanged { get; set; }
         #endregion
 
 
@@ -891,7 +885,7 @@ namespace Radzen.Blazor
 
             if (ShowConfirmationButton)
             {
-                return UnconfirmedValueChanged.InvokeAsync(newValue);
+                return Task.CompletedTask;
             }
 
             ConfirmedValue = newValue;

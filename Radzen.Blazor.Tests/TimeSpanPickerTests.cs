@@ -27,10 +27,21 @@ namespace Radzen.Blazor.Tests
             { TimeSpanUnit.Millisecond, ".rz-timespanpicker-milliseconds" },
             { TimeSpanUnit.Microsecond, ".rz-timespanpicker-microseconds" }
         };
-        const string _unitValuePickerSelector = ".rz-timespanpicker-unitvaluepicker";
         const string _signPickerSelector = ".rz-timespanpicker-signpicker";
         const string _positiveSignPickerSelector = $"{_signPickerSelector} > .rz-button:first-child";
         const string _negativeSignPickerSelector = $"{_signPickerSelector} > .rz-button:last-child";
+
+        static readonly Dictionary<TimeSpanUnit, TimeSpan> _unitSpans = new()
+        {
+            { TimeSpanUnit.Day, TimeSpan.FromDays(1) },
+            { TimeSpanUnit.Hour, TimeSpan.FromHours(1) },
+            { TimeSpanUnit.Minute, TimeSpan.FromMinutes(1) },
+            { TimeSpanUnit.Second, TimeSpan.FromSeconds(1) },
+            { TimeSpanUnit.Millisecond, TimeSpan.FromMilliseconds(1) },
+            { TimeSpanUnit.Microsecond, TimeSpan.FromMicroseconds(1) }
+        };
+        public static IEnumerable<object[]> TimeSpanUnitsForTheory
+            => Enum.GetValues<TimeSpanUnit>().Select(x => new object[] { x });
 
         static readonly CultureInfo _cultureInfo = CultureInfo.InvariantCulture;
 
@@ -515,7 +526,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Culture, _cultureInfo);
             });
 
-            var inputValue = new TimeSpan(3, 15, 30);
+            var inputValue = new TimeSpan(5, 15, 30);
             var input = inputValue.ToString(null, _cultureInfo);
 
             var inputElement = component.Find(_inputFieldSelector);
@@ -543,7 +554,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Culture, _cultureInfo);
             });
 
-            var inputValue = new TimeSpan(3, 15, 30);
+            var inputValue = new TimeSpan(5, 15, 30);
             var input = inputValue.ToString(null, _cultureInfo);
 
             var inputElement = component.Find(_inputFieldSelector);
@@ -565,7 +576,7 @@ namespace Radzen.Blazor.Tests
             var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan?>>();
 
             var raised = false;
-            TimeSpan? value = new TimeSpan(3, 15, 30);
+            TimeSpan? value = new TimeSpan(5, 15, 30);
             component.SetParametersAndRender(parameters =>
             {
                 parameters.Add(p => p.AllowClear, true);
@@ -739,15 +750,13 @@ namespace Radzen.Blazor.Tests
 
             var formattedNumber = number.ToString(format, _cultureInfo);
 
-            var field = component.Find($"{_unitElementSelectors[unit]} > {_unitValuePickerSelector}");
+            var field = component.Find($"{_unitElementSelectors[unit]} input");
 
-            Assert.Contains($"value=\"{formattedNumber}\"", field.ToMarkup());
+            Assert.Equal(formattedNumber, field.GetAttribute("value"));
         }
 
-        public static IEnumerable<object[]> TimeSpanPicker_Renders_FieldPrecisionParameter_Data
-            => Enum.GetValues<TimeSpanUnit>().Select(x => new object[] { x });
         [Theory]
-        [MemberData(nameof(TimeSpanPicker_Renders_FieldPrecisionParameter_Data))]
+        [MemberData(nameof(TimeSpanUnitsForTheory))]
         public void TimeSpanPicker_Renders_FieldPrecisionParameter(TimeSpanUnit precision)
         {
             using var ctx = new TestContext();
@@ -905,15 +914,200 @@ namespace Radzen.Blazor.Tests
         #endregion
 
         #region Panel behavior
+        [Theory]
+        [MemberData(nameof(TimeSpanUnitsForTheory))]
+        public void TimeSpanPicker_Raises_ChangeAndValueChanged_OnPanelInputChange(TimeSpanUnit unit)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            TimeSpan value = TimeSpan.Zero;
+            TimeSpan? newValue = TimeSpan.Zero;
+            bool raisedChange = false;
+            bool raisedValueChanged = false;
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.Change, args => { raisedChange = true; newValue = args; });
+                parameters.Add(p => p.ValueChanged, args => { raisedValueChanged = true; newValue = args; });
+                parameters.Add(p => p.Culture, _cultureInfo);
+                parameters.Add(p => p.FieldPrecision, TimeSpanUnit.Microsecond);
+            });
+
+            var inputValue = 15;
+            var input = inputValue.ToString(null, _cultureInfo);
+            var expectedValue = value + inputValue * _unitSpans[unit];
+
+            var unitInputFieldSelector = $"{_unitElementSelectors[unit]} input";
+            var inputElement = component.Find(unitInputFieldSelector);
+
+            inputElement.Change(input);
+
+            Assert.True(raisedChange, "Change not raised");
+            Assert.True(raisedValueChanged, "ValueChanged not raised");
+            Assert.Equal(expectedValue, newValue);
+        }
+
+        [Theory]
+        [MemberData(nameof(TimeSpanUnitsForTheory))]
+        public void TimeSpanPicker_DoesNotRaise_ChangeOrValueChanged_OnPanelInputChange_IfConfirmationButtonShown(TimeSpanUnit unit)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            TimeSpan initialValue = TimeSpan.Zero;
+            bool raisedChange = false;
+            bool raisedValueChanged = false;
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, initialValue);
+                parameters.Add(p => p.Change, args => { raisedChange = true; });
+                parameters.Add(p => p.ValueChanged, args => { raisedValueChanged = true; });
+                parameters.Add(p => p.Culture, _cultureInfo);
+                parameters.Add(p => p.FieldPrecision, TimeSpanUnit.Microsecond);
+                parameters.Add(p => p.ShowConfirmationButton, true);
+            });
+
+            var inputValue = 15;
+            var input = inputValue.ToString(null, _cultureInfo);
+
+            var unitInputFieldSelector = $"{_unitElementSelectors[unit]} input";
+            var inputElement = component.Find(unitInputFieldSelector);
+
+            inputElement.Change(input);
+
+            Assert.False(raisedChange, "Change raised");
+            Assert.False(raisedValueChanged, "ValueChanged raised");
+            Assert.Equal(initialValue, component.Instance.Value);
+        }
+
+        private static void TimeSpanPicker_Raises_ChangeAndValueChanged_OnClickSignButton(
+            TimeSpan initialValue, TimeSpan expectedValue, bool isPositiveButton)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            TimeSpan min = TimeSpan.MinValue;
+            TimeSpan max = TimeSpan.MaxValue;
+            TimeSpan? newValue = TimeSpan.Zero;
+            bool raisedChange = false;
+            bool raisedValueChanged = false;
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, initialValue);
+                parameters.Add(p => p.Min, min);
+                parameters.Add(p => p.Max, max);
+                parameters.Add(p => p.Change, args => { raisedChange = true; newValue = args; });
+                parameters.Add(p => p.ValueChanged, args => { raisedValueChanged = true; newValue = args; });
+            });
+
+            var signButton = component.Find(isPositiveButton ? _positiveSignPickerSelector : _negativeSignPickerSelector);
+            signButton.Click();
+
+            Assert.True(raisedChange, "Change not raised");
+            Assert.True(raisedValueChanged, "ValueChanged not raised");
+            Assert.Equal(expectedValue, newValue);
+        }
+        [Fact]
+        public void TimeSpanPicker_Raises_ChangeOrValueChanged_OnClickPositiveSignButton()
+            => TimeSpanPicker_Raises_ChangeAndValueChanged_OnClickSignButton(
+                
+                new TimeSpan(5, 15, 30).Negate(), new TimeSpan(5, 15, 30), true);
+        [Fact]
+        public void TimeSpanPicker_Raises_ChangeAndValueChanged_OnClickNegativeSignButton()
+            => TimeSpanPicker_Raises_ChangeAndValueChanged_OnClickSignButton(
+                new TimeSpan(5, 15, 30), new TimeSpan(5, 15, 30).Negate(), false);
+
+        private static void TimeSpanPicker_DoesNotRaise_ChangeOrValueChanged_OnClickSignButton_IfConfirmationButtonShown(
+            TimeSpan initialValue, bool isPositiveButton)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            TimeSpan min = TimeSpan.MinValue;
+            TimeSpan max = TimeSpan.MaxValue;
+            bool raisedChange = false;
+            bool raisedValueChanged = false;
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, initialValue);
+                parameters.Add(p => p.Min, min);
+                parameters.Add(p => p.Max, max);
+                parameters.Add(p => p.Change, args => { raisedChange = true; });
+                parameters.Add(p => p.ValueChanged, args => { raisedValueChanged = true; });
+                parameters.Add(p => p.ShowConfirmationButton, true);
+            });
+
+            var signButton = component.Find(isPositiveButton ? _positiveSignPickerSelector : _negativeSignPickerSelector);
+            signButton.Click();
+
+            Assert.False(raisedChange, "Change raised");
+            Assert.False(raisedValueChanged, "ValueChanged raised");
+            Assert.Equal(initialValue, component.Instance.Value);
+        }
+        [Fact]
+        public void TimeSpanPicker_DoesNotRaise_ChangeOrValueChanged_OnClickPositiveSignButton_IfConfirmationButtonShown()
+            => TimeSpanPicker_DoesNotRaise_ChangeOrValueChanged_OnClickSignButton_IfConfirmationButtonShown(
+            -new TimeSpan(5, 15, 30), true);
+        [Fact]
+        public void TimeSpanPicker_DoesNotRaise_ChangeOrValueChanged_OnClickNegativeSignButton_IfConfirmationButtonShown()
+            => TimeSpanPicker_DoesNotRaise_ChangeOrValueChanged_OnClickSignButton_IfConfirmationButtonShown(
+            new TimeSpan(5, 15, 30), false);
+
+        [Fact]
+        public void TimeSpanPicker_Raises_ChangeAndValueChanged_OnClickConfirmationButton()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
+
+            TimeSpan initialValue = new TimeSpan(5, 15, 30);
+            TimeSpan? newValue = TimeSpan.Zero;
+            bool raisedChange = false;
+            bool raisedValueChanged = false;
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, initialValue);
+                parameters.Add(p => p.Change, args => { raisedChange = true; newValue = args; });
+                parameters.Add(p => p.ValueChanged, args => { raisedValueChanged = true; newValue = args; });
+                parameters.Add(p => p.Culture, _cultureInfo);
+                parameters.Add(p => p.ShowConfirmationButton, true);
+            });
+
+            var inputValue = 20;
+            var input = inputValue.ToString(null, _cultureInfo);
+            var expectedValue = new TimeSpan(inputValue, 15, 30);
+
+            var unitInputFieldSelector = $"{_unitElementSelectors[TimeSpanUnit.Hour]} input";
+            var inputElement = component.Find(unitInputFieldSelector);
+            inputElement.Change(input);
+
+            var confirmationButton = component.Find(_confirmationButtonSelector);
+            confirmationButton.Click();
+
+            Assert.True(raisedChange, "Change not raised");
+            Assert.True(raisedValueChanged, "ValueChanged not raised");
+            Assert.Equal(expectedValue, newValue);
+        }
+
         private static void TimeSpanPicker_Respects_StepParameter(
-            Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>> stepParameterSelector, TimeSpanUnit unit, long ticksPerUnit)
+            Expression<Func<RadzenTimeSpanPicker<TimeSpan>, string>> stepParameterSelector, TimeSpanUnit unit)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
             var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan>>();
             var step = 5;
-            var stepTicks = step * ticksPerUnit;
+            var stepSpan = step * _unitSpans[unit];
             var initialValue = new TimeSpan(1, 2, 3, 4, 5, 6);
             component.SetParametersAndRender(parameters =>
             {
@@ -923,35 +1117,35 @@ namespace Radzen.Blazor.Tests
             });
 
             var unitSelector = _unitElementSelectors[unit];
-            var expectedValueUp = initialValue.Add(new TimeSpan(2 * stepTicks));
-            var fieldUpButton = component.Find($"{unitSelector} > {_unitValuePickerSelector} > .rz-numeric-up");
+            var expectedValueUp = initialValue + 2 * stepSpan;
+            var fieldUpButton = component.Find($"{unitSelector} .rz-numeric-up");
             fieldUpButton.Click();
             fieldUpButton.Click();
             Assert.Equal(expectedValueUp, component.Instance.Value);
 
-            var expectedValueDown = expectedValueUp.Add(new TimeSpan(-stepTicks));
-            var fieldDownButton = component.Find($"{unitSelector} > {_unitValuePickerSelector} > .rz-numeric-down");
+            var expectedValueDown = expectedValueUp - stepSpan;
+            var fieldDownButton = component.Find($"{unitSelector} .rz-numeric-down");
             fieldDownButton.Click();
             Assert.Equal(expectedValueDown, component.Instance.Value);
         }
         [Fact]
         public void TimeSpanPicker_Respects_DaysStepParameter()
-            => TimeSpanPicker_Respects_StepParameter(x => x.DaysStep, TimeSpanUnit.Day, TimeSpan.TicksPerDay);
+            => TimeSpanPicker_Respects_StepParameter(x => x.DaysStep, TimeSpanUnit.Day);
         [Fact]
         public void TimeSpanPicker_Respects_HoursStepParameter()
-            => TimeSpanPicker_Respects_StepParameter(x => x.HoursStep, TimeSpanUnit.Hour, TimeSpan.TicksPerHour);
+            => TimeSpanPicker_Respects_StepParameter(x => x.HoursStep, TimeSpanUnit.Hour);
         [Fact]
         public void TimeSpanPicker_Respects_MinutesStepParameter()
-            => TimeSpanPicker_Respects_StepParameter(x => x.MinutesStep, TimeSpanUnit.Minute, TimeSpan.TicksPerMinute);
+            => TimeSpanPicker_Respects_StepParameter(x => x.MinutesStep, TimeSpanUnit.Minute);
         [Fact]
         public void TimeSpanPicker_Respects_SecondsStepParameter()
-            => TimeSpanPicker_Respects_StepParameter(x => x.SecondsStep, TimeSpanUnit.Second, TimeSpan.TicksPerSecond);
+            => TimeSpanPicker_Respects_StepParameter(x => x.SecondsStep, TimeSpanUnit.Second);
         [Fact]
         public void TimeSpanPicker_Respects_MillisecondsStepParameter()
-            => TimeSpanPicker_Respects_StepParameter(x => x.MillisecondsStep, TimeSpanUnit.Millisecond, TimeSpan.TicksPerMillisecond);
+            => TimeSpanPicker_Respects_StepParameter(x => x.MillisecondsStep, TimeSpanUnit.Millisecond);
         [Fact]
         public void TimeSpanPicker_Respects_MicrosecondsStepParameter()
-            => TimeSpanPicker_Respects_StepParameter(x => x.MicrosecondsStep, TimeSpanUnit.Microsecond, TimeSpan.TicksPerMicrosecond);
+            => TimeSpanPicker_Respects_StepParameter(x => x.MicrosecondsStep, TimeSpanUnit.Microsecond);
         #endregion
     }
 }
