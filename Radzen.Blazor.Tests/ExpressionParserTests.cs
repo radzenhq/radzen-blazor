@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -119,10 +120,21 @@ namespace Radzen.Blazor.Tests
     [Fact]
     public void Should_SupportEnumWithCasts()
     {
-      var expression = ExpressionParser.Parse<Car>($"it => it.Type == (Radzen.Blazor.Tests.CarType)1", type =>
-      {
-        return Type.GetType(type);
-      });
+      var typeLocator = (string type) => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);
+
+      var expression = ExpressionParser.Parse<ItemWithGenericProperty<CarType[]>>("it => it.Value.Any(i => (new []{0}).Contains(i))", typeLocator);
+
+      var func = expression.Compile();
+
+      Assert.True(func(new ItemWithGenericProperty<CarType[]> { Value = [CarType.Sedan] }));
+    }
+
+    [Fact]
+    public void Should_SupportEnumCollections()
+    {
+      var typeLocator = (string type) => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);
+
+      var expression = ExpressionParser.Parse<Car>($"it => it.Type == (Radzen.Blazor.Tests.CarType)1", typeLocator);
 
       var func = expression.Compile();
 
@@ -180,7 +192,7 @@ namespace Radzen.Blazor.Tests
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person { Famous = null }));
+        Assert.False(func(new Person { Famous = null }));
     }
 
     [Fact]

@@ -23,12 +23,8 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
   public override Expression VisitBinaryExpression(BinaryExpressionSyntax node)
   {
     var left = Visit(node.Left);
-    var right = Visit(node.Right);
 
-    if (right.Type != left.Type)
-    {
-      right = Expression.Convert(right, left.Type);
-    }
+    var right = ConvertIfNeeded(Visit(node.Right), left.Type);
 
     return Expression.MakeBinary(ParseBinaryOperator(node.OperatorToken), left, right);
   }
@@ -133,6 +129,16 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
     return Visit(argument.Expression);
   }
 
+  private static Expression ConvertIfNeeded(Expression expression, Type targetType)
+  {
+    if (expression is not LambdaExpression)
+    {
+      return expression.Type == targetType ? expression : Expression.Convert(expression, targetType);
+    }
+
+    return expression;
+  }
+
   public override Expression VisitInvocationExpression(InvocationExpressionSyntax node)
   {
     if (node.Expression is MemberAccessExpressionSyntax methodCall)
@@ -159,7 +165,8 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
         {
           var itemType = GetItemType(instanceType);
           var genericMethod = methodInfo.MakeGenericMethod(itemType);
-          return Expression.Call(genericMethod, new[] { instance }.Concat(arguments));
+
+          return Expression.Call(genericMethod, new[] { instance }.Concat(arguments.Select(a => ConvertIfNeeded(a, itemType))));
         }
       }
 
