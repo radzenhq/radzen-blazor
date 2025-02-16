@@ -66,7 +66,7 @@
                 {
                     <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-days">
                         <label for="@($"{UniqueID}-d")" class="rz-timespanpicker-unit">@DaysUnitText</label>
-                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-d")"
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-d")" Culture="@Culture"
                                        Value="@Math.Abs(UnconfirmedValue.Days)"
                                        Min="0" Max="@TimeFieldsMaxValues[TimeSpanUnit.Day]" Step="@DaysStep"
                                        Disabled="@Disabled" ReadOnly="@ReadOnly"
@@ -78,7 +78,7 @@
                 {
                     <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-hours">
                         <label for="@($"{UniqueID}-h")" class="rz-timespanpicker-unit">@HoursUnitText</label>
-                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-h")"
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-h")" Culture="@Culture"
                                        Value="@Math.Abs(UnconfirmedValue.Hours)"
                                        Min="0" Max="@TimeFieldsMaxValues[TimeSpanUnit.Hour]" Step="@HoursStep"
                                        Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
@@ -90,7 +90,7 @@
                 {
                     <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-minutes">
                         <label for="@($"{UniqueID}-m")" class="rz-timespanpicker-unit">@MinutesUnitText</label>
-                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-m")"
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-m")" Culture="@Culture"
                                        Value="@Math.Abs(UnconfirmedValue.Minutes)"
                                        Min="0" Max="@TimeFieldsMaxValues[TimeSpanUnit.Minute]" Step="@MinutesStep"
                                        Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
@@ -102,7 +102,7 @@
                 {
                     <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-seconds">
                         <label for="@($"{UniqueID}-s")" class="rz-timespanpicker-unit">@SecondsUnitText</label>
-                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-s")"
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-s")" Culture="@Culture"
                                        Value="@Math.Abs(UnconfirmedValue.Seconds)"
                                        Min="0" Max="@TimeFieldsMaxValues[TimeSpanUnit.Second]" Step="@SecondsStep"
                                        Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "00" : null)"
@@ -114,7 +114,7 @@
                 {
                     <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-milliseconds">
                         <label for="@($"{UniqueID}-ms")" class="rz-timespanpicker-unit">@MillisecondsUnitText</label>
-                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-ms")"
+                        <RadzenNumeric TValue="int" Name="@($"{UniqueID}-ms")" Culture="@Culture"
                                        Value="@Math.Abs(UnconfirmedValue.Milliseconds)"
                                        Min="0" Max="@TimeFieldsMaxValues[TimeSpanUnit.Millisecond]" Step="@MillisecondsStep"
                                        Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "000" : null)"
@@ -128,7 +128,7 @@
                     {
                         <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-microseconds">
                             <label for="@($"{UniqueID}-us")" class="rz-timespanpicker-unit">@MicrosecondsUnitText</label>
-                            <RadzenNumeric TValue="int" Name="@($"{UniqueID}-us")"
+                            <RadzenNumeric TValue="int" Name="@($"{UniqueID}-us")" Culture="@Culture"
                                            Value="@Math.Abs(UnconfirmedValue.Microseconds)"
                                            Min="0" Max="@TimeFieldsMaxValues[TimeSpanUnit.Microsecond]" Step="@MicrosecondsStep"
                                            Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? "000" : null)"

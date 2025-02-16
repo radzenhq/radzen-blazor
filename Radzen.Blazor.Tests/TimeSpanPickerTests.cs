@@ -593,6 +593,42 @@ namespace Radzen.Blazor.Tests
         #endregion
 
         #region Panel look
+        private static void TimeSpanPicker_Renders_CorrectValuesInPanelInputs(TimeSpanUnit unit, bool negative)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+
+            var number = 5;
+            var value = _unitSpans[unit] * number * (negative ? -1 : 1); // zeros in all units except for one
+            var min = TimeSpan.MinValue;
+            var max = TimeSpan.MaxValue;
+            var component = ctx.RenderComponent<RadzenTimeSpanPicker<TimeSpan?>>();
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Value, value);
+                parameters.Add(p => p.FieldPrecision, TimeSpanUnit.Microsecond);
+                parameters.Add(p => p.Min, min);
+                parameters.Add(p => p.Max, max);
+                parameters.Add(p => p.Culture, _cultureInfo);
+            });
+
+            var expectedValue = number.ToString(_cultureInfo);
+
+            var field = component.Find($"{_unitElementSelectors[unit]} input");
+            var fieldValue = field.GetAttribute("value");
+
+            Assert.Equal(expectedValue, fieldValue);
+        }
+        [Theory]
+        [MemberData(nameof(TimeSpanUnitsForTheory))]
+        public void TimeSpanPicker_Renders_CorrectValuesInPanelInputs_IfPositiveValue(TimeSpanUnit unit)
+            => TimeSpanPicker_Renders_CorrectValuesInPanelInputs(unit, false);
+        [Theory]
+        [MemberData(nameof(TimeSpanUnitsForTheory))]
+        public void TimeSpanPicker_Renders_CorrectValuesInPanelInputs_IfNegativeValue(TimeSpanUnit unit)
+            => TimeSpanPicker_Renders_CorrectValuesInPanelInputs(unit, true);
+
         [Fact]
         public void TimeSpanPicker_Renders_SignButtons_WhenMinNegative_WhenMaxPositive()
         {
