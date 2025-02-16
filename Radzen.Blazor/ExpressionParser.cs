@@ -309,8 +309,19 @@ public static class ExpressionParser
     return Expression.Lambda<Func<T, TResult>>(body, parameter);
   }
 
-  public static Expression<Func<T, object>> ParseProjection<T>(string expression, Func<string, Type> typeLocator = null)
+  public static LambdaExpression ParseProjection<T>(string expression, Func<string, Type> typeLocator = null)
   {
-    return ParseLambda<T, object>(expression, typeLocator);
+    var syntaxTree = CSharpSyntaxTree.ParseText(expression);
+    var root = syntaxTree.GetRoot();
+    var lambdaExpression = root.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().FirstOrDefault();
+    if (lambdaExpression == null)
+    {
+      throw new ArgumentException("Invalid lambda expression.");
+    }
+    var parameter = Expression.Parameter(typeof(T), lambdaExpression.Parameter.Identifier.Text);
+    var visitor = new ExpressionSyntaxVisitor<T>(parameter, typeLocator);
+    var body = visitor.Visit(lambdaExpression.Body);
+
+    return Expression.Lambda(body, parameter);
   }
 }

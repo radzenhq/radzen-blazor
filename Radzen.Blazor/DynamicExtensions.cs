@@ -1,4 +1,5 @@
 ﻿using Radzen;
+using System.Linq.Expressions;
 
 namespace System.Linq.Dynamic.Core
 {
@@ -8,7 +9,7 @@ namespace System.Linq.Dynamic.Core
     public static class DynamicExtensions
     {
         static Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName.Replace("+",".") == type);
+            .SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName.Replace("+", ".") == type);
 
         /// <summary>
         /// Filters using the specified filter descriptors.
@@ -26,7 +27,7 @@ namespace System.Linq.Dynamic.Core
                     {
                         var value = object.Equals(parameters[i], string.Empty) ? @"""""" :
                             parameters[i] == null ? @"null" :
-                                parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}"""  : 
+                                parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}""" :
                                     parameters[i] is bool ? $"{parameters[i]}".ToLower() : parameters[i];
 
                         selector = selector.Replace($"@{i}", $"{value}");
@@ -40,10 +41,10 @@ namespace System.Linq.Dynamic.Core
                     .Replace("Guid(", "Guid.Parse(")
                     .Replace(" = ", " == ");
 
-                return !string.IsNullOrEmpty(selector) ? 
+                return !string.IsNullOrEmpty(selector) ?
                     source.Where(ExpressionParser.Parse<T>(selector, typeLocator)) : source;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new InvalidOperationException($"Invalid Where selector");
             }
@@ -78,10 +79,17 @@ namespace System.Linq.Dynamic.Core
                     .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim() : s.Trim()) +
                         " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", ".").Trim()}"));
 
-                return !string.IsNullOrEmpty(selector) ?
-                   source.Select(ExpressionParser.ParseProjection<T>($"it => new {{ {selector} }}")) : source;
+                if (string.IsNullOrEmpty(selector))
+                {
+                    return source;
+                }
+
+                var lambda = ExpressionParser.ParseProjection<T>($"it => new {{ {selector} }}");
+
+                return source.Provider.CreateQuery(Expression.Call(typeof(Queryable), nameof(Queryable.Select),
+                          [source.ElementType, lambda.Body.Type], source.Expression, Expression.Quote(lambda)));
             }
-            catch(Exception ex)
+            catch (Exception)
             {
                 throw new InvalidOperationException($"Invalid selector");
             }
