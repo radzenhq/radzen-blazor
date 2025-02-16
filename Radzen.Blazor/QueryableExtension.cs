@@ -969,7 +969,7 @@ namespace Radzen
                 }
                 else
                 {
-                    return $"{property} {linqOperator} ({column.FilterPropertyType.FullName.Replace("+",".")}){value}";
+                    return $"{property} {linqOperator} {value}";
                 }
             }
             else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
