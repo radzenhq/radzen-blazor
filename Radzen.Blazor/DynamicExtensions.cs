@@ -25,17 +25,6 @@ namespace System.Linq.Dynamic.Core
     /// </summary>
     public static class DynamicExtensions
     {
-        static string rtPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
-
-        static CSharpCompilation Compilation = CSharpCompilation.Create(Guid.NewGuid().ToString())
-              .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
-              .WithOptimizationLevel(OptimizationLevel.Debug))
-              .AddReferences(MetadataReference.CreateFromFile(Path.Combine(rtPath, "System.Runtime.dll")))
-              .AddReferences(MetadataReference.CreateFromFile(Path.Combine(rtPath, "System.Collections.dll")))
-              .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
-              .AddReferences(MetadataReference.CreateFromFile(typeof(Expression).Assembly.Location))
-              .AddReferences(MetadataReference.CreateFromFile(typeof(Queryable).Assembly.Location))
-              .AddReferences(MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location));
         private static Assembly Compile(CSharpCompilation compilation, string code, AssemblyLoadContext context)
         {
             var errors = compilation.GetDiagnostics().Where(d => d.Severity == DiagnosticSeverity.Error);
@@ -88,27 +77,12 @@ namespace System.Linq.Dynamic.Core
                     }
                 }
 
-                var code = $@"
-using System;
-using System.Linq;
-using System.Linq.Expressions;
-namespace Dynamic;
-public static class Linq 
-{{ 
-  public static Expression<Func<{typeof(T).FullName.Replace("+", ".")}, bool>> where = {(selector == "true" ? "i => true" : selector).Replace("DateTime", "DateTime.Parse").Replace("DateTimeOffset", "DateTimeOffset.Parse").Replace("DateOnly", "DateOnly.Parse").Replace("Guid", "Guid.Parse").Replace(" = "," == ")};
-}}";
+                selector = (selector == "true" ? "i => true" : selector).Replace("DateTime(", "DateTime.Parse(").Replace("DateTimeOffset(", "DateTimeOffset.Parse(").Replace("DateOnly(", "DateOnly.Parse(").Replace("Guid(", "Guid.Parse(").Replace(" = ", " == ");
 
-                var assembly = Compile(Compilation
-                  .AddReferences(MetadataReference.CreateFromFile(typeof(T).Assembly.Location))
-                  .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(LanguageVersion.Latest))),
-                  code, new AssemblyLoadContext("RadzenALC", true));
-
-                Expression<Func<T, bool>> whereMethod = (Expression<Func<T, bool>>)assembly
-                        .GetType("Dynamic.Linq").GetFields().FirstOrDefault().GetValue(null);
-
-                return source.Where(whereMethod);
+                return !string.IsNullOrEmpty(selector) ? 
+                    source.Where(ExpressionParser.Parse<T>(selector)) : source;
             }
-            catch
+            catch(Exception ex)
             {
                 throw new InvalidOperationException($"Invalid Where selector");
             }
@@ -171,6 +145,18 @@ public static class Linq
     }}
 }}";
 
+               string rtPath = Path.GetDirectoryName(typeof(object).Assembly.Location);
+
+               CSharpCompilation Compilation = CSharpCompilation.Create(Guid.NewGuid().ToString())
+                      .WithOptions(new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                      .WithOptimizationLevel(OptimizationLevel.Debug))
+                      .AddReferences(MetadataReference.CreateFromFile(Path.Combine(rtPath, "System.Runtime.dll")))
+                      .AddReferences(MetadataReference.CreateFromFile(Path.Combine(rtPath, "System.Collections.dll")))
+                      .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
+                      .AddReferences(MetadataReference.CreateFromFile(typeof(Expression).Assembly.Location))
+                      .AddReferences(MetadataReference.CreateFromFile(typeof(Queryable).Assembly.Location))
+                      .AddReferences(MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location));
+
                 var assembly = Compile(Compilation
                   .AddReferences(MetadataReference.CreateFromFile(typeof(T).Assembly.Location))
                   .AddSyntaxTrees(CSharpSyntaxTree.ParseText(code, new CSharpParseOptions(LanguageVersion.Latest))),
@@ -178,7 +164,7 @@ public static class Linq
 
                 return (IQueryable)assembly.GetType("Dynamic.Linq").GetMethods().FirstOrDefault().Invoke(null, new object[] { source });
             }
-            catch
+            catch(Exception ex)
             {
                 throw new InvalidOperationException($"Invalid selector");
             }
