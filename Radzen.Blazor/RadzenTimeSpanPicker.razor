@@ -75,7 +75,9 @@
 
                 @{
                 #if NET7_0_OR_GREATER
-                    RenderUnitField(TimeSpanUnit.Microsecond, MicrosecondsUnitText, "us", UnconfirmedValue.Microseconds, MicrosecondsStep, "000", UpdateMicroseconds);
+                    {
+                        @RenderUnitField(TimeSpanUnit.Microsecond, MicrosecondsUnitText, "us", UnconfirmedValue.Microseconds, MicrosecondsStep, "000", UpdateMicroseconds)
+                    }
                 #endif
                 }
             </div>
@@ -101,7 +103,7 @@
             @if (FieldPrecision >= unit && TimeFieldsMaxValues[unit] > 0)
             {
                 var inputName = $"{UniqueID}-{unitSymbol}";
-                <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-@(unit.ToString().ToLowerInvariant())">
+                <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-@(unit.ToString().ToLowerInvariant())s">
                     <label for="@inputName" class="rz-timespanpicker-unit">@label</label>
                     <RadzenNumeric TValue="int" Name="@inputName" Culture="@Culture"
                                    Value="@Math.Abs(value)"
