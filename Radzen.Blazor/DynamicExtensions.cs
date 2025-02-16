@@ -55,7 +55,7 @@ namespace System.Linq.Dynamic.Core
         }
 
 
-        static Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);
+        static Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName.Replace("+",".") == type);
 
         /// <summary>
         /// Filters using the specified filter descriptors.
