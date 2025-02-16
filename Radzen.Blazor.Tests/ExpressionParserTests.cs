@@ -16,6 +16,7 @@ namespace Radzen.Blazor.Tests
     {
       public short? Age { get; set; }
       public string Name { get; set; }
+      public bool? Famous { get; set; }
     }
 
     public class Car
@@ -164,11 +165,21 @@ namespace Radzen.Blazor.Tests
     [Fact]
     public void Should_SupportNullableProperties()
     {
-        var expression = ExpressionParser.Parse<Person>("it => it.Age == 50)");
+        var expression = ExpressionParser.Parse<Person>("it => it.Age == 50");
 
         var func = expression.Compile();
 
         Assert.True(func(new Person { Age = 50 }));
+    }
+
+    [Fact]
+    public void Should_SupportNullablePropertiesWithArray()
+    {
+        var expression = ExpressionParser.Parse<Person>("it => (new []{}).Contains(it.Famous)");
+
+        var func = expression.Compile();
+
+        Assert.True(func(new Person { Famous = null }));
     }
 
     [Fact]
