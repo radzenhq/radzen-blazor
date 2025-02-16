@@ -5,10 +5,65 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Concurrent;
+using System.Reflection.Emit;
 
 namespace Radzen;
 
-class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
+static class DynamicTypeFactory
+{
+  public static Type CreateType(string typeName, string[] propertyNames, Type[] propertyTypes)
+  {
+    if (propertyNames.Length != propertyTypes.Length)
+    {
+      throw new ArgumentException("Property names and types count mismatch.");
+    }
+
+    var assemblyName = new AssemblyName("DynamicTypesAssembly");
+    var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+    var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicTypesModule");
+
+    var typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Sealed);
+
+    for (int i = 0; i < propertyNames.Length; i++)
+    {
+      var fieldBuilder = typeBuilder.DefineField("_" + propertyNames[i], propertyTypes[i], FieldAttributes.Private);
+      var propertyBuilder = typeBuilder.DefineProperty(propertyNames[i], PropertyAttributes.None, propertyTypes[i], null);
+
+      var getterMethod = typeBuilder.DefineMethod(
+          "get_" + propertyNames[i],
+          MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+          propertyTypes[i],
+          Type.EmptyTypes);
+
+      var getterIl = getterMethod.GetILGenerator();
+      getterIl.Emit(OpCodes.Ldarg_0);
+      getterIl.Emit(OpCodes.Ldfld, fieldBuilder);
+      getterIl.Emit(OpCodes.Ret);
+
+      propertyBuilder.SetGetMethod(getterMethod);
+
+      var setterMethod = typeBuilder.DefineMethod(
+                "set_" + propertyNames[i],
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
+                null,
+                new[] { propertyTypes[i] });
+
+      var setterIl = setterMethod.GetILGenerator();
+      setterIl.Emit(OpCodes.Ldarg_0);
+      setterIl.Emit(OpCodes.Ldarg_1);
+      setterIl.Emit(OpCodes.Stfld, fieldBuilder);
+      setterIl.Emit(OpCodes.Ret);
+
+      propertyBuilder.SetSetMethod(setterMethod);
+    }
+
+    var dynamicType = typeBuilder.CreateType();
+    return dynamicType;
+  }
+}
+
+class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
 {
   private readonly ParameterExpression parameter;
   private readonly Func<string, Type> typeLocator;
@@ -18,7 +73,6 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
     this.parameter = parameter;
     this.typeLocator = typeLocator;
   }
-
 
   public override Expression VisitBinaryExpression(BinaryExpressionSyntax node)
   {
@@ -121,7 +175,7 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
     {
       var itemType = GetItemType(instance.Type);
 
-      var visitor = new ExpressionSyntaxVisitor(Expression.Parameter(itemType, lambda.Parameter.Identifier.Text), typeLocator);
+      var visitor = new ExpressionSyntaxVisitor<T>(Expression.Parameter(itemType, lambda.Parameter.Identifier.Text), typeLocator);
 
       return visitor.Visit(lambda);
     }
@@ -215,27 +269,48 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
       _ => throw new NotSupportedException("Unsupported operator: " + token.Text),
     };
   }
+
+  public override Expression VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpressionSyntax node)
+  {
+    var properties = node.Initializers.Select(init =>
+    {
+      var name = init.NameEquals?.Name.Identifier.Text ?? ((IdentifierNameSyntax)init.Expression).ToString();
+      var value = Visit(init.Expression);
+      return new { Name = name, Value = value };
+    }).ToList();
+
+    var propertyNames = properties.Select(p => p.Name).ToArray();
+    var propertyTypes = properties.Select(p => p.Value.Type).ToArray();
+    var dynamicType = DynamicTypeFactory.CreateType(typeof(T).Name, propertyNames, propertyTypes);
+
+    var bindings = properties.Select(p => Expression.Bind(dynamicType.GetProperty(p.Name), p.Value));
+    return Expression.MemberInit(Expression.New(dynamicType), bindings);
+  }
 }
 
 public static class ExpressionParser
 {
   public static Expression<Func<T, bool>> Parse<T>(string expression, Func<string, Type> typeLocator = null)
   {
+    return ParseLambda<T, bool>(expression, typeLocator);
+  }
+  public static Expression<Func<T, TResult>> ParseLambda<T, TResult>(string expression, Func<string, Type> typeLocator = null)
+  {
     var syntaxTree = CSharpSyntaxTree.ParseText(expression);
     var root = syntaxTree.GetRoot();
-
     var lambdaExpression = root.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().FirstOrDefault();
-
     if (lambdaExpression == null)
     {
       throw new ArgumentException("Invalid lambda expression.");
     }
-
     var parameter = Expression.Parameter(typeof(T), lambdaExpression.Parameter.Identifier.Text);
-
-    var visitor = new ExpressionSyntaxVisitor(parameter, typeLocator);
+    var visitor = new ExpressionSyntaxVisitor<T>(parameter, typeLocator);
     var body = visitor.Visit(lambdaExpression.Body);
+    return Expression.Lambda<Func<T, TResult>>(body, parameter);
+  }
 
-    return Expression.Lambda<Func<T, bool>>(body, parameter);
+  public static Expression<Func<T, object>> ParseProjection<T>(string expression, Func<string, Type> typeLocator = null)
+  {
+    return ParseLambda<T, object>(expression, typeLocator);
   }
 }

@@ -28,8 +28,8 @@ namespace Radzen.Blazor.Tests
 
     public enum Status
     {
-        Office,
-        Remote,
+      Office,
+      Remote,
     }
     class OrderDetail
     {
@@ -192,31 +192,31 @@ namespace Radzen.Blazor.Tests
     [Fact]
     public void Should_SupportNullableProperties()
     {
-        var expression = ExpressionParser.Parse<Person>("it => it.Age == 50");
+      var expression = ExpressionParser.Parse<Person>("it => it.Age == 50");
 
-        var func = expression.Compile();
+      var func = expression.Compile();
 
-        Assert.True(func(new Person { Age = 50 }));
+      Assert.True(func(new Person { Age = 50 }));
     }
 
     [Fact]
     public void Should_SupportNullablePropertiesWithArray()
     {
-        var expression = ExpressionParser.Parse<Person>("it => (new []{}).Contains(it.Famous)");
+      var expression = ExpressionParser.Parse<Person>("it => (new []{}).Contains(it.Famous)");
 
-        var func = expression.Compile();
+      var func = expression.Compile();
 
-        Assert.False(func(new Person { Famous = null }));
+      Assert.False(func(new Person { Famous = null }));
     }
 
     [Fact]
     public void Should_SupportDateTimeWithArray()
     {
-        var expression = ExpressionParser.Parse<Person>("it => (new []{DateTime.Parse(\"5/5/2000 12:00:00 AM\")}).Contains(it.BirthDate)");
+      var expression = ExpressionParser.Parse<Person>("it => (new []{DateTime.Parse(\"5/5/2000 12:00:00 AM\")}).Contains(it.BirthDate)");
 
-        var func = expression.Compile();
+      var func = expression.Compile();
 
-        Assert.True(func(new Person { BirthDate = DateTime.Parse("5/5/2000 12:00:00 AM") }));
+      Assert.True(func(new Person { BirthDate = DateTime.Parse("5/5/2000 12:00:00 AM") }));
     }
 
     [Fact]
@@ -227,6 +227,18 @@ namespace Radzen.Blazor.Tests
       var func = expression.Compile();
 
       Assert.True(func(new ItemWithGenericProperty<double> { Value = 50.0 }));
+    }
+
+    [Fact]
+    public void Should_CreateProjection()
+    {
+      var expression = ExpressionParser.ParseProjection<OrderDetail>("it => new { ProductName = it.Product.ProductName}");
+
+      var func = expression.Compile();
+
+      var result = func(new OrderDetail { Product = new Product { ProductName = "Queso" } });
+
+      Assert.Equal("Queso", result.GetType().GetProperty("ProductName").GetValue(result));
     }
   }
 }
