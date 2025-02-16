@@ -186,7 +186,7 @@ namespace Radzen.Blazor.Tests
     [Fact]
     public void Should_SupportDateTimeWithArray()
     {
-        var expression = ExpressionParser.Parse<Person>("it => (new []{DateTime.Parse.Parse(\"5/5/2000 12:00:00 AM\")}).Contains(it.BirthDate)");
+        var expression = ExpressionParser.Parse<Person>("it => (new []{DateTime.Parse(\"5/5/2000 12:00:00 AM\")}).Contains(it.BirthDate)");
 
         var func = expression.Compile();
 
