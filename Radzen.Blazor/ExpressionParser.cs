@@ -19,12 +19,20 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
     this.typeLocator = typeLocator;
   }
 
+
   public override Expression VisitBinaryExpression(BinaryExpressionSyntax node)
   {
     var left = Visit(node.Left);
     var right = Visit(node.Right);
+
+    if (right.Type != left.Type)
+    {
+      right = Expression.Convert(right, left.Type);
+    }
+
     return Expression.MakeBinary(ParseBinaryOperator(node.OperatorToken), left, right);
   }
+
 
   public override Expression VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
   {

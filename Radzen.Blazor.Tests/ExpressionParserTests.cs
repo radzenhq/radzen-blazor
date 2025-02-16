@@ -162,13 +162,23 @@ namespace Radzen.Blazor.Tests
     }
 
     [Fact]
-    public void Should_SupportNullableShortParsing()
+    public void Should_SupportNullableProperties()
     {
         var expression = ExpressionParser.Parse<Person>("it => it.Age == 50)");
 
         var func = expression.Compile();
 
         Assert.True(func(new Person { Age = 50 }));
+    }
+
+    [Fact]
+    public void Should_SupportNumericConversion()
+    {
+      var expression = ExpressionParser.Parse<ItemWithGenericProperty<double>>("it => it.Value == 50");
+
+      var func = expression.Compile();
+
+      Assert.True(func(new ItemWithGenericProperty<double> { Value = 50.0 }));
     }
   }
 }
