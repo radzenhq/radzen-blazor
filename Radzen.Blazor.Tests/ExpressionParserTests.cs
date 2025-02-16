@@ -26,7 +26,11 @@ namespace Radzen.Blazor.Tests
       public CarType Type { get; set; }
     }
 
-
+    public enum Status
+    {
+        Office,
+        Remote,
+    }
     class OrderDetail
     {
       public Product Product { get; set; }
@@ -34,6 +38,7 @@ namespace Radzen.Blazor.Tests
       public Order Order { get; set; }
 
       public List<WorkStatus> WorkStatuses { get; set; }
+      public List<Status> Statuses { get; set; }
     }
 
     class Order
@@ -163,6 +168,15 @@ namespace Radzen.Blazor.Tests
       var func = expression.Compile();
 
       Assert.True(func(new OrderDetail { WorkStatuses = [new() { Name = "Office" }] }));
+    }
+
+    [Fact]
+    public void Should_SupportNestedLambdasWithEnums()
+    {
+      var expression = ExpressionParser.Parse<OrderDetail>("it => it.Statuses.Any(i => (new []{1}).Contains(i))");
+      var func = expression.Compile();
+
+      Assert.True(func(new OrderDetail { Statuses = new List<Status>() { (Status)1 } }));
     }
 
     [Fact]
