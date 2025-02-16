@@ -14,6 +14,7 @@ namespace Radzen.Blazor.Tests
   {
     class Person
     {
+      public short? Age { get; set; }
       public string Name { get; set; }
     }
 
@@ -158,6 +159,16 @@ namespace Radzen.Blazor.Tests
       var func = expression.Compile();
 
       Assert.True(func(new Person { Name = "Nana" }));
+    }
+
+    [Fact]
+    public void Should_SupportNullableShortParsing()
+    {
+        var expression = ExpressionParser.Parse<Person>("it => it.Age == 50)");
+
+        var func = expression.Compile();
+
+        Assert.True(func(new Person { Age = 50 }));
     }
   }
 }
