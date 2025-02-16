@@ -408,12 +408,20 @@ namespace Radzen.Blazor
                     return;
                 }
 
-                _confirmedValue = value.HasValue ? AdjustToBounds(value.Value) : null;
-                var publicValue = _confirmedValue is null
-                    ? _isNullable ? null : DefaultNonNullValue
-                    : _confirmedValue;
-                Value = (TValue) (object) publicValue;
-                ResetUnconfirmedValue();
+                TimeSpan? newValue = value.HasValue ? AdjustToBounds(value.Value) :
+                    _isNullable ? null : DefaultNonNullValue;
+                if (_confirmedValue == newValue)
+                {
+                    return;
+                }
+                _confirmedValue = newValue;
+
+                Value = (TValue) (object)_confirmedValue;
+
+                if (ShowConfirmationButton is false)
+                {
+                    UnconfirmedValue = ConfirmedValue ?? DefaultNonNullValue;
+                }
             }
         }
 
@@ -429,6 +437,10 @@ namespace Radzen.Blazor
                 }
 
                 var newValue = AdjustToBounds(value);
+                if (_unconfirmedValue == newValue)
+                {
+                    return;
+                }
 
                 if (newValue != TimeSpan.Zero || _canBeEitherPositiveOrNegative is false)
                 {
@@ -544,8 +556,6 @@ namespace Radzen.Blazor
             }
 
             await ClosePopup();
-
-            StateHasChanged();
         }
 
         /// <inheritdoc/>
@@ -588,8 +598,6 @@ namespace Radzen.Blazor
             }
 
             await Change.InvokeAsync(ConfirmedValue);
-
-            StateHasChanged();
         }
 
         private async Task SetValueFromInput(string inputValue)
@@ -601,21 +609,16 @@ namespace Radzen.Blazor
 
             bool valid = TryParseInput(inputValue, out TimeSpan value);
 
-            TimeSpan? newValue = valid ? value : null;
+            TimeSpan? newValue = valid ? AdjustToBounds(value) : null;
 
             if (ConfirmedValue != newValue && (newValue is not null || _isNullable))
             {
                 ConfirmedValue = newValue;
-                await Change.InvokeAsync(ConfirmedValue);
 
-                if (FieldIdentifier.FieldName != null)
-                {
-                    EditContext?.NotifyFieldChanged(FieldIdentifier);
-                }
+                // sometimes onchange is triggered after the popup opens so it won't synchronize the value while opening
+                UnconfirmedValue = ConfirmedValue ?? DefaultNonNullValue;
 
-                await ValueChanged.InvokeAsync(Value);
-
-                StateHasChanged();
+                await OnChange();
             }
             else
             {
@@ -883,19 +886,22 @@ namespace Radzen.Blazor
 
             UnconfirmedValue = newValue;
 
-            if (ShowConfirmationButton)
+            if (ShowConfirmationButton || UnconfirmedValue == ConfirmedValue)
             {
                 return Task.CompletedTask;
             }
 
-            ConfirmedValue = newValue;
+            ConfirmedValue = UnconfirmedValue;
             return OnChange();
         }
 
         private async Task ConfirmValue()
         {
-            ConfirmedValue = UnconfirmedValue;
-            await OnChange();
+            if (ConfirmedValue != UnconfirmedValue)
+            {
+                ConfirmedValue = UnconfirmedValue;
+                await OnChange();
+            }
             await ClosePopup();
             await FocusAsync();
         }
