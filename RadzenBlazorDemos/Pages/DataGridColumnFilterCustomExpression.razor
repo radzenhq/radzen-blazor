@@ -56,10 +56,11 @@ else
     DateTime? hireDate = null;
     TitleOfCourtesy? currentTOC;
     List<string> selectedWorkStatus;
+    string whereExpression;
 
     public LogicalFilterOperator workStatusOperator { get; set; } = LogicalFilterOperator.Or;
 
-    List<string> companyNames = new List<string> { "Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
+    List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
     List<string> workStatuses = new List<string> { "Office", "Remote", "Temporary", "Permanent" };
     public enum TitleOfCourtesy
     {
@@ -85,30 +86,27 @@ else
         }
     }
 
-    IEnumerable<Employee> allEmployees;
-    IEnumerable<Employee> employees;
+    IEnumerable<Employee> employees; 
 
     protected override async Task OnInitializedAsync()
     {
-        allEmployees = await Task.FromResult(Enumerable.Range(0, 60).Select(i =>
+        employees = await Task.FromResult(Enumerable.Range(0, 60).Select(i =>
             new Employee
-                {
-                    ID = i,
-                    CompanyName = companyNames[i % 6],
-                    HireDate = DateTime.Now.AddMonths(-i),
-                    TitleOfCourtesy = i % 2 == 1 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
+            {
+                ID = i,
+                CompanyName = companyNames[i % 6],
+                HireDate = DateTime.Now.AddMonths(-i),
+                TitleOfCourtesy = i % 2 == 1 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
                     WorkStatus = $"{(i < 20 ? "Office" : i >= 20 && i < 40 ? "Remote" : "Office, Remote")} {(i < 12 ? ", Temporary" : i >= 12 && i < 30 ? ", Permanent" : i > 30 && i < 44 ? ", Temporary" : ", Permanent")}"
-                }).AsQueryable());
-
-        employees = allEmployees;
+            }).AsQueryable());
     }
 
     private async Task WorkStatusFilterClear(RadzenDataGridColumn<Employee> column)
     {
-        if (selectedWorkStatus != null)
+        if(selectedWorkStatus != null)
         {
             selectedWorkStatus = null;
-            await OnSelectedWorkStatusChange(column);
+            await OnSelectedWorkStatusChange(column);            
         }
         await column.CloseFilter();
     }
@@ -118,31 +116,28 @@ else
         await column.CloseFilter();
     }
 
-    bool initialSort = false;
     async Task OnSelectedWorkStatusChange(RadzenDataGridColumn<Employee> column)
     {
         var createWhereExpression = new List<string>();
 
         if (selectedWorkStatus?.Any() == true)
         {
-            employees = await Task.FromResult(employees.Where(e =>
-                workStatusOperator == LogicalFilterOperator.Or ?
-                    selectedWorkStatus.Any(s => e.WorkStatus.Contains(s)) :
-                        selectedWorkStatus.All(s => e.WorkStatus.Contains(s))));
+            whereExpression = string.Join($" {Enum.GetName(typeof(LogicalFilterOperator), workStatusOperator).ToLowerInvariant()} ",
+                selectedWorkStatus.Select(s => $"it.WorkStatus.Contains(\"{s}\")"));
         }
         else
         {
+            whereExpression = null;
             selectedWorkStatus = null;
-            initialSort = true;
-            employees = allEmployees;
         }
+
+        await column.SetCustomFilterExpressionAsync(whereExpression);
     }
 
     void OnRender(DataGridRenderEventArgs<Employee> args)
     {
-        if (args.FirstRender || initialSort)
+        if (args.FirstRender)
         {
-            initialSort = false;
             args.Grid.Sorts.Add(new SortDescriptor() { Property = "CompanyName", SortOrder = SortOrder.Ascending });
             args.Grid.Sorts.Add(new SortDescriptor() { Property = "TitleOfCourtesy", SortOrder = SortOrder.Ascending });
         }
