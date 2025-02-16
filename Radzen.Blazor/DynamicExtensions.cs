@@ -7,7 +7,8 @@ namespace System.Linq.Dynamic.Core
     /// </summary>
     public static class DynamicExtensions
     {
-        static Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName.Replace("+",".") == type);
+        static Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName.Replace("+",".") == type);
 
         /// <summary>
         /// Filters using the specified filter descriptors.
@@ -74,7 +75,8 @@ namespace System.Linq.Dynamic.Core
                     .Split(",", StringSplitOptions.RemoveEmptyEntries);
 
                 selector = string.Join(", ", properties
-                    .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim() : s.Trim()) + " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", ".").Trim()}"));
+                    .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim() : s.Trim()) +
+                        " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", ".").Trim()}"));
 
                 return !string.IsNullOrEmpty(selector) ?
                    source.Select(ExpressionParser.ParseProjection<T>($"it => new {{ {selector} }}")) : source;
