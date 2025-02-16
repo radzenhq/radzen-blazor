@@ -54,6 +54,9 @@ namespace System.Linq.Dynamic.Core
             return context.LoadFromStream(projectStream);
         }
 
+
+        static Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);
+
         /// <summary>
         /// Filters using the specified filter descriptors.
         /// </summary>
@@ -80,7 +83,7 @@ namespace System.Linq.Dynamic.Core
                 selector = (selector == "true" ? "i => true" : selector).Replace("DateTime(", "DateTime.Parse(").Replace("DateTimeOffset(", "DateTimeOffset.Parse(").Replace("DateOnly(", "DateOnly.Parse(").Replace("Guid(", "Guid.Parse(").Replace(" = ", " == ");
 
                 return !string.IsNullOrEmpty(selector) ? 
-                    source.Where(ExpressionParser.Parse<T>(selector)) : source;
+                    source.Where(ExpressionParser.Parse<T>(selector, typeLocator)) : source;
             }
             catch(Exception ex)
             {
