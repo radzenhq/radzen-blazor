@@ -17,6 +17,7 @@ namespace Radzen.Blazor.Tests
       public short? Age { get; set; }
       public string Name { get; set; }
       public bool? Famous { get; set; }
+      public DateTime BirthDate { get; set; }
     }
 
     public class Car
@@ -180,6 +181,16 @@ namespace Radzen.Blazor.Tests
         var func = expression.Compile();
 
         Assert.True(func(new Person { Famous = null }));
+    }
+
+    [Fact]
+    public void Should_SupportDateTimeWithArray()
+    {
+        var expression = ExpressionParser.Parse<Person>("it => (new []{DateTime.Parse.Parse(\"5/5/2000 12:00:00 AM\")}).Contains(it.BirthDate)");
+
+        var func = expression.Compile();
+
+        Assert.True(func(new Person { BirthDate = DateTime.Parse("5/5/2000 12:00:00 AM") }));
     }
 
     [Fact]
