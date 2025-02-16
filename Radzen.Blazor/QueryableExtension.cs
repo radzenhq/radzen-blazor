@@ -605,7 +605,7 @@ namespace Radzen
                                     else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
                                         column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
                                     {
-                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.NotIn ? "!" : "")}{column.Property}.Any(i => ({enumerableValueAsString}).Contains(i.{column.FilterProperty}))");
+                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.NotIn ? "!" : "")}{"it." + column.Property}.Any(i => ({enumerableValueAsString}).Contains(i.{column.FilterProperty}))");
                                     }
                                 }
                             }
