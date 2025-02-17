@@ -274,6 +274,11 @@ namespace Radzen
                 member = Expression.PropertyOrField(expression, currentPart);
             }
 
+            if (expression.Type.IsValueType && Nullable.GetUnderlyingType(expression.Type) == null)
+            {
+                expression = Expression.Convert(expression, typeof(object));
+            }
+
             return parts.Length > 1 ? GetNestedPropertyExpression(member, parts[1], type) :
                 (Nullable.GetUnderlyingType(member.Type) != null || member.Type == typeof(string)) ?
                     Expression.Condition(Expression.Equal(expression, Expression.Constant(null)), Expression.Constant(null, member.Type), member) :
