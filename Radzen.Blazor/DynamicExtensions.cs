@@ -46,7 +46,7 @@ namespace System.Linq.Dynamic.Core
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Invalid Where selector");
+                throw new InvalidOperationException($"Invalid Where selector: '{selector}'. Exception: {ex.Message}");
             }
         }
 
@@ -89,9 +89,9 @@ namespace System.Linq.Dynamic.Core
                 return source.Provider.CreateQuery(Expression.Call(typeof(Queryable), nameof(Queryable.Select),
                           [source.ElementType, lambda.Body.Type], source.Expression, Expression.Quote(lambda)));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                throw new InvalidOperationException($"Invalid selector");
+                throw new InvalidOperationException($"Invalid Select selector: '{selector}'. Exception: {ex.Message}");
             }
         }
     }
