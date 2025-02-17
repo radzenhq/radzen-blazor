@@ -306,12 +306,12 @@ namespace Radzen
                     filter.FilterOperator == FilterOperator.NotIn ? FilterOperator.DoesNotContain : filter.FilterOperator;
             }
 
-            var isEnum = PropertyAccess.IsEnum(property.Type) || PropertyAccess.IsNullableEnum(property.Type);
+            var isEnum = !isEnumerable && (PropertyAccess.IsEnum(property.Type) || PropertyAccess.IsNullableEnum(property.Type));
             var caseInsensitive = property.Type == typeof(string) && !isEnumerable && filterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive;
 
             var constant = Expression.Constant(caseInsensitive ?
                 $"{filter.FilterValue}".ToLowerInvariant() :
-                    isEnum && filter.FilterValue != null ? Enum.ToObject(Nullable.GetUnderlyingType(property.Type) ?? property.Type, filter.FilterValue) : filter.FilterValue,
+                    isEnum && !isEnumerable && filter.FilterValue != null ? Enum.ToObject(Nullable.GetUnderlyingType(property.Type) ?? property.Type, filter.FilterValue) : filter.FilterValue,
                     !isEnum && isEnumerable ? valueType : property.Type);
 
             if (caseInsensitive && !isEnumerable)
@@ -479,7 +479,7 @@ namespace Radzen
                 }
                 else if (PropertyAccess.IsEnum(items.ElementType) || PropertyAccess.IsNullableEnum(items.ElementType))
                 {
-                    return items.Cast<object>().Select(i => Convert.ChangeType(i,typeof(int)));
+                    return items.Cast<object>().Select(i => i != null ? Convert.ChangeType(i,typeof(int)) : null);
                 }
 
                 return items.Cast<object>();
@@ -549,7 +549,7 @@ namespace Radzen
 #endif
                         }
                     }
-                    else if (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
+                    else if (!(v != null && IsEnumerable(v.GetType())) && (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType)))
                     {
                         Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(column.FilterPropertyType) ?? column.FilterPropertyType);
                         if (v != null)
@@ -561,7 +561,7 @@ namespace Radzen
                             secondValue = Convert.ChangeType(sv, enumType).ToString();
                         }
                     }
-                    else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+                    else if (v != null && IsEnumerable(v.GetType()) || IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
                     {
                         var enumerableValue = ((IEnumerable)(v != null ? v : Enumerable.Empty<object>())).AsQueryable();
                         var enumerableSecondValue = ((IEnumerable)(sv != null ? sv : Enumerable.Empty<object>())).AsQueryable();
