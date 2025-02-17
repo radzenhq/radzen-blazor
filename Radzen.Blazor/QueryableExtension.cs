@@ -1538,7 +1538,7 @@ namespace Radzen
                 }
 
                 // Apply case sensitivity handling
-                if (ignoreCase)
+                if (ignoreCase && propertyExpression.Type == typeof(string))
                 {
                     propertyExpression = Expression.Call(propertyExpression, "ToLower", Type.EmptyTypes);
                 }
