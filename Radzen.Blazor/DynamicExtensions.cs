@@ -77,7 +77,7 @@ namespace System.Linq.Dynamic.Core
 
                 selector = string.Join(", ", properties
                     .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim() : s.Trim()) +
-                        " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", ".").Trim()}"));
+                        " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", "?.").Trim()}"));
 
                 if (string.IsNullOrEmpty(selector))
                 {
