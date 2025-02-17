@@ -259,5 +259,30 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("Chai", result.ElementType.GetProperty("ProductName").GetValue(result.FirstOrDefault()));
         }
+
+        [Fact]
+        public void Should_SupportDictionaryIndexAccess()
+        {
+            var expression = ExpressionParser.ParsePredicate<Dictionary<string, object>>("it => (int)it[\"foo\"] == 1");
+            var func = expression.Compile();
+            Assert.True(func(new Dictionary<string, object> { ["foo"] = 1 }));
+        }
+
+        [Fact]
+        public void Should_SupportDictionaryIndexAccessWithNullableCast()
+        {
+            var expression = ExpressionParser.ParsePredicate<Dictionary<string, object>>("it => (Int32?)it[\"foo\"] == null");
+            var func = expression.Compile();
+            Assert.True(func(new Dictionary<string, object> { ["foo"] = null }));
+        }
+
+        [Fact]
+        public void Should_SupportArrayIndexAccess()
+        {
+            var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<int[]>>("it => it.Value[0] == 1");
+            var func = expression.Compile();
+
+            Assert.True(func(new ItemWithGenericProperty<int[]> { Value = [1] }));
+        }
     }
 }

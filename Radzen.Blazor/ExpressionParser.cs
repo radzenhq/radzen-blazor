@@ -127,7 +127,43 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
 
     public override Expression VisitCastExpression(CastExpressionSyntax node)
     {
-        var targetType = typeLocator?.Invoke(node.Type.ToString());
+        var typeName = node.Type.ToString();
+
+        var nullable = typeName.EndsWith("?");
+
+        if (nullable)
+        {
+            typeName = typeName[..^1];
+        }
+
+        var targetType = typeName switch
+        {
+            nameof(Int32) => typeof(int),
+            nameof(Int64) => typeof(long),
+            nameof(Double) => typeof(double),
+            nameof(Single) => typeof(float),
+            nameof(Decimal) => typeof(decimal),
+            nameof(String) => typeof(string),
+            nameof(Boolean) => typeof(bool),
+            nameof(DateTime) => typeof(DateTime),
+            nameof(DateOnly) => typeof(DateOnly),
+            nameof(TimeOnly) => typeof(TimeOnly),
+            nameof(Guid) => typeof(Guid),
+            nameof(Char) => typeof(char),
+            "int" => typeof(int),
+            "long" => typeof(long),
+            "double" => typeof(double),
+            "float" => typeof(float),
+            "decimal" => typeof(decimal),
+            "string" => typeof(string),
+            "char" => typeof(char),
+            _ => typeLocator?.Invoke(typeName)
+        };
+
+        if (nullable)
+        {
+            targetType = typeof(Nullable<>).MakeGenericType(targetType);
+        }
 
         if (targetType == null)
         {
@@ -318,7 +354,28 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
 
         throw new NotSupportedException("Unsupported member binding: " + node.ToString());
     }
-}
+
+    public override Expression VisitElementAccessExpression(ElementAccessExpressionSyntax node)
+    {
+        var expression = Visit(node.Expression);
+        var arguments = node.ArgumentList.Arguments.Select(arg => Visit(arg.Expression)).ToArray();
+
+        if (expression.Type.IsArray)
+        {
+            return Expression.ArrayIndex(expression, arguments);
+        }
+
+        var indexer = expression.Type.GetProperties()
+            .FirstOrDefault(p => p.GetIndexParameters().Length == arguments.Length);
+
+        if (indexer != null)
+        {
+            return Expression.MakeIndex(expression, indexer, arguments);
+        }
+
+        throw new NotSupportedException("Unsupported element access: " + node.ToString());
+    }
+  }
 
 public static class ExpressionParser
 {
