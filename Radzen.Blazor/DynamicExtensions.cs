@@ -46,7 +46,7 @@ namespace System.Linq.Dynamic.Core
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Invalid Where selector: '{selector}'. Exception: {ex.Message}");
+                throw new InvalidOperationException($"Invalid Where selector: '{selector}'. Exception: {ex}");
             }
         }
 
@@ -91,7 +91,7 @@ namespace System.Linq.Dynamic.Core
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Invalid Select selector: '{selector}'. Exception: {ex.Message}");
+                throw new InvalidOperationException($"Invalid Select selector: '{selector}'. Exception: {ex}");
             }
         }
     }
