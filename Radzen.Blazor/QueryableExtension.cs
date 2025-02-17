@@ -609,6 +609,10 @@ namespace Radzen
                                     {
                                         whereList.Add($@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any()");
                                     }
+                                    else
+                                    {
+                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "! " : "")}({enumerableValueAsString}).Contains({property})");
+                                    }
                                 }
                                 else if (columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn)
                                 {

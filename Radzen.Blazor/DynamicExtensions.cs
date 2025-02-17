@@ -21,7 +21,7 @@ namespace System.Linq.Dynamic.Core
         {
             try
             {
-                if (parameters != null)
+                if (parameters != null && !string.IsNullOrEmpty(selector))
                 {
                     for (var i = 0; i < parameters.Length; i++)
                     {
@@ -34,7 +34,7 @@ namespace System.Linq.Dynamic.Core
                     }
                 }
 
-                selector = (selector == "true" ? "i => true" : selector)
+                selector = (selector == "true" ? "" : selector)
                     .Replace("DateTime(", "DateTime.Parse(")
                     .Replace("DateTimeOffset(", "DateTimeOffset.Parse(")
                     .Replace("DateOnly(", "DateOnly.Parse(")
