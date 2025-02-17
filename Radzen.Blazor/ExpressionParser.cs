@@ -378,40 +378,30 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
   }
 
 /// <summary>
-/// ExpressionParser class.
+/// Parse lambda expressions from strings.
 /// </summary>
 public static class ExpressionParser
 {
     /// <summary>
-    /// ParsePredicate.
+    /// Parses a lambda expression that returns a boolean value.
     /// </summary>
+    /// <example>
     public static Expression<Func<T, bool>> ParsePredicate<T>(string expression, Func<string, Type> typeLocator = null)
     {
-        return ParseExpression<T, bool>(expression, typeLocator);
+        return ParseLambda<T, bool>(expression, typeLocator);
     }
 
     /// <summary>
-    /// ParseExpression.
+    /// Parses a lambda expression that returns a typed result.
     /// </summary>
-    public static Expression<Func<T, TResult>> ParseExpression<T, TResult>(string expression, Func<string, Type> typeLocator = null)
+    public static Expression<Func<T, TResult>> ParseLambda<T, TResult>(string expression, Func<string, Type> typeLocator = null)
     {
-        var syntaxTree = CSharpSyntaxTree.ParseText(expression);
-        var root = syntaxTree.GetRoot();
-        var lambdaExpression = root.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().FirstOrDefault();
-        if (lambdaExpression == null)
-        {
-            throw new ArgumentException("Invalid lambda expression.");
-        }
-        var parameter = Expression.Parameter(typeof(T), lambdaExpression.Parameter.Identifier.Text);
-        var visitor = new ExpressionSyntaxVisitor<T>(parameter, typeLocator);
-        var body = visitor.Visit(lambdaExpression.Body);
+        var (parameter, body) = Parse<T>(expression, typeLocator);
+
         return Expression.Lambda<Func<T, TResult>>(body, parameter);
     }
 
-    /// <summary>
-    /// ParseLambda.
-    /// </summary>
-    public static LambdaExpression ParseLambda<T>(string expression, Func<string, Type> typeLocator = null)
+    private static (ParameterExpression, Expression) Parse<T>(string expression, Func<string, Type> typeLocator)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(expression);
         var root = syntaxTree.GetRoot();
@@ -423,6 +413,15 @@ public static class ExpressionParser
         var parameter = Expression.Parameter(typeof(T), lambdaExpression.Parameter.Identifier.Text);
         var visitor = new ExpressionSyntaxVisitor<T>(parameter, typeLocator);
         var body = visitor.Visit(lambdaExpression.Body);
+        return (parameter, body);
+    }
+
+    /// <summary>
+    /// Parses a lambda expression that returns untyped result.
+    /// </summary>
+    public static LambdaExpression ParseLambda<T>(string expression, Func<string, Type> typeLocator = null)
+    {
+        var (parameter, body) = Parse<T>(expression, typeLocator);
 
         return Expression.Lambda(body, parameter);
     }

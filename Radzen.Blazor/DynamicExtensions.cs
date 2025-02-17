@@ -8,7 +8,7 @@ namespace System.Linq.Dynamic.Core
     /// </summary>
     public static class DynamicExtensions
     {
-        static Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies()
+        static readonly Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName.Replace("+", ".") == type);
 
         /// <summary>
@@ -16,12 +16,12 @@ namespace System.Linq.Dynamic.Core
         /// </summary>
         public static IQueryable<T> Where<T>(
             this IQueryable<T> source,
-            string selector,
+            string predicate,
             object[] parameters = null, object[] otherParameters = null)
         {
             try
             {
-                if (parameters != null && !string.IsNullOrEmpty(selector))
+                if (parameters != null && !string.IsNullOrEmpty(predicate))
                 {
                     for (var i = 0; i < parameters.Length; i++)
                     {
@@ -30,23 +30,23 @@ namespace System.Linq.Dynamic.Core
                                 parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}""" :
                                     parameters[i] is bool ? $"{parameters[i]}".ToLower() : parameters[i];
 
-                        selector = selector.Replace($"@{i}", $"{value}");
+                        predicate = predicate.Replace($"@{i}", $"{value}");
                     }
                 }
 
-                selector = (selector == "true" ? "" : selector)
+                predicate = (predicate == "true" ? "" : predicate)
                     .Replace("DateTime(", "DateTime.Parse(")
                     .Replace("DateTimeOffset(", "DateTimeOffset.Parse(")
                     .Replace("DateOnly(", "DateOnly.Parse(")
                     .Replace("Guid(", "Guid.Parse(")
                     .Replace(" = ", " == ");
 
-                return !string.IsNullOrEmpty(selector) ?
-                    source.Where(ExpressionParser.ParsePredicate<T>(selector, typeLocator)) : source;
+                return !string.IsNullOrEmpty(predicate) ?
+                    source.Where(ExpressionParser.ParsePredicate<T>(predicate, typeLocator)) : source;
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Invalid Where selector: '{selector}'. Exception: {ex}", ex.InnerException);
+                throw new InvalidOperationException($"Invalid predicate: {predicate}", ex);
             }
         }
 
@@ -58,7 +58,7 @@ namespace System.Linq.Dynamic.Core
             string selector,
             object[] parameters = null)
         {
-            return Radzen.QueryableExtension.OrderBy(source, selector);
+            return QueryableExtension.OrderBy(source, selector);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace System.Linq.Dynamic.Core
             }
             catch (Exception ex)
             {
-                throw new InvalidOperationException($"Invalid Select selector: '{selector}'. Exception: {ex}", ex.InnerException);
+                throw new InvalidOperationException($"Invalid selector: {selector}.", ex);
             }
         }
     }
