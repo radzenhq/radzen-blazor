@@ -1804,8 +1804,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    // view = base.View.Where<TItem>(allColumns);
-                    view = System.Linq.Dynamic.Core.DynamicExtensions.Where(base.View,allColumns.ToFilterString());
+                    view = base.View.Where<TItem>(allColumns);
 
                     if (!string.IsNullOrEmpty(orderBy))
                     {
