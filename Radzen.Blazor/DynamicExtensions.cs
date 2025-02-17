@@ -42,7 +42,7 @@ namespace System.Linq.Dynamic.Core
                     .Replace(" = ", " == ");
 
                 return !string.IsNullOrEmpty(selector) ?
-                    source.Where(ExpressionParser.Parse<T>(selector, typeLocator)) : source;
+                    source.Where(ExpressionParser.ParsePredicate<T>(selector, typeLocator)) : source;
             }
             catch (Exception ex)
             {
@@ -84,7 +84,7 @@ namespace System.Linq.Dynamic.Core
                     return source;
                 }
 
-                var lambda = ExpressionParser.ParseProjection<T>($"it => new {{ {selector} }}");
+                var lambda = ExpressionParser.ParseLambda<T>($"it => new {{ {selector} }}");
 
                 return source.Provider.CreateQuery(Expression.Call(typeof(Queryable), nameof(Queryable.Select),
                           [source.ElementType, lambda.Body.Type], source.Expression, Expression.Quote(lambda)));

@@ -55,7 +55,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_ParseBindaryExpression()
         {
-            var expression = ExpressionParser.Parse<Person>("p => p.Name == \"foo\"");
+            var expression = ExpressionParser.ParsePredicate<Person>("p => p.Name == \"foo\"");
 
             var func = expression.Compile();
 
@@ -65,7 +65,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_ParseConditionalExpression()
         {
-            var expression = ExpressionParser.Parse<OrderDetail>("it => (it.Product.ProductName == null ? \"\" : it.Product.ProductName).Contains(\"Queso\") && it.Quantity == 50");
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => (it.Product.ProductName == null ? \"\" : it.Product.ProductName).Contains(\"Queso\") && it.Quantity == 50");
 
             var func = expression.Compile();
 
@@ -75,7 +75,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_ParseNestedLogicalOperations()
         {
-            var expression = ExpressionParser.Parse<OrderDetail>("it => (it.Product.ProductName == null ? \"\" : it.Product.ProductName).Contains(\"Queso\") && (it.Quantity == 50 || it.Quantity == 12)");
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => (it.Product.ProductName == null ? \"\" : it.Product.ProductName).Contains(\"Queso\") && (it.Quantity == 50 || it.Quantity == 12)");
 
             var func = expression.Compile();
 
@@ -85,7 +85,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportDateTimeParsing()
         {
-            var expression = ExpressionParser.Parse<OrderDetail>("it => it.Order.OrderDate >= DateTime.Parse(\"2025-02-11\")");
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => it.Order.OrderDate >= DateTime.Parse(\"2025-02-11\")");
 
             var func = expression.Compile();
             Assert.True(func(new OrderDetail { Order = new Order { OrderDate = new DateTime(2025, 2, 11) } }));
@@ -99,7 +99,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportDateOnlyParsing()
         {
-            var expression = ExpressionParser.Parse<ItemWithGenericProperty<DateOnly>>("it => it.Value >= DateOnly.Parse(\"2025-02-11\")");
+            var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<DateOnly>>("it => it.Value >= DateOnly.Parse(\"2025-02-11\")");
 
             var func = expression.Compile();
 
@@ -109,7 +109,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportTimeOnlyParsing()
         {
-            var expression = ExpressionParser.Parse<ItemWithGenericProperty<TimeOnly>>("it => it.Value >= TimeOnly.Parse(\"12:00:00\")");
+            var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<TimeOnly>>("it => it.Value >= TimeOnly.Parse(\"12:00:00\")");
             var func = expression.Compile();
             Assert.True(func(new ItemWithGenericProperty<TimeOnly> { Value = new TimeOnly(12, 0, 0) }));
         }
@@ -117,7 +117,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportGuidParsing()
         {
-            var expression = ExpressionParser.Parse<ItemWithGenericProperty<Guid>>("it => it.Value == Guid.Parse(\"f0e7e7d8-4f4d-4b5f-8b3e-3f1d1b4f5f5f\")");
+            var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<Guid>>("it => it.Value == Guid.Parse(\"f0e7e7d8-4f4d-4b5f-8b3e-3f1d1b4f5f5f\")");
             var func = expression.Compile();
             Assert.True(func(new ItemWithGenericProperty<Guid> { Value = Guid.Parse("f0e7e7d8-4f4d-4b5f-8b3e-3f1d1b4f5f5f") }));
         }
@@ -127,7 +127,7 @@ namespace Radzen.Blazor.Tests
         {
             var typeLocator = (string type) => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);
 
-            var expression = ExpressionParser.Parse<ItemWithGenericProperty<CarType[]>>("it => it.Value.Any(i => (new []{0}).Contains(i))", typeLocator);
+            var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<CarType[]>>("it => it.Value.Any(i => (new []{0}).Contains(i))", typeLocator);
 
             var func = expression.Compile();
 
@@ -139,7 +139,7 @@ namespace Radzen.Blazor.Tests
         {
             var typeLocator = (string type) => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);
 
-            var expression = ExpressionParser.Parse<Car>($"it => it.Type == (Radzen.Blazor.Tests.CarType)1", typeLocator);
+            var expression = ExpressionParser.ParsePredicate<Car>($"it => it.Type == (Radzen.Blazor.Tests.CarType)1", typeLocator);
 
             var func = expression.Compile();
 
@@ -149,7 +149,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportCollectionLiterals()
         {
-            var expression = ExpressionParser.Parse<OrderDetail>("it => (new []{\"Tofu\"}).Contains(it.Product.ProductName)");
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => (new []{\"Tofu\"}).Contains(it.Product.ProductName)");
             var func = expression.Compile();
 
             Assert.True(func(new OrderDetail { Product = new Product { ProductName = "Tofu" } }));
@@ -164,7 +164,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportNestedLambdas()
         {
-            var expression = ExpressionParser.Parse<OrderDetail>("it => it.WorkStatuses.Any(i => (new []{\"Office\"}).Contains(i.Name))");
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => it.WorkStatuses.Any(i => (new []{\"Office\"}).Contains(i.Name))");
             var func = expression.Compile();
 
             Assert.True(func(new OrderDetail { WorkStatuses = [new() { Name = "Office" }] }));
@@ -173,7 +173,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportNestedLambdasWithEnums()
         {
-            var expression = ExpressionParser.Parse<OrderDetail>("it => it.Statuses.Any(i => (new []{1}).Contains(i))");
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => it.Statuses.Any(i => (new []{1}).Contains(i))");
             var func = expression.Compile();
 
             Assert.True(func(new OrderDetail { Statuses = new List<Status>() { (Status)1 } }));
@@ -182,7 +182,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportToLower()
         {
-            var expression = ExpressionParser.Parse<Person>("it => (it.Name == null ? \"\" : it.Name).ToLower().Contains(\"na\".ToLower())");
+            var expression = ExpressionParser.ParsePredicate<Person>("it => (it.Name == null ? \"\" : it.Name).ToLower().Contains(\"na\".ToLower())");
 
             var func = expression.Compile();
 
@@ -192,7 +192,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportNullableProperties()
         {
-            var expression = ExpressionParser.Parse<Person>("it => it.Age == 50");
+            var expression = ExpressionParser.ParsePredicate<Person>("it => it.Age == 50");
 
             var func = expression.Compile();
 
@@ -202,7 +202,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportNullablePropertiesWithArray()
         {
-            var expression = ExpressionParser.Parse<Person>("it => (new []{}).Contains(it.Famous)");
+            var expression = ExpressionParser.ParsePredicate<Person>("it => (new []{}).Contains(it.Famous)");
 
             var func = expression.Compile();
 
@@ -212,7 +212,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportDateTimeWithArray()
         {
-            var expression = ExpressionParser.Parse<Person>("it => (new []{DateTime.Parse(\"5/5/2000 12:00:00 AM\")}).Contains(it.BirthDate)");
+            var expression = ExpressionParser.ParsePredicate<Person>("it => (new []{DateTime.Parse(\"5/5/2000 12:00:00 AM\")}).Contains(it.BirthDate)");
 
             var func = expression.Compile();
 
@@ -222,7 +222,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportNumericConversion()
         {
-            var expression = ExpressionParser.Parse<ItemWithGenericProperty<double>>("it => it.Value == 50");
+            var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<double>>("it => it.Value == 50");
 
             var func = expression.Compile();
 
@@ -232,13 +232,22 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_CreateProjection()
         {
-            var expression = ExpressionParser.ParseProjection<OrderDetail>("it => new { ProductName = it.Product.ProductName}");
+            var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { ProductName = it.Product.ProductName}");
 
             var func = expression.Compile();
 
             var result = func.DynamicInvoke(new OrderDetail { Product = new Product { ProductName = "Queso" } });
 
             Assert.Equal("Queso", result.GetType().GetProperty("ProductName").GetValue(result));
+        }
+
+        [Fact]
+        public void Should_CreateProjectionFromConditionalAccess()
+        {
+            var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { ProductName = it.Product?.ProductName}");
+            var func = expression.Compile();
+            var result = func.DynamicInvoke(new OrderDetail { Product = null });
+            Assert.Null(result.GetType().GetProperty("ProductName").GetValue(result));
         }
 
         [Fact]
