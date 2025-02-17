@@ -587,7 +587,9 @@ namespace Radzen
 
                             var booleanOperator = column.LogicalFilterOperator == LogicalFilterOperator.And ? "&&" : "||";
 
-                            var property = "it." + PropertyAccess.GetProperty(column.GetFilterProperty());
+                            var filterProperty = column.GetFilterProperty();
+                            var itemInstanceName = !filterProperty.Contains("[") ? "it." : "";
+                            var property = itemInstanceName + PropertyAccess.GetProperty(column.GetFilterProperty());
 
                             if (sv == null)
                             {
@@ -595,7 +597,7 @@ namespace Radzen
                                 {
                                     if (column.GetFilterValue() is string && column.Property != column.FilterProperty)
                                     {
-                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "! " : "")}{"it." + column.Property}.Any(i => {"i." + column.FilterProperty}.Contains(""" + column.GetFilterValue() + "\"))");
+                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "! " : "")}{itemInstanceName + column.Property}.Any(i => {"i." + column.FilterProperty}.Contains(""" + column.GetFilterValue() + "\"))");
                                     }
                                     else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
                                         IsEnumerable(column.PropertyType) && column.PropertyType != typeof(string))
@@ -618,7 +620,7 @@ namespace Radzen
                                     else if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
                                         column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
                                     {
-                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.NotIn ? "!" : "")}{"it." + column.Property}.Any(i => ({enumerableValueAsString}).Contains(i.{column.FilterProperty}))");
+                                        whereList.Add($@"{(columnFilterOperator == FilterOperator.NotIn ? "!" : "")}{itemInstanceName + column.Property}.Any(i => ({enumerableValueAsString}).Contains(i.{column.FilterProperty}))");
                                     }
                                 }
                             }
@@ -902,7 +904,9 @@ namespace Radzen
         /// <returns>System.String.</returns>
         private static string GetColumnFilter<T>(RadzenDataGridColumn<T> column, string value, bool second = false)
         {
-            var property = "it." + PropertyAccess.GetProperty(column.GetFilterProperty());
+            var filterProperty = column.GetFilterProperty();
+            var itemInstanceName = !filterProperty.Contains("[") ? "it." : "";
+            var property = itemInstanceName + PropertyAccess.GetProperty(filterProperty);
             var propertyType = !string.IsNullOrEmpty(property) ? PropertyAccess.GetPropertyType(typeof(T), property) : null;
 
             string npProperty = (propertyType != null ? Nullable.GetUnderlyingType(propertyType) != null : true) ? $@"({property} ?? null)" : property;
