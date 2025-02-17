@@ -397,7 +397,6 @@ public static class ExpressionParser
     /// <summary>
     /// Parses a lambda expression that returns a boolean value.
     /// </summary>
-    /// <example>
     public static Expression<Func<T, bool>> ParsePredicate<T>(string expression, Func<string, Type> typeLocator = null)
     {
         return ParseLambda<T, bool>(expression, typeLocator);
