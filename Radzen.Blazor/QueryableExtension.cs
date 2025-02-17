@@ -1531,14 +1531,15 @@ namespace Radzen
                         );
                     }
                 }
-                else
+
+                if (string.IsNullOrEmpty(property) || propertyExpression?.Type != typeof(string))
                 {
                     // Default property access if no property is specified
                     propertyExpression = Expression.Call(parameter, "ToString", Type.EmptyTypes);
                 }
 
                 // Apply case sensitivity handling
-                if (ignoreCase && propertyExpression.Type == typeof(string))
+                if (ignoreCase)
                 {
                     propertyExpression = Expression.Call(propertyExpression, "ToLower", Type.EmptyTypes);
                 }
