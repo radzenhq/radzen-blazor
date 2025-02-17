@@ -377,13 +377,22 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
     }
   }
 
+/// <summary>
+/// ExpressionParser class.
+/// </summary>
 public static class ExpressionParser
 {
+    /// <summary>
+    /// ParsePredicate.
+    /// </summary>
     public static Expression<Func<T, bool>> ParsePredicate<T>(string expression, Func<string, Type> typeLocator = null)
     {
         return ParseExpression<T, bool>(expression, typeLocator);
     }
 
+    /// <summary>
+    /// ParseExpression.
+    /// </summary>
     public static Expression<Func<T, TResult>> ParseExpression<T, TResult>(string expression, Func<string, Type> typeLocator = null)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(expression);
@@ -399,6 +408,9 @@ public static class ExpressionParser
         return Expression.Lambda<Func<T, TResult>>(body, parameter);
     }
 
+    /// <summary>
+    /// ParseLambda.
+    /// </summary>
     public static LambdaExpression ParseLambda<T>(string expression, Func<string, Type> typeLocator = null)
     {
         var syntaxTree = CSharpSyntaxTree.ParseText(expression);
