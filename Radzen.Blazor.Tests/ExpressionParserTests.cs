@@ -171,6 +171,15 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Should_SupportNestedLambdasWithNot()
+        {
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => it.WorkStatuses.Any(i => !(new []{\"Office\"}).Contains(i.Name))");
+            var func = expression.Compile();
+
+            Assert.False(func(new OrderDetail { WorkStatuses = [new() { Name = "Office" }] }));
+        }
+
+        [Fact]
         public void Should_SupportNestedLambdasWithEnums()
         {
             var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => it.Statuses.Any(i => (new []{1}).Contains(i))");
