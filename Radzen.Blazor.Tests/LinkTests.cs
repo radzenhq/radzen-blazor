@@ -79,6 +79,20 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Link_Renders_DisabledParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenLink>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+
+            Assert.Contains("class=\"rz-link rz-link-disabled active\"", component.Markup);
+
+            Assert.DoesNotContain("href=", component.Markup);
+        }
+
+        [Fact]
         public void Icon_Renders_UnmatchedParameter()
         {
             using var ctx = new TestContext();
