@@ -375,7 +375,19 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
 
         throw new NotSupportedException("Unsupported element access: " + node.ToString());
     }
-  }
+
+    public override Expression VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
+    {
+        var operand = Visit(node.Operand);
+
+        return node.OperatorToken.Kind() switch
+        {
+            SyntaxKind.MinusToken => Expression.Negate(operand),
+            SyntaxKind.ExclamationToken => Expression.Not(operand),
+            _ => throw new NotSupportedException("Unsupported unary operator: " + node.OperatorToken.Text),
+        };
+    }
+}
 
 /// <summary>
 /// Parse lambda expressions from strings.
