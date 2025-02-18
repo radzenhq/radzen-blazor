@@ -521,29 +521,34 @@ namespace Radzen
                             whereList.Add(customFilterExpression);
                         }
                     }
+                    else if (column.FilterPropertyType == typeof(TimeOnly) || column.FilterPropertyType == typeof(TimeOnly?))
+                    { 
+                        value = v != null ? ((TimeOnly)v).ToString("HH:mm:ss") : "";
+                        secondValue = sv != null ? ((TimeOnly)sv).ToString("HH:mm:ss") : "";
+                    }
                     else if (PropertyAccess.IsDate(column.FilterPropertyType))
                     {
                         if (v != null)
                         {
-                           
-                            value = 
-                                v is DateTime ? ((DateTime) v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
-                                : v is DateTimeOffset ? ((DateTimeOffset) v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
-                                : 
+
+                            value =
+                                v is DateTime ? ((DateTime)v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : v is DateTimeOffset ? ((DateTimeOffset)v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                :
 #if NET6_0_OR_GREATER
-                                v is DateOnly ? ((DateOnly) v).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
+                                v is DateOnly ? ((DateOnly)v).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
 #else
                                     "";
 #endif
                         }
                         if (sv != null)
                         {
-                            secondValue = 
-                                sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) 
-                                : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture) 
-                                : 
+                            secondValue =
+                                sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                :
 #if NET6_0_OR_GREATER
-                                sv is DateOnly ? ((DateOnly) sv).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
+                                sv is DateOnly ? ((DateOnly)sv).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
 #else
                             "";
 #endif
@@ -643,7 +648,7 @@ namespace Radzen
                                 else if ((columnFilterOperator == FilterOperator.In || columnFilterOperator == FilterOperator.NotIn) &&
                                          (columnSecondFilterOperator == FilterOperator.In || columnSecondFilterOperator == FilterOperator.NotIn))
                                 {
-	                                whereList.Add($@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any() {booleanOperator} ({property}).{(columnSecondFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableSecondValueAsString}).Any()");
+                                    whereList.Add($@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any() {booleanOperator} ({property}).{(columnSecondFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableSecondValueAsString}).Any()");
                                 }
                             }
                         }

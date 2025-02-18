@@ -1053,6 +1053,12 @@ namespace Radzen.Blazor
                 value = offset;
             }
 
+            if ((FilterPropertyType == typeof(TimeOnly) || FilterPropertyType == typeof(TimeOnly?)) && value != null && value is string)
+            {
+                TimeOnly? v = TimeOnly.Parse($"{value}");
+                value = v;
+            }
+
             if (!QueryableExtension.IsEnumerable(value?.GetType() ?? typeof(object)) && (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType))))
             {
                 Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(FilterPropertyType) ?? FilterPropertyType);
