@@ -66,7 +66,7 @@ namespace Radzen.Blazor
             {
                 if (_view == null)
                 {
-                    _view = Data != null ? Data.AsQueryable().Where<TItem>(this) : Enumerable.Empty<TItem>().AsQueryable();
+                    _view = Data != null ? System.Linq.Dynamic.Core.DynamicExtensions.Where(Data.AsQueryable(), this.ToFilterString()) : Enumerable.Empty<TItem>().AsQueryable();
                 }
 
                 return _view;
