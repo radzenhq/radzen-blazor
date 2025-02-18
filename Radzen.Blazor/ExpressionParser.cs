@@ -302,6 +302,7 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
             SyntaxKind.ExclamationEqualsToken => ExpressionType.NotEqual,
             SyntaxKind.AmpersandAmpersandToken => ExpressionType.AndAlso,
             SyntaxKind.BarBarToken => ExpressionType.OrElse,
+            SyntaxKind.QuestionQuestionToken => ExpressionType.Coalesce,
             _ => throw new NotSupportedException("Unsupported operator: " + token.Text),
         };
     }

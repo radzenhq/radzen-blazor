@@ -247,6 +247,16 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Should_SupportNullCoalescence()
+        {
+            var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<double?>>("it => (it.Value ?? 0) == 0");
+
+            var func = expression.Compile();
+
+            Assert.True(func(new ItemWithGenericProperty<double?> { Value = null }));
+        }
+
+        [Fact]
         public void Should_CreateProjection()
         {
             var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { ProductName = it.Product.ProductName}");
