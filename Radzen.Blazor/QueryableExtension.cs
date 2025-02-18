@@ -526,6 +526,11 @@ namespace Radzen
                         value = v != null ? ((TimeOnly)v).ToString("HH:mm:ss") : "";
                         secondValue = sv != null ? ((TimeOnly)sv).ToString("HH:mm:ss") : "";
                     }
+                    else if (column.FilterPropertyType == typeof(Guid) || column.FilterPropertyType == typeof(Guid?))
+                    {
+                        value = $"{v}";
+                        secondValue = $"{sv}";
+                    }
                     else if (PropertyAccess.IsDate(column.FilterPropertyType))
                     {
                         if (v != null)
