@@ -292,7 +292,9 @@ namespace Radzen
 
             Type secondValueType = filter.SecondFilterValue != null ? filter.SecondFilterValue.GetType() : null;
 
-            Expression property = GetNestedPropertyExpression(parameter, !isEnumerable ? filter.FilterProperty ?? filter.Property : filter.Property, type);
+            Expression p = GetNestedPropertyExpression(parameter, filter.Property, type);
+
+            Expression property = GetNestedPropertyExpression(parameter, !isEnumerable && !IsEnumerable(p.Type) ? filter.FilterProperty ?? filter.Property : filter.Property, type);
 
             Type collectionItemType = IsEnumerable(property.Type) && property.Type.IsGenericType ? property.Type.GetGenericArguments()[0] : null;
 
@@ -521,7 +523,7 @@ namespace Radzen
                             whereList.Add(customFilterExpression);
                         }
                     } 
-                    else if (v != null && IsEnumerable(v.GetType()) || IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+                    else if (v != null && IsEnumerable(v.GetType()) && v.GetType() != typeof(string) || IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
                     {
                         var enumerableValue = ((IEnumerable)(v != null ? v : Enumerable.Empty<object>())).AsQueryable();
                         var enumerableSecondValue = ((IEnumerable)(sv != null ? sv : Enumerable.Empty<object>())).AsQueryable();
@@ -560,7 +562,7 @@ namespace Radzen
                             {
                                 if (columnFilterOperator == FilterOperator.Contains || columnFilterOperator == FilterOperator.DoesNotContain)
                                 {
-                                    if (column.GetFilterValue() is string && column.Property != column.FilterProperty)
+                                    if (column.GetFilterValue() is string && column.Property != column.FilterProperty && !string.IsNullOrEmpty(column.FilterProperty))
                                     {
                                         whereList.Add($@"{(columnFilterOperator == FilterOperator.DoesNotContain ? "! " : "")}{itemInstanceName + column.Property}.Any(i => {"i." + column.FilterProperty}.Contains(""" + column.GetFilterValue() + "\"))");
                                     }
