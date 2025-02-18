@@ -210,9 +210,9 @@ namespace Radzen
             if (_sideDialogTask?.Task.IsCompleted == false)
             {
                 _sideDialogTask.TrySetResult(result);
+                OnSideClose?.Invoke(result);
             }
 
-            OnSideClose?.Invoke(result);
         }
 
         /// <summary>
