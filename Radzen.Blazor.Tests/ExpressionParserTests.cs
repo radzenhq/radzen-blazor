@@ -282,11 +282,52 @@ namespace Radzen.Blazor.Tests
             var func = expression.Compile();
 
             var result = func.DynamicInvoke(new OrderDetail { Product = new Product { ProductName = "Queso" } });
+
             var property = result.GetType().GetProperty("ProductName");
 
             Assert.Equal(typeof(string), property.PropertyType);
 
             Assert.Equal("Queso", property.GetValue(result));
+        }
+
+        [Fact]
+        public void Should_CreateProjectionFromNestedAccess()
+        {
+            var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { it.Product.Category.CategoryName }");
+
+            var func = expression.Compile();
+
+            var orderDetail = new OrderDetail { Product = new Product { Category = new Category { CategoryName = "Beverages" } } };
+
+            var x = new {  orderDetail?.Product?.Category?.CategoryName };
+
+            var result = func.DynamicInvoke(orderDetail);
+
+            var property = result.GetType().GetProperty("CategoryName");
+
+            Assert.Equal(typeof(string), property.PropertyType);
+
+            Assert.Equal("Beverages", property.GetValue(result));
+        }
+
+        [Fact]
+        public void Should_CreateProjectionFromNestedConditionalAccess()
+        {
+            var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { it.Product?.Category?.CategoryName }");
+
+            var func = expression.Compile();
+
+            var orderDetail = new OrderDetail { Product = new Product { Category = new Category { CategoryName = "Beverages" } } };
+
+            var x = new { orderDetail?.Product?.Category?.CategoryName };
+
+            var result = func.DynamicInvoke(orderDetail);
+
+            var property = result.GetType().GetProperty("CategoryName");
+
+            Assert.Equal(typeof(string), property.PropertyType);
+
+            Assert.Equal("Beverages", property.GetValue(result));
         }
 
         [Fact]
@@ -303,7 +344,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void Should_CreateProjectionFromNestedConditionalAccess()
+        public void Should_CreateProjectionFromNestedConditionalAccessAndAssignment()
         {
             var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { CategoryName = it.Product?.Category?.CategoryName}");
             var func = expression.Compile();

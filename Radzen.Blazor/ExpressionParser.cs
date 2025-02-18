@@ -334,11 +334,43 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
         };
     }
 
+    private static string GetPropertyNameFromInitializer(AnonymousObjectMemberDeclaratorSyntax initializer)
+    {
+        if (initializer.NameEquals != null)
+        {
+            return initializer.NameEquals.Name.Identifier.Text;
+        }
+
+        var expression = initializer.Expression;
+
+        if (expression is MemberAccessExpressionSyntax memberAccess)
+        {
+            expression = memberAccess.Name;
+        }
+
+        while (expression is ConditionalAccessExpressionSyntax conditionalAccess)
+        {
+            expression = conditionalAccess.WhenNotNull;
+        }
+
+        if (expression is MemberBindingExpressionSyntax memberBinding)
+        {
+            expression = memberBinding.Name;
+        }
+
+        if (expression is IdentifierNameSyntax identifier)
+        {
+            return identifier.Identifier.Text;
+        }
+
+        throw new NotSupportedException("Unsupported initializer: " + initializer.ToString());
+    }
+
     public override Expression VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpressionSyntax node)
     {
         var properties = node.Initializers.Select(init =>
         {
-            var name = init.NameEquals?.Name.Identifier.Text ?? ((IdentifierNameSyntax)init.Expression).ToString();
+            var name = GetPropertyNameFromInitializer(init);
             var value = Visit(init.Expression);
             return new { Name = name, Value = value };
         }).ToList();
