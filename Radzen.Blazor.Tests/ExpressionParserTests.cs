@@ -42,6 +42,12 @@ namespace Radzen.Blazor.Tests
             public List<Status> Statuses { get; set; }
         }
 
+        class Category
+        {
+            public string CategoryName { get; set; }
+
+        }
+
         class Order
         {
             public DateTime OrderDate { get; set; }
@@ -50,6 +56,8 @@ namespace Radzen.Blazor.Tests
         class Product
         {
             public string ProductName { get; set; }
+
+            public Category Category { get; set; }
         }
 
         [Fact]
@@ -246,8 +254,11 @@ namespace Radzen.Blazor.Tests
             var func = expression.Compile();
 
             var result = func.DynamicInvoke(new OrderDetail { Product = new Product { ProductName = "Queso" } });
+            var property = result.GetType().GetProperty("ProductName");
 
-            Assert.Equal("Queso", result.GetType().GetProperty("ProductName").GetValue(result));
+            Assert.Equal(typeof(string), property.PropertyType);
+
+            Assert.Equal("Queso", property.GetValue(result));
         }
 
         [Fact]
@@ -256,7 +267,24 @@ namespace Radzen.Blazor.Tests
             var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { ProductName = it.Product?.ProductName}");
             var func = expression.Compile();
             var result = func.DynamicInvoke(new OrderDetail { Product = null });
-            Assert.Null(result.GetType().GetProperty("ProductName").GetValue(result));
+
+            var property = result.GetType().GetProperty("ProductName");
+
+            Assert.Equal(typeof(string), property.PropertyType);
+            Assert.Null(property.GetValue(result));
+        }
+
+        [Fact]
+        public void Should_CreateProjectionFromNestedConditionalAccess()
+        {
+            var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { CategoryName = it.Product?.Category?.CategoryName}");
+            var func = expression.Compile();
+            var result = func.DynamicInvoke(new OrderDetail { Product = null });
+
+            var property = result.GetType().GetProperty("CategoryName");
+
+            Assert.Equal(typeof(string), property.PropertyType);
+            Assert.Null(property.GetValue(result));
         }
 
         [Fact]

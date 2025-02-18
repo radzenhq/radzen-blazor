@@ -323,10 +323,17 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
         return Expression.MemberInit(Expression.New(dynamicType), bindings);
     }
 
+    private Expression instance;
+
     public override Expression VisitConditionalAccessExpression(ConditionalAccessExpressionSyntax node)
     {
         var expression = Visit(node.Expression);
+
+        instance = expression;
+
         var whenNotNull = Visit(node.WhenNotNull);
+
+        instance = null;
 
         if (expression.Type.IsValueType && Nullable.GetUnderlyingType(expression.Type) == null)
         {
@@ -345,11 +352,9 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
 
     public override Expression VisitMemberBindingExpression(MemberBindingExpressionSyntax node)
     {
-        if (node.Parent is ConditionalAccessExpressionSyntax conditional)
+        if (instance is Expression expression)
         {
-            var expression = Visit(conditional.Expression);
-            var memberName = node.Name.Identifier.Text;
-            return Expression.PropertyOrField(expression, memberName);
+            return Expression.PropertyOrField(expression, node.Name.Identifier.Text);
         }
 
         throw new NotSupportedException("Unsupported member binding: " + node.ToString());
