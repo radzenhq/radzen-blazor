@@ -76,7 +76,7 @@ namespace System.Linq.Dynamic.Core
                     .Split(",", StringSplitOptions.RemoveEmptyEntries);
 
                 selector = string.Join(", ", properties
-                    .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim()) +
+                    .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim().Replace(".", "_")) +
                         " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", "?.").Trim()}"));
 
                 if (string.IsNullOrEmpty(selector))
