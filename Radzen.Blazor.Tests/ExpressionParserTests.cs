@@ -131,6 +131,14 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Should_SupportDateTimeOffsetParsing()
+        {
+            var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<DateTimeOffset>>("it => it.Value == DateTimeOffset.Parse(\"2025-02-11\")");
+            var func = expression.Compile();
+            Assert.True(func(new ItemWithGenericProperty<DateTimeOffset> { Value = DateTimeOffset.Parse("2025-02-11") }));
+        }
+
+        [Fact]
         public void Should_SupportEnumWithCasts()
         {
             var typeLocator = (string type) => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);

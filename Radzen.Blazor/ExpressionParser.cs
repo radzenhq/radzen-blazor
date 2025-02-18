@@ -1,11 +1,10 @@
-using System;
-using System.Linq.Expressions;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis;
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
-using System.Collections.Concurrent;
 using System.Reflection.Emit;
 
 namespace Radzen;
@@ -47,7 +46,7 @@ static class DynamicTypeFactory
                       "set_" + propertyNames[i],
                       MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
                       null,
-                      new[] { propertyTypes[i] });
+                      [propertyTypes[i]]);
 
             var setterIl = setterMethod.GetILGenerator();
             setterIl.Emit(OpCodes.Ldarg_0);
@@ -102,14 +101,14 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
             return parameter;
         }
 
-        return node.Identifier.Text switch
+        var type = GetType(node.Identifier.Text);
+
+        if (type != null)
         {
-            nameof(DateTime) => Expression.Constant(typeof(DateTime)),
-            nameof(DateOnly) => Expression.Constant(typeof(DateOnly)),
-            nameof(TimeOnly) => Expression.Constant(typeof(TimeOnly)),
-            nameof(Guid) => Expression.Constant(typeof(Guid)),
-            _ => throw new NotSupportedException("Unsupported identifier: " + node.Identifier.Text),
-        };
+            return Expression.Constant(type);
+        }
+
+        throw new NotSupportedException("Unsupported identifier: " + node.Identifier.Text);
     }
 
     public override Expression VisitConditionalExpression(ConditionalExpressionSyntax node)
@@ -125,18 +124,16 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
         return Visit(node.Expression);
     }
 
-    public override Expression VisitCastExpression(CastExpressionSyntax node)
+    private Type GetType(string typeName)
     {
-        var typeName = node.Type.ToString();
-
-        var nullable = typeName.EndsWith("?");
+        var nullable = typeName.EndsWith('?');
 
         if (nullable)
         {
             typeName = typeName[..^1];
         }
 
-        var targetType = typeName switch
+        var type = typeName switch
         {
             nameof(Int32) => typeof(int),
             nameof(Int64) => typeof(long),
@@ -147,6 +144,7 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
             nameof(Boolean) => typeof(bool),
             nameof(DateTime) => typeof(DateTime),
             nameof(DateOnly) => typeof(DateOnly),
+            nameof(DateTimeOffset) => typeof(DateTimeOffset),
             nameof(TimeOnly) => typeof(TimeOnly),
             nameof(Guid) => typeof(Guid),
             nameof(Char) => typeof(char),
@@ -160,10 +158,19 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
             _ => typeLocator?.Invoke(typeName)
         };
 
-        if (nullable)
+        if (nullable && type != null)
         {
-            targetType = typeof(Nullable<>).MakeGenericType(targetType);
+            type = typeof(Nullable<>).MakeGenericType(type);
         }
+
+        return type;
+    }
+
+    public override Expression VisitCastExpression(CastExpressionSyntax node)
+    {
+        var typeName = node.Type.ToString();
+
+        var targetType = GetType(typeName);
 
         if (targetType == null)
         {
@@ -171,6 +178,7 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
         }
 
         var operand = Visit(node.Expression);
+
         return Expression.Convert(operand, targetType);
     }
 
