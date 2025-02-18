@@ -3436,7 +3436,7 @@ namespace Radzen
             var typeName = isEnum ? "Enum" : (Nullable.GetUnderlyingType(type) ?? type).Name;
             var typeFunc = $@"{typeName}{(!isEnum && Nullable.GetUnderlyingType(type) != null ? "?" : "")}";
 
-            return $@"{typeFunc}(it[""{name}""])";
+            return $@"({typeFunc})it[""{name}""]";
         }
     }
 

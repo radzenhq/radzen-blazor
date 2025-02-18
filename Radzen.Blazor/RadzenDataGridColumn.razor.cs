@@ -176,7 +176,7 @@ namespace Radzen.Blazor
                     propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
                 }
 
-                if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null)
+                if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null && _filterOperator == null)
                 {
                     SetFilterOperator(FilterOperator.Contains);
                 }
@@ -1053,7 +1053,19 @@ namespace Radzen.Blazor
                 value = offset;
             }
 
-            if (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType)))
+            if ((FilterPropertyType == typeof(TimeOnly) || FilterPropertyType == typeof(TimeOnly?)) && value != null && value is string)
+            {
+                var v = TimeOnly.Parse($"{value}");
+                value = FilterPropertyType == typeof(TimeOnly) ? v : (TimeOnly?)v;
+            }
+
+            if ((FilterPropertyType == typeof(Guid) || FilterPropertyType == typeof(Guid?)) && value != null && value is string)
+            {
+                var v = Guid.Parse($"{value}");
+                value = FilterPropertyType == typeof(Guid) ? v : (Guid?)v;
+            }
+
+            if (!QueryableExtension.IsEnumerable(value?.GetType() ?? typeof(object)) && (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType))))
             {
                 Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(FilterPropertyType) ?? FilterPropertyType);
                 value = value is not null ? Convert.ChangeType(value, enumType) : null;

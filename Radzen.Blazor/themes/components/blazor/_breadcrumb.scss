@@ -21,4 +21,9 @@
         display: inline-flex;
         align-items: center;
     }
+
+    .rz-link-disabled {
+        pointer-events: none;
+        opacity: 0.5;
+    }
 }
