@@ -114,8 +114,27 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
     public override Expression VisitConditionalExpression(ConditionalExpressionSyntax node)
     {
         var condition = Visit(node.Condition);
+
         var whenTrue = Visit(node.WhenTrue);
+
         var whenFalse = Visit(node.WhenFalse);
+
+        if (whenTrue.Type != whenFalse.Type)
+        {
+            if (whenTrue.Type == typeof(object))
+            {
+                whenTrue = Expression.Convert(whenTrue, whenFalse.Type);
+            }
+            else if (whenFalse.Type == typeof(object))
+            {
+                whenFalse = Expression.Convert(whenFalse, whenTrue.Type);
+            }
+            else
+            {
+                throw new NotSupportedException("Conditional expression types mismatch: " + whenTrue.Type + " and " + whenFalse.Type);
+            }
+        }
+
         return Expression.Condition(condition, whenTrue, whenFalse);
     }
 

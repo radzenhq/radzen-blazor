@@ -265,6 +265,16 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Should_SupportNullConditionAndCoalescence()
+        {
+            var expression = ExpressionParser.ParsePredicate<Person>("it => (((it == null) ? null : it.Name) ?? \"\").Contains(\"Da\")");
+
+            var func = expression.Compile();
+
+            Assert.True(func(new Person { Name = "Dali" }));
+        }
+
+        [Fact]
         public void Should_CreateProjection()
         {
             var expression = ExpressionParser.ParseLambda<OrderDetail>("it => new { ProductName = it.Product.ProductName}");
