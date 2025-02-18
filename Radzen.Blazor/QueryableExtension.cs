@@ -520,57 +520,7 @@ namespace Radzen
                         {
                             whereList.Add(customFilterExpression);
                         }
-                    }
-                    else if (column.FilterPropertyType == typeof(TimeOnly) || column.FilterPropertyType == typeof(TimeOnly?))
-                    { 
-                        value = v != null ? ((TimeOnly)v).ToString("HH:mm:ss") : "";
-                        secondValue = sv != null ? ((TimeOnly)sv).ToString("HH:mm:ss") : "";
-                    }
-                    else if (column.FilterPropertyType == typeof(Guid) || column.FilterPropertyType == typeof(Guid?))
-                    {
-                        value = $"{v}";
-                        secondValue = $"{sv}";
-                    }
-                    else if (PropertyAccess.IsDate(column.FilterPropertyType))
-                    {
-                        if (v != null)
-                        {
-
-                            value =
-                                v is DateTime ? ((DateTime)v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
-                                : v is DateTimeOffset ? ((DateTimeOffset)v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
-                                :
-#if NET6_0_OR_GREATER
-                                v is DateOnly ? ((DateOnly)v).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
-#else
-                                    "";
-#endif
-                        }
-                        if (sv != null)
-                        {
-                            secondValue =
-                                sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
-                                : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
-                                :
-#if NET6_0_OR_GREATER
-                                sv is DateOnly ? ((DateOnly)sv).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
-#else
-                            "";
-#endif
-                        }
-                    }
-                    else if (!(v != null && IsEnumerable(v.GetType())) && (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType)))
-                    {
-                        Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(column.FilterPropertyType) ?? column.FilterPropertyType);
-                        if (v != null)
-                        {
-                            value = Convert.ChangeType(v, enumType).ToString();
-                        }
-                        if (sv != null)
-                        {
-                            secondValue = Convert.ChangeType(sv, enumType).ToString();
-                        }
-                    }
+                    } 
                     else if (v != null && IsEnumerable(v.GetType()) || IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
                     {
                         var enumerableValue = ((IEnumerable)(v != null ? v : Enumerable.Empty<object>())).AsQueryable();
@@ -656,6 +606,56 @@ namespace Radzen
                                     whereList.Add($@"({property}).{(columnFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableValueAsString}).Any() {booleanOperator} ({property}).{(columnSecondFilterOperator == FilterOperator.NotIn ? "Except" : "Intersect")}({enumerableSecondValueAsString}).Any()");
                                 }
                             }
+                        }
+                    }
+                    else if (column.FilterPropertyType == typeof(TimeOnly) || column.FilterPropertyType == typeof(TimeOnly?))
+                    { 
+                        value = v != null ? ((TimeOnly)v).ToString("HH:mm:ss") : "";
+                        secondValue = sv != null ? ((TimeOnly)sv).ToString("HH:mm:ss") : "";
+                    }
+                    else if (column.FilterPropertyType == typeof(Guid) || column.FilterPropertyType == typeof(Guid?))
+                    {
+                        value = $"{v}";
+                        secondValue = $"{sv}";
+                    }
+                    else if (PropertyAccess.IsDate(column.FilterPropertyType))
+                    {
+                        if (v != null)
+                        {
+
+                            value =
+                                v is DateTime ? ((DateTime)v).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : v is DateTimeOffset ? ((DateTimeOffset)v).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                :
+#if NET6_0_OR_GREATER
+                                v is DateOnly ? ((DateOnly)v).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
+#else
+                                    "";
+#endif
+                        }
+                        if (sv != null)
+                        {
+                            secondValue =
+                                sv is DateTime ? ((DateTime)sv).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                : sv is DateTimeOffset ? ((DateTimeOffset)sv).UtcDateTime.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)
+                                :
+#if NET6_0_OR_GREATER
+                                sv is DateOnly ? ((DateOnly)sv).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) : "";
+#else
+                            "";
+#endif
+                        }
+                    }
+                    else if (!(v != null && IsEnumerable(v.GetType())) && (PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType)))
+                    {
+                        Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(column.FilterPropertyType) ?? column.FilterPropertyType);
+                        if (v != null)
+                        {
+                            value = Convert.ChangeType(v, enumType).ToString();
+                        }
+                        if (sv != null)
+                        {
+                            secondValue = Convert.ChangeType(sv, enumType).ToString();
                         }
                     }
                     else
