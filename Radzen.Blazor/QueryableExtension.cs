@@ -96,23 +96,12 @@ namespace Radzen
             return (IOrderedQueryable<T>)OrderBy((IQueryable)source, ordering);
         }
 
-        static string RemoveVariableReference(string expression)
-        {
-            // Regex pattern to match any variable reference in a lambda expression
-            string pattern = @"(\b\w+\b)\s*=>\s*\1\.(\w+)(\s*\?\?\s*\1\.\w+)?";
-
-            // Replace with just the property name, ignoring the variable reference
-            return Regex.Replace(expression, pattern, m => m.Groups[2].Value);
-        }
-
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
         /// <returns>A <see cref="IQueryable"/> whose elements are sorted according to the specified <paramref name="ordering"/>.</returns>
         public static IQueryable OrderBy(this IQueryable source, string ordering = null)
         {
-            ordering = RemoveVariableReference(ordering ?? "");
-
             var parameters = new ParameterExpression[] { Expression.Parameter(source.ElementType, "x") };
 
             Expression expression = source.Expression;

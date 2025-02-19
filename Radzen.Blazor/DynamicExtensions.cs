@@ -1,5 +1,6 @@
 ﻿using Radzen;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace System.Linq.Dynamic.Core
 {
@@ -68,7 +69,16 @@ namespace System.Linq.Dynamic.Core
             string selector,
             object[] parameters = null)
         {
-            return QueryableExtension.OrderBy(source, selector);
+            try
+            {
+                selector = selector.Contains("=>") ? RemoveVariableReference(selector) : selector;
+
+                return QueryableExtension.OrderBy(source, selector.Trim());
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Invalid selector: {selector}.", ex);
+            }
         }
 
         /// <summary>
@@ -103,6 +113,20 @@ namespace System.Linq.Dynamic.Core
             {
                 throw new InvalidOperationException($"Invalid selector: {selector}.", ex);
             }
+        }
+        static string RemoveVariableReference(string expression)
+        {
+            // Regex pattern to match any variable reference in a lambda expression
+            string pattern = @"^\s*\b\w+\b\s*=>\s*";  // Matches "it => " or similar
+
+            // Remove the variable reference from the start
+            expression = Regex.Replace(expression, pattern, "").Trim();
+
+            // Remove remaining instances of the variable reference prefix (e.g., "it.")
+            pattern = @"\b\w+\."; // Matches "it.", "x.", etc.
+            expression = Regex.Replace(expression, pattern, "");
+
+            return expression.Trim();
         }
     }
 }
