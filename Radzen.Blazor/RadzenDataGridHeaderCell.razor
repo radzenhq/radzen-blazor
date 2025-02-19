@@ -251,11 +251,11 @@ else
 
             if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
             {
-                query = query.SelectMany(property).Select(Column.FilterProperty).Distinct().OrderBy();
+                query = query.SelectMany(property).Select(Column.FilterProperty).Distinct().Cast<object>().OrderBy(i => i);
             }
             else
             {
-                query = query.Select(property).Distinct().OrderBy();
+                query = query.Select(property).Distinct().Cast<object>().OrderBy(i => i);
             }
 
             filterValuesCount = query.Cast<object>().Count();
