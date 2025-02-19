@@ -207,7 +207,7 @@ namespace Radzen.Blazor.Tests
         [Fact]
         public void Should_SupportNestedLambdasWithComplexMethod()
         {
-            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => new [] { (Status)1 }.Intersect(x.Status).Any()");
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => new [] { (Status)1 }.Intersect(it.Statuses).Any()", type => typeof(Status));
             var func = expression.Compile();
 
             Assert.True(func(new OrderDetail { Statuses = new List<Status>() { (Status)1 } }));

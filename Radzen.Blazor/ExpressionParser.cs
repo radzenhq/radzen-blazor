@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -208,7 +209,7 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
         return Expression.NewArrayInit(elementType, expressions);
     }
 
-    private Expression CallStaticMethod(Type type, string methodName, Expression[] arguments, Type[] argumentTypes)
+    private static MethodCallExpression CallStaticMethod(Type type, string methodName, Expression[] arguments, Type[] argumentTypes)
     {
         var methodInfo = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static, argumentTypes);
 
@@ -280,10 +281,17 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
 
                 if (methodInfo != null)
                 {
-                    var itemType = GetItemType(instanceType);
-                    var genericMethod = methodInfo.MakeGenericMethod(itemType);
+                    var argumentType = GetItemType(instanceType);
+                    var genericMethod = methodInfo.MakeGenericMethod(argumentType);
+                    var parameters = genericMethod.GetParameters();
+                    var argumentsWithInstance = new[] { instance }.Concat(arguments).ToArray();
 
-                    return Expression.Call(genericMethod, new[] { instance }.Concat(arguments.Select(a => ConvertIfNeeded(a, itemType))));
+                    if (parameters.Length != argumentsWithInstance.Length)
+                    {
+                        throw new NotSupportedException("Unsupported method call: " + methodCall.Name.Identifier.Text);
+                    }
+                    
+                    return Expression.Call(genericMethod, argumentsWithInstance.Select((a, index) => ConvertIfNeeded(a, parameters[index].ParameterType)));
                 }
             }
 
