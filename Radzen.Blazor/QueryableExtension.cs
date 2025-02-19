@@ -87,21 +87,39 @@ namespace Radzen
                 }).AsQueryable();
         }
 
+        internal static string RemoveVariableReference(string expression)
+        {
+            // Regex pattern to match any variable reference in a lambda expression
+            string pattern = @"^\s*\b\w+\b\s*=>\s*";  // Matches "it => " or similar
+
+            // Remove the variable reference from the start
+            expression = Regex.Replace(expression, pattern, "").Trim();
+
+            // Remove remaining instances of the variable reference prefix (e.g., "it.")
+            pattern = @"\b\w+\."; // Matches "it.", "x.", etc.
+            expression = Regex.Replace(expression, pattern, "");
+
+            return expression.Trim();
+        }
+
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
         /// <returns>A <see cref="IQueryable{T}"/> whose elements are sorted according to the specified <paramref name="ordering"/>.</returns>
-        public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string ordering = null)
+        public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string selector = null)
         {
-            return (IOrderedQueryable<T>)OrderBy((IQueryable)source, ordering);
+            selector = selector.Contains("=>") ? RemoveVariableReference(selector) : selector;
+            return (IOrderedQueryable<T>)OrderBy((IQueryable)source, selector);
         }
 
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
         /// <returns>A <see cref="IQueryable"/> whose elements are sorted according to the specified <paramref name="ordering"/>.</returns>
-        public static IQueryable OrderBy(this IQueryable source, string ordering = null)
+        public static IQueryable OrderBy(this IQueryable source, string selector = null)
         {
+            selector = selector.Contains("=>") ? RemoveVariableReference(selector) : selector;
+
             var parameters = new ParameterExpression[] { Expression.Parameter(source.ElementType, "x") };
 
             Expression expression = source.Expression;
@@ -109,7 +127,7 @@ namespace Radzen
             string methodAsc = "OrderBy";
             string methodDesc = "OrderByDescending";
 
-            foreach (var o in (ordering ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries))
+            foreach (var o in (selector ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 var nameAndOrder = o.Trim();
 
