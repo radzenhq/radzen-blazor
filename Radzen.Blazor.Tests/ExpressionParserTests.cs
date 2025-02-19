@@ -151,6 +151,15 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Should_SupportNullableCollection()
+        {
+            var expression = ExpressionParser.ParsePredicate<Person>("it => new bool?[]{ false }.Contains(it.Famous)");
+            var func = expression.Compile();
+
+            Assert.True(func(new Person { Famous = false }));
+        }
+
+        [Fact]
         public void Should_SupportEnumCollections()
         {
             var typeLocator = (string type) => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);

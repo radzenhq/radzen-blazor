@@ -2,7 +2,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -175,6 +174,7 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
             "decimal" => typeof(decimal),
             "string" => typeof(string),
             "char" => typeof(char),
+            "bool" => typeof(bool),
             _ => typeLocator?.Invoke(typeName)
         };
 
@@ -206,6 +206,20 @@ class ExpressionSyntaxVisitor<T> : CSharpSyntaxVisitor<Expression>
     {
         var expressions = node.Initializer.Expressions.Select(Visit).ToArray();
         var elementType = expressions.Length > 0 ? expressions[0].Type : typeof(object);
+        return Expression.NewArrayInit(elementType, expressions);
+    }
+
+    public override Expression VisitArrayCreationExpression(ArrayCreationExpressionSyntax node)
+    {
+        var elementType = GetType(node.Type.ElementType.ToString());
+
+        if (elementType == null)
+        {
+            throw new NotSupportedException("Unsupported array element type: " + node.Type.ElementType);
+        }
+
+        var expressions = node.Initializer.Expressions.Select(e => ConvertIfNeeded(Visit(e), elementType));
+
         return Expression.NewArrayInit(elementType, expressions);
     }
 
