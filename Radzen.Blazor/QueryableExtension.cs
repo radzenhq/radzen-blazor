@@ -105,7 +105,7 @@ namespace Radzen
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
-        /// <returns>A <see cref="IQueryable{T}"/> whose elements are sorted according to the specified <paramref name="ordering"/>.</returns>
+        /// <returns>A <see cref="IQueryable{T}"/> whose elements are sorted according to the specified <paramref name="selector"/>.</returns>
         public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string selector = null)
         {
             selector = selector.Contains("=>") ? RemoveVariableReference(selector) : selector;
@@ -115,7 +115,7 @@ namespace Radzen
         /// <summary>
         /// Sorts the elements of a sequence in ascending or descending order according to a key.
         /// </summary>
-        /// <returns>A <see cref="IQueryable"/> whose elements are sorted according to the specified <paramref name="ordering"/>.</returns>
+        /// <returns>A <see cref="IQueryable"/> whose elements are sorted according to the specified <paramref name="selector"/>.</returns>
         public static IQueryable OrderBy(this IQueryable source, string selector = null)
         {
             selector = selector.Contains("=>") ? RemoveVariableReference(selector) : selector;
