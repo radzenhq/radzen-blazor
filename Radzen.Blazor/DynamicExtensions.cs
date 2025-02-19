@@ -28,7 +28,8 @@ namespace System.Linq.Dynamic.Core
                         var value = object.Equals(parameters[i], string.Empty) ? @"""""" :
                             parameters[i] == null ? @"null" :
                                 parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}""" :
-                                    parameters[i] is bool ? $"{parameters[i]}".ToLower() : parameters[i];
+                                    parameters[i] is bool ? $"{parameters[i]}".ToLower() :
+                                        parameters[i] is Guid ? $"Guid.Parse(\"{parameters[i]}\")" : parameters[i];
 
                         predicate = predicate.Replace($"@{i}", $"{value}");
                     }
