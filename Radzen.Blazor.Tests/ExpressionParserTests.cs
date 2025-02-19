@@ -171,6 +171,15 @@ namespace Radzen.Blazor.Tests
             Assert.True(func(new OrderDetail { Product = new Product { ProductName = "Tofu" } }));
         }
 
+        [Fact]
+        public void Should_SupportNullableCollection()
+        {
+            var expression = ExpressionParser.ParsePredicate<Person>("it => new bool?[]{ false }.Contains(it.Famous)");
+            var func = expression.Compile();
+
+            Assert.True(func(new Person { Famous = false }));
+        }
+
         class WorkStatus
         {
             public string Name { get; set; }
