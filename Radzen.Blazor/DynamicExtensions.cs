@@ -25,11 +25,20 @@ namespace System.Linq.Dynamic.Core
                 {
                     for (var i = 0; i < parameters.Length; i++)
                     {
-                        var value = object.Equals(parameters[i], string.Empty) ? @"""""" :
-                            parameters[i] == null ? @"null" :
-                                parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}""" :
-                                    parameters[i] is bool ? $"{parameters[i]}".ToLower() :
-                                        parameters[i] is Guid ? $"Guid.Parse(\"{parameters[i]}\")" : parameters[i];
+                        object param = parameters[i];
+                        string value = param switch
+                        {
+                            string s when s == string.Empty => @"""""",
+                            null => "null",
+                            string s => @$"""{s.Replace("\"", "\\\"")}""",
+                            bool b => b.ToString().ToLower(),
+                            Guid g => $"Guid.Parse(\"{g}\")",
+                            DateTime dt => $"DateTime.Parse(\"{dt:yyyy-MM-ddTHH:mm:ss.fffZ}\")",
+                            DateTimeOffset dto => $"DateTime.Parse(\"{dto.UtcDateTime:yyyy-MM-ddTHH:mm:ss.fffZ}\")",
+                            DateOnly d => $"DateOnly.Parse(\"{d:yyy-MM-dd}\")",
+                            TimeOnly t => $"TimeOnly.Parse(\"{t:HH:mm:ss}\")",
+                            _ => param.ToString()
+                        };
 
                         predicate = predicate.Replace($"@{i}", $"{value}");
                     }
