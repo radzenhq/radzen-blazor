@@ -358,7 +358,25 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        async Task Update(bool sourceToTarget, IEnumerable<TItem> items)
+        /// <summary>
+        /// Returns a collection of TItem that are selected in the source list.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TItem> GetSelectedSources()
+        {
+            return Multiple ? (selectedSourceItems as IEnumerable)?.Cast<TItem>() : [(TItem)selectedSourceItems];
+        }
+
+        /// <summary>
+        /// Returns a collection of TItem that are selected in the target list.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<TItem> GetSelectedTargets()
+        {
+            return Multiple ? (selectedTargetItems as IEnumerable)?.Cast<TItem>() : [(TItem)selectedTargetItems];
+        }
+
+        private async Task Update(bool sourceToTarget, IEnumerable<TItem> items)
         {
             if (sourceToTarget)
             {
@@ -405,24 +423,12 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        async Task SourceToTarget()
-        {
-            await Update(true, null);
-        }
+        private async Task SourceToTarget() => await Update(true, null);
 
-        async Task SelectedSourceToTarget()
-        {
-            await Update(true, Multiple ? (selectedSourceItems as IEnumerable)?.Cast<TItem>() : new List<TItem>() { (TItem)selectedSourceItems } );
-        }
+        private async Task SelectedSourceToTarget() => await Update(true, GetSelectedSources());
 
-        async Task TargetToSource()
-        {
-            await Update(false, null);
-        }
+        private async Task TargetToSource() => await Update(false, null);
 
-        async Task SelectedTargetToSource()
-        {
-            await Update(false, Multiple ? (selectedTargetItems as IEnumerable)?.Cast<TItem>() : new List<TItem>() { (TItem)selectedTargetItems });
-        }
+        private async Task SelectedTargetToSource() => await Update(false, GetSelectedTargets());
     }
 }
