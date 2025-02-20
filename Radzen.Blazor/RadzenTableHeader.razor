@@ -1,0 +1,9 @@
+﻿@inherits RadzenComponentWithChildren
+@if (Visible)
+{
+    <thead @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <CascadingValue Value=this>
+            @ChildContent
+        </CascadingValue>
+    </thead>
+}

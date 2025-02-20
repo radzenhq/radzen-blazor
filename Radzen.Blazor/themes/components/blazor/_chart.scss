@@ -144,10 +144,6 @@ $chart-color-schemes: (
   }
 }
 
-.rz-category-axis .rz-tick-text {
-  text-anchor: middle;
-}
-
 .rz-axis .rz-axis-title {
   stroke: none;
   text-anchor: middle;
@@ -234,10 +230,16 @@ $chart-color-schemes: (
 
 .rz-chart-tooltip {
   position: absolute;
-  transform: translate(-50%, -100%);
-  transition: top 0.2s, left 0.2s;
   top: 0;
   left: 0;
+}
+
+.rz-top-chart-tooltip  {
+  transform: translate(-50%, -100%);
+}
+
+.rz-bottom-chart-tooltip {
+  transform: translate(-50%, 0);
 }
 
 .rz-chart-tooltip-content {
@@ -253,19 +255,43 @@ $chart-color-schemes: (
 .rz-chart-tooltip {
   &:not(.rz-pie-tooltip) {
     .rz-chart-tooltip-content {
-      margin-bottom: 15px;
       &:after {
         content: ' ';
         position: absolute;
         width: 8px;
         height: 8px;
-        left: 50%;
-        bottom: 0;
         background-color: inherit;
         transform-origin: center;
+      }
+    }
+  }
+}
+
+.rz-top-chart-tooltip {
+  &:not(.rz-pie-tooltip) {
+    .rz-chart-tooltip-content {
+      margin-bottom: 15px;
+      &:after {
+        left: 50%;
+        bottom: 0;
         transform: translate(-50%, -11px) rotate(45deg);
         border-bottom: inherit;
         border-right: inherit;
+      }
+    }
+  }
+}
+
+.rz-bottom-chart-tooltip {
+  &:not(.rz-pie-tooltip) {
+    .rz-chart-tooltip-content {
+      margin-top: 15px;
+      &:after {
+        left: 50%;
+        top: 0;
+        transform: translate(-50%, 11px) rotate(45deg);
+        border-top: inherit;
+        border-left: inherit;
       }
     }
   }
@@ -299,8 +325,8 @@ $chart-color-schemes: (
     justify-content: space-between;
     gap: 1rem;
     padding: 0.125rem 0.5rem;
-    border-radius: var(  --rz-chart-tooltip-item-border-radius);
-  
+    border-radius: var(--rz-chart-tooltip-item-border-radius);
+
     &:hover {
       background-color: var(--rz-chart-tooltip-item-hover-background-color);
     }

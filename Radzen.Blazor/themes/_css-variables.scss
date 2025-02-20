@@ -155,6 +155,28 @@
   --rz-card-border-radius: #{$card-border-radius};
   --rz-card-heading-margin-bottom: #{$card-heading-margin-bottom};
 
+  /* Carousel */
+  --rz-carousel-pager-button-width: #{$rz-carousel-pager-button-width};
+  --rz-carousel-pager-button-height: #{$rz-carousel-pager-button-height};
+  --rz-carousel-pager-button-border: #{$rz-carousel-pager-button-border};
+  --rz-carousel-pager-button-border-radius: #{$rz-carousel-pager-button-border-radius};
+  --rz-carousel-pager-button-background-color: #{$rz-carousel-pager-button-background-color};
+  --rz-carousel-pager-button-color: #{$rz-carousel-pager-button-color};
+  --rz-carousel-pager-button-hover-border: #{$rz-carousel-pager-button-hover-border};
+  --rz-carousel-pager-button-hover-background-color: #{$rz-carousel-pager-button-hover-background-color};
+  --rz-carousel-pager-button-hover-color: #{$rz-carousel-pager-button-hover-color};
+  --rz-carousel-pager-button-active-width: #{$rz-carousel-pager-button-active-width};
+  --rz-carousel-pager-button-active-height: #{$rz-carousel-pager-button-active-height};
+  --rz-carousel-pager-button-active-border: #{$rz-carousel-pager-button-active-border};
+  --rz-carousel-pager-button-active-background-color: #{$rz-carousel-pager-button-active-background-color};
+  --rz-carousel-pager-button-active-color: #{$rz-carousel-pager-button-active-color};
+  --rz-carousel-pager-overlay-opacity: #{$rz-carousel-pager-overlay-opacity};
+  --rz-carousel-pager-gap: #{$rz-carousel-pager-gap};
+  --rz-carousel-pager-height: #{$rz-carousel-pager-height};
+  --rz-carousel-prev-next-button-border-radius: #{$rz-carousel-prev-next-button-border-radius};
+  --rz-carousel-prev-next-button-inset: #{$rz-carousel-prev-next-button-inset};
+  --rz-carousel-border-radius: #{$rz-carousel-border-radius};
+
   /* Chart */
   --rz-chart-axis-color: #{$chart-axis-color};
   --rz-chart-axis-label-color: #{$chart-axis-label-color};

@@ -1,0 +1,18 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
+    <RadzenSelectBar Orientation="Orientation.Horizontal" @bind-Value=@value TValue="bool">
+        <Items>
+            <RadzenSelectBarItem Text="On" Value="true" />
+            <RadzenSelectBarItem Text="Off" Value="false" />
+        </Items>
+    </RadzenSelectBar>
+    <RadzenSelectBar Orientation="Orientation.Vertical" @bind-Value=@value TValue="bool">
+        <Items>
+            <RadzenSelectBarItem Text="On" Value="true" />
+            <RadzenSelectBarItem Text="Off" Value="false" />
+        </Items>
+    </RadzenSelectBar>
+</RadzenStack>
+
+@code {
+    bool value;
+}

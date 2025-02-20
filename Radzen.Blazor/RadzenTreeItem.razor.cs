@@ -23,10 +23,17 @@ namespace Radzen.Blazor
 
         ClassList ContentClassList => ClassList.Create("rz-treenode-content")
                                                .Add("rz-treenode-content-selected", selected)
-                                               .Add("rz-state-focused", Tree.IsFocused(this));
-        ClassList IconClassList => ClassList.Create("rz-tree-toggler rzi")
+                                               .Add("rz-state-focused", Tree.IsFocused(this))
+                                               .Add(Tree.ItemContentCssClass)
+                                               .Add(ContentCssClass);
+        ClassList IconClassList => ClassList.Create("notranslate rz-tree-toggler rzi")
                                                .Add("rzi-caret-down", clientExpanded)
-                                               .Add("rzi-caret-right", !clientExpanded);
+                                               .Add("rzi-caret-right", !clientExpanded)
+                                               .Add(Tree.ItemIconCssClass)
+                                               .Add(IconCssClass);
+        private ClassList LabelClassList => ClassList.Create("rz-treenode-label")
+                                               .Add(Tree.ItemLabelCssClass)
+                                               .Add(LabelCssClass);
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
@@ -98,6 +105,24 @@ namespace Radzen.Blazor
         [Parameter]
         public IEnumerable Data { get; set; }
 
+        /// <summary>
+        /// Gets or sets the CSS classes added to the content.
+        /// </summary>
+        [Parameter]
+        public string ContentCssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the icon.
+        /// </summary>
+        [Parameter]
+        public string IconCssClass { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS classes added to the label.
+        /// </summary>
+        [Parameter]
+        public string LabelCssClass { get; set; }
+
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
         internal void AddItem(RadzenTreeItem item)
@@ -130,9 +155,9 @@ namespace Radzen.Blazor
         }
 
         bool clientExpanded;
-        internal async Task Toggle()
+        async Task Toggle()
         {
-            if (expanded)
+            if (expanded && !Tree.SingleExpand)
             {
                 clientExpanded = !clientExpanded;
 
@@ -142,19 +167,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    if (items.Count > 0)
-                    {
-                        Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
-                    }
-
-                    if (Tree != null)
-                    {
-                        await Tree.Collapse.InvokeAsync(new TreeEventArgs()
-                        {
-                            Text = Text,
-                            Value = Value
-                        });
-                    }
+                    await Collapse();
                 }
 
                 return;
@@ -180,19 +193,36 @@ namespace Radzen.Blazor
             }
             else
             {
-                if (items.Count > 0)
-                {
-                    Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
-                }
+                await Collapse();
+            }
+        }
 
-                if (Tree != null)
+        async Task Collapse()
+        {
+            expanded = false;
+            clientExpanded = false;
+
+            if (items.Count > 0)
+            {
+                Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
+
+                if (ParentItem != null)
                 {
-                    await Tree.Collapse.InvokeAsync(new TreeEventArgs()
-                    {
-                        Text = Text,
-                        Value = Value
-                    });
+                    ParentItem.items = Tree.CurrentItems;
                 }
+                else if (Tree != null)
+                {
+                    Tree.items = Tree.CurrentItems;
+                }
+            }
+
+            if (Tree != null)
+            {
+                await Tree.Collapse.InvokeAsync(new TreeEventArgs()
+                {
+                    Text = Text,
+                    Value = Value
+                });
             }
         }
 
@@ -204,15 +234,14 @@ namespace Radzen.Blazor
 
                 if (Tree.SingleExpand)
                 {
-                    var siblings = ParentItem?.items ?? Tree.items;
+                    var siblings = (ParentItem?.items ?? Tree.items).Where(s => s != this && s.expanded).ToList();
 
                     foreach (var sibling in siblings)
                     {
-                        if (sibling != this && sibling.expanded)
-                        {
-                            await sibling.Toggle();
-                        }
+                        await sibling.Collapse();
                     }
+
+                    await Tree.ChangeState();
                 }
             }
         }

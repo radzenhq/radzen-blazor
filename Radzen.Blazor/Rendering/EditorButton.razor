@@ -1,13 +1,13 @@
 @if (PreventBlur)
 {
 <button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled || !EnabledModes.HasFlag(Editor.GetMode())) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@GetTitle()>
-    <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+    <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
 </button>
 }
 else
 {
 <button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled || !EnabledModes.HasFlag(Editor.GetMode())) title=@GetTitle()>
-    <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+    <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
 </button>
 }
 @code {

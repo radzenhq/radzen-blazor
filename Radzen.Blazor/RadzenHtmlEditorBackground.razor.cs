@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
@@ -24,7 +25,7 @@ namespace Radzen.Blazor
         /// Specifies the default background color. Set to <c>"rgb(0, 0, 255)"</c> by default;
         /// </summary>
         [Parameter]
-        public string Value { get; set; } = "rgb(0, 0, 255)";
+        public override string Value { get; set; } = "rgb(0, 0, 255)";
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool. Set to <c>"Background color"</c> by default.
         /// </summary>

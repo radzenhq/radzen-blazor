@@ -3,10 +3,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data.Common;
-using System.Globalization;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -117,6 +114,13 @@ namespace Radzen.Blazor
         /// <value>The property name.</value>
         [Parameter]
         public string Property { get; set; }
+
+        /// <summary>
+        /// Gets or sets the filter property name.
+        /// </summary>
+        /// <value>The filter property name.</value>
+        [Parameter]
+        public string FilterProperty { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this property is selected in the filter.
@@ -340,10 +344,16 @@ namespace Radzen.Blazor
         {
             switch (filterOperator)
             {
+                case FilterOperator.Custom:
+                    return DataFilter?.CustomText;
                 case FilterOperator.Contains:
                     return DataFilter?.ContainsText;
                 case FilterOperator.DoesNotContain:
                     return DataFilter?.DoesNotContainText;
+                case FilterOperator.In:
+                    return DataFilter?.InText;
+                case FilterOperator.NotIn:
+                    return DataFilter?.NotInText;
                 case FilterOperator.EndsWith:
                     return DataFilter?.EndsWithText;
                 case FilterOperator.Equals:

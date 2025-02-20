@@ -31,14 +31,14 @@
                     Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
             </FilterTemplate>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Title="Customers" Property="Orders" FilterProperty="Customer/CustomerID" Sortable=false
+        <RadzenDataGridColumn Title="Customers" Property="NorthwindOrders" FilterProperty="Customer/CustomerID" Sortable=false
                                   Type="typeof(IEnumerable<Customer>)" FilterValue="@selectedCustomers" FilterOperator="FilterOperator.In">
             <FilterTemplate>
                 <RadzenDropDown @bind-Value=@selectedCustomers Style="width:100%" TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select company" }})"
                     Change=@OnSelectedCustomersChange Data="@(customers)" AllowSelectAll="false" Multiple="true" MaxSelectedLabels="2" />
             </FilterTemplate>
             <Template>
-                    @(string.Join(',', context.Orders != null ? context.Orders.Select(i => i.Customer.CompanyName) : Enumerable.Empty<string>()))
+                @(string.Join(',', context.NorthwindOrders != null ? context.NorthwindOrders.Select(i => i.Customer?.CompanyName) : Enumerable.Empty<string>()))
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" />

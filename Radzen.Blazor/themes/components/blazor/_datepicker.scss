@@ -61,6 +61,11 @@ $timepicker-border: none !default;
 .rz-datepicker {
   display: inline-block;
   position: relative;
+  border-radius: var(--rz-input-border-radius);
+
+  &:has(>.rz-inputtext:not(:disabled):not(.rz-state-disabled):focus) {
+    outline: none; // unify .invalid styles with other forms components
+  }
 
   .rz-readonly {
       cursor: pointer;
@@ -70,6 +75,9 @@ $timepicker-border: none !default;
     @extend %input;
     width: 100%;
     line-height: var(--rz-datepicker-line-height);
+  }
+
+  &:has(.rz-datepicker-trigger) > .rz-inputtext {
     padding-inline-end: calc(1rem + var(--rz-datepicker-trigger-icon-width));
   }
 

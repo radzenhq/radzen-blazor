@@ -1,0 +1,59 @@
+﻿<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Allow paging
+                <RadzenSwitch @bind-Value="@allowPaging" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "allow paging" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Pager Overlay
+                <RadzenSwitch @bind-Value="@pagerOverlay" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "pager overlay" }})" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Pager Position
+                <RadzenSelectBar @bind-Value="@pagerPosition" TextProperty="Text" ValueProperty="Value" 
+                        Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-none rz-display-xl-flex" />
+                <RadzenDropDown @bind-Value="@pagerPosition" TextProperty="Text" Name="PagerPosition" ValueProperty="Value"
+                                Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" class="rz-display-flex rz-display-xl-none" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenCarousel @ref=carousel @bind-SelectedIndex="@selectedIndex" Auto="false" AllowPaging="@allowPaging"
+        Style="height: 400px;" PagerPosition="@pagerPosition" PagerOverlay="@pagerOverlay">
+        <Items>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/2.jpg" class="rz-w-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/1.jpg" class="rz-w-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/3.jpg" class="rz-w-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/4.jpg" class="rz-w-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/5.jpg" class="rz-w-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/6.jpg" class="rz-w-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/7.jpg" class="rz-w-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/8.jpg" class="rz-w-100" />
+            </RadzenCarouselItem>
+        </Items>
+    </RadzenCarousel>
+</RadzenStack>
+
+@code {
+    RadzenCarousel carousel;
+    bool allowPaging = true;
+    bool pagerOverlay = true;
+    PagerPosition pagerPosition = PagerPosition.Bottom;
+
+    int selectedIndex;
+}

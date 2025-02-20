@@ -4,9 +4,29 @@
     DataGrid <strong>Column Picker</strong>
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Enable column picker by setting the AllowColumnPicking property to true.
+    Enable default column picker by setting the <strong>AllowColumnPicking</strong> grid property to true.
+    You can disable picking for specific columns by setting their <strong>Pickable</strong> property to false.
+    The example below also sets <strong>ColumnsPickerAllowFiltering</strong> on the grid to make picking columns easier.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Documentation:
+    <a href="https://blazor.radzen.com/docs/api/Radzen.Blazor.RadzenDataGrid-1.html">grid</a>,
+    <a href="https://blazor.radzen.com/docs/api/Radzen.Blazor.RadzenDataGridColumn-1.html">column</a>.
 </RadzenText>
 
 <RadzenExample ComponentName="DataGrid" Example="DataGridColumnPicking">
     <DataGridColumnPicking />
+</RadzenExample>
+
+<RadzenText TextStyle="TextStyle.H3" TagName="TagName.H2" class="rz-pt-8">
+    Picking columns with <strong>Context Menu</strong>
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    You could also create your own custom column picker using the context menu.
+    In this case you will have to track column visibility yourself.
+</RadzenText>
+
+<RadzenExample ComponentName="DataGrid" Example="DataGridColumnPickingContextMenu">
+    <DataGridColumnPickingContextMenu />
 </RadzenExample>

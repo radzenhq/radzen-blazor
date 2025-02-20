@@ -27,8 +27,8 @@
                         <div class="rz-helper-hidden-accessible">
                             <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox" aria-label="@SelectAllText" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
                         </div>
-                        <div class="@(IsAllSelected() ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box")">
-                            <span class="@(IsAllSelected() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>
+                        <div class="@(IsAllSelected() ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box")">
+                            <span class="@(IsAllSelected() ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
                         </div>
                     </div>
                     }
@@ -41,7 +41,7 @@
                 {
                     <div class="rz-listbox-filter-container">
                         @RenderFilter()
-                        <span class="rz-listbox-filter-icon rzi rzi-search"></span>
+                        <span class="notranslate rz-listbox-filter-icon rzi rzi-search"></span>
                     </div>
                 }
             </div>

@@ -47,7 +47,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Icon, icon));
 
-            Assert.Contains(@$"<i class=""rzi"">{icon}</i>", component.Markup);
+            Assert.Contains(@$"<i class=""notranslate rzi"">{icon}</i>", component.Markup);
         }
 
         [Fact]
@@ -76,6 +76,20 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Target, target));
 
             Assert.Contains(@$"target=""{target}""", component.Markup);
+        }
+
+        [Fact]
+        public void Link_Renders_DisabledParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenLink>();
+
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Disabled, true));
+
+            Assert.Contains("class=\"rz-link rz-link-disabled active\"", component.Markup);
+
+            Assert.DoesNotContain("href=", component.Markup);
         }
 
         [Fact]

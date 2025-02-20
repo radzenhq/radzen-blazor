@@ -30,10 +30,10 @@ namespace Radzen.Blazor
     ///   }
     /// </code>
     /// </example>
-    public partial class RadzenSeriesAnnotation<TItem> : RadzenChartComponentBase, IChartSeriesOverlay
+    public partial class RadzenSeriesAnnotation<TItem> : RadzenChartComponentBase, IChartSeriesOverlay, IDisposable
     {
         /// <summary>
-        /// The data item from the series this annotation applies to. 
+        /// The data item from the series this annotation applies to.
         /// </summary>
         [Parameter]
         public TItem Data { get; set; }
@@ -51,6 +51,10 @@ namespace Radzen.Blazor
         /// <summary> Vertical offset from the default position. </summary>
         [Parameter]
         public double OffsetY { get; set; }
+
+        /// <summary> The color of the annotation text. </summary>
+        [Parameter]
+        public string Fill { get; set; }
 
         /// <summary> Determines whether the annotation is visible. Set to <c>true</c> by default.</summary>
         [Parameter]
@@ -126,13 +130,14 @@ namespace Radzen.Blazor
                     break;
             }
 
-            return builder => 
+            return builder =>
             {
                 builder.OpenElement(0, "g");
                 builder.OpenComponent<Text>(1);
-                builder.AddAttribute(2, "Value", Text);
-                builder.AddAttribute(3, "Position", new Point{ X = x, Y = y });
-                builder.AddAttribute(4, "TextAnchor", textAnchor);
+                builder.AddAttribute(2, nameof(Rendering.Text.Value), Text);
+                builder.AddAttribute(3, nameof(Rendering.Text.Position), new Point{ X = x, Y = y });
+                builder.AddAttribute(4, nameof(Rendering.Text.TextAnchor), textAnchor);
+                builder.AddAttribute(5, nameof(Rendering.Text.Fill), Fill);
                 builder.SetKey($"{Text}-{Chart.Series.IndexOf(series)}");
                 builder.CloseComponent();
                 builder.CloseElement();
@@ -152,9 +157,18 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc/>
-        public RenderFragment RenderTooltip(double mouseX, double mouseY, double marginLeft, double marginTop)
+        public RenderFragment RenderTooltip(double mouseX, double mouseY)
         {
             return null;
         }
+
+        /// <inheritdoc />
+        public Point GetTooltipPosition(double mouseX, double mouseY)
+        {
+            return new Point { X = mouseX, Y = mouseY };
+        }
+
+        /// <inheritdoc/>
+        public void Dispose() => series?.Overlays.Remove(this);
     }
 }

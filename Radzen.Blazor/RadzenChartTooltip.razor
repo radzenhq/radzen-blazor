@@ -1,0 +1,184 @@
+@implements IAsyncDisposable
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+@foreach (var tooltip in tooltips)
+{
+    <div id="@UniqueID"
+         style="display: none; top: 0; left: 0; z-index: 1001; position: absolute;"
+         class="@($"rz-scheme-{tooltip.Options.ColorScheme.ToString().ToLowerInvariant()}")">
+        @tooltip.Options.ChildContent(Service)
+    </div>
+}
+
+@code {
+    public string UniqueID { get; set; }
+
+    [Inject] private TooltipService Service { get; set; }
+
+    List<ChartTooltip> tooltips = new List<ChartTooltip>();
+
+    async Task Open(ElementReference chart, double x, double y, ChartTooltipOptions options)
+    {
+        tooltips.Clear();
+        tooltips.Add(new ChartTooltip { Options = options, Chart = chart, X = x, Y = y });
+
+        await InvokeAsync(StateHasChanged);
+
+        var tooltip = tooltips.LastOrDefault();
+
+        if (tooltip != null)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.openChartTooltip",
+                tooltip.Chart,
+                x,
+                y,
+                UniqueID);
+        }
+    }
+
+    bool IsJSRuntimeAvailable { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        IsJSRuntimeAvailable = true;
+
+        var tooltip = tooltips.LastOrDefault();
+
+        if (tooltip != null)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.openChartTooltip",
+                tooltip.Chart,
+                tooltip.X,
+                tooltip.Y,
+                UniqueID,
+                Reference,
+                "RadzenChartTooltip.CloseTooltip");
+        }
+    }
+
+    private DotNetObjectReference<RadzenChartTooltip> reference;
+
+    /// <summary>
+    /// Gets the reference for the current component.
+    /// </summary>
+    /// <value>The reference.</value>
+    protected DotNetObjectReference<RadzenChartTooltip> Reference
+    {
+        get
+        {
+            if (reference == null)
+            {
+                reference = DotNetObjectReference.Create(this);
+            }
+
+            return reference;
+        }
+    }
+
+    /// <summary>
+    /// Closes this instance.
+    /// </summary>
+    [JSInvokable("RadzenChartTooltip.CloseTooltip")]
+    public void CloseTooltip()
+    {
+        Service.Close();
+    }
+
+    public async Task Close()
+    {
+        var lastTooltip = tooltips.LastOrDefault();
+        if (lastTooltip != null)
+        {
+            if (IsJSRuntimeAvailable)
+            {
+                try
+                {
+                    tooltips.Remove(lastTooltip);
+                    await JSRuntime.InvokeVoidAsync("Radzen.closeTooltip", UniqueID);
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        while (tooltips.Count != 0)
+        {
+            await Close();
+        }
+        reference?.Dispose();
+        reference = null;
+
+        if (IsJSRuntimeAvailable)
+        {
+            try
+            {
+               await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", UniqueID);
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        Service.OnOpenChartTooltip -= OnOpen;
+        Service.OnClose -= OnClose;
+        Service.OnNavigate -= OnNavigate;
+    }
+
+    protected override void OnInitialized()
+    {
+        UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
+
+        Service.OnOpenChartTooltip += OnOpen;
+        Service.OnClose += OnClose;
+        Service.OnNavigate += OnNavigate;
+    }
+
+    void OnOpen(ElementReference element, double x, double y, ChartTooltipOptions options)
+    {
+        Open(element, x, y, options).ConfigureAwait(false);
+    }
+
+    void OnClose()
+    {
+        Close().ConfigureAwait(false);
+    }
+
+    void OnNavigate()
+    {
+        JSRuntime.InvokeVoidAsync("Radzen.closePopup", UniqueID);
+    }
+
+    private sealed class ChartTooltip
+    {
+        /// <summary>
+        /// Gets or sets the owning chart.
+        /// </summary>
+        /// <value>The chart.</value>
+        public ElementReference Chart { get; set; }
+        /// <summary>
+        /// Gets or sets the horizontal position of the tooltip.
+        /// </summary>
+        /// <value>The position.</value>
+        public double X { get; set; }
+        /// <summary>
+        /// Gets or sets the vertical position of the tooltip.
+        /// </summary>
+        /// <value>The position.</value>
+        public double Y { get; set; }
+        /// <summary>
+        /// Gets or sets the options.
+        /// </summary>
+        /// <value>The options.</value>
+        public ChartTooltipOptions Options { get; set; }
+    }
+}

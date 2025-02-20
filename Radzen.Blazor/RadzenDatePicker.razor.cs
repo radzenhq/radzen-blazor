@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -316,6 +315,12 @@ namespace Radzen.Blazor
         /// <value>The input CSS class.</value>
         [Parameter]
         public string InputClass { get; set; }
+        /// <summary>
+        /// Gets or sets the button CSS class.
+        /// </summary>
+        /// <value>The button CSS class.</value>
+        [Parameter]
+        public string ButtonClass { get; set; }
 
         /// <summary>
         /// Gets or sets the Minimum Selectable Date.
@@ -697,7 +702,7 @@ namespace Radzen.Blazor
 
         private string ButtonClasses
         {
-            get => $"rz-button-icon-left rzi rzi-{(TimeOnly ? "time" : "calendar")}";
+            get => $"notranslate rz-button-icon-left rzi rzi-{(TimeOnly ? "time" : "calendar")}";
         }
 
         /// <summary>
@@ -743,6 +748,12 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool Disabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the FormFieldContext of the component
+        /// </summary>
+        [CascadingParameter]
+        public IFormFieldContext FormFieldContext { get; set; } = null;
 
         /// <summary>
         /// Gets or sets a value indicating whether days part is shown.
@@ -911,6 +922,9 @@ namespace Radzen.Blazor
             return $"{(Inline ? "overflow:auto;" : "")}{(Style != null ? Style : "")}";
         }
 
+        /// <summary> Gets the current placeholder. Returns empty string if this component is inside a RadzenFormField.</summary>
+        protected string CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
+
         /// <summary>
         /// Closes this instance popup.
         /// </summary>
@@ -971,10 +985,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return ClassList.Create()
+            return ClassList.Create("rz-datepicker")
                             .Add("rz-datepicker-inline", Inline)
+                            .AddDisabled(Disabled)
+                            .Add("rz-state-empty", !HasValue)
                             .Add(FieldIdentifier, EditContext)
                             .ToString();
+
         }
 
         private async Task SetDay(DateTime newValue)
@@ -1051,7 +1068,14 @@ namespace Radzen.Blazor
                 shouldClose = !visible;
             }
 
+            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
+
             await base.SetParametersAsync(parameters);
+
+            if (disabledChanged)
+            {
+                FormFieldContext?.DisabledChanged(Disabled);
+            }
 
             if (shouldClose && !firstRender && IsJSRuntimeAvailable)
             {
@@ -1143,14 +1167,20 @@ namespace Radzen.Blazor
 
         string GetDayCssClass(DateTime date, DateRenderEventArgs dateArgs, bool forCell = true)
         {
-            return ClassList.Create()
+            var list = ClassList.Create()
                                .Add("rz-state-default", !forCell)
                                .Add("rz-calendar-other-month", CurrentDate.Month != date.Month)
                                .Add("rz-state-active", !forCell && DateTimeValue.HasValue && DateTimeValue.Value.Date.CompareTo(date.Date) == 0)
                                .Add("rz-calendar-today", !forCell && DateTime.Now.Date.CompareTo(date.Date) == 0)
                                .Add("rz-state-focused", !forCell && FocusedDate.Date.CompareTo(date.Date) == 0)
-                               .Add("rz-state-disabled", !forCell && dateArgs.Disabled)
-                               .ToString();
+                               .Add("rz-state-disabled", !forCell && dateArgs.Disabled);
+
+            if (dateArgs.Attributes != null && dateArgs.Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
+            {
+                list.Add($"{@class}", true);
+            }
+
+            return list.ToString();
         }
         async Task OnCalendarKeyPress(KeyboardEventArgs args)
         {
@@ -1174,10 +1204,13 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                await SetDay(FocusedDate);
+                if (!DateAttributes(FocusedDate).Disabled)
+                {
+                    await SetDay(FocusedDate);
 
-                await ClosePopup();
-                await FocusAsync();
+                    await ClosePopup();
+                    await FocusAsync();
+                }
             }
             else if (key == "Escape")
             {
@@ -1250,6 +1283,8 @@ namespace Radzen.Blazor
 
         internal async Task TogglePopup()
         {
+            if (Inline) return;
+
             if (PopupRenderMode == PopupRenderMode.Initial)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, false, null, null, true, true);
@@ -1262,6 +1297,8 @@ namespace Radzen.Blazor
 
         async Task ClosePopup()
         {
+            if (Inline) return;
+
             if (PopupRenderMode == PopupRenderMode.Initial)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);

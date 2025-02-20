@@ -43,7 +43,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's first page button's title attribute.
         /// </summary>
         [Parameter]
-        public string FirstPageTitle { get; set; } = "First page.";
+        public string FirstPageTitle { get; set; } = "First page";
 
         /// <summary>
         /// Gets or sets the pager's first page button's aria-label attribute.
@@ -335,6 +335,60 @@ namespace Radzen.Blazor
                 skip = page * PageSize;
                 await InvokeAsync(Reload);
                 await PageChanged.InvokeAsync(new PagerEventArgs() { Skip = skip, Top = PageSize, PageIndex = CurrentPage });
+            }
+        }
+
+        async Task OnFirstPageClick()
+        {
+            focusedIndex = -2;
+
+            await FirstPage();
+
+            if (skip == 0)
+            {
+                focusedIndex = focusedIndex + 2;
+            }
+        }
+
+        async Task OnPrevPageClick()
+        {
+            focusedIndex = -1;
+
+            await PrevPage();
+
+            if (skip == 0)
+            {
+                focusedIndex++;
+            }
+        }
+
+        async Task OnPageClick(int i, int startPage)
+        {
+            focusedIndex = i - startPage;
+            await GoToPage(i);
+        }
+
+        async Task OnNextPageClick(int endPage)
+        {
+            focusedIndex = Math.Min(endPage + 1, PageNumbersCount);
+
+            await NextPage();
+
+            if (CurrentPage == numberOfPages - 1)
+            {
+                focusedIndex--;
+            }
+        }
+
+        async Task OnLastPageClick(int endPage)
+        {
+            focusedIndex = Math.Min(endPage + 1, PageNumbersCount) + 1;
+
+            await LastPage();
+
+            if (CurrentPage == numberOfPages - 1)
+            {
+                focusedIndex = focusedIndex - 2;
             }
         }
 

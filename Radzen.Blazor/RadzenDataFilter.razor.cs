@@ -228,6 +228,20 @@ namespace Radzen.Blazor
         public string DoesNotContainText { get; set; } = "Does not contain";
 
         /// <summary>
+        /// Gets or sets the in operator text.
+        /// </summary>
+        /// <value>The in operator text.</value>
+        [Parameter]
+        public string InText { get; set; } = "In";
+
+        /// <summary>
+        /// Gets or sets the not in operator text.
+        /// </summary>
+        /// <value>The not in operator text.</value>
+        [Parameter]
+        public string NotInText { get; set; } = "Not in";
+
+        /// <summary>
         /// Gets or sets the starts with text.
         /// </summary>
         /// <value>The starts with text.</value>
@@ -261,6 +275,13 @@ namespace Radzen.Blazor
         /// <value>The not empty text.</value>
         [Parameter]
         public string IsNotEmptyText { get; set; } = "Is not empty";
+
+        /// <summary>
+        /// Gets or sets the custom filter operator text.
+        /// </summary>
+        /// <value>The custom filter operator text.</value>
+        [Parameter]
+        public string CustomText { get; set; } = "Custom";
 
         /// <summary>
         /// Gets or sets a value indicating whether the columns can be filtered.

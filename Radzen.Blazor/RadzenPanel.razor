@@ -8,7 +8,7 @@
                 <div>
                     @if (!string.IsNullOrEmpty(Icon))
                     {
-                        <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+                        <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Text))
                     {
@@ -23,7 +23,7 @@
                    @onclick:preventDefault="true" role="button" aria-controls="rz-panel-0-content"
                    aria-expanded="@(collapsed ? "false" : "true")" aria-label="@(collapsed ? ExpandAriaLabel : CollapseAriaLabel)" title="@(collapsed ? ExpandTitle : CollapseTitle)"
                    tabindex="0" @onkeypress="@(args => OnKeyPress(args, Toggle(new MouseEventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
-                    <span class="rzi @(collapsed ? "rzi-plus" : "rzi-minus")"></span>
+                    <span class="notranslate rzi @(collapsed ? "rzi-plus" : "rzi-minus")"></span>
                 </a>
             }
         </div>

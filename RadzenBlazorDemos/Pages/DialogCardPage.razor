@@ -37,32 +37,33 @@
         <RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}")/>
     </RadzenStack>
     <RadzenDataGrid AllowFiltering="true" AllowPaging="true" AllowSorting="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                Data="@(orderDetails.Where(o => o.OrderID == OrderID))" ColumnWidth="200px" Density="Density.Compact" AllowAlternatingRows="false">
+                Data="@(orderDetails)" ColumnWidth="200px" Density="Density.Compact" AllowAlternatingRows="false">
         <Columns>
             <RadzenDataGridColumn Property="@nameof(OrderDetail.Quantity)" Title="Quantity" />
-            <RadzenDataGridColumn Property="Order.OrderDate" Title="Order Date" />
+            <RadzenDataGridColumn Property="Order.OrderDate" Title="Order Date" FormatString="{0:d}" />
             <RadzenDataGridColumn Property="@nameof(OrderDetail.Discount)" Title="Discount" FormatString="{0:P}" />
         </Columns>
     </RadzenDataGrid>
     </RadzenStack>
-    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
+    <RadzenStack Visible="@ShowClose" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
         <RadzenButton Click="@((args) => dialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px" />
     </RadzenStack>
 </RadzenStack>
 @code {
     [Parameter] public int OrderID { get; set; }
+    [Parameter] public bool ShowClose { get; set; } = true;
 
     Order order;
     IEnumerable<OrderDetail> orderDetails;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        await base.OnInitializedAsync();
+        await base.OnParametersSetAsync();
 
         order = dbContext.Orders.Where(o => o.OrderID == OrderID)
                           .Include("Customer")
                           .Include("Employee").FirstOrDefault();
 
-        orderDetails = dbContext.OrderDetails.Include("Order").ToList();
+        orderDetails = dbContext.OrderDetails.Where(o => o.OrderID == OrderID).Include("Order").ToList();
     }
 }

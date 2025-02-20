@@ -1,0 +1,11 @@
+﻿@inherits RadzenComponentWithChildren
+@if (Visible)
+{
+    <td @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <span class="rz-cell-data">
+        <CascadingValue Value=this>
+            @ChildContent
+        </CascadingValue>
+        </span>
+    </td>
+}

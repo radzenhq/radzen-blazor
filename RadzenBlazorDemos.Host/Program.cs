@@ -91,6 +91,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
+app.MapStaticAssets();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAntiforgery();

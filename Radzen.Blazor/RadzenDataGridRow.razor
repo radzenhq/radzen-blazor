@@ -3,9 +3,9 @@
 @implements IRadzenForm
  <CascadingValue Value=@EditContext>
     <CascadingValue Value=this>
-@{var rowArgs = Grid?.RowAttributes(Item); }
+@{var rowArgs = Grid?.RowAttributes(Item, Index); }
 @{var firstLevel = Grid.AllowCompositeDataCells ? 0 : Grid.deepestChildColumnLevel; }
-@for(var i = firstLevel; i < Grid.deepestChildColumnLevel + 1; i++)
+@for(var i = firstLevel; Grid.AllowCompositeDataCells ? i <= Grid.deepestChildColumnLevel + 1 : i < Grid.deepestChildColumnLevel  + 1; i++)
 {
 <tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
     @if (Grid.ShowGroupExpandColumn)
@@ -25,7 +25,7 @@
     {
         <td class="rz-col-icon" rowspan="@(Grid.AllowCompositeDataCells ? (Grid.deepestChildColumnLevel + 1) : 1)">
             <span class="rz-column-title"></span>
-            @if (rowArgs.Item1.Expandable)
+            @if (rowArgs.Item1.Expandable && !Grid.LoadChildData.HasDelegate)
             {
                 <a id="@(Grid.GridId() + Item.GetHashCode())" aria-label="@Grid.ExpandChildItemAriaLabel" @onclick:preventDefault="true" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
                     <span class="@(Grid.ExpandedItemStyle(Item))"></span>

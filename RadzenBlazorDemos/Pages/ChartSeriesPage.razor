@@ -1,4 +1,5 @@
 @page "/chart-series"
+@page "/docs/guides/components/chart.html"
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Chart
@@ -11,13 +12,13 @@
     Chart Series
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
-    The chart can display 
-        <strong><RadzenLink Path="/area-chart" Text="area" /></strong>, 
-        <strong><RadzenLink Path="/bar-chart" Text="bar" /></strong>, 
-        <strong><RadzenLink Path="/column-chart" Text="column" /></strong>, 
+    The chart can display
+        <strong><RadzenLink Path="/area-chart" Text="area" /></strong>,
+        <strong><RadzenLink Path="/bar-chart" Text="bar" /></strong>,
+        <strong><RadzenLink Path="/column-chart" Text="column" /></strong>,
         <strong><RadzenLink Path="/donut-chart" Text="donut" /></strong>,
         <strong><RadzenLink Path="/line-chart" Text="line" /></strong>, and
-        <strong><RadzenLink Path="/pie-chart" Text="pie" /></strong> 
+        <strong><RadzenLink Path="/pie-chart" Text="pie" /></strong>
     data series. The chart series needs data and configuration to tell it which property of the data item is the value of the series (Y axis) and which is the category (X axis).
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
@@ -55,29 +56,13 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Chart component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate forward across Chart legend items.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Shift" /> + <RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate backward across Chart legend items.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> or <RadzenBadge Text="Space" /></span></td>
-                    <td><span class="rz-cell-data">Show/hide the focused Chart legend item serie.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate forward across Chart legend items." },
+        new KeyboardShortcut { Key = "Shift + Tab", Action = "Navigate backward across Chart legend items." },
+        new KeyboardShortcut { Key = "Enter or Space", Action = "Show/hide the focused Chart legend item serie." }
+    };
+}

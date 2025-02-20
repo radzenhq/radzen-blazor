@@ -10,7 +10,7 @@ namespace Radzen
     public class SchedulerMonthSelectEventArgs
     {
         /// <summary>
-        /// Monthg start date. You can change this value to navigate to a different date.
+        /// Month start date.
         /// </summary>
         public DateTime MonthStart { get; set; }
         /// <summary>

@@ -430,7 +430,7 @@ $timeline-point-sizes: map-merge(
   .rz-timeline-axis-#{$size} {
     --rz-timeline-point-size: #{map-get($timeline-point, size)};
 
-    .rzi {
+    .rz-timeline-point .rzi {
       font-size: map-get($timeline-point, font-size);
     }
   }

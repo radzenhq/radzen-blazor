@@ -1,4 +1,5 @@
 ﻿@page "/slider"
+@page "/docs/guides/components/slider.html"
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Slider
@@ -55,6 +56,13 @@
     <SliderDisabled />
 </RadzenExample>
 
+<RadzenText Anchor="slider#vertical-slider" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Vertical Slider
+</RadzenText>
+<RadzenExample ComponentName="Slider" Example="SliderVertical">
+    <SliderVertical />
+</RadzenExample>
+
 <RadzenText Anchor="slider#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Keyboard Navigation
 </RadzenText>
@@ -62,29 +70,13 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Slider component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a Slider handle.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Right arrow" /> on a focused Slider handle.</span></td>
-                    <td><span class="rz-cell-data">Increase the Slider value with the Step configured.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Left arrow" /> on a focused Slider handle.</span></td>
-                    <td><span class="rz-cell-data">Decrease the Slider value with the Step configured.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Slider handle." },
+        new KeyboardShortcut { Key = "RightArrow on a focused Slider handle", Action = "Increase the Slider value with the Step configured." },
+        new KeyboardShortcut { Key = "LeftArrow on a focused Slider handle", Action = "Decrease the Slider value with the Step configured." }
+    };
+}

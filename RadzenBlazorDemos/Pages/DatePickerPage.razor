@@ -1,4 +1,5 @@
 ﻿@page "/datepicker"
+@page "/docs/guides/components/datepicker.html"
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DatePicker
@@ -110,7 +111,7 @@
     <DatePickerWithDateOnlyTimeOnly />
 </RadzenExample>
 
-    
+
 <RadzenText Anchor="datepicker#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Keyboard Navigation
 </RadzenText>
@@ -118,53 +119,19 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor DatePicker component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a DatePicker component.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /> on open popup</span></td>
-                    <td><span class="rz-cell-data">Navigate forward across available picker components.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Shift" /> + <RadzenBadge Text="Tab" /> on open popup</span></td>
-                    <td><span class="rz-cell-data">Navigate backward across available picker components.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Right Arrow" /> on open popup</span></td>
-                    <td><span class="rz-cell-data">Select previous day.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Left Arrow" /> on open popup</span></td>
-                    <td><span class="rz-cell-data">Select next day.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Up Arrow" /> on open popup</span></td>
-                    <td><span class="rz-cell-data">Select same day from previous week.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Down Arrow" /> on open popup</span></td>
-                    <td><span class="rz-cell-data">Select same day from next week.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> in an opened popup</span></td>
-                    <td><span class="rz-cell-data">Select the focused day and close the popup.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Esc" /> in an opened popup</span></td>
-                    <td><span class="rz-cell-data">Close the popup.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DatePicker component." },
+        new KeyboardShortcut { Key = "Tab on open popup", Action = "Navigate forward across available picker components." },
+        new KeyboardShortcut { Key = "Shift + Tab on open popup", Action = "Navigate backward across available picker components." },
+        new KeyboardShortcut { Key = "RightArrow on open popup", Action = "Select previous day." },
+        new KeyboardShortcut { Key = "LeftArrow on open popup", Action = "Select next day." },
+        new KeyboardShortcut { Key = "UpArrow on open popup", Action = "Select same day from previous week." },
+        new KeyboardShortcut { Key = "DownArrow on open popup", Action = "Select same day from next week." },
+        new KeyboardShortcut { Key = "Enter in an opened popup", Action = "Select the focused day and close the popup." },
+        new KeyboardShortcut { Key = "Esc in an opened popup", Action = "Close the popup." }
+    };
+}

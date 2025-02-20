@@ -81,6 +81,30 @@ namespace Radzen.Blazor
         [Parameter]
         public string HeightText { get; set; } = "Image Height";
 
+        /// <summary>
+        /// Specifies whether to show the image width section. Set it to false to hide it. Default value is true.
+        /// </summary>
+        [Parameter]
+        public bool ShowWidth { get; set; } = true;
+
+        /// <summary>
+        /// Specifies whether to show the image height section. Set it to false to hide it. Default value is true.
+        /// </summary>
+        [Parameter]
+        public bool ShowHeight { get; set; } = true;
+
+        /// <summary>
+        /// Specifies whether to show the web address section. Set it to false to hide it. Default value is true.
+        /// </summary>
+        [Parameter]
+        public bool ShowSrc { get; set; } = true;
+
+        /// <summary>
+        /// Specifies whether to show the alternative text section. Set it to false to hide it. Default value is true.
+        /// </summary>
+        [Parameter]
+        public bool ShowAlt { get; set; } = true;
+
         ImageAttributes Attributes { get; set; }
         RadzenUpload FileUpload { get; set; }
 
@@ -107,6 +131,8 @@ namespace Radzen.Blazor
             {
                 DialogService.Close(true);
             }
+
+            await Editor.RaiseUploadComplete(args);
         }
 
         async Task OnUploadError(UploadErrorEventArgs args)

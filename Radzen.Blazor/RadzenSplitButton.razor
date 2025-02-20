@@ -4,7 +4,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-         tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+         tabindex="@(Disabled ? -1 : TabIndex)" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         <button aria-label="@(ButtonAriaLabel ?? Text)" tabindex="-1" disabled="@IsDisabled" class="@getButtonCss()" type="button" @onclick="@OnClick">
             <span class="rz-button-box">
             @if (ButtonContent != null)
@@ -25,11 +25,11 @@
                 {
                     @if (!string.IsNullOrEmpty(@Icon))
                     {
-                        <i class="rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {
-                        <img class="rz-button-icon-left rzi" src="@Image" alt=@ImageAlternateText />
+                        <img class="notranslate rz-button-icon-left rzi" src="@Image" alt=@ImageAlternateText />
                     }
                     @if (!string.IsNullOrEmpty(Text))
                     {

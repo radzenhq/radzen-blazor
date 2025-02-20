@@ -23,6 +23,7 @@ $radio-checked-border: var(--rz-input-border) !default;
 
 .rz-radio-button-list-vertical {
   box-sizing: border-box;
+  border-radius: var(--rz-border-radius);
 
   .rz-radio-btn {
     display: flex;
@@ -34,6 +35,7 @@ $radio-checked-border: var(--rz-input-border) !default;
 
 .rz-radio-button-list-horizontal {
   box-sizing: border-box;
+  border-radius: var(--rz-border-radius);
   
   .rz-radio-btn {
     display: inline-flex;

@@ -7,11 +7,11 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Linq.Dynamic.Core;
-using System.Linq.Dynamic.Core.Parser;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -530,6 +530,12 @@ namespace Radzen
         /// Gets the dropped item.
         /// </summary>
         public TItem ToItem { get; internal set; }
+
+        /// <summary>
+        /// The data that underlies a drag-and-drop operation, known as the drag data store.
+        /// See <see cref="DataTransfer"/>.
+        /// </summary>
+        public DataTransfer DataTransfer { get; set; } = default!;
     }
 
     /// <summary>
@@ -551,7 +557,6 @@ namespace Radzen
         /// Gets or sets a value indicating whether this item is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        [Parameter]
         public bool Visible { get; set; } = true;
 
         /// <summary>
@@ -574,14 +579,12 @@ namespace Radzen
         /// Gets or sets a value indicating whether this item is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        [Parameter]
         public bool Visible { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether this item is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        [Parameter]
         public bool Disabled { get; set; }
 
         /// <summary>
@@ -610,6 +613,34 @@ namespace Radzen
         /// Gets the DropDown.
         /// </summary>
         public RadzenListBox<TValue> ListBox { get; internal set; }
+    }
+
+    /// <summary>
+    /// Supplies information about RadzenPickList ItemRender event.
+    /// </summary>
+    public class PickListItemRenderEventArgs<TItem>
+    {
+        /// <summary>
+        /// Gets the data item.
+        /// </summary>
+        public TItem Item { get; internal set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this item is visible.
+        /// </summary>
+        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
+        public bool Visible { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this item is visible.
+        /// </summary>
+        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
+        public bool Disabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets the row HTML attributes.
+        /// </summary>
+        public IDictionary<string, object> Attributes { get; private set; } = new Dictionary<string, object>();
     }
 
     /// <summary>
@@ -758,6 +789,11 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if expandable; otherwise, <c>false</c>.</value>
         public bool Expandable { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating row index.
+        /// </summary>
+        public int Index { get; set; }
     }
 
     /// <summary>
@@ -978,7 +1014,7 @@ namespace Radzen
         {
             get
             {
-                return _size != default(long) ? _size : source.Size;
+                return _size != default(long) ? _size : source != null ? source.Size : 0;
             }
             set
             {
@@ -2251,6 +2287,18 @@ namespace Radzen
         /// </summary>
         /// <value>The property.</value>
         public string Property { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property type.
+        /// </summary>
+        /// <value>The property type.</value>
+        public Type Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the filtered property.
+        /// </summary>
+        /// <value>The property.</value>
+        public string FilterProperty { get; set; }
         /// <summary>
         /// Gets or sets the value to filter by.
         /// </summary>
@@ -2288,6 +2336,18 @@ namespace Radzen
         /// </summary>
         /// <value>The property.</value>
         public string Property { get; set; }
+
+        /// <summary>
+        /// Gets or sets the property type.
+        /// </summary>
+        /// <value>The property type.</value>
+        public Type Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the filtered property.
+        /// </summary>
+        /// <value>The property.</value>
+        public string FilterProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the value to filter by.
@@ -2390,6 +2450,43 @@ namespace Radzen
         /// </summary>
         /// <value>The level.</value>
         public int Level { get; set; }
+    }
+
+    /// <summary>
+    /// The result of a call to a <see cref="QueryableExtension"/>.GroupByMany() overload.
+    /// </summary>
+    public class GroupResult
+    {
+        /// <summary>
+        /// The key value of the group.
+        /// </summary>
+        public dynamic Key { get; internal set; } = null!;
+
+        /// <summary>
+        /// The number of resulting elements in the group.
+        /// </summary>
+        public int Count { get; internal set; }
+
+        /// <summary>
+        /// The resulting elements in the group.
+        /// </summary>
+        public IEnumerable Items { get; internal set; }
+
+        /// <summary>
+        /// The resulting subgroups in the group.
+        /// </summary>
+        public IEnumerable<GroupResult> Subgroups { get; internal set; }
+
+        /// <summary>
+        /// Returns a <see cref="System.String" /> showing the key of the group and the number of items in the group.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return string.Format(CultureInfo.CurrentCulture, "{0} ({1})", ((object)Key).ToString(), Count);
+        }
     }
 
     /// <summary>
@@ -2866,9 +2963,14 @@ namespace Radzen
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="type">The type.</param>
+        /// <param name="culture">The culture.</param>
         /// <returns>System.Object</returns>
-        public static object ChangeType(object value, Type type)
+        public static object ChangeType(object value, Type type, CultureInfo culture = null)
         {
+            if (culture == null)
+            {
+                culture = CultureInfo.CurrentCulture;
+            }
             if (value == null && Nullable.GetUnderlyingType(type) != null)
             {
                 return value;
@@ -2896,7 +2998,7 @@ namespace Radzen
 
             }
 
-            return value is IConvertible ? Convert.ChangeType(value, Nullable.GetUnderlyingType(type) ?? type) : value;
+            return value is IConvertible ? Convert.ChangeType(value, Nullable.GetUnderlyingType(type) ?? type, culture) : value;
         }
     }
 
@@ -2917,7 +3019,9 @@ namespace Radzen
         {
             if (propertyName.Contains("["))
             {
-                return DynamicExpressionParser.ParseLambda<TItem, TValue>(null, false, propertyName).Compile();
+                var arg = Expression.Parameter(typeof(TItem));
+
+                return Expression.Lambda<Func<TItem, TValue>>(QueryableExtension.GetNestedPropertyExpression(arg, propertyName, type), arg).Compile();
             }
             else
             {
@@ -3069,11 +3173,6 @@ namespace Radzen
             }
             var propertyName = $"{(type != null ? "@" : "")}{property}";
 
-            if (propertyName.IndexOf(".") != -1)
-            {
-                return $"np({propertyName})";
-            }
-
             return propertyName;
         }
 
@@ -3113,7 +3212,7 @@ namespace Radzen
         {
             var type = data.GetType();
             var arg = Expression.Parameter(typeof(object));
-            var body = Expression.Property(Expression.Convert(arg, type), propertyName);
+            var body = Expression.Convert(Expression.Property(Expression.Convert(arg, type), propertyName), typeof(T));
 
             return Expression.Lambda<Func<object, T>>(body, arg).Compile();
         }
@@ -3290,6 +3389,21 @@ namespace Radzen
 
             return null;
         }
+
+        /// <summary>
+        /// Gets the dynamic property expression when binding to IDictionary.
+        /// </summary>
+        /// <param name="name">The property name.</param>
+        /// <param name="type">The property type.</param>
+        /// <returns>Dynamic property expression.</returns>
+        public static string GetDynamicPropertyExpression(string name, Type type)
+        {
+            var isEnum = type.IsEnum || Nullable.GetUnderlyingType(type)?.IsEnum == true;
+            var typeName = isEnum ? "Enum" : (Nullable.GetUnderlyingType(type) ?? type).Name;
+            var typeFunc = $@"{typeName}{(!isEnum && Nullable.GetUnderlyingType(type) != null ? "?" : "")}";
+
+            return $@"({typeFunc})it[""{name}""]";
+        }
     }
 
     /// <summary>
@@ -3354,6 +3468,21 @@ namespace Radzen
         /// Sets the focus.
         /// </summary>
         ValueTask FocusAsync();
+
+        /// <summary>
+        /// Sets the Disabled state of the component
+        /// </summary>
+        bool Disabled { get; set; }
+
+        /// <summary>
+        /// Sets the Visible state of the component
+        /// </summary>
+        bool Visible { get; set; }
+
+        /// <summary>
+        /// Sets the FormFieldContext of the component
+        /// </summary>
+        IFormFieldContext FormFieldContext { get; }
     }
 
     /// <summary>

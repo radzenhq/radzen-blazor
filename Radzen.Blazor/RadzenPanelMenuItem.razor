@@ -10,11 +10,11 @@
                 <NavLink tabindex="-1" target="@Target" class=@(Selected ? "rz-navigation-item-link rz-navigation-item-link-active" : "rz-navigation-item-link") style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@getIconStyle()">@((MarkupString)Icon)</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" style="@getIconStyle()">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
-                        <img class="rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
+                        <img class="notranslate rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
                     }
                     @if (Template != null)
                     {
@@ -26,7 +26,7 @@
                     }
                     @if (items.Any() && Parent?.ShowArrow == true)
                     {
-                        <i class="rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
+                        <i class="notranslate rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
                     }
                 </NavLink>
             }
@@ -35,11 +35,11 @@
                 <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")" @onclick="@Toggle">
                     @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@getIconStyle()">@((MarkupString)Icon)</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" style="@getIconStyle()">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
-                        <img class="rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
+                        <img class="notranslate rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
                     }
                     @if (Template != null)
                     {
@@ -51,7 +51,7 @@
                     }
                     @if (items.Any() && Parent?.ShowArrow == true)
                     {
-                        <i class="rzi rz-navigation-item-icon-children" style="@getStyle()">keyboard_arrow_down</i>
+                        <i class="notranslate rzi rz-navigation-item-icon-children" style="@getStyle()">keyboard_arrow_down</i>
                     }
                 </div>
             }

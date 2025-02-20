@@ -235,6 +235,8 @@ namespace Radzen.Blazor
             {
                 htmlChanged = false;
 
+                _value = Html;
+
                 await ValueChanged.InvokeAsync(Html);
 
                 if (FieldIdentifier.FieldName != null)
@@ -403,7 +405,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-html-editor";
+            return GetClassList("rz-html-editor").ToString();
         }
 
         /// <inheritdoc />
@@ -415,6 +417,42 @@ namespace Radzen.Blazor
             {
                 JSRuntime.InvokeVoidAsync("Radzen.destroyEditor", ContentEditable);
             }
+        }
+
+        /// <summary>
+        /// Gets or sets the callback which when a file is uploaded.
+        /// </summary>
+        /// <value>The complete callback.</value>
+        [Parameter]
+        public EventCallback<UploadCompleteEventArgs> UploadComplete { get; set; }
+
+
+        internal async Task RaiseUploadComplete(UploadCompleteEventArgs args)
+        {
+            await UploadComplete.InvokeAsync(args);
+        }
+
+        /// <summary>
+        /// Invoked by interop when the upload is complete.
+        /// </summary>
+        [JSInvokable("OnUploadComplete")]
+        public async Task OnUploadComplete(string response)
+        {
+            System.Text.Json.JsonDocument doc = null;
+
+            if (!string.IsNullOrEmpty(response))
+            {
+                try
+                {
+                    doc = System.Text.Json.JsonDocument.Parse(response);
+                }
+                catch (System.Text.Json.JsonException)
+                {
+                    //
+                }
+            }
+
+            await UploadComplete.InvokeAsync(new UploadCompleteEventArgs() { RawResponse = response, JsonResponse = doc });
         }
     }
 }

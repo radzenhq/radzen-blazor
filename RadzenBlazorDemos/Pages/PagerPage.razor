@@ -1,4 +1,5 @@
 ﻿@page "/pager"
+@page "/docs/guides/components/pager.html"
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Pager
@@ -28,34 +29,14 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Pager component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a Pager component.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Left Arrow" /></span></td>
-                    <td><span class="rz-cell-data">Focus previous Pager page.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Right Arrow" /></span></td>
-                    <td><span class="rz-cell-data">Focus next Pager page.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> or <RadzenBadge Text="Space" /></span></td>
-                    <td><span class="rz-cell-data">Go to the focused Pager page.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
 
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Pager component." },
+        new KeyboardShortcut { Key = "LeftArrow", Action = "Focus previous Pager page." },
+        new KeyboardShortcut { Key = "RightArrow", Action = "Focus next Pager page." },
+        new KeyboardShortcut { Key = "Enter or Space", Action = "Go to the focused Pager page." }
+    };
+}

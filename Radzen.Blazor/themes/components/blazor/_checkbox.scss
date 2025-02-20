@@ -27,6 +27,7 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 
 .rz-checkbox-list-vertical {
   box-sizing: border-box;
+  border-radius: var(--rz-border-radius);
 
   .rz-checkbox {
     display: flex;
@@ -39,6 +40,7 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 
 .rz-checkbox-list-horizontal {
   box-sizing: border-box;
+  border-radius: var(--rz-border-radius);
   
   .rz-checkbox {
     display: inline-flex;
@@ -65,6 +67,7 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   width: var(--rz-checkbox-width);
   min-width: var(--rz-checkbox-width);
   height: var(--rz-checkbox-height);
+  border-radius: var(--rz-checkbox-border-radius);
 
   &:focus {
     outline: var(--rz-outline-normal);

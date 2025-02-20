@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -203,6 +202,13 @@ namespace Radzen.Blazor
         public bool ShowAdd { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets preserving the selected row index on pageing.
+        /// </summary>
+        /// <value>Row selection preservation on pageing.</value>
+        [Parameter]
+        public bool PreserveRowSelectionOnPaging { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the page numbers count.
         /// </summary>
         /// <value>The page numbers count.</value>
@@ -347,6 +353,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected ElementReference popup;
 
+        bool isFirstRender;
         /// <summary>
         /// Called when [after render asynchronous].
         /// </summary>
@@ -354,6 +361,8 @@ namespace Radzen.Blazor
         /// <returns>Task.</returns>
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
+            isFirstRender = firstRender;
+
             if (firstRender)
             {
                 if(Visible && LoadData.HasDelegate && Data == null)
@@ -390,7 +399,7 @@ namespace Radzen.Blazor
             if (!LoadData.HasDelegate)
             {
                 searchText = null;
-                await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+                await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, OrderBy = "" });
             }
         }
 
@@ -405,7 +414,7 @@ namespace Radzen.Blazor
 
             if (!string.IsNullOrEmpty(searchText) && !LoadData.HasDelegate)
             {
-                await OnLoadData(new Radzen.LoadDataArgs() { Skip = skip, Top = PageSize });
+                await OnLoadData(new Radzen.LoadDataArgs() { Skip = skip, Top = PageSize, OrderBy = "" });
             }
         }
 
@@ -415,7 +424,7 @@ namespace Radzen.Blazor
         public async Task Reload()
         {
             searchText = null;
-            await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+            await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, OrderBy = "" });
         }
 
         private string GetPropertyFilterExpression(string property, string filterCaseSensitivityOperator)
@@ -440,6 +449,7 @@ namespace Radzen.Blazor
         }
 
         string prevSearch;
+        string prevOrder = "";
         int? skip;
         async Task OnLoadData(LoadDataArgs args)
         {
@@ -458,10 +468,13 @@ namespace Radzen.Blazor
                 if (query == null)
                     return;
 
+                var filterOperator = FilterOperator == StringFilterOperator.Contains ?
+                                        Radzen.FilterOperator.Contains :
+                                            FilterOperator == StringFilterOperator.StartsWith ? Radzen.FilterOperator.StartsWith :
+                                               FilterOperator == StringFilterOperator.EndsWith ? Radzen.FilterOperator.EndsWith : Radzen.FilterOperator.Equals;
+
                 if (!string.IsNullOrEmpty(searchText))
                 {
-                    string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
-
                     if (AllowFilteringByAllStringColumns && grid != null)
                     {
                         if (AllowFilteringByWord)
@@ -470,16 +483,16 @@ namespace Radzen.Blazor
 
                             foreach (string word in words)
                             {
-                                query = query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
-                                    .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
-                                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                                query = query.Where(grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                                    .Select(c => new FilterDescriptor() { Property = c.GetFilterProperty(), FilterValue = word, FilterOperator = filterOperator }), 
+                                        LogicalFilterOperator.Or, FilterCaseSensitivity);
                             }
                         }
                         else
                         {
-                            query = query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(" || ", grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
-                                .Select(c => GetPropertyFilterExpression(c.GetFilterProperty(), filterCaseSensitivityOperator))),
-                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                            query = query.Where(grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
+                                .Select(c => new FilterDescriptor() { Property = c.GetFilterProperty(), FilterValue = searchText, FilterOperator = filterOperator }), 
+                                    LogicalFilterOperator.Or, FilterCaseSensitivity);
                         }
                     }
                     else
@@ -490,33 +503,48 @@ namespace Radzen.Blazor
 
                             foreach (string word in words)
                             {
-                                query = query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
-                                    FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? word.ToLower() : word);
+                                query = query.Where(TextProperty, word, FilterOperator, FilterCaseSensitivity);
                             }
                         }
                         else
                         {
-                            query = query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"{GetPropertyFilterExpression(TextProperty, filterCaseSensitivityOperator)}",
-                                FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                            query = query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                         }
                     }
                 }
 
                 if (!string.IsNullOrEmpty(args.OrderBy))
                 {
-                    query = query.OrderBy(DynamicLinqCustomTypeProvider.ParsingConfig, args.OrderBy);
+                    query = query.OrderBy(args.OrderBy);
                 }
 
-                count = await Task.FromResult(query.Count());
+                count = await Task.FromResult(query.Cast<object>().Count());
 
-                pagedData = await Task.FromResult(QueryableExtension.ToList(query.Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize)).Cast<object>());
+                pagedData = await Task.FromResult(query.Cast<object>().Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize).ToList());
 
                 _internalView = query;
+
+                if (prevOrder != args.OrderBy)
+                {
+                    prevOrder = args.OrderBy;
+                    await JSRuntime.InvokeVoidAsync("eval");
+                }
             }
             else
             {
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs() { Skip = skip, Top = args.Top, OrderBy = args.OrderBy, Filter = searchText });
             }
+            
+            if(PreserveRowSelectionOnPaging && selectedIndex != -1)
+            {	
+                var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (pagedData != null ? pagedData : Enumerable.Empty<object>())).OfType<object>().ToList();
+                selectedIndex = Math.Clamp(selectedIndex, 0, items.Count - 1);
+                
+                await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", selectedIndex - 1, null);
+
+                await grid.OnRowSelect(items[selectedIndex], false);
+            }
+
         }
 
         IEnumerable _internalView = Enumerable.Empty<object>();
@@ -559,7 +587,11 @@ namespace Radzen.Blazor
 
                     if (!string.IsNullOrEmpty(ValueProperty))
                     {
-                        var item = Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", value).FirstOrDefault();
+                        var item = Query.Where(new FilterDescriptor[]
+                            { 
+                                new FilterDescriptor() { Property = ValueProperty, FilterValue = value } 
+                            }, LogicalFilterOperator.And, FilterCaseSensitivity.Default).FirstOrDefault();
+
                         if (item != null && SelectedItem != item)
                         {
                             SelectedItem = item;
@@ -580,6 +612,15 @@ namespace Radzen.Blazor
                         SelectedItemChanged.InvokeAsync(SelectedItem);
                         selectedItems.Clear();
                         selectedItems.Add(SelectedItem);
+                        try
+                        {
+                            if (grid != null && !isFirstRender)
+                            {
+                                InvokeAsync(() => grid.SelectRow(SelectedItem, false));
+                                JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", Items.ToList().IndexOf(SelectedItem) - 1, null);
+                            }
+                        }
+                        catch { }
                     }
                 }
                 else
@@ -592,8 +633,12 @@ namespace Radzen.Blazor
                         {
                             foreach (object v in valueList)
                             {
-                                var item = Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", v).FirstOrDefault();
-                                if (item != null && !selectedItems.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"object.Equals(it.{ValueProperty},@0)", v).Any())
+                                var item = Query.Where(new FilterDescriptor[]
+                                    {
+                                        new FilterDescriptor() { Property = ValueProperty, FilterValue = v }
+                                    }, LogicalFilterOperator.And, FilterCaseSensitivity.Default).FirstOrDefault();
+
+                                if (item != null && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())
                                 {
                                     selectedItems.Add(item);
                                 }
@@ -603,10 +648,7 @@ namespace Radzen.Blazor
                         {
                             foreach (object v in valueList)
                             {
-                                if (selectedItems.IndexOf(v) == -1)
-                                {
-                                    selectedItems.Add(v);
-                                }
+                                selectedItems.Add(v);
                             }
                         }
 
@@ -629,6 +671,8 @@ namespace Radzen.Blazor
             if (Disabled)
                 return;
 
+            var canRequest = searchText != null;
+
             searchText = null;
             internalValue = default(TValue);
             selectedItem = null;
@@ -644,7 +688,10 @@ namespace Radzen.Blazor
                 await grid.SelectRow(null);
             }
 
-            await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize });
+            if (canRequest)
+            {
+                await OnLoadData(new Radzen.LoadDataArgs() { Skip = 0, Top = PageSize, OrderBy = "" });
+            }
 
             StateHasChanged();
         }
@@ -669,7 +716,7 @@ namespace Radzen.Blazor
                     if (shouldChange)
                     {
                         selectedIndex = newSelectedIndex;
-                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), key, selectedIndex - 1, null);
+                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), key, selectedIndex + (key == "ArrowUp" ? 1 : -1), null);
                         await grid.OnRowSelect(items[selectedIndex], false);
                     }
 
@@ -896,8 +943,11 @@ namespace Radzen.Blazor
                 await SelectItem(item);
             }
         }
-
-        async Task CloseAndFocus()
+        /// <summary>
+        /// Closes the dropdown popup and sets focus to the input element.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task CloseAndFocus()
         {
             if (!Disabled && !Multiple)
             {

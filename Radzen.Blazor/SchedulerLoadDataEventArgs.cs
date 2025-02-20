@@ -16,5 +16,10 @@ namespace Radzen
         /// The start of the currently rendered period.
         /// </summary>
         public DateTime End { get; set; }
+        /// <summary>
+        /// The selected view of the scheduler.
+        /// </summary>
+        public ISchedulerView View { get; set; }
+
     }
 }

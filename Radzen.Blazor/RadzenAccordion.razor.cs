@@ -113,7 +113,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Refreshes this instance.
         /// </summary>
-        internal void Refresh()
+        public void Refresh()
         {
             StateHasChanged();
         }
@@ -163,6 +163,8 @@ namespace Radzen.Blazor
         
         internal async System.Threading.Tasks.Task SelectItem(RadzenAccordionItem item, bool? value = null)
         {
+            if(item.Disabled) return;
+
             await CollapseAll(item);
 
             var itemIndex = items.IndexOf(item);
@@ -178,7 +180,7 @@ namespace Radzen.Blazor
                 await Expand.InvokeAsync(itemIndex);
             }
 
-            item.SetSelected(value ?? !selected);
+            await item.SetSelected(value ?? !selected);
 
             if (!Multiple)
             {
@@ -196,7 +198,7 @@ namespace Radzen.Blazor
                 {
                     if (i.GetSelected())
                     {
-                        i.SetSelected(false);
+                        await i.SetSelected(false);
                         await Collapse.InvokeAsync(items.IndexOf(i));
                     }
                 }

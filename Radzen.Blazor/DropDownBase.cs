@@ -6,7 +6,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Radzen
@@ -272,7 +271,7 @@ namespace Radzen
         /// <summary>
         /// The selected items
         /// </summary>
-        protected IList<object> selectedItems = new List<object>();
+        protected ISet<object> selectedItems = new HashSet<object>();
         /// <summary>
         /// The selected item
         /// </summary>
@@ -288,10 +287,10 @@ namespace Radzen
                 return;
             }
 
-            if (selectedItems.Count != View.Cast<object>().ToList().Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).Count())
+            if (selectedItems.Count != View.Cast<object>().ToList().Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true).Count())
             {
                 selectedItems.Clear();
-                selectedItems = View.Cast<object>().ToList().Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).ToList();
+                selectedItems = View.Cast<object>().ToList().Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true).ToHashSet(ItemComparer);
             }
             else
             {
@@ -341,15 +340,17 @@ namespace Radzen
 
         internal bool IsAllSelected()
         {
+            List<object> notDisabledItemsInList = View.Cast<object>().ToList()
+                .Where(i => disabledPropertyGetter == null || disabledPropertyGetter(i) as bool? != true)
+                .ToList();
+
             if (LoadData.HasDelegate && !string.IsNullOrEmpty(ValueProperty))
             {
-                return View != null && View.Cast<object>().ToList()
-                    .Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true)
+                return View != null && notDisabledItemsInList.Count > 0 && notDisabledItemsInList
                     .All(i => IsItemSelectedByValue(GetItemOrValueFromProperty(i, ValueProperty)));
             }
 
-            return View != null && selectedItems.Count == View.Cast<object>().ToList()
-                    .Where(i => disabledPropertyGetter != null ? disabledPropertyGetter(i) as bool? != true : true).Count();
+            return View != null && notDisabledItemsInList.Count > 0 && selectedItems.Count == notDisabledItemsInList.Count;
         }
 
         /// <summary>
@@ -434,9 +435,13 @@ namespace Radzen
 
                 var type = query.ElementType;
 
-                if (type == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
+                if (type == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Cast<object>().Any())
                 {
-                    type = query.FirstOrDefault().GetType();
+                    var firstElement = query.Cast<object>().FirstOrDefault(i => i != null);
+                    if (firstElement != null)
+                    {
+                        type = firstElement.GetType();
+                    }
                 }
 
                 if (!string.IsNullOrEmpty(ValueProperty))
@@ -452,6 +457,11 @@ namespace Radzen
                 if (!string.IsNullOrEmpty(DisabledProperty))
                 {
                     disabledPropertyGetter = GetGetter(DisabledProperty, type);
+                }
+
+                if (selectedItems.Count == 0)
+                {
+                    selectedItems = new HashSet<object>(ItemComparer);
                 }
             }
         }
@@ -675,8 +685,10 @@ namespace Radzen
 
                 if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
                 {
-                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, $"{searchText}".Trim());
                     var itemToSelect = items.ElementAtOrDefault(selectedIndex);
+
+                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, $"{searchText}".Trim());
+
                     if (itemToSelect != null)
                     {
                         await OnSelectItem(itemToSelect, true);
@@ -730,9 +742,10 @@ namespace Radzen
             }
             else
             {
-                var filteredItems = Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive)
-                    .Cast<object>()
-                    .ToList();
+                var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
+                    Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
+                    Query)
+                    .Cast(Query.ElementType).Cast<dynamic>().ToList();
 
 
                 if (previousKey != args.Key)
@@ -986,7 +999,7 @@ namespace Radzen
             {
                 if (Multiple)
                 {
-                    return selectedItems.IndexOf(item) != -1;
+                    return selectedItems.Contains(item);
                 }
                 else
                 {
@@ -1130,9 +1143,13 @@ namespace Radzen
                     var query = Data.AsQueryable();
                     var elementType = query.ElementType;
 
-                    if (elementType == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Any())
+                    if (elementType == typeof(object) && typeof(EnumerableQuery).IsAssignableFrom(query.GetType()) && query.Cast<object>().Any())
                     {
-                        elementType = query.FirstOrDefault().GetType();
+                        var firstElement = query.Cast<object>().FirstOrDefault(i => i != null);
+                        if (firstElement != null)
+                        {
+                            elementType = firstElement.GetType();
+                        }
                     }
 
                     if (elementType != null)
@@ -1212,18 +1229,14 @@ namespace Radzen
                 }
                 else
                 {
-                    selectedItems = selectedItems.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"!object.Equals(it.{ValueProperty},@0)", value).ToList();
+                    selectedItems = selectedItems.AsQueryable().Where(i => !object.Equals(GetItemOrValueFromProperty(i, ValueProperty), value)).ToHashSet(ItemComparer);
                 }
             }
             else
             {
-                if (!selectedItems.Any(i => object.Equals(i, item)))
+                if (!selectedItems.Add(item))
                 {
-                    selectedItems.Add(item);
-                }
-                else
-                {
-                    selectedItems = selectedItems.Where(i => !object.Equals(i, item)).ToList();
+                    selectedItems.Remove(item);
                 }
             }
         }
@@ -1247,7 +1260,16 @@ namespace Radzen
                         }
                         else
                         {
-                            SelectedItem = view.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", value).FirstOrDefault();
+                            SelectedItem = view.AsQueryable().Where(new FilterDescriptor[] 
+                            { 
+                                new FilterDescriptor() 
+                                { 
+                                    Property = ValueProperty, 
+                                    FilterValue = value 
+                                } 
+                            },
+                            LogicalFilterOperator.And,
+                            FilterCaseSensitivity.Default).FirstOrDefault();
                         }
                     }
                     else
@@ -1264,7 +1286,7 @@ namespace Radzen
                     {
                         if (!string.IsNullOrEmpty(ValueProperty))
                         {
-                            foreach (object v in values.ToDynamicList())
+                            foreach (object v in values.Cast<dynamic>().ToList())
                             {
                                 dynamic item;
 
@@ -1274,10 +1296,19 @@ namespace Radzen
                                 }
                                 else
                                 {
-                                    item = view.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"{ValueProperty} == @0", v).FirstOrDefault();
+                                    item = view.AsQueryable().Where(new FilterDescriptor[]
+                                    {
+                                        new FilterDescriptor()
+                                        {
+                                            Property = ValueProperty,
+                                            FilterValue = v
+                                        }
+                                    },
+                                    LogicalFilterOperator.And,
+                                    FilterCaseSensitivity.Default).FirstOrDefault();
                                 }
 
-                                if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where(DynamicLinqCustomTypeProvider.ParsingConfig, $@"object.Equals(it.{ValueProperty},@0)", v).Any())
+                                if (!object.Equals(item, null) && !selectedItems.AsQueryable().Where(i => object.Equals(GetItemOrValueFromProperty(i, ValueProperty), v)).Any())
                                 {
                                     selectedItems.Add(item);
                                 }
@@ -1285,7 +1316,7 @@ namespace Radzen
                         }
                         else
                         {
-                            selectedItems = ((IEnumerable)values).Cast<object>().ToList();
+                            selectedItems = values.Cast<object>().ToHashSet(ItemComparer);
                         }
 
                     }
@@ -1296,6 +1327,11 @@ namespace Radzen
                 selectedItem = null;
             }
         }
+
+        /// <summary>
+        /// For lists of objects, an IEqualityComparer to control how selected items are determined
+        /// </summary>
+        [Parameter] public IEqualityComparer<object> ItemComparer { get; set; }
 
         internal bool IsItemSelectedByValue(object v)
         {

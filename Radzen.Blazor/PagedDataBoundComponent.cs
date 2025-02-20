@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor;
@@ -354,18 +353,18 @@ namespace Radzen
         /// Called when [parameters set asynchronous].
         /// </summary>
         /// <returns>Task.</returns>
-        protected override Task OnParametersSetAsync()
+        protected override async Task OnParametersSetAsync()
         {
             if (Visible && !LoadData.HasDelegate)
             {
-                InvokeAsync(Reload);
+                await InvokeAsync(Reload);
             }
             else
             {
                 CalculatePager();
             }
 
-            return base.OnParametersSetAsync();
+            await base.OnParametersSetAsync();
         }
 
         /// <summary>

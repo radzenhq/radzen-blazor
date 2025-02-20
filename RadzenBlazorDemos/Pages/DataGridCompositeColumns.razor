@@ -9,10 +9,15 @@
         <RadzenCheckBox @bind-Value=@allowCompositeDataCells Name="CheckBox1" TValue="bool" Change=@(args => grid.Reload())/>
         <RadzenLabel Text="Allow composite data cells" Component="CheckBox1" />
     </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin-top:20px">
+        <div>Filter Mode:</div>
+        <RadzenDropDown @bind-Value="@filterMode" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(FilterMode)).Cast<FilterMode>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+    </RadzenStack>
 </RadzenCard>
 
-<RadzenDataGrid @ref="grid" AllowGrouping=true AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand"  FilterMode="FilterMode.Advanced" PageSize="5" AllowPaging="true"  
-    Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" HideGroupedColumn="false" >
+<RadzenDataGrid @ref="grid" AllowGrouping=true AllowCompositeDataCells="@allowCompositeDataCells" AllowSorting="true" AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterMode="@filterMode" PageSize="5" AllowPaging="true"
+                Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" Style="height:420px" HideGroupedColumn="false" >
     <Columns>
         <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
@@ -47,6 +52,7 @@
 </RadzenDataGrid>
 
 @code {
+    FilterMode filterMode = FilterMode.Advanced;
     bool allowCompositeDataCells = false;
     RadzenDataGrid<Employee> grid;
     IEnumerable<Employee> employees;

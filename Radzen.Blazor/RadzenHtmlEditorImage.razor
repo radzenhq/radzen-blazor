@@ -32,22 +32,34 @@
                     <RadzenFileInput Accept="image/*" ChooseText=@UploadChooseText @bind-Value=@Attributes.Src style="width: 100%" />
                 }
                     </div>
-                    <div class="rz-html-editor-dialog-item">
-                        <label>@WidthText</label>
-                        <RadzenTextBox @bind-Value=@Attributes.Width style="width: 100%" />
-                    </div>
-                    <div class="rz-html-editor-dialog-item">
-                        <label>@HeightText</label>
-                        <RadzenTextBox @bind-Value=@Attributes.Height style="width: 100%" />
-                    </div>
-                    <div class="rz-html-editor-dialog-item">
-                        <label>@UrlText</label>
-                        <RadzenTextBox @bind-Value=@Attributes.Src style="width: 100%" />
-                    </div>
-                    <div class="rz-html-editor-dialog-item">
-                        <label>@AltText</label>
-                        <RadzenTextBox @bind-Value=@Attributes.Alt style="width: 100%" />
-                    </div>
+                    @if (ShowWidth)
+                    {
+                        <div class="rz-html-editor-dialog-item">
+                            <label>@WidthText</label>
+                            <RadzenTextBox @bind-Value=@Attributes.Width style="width: 100%" />
+                        </div>
+                    }
+                    @if (ShowHeight)
+                    {
+                        <div class="rz-html-editor-dialog-item">
+                            <label>@HeightText</label>
+                            <RadzenTextBox @bind-Value=@Attributes.Height style="width: 100%" />
+                        </div>
+                    }
+                    @if (ShowSrc)
+                    {
+                        <div class="rz-html-editor-dialog-item">
+                            <label>@UrlText</label>
+                            <RadzenTextBox @bind-Value=@Attributes.Src style="width: 100%" />
+                        </div>
+                    }
+                    @if (ShowAlt)
+                    {
+                        <div class="rz-html-editor-dialog-item">
+                            <label>@AltText</label>
+                            <RadzenTextBox @bind-Value=@Attributes.Alt style="width: 100%" />
+                        </div>
+                    }
                     <div class="rz-html-editor-dialog-buttons">
                         <RadzenButton Text=@OkText ButtonType="ButtonType.Submit" />
                         <RadzenButton Text=@CancelText Click="()=> ds.Close(false)" ButtonStyle="ButtonStyle.Secondary" />

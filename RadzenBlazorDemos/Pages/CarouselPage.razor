@@ -1,0 +1,60 @@
+﻿@page "/carousel"
+@page "/docs/guides/components/carousel.html"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Carousel
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Carousel</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="Carousel" Example="CarouselConfig">
+    <CarouselConfig />
+</RadzenExample>
+
+<RadzenText Anchor="carousel#navigation-style" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Navigation button styles
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Easily change the look and feel of next/prev navigation buttons via <code>ButtonStyle</code>, <code>Shade</code>, <code>Variant</code>, and <code>Size</code>.
+</RadzenText>
+<RadzenExample ComponentName="Carousel" Example="CarouselNavigation">
+    <CarouselNavigation />
+</RadzenExample> 
+
+<RadzenText Anchor="carousel#navigation-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Navigation button content
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>NextText=""</code> and <code>PrevText=""</code> to add text to the next/prev navigation buttons. To change the icons, use <code>NextIcon=""</code> and <code>PrevIcon=""</code>.
+</RadzenText>
+<RadzenExample ComponentName="Carousel" Example="CarouselNavigationContents">
+    <CarouselNavigationContents />
+</RadzenExample>
+
+<RadzenText Anchor="carousel#paging" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Paging
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can disable the built-in paging via <code>AllowPaging="false"</code>. <code>PagerOverlay</code> and <code>PagerPosition</code> help to position the pager according to your needs.
+</RadzenText>
+<RadzenExample ComponentName="Carousel" Example="CarouselPaging">
+    <CarouselPaging />
+</RadzenExample>
+
+<RadzenText Anchor="carousel#data-binding" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-8">
+    Data-binding
+</RadzenText>
+<RadzenExample ComponentName="Carousel" Example="CarouselDataBinding">
+    <CarouselDataBinding />
+</RadzenExample>
+
+<RadzenText Anchor="carousel#pager" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Carousel with RadzenPager
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can use the Carousel with <RadzenLink Text="RadzenPager" Path="/pager" target="_blank" /> component.
+</RadzenText>
+<RadzenExample ComponentName="Carousel" Example="CarouselPager">
+    <CarouselPager />
+</RadzenExample> 

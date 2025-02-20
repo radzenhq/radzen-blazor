@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -34,16 +32,24 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the size.
+        /// Gets or sets the size. Set to <c>ButtonSize.Medium</c> by default.
         /// </summary>
         /// <value>The size.</value>
         [Parameter]
         public ButtonSize Size { get; set; } = ButtonSize.Medium;
 
+        /// <summary>
+        /// Gets or sets the orientation. Set to <c>Orientation.Horizontal</c> by default.
+        /// </summary>
+        /// <value>The orientation.</value>
+        [Parameter]
+        public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
-        ClassList ButtonClassList(RadzenSelectBarItem item) => ClassList.Create($"rz-button rz-button-{getButtonSize()} rz-button-text-only")
-                            .Add("rz-state-active", IsSelected(item))
-                            .AddDisabled(Disabled || item.Disabled);
+
+        ClassList ButtonClassList(RadzenSelectBarItem item)
+            => ClassList.Create($"rz-button rz-button-{getButtonSize()} rz-button-text-only")
+                        .Add("rz-state-active", IsSelected(item))
+                        .AddDisabled(Disabled || item.Disabled);
 
         /// <summary>
         /// Gets or sets the value property.
@@ -98,9 +104,10 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
-        {
-            return GetClassList("rz-selectbutton rz-buttonset").Add($"rz-buttonset-{items.Count}").ToString();
-        }
+            => GetClassList("rz-selectbutton rz-buttonset")
+                .Add($"rz-selectbutton-{(Orientation == Orientation.Vertical ? "vertical" : "horizontal")}")
+                .Add($"rz-buttonset-{items.Count}")
+                .ToString();
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenSelectBar{TValue}"/> is multiple.
@@ -180,7 +187,7 @@ namespace Radzen.Blazor
         /// Selects the item.
         /// </summary>
         /// <param name="item">The item.</param>
-        protected async System.Threading.Tasks.Task SelectItem(RadzenSelectBarItem item)
+        protected async Task SelectItem(RadzenSelectBarItem item)
         {
             if (Disabled || item.Disabled)
                 return;
@@ -189,7 +196,7 @@ namespace Radzen.Blazor
             {
                 var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
 
-                var selectedValues = Value != null ? QueryableExtension.ToList(((IEnumerable)Value).AsQueryable().Cast(type)) : new List<dynamic>();
+                var selectedValues = Value != null ? new List<dynamic>(((IEnumerable)Value).Cast<dynamic>()) : new List<dynamic>();
 
                 if (!selectedValues.Contains(item.Value))
                 {

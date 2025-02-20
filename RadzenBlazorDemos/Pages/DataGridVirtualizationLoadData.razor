@@ -1,5 +1,4 @@
-﻿@using System.Linq.Dynamic.Core
-@using RadzenBlazorDemos.Data
+﻿@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
 
@@ -51,7 +50,7 @@
         if (!string.IsNullOrEmpty(args.Filter))
         {
             lastfilter = args.Filter;
-            query = query.Where(args.Filter);
+            query = query.Where(grid.ColumnsCollection);
             count = await Task.FromResult(query.Count());
         }
         else

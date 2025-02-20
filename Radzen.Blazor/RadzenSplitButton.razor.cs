@@ -146,6 +146,13 @@ namespace Radzen.Blazor
         public string DropDownIcon { get; set; } = "arrow_drop_down";
 
         /// <summary>
+        /// Gets or sets the index of the tab.
+        /// </summary>
+        /// <value>The index of the tab.</value>
+        [Parameter]
+        public int TabIndex { get; set; } = 0;
+
+        /// <summary>
         /// Gets or sets the click callback.
         /// </summary>
         /// <value>The click callback.</value>
@@ -188,7 +195,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return $"popup{UniqueID}";
+                return $"popup{GetId()}";
             }
         }
 

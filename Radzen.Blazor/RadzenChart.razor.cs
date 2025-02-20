@@ -52,6 +52,9 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public EventCallback<LegendClickEventArgs> LegendClick { get; set; }
+        
+        [Inject]
+        TooltipService TooltipService { get; set; }
 
         /// <summary>
         /// Gets the runtime width of the chart.
@@ -276,7 +279,6 @@ namespace Radzen.Blazor
             }
         }
 
-        ChartTooltipContainer chartTooltipContainer;
         RenderFragment tooltip;
         object tooltipData;
         double mouseX;
@@ -367,11 +369,15 @@ namespace Radzen.Blazor
                     {
                         foreach (var overlay in series.Overlays.Reverse())
                         {
-                            if (overlay.Visible && overlay.Contains(mouseX - MarginLeft, mouseY - MarginTop, TooltipTolerance))
+                            if (overlay.Visible && overlay.Contains(queryX, queryY, TooltipTolerance))
                             {
                                 tooltipData = null;
-                                tooltip = overlay.RenderTooltip(mouseX, mouseY, MarginLeft, MarginTop);
-                                chartTooltipContainer.Refresh();
+                                tooltip = overlay.RenderTooltip(queryX, queryY);
+                                var tooltipPosition = overlay.GetTooltipPosition(queryX, queryY);
+                                TooltipService.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+                                {
+                                    ColorScheme = ColorScheme
+                                });
                                 await Task.Yield();
 
                                 return;
@@ -399,21 +405,25 @@ namespace Radzen.Blazor
                     if (closestSeriesData != tooltipData)
                     {
                         tooltipData = closestSeriesData;
-                        tooltip = closestSeries.RenderTooltip(closestSeriesData, MarginLeft, MarginTop, Height ?? 0);
-                        chartTooltipContainer.Refresh();
+                        tooltip = closestSeries.RenderTooltip(closestSeriesData);
+                        var tooltipPosition = closestSeries.GetTooltipPosition(closestSeriesData);
+                        TooltipService.OpenChartTooltip(Element, tooltipPosition.X + MarginLeft, tooltipPosition.Y + MarginTop, _ => tooltip, new ChartTooltipOptions
+                        {
+                            ColorScheme = ColorScheme
+                        });
                         await Task.Yield();
                     }
                     return;
                 }
+            }
 
-                if (tooltip != null)
-                {
-                    tooltipData = null;
-                    tooltip = null;
+            if (tooltip != null)
+            {
+                tooltipData = null;
+                tooltip = null;
 
-                    chartTooltipContainer.Refresh();
-                    await Task.Yield();
-                }
+                TooltipService.Close();
+                await Task.Yield();
             }
         }
 

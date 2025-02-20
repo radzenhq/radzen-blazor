@@ -1,0 +1,66 @@
+﻿<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenCheckBox @bind-Value=@allowAlternatingRows Name="CheckBox1" TValue="bool" />
+        <RadzenLabel Text="Allow alternating rows" Component="CheckBox1" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin-top:20px">
+        <div>GridLines:</div>
+        <RadzenSelectBar @bind-Value="@gridLines" TextProperty="Text" ValueProperty="Value"
+        Data="@(Enum.GetValues(typeof(Radzen.DataGridGridLines)).Cast<Radzen.DataGridGridLines>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenTable GridLines="@gridLines" AllowAlternatingRows="@allowAlternatingRows">
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell>
+                Column 0
+            </RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>
+                Column 1
+            </RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>
+                Column 2
+            </RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        <RadzenTableRow>
+            <RadzenTableCell>
+                Cell 0 1
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 0 2
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 0 3
+            </RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>
+                Cell 1 1
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 1 2
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 1 3
+            </RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>
+                Cell 2 1
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 2 2
+            </RadzenTableCell>
+            <RadzenTableCell>
+                Cell 2 3
+            </RadzenTableCell>
+        </RadzenTableRow>
+    </RadzenTableBody>
+</RadzenTable>
+@code{
+    Radzen.DataGridGridLines gridLines = Radzen.DataGridGridLines.Default;
+    bool allowAlternatingRows = true;
+}

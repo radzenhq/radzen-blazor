@@ -81,8 +81,8 @@
             @for (var day = 0; day < 7; day ++)
             {
                 var dayOfWeek = StartDate.AddDays(days++);
-                <div @onclick="@(args => OnSlotClick(dayOfWeek))" @attributes=@Attributes(dayOfWeek) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek))>
-                    <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")">
+                <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
+                    <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation>
                         @dayOfWeek.Day
                     </div>
                 </div>
@@ -123,6 +123,11 @@
     async Task OnSlotClick(DateTime date)
     {
         await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInSlot(date, date.AddDays(1)));
+    }
+
+    async Task OnDayClick(DateTime day)
+    {
+        await Scheduler.SelectDay(day, AppointmentsInSlot(day, day.AddDays(1)));
     }
 
     double DetermineTop(HashSet<double> existingTops)
@@ -167,7 +172,11 @@
             return Array.Empty<AppointmentData>();
         }
 
-        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end))
+                   .OrderByDescending(item => item.End.Subtract(item.Start).TotalDays > 1)
+                   .ThenBy(item => item.Start)
+                   .ThenByDescending(item => item.End)
+                   .ToArray();
     }
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)

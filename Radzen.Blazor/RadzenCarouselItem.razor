@@ -1,0 +1,8 @@
+﻿@using Microsoft.JSInterop
+@implements IDisposable
+@inject IJSRuntime JSRuntime
+
+<li @ref="element" @attributes=@Attributes class=@ClassList tabindex="0">
+    @ChildContent
+    <div class="rz-carousel-snapper"></div>
+</li>

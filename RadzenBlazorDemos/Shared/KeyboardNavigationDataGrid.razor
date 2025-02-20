@@ -1,0 +1,31 @@
+﻿<RadzenTable>
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell>Press this key</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>To do this</RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        @foreach (var item in Data)
+        {
+            <RadzenTableRow>
+                <RadzenTableCell>@GetKeysAsMarkupString(item.Key)</RadzenTableCell>
+                <RadzenTableCell>@item.Action</RadzenTableCell>
+            </RadzenTableRow>
+        }
+    </RadzenTableBody>
+</RadzenTable>
+
+
+@code {
+    string[] keys = new string[] { "Tab", "DownArrow", "UpArrow", "LeftArrow", "RightArrow", "Enter", "Space", "Shift", "Alt", "Esc", "Escape" };
+
+    [Parameter]
+    public IEnumerable<KeyboardShortcut> Data { get; set; }
+
+    MarkupString GetKeysAsMarkupString(string value)
+    {
+        return (MarkupString)string.Join(" ", value.Split(" ")
+            .Select(s => keys.Contains(s) ? $@"<span class=""rz-badge rz-badge-primary rz-variant-filled rz-shade-default"">{s}</span>" : s));
+    }
+}

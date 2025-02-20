@@ -1,4 +1,5 @@
 ﻿@page "/datagrid"
+@page "/docs/guides/components/datagrid.html"
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     DataGrid
@@ -18,81 +19,26 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor DataGrid component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a DataGrid.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Down Arrow" /></span></td>
-                    <td><span class="rz-cell-data">Focus next DataGrid item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Up Arrow" /></span></td>
-                    <td><span class="rz-cell-data">Focus previous DataGrid item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> or <RadzenBadge Text="Space" /></span></td>
-                    <td><span class="rz-cell-data">Select the focused DataGrid item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Shift" /> + <RadzenBadge Text="Enter" /> or <RadzenBadge Text="Space" /></span></td>
-                    <td><span class="rz-cell-data">Select/deselect multiple DataGrid items.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Left Arrow" /> when header row is focused</span></td>
-                    <td><span class="rz-cell-data">Focus previous DataGrid header cell.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Right Arrow" /> when header row is focused</span></td>
-                    <td><span class="rz-cell-data">Focus next DataGrid header cell.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> on focused header cell</span></td>
-                    <td><span class="rz-cell-data">Sort DataGrid by focused header cell column.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Alt" /> + <RadzenBadge Text="Down arrow" /> on focused header cell</span></td>
-                    <td><span class="rz-cell-data">Open DataGrid column filter popup.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /> in an opened DataGrid column filter popup.</span></td>
-                    <td><span class="rz-cell-data">Navigate forward across available filter options.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Shift" /> + <RadzenBadge Text="Tab" /> in an opened DataGrid column filter popup.</span></td>
-                    <td><span class="rz-cell-data">Navigate backward across available filter options.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Esc" /> in an opened DataGrid column filter popup</span></td>
-                    <td><span class="rz-cell-data">Close the DataGrid column filter popup.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a DataGrid pager.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Left Arrow" /> on focused pager</span></td>
-                    <td><span class="rz-cell-data">Focus previous DataGrid pager page.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Right Arrow" /> on focused pager</span></td>
-                    <td><span class="rz-cell-data">Focus next DataGrid pager page.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> or <RadzenBadge Text="Space" /> on focused pager</span></td>
-                    <td><span class="rz-cell-data">Go to the focused DataGrid pager page.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@data" />
+
+@code {
+    List<KeyboardShortcut> data = new List<KeyboardShortcut>
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DataGrid." },
+        new KeyboardShortcut { Key = "DownArrow", Action = "Focus next DataGrid item." },
+        new KeyboardShortcut { Key = "UpArrow", Action = "Focus previous DataGrid item." },
+        new KeyboardShortcut { Key = "Enter or Space", Action = "Select the focused DataGrid item." },
+        new KeyboardShortcut { Key = "Shift + Enter or Space", Action = "Select/deselect multiple DataGrid items." },
+        new KeyboardShortcut { Key = "LeftArrow when header row is focused", Action = "Focus previous DataGrid header cell." },
+        new KeyboardShortcut { Key = "RightArrow when header row is focused", Action = "Focus next DataGrid header cell." },
+        new KeyboardShortcut { Key = "Enter on focused header cell", Action = "Sort DataGrid by focused header cell column." },
+        new KeyboardShortcut { Key = "Alt + DownArrow on focused header cell", Action = "Open DataGrid column filter popup." },
+        new KeyboardShortcut { Key = "Tab in an opened DataGrid column filter popup", Action = "Navigate forward across available filter options." },
+        new KeyboardShortcut { Key = "Shift + Tab in an opened DataGrid column filter popup", Action = "Navigate backward across available filter options." },
+        new KeyboardShortcut { Key = "Esc in an opened DataGrid column filter popup", Action = "Close the DataGrid column filter popup." },
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a DataGrid pager." },
+        new KeyboardShortcut { Key = "LeftArrow on focused pager", Action = "Focus previous DataGrid pager page." },
+        new KeyboardShortcut { Key = "RightArrow on focused pager", Action = "Focus next DataGrid pager page." },
+        new KeyboardShortcut { Key = "Enter or Space on focused pager", Action = "Go to the focused DataGrid pager page." }
+    };
+}

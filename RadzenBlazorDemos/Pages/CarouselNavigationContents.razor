@@ -1,0 +1,62 @@
+﻿<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    PrevText
+                    <RadzenTextBox @bind-Value="@prevText" Style="width: 200px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    PrevIcon
+                    <RadzenTextBox @bind-Value="@prevIcon" Style="width: 200px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    NextText
+                    <RadzenTextBox @bind-Value="@nextText" Style="width: 200px;" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                    NextIcon
+                    <RadzenTextBox @bind-Value="@nextIcon" Style="width: 200px;" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenCarousel @ref=carousel AllowNavigation="false" Auto="false" Style="height: 400px; max-width: 600px;" class="rz-mx-auto"
+        NextText="@nextText" NextIcon="@nextIcon" PrevText="@prevText" PrevIcon="@prevIcon">
+        <Items>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/3.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/2.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/7.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/4.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/5.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/6.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/1.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+            <RadzenCarouselItem>
+                <RadzenImage Path="images/gallery/8.jpg" class="rz-h-100" />
+            </RadzenCarouselItem>
+        </Items>
+    </RadzenCarousel>
+</RadzenStack>
+
+@code {
+    RadzenCarousel carousel;
+
+    string prevText = "Prev";
+    string prevIcon = "arrow_circle_left";
+    string nextText = "Next";
+    string nextIcon = "arrow_circle_right";
+}

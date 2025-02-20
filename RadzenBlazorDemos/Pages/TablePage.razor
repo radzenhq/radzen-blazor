@@ -1,0 +1,41 @@
+﻿@page "/table"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Table
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The <code>RadzenTable</code> component allows you to display tabular data. It supports grid lines and alternating (striped) via the <code>GridLines</code> and <code>AllowAlternatingRows</code> properties.
+</RadzenText>
+<RadzenExample ComponentName="Table" Example="TableConfig">
+    <TableConfig />
+</RadzenExample>
+<RadzenText Anchor="table#dynamic" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Dynamic Table
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    You can use <code>for</code> loops to create a <code>RadzenTable</code> with dynamic columns and rows.
+</RadzenText>
+<RadzenExample ComponentName="Table" Example="TableDynamic">
+    <TableDynamic />
+</RadzenExample>
+
+<RadzenText Anchor="table#scrollable" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Scrollable Table
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    To enable row scrolling set the height of the <code>RadzenTable</code> component: <code>&lt;RadzenTable style="height: 800px" ...&gt;</code>.
+    To enable column scrolling set the width of the header cells: <code>&lt;RadzenTableHeaderCell Style="width:150px"&gt;</code>.
+</RadzenText>
+<RadzenExample ComponentName="Table" Example="TableScrollable">
+    <TableScrollable />
+</RadzenExample>
+
+<RadzenText Anchor="table#scrollable" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Table with merged cells
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Setting the <code>colspan</code> and <code>rowspan</code> attributes allows you to span cells across columns and rows.
+</RadzenText>
+<RadzenExample ComponentName="Table" Example="TableMergedCells">
+    <TableMergedCells />
+</RadzenExample>

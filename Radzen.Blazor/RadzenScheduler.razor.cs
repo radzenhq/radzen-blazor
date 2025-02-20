@@ -3,7 +3,6 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -63,6 +62,16 @@ namespace Radzen.Blazor
         /// <value>The template.</value>
         [Parameter]
         public RenderFragment<TItem> Template { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the additional content to be rendered in place of the default navigation buttons in the scheduler.
+        /// This property allows for complete customization of the navigation controls, replacing the native date navigation buttons (such as year, month, and day) with user-defined content or buttons.
+        /// Use this to add custom controls or interactive elements that better suit your application's requirements.
+        /// </summary>
+        /// <value>The custom navigation template to replace default navigation buttons.</value>
+        [Parameter]
+        public RenderFragment NavigationTemplate { get; set; }
+
 
         /// <summary>
         /// Gets or sets the data of RadzenScheduler. It will display an appointment for every item of the collection which is within the current view date range.
@@ -136,6 +145,13 @@ namespace Radzen.Blazor
         public string TextProperty { get; set; }
 
         /// <summary>
+        /// Specifies whether to Show or Hide the Scheduler Header. Defaults to true />.
+        /// </summary>
+        /// <value>Show / hide header</value>
+        [Parameter]
+        public bool ShowHeader { get; set; } = true;
+
+        /// <summary>
         /// A callback that will be invoked when the user clicks a slot in the current view. Commonly used to add new appointments.
         /// </summary>
         /// <example>
@@ -178,15 +194,33 @@ namespace Radzen.Blazor
         /// &lt;RadzenScheduler Data=@appointments MonthSelect=@OnMonthSelect&gt;
         /// &lt;/RadzenScheduler&gt;
         /// @code {
-        /// void OnMonthSelect(SchedulerTodaySelectEventArgs args)
+        /// void OnMonthSelect(SchedulerMonthSelectEventArgs args)
         /// {
-        ///     args.Month = DateTime.Month.AddMonth(1);
+        ///     var selectedMonth = args.MonthStart.Month;
         /// }
         /// }
         /// </code>
         /// </example>
         [Parameter]
         public EventCallback<SchedulerMonthSelectEventArgs> MonthSelect { get; set; }
+
+        /// <summary>
+        /// A callback that will be invoked when the user clicks a day header button or the day number in a MonthView.
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// &lt;RadzenScheduler Data=@appointments DaySelect=@OnDaySelect&gt;
+        /// &lt;/RadzenScheduler&gt;
+        /// @code {
+        /// void OnDaySelect(SchedulerDaySelectEventArgs args)
+        /// {
+        ///     var selectedDay = args.Day;
+        /// }
+        /// }
+        /// </code>
+        /// </example>
+        [Parameter]
+        public EventCallback<SchedulerDaySelectEventArgs> DaySelect { get; set; }
 
         /// <summary>
         /// A callback that will be invoked when the user clicks an appointment in the current view. Commonly used to edit existing appointments.
@@ -375,6 +409,12 @@ namespace Radzen.Blazor
         public async Task SelectMonth(DateTime monthStart, IEnumerable<AppointmentData> appointments)
         {
             await MonthSelect.InvokeAsync(new SchedulerMonthSelectEventArgs { MonthStart = monthStart, Appointments = appointments, View = SelectedView });
+        }
+
+        /// <inheritdoc />
+        public async Task SelectDay(DateTime day, IEnumerable<AppointmentData> appointments)
+        {
+            await DaySelect.InvokeAsync(new SchedulerDaySelectEventArgs { Day = day, Appointments = appointments, View = SelectedView });
         }
 
         /// <inheritdoc />
@@ -570,7 +610,7 @@ namespace Radzen.Blazor
         {
             if (SelectedView != null)
             {
-                await LoadData.InvokeAsync(new SchedulerLoadDataEventArgs { Start = SelectedView.StartDate, End = SelectedView.EndDate });
+                await LoadData.InvokeAsync(new SchedulerLoadDataEventArgs { Start = SelectedView.StartDate, End = SelectedView.EndDate, View = SelectedView });
             }
         }
 
@@ -601,10 +641,22 @@ namespace Radzen.Blazor
             rangeStart = start;
             rangeEnd = end;
 
-            var predicate = $"{EndProperty} >= @0 && {StartProperty} < @1";
-
             appointments = Data.AsQueryable()
-                               .Where(DynamicLinqCustomTypeProvider.ParsingConfig, predicate, start, end)
+                               .Where(
+                                new FilterDescriptor[] {
+                                    new FilterDescriptor
+                                    {
+                                       Property = StartProperty,
+                                       FilterValue = start,
+                                       FilterOperator = FilterOperator.GreaterThanOrEquals
+                                    },
+                                    new FilterDescriptor
+                                    {
+                                       Property = EndProperty,
+                                       FilterValue = end,
+                                       FilterOperator = FilterOperator.LessThanOrEquals
+                                    }
+                                }, LogicalFilterOperator.And, FilterCaseSensitivity.Default)
                                .ToList()
                                .Select(item => new AppointmentData { Start = startGetter(item), End = endGetter(item), Text = textGetter(item), Data = item });
 

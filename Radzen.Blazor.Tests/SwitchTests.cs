@@ -134,5 +134,18 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(object.Equals(value, !(bool)newValue));
         }
+
+        [Fact]
+        public void Switch_Renders_ReadOnlyParameter()
+        {
+            using var ctx = new TestContext();
+
+            var component = ctx.RenderComponent<RadzenSwitch>();
+
+            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.ReadOnly, true));
+
+            Assert.Contains(@$"rz-readonly", component.Markup);
+        }
+
     }
 }

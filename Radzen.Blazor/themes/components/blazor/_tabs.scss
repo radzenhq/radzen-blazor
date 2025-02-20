@@ -275,12 +275,6 @@ $tabs-transition: var(--rz-transition-all) !default;
   }
 }
 
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-  .rz-tabview-panels {
-    flex: auto;
-  }
-}
-
 .rz-tabview-panel {
   padding: var(--rz-tabs-padding);
 }

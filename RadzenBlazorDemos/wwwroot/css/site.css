@@ -233,6 +233,12 @@ video {
 .components-list {
     --rz-link-hover-text-decoration: none;
 
+    .rz-link-disabled
+    {
+        pointer-events: none;
+        opacity: 0.5;
+    }
+
     .rz-link {
         display: block;
         width: 100%;
@@ -457,6 +463,14 @@ svg.illustration {
     text-decoration: none;
     color: var(--rz-tabs-tab-hover-color);
     border-inline-start-color: var(--rz-tabs-tab-hover-color);
+}
+
+/* Promo */
+
+.promo-alert {
+    background: linear-gradient(110deg, rgba(0,0,0,0.4) 100%, rgba(0,0,0,0.3) 30%, rgba(0,0,0,0.4) 100%),linear-gradient(110deg, #000 20%, #AA01E4 75%, #534EEB 100%);
+    background-size: cover;
+    padding: 2rem !important;
 }
 
 /* Responsive */

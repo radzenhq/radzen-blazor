@@ -1,0 +1,9 @@
+﻿@inherits RadzenComponentWithChildren
+@if (Visible)
+{
+    <th @ref="@Element" style="padding: var(--rz-grid-cell-padding);@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+        <CascadingValue Value=this>
+            @ChildContent
+        </CascadingValue>
+    </th>
+}

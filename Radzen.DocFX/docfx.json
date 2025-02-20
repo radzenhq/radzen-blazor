@@ -20,9 +20,6 @@
     "content": [
       {
         "files": ["api/**.yml", "api/index.md"]
-      },
-      {
-        "files": ["guides/**.md", "guides/**/toc.yml", "toc.yml", "*.md"]
       }
     ],
     "resource": [

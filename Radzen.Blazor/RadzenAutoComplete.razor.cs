@@ -1,7 +1,6 @@
 ﻿using Radzen;
 using Radzen.Blazor.Rendering;
 using System.Collections;
-using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Components;
@@ -23,6 +22,35 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenAutoComplete : DataBoundFormComponent<string>
     {
+        object selectedItem = null;
+
+        /// <summary>
+        /// Gets or sets the selected item.
+        /// </summary>
+        /// <value>The selected item.</value>
+        [Parameter]
+        public object SelectedItem
+        {
+            get
+            {
+                return selectedItem;
+            }
+            set
+            {
+                if (selectedItem != value)
+                {
+                    selectedItem = object.Equals(value, "null") ? null : value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the selected item changed.
+        /// </summary>
+        /// <value>The selected item changed.</value>
+        [Parameter]
+        public EventCallback<object> SelectedItemChanged { get; set; }
+
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
@@ -153,8 +181,8 @@ namespace Radzen.Blazor
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
 
             value = $"{value}";
-
-            if (value.Length < MinLength)
+            
+            if (value.Length < MinLength && !OpenOnFocus)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                 return;
@@ -195,7 +223,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Data != null && !string.IsNullOrEmpty(searchText) ? Data.AsQueryable() : null;
+                return Data != null && (OpenOnFocus || !string.IsNullOrEmpty(searchText)) ? Data.AsQueryable() : null;
             }
         }
 
@@ -209,12 +237,7 @@ namespace Radzen.Blazor
             {
                 if (Query != null)
                 {
-                    string filterCaseSensitivityOperator = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? ".ToLower()" : "";
-
-                    string textProperty = string.IsNullOrEmpty(TextProperty) ? string.Empty : $".{TextProperty}";
-
-                    return Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, $"o=>o{textProperty}{filterCaseSensitivityOperator}.{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)",
-                        FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ? searchText.ToLower() : searchText);
+                    return Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                 }
 
                 return null;
@@ -232,6 +255,8 @@ namespace Radzen.Blazor
             await ValueChanged.InvokeAsync($"{Value}");
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
+
+            await SelectedItemChanged.InvokeAsync(null);
         }
 
         async System.Threading.Tasks.Task SelectItem(object item)
@@ -248,6 +273,8 @@ namespace Radzen.Blazor
             await ValueChanged.InvokeAsync($"{Value}");
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
+
+            await SelectedItemChanged.InvokeAsync(item);
 
             StateHasChanged();
         }
@@ -307,7 +334,21 @@ namespace Radzen.Blazor
                 shouldClose = !visible;
             }
 
+            if (parameters.DidParameterChange(nameof(SelectedItem), SelectedItem))
+            {
+                var item = parameters.GetValueOrDefault<object>(nameof(SelectedItem));
+                if (item != null)
+                { 
+                    await SelectItem(item);
+                }
+            }
+
             await base.SetParametersAsync(parameters);
+
+            if (parameters.DidParameterChange(nameof(Value), Value))
+            {
+                Value = parameters.GetValueOrDefault<object>(nameof(Value));
+            }
 
             if (shouldClose && !firstRender)
             {

@@ -43,7 +43,7 @@ public class DollarsTypeConverter : TypeConverter
             return new Dollars(d);
 
         if (value is string s)
-            return decimal.TryParse(s, out var val) ? new Dollars(val) : null;
+            return decimal.TryParse(s, culture, out var val) ? new Dollars(val) : null;
         
         return base.ConvertFrom(context, culture, value);
     }

@@ -1,0 +1,163 @@
+﻿@page "/sizing"
+
+<PageTitle>Blazor Sizing Utilities | Free UI Components by Radzen</PageTitle>
+<HeadContent>
+    <meta name="description" content="Sizing styles and utility CSS classes for width and height available in Radzen Blazor Components library.">
+</HeadContent>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Sizing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Sizing utility CSS classes for width and height can be used to control the overall layout of elements.
+</RadzenText>
+
+<RadzenText Anchor="sizing#width-percentage-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Width percentage CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    You can use the predefined utility classes for width of 25%, 50%, 75%, 100%.
+</RadzenText>
+<RadzenExample Example="SizingWidthClasses">
+    <SizingWidthClasses />
+</RadzenExample>
+
+<RadzenText Anchor="sizing#width-keyword-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Width keyword CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    There are width keyword values exposed as CSS classes such as fit-content, min-content, max-content, and stretch.  
+</RadzenText>
+<RadzenExample Example="SizingWidthKeywordClasses">
+    <SizingWidthKeywordClasses />
+</RadzenExample>
+
+<RadzenText Anchor="sizing#width-viewport-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Width viewport CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    These are viewport width values exposed as CSS classes.
+</RadzenText>
+<RadzenExample Example="SizingWidthViewportClasses">
+    <SizingWidthViewportClasses />
+</RadzenExample>
+
+<RadzenText Anchor="borders#border-radius" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Max-width and min-width CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    Use these CSS classes to set desired minimum and maximum width <code>class="rz-min-w-100"</code>.
+</RadzenText>
+
+<RadzenTable>
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            <RadzenTableHeaderCell>Width value</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>Width CSS class</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>Min-width CSS class</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>Max-width CSS class</RadzenTableHeaderCell>
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        <RadzenTableRow>
+            <RadzenTableCell>25%</RadzenTableCell>
+            <RadzenTableCell>.rz-w-25</RadzenTableCell>
+            <RadzenTableCell>.rz-min-w-25</RadzenTableCell>
+            <RadzenTableCell>.rz-max-w-25</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>50%</RadzenTableCell>
+            <RadzenTableCell>.rz-w-50</RadzenTableCell>
+            <RadzenTableCell>.rz-min-w-50</RadzenTableCell>
+            <RadzenTableCell>.rz-max-w-50</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>75%</RadzenTableCell>
+            <RadzenTableCell>.rz-w-75</RadzenTableCell>
+            <RadzenTableCell>.rz-min-w-75</RadzenTableCell>
+            <RadzenTableCell>.rz-max-w-75</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>100%</RadzenTableCell>
+            <RadzenTableCell>.rz-w-100</RadzenTableCell>
+            <RadzenTableCell>.rz-min-w-100</RadzenTableCell>
+            <RadzenTableCell>.rz-max-w-100</RadzenTableCell>
+        </RadzenTableRow>
+    </RadzenTableBody>
+</RadzenTable>
+
+<RadzenText Anchor="sizing#height-percentage-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Height percentage CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    You can use the predefined utility classes for height of 25%, 50%, 75%, 100%.
+</RadzenText>
+<RadzenExample Example="SizingHeightClasses">
+    <SizingHeightClasses />
+</RadzenExample>
+
+<RadzenText Anchor="sizing#height-viewport-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Height viewport CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    These are viewport height values exposed as CSS classes.
+</RadzenText>
+<RadzenExample Example="SizingHeightViewportClasses">
+    <SizingHeightViewportClasses />
+</RadzenExample>
+
+<RadzenText Anchor="borders#border-radius" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Max-height and min-height CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-6">
+    Use these CSS classes to set desired minimum and maximum height <code>class="rz-min-h-100"</code>.
+</RadzenText>
+
+<RadzenTable>
+    <RadzenTableHeader>
+        <RadzenTableRow>
+            <RadzenTableHeaderCell>Height value</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>Height CSS class</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>Min-height CSS class</RadzenTableHeaderCell>
+            <RadzenTableHeaderCell>Max-height CSS class</RadzenTableHeaderCell>
+        </RadzenTableRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+        <RadzenTableRow>
+            <RadzenTableCell>25%</RadzenTableCell>
+            <RadzenTableCell>.rz-h-25</RadzenTableCell>
+            <RadzenTableCell>.rz-min-h-25</RadzenTableCell>
+            <RadzenTableCell>.rz-max-h-25</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>50%</RadzenTableCell>
+            <RadzenTableCell>.rz-h-50</RadzenTableCell>
+            <RadzenTableCell>.rz-min-h-50</RadzenTableCell>
+            <RadzenTableCell>.rz-max-h-50</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>75%</RadzenTableCell>
+            <RadzenTableCell>.rz-h-75</RadzenTableCell>
+            <RadzenTableCell>.rz-min-h-75</RadzenTableCell>
+            <RadzenTableCell>.rz-max-h-75</RadzenTableCell>
+        </RadzenTableRow>
+        <RadzenTableRow>
+            <RadzenTableCell>100%</RadzenTableCell>
+            <RadzenTableCell>.rz-h-100</RadzenTableCell>
+            <RadzenTableCell>.rz-min-h-100</RadzenTableCell>
+            <RadzenTableCell>.rz-max-h-100</RadzenTableCell>
+        </RadzenTableRow>
+    </RadzenTableBody>
+</RadzenTable>
+
+<RadzenText Anchor="spacing#responsive-spacing" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Responsive sizing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    You can set a specific size value for different screen sizes by inserting the respective breakpoint abbreviation.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    For example <code>.rz-w-{breakpoint}-100</code>, where <code>{breakpoint}</code> can be <code>xs</code>, <code>sm</code>, <code>md</code>, <code>lg</code>, <code>xl</code>, <code>xx</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    Learn more about <RadzenLink Text="Breakpoints" Path="/breakpoints" />.
+</RadzenText>

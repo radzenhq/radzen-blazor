@@ -1,4 +1,5 @@
 @page "/tree"
+@page "/docs/guides/components/tree.html"
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Tree
@@ -18,41 +19,16 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Tree component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a Tree component.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Up Arrow" /></span></td>
-                    <td><span class="rz-cell-data">Select previous hierarchical Tree item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Down Arrow" /></span></td>
-                    <td><span class="rz-cell-data">Select next hierarchical Tree item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Right Arrow" /></span></td>
-                    <td><span class="rz-cell-data">Expands selected Tree item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Left Arrow" /></span></td>
-                    <td><span class="rz-cell-data">Collapse selected Tree item.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Enter" /> or <RadzenBadge Text="Space" /></span></td>
-                    <td><span class="rz-cell-data">Check/uncheck selected Tree item if CheckBox is available.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Tree component." },
+        new KeyboardShortcut { Key = "UpArrow", Action = "Select previous hierarchical Tree item." },
+        new KeyboardShortcut { Key = "DownArrow", Action = "Select next hierarchical Tree item." },
+        new KeyboardShortcut { Key = "RightArrow", Action = "Expands selected Tree item." },
+        new KeyboardShortcut { Key = "LeftArrow", Action = "Collapse selected Tree item." },
+        new KeyboardShortcut { Key = "Enter or Space", Action = "Check/uncheck selected Tree item if CheckBox is available." }
+    };
+}

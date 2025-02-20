@@ -3,12 +3,9 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
-
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
@@ -262,23 +259,7 @@ namespace Radzen
                 {
                     if (!string.IsNullOrEmpty(searchText))
                     {
-                        var ignoreCase = FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive;
-
-                        var query = new List<string>();
-
-                        if (!string.IsNullOrEmpty(TextProperty))
-                        {
-                            query.Add(TextProperty);
-                        }
-
-                        if (ignoreCase)
-                        {
-                            query.Add("ToLower()");
-                        }
-
-                        query.Add($"{Enum.GetName(typeof(StringFilterOperator), FilterOperator)}(@0)");
-
-                        _view = Query.Where(DynamicLinqCustomTypeProvider.ParsingConfig, string.Join(".", query), ignoreCase ? searchText.ToLower() : searchText);
+                        _view = Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                     }
                     else
                     {

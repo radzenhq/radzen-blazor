@@ -216,12 +216,12 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
             Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
 
             Assert.Contains(@$"autocomplete=""on""", component.Markup);
             Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
@@ -232,7 +232,7 @@ namespace Radzen.Blazor.Tests
             Assert.DoesNotContain(@$"aria-autocomplete", component.Markup);
 
             component.Instance.DefaultAutoCompleteAttribute = "autocomplete-custom";
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
 
             Assert.Contains(@$"autocomplete=""autocomplete-custom""", component.Markup);
             Assert.Contains(@$"aria-autocomplete=""none""", component.Markup);
@@ -245,22 +245,22 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenNumeric<double>>();
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, false));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", false));
             component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.On));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
             component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.Off));
 
             Assert.Contains(@$"autocomplete=""off""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
             component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.BdayMonth));
 
             Assert.Contains(@$"autocomplete=""{AutoCompleteType.BdayMonth.GetAutoCompleteValue()}""", component.Markup);
 
-            component.SetParametersAndRender(parameters => parameters.Add<bool>(p => p.AutoComplete, true));
+            component.SetParametersAndRender(parameters => parameters.AddUnmatched("AutoComplete", true));
             component.SetParametersAndRender(parameters => parameters.Add<AutoCompleteType>(p => p.AutoCompleteType, AutoCompleteType.BdayYear));
 
             Assert.Contains(@$"autocomplete=""{AutoCompleteType.BdayYear.GetAutoCompleteValue()}""", component.Markup);
@@ -463,10 +463,11 @@ namespace Radzen.Blazor.Tests
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var value = new Dollars(11m);
-            Dollars? ConvertFunc(string s) => decimal.TryParse(s, out var val) ? new Dollars(val) : null;
+            Dollars? ConvertFunc(string s) => decimal.TryParse(s, System.Globalization.CultureInfo.InvariantCulture, out var val) ? new Dollars(val) : null;
             var component = ctx.RenderComponent<RadzenNumeric<Dollars?>>(
                 ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.ConvertValue), (Func<string, Dollars?>)ConvertFunc),
-                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.Value), value)
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars?>.Value), value),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
             );
 
             component.Render();
@@ -494,7 +495,101 @@ namespace Radzen.Blazor.Tests
 
             component.Render();
 
-            Assert.Contains($" value=\"{valueToTest.ToString(format)}\"", component.Markup);
+            Assert.Contains($" value=\"{valueToTest.ToString(format, System.Globalization.CultureInfo.CurrentCulture)}\"", component.Markup);
+        }
+        [Fact]
+        public void Numeric_Supports_TypeConverterWithCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = new Dollars(100.234m);
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<Dollars>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest.ToString(format, System.Globalization.CultureInfo.InvariantCulture)}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_EmptyString()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"0.00\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_ValueString()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "12.50";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.InvariantCulture)
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_ValueStringEsCLCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "12,50";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.GetCultureInfo("es-CL"))
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest}\"", component.Markup);
+        }
+
+        [Fact]
+        public void Numeric_Supports_ValueStringEnUSCulture()
+        {
+            using var ctx = new TestContext();
+
+            var valueToTest = "12.50";
+            string format = "0.00";
+
+            var component = ctx.RenderComponent<RadzenNumeric<string>>(
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Format), format),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<string>.Value), valueToTest),
+                ComponentParameter.CreateParameter(nameof(RadzenNumeric<Dollars>.Culture), System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+            );
+
+            component.Render();
+
+            Assert.Contains($" value=\"{valueToTest}\"", component.Markup);
         }
 
         [Fact]
@@ -517,10 +612,10 @@ namespace Radzen.Blazor.Tests
                 });
             });
             
-            component.Find("input").Change("13.53");
+            component.Find("input").Change(13.53);
 
-            var maxDollars = new Dollars(2);
-            Assert.Contains($" value=\"{maxDollars.ToString()}\"", component.Markup);
+            var maxDollars = new Dollars(maxValue);
+            Assert.Contains($" value=\"{maxDollars}\"", component.Markup);
             Assert.Equal(component.Instance.Value, maxDollars);
         }
 

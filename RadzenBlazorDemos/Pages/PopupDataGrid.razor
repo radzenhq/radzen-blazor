@@ -1,0 +1,102 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
+
+@inherits DbContextPage
+@inject IJSRuntime JSRuntime
+
+<style type="text/css">
+    .my-popup {
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        height: 360px;
+        width: 600px;
+        border: var(--rz-panel-border);
+        background-color: var(--rz-panel-background-color);
+        box-shadow: var(--rz-panel-shadow);
+        border-radius: var(--rz-border-radius)
+    }
+ </style>
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenTextBox @ref=textBox Value="@customerId" @oninput=@OnInput
+                   @onclick="@(args => popup.ToggleAsync(textBox.Element))" @onkeydown=@OnKeyDown />
+</div>
+
+<Popup @ref=popup id="popup" AutoFocusFirstElement="false" class="my-popup">
+    <RadzenDataGrid @ref=grid id="grid" TItem="Customer" Data="@customers" RowSelect="@OnRowSelect" AllowSorting="true" Style="height:360px">
+        <Columns>
+            <RadzenDataGridColumn Property="CustomerID" Title="CustomerID" />
+            <RadzenDataGridColumn Property="CompanyName" Title="CompanyName" />
+            <RadzenDataGridColumn Property="ContactName" Title="ContactName" />
+            <RadzenDataGridColumn Property="City" Title="City" />
+            <RadzenDataGridColumn Property="Country" Title="Country" />
+        </Columns>
+    </RadzenDataGrid>
+</Popup>
+
+@code {
+    RadzenTextBox textBox;
+    string value = "";
+    string customerId;
+    IEnumerable<Customer> customers;
+    Popup popup;
+    RadzenDataGrid<Customer> grid;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        customers = dbContext.Customers
+            .Where(c => c.CustomerID.ToString().Contains(value)
+                || c.CompanyName.ToLowerInvariant().Contains(value)
+                    || c.ContactName.ToLowerInvariant().Contains(value)
+                        || c.City.ToLowerInvariant().Contains(value)
+                            || c.Country.ToLowerInvariant().Contains(value));
+    }
+
+    async Task OnRowSelect(Customer customer)
+    {
+        value = "";
+        customerId = customer.CustomerID;
+        await popup.CloseAsync();
+    }
+
+    async Task OnInput(ChangeEventArgs args)
+    {
+        selectedIndex = 0;
+        customerId = value = $"{args.Value}";
+        await grid.Reload();
+    }
+
+    int selectedIndex = 0;
+    async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        var items = customers;
+        var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", "popup");
+
+        var key = args.Code != null ? args.Code : args.Key;
+
+        if (!args.AltKey && (key == "ArrowDown" || key == "ArrowUp"))
+        {
+            var result = await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", "grid", key, selectedIndex, null, false);
+            selectedIndex = result.First();
+        }
+        else if (args.AltKey && key == "ArrowDown" || key == "Enter" || key == "NumpadEnter")
+        {
+            if (popupOpened && (key == "Enter" || key == "NumpadEnter"))
+            {
+                customerId = items.ElementAtOrDefault(selectedIndex)?.CustomerID;
+            }
+
+            await popup.ToggleAsync(textBox.Element);
+        }
+        else if (key == "Escape" || key == "Tab")
+        {
+            await popup.CloseAsync();
+        }
+    }
+}

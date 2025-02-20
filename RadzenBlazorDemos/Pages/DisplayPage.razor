@@ -1,0 +1,37 @@
+﻿@page "/display"
+
+<PageTitle>Blazor Display Utilities | Free UI Components by Radzen</PageTitle>
+<HeadContent>
+    <meta name="description" content="Display styles and utility CSS classes available in Radzen Blazor Components library.">
+</HeadContent>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Display
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Display utility CSS classes can be used to control the display value of UI elements and components.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    <code>.rz-display-{value}</code>, where <code>{value}</code> can be:
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Body1"><code>none</code> for hiding an element</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>block</code> to treat an element as a block box</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>inline</code> to treat an element as an inline box</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>inline-block</code> to have a block box surrounded by elements as if it were an inline box</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>flex</code> to have a block box that arranges its content according to the flexbox model</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>inline-flex</code> to have an inline box that arranges its content according to the flexbox model</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>grid</code> to have a block box that arranges its content according to the grid model</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1"><code>inline-grid</code> to have an inline box that arranges its content according to the grid model</RadzenText>
+
+<RadzenText Anchor="spacing#responsive-spacing" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Responsive display
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    You can set a specific display value for different screen sizes by inserting the respective breakpoint abbreviation.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    For example <code>.rz-display-{breakpoint}-block</code>, where <code>{breakpoint}</code> can be <code>xs</code>, <code>sm</code>, <code>md</code>, <code>lg</code>, <code>xl</code>, <code>xx</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    Learn more about <RadzenLink Text="Breakpoints" Path="/breakpoints" />.
+</RadzenText>

@@ -35,7 +35,7 @@ namespace Radzen.Blazor
                                            .Add("rz-state-active", !object.Equals(Value, false))
                                            .AddDisabled(Disabled);
 
-        ClassList IconClassList => ClassList.Create("rz-chkbox-icon")
+        ClassList IconClassList => ClassList.Create("notranslate rz-chkbox-icon")
                                             .Add("rzi rzi-check", object.Equals(Value, true))
                                             .Add("rzi rzi-times", object.Equals(Value, null));
 

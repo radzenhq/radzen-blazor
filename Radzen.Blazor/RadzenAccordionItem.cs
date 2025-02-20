@@ -34,7 +34,31 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value><c>true</c> if selected; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool Selected { get; set; }
+        public bool Selected 
+        {
+            get
+            {
+                return selected != null ? selected.Value : false;
+            }
+            set
+            {
+                selected = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the value changed.
+        /// </summary>
+        /// <value>The value changed.</value>
+        [Parameter]
+        public EventCallback<bool> SelectedChanged { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is disabled.
+        /// </summary>
+        /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
 
         /// <summary>
         /// Gets or sets the title attribute of the expand button.
@@ -132,9 +156,11 @@ namespace Radzen.Blazor
             return selected ?? Selected;
         }
 
-        internal void SetSelected(bool? value)
+        internal async Task SetSelected(bool? value)
         {
             selected = value;
+
+            await SelectedChanged.InvokeAsync(Selected);
         }
 
         /// <summary>
@@ -144,12 +170,19 @@ namespace Radzen.Blazor
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            bool shouldRefresh = false;
             if (parameters.DidParameterChange(nameof(Selected), Selected))
             {
-                Accordion?.SelectItem(this, parameters.GetValueOrDefault<bool>(nameof(Selected)));
+                selected = parameters.GetValueOrDefault<bool>(nameof(Selected));
+                shouldRefresh = true;
             }
 
             await base.SetParametersAsync(parameters);
+
+            if (shouldRefresh)
+            {
+                Accordion.Refresh();
+            }
         }
 
         /// <summary>

@@ -4,38 +4,54 @@
 @using Radzen.Blazor.Rendering
 
 @inherits DbContextPage
-@inject IJSRuntime JSRuntime
 
-<RadzenButton @ref=button Text="@(orderId != null ? "Selected order: " + orderId.ToString() : "Select order")" Click="@(args => popup.ToggleAsync(button.Element))" />
+<style type="text/css">
+    .my-popup {
+        display: none;
+        position: absolute;
+        overflow: hidden;
+        height: 360px;
+        width: 600px;
+        border: var(--rz-panel-border);
+        background-color: var(--rz-panel-background-color);
+        box-shadow: var(--rz-panel-shadow);
+        border-radius: var(--rz-border-radius)
+    }
+ </style>
 
-<Popup @ref=popup Lazy=true Open="@OnOpen"
-    Style="display:none;position:absolute;height:300px;width:600px;padding:5px;border:var(--rz-panel-border);background-color:var(--rz-panel-background-color);">
-    <RadzenTextBox id="search" Placeholder="Type to search..." Style="width:100%;" @oninput=@(args => searchString = $"{args.Value}") Value="@searchString" />
-    <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" Style="height:100%;overflow:auto;">
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton @ref=button Text="@(orderId != null ? "Selected order: " + orderId.ToString() : "Select order")" Click="@(args => popup.ToggleAsync(button.Element))" />
+</div>
+
+<Popup @ref=popup Lazy=true class="my-popup">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="1rem" class="rz-h-100 rz-p-4">
+    <RadzenTextBox id="search" Placeholder="Type to search..." @oninput=@(args => searchString = $"{args.Value}") Value="@searchString" />
+    <RadzenDataList @ref=dataList AllowVirtualization=true Data="@orders" Style="flex: 1; --rz-datalist-padding: 0.5rem 0; --rz-datalist-item-margin-inline: 0; overflow:auto;">
         <Template Context="order">
-            <RadzenCard Style="width:100%">
-                <RadzenRow>
-                    <RadzenColumn Size="8" class="rz-text-truncate">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="rz-me-1" />
-                        <b>@(order.ShipName)</b>
-                    </RadzenColumn>
-                    <RadzenColumn Size="4" class="rz-text-align-end">
-                        <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
-                    </RadzenColumn>
-                </RadzenRow>
-                <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
+            <RadzenRow>
+                <RadzenColumn Size="8" class="rz-text-truncate">
+                    <RadzenBadge BadgeStyle="BadgeStyle.Light" Text=@($"{order.OrderID}") class="rz-me-1" />
+                    <b>@(order.ShipName)</b>
+                </RadzenColumn>
+                <RadzenColumn Size="4" class="rz-text-align-end">
+                    <RadzenBadge BadgeStyle="BadgeStyle.Success" Text=@($"{String.Format(new System.Globalization.CultureInfo("en-US"), "{0:C}", order.Freight)}") />
+                </RadzenColumn>
+            </RadzenRow>
+            <hr style="border: none; background-color: var(--rz-text-disabled-color); height: 1px; margin: 1rem 0;" />
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="1rem">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
                     <RadzenImage Path="@order.Employee?.Photo" Style="width: 80px; height: 80px; border-radius: 50%" AlternateText="@(order.Employee?.FirstName + " " + order.Employee?.LastName)" />
                     <RadzenStack Gap="0">
                         <RadzenText TextStyle="TextStyle.H6" class="rz-mb-0">@(order.Employee?.FirstName + " " + order.Employee?.LastName)</RadzenText>
                         <RadzenText TextStyle="TextStyle.Body1">@order.ShipAddress</RadzenText>
-                        <RadzenText TextStyle="TextStyle.Body2">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-0">@(order.ShipCity), @(order.ShipCountry)</RadzenText>
                     </RadzenStack>
-                    <RadzenButton Text="Select" Click="@(args => SelectOrder(order))" Visible=@(orderId != order.OrderID) />
                 </RadzenStack>
-            </RadzenCard>
+                <RadzenButton Text="Select" Click="@(args => SelectOrder(order))" Visible=@(orderId != order.OrderID) />
+            </RadzenStack>
         </Template>
     </RadzenDataList>
+    </RadzenStack>
 </Popup>
 
 @code {
@@ -63,10 +79,5 @@
     {
         orderId = order.OrderID; 
         await popup.CloseAsync();
-    }
-
-    async Task OnOpen()
-    {
-        await JSRuntime.InvokeVoidAsync("eval", "setTimeout(function(){ document.getElementById('search').focus(); }, 200)"); 
     }
 }

@@ -106,7 +106,7 @@
         }
 
         <div class="rz-dropdown-trigger rz-corner-right">
-            <span class="rz-dropdown-trigger-icon  rzi rzi-chevron-down"></span>
+            <span class="notranslate rz-dropdown-trigger-icon rzi rzi-chevron-down"></span>
         </div>
 
         <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
@@ -137,8 +137,8 @@
                         <div class="rz-helper-hidden-accessible">
                             <input readonly="readonly" type="checkbox" id="@($"{(Name ?? UniqueID + "sa")}")" aria-label="@SearchAriaLabel" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
                         </div>
-                        <div class="@(IsAllSelected() ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box")">
-                            <span class="@(IsAllSelected() ? "rz-chkbox-icon rzi rzi-check" : "rz-chkbox-icon")"></span>
+                        <div class="@(IsAllSelected() ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box")">
+                            <span class="@(IsAllSelected() ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
                         </div>
                     </div>
                     }
@@ -152,12 +152,12 @@
                             <input id="@SearchID" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-inputtext" role="textbox" type="text"
                                    onclick="Radzen.preventDefaultAndStopPropagation(event)" aria-label="@SearchAriaLabel"
                                    @ref="@search" @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);})
-                                   @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" />
-                            <span class="rz-multiselect-filter-icon rzi rzi-search"></span>
+                                   @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" autocomplete="@FilterAutoCompleteType" />
+                            <span class="notranslate rz-multiselect-filter-icon rzi rzi-search"></span>
                         </div>
                     }
                     <a id="@(GetId() + "clear")" class="rz-multiselect-close " @onclick="@ClearAll" @onclick:stopPropagation="true">
-                        <span class="rzi rzi-times"></span>
+                        <span class="notranslate rzi rzi-times"></span>
                     </a>
                 </div>
                 }
@@ -180,7 +180,7 @@
         </div>
         @if (AllowClear && (!Multiple && HasValue || Multiple && selectedItems.Count > 0))
         {
-            <i class="rz-dropdown-clear-icon rzi rzi-times" @onclick="@ClearAll" @onclick:stopPropagation="true"></i>
+            <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@ClearAll" @onclick:stopPropagation="true"></i>
         }
     </div>
 }
@@ -191,10 +191,10 @@
         return __builder => {
             <text>
                 <div class="rz-dropdown-filter-container">
-                    <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext" autocomplete="off" aria-autocomplete="none" type="text"
+                    <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext" autocomplete="@FilterAutoCompleteType" aria-autocomplete="none" type="text"
                            @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress"
                            @bind:event="oninput" @bind:get="searchText" @bind:set="@(args => { searchText = $"{args}"; SearchTextChanged.InvokeAsync(searchText);})" />
-                    <span class="rz-dropdown-filter-icon rzi rzi-search"></span>
+                    <span class="notranslate rz-dropdown-filter-icon rzi rzi-search"></span>
                 </div>
             </text>
         };
@@ -202,10 +202,10 @@
         return __builder => {
             <text>
                 <div class="rz-dropdown-filter-container">
-                    <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext" autocomplete="off" aria-autocomplete="none" type="text"
+                    <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext" autocomplete="@FilterAutoCompleteType" aria-autocomplete="none" type="text"
                            @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@searchText"
                            @oninput="@((ChangeEventArgs args) => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);})" />
-                    <span class="rz-dropdown-filter-icon rzi rzi-search"></span>
+                    <span class="notranslate rz-dropdown-filter-icon rzi rzi-search"></span>
                 </div>
             </text>
         };

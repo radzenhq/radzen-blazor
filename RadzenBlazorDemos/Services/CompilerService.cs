@@ -16,6 +16,9 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Razor;
 using Radzen.Blazor;
 using RadzenBlazorDemos.Shared;
+using MetadataReferenceService.Abstractions.Types;
+using MetadataReferenceService.BlazorWasm;
+using System.ComponentModel;
 
 namespace RadzenBlazorDemos
 {
@@ -92,17 +95,47 @@ namespace RadzenBlazorDemos
 @using RadzenBlazorDemos.Pages
 ";
         private readonly HttpClient httpClient;
+        private readonly BlazorWasmMetadataReferenceService metadataReferenceService;
 
-        public CompilerService(HttpClient httpClient)
+        public CompilerService(HttpClient httpClient, NavigationManager navigationManager)
         {
             this.httpClient = httpClient;
+            this.metadataReferenceService = new BlazorWasmMetadataReferenceService(navigationManager);
+        }
+
+        private async Task<IEnumerable<MetadataReference>> GetReferencesAsync(IEnumerable<Assembly> assemblies)
+        {
+            var syncAssemblies = new List<Assembly>();
+
+            var asyncAssemblies = new List<Assembly>();
+
+            foreach (var assembly in assemblies)
+            {
+                if (string.IsNullOrEmpty(assembly.Location))
+                {
+                    asyncAssemblies.Add(assembly);
+                }
+                else
+                {
+                    syncAssemblies.Add(assembly);
+                }
+            }
+
+            var syncReferences = syncAssemblies.Select(a => MetadataReference.CreateFromFile(a.Location)).ToList();
+
+            var asyncReferences = await Task.WhenAll(asyncAssemblies.Select(assembly => metadataReferenceService.CreateAsync(new AssemblyDetails
+            {
+                Name = assembly.GetName().Name
+            })));
+
+            return syncReferences.Concat(asyncReferences).ToList();
         }
 
         private async Task InitializeAsync()
         {
-            var streams = await GetStreamsAsync();
+            var assemblies = GetAssemblies();
 
-            var referenceAssemblies = streams.Select(stream => MetadataReference.CreateFromStream(stream)).ToList();
+            var referenceAssemblies = await GetReferencesAsync(assemblies);
 
             compilation = CSharpCompilation.Create(
                  "RadzenBlazorDemos.DynamicAssembly",
@@ -125,8 +158,7 @@ namespace RadzenBlazorDemos
             });
         }
 
-
-        private async Task<IEnumerable<Stream>> GetStreamsAsync()
+        private IEnumerable<Assembly> GetAssemblies()
         {
              var referenceAssemblyRoots = new[]
              {
@@ -135,35 +167,14 @@ namespace RadzenBlazorDemos
                  typeof(RadzenButton).Assembly,
                  typeof(ExpandoObject).Assembly,
                  typeof(EventConsole).Assembly,
+                 typeof(Component).Assembly
              };
 
-             var referencedAssemblies = referenceAssemblyRoots
+             return  referenceAssemblyRoots
                .SelectMany(assembly => assembly.GetReferencedAssemblies().Append(assembly.GetName()))
                .Select(Assembly.Load)
                .Distinct()
                .ToList();
-
-            if (referencedAssemblies.Any(assembly => string.IsNullOrEmpty(assembly.Location)))
-            {
-                var list = new List<Stream>();
-
-                await Task.WhenAll(
-                    referencedAssemblies.Select(async assembly =>
-                    {
-                        var result = await httpClient.GetAsync($"/_framework/{assembly.GetName().Name}.dll");
-
-                        result.EnsureSuccessStatusCode();
-
-                        list.Add(await result.Content.ReadAsStreamAsync());
-                    })
-                );
-
-                return list;
-            }
-            else
-            {
-                return referencedAssemblies.Select(assembly => File.OpenRead(assembly.Location));
-            }
         }
 
         public async Task<Type> CompileAsync(string source)
@@ -180,7 +191,7 @@ namespace RadzenBlazorDemos
 
             var csharpDocument = codeDocument.GetCSharpDocument();
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(csharpDocument.GeneratedCode, CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp10));
+            var syntaxTree = CSharpSyntaxTree.ParseText(csharpDocument.GeneratedCode.Replace("<Radzen.Group>", "<global::Radzen.Group>"), CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp10));
 
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(syntaxTree);
 

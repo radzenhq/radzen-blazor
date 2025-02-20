@@ -1,6 +1,6 @@
 <div title=@Title class="rz-html-editor-colorpicker" @onmousedown:preventDefault>
     <button tabindex="-1" class="rz-html-editor-color" @onclick=@OnClick disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode())) @onclick:preventDefault>
-        <i class="rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
+        <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
         <div class="rz-html-editor-color-value" style="background-color:@Value"></div>
     </button>
     <RadzenColorPicker

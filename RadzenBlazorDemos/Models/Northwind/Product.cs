@@ -16,6 +16,34 @@ namespace RadzenBlazorDemos.Models.Northwind
       set;
     }
 
+    public static ProductComparer Comparer { get; } = new();
+    public class ProductComparer : IEqualityComparer<Product>, IEqualityComparer<object>
+    {
+      public bool Equals(Product x, Product y)
+      {
+        if (ReferenceEquals(x, y)) return true;
+        if (x is null) return false;
+        if (y is null) return false;
+        if (x.GetType() != y.GetType()) return false;
+        return x.ProductName == y.ProductName;
+      }
+
+      public int GetHashCode(Product obj)
+      {
+        return (obj.ProductName != null ? obj.ProductName.GetHashCode() : 0);
+      }
+
+      public new bool Equals(object x, object y)
+      {
+        return Equals((Product)x, (Product)y);
+      }
+
+      public int GetHashCode(object obj)
+      {
+        return GetHashCode((Product)obj);
+      }
+    }
+
 
     [InverseProperty("Product")]
     public ICollection<OrderDetail> OrderDetails { get; set; }

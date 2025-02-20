@@ -9,11 +9,11 @@
                 <NavLink tabindex="-1" target="@Target" class="rz-navigation-item-link" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {
-                        <img class="rz-navigation-item-icon" src="@Image" style="@ImageStyle" alt=@ImageAlternateText />
+                        <img class="notranslate rz-navigation-item-icon" src="@Image" style="@ImageStyle" alt=@ImageAlternateText />
                     }
                     @if (Template != null)
                     {
@@ -25,7 +25,7 @@
                     }
                     @if (ChildContent != null)
                     {
-                        <i class="rzi rz-navigation-item-icon-children">keyboard_arrow_down</i>
+                        <i class="notranslate rzi rz-navigation-item-icon-children">keyboard_arrow_down</i>
                     }
                 </NavLink>
             }
@@ -34,11 +34,11 @@
                 <div class="rz-navigation-item-link">
                     @if (!string.IsNullOrEmpty(Icon))
                     {
-                        <i class="rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {
-                        <img class="rz-navigation-item-icon" src="@Image" style="@ImageStyle" alt=@ImageAlternateText />
+                        <img class="notranslate rz-navigation-item-icon" src="@Image" style="@ImageStyle" alt=@ImageAlternateText />
                     }
                     @if (Template != null)
                     {
@@ -50,7 +50,7 @@
                     }
                     @if (ChildContent != null)
                     {
-                        <i class="rzi rz-navigation-item-icon-children">keyboard_arrow_down</i>
+                        <i class="notranslate rzi rz-navigation-item-icon-children">keyboard_arrow_down</i>
                     }
                 </div>
             }

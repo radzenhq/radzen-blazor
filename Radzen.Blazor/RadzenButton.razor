@@ -25,11 +25,11 @@
                 {
                     @if (!string.IsNullOrEmpty(@Icon))
                     {
-                        <i class="rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
+                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {
-                        <img class="rz-button-icon-left rzi" src="@Image" alt="@ImageAlternateText" />
+                        <img class="notranslate rz-button-icon-left rzi" src="@Image" alt="@ImageAlternateText" />
                     }
                     @if (!string.IsNullOrEmpty(Text))
                     {

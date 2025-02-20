@@ -17,13 +17,6 @@ namespace Radzen
     public class FormComponentWithAutoComplete<T> : FormComponent<T>
     {
         /// <summary>
-        /// Gets or sets a value indicating the browser built-in autocomplete is enabled.
-        /// </summary>
-        /// <value><c>true</c> if input automatic complete is enabled; otherwise, <c>false</c>.</value>
-        [Parameter]
-        public virtual bool AutoComplete { get; set; } = true;
-
-        /// <summary>
         /// Gets or sets a value indicating the type of built-in autocomplete
         /// the browser should use.
         /// <see cref="Blazor.AutoCompleteType" />
@@ -44,8 +37,8 @@ namespace Radzen
         /// AutoCompleteType.</value>
         public virtual string AutoCompleteAttribute
         {
-            get => !AutoComplete ? DefaultAutoCompleteAttribute :
-                autoComplete as string ?? AutoCompleteType.GetAutoCompleteValue();
+            get => Attributes != null && Attributes.ContainsKey("AutoComplete") && $"{Attributes["AutoComplete"]}".ToLower() == "false" ? DefaultAutoCompleteAttribute :
+                Attributes != null && Attributes.ContainsKey("AutoComplete") ? Attributes["AutoComplete"] as string ?? AutoCompleteType.GetAutoCompleteValue() : AutoCompleteType.GetAutoCompleteValue();
         }
 
         /// <summary>
@@ -53,18 +46,11 @@ namespace Radzen
         /// </summary>
         public virtual string DefaultAutoCompleteAttribute { get; set; } = "off";
 
-        object autoComplete;
         object ariaAutoComplete;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            parameters = parameters.TryGetValue(nameof(AutoComplete).ToLower(), out autoComplete) ?
-                ParameterView.FromDictionary(parameters
-                    .ToDictionary().Where(i => i.Key != nameof(AutoComplete).ToLower()).ToDictionary(i => i.Key, i => i.Value)
-                    .ToDictionary(i => i.Key, i => i.Value))
-                : parameters;
-
             parameters = parameters.TryGetValue("aria-autocomplete", out ariaAutoComplete) ?
                 ParameterView.FromDictionary(parameters
                     .ToDictionary().Where(i => i.Key != "aria-autocomplete").ToDictionary(i => i.Key, i => i.Value)

@@ -12,20 +12,30 @@
     @ChildContent
 </CascadingValue>
 <div @ref=Element  style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
-    <div class="rz-scheduler-nav">
-        <div class="rz-scheduler-nav-prev-next">
-            <button tabindex="0" class="rz-button rz-prev" @onclick=@OnPrev title="@PrevText"><RadzenIcon Icon="chevron_left" /></button>
-            <button tabindex="0" class="rz-button rz-next" @onclick=@OnNext title="@NextText"><RadzenIcon Icon="chevron_right" /></button>
-            <button tabindex="0" class="rz-button rz-today" @onclick=@OnToday title="@TodayText">@TodayText</button>
-        </div>
-        <div class="rz-scheduler-nav-title">@SelectedView?.Title</div>
-        <div class="rz-scheduler-nav-views">
-        @foreach (var view in Views)
+        @if (ShowHeader)
         {
-            <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text class="@($"{(IsSelected(view)? " rz-state-active" : "")}")" />
+            <div class="rz-scheduler-nav">
+                <div class="rz-scheduler-nav-prev-next">
+                    <button tabindex="0" class="rz-button rz-prev" @onclick=@OnPrev title="@PrevText"><RadzenIcon Icon="chevron_left" /></button>
+                    <button tabindex="0" class="rz-button rz-next" @onclick=@OnNext title="@NextText"><RadzenIcon Icon="chevron_right" /></button>
+                    <button tabindex="0" class="rz-button rz-today" @onclick=@OnToday title="@TodayText">@TodayText</button>
+                </div>
+                <div class="rz-scheduler-nav-title">@SelectedView?.Title</div>
+                <div class="rz-scheduler-nav-views">
+                    @if (NavigationTemplate != null)
+                    {
+                        @NavigationTemplate
+                    }
+                    else
+                    {
+                        @foreach (var view in Views)
+                        {
+                            <RadzenButton Click=@(args => OnChangeView(view)) Icon=@view.Icon Text=@view.Text class="@($"{(IsSelected(view) ? " rz-state-active" : "")}")" />
+                        }
+                    }
+                </div>
+            </div>
         }
-        </div>
-    </div>
-    @SelectedView?.Render()
+        @SelectedView?.Render()
 </div>
 }

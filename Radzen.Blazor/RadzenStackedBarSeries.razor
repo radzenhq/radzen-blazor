@@ -36,11 +36,13 @@
 
                 if (radius > 0)
                 {
-                    var items = barSeries.SelectMany(series => series.ItemsForCategory(category(data))).ToList();
+                    var items = barSeries.SelectMany(series => series.ItemsForCategory(category(data))).OfType<TItem>().ToList();
                     var index = items.IndexOf(data);
                     var width = Math.Abs(x0 - x);
 
-                    if (radius > height / 2 || index < items.Count - 1 || radius > width)
+                    var nextValue = (index < items.Count - 1) ? Value(items[index + 1]) : 0;
+
+                    if (radius > height / 2 || (index < items.Count - 1 && nextValue != 0) || radius > width)
                     {
                         radius = 0;
                     }

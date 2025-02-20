@@ -39,12 +39,15 @@
 
     public void Export(string type)
     {
+        var columnsToExport = grid.ColumnsCollection.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property));
+
         service.Export("OrderDetails", type, new Query() 
             { 
-                OrderBy = grid.Query.OrderBy, 
-                Filter = grid.Query.Filter, 
+                OrderBy = grid.Query.OrderBy,
+                Filter = grid.Query.Filter,
+                Expand = "Order,Product",
                 Select = string.Join(",", grid.ColumnsCollection.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property))
-                        .Select(c => c.Property.Contains(".") ? $"{c.Property} as {c.Property.Replace(".", "_")}" : c.Property))
+                            .Select(c => c.Property.Contains(".") ? $"{c.Property} as {c.Property.Replace(".", "_")}" : c.Property))
             });
     }
 }

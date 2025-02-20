@@ -184,7 +184,7 @@ namespace Radzen
                 Text = "Material",
                 Value = "material",
                 Primary = "#4340d2",
-                Secondary = "#e91e63",
+                Secondary = "#e31c65",
                 Base = "#f5f5f5",
                 Selection = "rgba(67, 64, 210, 0.12)",
                 SelectionText = "#4340d2",

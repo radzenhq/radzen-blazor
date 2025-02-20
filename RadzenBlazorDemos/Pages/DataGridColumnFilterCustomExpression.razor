@@ -1,6 +1,4 @@
-﻿@using System.Linq.Dynamic.Core
-
-@if (employees == null)
+﻿@if (employees == null)
 {
     <p><em>Loading...</em></p>
 }
@@ -125,7 +123,7 @@ else
         if (selectedWorkStatus?.Any() == true)
         {
             whereExpression = string.Join($" {Enum.GetName(typeof(LogicalFilterOperator), workStatusOperator).ToLowerInvariant()} ",
-                selectedWorkStatus.Select(s => $"WorkStatus.Contains(\"{s}\")"));
+                selectedWorkStatus.Select(s => $"it.WorkStatus.Contains(\"{s}\")"));
         }
         else
         {

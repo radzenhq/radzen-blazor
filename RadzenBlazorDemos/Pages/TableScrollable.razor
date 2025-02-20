@@ -1,0 +1,32 @@
+﻿<RadzenTable style="height:335px">
+    <RadzenTableHeader>
+        <RadzenTableHeaderRow>
+            @for (var i = 0; i < cols; i++)
+            {
+                var col = i;
+                <RadzenTableHeaderCell Style="width:150px">
+                    @($"Column {col}")
+                </RadzenTableHeaderCell>
+            }
+        </RadzenTableHeaderRow>
+    </RadzenTableHeader>
+    <RadzenTableBody>
+    @for (var i = 0; i < rows; i++)
+    {
+        var row = i;
+        <RadzenTableRow>
+            @for (var j = 0; j < cols; j++)
+            {
+                var cell = j;
+                <RadzenTableCell>
+                    @($"Cell {row} {cell}")
+                </RadzenTableCell>
+            }
+        </RadzenTableRow>
+    }
+    </RadzenTableBody>
+</RadzenTable>
+@code{
+    int rows = 50;
+    int cols = 50;
+}

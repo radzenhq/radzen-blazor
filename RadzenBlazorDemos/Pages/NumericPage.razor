@@ -1,4 +1,5 @@
 ﻿@page "/numeric"
+@page "/docs/guides/components/numeric.html"
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Numeric
@@ -86,29 +87,13 @@
     The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor Numeric component.
 </RadzenText>
 
-<div class="rz-data-grid rz-datatable rz-datatable-scrollable" style="width: 100%;">
-    <div class="rz-data-grid-data">
-        <table class="rz-grid-table">
-            <thead>
-                <tr>
-                    <th style="padding: var(--rz-grid-cell-padding)">Press this key</th>
-                    <th style="padding: var(--rz-grid-cell-padding)">To do this</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Tab" /></span></td>
-                    <td><span class="rz-cell-data">Navigate to a Numeric component.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Up arrow" /> in a focused Numeric.</span></td>
-                    <td><span class="rz-cell-data">Increase the Numeric value with the Step configured.</span></td>
-                </tr>
-                <tr>
-                    <td><span class="rz-cell-data"><RadzenBadge Text="Down arrow" /> in a focused Numeric.</span></td>
-                    <td><span class="rz-cell-data">Decrease the Numeric value with the Step configured.</span></td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a Numeric component." },
+        new KeyboardShortcut { Key = "UpArrow in a focused Numeric", Action = "Increase the Numeric value with the Step configured." },
+        new KeyboardShortcut { Key = "DownArrow in a focused Numeric", Action = "Decrease the Numeric value with the Step configured." }
+    };
+}

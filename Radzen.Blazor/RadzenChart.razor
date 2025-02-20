@@ -13,7 +13,7 @@
 {
     <CascadingValue Value="@this">
         <Legend />
-        <svg style="width: 100%; height: 100%">
+        <svg style="width: 100%; height: 100%; overflow: visible;">
             <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
                 <ClipPath />
                 @if(ShouldRenderAxes())
@@ -38,13 +38,7 @@
                 @donut.RenderTitle(MarginLeft, MarginTop)
             }
         }
-        <ChartTooltipContainer @ref="@chartTooltipContainer">
-            @if (tooltip != null)
-            {
-                @tooltip
-            }
-        </ChartTooltipContainer>
-        
+
     </CascadingValue>
 }
 </div>

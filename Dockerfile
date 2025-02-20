@@ -17,7 +17,7 @@ COPY RadzenBlazorDemos.Host /app/RadzenBlazorDemos.Host
 WORKDIR /app
 RUN docfx DocFX/docfx.json
 
-FROM mcr.microsoft.com/dotnet/sdk:8.0
+FROM mcr.microsoft.com/dotnet/sdk:9.0
 
 COPY --from=0 /app/RadzenBlazorDemos.Host /app/RadzenBlazorDemos.Host
 COPY --from=0 /app/RadzenBlazorDemos /app/RadzenBlazorDemos
