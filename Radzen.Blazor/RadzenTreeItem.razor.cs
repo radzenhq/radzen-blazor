@@ -167,7 +167,19 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    await Collapse();
+                    if (items.Count > 0)
+                    {
+                        Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
+                    }
+
+                    if (Tree != null)
+                    {
+                        await Tree.Collapse.InvokeAsync(new TreeEventArgs()
+                        {
+                            Text = Text,
+                            Value = Value
+                        });
+                    }
                 }
 
                 return;
@@ -193,36 +205,19 @@ namespace Radzen.Blazor
             }
             else
             {
-                await Collapse();
-            }
-        }
-
-        async Task Collapse()
-        {
-            expanded = false;
-            clientExpanded = false;
-
-            if (items.Count > 0)
-            {
-                Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
-
-                if (ParentItem != null)
+                if (items.Count > 0)
                 {
-                    ParentItem.items = Tree.CurrentItems;
+                    Tree.RemoveFromCurrentItems(Tree.CurrentItems.IndexOf(items[0]), items.Count);
                 }
-                else if (Tree != null)
-                {
-                    Tree.items = Tree.CurrentItems;
-                }
-            }
 
-            if (Tree != null)
-            {
-                await Tree.Collapse.InvokeAsync(new TreeEventArgs()
+                if (Tree != null)
                 {
-                    Text = Text,
-                    Value = Value
-                });
+                    await Tree.Collapse.InvokeAsync(new TreeEventArgs()
+                    {
+                        Text = Text,
+                        Value = Value
+                    });
+                }
             }
         }
 
@@ -238,7 +233,7 @@ namespace Radzen.Blazor
 
                     foreach (var sibling in siblings)
                     {
-                        await sibling.Collapse();
+                        await sibling.Toggle();
                     }
 
                     await Tree.ChangeState();
