@@ -522,7 +522,8 @@ namespace Radzen.Blazor
             {
                 for (int current = (int)Culture.DateTimeFormat.FirstDayOfWeek, to = current + 7; current < to; current++)
                 {
-                    yield return Culture.DateTimeFormat.AbbreviatedDayNames[current % 7];
+                    string weekday = Culture.DateTimeFormat.AbbreviatedDayNames[current % 7];
+                    yield return weekday.Length <= 3 ? weekday : weekday[..3];
                 }
             }
         }
