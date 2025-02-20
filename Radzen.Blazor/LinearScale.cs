@@ -113,12 +113,12 @@ namespace Radzen.Blazor
                 Round = false;
             }
 
-            if (step <= 0)
+            if (step == 0)
             {
-                throw new ArgumentOutOfRangeException("Step must be greater than zero");
+                throw new ArgumentOutOfRangeException("Step must be non-zero");
             }
 
-            return (start, end, step);
+            return (start, end, Math.Abs(step));
         }
     }
 }
