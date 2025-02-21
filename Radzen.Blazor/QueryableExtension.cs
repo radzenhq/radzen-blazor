@@ -510,13 +510,17 @@ namespace Radzen
                 {
                     return items.Cast<string>().Select(i => $@"""{i}""");
                 }
+                else if (items.ElementType == typeof(bool) || items.ElementType == typeof(bool?))
+                {
+                    return items.Cast<object>().Select(i => $@"{i}".ToLower());
+                }
                 else if (PropertyAccess.IsDate(items.ElementType))
                 {
                     return items.Cast<object>().Select(i => $@"DateTime.Parse(""{i}"")");
                 }
                 else if (PropertyAccess.IsEnum(items.ElementType) || PropertyAccess.IsNullableEnum(items.ElementType))
                 {
-                    return items.Cast<object>().Select(i => i != null ? Convert.ChangeType(i,typeof(int)) : null);
+                    return items.Cast<object>().Select(i => i != null ? Convert.ChangeType(i, typeof(int)) : null);
                 }
 
                 return items.Cast<object>();
