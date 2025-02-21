@@ -252,6 +252,7 @@ else
             if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
             {
                 query = query.SelectMany(property).Select(Column.FilterProperty).Distinct().Cast<object>().OrderBy(i => i);
+                propertyType = query.ElementType;
             }
             else
             {
