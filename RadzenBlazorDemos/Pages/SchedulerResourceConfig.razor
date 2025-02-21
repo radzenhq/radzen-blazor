@@ -1,0 +1,207 @@
+@inject DialogService DialogService
+
+<RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="2.0rem" class="rz-p-4 rz-mb-6 rz-border-radius-1" Style="border: var(--rz-grid-cell-border);height:4rem;">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.0rem" Style="margin-right: 40px;">
+        <RadzenLabel Text="Group by:  " />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" >
+        <RadzenLabel Text="Building:  " />
+        <RadzenSwitch Change=@(args => OnChange(args, "Building")) @bind-Value=@showLocation />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" >
+        <RadzenLabel Text="Room:  " />
+        <RadzenSwitch Change=@(args => OnChange(args, "Room")) @bind-Value=@showRoom />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" >
+        <RadzenLabel Text="Person:  " />
+        <RadzenSwitch Change=@(args => OnChange(args, "Person")) @bind-Value=@showAttendee />
+    </RadzenStack>
+</RadzenStack>
+
+<RadzenScheduler @ref=@scheduler style="height: 805px;" SlotRender=@OnSlotRender TItem="ResourceAppointment" Data=@appointments StartProperty="Start" EndProperty="End"
+TextProperty="Text" SelectedIndex="0"
+SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender DaySelect="@OnDaySelect"
+AppointmentMove=@OnAppointmentMove >
+    <Resources>
+        <RadzenSchedulerResource IsActive=@showLocation Title="Location" Property="Building" Data="@(Buildings)" />
+        <RadzenSchedulerResource IsActive=@showRoom Title="Room" Property="Room" Data="@(Rooms)" />
+        <RadzenSchedulerResource IsActive=@showAttendee Title="Attendee" Property="Person" Data="@(People)" />
+    </Resources>
+    <ChildContent>
+        <RadzenDayView />
+        <RadzenDayView ShowResourceGrouping="false" />
+        <RadzenMultiDayView AdvanceDays="1" NumberOfDays="4" />
+        <RadzenWeekView />
+    </ChildContent>
+</RadzenScheduler>
+
+<EventConsole @ref=@console />
+
+@code {
+    RadzenScheduler<ResourceAppointment> scheduler;
+    EventConsole console;
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+    bool showLocation = true;
+    bool showRoom = true;
+    bool showAttendee = true;
+
+    int sliderMinimumWidth { get; set; } = 250;
+
+    string[] Buildings = new[] { "London", "Edinburgh" };
+    string[] Rooms = new[] { "Home", "Office" };
+    string[] People = new[] { "Alan", "Bjorn", "Charlotte" };
+
+    void OnChange(bool? value, string name)
+    {
+        console.Log($"{name} value changed to {value}");
+    }
+
+    IList<ResourceAppointment> appointments = new List<ResourceAppointment>
+    {
+        new ResourceAppointment { Start = DateTime.Today.AddDays(-5), End = DateTime.Today.AddDays(-1), Text = "Vacation", Building="London", Room = "Home", Person = "Bjorn" },
+        new ResourceAppointment { Start = DateTime.Today.AddDays(-1).AddHours(12), End = DateTime.Today.AddDays(-1).AddHours(14), Text = "Lunch", Building="Edinburgh", Room = "Home", Person = "Bjorn" },
+        new ResourceAppointment { Start = DateTime.Today.AddDays(-1).AddHours(12), End = DateTime.Today.AddDays(-1).AddHours(14), Text = "Lunch", Building="Edinburgh", Room = "Home", Person = "Charlotte" },
+        new ResourceAppointment { Start = DateTime.Today.AddDays(-1).AddHours(9), End = DateTime.Today.AddDays(10).AddHours(14), Text = "Compile report", Building="Edinburgh", Room = "Home", Person = "Bjorn" },
+        new ResourceAppointment { Start = DateTime.Today.AddDays(-1).AddHours(9), End = DateTime.Today.AddDays(-1).AddHours(11), Text = "Product feedback", Building="Edinburgh", Room = "Home", Person = "Charlotte" },
+        new ResourceAppointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting", Building="London", Room = "Home", Person = "Alan" },
+        new ResourceAppointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting", Building="London", Room = "Home", Person = "Bjorn" },
+        new ResourceAppointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(11), Text = "Online meeting", Building="London", Room = "Home", Person = "Charlotte" },
+        new ResourceAppointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(15), Text = "Compile Report", Building="London", Room = "Office", Person = "Alan" },
+        new ResourceAppointment { Start = DateTime.Today.AddHours(16), End = DateTime.Today.AddHours(18), Text = "Recruitment", Building="Edinburgh", Room = "Office", Person = "Bjorn" },
+        new ResourceAppointment { Start = DateTime.Today.AddDays(1).AddHours(10), End = DateTime.Today.AddDays(1).AddHours(16), Text = "Development", Building="London", Room = "Home", Person = "Alan" },
+        new ResourceAppointment { Start = DateTime.Today.AddDays(1).AddHours(9), End = DateTime.Today.AddDays(1).AddHours(17), Text = "Testing", Building="London", Room = "Office", Person = "Charlotte" },
+        new ResourceAppointment { Start = DateTime.Today.AddDays(1).AddHours(9), End = DateTime.Today.AddDays(1).AddHours(17), Text = "Work from home", Building="London", Room = "Home", Person = "Bjorn" },
+        new ResourceAppointment { Start = DateTime.Today.AddDays(2).AddHours(10), End = DateTime.Today.AddDays(2).AddHours(15), Text = "Product demonstration", Building="London", Room = "Office", Person = "Charlotte" },
+    };
+
+    void OnDaySelect(SchedulerDaySelectEventArgs args)
+    {
+        console.Log($"DaySelect: Day={args.Day} AppointmentCount={args.Appointments.Count()}");
+        scheduler.Reload();
+    }
+
+    void OnSlotRender(SchedulerSlotRenderEventArgs args)
+    {
+        // Highlight today in month view
+        if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
+        {
+            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+        }
+
+        // Highlight working hours (9-18)
+        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
+        {
+            args.Attributes["style"] = "background: var(--rz-scheduler-highlight-background-color, rgba(255,220,40,.2));";
+        }
+    }
+
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+        string resourceFilter;
+
+        console.Log($"SlotSelect: Start={args.Start} End={args.End}");
+
+        foreach(var item in args.ResourceFilters)
+        {
+            console.Log($"SlotSelect (resource filter): Property={item.Property} Value={item.Value}");
+        }
+
+        if (args.View.Text != "Year")
+        {
+            ResourceAppointment data = await DialogService.OpenAsync<AddResourceAppointmentPage>("Add Appointment",
+                new Dictionary<string, object> { 
+                    { "Start", args.Start }, 
+                    { "End", args.End }, 
+                    { "Building", args.ResourceFilters.Where(w=>w.Property=="Building").FirstOrDefault().Value },
+                    { "Room", args.ResourceFilters.Where(w=>w.Property=="Room").FirstOrDefault().Value },
+                    { "Person", args.ResourceFilters.Where(w=>w.Property=="Person").FirstOrDefault().Value },
+                    { "Buildings", Buildings },
+                    { "Rooms", Rooms },
+                    { "People", People }
+                });
+
+            if (data != null)
+            {
+                appointments.Add(data);
+                // Either call the Reload method or reassign the Data property of the Scheduler
+                await scheduler.Reload();
+            }
+        }
+    }
+
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<ResourceAppointment> args)
+    {
+        console.Log($"AppointmentSelect: Appointment={args.Data.Text}");
+
+        var copy = new ResourceAppointment
+        {
+            Building = args.Data.Building,
+            Room = args.Data.Room,
+            Person = args.Data.Person,
+            Start = args.Data.Start,
+            End = args.Data.End,
+            Text = args.Data.Text
+        };
+
+        var data = await DialogService.OpenAsync<EditResourceAppointmentPage>("Edit Appointment", new Dictionary<string, object> { 
+            { "Appointment", copy }, 
+            { "Buildings", Buildings },
+            { "Rooms", Rooms },
+            { "People", People }
+        });
+
+        if (data != null)
+        {
+            // Update the appointment
+            args.Data.Building = data.Building;
+            args.Data.Room = data.Room;
+            args.Data.Person = data.Person;
+            args.Data.Start = data.Start;
+            args.Data.End = data.End;
+            args.Data.Text = data.Text;
+        }
+
+        await scheduler.Reload();
+    }
+
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<ResourceAppointment> args)
+    {
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+
+        if (args.Data.Person == "Alan")
+        {
+            args.Attributes["style"] = "background: darkred";
+        }
+        else if (args.Data.Person == "Bjorn")
+        {
+            args.Attributes["style"] = "background: darkorange";
+        }
+        else if (args.Data.Person == "Charlotte")
+        {
+            args.Attributes["style"] = "background: darkgreen";
+        }
+        else
+        {
+            args.Attributes["style"] = "background: darkblue";
+        }
+    }
+
+    async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs args)
+    {
+        var draggedAppointment = appointments.FirstOrDefault(x => x == args.Appointment.Data);
+
+        if (draggedAppointment != null)
+        {
+            draggedAppointment.Start = draggedAppointment.Start + args.TimeSpan;
+            draggedAppointment.End = draggedAppointment.End + args.TimeSpan;
+            if(args.ResourceFilters!=null)
+            {
+                if (args.ResourceFilters.Where(w => w.Property == "Building").Any()) draggedAppointment.Building = args.ResourceFilters.Where(w => w.Property == "Building").FirstOrDefault().Value;
+                if (args.ResourceFilters.Where(w => w.Property == "Room").Any()) draggedAppointment.Room = args.ResourceFilters.Where(w => w.Property == "Room").FirstOrDefault().Value;
+                if (args.ResourceFilters.Where(w => w.Property == "Person").Any()) draggedAppointment.Person = args.ResourceFilters.Where(w => w.Property == "Person").FirstOrDefault().Value;
+            }
+            await scheduler.Reload();
+        }
+    }
+}

@@ -1,0 +1,26 @@
+@using Radzen.Blazor
+@namespace Radzen.Blazor
+
+@inherits SchedulerResourceBase
+
+@code {
+    /// <inheritdoc />
+    [Parameter]
+    public override string Title { get; set; }
+
+    /// <inheritdoc />
+    [Parameter]
+    public override string Property { get; set; }
+
+    /// <inheritdoc />
+    [Parameter]
+    public override int Order { get; set; } = 0;
+
+    /// <inheritdoc />
+    [Parameter]
+    public override bool IsActive { get; set; } = true;
+
+    /// <inheritdoc />
+    [Parameter]
+    public override IEnumerable<string> Data { get; set; }
+}

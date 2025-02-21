@@ -36,5 +36,9 @@ namespace Radzen
         {
             IsDefaultPrevented = true;
         }
+        /// <summary>
+        /// List of resource filters.
+        /// </summary>
+        public IList<(string Property, string Value)> ResourceFilters { get; set; }
     }
 }

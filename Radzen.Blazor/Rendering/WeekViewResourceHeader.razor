@@ -1,0 +1,34 @@
+@using Radzen.Blazor.Rendering
+
+@inherits ResourceHeaderBase
+
+<div class="rz-resource-scheduler-group-header-item">
+    <div class="rz-resource-scheduler-group-header-title">
+        @ResourceDataValue
+    </div>
+    @if (ResourceDictionary!=null && CurrentResource!=null && ResourceDictionary[CurrentResource] != null)
+    {
+        <div class="rz-resource-scheduler-group-header">
+            @foreach (var resValue in ResourceDictionary[CurrentResource].Data)
+            {
+                <CascadingValue Value=@Scheduler>
+                    <WeekViewResourceHeader StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@Appointments ResourceDataValue=@resValue
+                    HeaderFormat=@HeaderFormat TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot ResourceDictionary=@ResourceDictionary CurrentResource=@ResourceDictionary[CurrentResource]
+                    Parent=this AppointmentMove=@AppointmentMove />
+                </CascadingValue>
+            }
+        </div>
+    }
+    else
+    {
+        if(CurrentResource!=null)
+        {
+            <div class="rz-resource-scheduler-diary" style="@($"height: {Scheduler.Height}px")">
+                <CascadingValue Value=@Scheduler>
+                    <WeekView HeaderFormat=@HeaderFormat MinutesPerSlot=@MinutesPerSlot StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime 
+                            Appointments=@filteredAppointments ResourceFilterList=@resourceFilterList TimeFormat="@TimeFormat" AppointmentMove=AppointmentMove />
+                </CascadingValue>
+            </div>;
+        }
+    }
+</div>
