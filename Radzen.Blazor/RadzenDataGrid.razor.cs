@@ -115,7 +115,7 @@ namespace Radzen.Blazor
             var view = AllowPaging ? PagedView : View;
             var top = request.Count;
 
-            if(top <= 0)
+            if (top <= 0)
             {
                 top = PageSize;
             }
@@ -142,7 +142,7 @@ namespace Radzen.Blazor
         {
             var top = request.Count;
 
-            if(top <= 0)
+            if (top <= 0)
             {
                 top = PageSize;
             }
@@ -172,7 +172,7 @@ namespace Radzen.Blazor
             {
                 if (AllowVirtualization)
                 {
-                    if(AllowGrouping && Groups.Any() && !LoadData.HasDelegate)
+                    if (AllowGrouping && Groups.Any() && !LoadData.HasDelegate)
                     {
                         builder.OpenComponent(0, typeof(Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<GroupResult>));
                         builder.AddAttribute(1, "ItemsProvider", new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderDelegate<GroupResult>(LoadGroups));
@@ -220,7 +220,7 @@ namespace Radzen.Blazor
                             });
                         }));
 
-                        if(VirtualizationOverscanCount != default(int))
+                        if (VirtualizationOverscanCount != default(int))
                         {
                             builder.AddAttribute(1, "OverscanCount", VirtualizationOverscanCount);
                         }
@@ -424,7 +424,7 @@ namespace Radzen.Blazor
 
             if (column.FrozenPosition == FrozenColumnPosition.Left)
             {
-                for(var i=0; i<ColumnsCollection.Count; i++)
+                for (var i = 0; i < ColumnsCollection.Count; i++)
                 {
                     if (ColumnsCollection[i] == column)
                     {
@@ -437,7 +437,7 @@ namespace Radzen.Blazor
                             return "rz-frozen-cell rz-frozen-cell-left";
                         }
                     }
-                    if(!ColumnsCollection[i].IsFrozen())
+                    if (!ColumnsCollection[i].IsFrozen())
                     {
                         break;
                     }
@@ -445,11 +445,11 @@ namespace Radzen.Blazor
                 return "rz-frozen-cell rz-frozen-cell-left-inner";
             }
 
-            for (var i = ColumnsCollection.Count-1; i >=0; i--)
+            for (var i = ColumnsCollection.Count - 1; i >= 0; i--)
             {
                 if (ColumnsCollection[i] == column)
                 {
-                    if (i - 1 >=0 && (!ColumnsCollection[i-1].IsFrozen() || ColumnsCollection[i-1].FrozenPosition == FrozenColumnPosition.Left))
+                    if (i - 1 >= 0 && (!ColumnsCollection[i - 1].IsFrozen() || ColumnsCollection[i - 1].FrozenPosition == FrozenColumnPosition.Left))
                     {
                         return "rz-frozen-cell rz-frozen-cell-right rz-frozen-cell-right-end";
                     }
@@ -678,11 +678,11 @@ namespace Radzen.Blazor
                 }
             }
 
-            var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
+            var descriptor = Sorts.FirstOrDefault(d => d.Property == column?.GetSortProperty());
             if (descriptor == null && column.SortOrder.HasValue)
             {
                 descriptor = new SortDescriptor() { Property = column.GetSortProperty(), SortOrder = column.SortOrder.Value };
-                sorts.Add(descriptor);
+                Sorts.Add(descriptor);
             }
 
             if (!allColumns.Contains(column))
@@ -729,17 +729,17 @@ namespace Radzen.Blazor
         /// Updates pickable columns.
         /// </summary>
         public void UpdatePickableColumns()
-		{
-			if (allColumns.Any(c => c.Pickable))
-			{
-				if (AllowColumnPicking)
-				{
-					allPickableColumns = allColumns.Where(c => c.Pickable).OrderBy(c => c.GetOrderIndex()).ToList();
-				}
-			}
-		}
+        {
+            if (allColumns.Any(c => c.Pickable))
+            {
+                if (AllowColumnPicking)
+                {
+                    allPickableColumns = allColumns.Where(c => c.Pickable).OrderBy(c => c.GetOrderIndex()).ToList();
+                }
+            }
+        }
 
-		internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
+        internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
         {
             if (columns.Contains(column))
             {
@@ -813,7 +813,7 @@ namespace Radzen.Blazor
                 builder.AddAttribute(1, "Value", isFirst ? column.GetFilterValue() : column.GetSecondFilterValue());
                 builder.AddAttribute(2, "ShowUpDown", column.ShowUpDownForNumericFilter());
                 builder.AddAttribute(3, "Style", "width:100%");
-                builder.AddAttribute(4, "InputAttributes", new Dictionary<string,object>(){ { "aria-label", column.Title + $"{(!isFirst ? " second " : " ")}filter value " + (isFirst ? column.GetFilterValue() : column.GetSecondFilterValue()) } });
+                builder.AddAttribute(4, "InputAttributes", new Dictionary<string, object>() { { "aria-label", column.Title + $"{(!isFirst ? " second " : " ")}filter value " + (isFirst ? column.GetFilterValue() : column.GetSecondFilterValue()) } });
                 builder.AddAttribute(5, "id", getFilterInputId(column) + (isFirst ? "f" : "s"));
 
                 Action<object> action;
@@ -1636,7 +1636,7 @@ namespace Radzen.Blazor
 
                     await ColumnReordering.InvokeAsync(reorderingArgs);
 
-                    if(reorderingArgs.Cancel)
+                    if (reorderingArgs.Cancel)
                     {
                         indexOfColumnToReoder = null;
                         return;
@@ -1685,7 +1685,7 @@ namespace Radzen.Blazor
 
         internal string GetOrderBy()
         {
-            return string.Join(",", sorts.Select(d => GetSortOrderAsString(d, IsOData())));
+            return string.Join(",", Sorts.Select(d => GetSortOrderAsString(d, IsOData())));
         }
 
         internal string GetSortOrderAsString(SortDescriptor d, bool isOData)
@@ -2071,9 +2071,9 @@ namespace Radzen.Blazor
                     c.SetVisible(null);
                 });
                 selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
-                sorts.Clear();
+                Sorts.Clear();
                 columns = allColumns.Where(c => c.Parent == null).ToList();
-           }
+            }
         }
 
         /// <summary>
@@ -2184,7 +2184,7 @@ namespace Radzen.Blazor
                 .ToList();
 
             Query.Filters = filters;
-            Query.Sorts = sorts;
+            Query.Sorts = Sorts.ToList();
             if (LoadData.HasDelegate)
             {
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
@@ -2194,7 +2194,7 @@ namespace Radzen.Blazor
                     OrderBy = orderBy,
                     Filter = IsOData() ? allColumns.ToList().ToODataFilterString<TItem>() : filterString,
                     Filters = filters,
-                    Sorts = sorts
+                    Sorts = Sorts.ToList(),
                 });
             }
         }
@@ -2343,8 +2343,10 @@ namespace Radzen.Blazor
         {
             bool emptyTextChanged = false, allowColumnPickingChanged = false, valueChanged = false, allGroupsExpandedChanged = false;
 
-            foreach (var parameter in parameters) {
-                switch (parameter.Name) {
+            foreach (var parameter in parameters)
+            {
+                switch (parameter.Name)
+                {
                     case nameof(EmptyText):
                         emptyTextChanged = HasChanged(parameter.Value, EmptyText); break;
 
@@ -2416,7 +2418,7 @@ namespace Radzen.Blazor
                 await Task.Yield();
                 Data = Enumerable.Empty<TItem>().Append(default(TItem));
             }
-            else if(settings == null)
+            else if (settings == null)
             {
                 await base.ReloadOnFirstRender();
             }
@@ -2533,7 +2535,7 @@ namespace Radzen.Blazor
         /// <returns></returns>
         public async System.Threading.Tasks.Task CollapseAll()
         {
-            foreach(var item in expandedItems.Keys.ToList())
+            foreach (var item in expandedItems.Keys.ToList())
             {
                 await CollapseItem(item);
             }
@@ -2549,7 +2551,7 @@ namespace Radzen.Blazor
             // Only allow the functionality when multiple row expand is allowed
             if (this.ExpandMode != DataGridExpandMode.Multiple) return;
 
-            foreach (TItem item in items.Where(x=> expandedItems.Keys.Any(i => ItemEquals(i, x))))
+            foreach (TItem item in items.Where(x => expandedItems.Keys.Any(i => ItemEquals(i, x))))
             {
                 await CollapseItem(item);
             }
@@ -2809,10 +2811,10 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public async System.Threading.Tasks.Task EditRow(TItem item)
         {
-            if(itemsToInsert.Count() > 0 && EditMode == DataGridEditMode.Single)
+            if (itemsToInsert.Count() > 0 && EditMode == DataGridEditMode.Single)
             {
                 var itemsToCancel = itemsToInsert.ToList();
-                foreach( var itemToCancel in itemsToCancel)
+                foreach (var itemToCancel in itemsToCancel)
                 {
                     CancelEditRow(itemToCancel);
                 }
@@ -2908,7 +2910,7 @@ namespace Radzen.Blazor
         {
             if (itemsToInsert.Contains(item))
             {
-                if(!IsVirtualizationAllowed())
+                if (!IsVirtualizationAllowed())
                 {
                     var list = this.PagedView.ToList();
                     list.Remove(item);
@@ -2920,12 +2922,12 @@ namespace Radzen.Blazor
                 else
                 {
                     itemsToInsert.Remove(item);
-                    if(virtualize != null)
+                    if (virtualize != null)
                     {
                         virtualize.RefreshDataAsync();
                     }
 
-                    if(groupVirtualize != null)
+                    if (groupVirtualize != null)
                     {
                         groupVirtualize.RefreshDataAsync();
                     }
@@ -3024,7 +3026,7 @@ namespace Radzen.Blazor
 
         internal bool IsOData()
         {
-            if(isOData == null && Data != null)
+            if (isOData == null && Data != null)
             {
                 isOData = typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
             }
@@ -3032,48 +3034,46 @@ namespace Radzen.Blazor
             return isOData != null ? isOData.Value : false;
         }
 
-        internal List<SortDescriptor> sorts = new List<SortDescriptor>();
-
         internal void SetColumnSortOrder(RadzenDataGridColumn<TItem> column)
         {
+            var CurrentSortDescriptor = Sorts.FirstOrDefault(d => d.Property == column?.GetSortProperty());
             if (!AllowMultiColumnSorting)
             {
                 foreach (var c in allColumns.ToList().Where(c => c != column))
                 {
                     c.SetSortOrderInternal(null);
                 }
-                sorts.Clear();
+                Sorts.Clear();
             }
 
-            var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
-            if (descriptor == null)
+            if (CurrentSortDescriptor == null)
             {
-                descriptor = new SortDescriptor() { Property = column.GetSortProperty() };
+                CurrentSortDescriptor = new SortDescriptor() { Property = column.GetSortProperty() };
             }
 
-            if (column.GetSortOrder() == null)
+            if (CurrentSortDescriptor.SortOrder == null)
             {
                 column.SetSortOrderInternal(SortOrder.Ascending);
-                descriptor.SortOrder = SortOrder.Ascending;
+                CurrentSortDescriptor.SortOrder = SortOrder.Ascending;
             }
-            else if (column.GetSortOrder() == SortOrder.Ascending)
+            else if (CurrentSortDescriptor.SortOrder == SortOrder.Ascending)
             {
                 column.SetSortOrderInternal(SortOrder.Descending);
-                descriptor.SortOrder = SortOrder.Descending;
+                CurrentSortDescriptor.SortOrder = SortOrder.Descending;
             }
-            else if (column.GetSortOrder() == SortOrder.Descending)
+            else if (CurrentSortDescriptor.SortOrder == SortOrder.Descending)
             {
                 column.SetSortOrderInternal(null);
-                if (sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
+                if (Sorts.Any(d => d.Property == column?.GetSortProperty()))
                 {
-                    sorts.Remove(descriptor);
+                    Sorts.Remove(CurrentSortDescriptor);
                 }
-                descriptor = null;
+                CurrentSortDescriptor = null;
             }
 
-            if (descriptor != null && !sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
+            if (CurrentSortDescriptor != null && !Sorts.Any(d => d.Property == column?.GetSortProperty()))
             {
-                sorts.Add(descriptor);
+                Sorts.Add(CurrentSortDescriptor);
             }
         }
 
@@ -3084,9 +3084,9 @@ namespace Radzen.Blazor
                 RadzenDataGridColumn<TItem> column;
                 column = columns.FirstOrDefault(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property);
 
-                if(column == null)
+                if (column == null)
                 {
-                   column = allColumns.FirstOrDefault(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property);
+                    column = allColumns.FirstOrDefault(c => c.GetGroupProperty() == ((GroupDescriptor)args.NewItems[0]).Property);
                 }
 
                 if (column != null && HideGroupedColumn)
@@ -3159,7 +3159,7 @@ namespace Radzen.Blazor
 
         internal async Task EndColumnDropToGroup()
         {
-            if(indexOfColumnToReoder != null && uniqueIDOfColumnToReoder != null && AllowGrouping)
+            if (indexOfColumnToReoder != null && uniqueIDOfColumnToReoder != null && AllowGrouping)
             {
                 var functionName = $"Radzen['{getColumnUniqueId(indexOfColumnToReoder.Value)}end']";
                 await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
@@ -3171,7 +3171,7 @@ namespace Radzen.Blazor
                     var descriptor = Groups.Where(d => d.Property == column.GetGroupProperty()).FirstOrDefault();
                     if (descriptor == null)
                     {
-                        descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.GetTitle(), SortOrder = column.GetSortOrder() ?? SortOrder.Ascending, FormatString = column.FormatString  };
+                        descriptor = new GroupDescriptor() { Property = column.GetGroupProperty(), Title = column.GetTitle(), SortOrder = column.GetSortOrder() ?? SortOrder.Ascending, FormatString = column.FormatString };
                         Groups.Add(descriptor);
                         _groupedPagedView = null;
 
@@ -3564,42 +3564,42 @@ namespace Radzen.Blazor
             }
         }
 
-		/// <summary>
-		/// Compares two objects for equality.
-		/// </summary>
-		/// <param name="object1">The first object to compare.</param>
-		/// <param name="object2">The second object to compare.</param>
-		/// <returns>True if the objects are equal, false otherwise.</returns>
-		private static bool AreObjectsEqual(object object1, object object2)
-		{
-			// If both objects are null, they are considered equal
-			if (object1 == null && object2 == null)
-			{
-				return true;
-			}
+        /// <summary>
+        /// Compares two objects for equality.
+        /// </summary>
+        /// <param name="object1">The first object to compare.</param>
+        /// <param name="object2">The second object to compare.</param>
+        /// <returns>True if the objects are equal, false otherwise.</returns>
+        private static bool AreObjectsEqual(object object1, object object2)
+        {
+            // If both objects are null, they are considered equal
+            if (object1 == null && object2 == null)
+            {
+                return true;
+            }
 
-			// If only one of the objects is null, they are considered not equal
-			if (object1 == null || object2 == null)
-			{
-				return false;
-			}
+            // If only one of the objects is null, they are considered not equal
+            if (object1 == null || object2 == null)
+            {
+                return false;
+            }
 
-			// If both objects are enumerable, compare their elements
-			if (object1 is IEnumerable list1 && object2 is IEnumerable list2)
-			{
-				// Create hash sets from the enumerable objects
-				var set1 = new HashSet<object>(list1.Cast<object>());
-				var set2 = new HashSet<object>(list2.Cast<object>());
+            // If both objects are enumerable, compare their elements
+            if (object1 is IEnumerable list1 && object2 is IEnumerable list2)
+            {
+                // Create hash sets from the enumerable objects
+                var set1 = new HashSet<object>(list1.Cast<object>());
+                var set2 = new HashSet<object>(list2.Cast<object>());
 
-				// Check if the hash sets are equal
-				return set1.SetEquals(set2);
-			}
+                // Check if the hash sets are equal
+                return set1.SetEquals(set2);
+            }
 
-			// If the objects are not enumerable, compare them using the Equals method
-			return object1.Equals(object2);
-		}
+            // If the objects are not enumerable, compare them using the Equals method
+            return object1.Equals(object2);
+        }
 
-		object GetFilterValue(object value, Type type)
+        object GetFilterValue(object value, Type type)
         {
             if (value != null && value is JsonElement)
             {

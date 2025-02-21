@@ -182,7 +182,7 @@ namespace Radzen.Blazor
                 }
             }
         }
-        
+
         int? orderIndex;
 
         /// <summary>
@@ -739,7 +739,7 @@ namespace Radzen.Blazor
 
         internal void SetSortOrder(SortOrder? order)
         {
-            var descriptor = Grid.sorts.Where(d => d.Property == GetSortProperty()).FirstOrDefault();
+            var descriptor = Grid.Sorts.FirstOrDefault(d => d.Property == GetSortProperty());
             if (descriptor == null)
             {
                 descriptor = new SortDescriptor() { Property = GetSortProperty() };
@@ -753,16 +753,16 @@ namespace Radzen.Blazor
             else
             {
                 SetSortOrderInternal(null);
-                if (Grid.sorts.Where(d => d.Property == GetSortProperty()).Any())
+                if (Grid.Sorts.Any(d => d.Property == GetSortProperty()))
                 {
-                    Grid.sorts.Remove(descriptor);
+                    Grid.Sorts.Remove(descriptor);
                 }
                 descriptor = null;
             }
 
-            if (descriptor != null && !Grid.sorts.Where(d => d.Property == GetSortProperty()).Any())
+            if (descriptor != null && !Grid.Sorts.Any(d => d.Property == GetSortProperty()))
             {
-                Grid.sorts.Add(descriptor);
+                Grid.Sorts.Add(descriptor);
             }
 
             sortOrder = new SortOrder?[] { order };
@@ -882,10 +882,10 @@ namespace Radzen.Blazor
 
                 if (Grid != null)
                 {
-                    var descriptor = Grid.sorts.Where(d => d.Property == GetSortProperty()).FirstOrDefault();
+                    var descriptor = Grid.Sorts.FirstOrDefault(d => d.Property == GetSortProperty());
                     if (descriptor == null)
                     {
-                        Grid.sorts.Add(new SortDescriptor() { Property = GetSortProperty(), SortOrder = sortOrder.FirstOrDefault() });
+                        Grid.Sorts.Add(new SortDescriptor() { Property = GetSortProperty(), SortOrder = sortOrder.FirstOrDefault() });
                         Grid._view = null;
                     }
                 }
@@ -1073,7 +1073,7 @@ namespace Radzen.Blazor
 
             if (isFirst)
             {
-                filterValue = CanSetCurrentValue(value) ? value : 
+                filterValue = CanSetCurrentValue(value) ? value :
                     GetFilterOperator() == FilterOperator.IsEmpty  || GetFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
             }
             else
@@ -1178,7 +1178,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The filter operator.</value>
         [Parameter]
-        public FilterOperator FilterOperator 
+        public FilterOperator FilterOperator
         {
             get
             {
@@ -1462,10 +1462,10 @@ namespace Radzen.Blazor
         /// </summary>
         public int? GetSortIndex()
         {
-            var descriptor = Grid.sorts.Where(s => s.Property == GetSortProperty()).FirstOrDefault();
+            var descriptor = Grid.Sorts.Where(s => s.Property == GetSortProperty()).FirstOrDefault();
             if (descriptor != null)
             {
-                return Grid.sorts.IndexOf(descriptor);
+                return Grid.Sorts.IndexOf(descriptor);
             }
 
             return null;
