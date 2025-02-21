@@ -21,8 +21,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="start">The start of the range.</param>
         /// <param name="end">The end of the range.</param>
+        /// <param name="resourceFilter">The end of the range.</param>
         /// <returns>A collection of appointments within the specified range.</returns>
-        IEnumerable<AppointmentData> GetAppointmentsInRange(DateTime start, DateTime end);
+        IEnumerable<AppointmentData> GetAppointmentsInRange(DateTime start, DateTime end, FilterDescriptor[] resourceFilter = null);
         /// <summary>
         /// Determines whether an appointment is within the specified range.
         /// </summary>
@@ -41,6 +42,16 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="view">The view to remove.</param>
         void RemoveView(ISchedulerView view);
+        /// <summary>
+        /// Adds a resource. Must be called when a <see cref="ISchedulerResource" /> is initialized.
+        /// </summary>
+        /// <param name="resource">The resource to add.</param>
+        void AddResource(ISchedulerResource resource);
+        /// <summary>
+        /// Removes a resource. Must be called when a <see cref="ISchedulerResource" /> is disposed.
+        /// </summary>
+        /// <param name="resource">The resource to remove.</param>
+        void RemoveResource(ISchedulerResource resource);
         /// <summary>
         /// Determines whether the specified view is selected.
         /// </summary>
@@ -62,14 +73,16 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="start">The start.</param>
         /// <param name="end">The end.</param>
-        Task SelectSlot(DateTime start, DateTime end);
+        /// <param name="resourceFilterList">The resource filter list.</param>
+        Task SelectSlot(DateTime start, DateTime end, IList<(string Field, string Value)> resourceFilterList = default);
         /// <summary>
         /// Selects the specified slot.
         /// </summary>
         /// <param name="start">The start.</param>
         /// <param name="end">The end.</param>
         /// <param name="appointments">The appointments for this range.</param>
-        Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments);
+        /// <param name="resourceFilterList">The resource filter list.</param>
+        Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, IList<(string Field, string Value)> resourceFilterList = default);
         /// <summary>
         /// Selects the specified month.
         /// </summary>
@@ -81,7 +94,8 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="day">The selected day.</param>
         /// <param name="appointments">The appointments for this range.</param>
-        Task SelectDay(DateTime day, IEnumerable<AppointmentData> appointments);
+        /// <param name="resourceFilterList">The resource filter list.</param>
+        Task SelectDay(DateTime day, IEnumerable<AppointmentData> appointments, IList<(string Field, string Value)> resourceFilterList = default);
         /// <summary>
         /// Selects the specified more link.
         /// </summary>
@@ -100,8 +114,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="start">The start of the slot.</param>
         /// <param name="end">The end of the slot.</param>
+        /// <param name="resourceFilterList">The resource filter list.</param>
         /// <returns>A dictionary containing the HTML attributes for the specified slot.</returns>
-        IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end);
+        IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, IList<(string Field, string Value)> resourceFilterList = default);
         /// <summary>
         /// Renders the appointment.
         /// </summary>
@@ -147,5 +162,15 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The culture.</value>
         CultureInfo Culture { get; set; }
+        /// <summary>
+        /// Gets or sets the resources of the scheduler. Use to specify the resources used for grouping.
+        /// </summary>
+        /// <value>The resources.</value>
+        RenderFragment Resources { get; set; }
+        /// <summary>
+        /// Gets the active resources of the scheduler. Use to specify the resources used for grouping.
+        /// </summary>
+        /// <value>The resources.</value>
+        IList<ISchedulerResource> ActiveResourceList { get; }
     }
 }

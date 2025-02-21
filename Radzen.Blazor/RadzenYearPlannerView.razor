@@ -21,6 +21,7 @@
         }
 
         return @<CascadingValue Value=@Scheduler>
+            <CascadingValue Value=@this>
                     <YearPlannerView StartDate=@StartDate
                         EndDate=@EndDate
                         StartMonth=@StartMonth
@@ -28,6 +29,7 @@
                         MoreText=@MoreText
                         Appointments=@appointments
                         AppointmentMove=OnAppointmentMove />
-                </CascadingValue>;
+                </CascadingValue>
+            </CascadingValue>;
     }
 }

@@ -28,6 +28,13 @@ namespace Radzen.Blazor
         public abstract string Text { get; set; }
 
         /// <summary>
+        /// Gets or sets whether resource grouping is employed.
+        /// </summary>
+        /// <value>The value.</value>
+        [Parameter]
+        public bool ShowResourceGrouping { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets the scheduler instance.
         /// </summary>
         /// <value>The scheduler.</value>
@@ -99,5 +106,15 @@ namespace Radzen.Blazor
         {
             await Scheduler.AppointmentMove.InvokeAsync(data);
         }
+        /// <summary>
+        /// Mark that a drag has started.
+        /// </summary>
+        /// <value>Has a drag started?</value>
+        public bool DragStarted { get; set; }
+        /// <summary>
+        /// The appointment data of a drag drop operation.
+        /// </summary>
+        /// <value>Appointment data</value>
+        public AppointmentData DraggedAppointment { get; set; }
     }
 }

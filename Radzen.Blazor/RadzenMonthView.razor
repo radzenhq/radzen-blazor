@@ -21,7 +21,9 @@
         }
 
         return @<CascadingValue Value=@Scheduler>
-            <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@maxAppointmentsInSlot MoreText=@MoreText Appointments=@appointments AppointmentMove=OnAppointmentMove />
-        </CascadingValue>;
+                    <CascadingValue Value=@this>
+                        <MonthView StartDate=@StartDate EndDate=@EndDate MaxAppointmentsInSlot=@maxAppointmentsInSlot MoreText=@MoreText Appointments=@appointments AppointmentMove=OnAppointmentMove />
+                    </CascadingValue>
+                </CascadingValue>;
     }
 }

@@ -7,13 +7,54 @@
     public override RenderFragment Render()
     {
         var appointments = Scheduler.GetAppointmentsInRange(StartDate, EndDate).ToList();
+        var resources = Scheduler.ActiveResourceList;
 
-        return
-    @<CascadingValue Value=@Scheduler>
-        <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments
-            TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot
-            AppointmentMove=OnAppointmentMove />
-    </CascadingValue>
-    ;
+        if (resources.Count > 0 && ShowResourceGrouping)
+        {
+            Dictionary<ISchedulerResource, ISchedulerResource> resourceDictionary;
+            resourceDictionary = new();
+            int count = resources.Count;
+            int next = 1;
+            foreach (var resource in resources)
+            {
+                if (next < count)
+                {
+                    resourceDictionary[resource] = resources[next];
+                }
+                else
+                {
+                    resourceDictionary[resource] = null;
+                }
+                next++;
+            }
+            var currentResource = resourceDictionary.FirstOrDefault().Key;
+
+            return
+                @<div class="rz-resource-scheduler">
+                    <div class="rz-resource-scheduler-group-header">
+                    @foreach (var resValue in currentResource.Data)
+                    {
+                        <CascadingValue Value=@Scheduler>
+                            <CascadingValue Value=@this>
+                                <DayViewResourceHeader StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments ResourceDataValue=@resValue
+                                        TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot ResourceDictionary=@resourceDictionary CurrentResource=@currentResource
+                                                AppointmentMove=OnAppointmentMove />
+                            </CascadingValue>
+                        </CascadingValue>
+                    }
+                    </div>
+                </div>;
+        }
+        else
+        {
+            return
+                @<CascadingValue Value=@Scheduler>
+                    <CascadingValue Value=@this>
+                        <DayView StartDate=@StartDate EndDate=@EndDate StartTime=@StartTime EndTime=@EndTime Appointments=@appointments
+                            TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot
+                            AppointmentMove=OnAppointmentMove />
+                    </CascadingValue>
+                </CascadingValue>;
+        }
     }
 }

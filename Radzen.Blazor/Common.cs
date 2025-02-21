@@ -736,6 +736,11 @@ namespace Radzen
         /// Gets or sets the time span.
         /// </summary>
         public TimeSpan TimeSpan { get; set; }
+
+        /// <summary>
+        /// List of resource filters.
+        /// </summary>
+        public IList<(string Property, string Value)> ResourceFilters { get; set; }
     }
 
     /// <summary>

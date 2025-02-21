@@ -1,0 +1,78 @@
+@inject DialogService DialogService
+
+<RadzenTemplateForm TItem="ResourceAppointment" Data="@model" Submit=@OnSubmit>
+    <RadzenStack Gap="1rem">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Select Building" Component="DropDownBuilding" />
+            <RadzenDropDown @bind-Value=@model.Building Data=@Buildings Style="width: 100%; max-width: 400px;" Name="DropDownBuilding" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Select Room" Component="DropDownRoom" />
+            <RadzenDropDown @bind-Value=@model.Room Data=@Rooms Style="width: 100%; max-width: 400px;" Name="DropDownRooms" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Select Person" Component="DropDownPeople" />
+            <RadzenDropDown @bind-Value=@model.Person Data=@People Style="width: 100%; max-width: 400px;" Name="DropDownPeople" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Title" Style="width: 4rem;" />
+            <RadzenTextBox @bind-Value="@model.Text" Name="Text" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="Text" Text="Title is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Start" Style="width: 4rem;" />
+            <RadzenDatePicker @bind-Value="@model.Start" Name="Start" ShowTime="true" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="Start" Text="Start is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="End" Style="width: 4rem;" />
+            <RadzenDatePicker Name="End" @bind-Value="@model.End" ShowTime="true" Style="width: 12rem;" />
+            <RadzenRequiredValidator Component="End" Text="End is required" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" >
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenTemplateForm>
+@code {
+
+    [Parameter]
+    public string Building { get; set; }
+
+    [Parameter]
+    public string Room { get; set; }
+
+    [Parameter]
+    public string Person { get; set; }
+
+    [Parameter]
+    public DateTime Start { get; set; }
+
+    [Parameter]
+    public DateTime End { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> Buildings { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> Rooms { get; set; }
+
+    [Parameter]
+    public IEnumerable<string> People { get; set; }
+
+    ResourceAppointment model = new ResourceAppointment();
+
+    protected override void OnParametersSet()
+    {
+        model.Building = Building;
+        model.Room = Room;
+        model.Person = Person;
+        model.Start = Start;
+        model.End = End;
+    }
+
+    void OnSubmit(ResourceAppointment model)
+    {
+        DialogService.Close(model);
+    }
+}
