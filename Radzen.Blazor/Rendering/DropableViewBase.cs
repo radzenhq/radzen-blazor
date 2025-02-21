@@ -10,9 +10,6 @@ namespace Radzen.Blazor.Rendering
     /// </summary>
     public abstract class DropableViewBase : ComponentBase
     {
-        private bool dragStarted = false;
-        private AppointmentData draggedAppointment;
-
         /// <summary>
         /// Gets or sets the root view for this. Used to hold and maintain DraggedAppointment and DragStarted variables.
         /// </summary>
