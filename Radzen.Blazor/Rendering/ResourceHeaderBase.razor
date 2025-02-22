@@ -1,0 +1,96 @@
+@using Radzen.Blazor.Rendering
+
+@inherits DropableViewBase
+
+@code {
+
+    ElementReference view;
+
+    [CascadingParameter]
+    public IScheduler Scheduler { get; set; }
+
+    [Parameter]
+    public IList<AppointmentData> Appointments { get; set; }
+
+    [Parameter]
+    public Dictionary<ISchedulerResource, ISchedulerResource> ResourceDictionary { get; set; }
+
+    [Parameter]
+    public ISchedulerResource CurrentResource { get; set; }
+
+    [Parameter]
+    public string ResourceDataValue { get; set; }
+
+    [Parameter]
+    public DateTime StartDate { get; set; }
+
+    [Parameter]
+    public TimeSpan StartTime { get; set; }
+
+    [Parameter]
+    public DateTime EndDate { get; set; }
+
+    [Parameter]
+    public TimeSpan EndTime { get; set; }
+
+    [Parameter]
+    public string TimeFormat { get; set; }
+
+    [Parameter]
+    public string HeaderFormat { get; set; }
+
+    [Parameter]
+    public int MinutesPerSlot { get; set; }
+
+    [Parameter]
+    public ResourceHeaderBase Parent { get; set; }
+
+    public FilterDescriptor Filter
+    {
+        get
+        {
+            return new FilterDescriptor { Property = CurrentResource.Property, FilterValue = ResourceDataValue, FilterOperator = FilterOperator.Equals };
+        }
+    }
+
+    public IList<AppointmentData> filteredAppointments
+    {
+        get
+        {
+            List<FilterDescriptor> filters = new();
+
+            if (CurrentResource != null)
+            {
+                ResourceHeaderBase current = this;
+                filters.Add(Filter);
+                while (current.Parent != null)
+                {
+                    filters.Add(current.Parent.Filter);
+                    current = current.Parent;
+                }
+            }
+
+            return Scheduler.GetAppointmentsInRange(StartDate, EndDate, filters.ToArray()).ToList();
+        }
+    }
+
+    public IList<(string Field, string Value)> resourceFilterList
+    {
+        get
+        {
+            List<(string Property, string Value)> resourceFilterList = new();
+
+            if (CurrentResource != null)
+            {
+                ResourceHeaderBase current = this;
+                resourceFilterList.Add(new() { Property = Filter.Property, Value = (string)Filter.FilterValue });
+                while (current.Parent != null)
+                {
+                    resourceFilterList.Add(new() { Property = current.Parent.Filter.Property, Value = (string)current.Parent.Filter.FilterValue });
+                    current = current.Parent;
+                }
+            }
+            return resourceFilterList;
+        }
+    }
+}

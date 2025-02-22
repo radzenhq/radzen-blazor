@@ -25,5 +25,9 @@ namespace Radzen
         /// The current view.
         /// </summary>
         public ISchedulerView View { get; set;}
+        /// <summary>
+        /// List of resource filters.
+        /// </summary>
+        public IList<(string Property, string Value)> ResourceFilters { get; set; }
     }
 }

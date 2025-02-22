@@ -798,3 +798,67 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
     }
   }
 }
+
+
+// Resource Scheduler Styles
+
+.rz-scheduler:has(div.rz-resource-scheduler-diary) {
+  height: 100% !important;
+}
+
+.rz-resource-scheduler {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
+}
+
+.rz-resource-scheduler-active-resources-icon {
+  font-weight: var(--rz-icon-weight, inherit);
+  padding-right: 20px;
+  align-self: center;
+}
+.rz-resource-scheduler-group-header {
+  border-block-start: var(--rz-scheduler-header-border);
+  color: var(--rz-scheduler-header-color);
+  display: flex;
+  overflow-y: hidden;
+  min-width: min-content;
+}
+
+.rz-resource-scheduler-group-header-item {
+  flex: 1;
+  text-align: center;
+  font-size: var(--rz-scheduler-header-font-size);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  border-inline-start: 1px;
+  border-block-start: 1px;
+}
+
+.rz-resource-scheduler-group-header-title {
+  background-color: var(--rz-scheduler-header-background-color);
+  height: 1.5rem;
+  font-weight: 600;
+}
+
+.rz-resource-scheduler-diary {
+  container-name: scheduler;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--rz-scheduler-border-color);
+  box-shadow: var(--rz-scheduler-shadow);
+  color: var(--rz-scheduler-color);
+  background: var(--rz-scheduler-background-color);
+  overflow: hidden;
+  background-clip: border-box;
+  min-width: 300px;
+}
+
+.rz-resource-scheduler-test {
+  min-width: 300px;
+  border-inline-start: 1px;
+  border-block-start: 1px;
+}

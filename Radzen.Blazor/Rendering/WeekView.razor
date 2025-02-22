@@ -27,7 +27,7 @@
                 @for (var date = start; date < end; date = date.AddMinutes(MinutesPerSlot))
                 {
                     var slotDate = date;
-                    <div @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate)) @attributes=@Attributes(date)></div>
+                    <div @onclick=@(args => OnSlotClick(slotDate)) ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(slotDate, ResourceFilterList)) @attributes=@Attributes(date)></div>
                 }
             </div>
         }
@@ -61,6 +61,9 @@
     [Parameter]
     public IList<AppointmentData> Appointments { get; set; }
 
+    [Parameter]
+    public IList<(string Field, string Value)> ResourceFilterList { get; set; }
+
     [CascadingParameter]
     public IScheduler Scheduler { get; set; }
 
@@ -76,14 +79,14 @@
 
     async Task OnSlotClick(DateTime date)
     {
-        await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)));
+        await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)), ResourceFilterList);
     }
 
     async Task OnDayClick(DateTime day)
     {
         var dayStart = day.Date.Add(StartTime);
         var dayEnd = day.Date.Add(EndTime);
-        await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd));
+        await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd), ResourceFilterList);
     }
 
     IDictionary<string, object> Attributes(DateTime date)
