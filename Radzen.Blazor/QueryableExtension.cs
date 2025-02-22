@@ -527,7 +527,7 @@ namespace Radzen
 
             };
 
-            var finalValues = value != null && !(IsEnumerable(value.GetType()) && !(value is string)) ? new object[] { value }.AsQueryable() : enumerableValue;
+            var finalValues = value != null && !(IsEnumerable(value.GetType()) && !(value is string)) ? new object[] { value }.AsQueryable().Cast(value.GetType()) : enumerableValue;
 
             return "new " + baseType + "[]{" + String.Join(",", values(finalValues)) + "}";
         }
