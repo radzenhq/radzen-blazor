@@ -503,7 +503,7 @@ namespace Radzen
             return (IList)genericToList.Invoke(null, new[] { query });
         }
 
-        static string EnumerableAsString(IQueryable enumerableValue, string baseType)
+        static string EnumerableAsString(IQueryable enumerableValue, string baseType, object value)
         {
             Func<IQueryable, IEnumerable<object>> values = (items) => {
                 if (items.ElementType == typeof(string))
@@ -526,7 +526,10 @@ namespace Radzen
                 return items.Cast<object>();
 
             };
-            return "new " + baseType + "[]{" + String.Join(",", values(enumerableValue)) + "}";
+
+            var finalValues = value != null && !(IsEnumerable(value.GetType()) && !(value is string)) ? new object[] { value }.AsQueryable() : enumerableValue;
+
+            return "new " + baseType + "[]{" + String.Join(",", values(finalValues)) + "}";
         }
 
         /// <summary>
@@ -577,9 +580,9 @@ namespace Radzen
                             baseType = "";
                         }
 
-                        var enumerableValueAsString = EnumerableAsString(enumerableValue, baseType);
+                        var enumerableValueAsString = EnumerableAsString(enumerableValue, baseType, v);
 
-                        var enumerableSecondValueAsString = EnumerableAsString(enumerableSecondValue, baseType);
+                        var enumerableSecondValueAsString = EnumerableAsString(enumerableSecondValue, baseType, sv);
 
                         if (enumerableValue?.Cast<object>().Any() == true)
                         {
