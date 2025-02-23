@@ -1055,7 +1055,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Get column white space class.
+        /// Get body column class.
         /// </summary>
         /// <returns></returns>
         public string GetBodyColumnClass()
@@ -1064,7 +1064,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Get column header white space class.
+        /// Get column header class.
         /// </summary>
         /// <returns></returns>
         public string GetHeaderColumnClass()
