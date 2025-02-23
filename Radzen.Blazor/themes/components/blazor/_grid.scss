@@ -463,7 +463,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       text-overflow: ellipsis;
       white-space: nowrap;
 
-      .rz-cell-data.rz-text-wrap {
+      &.rz-text-wrap {
         text-overflow: unset;
         overflow: visible;
       }

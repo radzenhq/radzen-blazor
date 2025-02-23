@@ -1,190 +1,76 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
-  <PropertyGroup>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <NoWarn>BL9993;BL0007;BL0005</NoWarn>
-    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
-    <RazorLangVersion>7.0</RazorLangVersion>
-    <LangVersion>latest</LangVersion>
-    <OutputType>Library</OutputType>
-    <IsPackable>true</IsPackable>
-    <PackageId>Radzen.Blazor</PackageId>
-    <Product>Radzen.Blazor</Product>
-    <Version>6.0.20</Version>
-    <Copyright>Radzen Ltd.</Copyright>
-    <Authors>Radzen Ltd.</Authors>
-    <Description>Radzen Blazor is a set of 90+ free native Blazor UI controls packed with DataGrid, Scheduler, Charts and robust theming including Material design and Fluent UI.</Description>
-    <PackageTags>blazor material design fluent fluentui components datagrid scheduler charts</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageProjectUrl>https://www.radzen.com</PackageProjectUrl>
-    <PackageIcon>icon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <Title>Radzen Components for Blazor</Title>
-    <RepositoryUrl>https://github.com/radzenhq/radzen-blazor</RepositoryUrl>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
-    <PackageReference Include="DartSassBuilder" Version="1.1.0" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.25" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.14" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
-  </ItemGroup>
+	<PropertyGroup>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<NoWarn>BL9993;BL0007;BL0005</NoWarn>
+		<TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+		<RazorLangVersion>7.0</RazorLangVersion>
+		<LangVersion>latest</LangVersion>
+		<OutputType>Library</OutputType>
+		<IsPackable>true</IsPackable>
+		<PackageId>Radzen.Blazor</PackageId>
+		<Product>Radzen.Blazor</Product>
+		<Version>6.0.20</Version>
+		<Copyright>Radzen Ltd.</Copyright>
+		<Authors>Radzen Ltd.</Authors>
+		<Description>Radzen Blazor is a set of 90+ free native Blazor UI controls packed with DataGrid, Scheduler, Charts and robust theming including Material design and Fluent UI.</Description>
+		<PackageTags>blazor material design fluent fluentui components datagrid scheduler charts</PackageTags>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageProjectUrl>https://www.radzen.com</PackageProjectUrl>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Title>Radzen Components for Blazor</Title>
+		<RepositoryUrl>https://github.com/radzenhq/radzen-blazor</RepositoryUrl>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+		<PackageReference Include="DartSassBuilder" Version="1.1.0" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.25" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.14" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net7.0'" Version="7.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="LICENSE.txt" Pack="true" PackagePath="" />
-    <None Include="icon.png" Pack="true" PackagePath="" />
-    <None Include="..\README.md" Pack="true" PackagePath="\" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="" />
+		<None Include="icon.png" Pack="true" PackagePath="" />
+		<None Include="..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Include="LinkerConfig.xml">
-      <LogicalName>$(MSBuildProjectName).xml</LogicalName>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="LinkerConfig.xml">
+			<LogicalName>$(MSBuildProjectName).xml</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
 
-  <PropertyGroup>
-    <DartSassOutputStyle>expanded</DartSassOutputStyle>
-    <EnableDefaultSassItems>false</EnableDefaultSassItems>
-  </PropertyGroup>
+	<PropertyGroup>
+		<DartSassOutputStyle>expanded</DartSassOutputStyle>
+		<EnableDefaultSassItems>false</EnableDefaultSassItems>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Sass Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" Condition="'$(TargetFramework)' == 'net8.0'" />
-  </ItemGroup>
+	<ItemGroup>
+		<Sass Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" Condition="'$(TargetFramework)' == 'net8.0'" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <SassFile Include="themes\components\blazor\_accordion.scss" />
-    <SassFile Include="themes\components\blazor\_alert.scss" />
-    <SassFile Include="themes\components\blazor\_autocomplete.scss" />
-    <SassFile Include="themes\components\blazor\_badge.scss" />
-    <SassFile Include="themes\components\blazor\_body.scss" />
-    <SassFile Include="themes\components\blazor\_breadcrumb.scss" />
-    <SassFile Include="themes\components\blazor\_button.scss" />
-    <SassFile Include="themes\components\blazor\_card.scss" />
-    <SassFile Include="themes\components\blazor\_carousel.scss" />
-    <SassFile Include="themes\components\blazor\_chart.scss" />
-    <SassFile Include="themes\components\blazor\_checkbox.scss" />
-    <SassFile Include="themes\components\blazor\_chip.scss" />
-    <SassFile Include="themes\components\blazor\_colorpicker.scss" />
-    <SassFile Include="themes\components\blazor\_common.scss" />
-    <SassFile Include="themes\components\blazor\_datafilter.scss" />
-    <SassFile Include="themes\components\blazor\_datalist.scss" />
-    <SassFile Include="themes\components\blazor\_datepicker.scss" />
-    <SassFile Include="themes\components\blazor\_dialog.scss" />
-    <SassFile Include="themes\components\blazor\_dropdown.scss" />
-    <SassFile Include="themes\components\blazor\_dropzone.scss" />
-    <SassFile Include="themes\components\blazor\_editor.scss" />
-    <SassFile Include="themes\components\blazor\_fieldset.scss" />
-    <SassFile Include="themes\components\blazor\_footer.scss" />
-    <SassFile Include="themes\components\blazor\_form-field.scss" />
-    <SassFile Include="themes\components\blazor\_form.scss" />
-    <SassFile Include="themes\components\blazor\_gauge.scss" />
-    <SassFile Include="themes\components\blazor\_google-map.scss" />
-    <SassFile Include="themes\components\blazor\_gravatar.scss" />
-    <SassFile Include="themes\components\blazor\_grid.scss" />
-    <SassFile Include="themes\components\blazor\_header.scss" />
-    <SassFile Include="themes\components\blazor\_icons.scss" />
-    <SassFile Include="themes\components\blazor\_image.scss" />
-    <SassFile Include="themes\components\blazor\_input.scss" />
-    <SassFile Include="themes\components\blazor\_layout.scss" />
-    <SassFile Include="themes\components\blazor\_link.scss" />
-    <SassFile Include="themes\components\blazor\_listbox.scss" />
-    <SassFile Include="themes\components\blazor\_login.scss" />
-    <SassFile Include="themes\components\blazor\_lookup.scss" />
-    <SassFile Include="themes\components\blazor\_mask.scss" />
-    <SassFile Include="themes\components\blazor\_menu.scss" />
-    <SassFile Include="themes\components\blazor\_navigation.scss" />
-    <SassFile Include="themes\components\blazor\_notification.scss" />
-    <SassFile Include="themes\components\blazor\_numeric.scss" />
-    <SassFile Include="themes\components\blazor\_overlay-panel.scss" />
-    <SassFile Include="themes\components\blazor\_pager.scss" />
-    <SassFile Include="themes\components\blazor\_panel-menu.scss" />
-    <SassFile Include="themes\components\blazor\_panel.scss" />
-    <SassFile Include="themes\components\blazor\_picklist.scss" />
-    <SassFile Include="themes\components\blazor\_profile-menu.scss" />
-    <SassFile Include="themes\components\blazor\_progressbar.scss" />
-    <SassFile Include="themes\components\blazor\_radio.scss" />
-    <SassFile Include="themes\components\blazor\_rating.scss" />
-    <SassFile Include="themes\components\blazor\_scheduler.scss" />
-    <SassFile Include="themes\components\blazor\_scrollbar.scss" />
-    <SassFile Include="themes\components\blazor\_security-code.scss" />
-    <SassFile Include="themes\components\blazor\_selectbar.scss" />
-    <SassFile Include="themes\components\blazor\_sidebar-toggle.scss" />
-    <SassFile Include="themes\components\blazor\_sidebar.scss" />
-    <SassFile Include="themes\components\blazor\_slider.scss" />
-    <SassFile Include="themes\components\blazor\_spacing.scss" />
-    <SassFile Include="themes\components\blazor\_speech-to-text-button.scss" />
-    <SassFile Include="themes\components\blazor\_splitbutton.scss" />
-    <SassFile Include="themes\components\blazor\_splitter.scss" />
-    <SassFile Include="themes\components\blazor\_ssrsviewer.scss" />
-    <SassFile Include="themes\components\blazor\_stack.scss" />
-    <SassFile Include="themes\components\blazor\_steps.scss" />
-    <SassFile Include="themes\components\blazor\_switch.scss" />
-    <SassFile Include="themes\components\blazor\_tabs.scss" />
-    <SassFile Include="themes\components\blazor\_textarea.scss" />
-    <SassFile Include="themes\components\blazor\_textbox.scss" />
-    <SassFile Include="themes\components\blazor\_timeline.scss" />
-    <SassFile Include="themes\components\blazor\_tooltip.scss" />
-    <SassFile Include="themes\components\blazor\_tree.scss" />
-    <SassFile Include="themes\components\blazor\_typography.scss" />
-    <SassFile Include="themes\components\blazor\_upload.scss" />
-    <SassFile Include="themes\components\blazor\_utilities.scss" />
-    <SassFile Include="themes\dark-base.scss" />
-    <SassFile Include="themes\dark-wcag.scss" />
-    <SassFile Include="themes\dark.scss" />
-    <SassFile Include="themes\default-base.scss" />
-    <SassFile Include="themes\default-wcag.scss" />
-    <SassFile Include="themes\default.scss" />
-    <SassFile Include="themes\humanistic-base.scss" />
-    <SassFile Include="themes\humanistic-dark-base.scss" />
-    <SassFile Include="themes\humanistic-dark-wcag.scss" />
-    <SassFile Include="themes\humanistic-dark.scss" />
-    <SassFile Include="themes\humanistic-wcag.scss" />
-    <SassFile Include="themes\humanistic.scss" />
-    <SassFile Include="themes\material-base.scss" />
-    <SassFile Include="themes\material-dark-base.scss" />
-    <SassFile Include="themes\material-dark-wcag.scss" />
-    <SassFile Include="themes\material-dark.scss" />
-    <SassFile Include="themes\material-wcag.scss" />
-    <SassFile Include="themes\material.scss" />
-    <SassFile Include="themes\software-base.scss" />
-    <SassFile Include="themes\software-dark-base.scss" />
-    <SassFile Include="themes\software-dark-wcag.scss" />
-    <SassFile Include="themes\software-dark.scss" />
-    <SassFile Include="themes\software-wcag.scss" />
-    <SassFile Include="themes\software.scss" />
-    <SassFile Include="themes\standard-base.scss" />
-    <SassFile Include="themes\standard-dark-base.scss" />
-    <SassFile Include="themes\standard-dark-wcag.scss" />
-    <SassFile Include="themes\standard-dark.scss" />
-    <SassFile Include="themes\standard-wcag.scss" />
-    <SassFile Include="themes\standard.scss" />
-    <SassFile Include="themes\_components.scss" />
-    <SassFile Include="themes\_css-variables.scss" />
-    <SassFile Include="themes\_fonts.scss" />
-    <SassFile Include="themes\_mixins.scss" />
-    <SassFile Include="themes\_variables.scss" />
-  </ItemGroup>
+	<Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net8.0'">
+		<PropertyGroup>
+			<_SassFileList>@(Sass->'&quot;%(FullPath)&quot;', ' ')</_SassFileList>
+			<DartSassBuilderArgs>files $(_SassFileList) --outputstyle $(DartSassOutputStyle) --level $(DartSassOutputLevel)</DartSassBuilderArgs>
+		</PropertyGroup>
+		<Message Text="$(DartSassBuilderArgs)" Importance="$(DartSassMessageLevel)" />
+		<Message Text="Converted SassFile list to argument" Importance="$(DartSassMessageLevel)" />
+	</Target>
 
- <Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net8.0'">
-    <PropertyGroup>
-      <_SassFileList>@(Sass->'"%(FullPath)"', ' ')</_SassFileList>
-      <DartSassBuilderArgs>files $(_SassFileList) --outputstyle $(DartSassOutputStyle) --level $(DartSassOutputLevel)</DartSassBuilderArgs>
-    </PropertyGroup>
-    <Message Text="$(DartSassBuilderArgs)" Importance="$(DartSassMessageLevel)" />
-    <Message Text="Converted SassFile list to argument" Importance="$(DartSassMessageLevel)" />
-  </Target>
-
-  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net8.0'">
-    <ItemGroup>
-        <CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
-    </ItemGroup>
-    <Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
-  </Target>
+	<Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net8.0'">
+		<ItemGroup>
+			<CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
+		</ItemGroup>
+		<Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
+	</Target>
 
 </Project>
