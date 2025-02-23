@@ -20,7 +20,7 @@ public enum WhiteSpaceText
     /// </summary>
     Nowrap,
     /// <summary>
-    /// The text will wrap when necessary, and any overflowed text will be clipped.
+    /// The text will not wrap, with addition of ellipsis and hidden overflow.
     /// </summary>
     Truncate
 }
