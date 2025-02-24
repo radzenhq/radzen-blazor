@@ -434,6 +434,18 @@ namespace Radzen.Blazor
         public string GroupFooterCssClass { get; set; }
 
         /// <summary>
+        /// Gets or sets the header white space style.
+        /// </summary>
+        [Parameter]
+        public WhiteSpace HeaderWhiteSpace { get; set; } = WhiteSpace.Truncate;
+
+        /// <summary>
+        /// Gets or sets the white space style.
+        /// </summary>
+        [Parameter]
+        public WhiteSpace WhiteSpace { get; set; } = WhiteSpace.Truncate;
+
+        /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is filterable.
         /// </summary>
         /// <value><c>true</c> if filterable; otherwise, <c>false</c>.</value>
@@ -1040,6 +1052,24 @@ namespace Radzen.Blazor
         public LogicalFilterOperator GetLogicalFilterOperator()
         {
             return logicalFilterOperator ?? LogicalFilterOperator;
+        }
+
+        /// <summary>
+        /// Get body column class.
+        /// </summary>
+        /// <returns></returns>
+        public string GetBodyColumnClass()
+        {
+            return $"rz-cell-data rz-text-{Enum.GetName(typeof(WhiteSpace), WhiteSpace).ToLower()}";
+        }
+
+        /// <summary>
+        /// Get column header class.
+        /// </summary>
+        /// <returns></returns>
+        public string GetHeaderColumnClass()
+        {
+            return $"rz-column-title-content rz-text-{Enum.GetName(typeof(WhiteSpace), HeaderWhiteSpace).ToLower()}";
         }
 
         /// <summary>
