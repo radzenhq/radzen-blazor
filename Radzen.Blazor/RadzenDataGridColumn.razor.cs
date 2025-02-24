@@ -1058,7 +1058,7 @@ namespace Radzen.Blazor
         /// Get body column class.
         /// </summary>
         /// <returns></returns>
-        public string GetBodyColumnClass()
+        internal string GetCellClass()
         {
             return $"rz-cell-data rz-text-{Enum.GetName(typeof(WhiteSpace), WhiteSpace).ToLower()}";
         }
@@ -1067,7 +1067,7 @@ namespace Radzen.Blazor
         /// Get column header class.
         /// </summary>
         /// <returns></returns>
-        public string GetHeaderColumnClass()
+        internal string GetHeaderClass()
         {
             return $"rz-column-title-content rz-text-{Enum.GetName(typeof(WhiteSpace), HeaderWhiteSpace).ToLower()}";
         }
