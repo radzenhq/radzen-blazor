@@ -385,6 +385,17 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Should_SelectByWithUntypedIQueryableString()
+        {
+            IQueryable list = new List<OrderDetail> { new OrderDetail { Product = new Product { ProductName = "Chai" } } }.AsQueryable();
+
+            var result = DynamicExtensions.Select(list, "Product.ProductName as ProductName");
+
+            Assert.Equal("Chai", result.ElementType.GetProperty("ProductName").GetValue(result.FirstOrDefault()));
+        }
+
+
+        [Fact]
         public void Should_SupportDictionaryIndexAccess()
         {
             var expression = ExpressionParser.ParsePredicate<Dictionary<string, object>>("it => (int)it[\"foo\"] == 1");

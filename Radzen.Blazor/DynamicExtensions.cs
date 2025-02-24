@@ -82,10 +82,20 @@ namespace System.Linq.Dynamic.Core
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
-        public static IQueryable Select<T>(
-            this IQueryable<T> source,
-            string selector,
-            object[] parameters = null)
+        public static IQueryable Select<T>(this IQueryable<T> source, string selector, object[] parameters = null)
+        {
+            return source.Select(selector, expression => ExpressionParser.ParseLambda<T>(expression));
+        }
+
+        /// <summary>
+        /// Projects each element of a sequence into a collection of property values.
+        /// </summary>
+        public static IQueryable Select(this IQueryable source, string selector, object[] parameters = null)
+        {
+            return source.Select(selector, expression => ExpressionParser.ParseLambda(expression, source.ElementType));
+        }
+
+        private static IQueryable Select(this IQueryable source, string selector, Func<string, LambdaExpression> lambdaCreator)
         {
             try
             {
@@ -102,7 +112,7 @@ namespace System.Linq.Dynamic.Core
                     return source;
                 }
 
-                var lambda = ExpressionParser.ParseLambda<T>($"it => new {{ {selector} }}");
+                var lambda = lambdaCreator($"it => new {{ {selector} }}");
 
                 return source.Provider.CreateQuery(Expression.Call(typeof(Queryable), nameof(Queryable.Select),
                           [source.ElementType, lambda.Body.Type], source.Expression, Expression.Quote(lambda)));
