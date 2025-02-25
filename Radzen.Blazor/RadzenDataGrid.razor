@@ -597,7 +597,7 @@
                             <a id="@(GetId() + "exp")" aria-label="@ExpandChildItemAriaLabel" class="@(getExpandIconCssClass(this, Item))" style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))" @onclick:preventDefault="true" @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation="true">
                                 <span class="@(this.ExpandedItemStyle(Item))"></span>
                             </a>
-                            <span class="rz-cell-data" @attributes="@spanAttributes">
+                            <span class="@column.GetCellClass()" @attributes="@spanAttributes">
                                 @if (Item != null)
                                 {
                                     @if (this.IsRowInEditMode(Item) && column.EditTemplate != null)
@@ -618,7 +618,7 @@
                     }
                     else
                     {
-                        <span class="rz-cell-data" @attributes="@spanAttributes">
+                            <span class="@column.GetCellClass()" @attributes="@spanAttributes">
                             @if (Item != null)
                             {
                                 @if (this.IsRowInEditMode(Item) && column.EditTemplate != null)

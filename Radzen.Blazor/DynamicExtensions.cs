@@ -1,5 +1,6 @@
 ﻿using Radzen;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 
 namespace System.Linq.Dynamic.Core
 {
@@ -25,10 +26,20 @@ namespace System.Linq.Dynamic.Core
                 {
                     for (var i = 0; i < parameters.Length; i++)
                     {
-                        var value = object.Equals(parameters[i], string.Empty) ? @"""""" :
-                            parameters[i] == null ? @"null" :
-                                parameters[i] is string ? @$"""{parameters[i].ToString().Replace("\"", "\\\"")}""" :
-                                    parameters[i] is bool ? $"{parameters[i]}".ToLower() : parameters[i];
+                        object param = parameters[i];
+                        string value = param switch
+                        {
+                            string s when s == string.Empty => @"""""",
+                            null => "null",
+                            string s => @$"""{s.Replace("\"", "\\\"")}""",
+                            bool b => b.ToString().ToLower(),
+                            Guid g => $"Guid.Parse(\"{g}\")",
+                            DateTime dt => $"DateTime.Parse(\"{dt:yyyy-MM-ddTHH:mm:ss.fffZ}\")",
+                            DateTimeOffset dto => $"DateTime.Parse(\"{dto.UtcDateTime:yyyy-MM-ddTHH:mm:ss.fffZ}\")",
+                            DateOnly d => $"DateOnly.Parse(\"{d:yyy-MM-dd}\")",
+                            TimeOnly t => $"TimeOnly.Parse(\"{t:HH:mm:ss}\")",
+                            _ => param.ToString()
+                        };
 
                         predicate = predicate.Replace($"@{i}", $"{value}");
                     }
@@ -58,16 +69,33 @@ namespace System.Linq.Dynamic.Core
             string selector,
             object[] parameters = null)
         {
-            return QueryableExtension.OrderBy(source, selector);
+            try
+            {
+                return QueryableExtension.OrderBy(source, selector);
+            }
+            catch (Exception ex)
+            {
+                throw new InvalidOperationException($"Invalid selector: {selector}.", ex);
+            }
         }
 
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
-        public static IQueryable Select<T>(
-            this IQueryable<T> source,
-            string selector,
-            object[] parameters = null)
+        public static IQueryable Select<T>(this IQueryable<T> source, string selector, object[] parameters = null)
+        {
+            return source.Select(selector, expression => ExpressionParser.ParseLambda<T>(expression));
+        }
+
+        /// <summary>
+        /// Projects each element of a sequence into a collection of property values.
+        /// </summary>
+        public static IQueryable Select(this IQueryable source, string selector, object[] parameters = null)
+        {
+            return source.Select(selector, expression => ExpressionParser.ParseLambda(expression, source.ElementType));
+        }
+
+        private static IQueryable Select(this IQueryable source, string selector, Func<string, LambdaExpression> lambdaCreator)
         {
             try
             {
@@ -76,7 +104,7 @@ namespace System.Linq.Dynamic.Core
                     .Split(",", StringSplitOptions.RemoveEmptyEntries);
 
                 selector = string.Join(", ", properties
-                    .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim()) +
+                    .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim().Replace(".", "_")) +
                         " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", "?.").Trim()}"));
 
                 if (string.IsNullOrEmpty(selector))
@@ -84,7 +112,7 @@ namespace System.Linq.Dynamic.Core
                     return source;
                 }
 
-                var lambda = ExpressionParser.ParseLambda<T>($"it => new {{ {selector} }}");
+                var lambda = lambdaCreator($"it => new {{ {selector} }}");
 
                 return source.Provider.CreateQuery(Expression.Call(typeof(Queryable), nameof(Queryable.Select),
                           [source.ElementType, lambda.Body.Type], source.Expression, Expression.Quote(lambda)));

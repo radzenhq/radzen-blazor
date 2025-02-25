@@ -151,6 +151,15 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
+        public void Should_SupportNullableCollection()
+        {
+            var expression = ExpressionParser.ParsePredicate<Person>("it => new bool?[]{ false }.Contains(it.Famous)");
+            var func = expression.Compile();
+
+            Assert.True(func(new Person { Famous = false }));
+        }
+
+        [Fact]
         public void Should_SupportEnumCollections()
         {
             var typeLocator = (string type) => AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes()).FirstOrDefault(t => t.FullName == type);
@@ -199,6 +208,15 @@ namespace Radzen.Blazor.Tests
         public void Should_SupportNestedLambdasWithEnums()
         {
             var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => it.Statuses.Any(i => (new []{1}).Contains(i))");
+            var func = expression.Compile();
+
+            Assert.True(func(new OrderDetail { Statuses = new List<Status>() { (Status)1 } }));
+        }
+
+        [Fact]
+        public void Should_SupportNestedLambdasWithComplexMethod()
+        {
+            var expression = ExpressionParser.ParsePredicate<OrderDetail>("it => new [] { (Status)1 }.Intersect(it.Statuses).Any()", type => typeof(Status));
             var func = expression.Compile();
 
             Assert.True(func(new OrderDetail { Statuses = new List<Status>() { (Status)1 } }));
@@ -365,6 +383,17 @@ namespace Radzen.Blazor.Tests
 
             Assert.Equal("Chai", result.ElementType.GetProperty("ProductName").GetValue(result.FirstOrDefault()));
         }
+
+        [Fact]
+        public void Should_SelectByWithUntypedIQueryableString()
+        {
+            IQueryable list = new List<OrderDetail> { new OrderDetail { Product = new Product { ProductName = "Chai" } } }.AsQueryable();
+
+            var result = DynamicExtensions.Select(list, "Product.ProductName as ProductName");
+
+            Assert.Equal("Chai", result.ElementType.GetProperty("ProductName").GetValue(result.FirstOrDefault()));
+        }
+
 
         [Fact]
         public void Should_SupportDictionaryIndexAccess()

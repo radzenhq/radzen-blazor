@@ -19,11 +19,11 @@
             <span class="rz-column-title" title="@(Grid.ShowColumnTitleAsTooltip ? @Column.GetTitle() : Column.HeaderTooltip)">
                 @if (Column.HeaderTemplate != null)
                 {
-                    <span class="rz-column-title-content" @onkeydown:stopPropagation>@Column.HeaderTemplate</span>
+                    <span class="@Column.GetHeaderClass()" @onkeydown:stopPropagation>@Column.HeaderTemplate</span>
                 }
                 else
                 {
-                    <span class="rz-column-title-content">@Column.GetTitle()</span>
+                    <span class="@Column.GetHeaderClass()">@Column.GetTitle()</span>
                 }
 
                 @if (Grid.AllowSorting && Column.Sortable)
@@ -251,11 +251,12 @@ else
 
             if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
             {
-                query = query.SelectMany(property).Select(Column.FilterProperty).Distinct().OrderBy();
+                query = query.SelectMany(property).Select(Column.FilterProperty).Distinct().Cast<object>().OrderBy(i => i);
+                propertyType = query.ElementType;
             }
             else
             {
-                query = query.Select(property).Distinct().OrderBy();
+                query = query.Select(property).Distinct().Cast<object>().OrderBy(i => i);
             }
 
             filterValuesCount = query.Cast<object>().Count();

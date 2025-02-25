@@ -463,6 +463,16 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       text-overflow: ellipsis;
       white-space: nowrap;
 
+      &.rz-text-wrap {
+        text-overflow: unset;
+        overflow: visible;
+      }
+
+      &.rz-text-nowrap {
+        text-overflow: unset;
+        overflow: visible;
+      }
+
       &:has(.rz-chkbox),
       &:has(.rz-button) {
         overflow: visible;

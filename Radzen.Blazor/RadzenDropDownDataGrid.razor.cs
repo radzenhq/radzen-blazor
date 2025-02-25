@@ -943,8 +943,11 @@ namespace Radzen.Blazor
                 await SelectItem(item);
             }
         }
-
-        async Task CloseAndFocus()
+        /// <summary>
+        /// Closes the dropdown popup and sets focus to the input element.
+        /// </summary>
+        /// <returns>A task that represents the asynchronous operation.</returns>
+        public async Task CloseAndFocus()
         {
             if (!Disabled && !Multiple)
             {
