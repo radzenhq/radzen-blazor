@@ -1572,53 +1572,38 @@ namespace Radzen
 
                 if (!string.IsNullOrEmpty(property))
                 {
-                    // Access the property using Expression.PropertyOrField
                     propertyExpression = GetNestedPropertyExpression(parameter, property);
-
-                    // If the property is nullable, convert it to a string if necessary
-                    if (Nullable.GetUnderlyingType(propertyExpression.Type) != null || propertyExpression.Type == typeof(string))
-                    {
-                        propertyExpression = Expression.Condition(
-                            Expression.Equal(propertyExpression, Expression.Constant(null, propertyExpression.Type)),
-                            Expression.Constant("", typeof(string)),
-                            Expression.Call(propertyExpression, "ToString", Type.EmptyTypes)
-                        );
-                    }
                 }
 
                 if (string.IsNullOrEmpty(property) || propertyExpression?.Type != typeof(string))
                 {
-                    // Default property access if no property is specified
-                    propertyExpression = Expression.Call(parameter, "ToString", Type.EmptyTypes);
+                    propertyExpression = Expression.Call(notNullCheck(parameter), "ToString", Type.EmptyTypes);
                 }
 
-                // Apply case sensitivity handling
                 if (ignoreCase)
                 {
                     propertyExpression = Expression.Call(propertyExpression, "ToLower", Type.EmptyTypes);
                 }
 
-                // Create the string comparison based on the operator
                 var constantExpression = Expression.Constant(ignoreCase ? value.ToLower() : value, typeof(string));
                 Expression comparisonExpression = null;
 
                 switch (op)
                 {
                     case StringFilterOperator.Contains:
-                        comparisonExpression = Expression.Call(propertyExpression, "Contains", null, constantExpression);
+                        comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "Contains", null, constantExpression);
                         break;
                     case StringFilterOperator.StartsWith:
-                        comparisonExpression = Expression.Call(propertyExpression, "StartsWith", null, constantExpression);
+                        comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "StartsWith", null, constantExpression);
                         break;
                     case StringFilterOperator.EndsWith:
-                        comparisonExpression = Expression.Call(propertyExpression, "EndsWith", null, constantExpression);
+                        comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "EndsWith", null, constantExpression);
                         break;
                     default:
                         comparisonExpression = Expression.Equal(propertyExpression, constantExpression);
                         break;
                 }
 
-                // Build the LINQ expression for the Where method
                 var lambda = Expression.Lambda(comparisonExpression, parameter);
                 result = source.Provider.CreateQuery(Expression.Call(
                     typeof(Queryable),
