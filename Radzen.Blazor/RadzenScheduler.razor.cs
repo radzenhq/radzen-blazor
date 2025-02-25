@@ -45,6 +45,13 @@ namespace Radzen.Blazor
         public RenderFragment ChildContent { get; set; }
 
         /// <summary>
+        /// Gets or sets the resources of the scheduler. Use to specify the resources used for grouping.
+        /// </summary>
+        /// <value>The resources.</value>
+        [Parameter]
+        public RenderFragment Resources { get; set; }
+
+        /// <summary>
         /// Gets or sets the template used to render appointments.
         /// </summary>
         /// <example>
@@ -347,6 +354,15 @@ namespace Radzen.Blazor
 
         IList<ISchedulerView> Views { get; set; } = new List<ISchedulerView>();
 
+        IList<ISchedulerResource> ResourceList { get; } = new List<ISchedulerResource>();
+
+        /// <inheritdoc />
+        public IList<ISchedulerResource> ActiveResourceList {
+            get {
+                return ResourceList.Where(w => w.IsActive).OrderBy(o => o.Order).ToList();
+            } 
+        }
+
         /// <summary>
         /// Gets the SelectedView.
         /// </summary>
@@ -369,9 +385,9 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end)
+        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, IList<(string Field, string Value)> resourceFilterList = default)
         {
-            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, View = SelectedView };
+            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, View = SelectedView, ResourceFilters = resourceFilterList };
 
             SlotRender?.Invoke(args);
 
@@ -391,15 +407,15 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public async Task SelectSlot(DateTime start, DateTime end)
+        public async Task SelectSlot(DateTime start, DateTime end, IList<(string Field, string Value)> resourceFilterList = default)
         {
-            await SlotSelect.InvokeAsync(new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = Array.Empty<AppointmentData>(), View = SelectedView });
+            await SlotSelect.InvokeAsync(new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = Array.Empty<AppointmentData>(), View = SelectedView, ResourceFilters = resourceFilterList });
         }
 
         /// <inheritdoc />
-        public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments)
+        public async Task<bool> SelectSlot(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments, IList<(string Field, string Value)> resourceFilterList = default)
         {
-            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView };
+            var args = new SchedulerSlotSelectEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView, ResourceFilters = resourceFilterList };
             await SlotSelect.InvokeAsync(args);
 
             return args.IsDefaultPrevented;
@@ -412,7 +428,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public async Task SelectDay(DateTime day, IEnumerable<AppointmentData> appointments)
+        public async Task SelectDay(DateTime day, IEnumerable<AppointmentData> appointments, IList<(string Field, string Value)> resourceFilterList = default)
         {
             await DaySelect.InvokeAsync(new SchedulerDaySelectEventArgs { Day = day, Appointments = appointments, View = SelectedView });
         }
@@ -444,6 +460,16 @@ namespace Radzen.Blazor
                     await InvokeLoadData();
                 }
 
+                StateHasChanged();
+            }
+        }
+
+        /// <inheritdoc />
+        public void AddResource(ISchedulerResource resource)
+        {
+            if (!ResourceList.Contains(resource))
+            {
+                ResourceList.Add(resource);
                 StateHasChanged();
             }
         }
@@ -527,6 +553,12 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
+        public void RemoveResource(ISchedulerResource resource)
+        {
+            ResourceList.Remove(resource);
+        }
+
+        /// <inheritdoc />
         protected override void OnInitialized()
         {
             CurrentDate = Date;
@@ -557,6 +589,7 @@ namespace Radzen.Blazor
         IEnumerable<AppointmentData> appointments;
         DateTime rangeStart;
         DateTime rangeEnd;
+        FilterDescriptor[] rangeFilter;
         Func<TItem, DateTime> startGetter;
         Func<TItem, DateTime> endGetter;
         Func<TItem, string> textGetter;
@@ -626,22 +659,30 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public IEnumerable<AppointmentData> GetAppointmentsInRange(DateTime start, DateTime end)
+        public IEnumerable<AppointmentData> GetAppointmentsInRange(DateTime start, DateTime end, FilterDescriptor[] resourceFilter = null)
         {
             if (Data == null)
             {
                 return Array.Empty<AppointmentData>();
             }
 
-            if (start == rangeStart && end == rangeEnd && appointments != null)
+            if (start == rangeStart && end == rangeEnd && rangeFilter == resourceFilter && appointments != null)
             {
                 return appointments;
             }
 
+            var resourceFilterData = Data;
+
+            if (resourceFilter != null)
+            {
+                resourceFilterData = resourceFilterData.AsQueryable().Where(resourceFilter, LogicalFilterOperator.And, FilterCaseSensitivity.Default);
+            }
+
             rangeStart = start;
             rangeEnd = end;
+            rangeFilter = resourceFilter;
 
-            appointments = Data.AsQueryable()
+            appointments = resourceFilterData.AsQueryable()
                                .Where(
                                 new FilterDescriptor[] {
                                     new FilterDescriptor

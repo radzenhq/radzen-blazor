@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
@@ -9,8 +10,13 @@ namespace Radzen.Blazor.Rendering
     /// </summary>
     public abstract class DropableViewBase : ComponentBase
     {
-        private bool dragStarted = false;
-        private AppointmentData draggedAppointment;
+        /// <summary>
+        /// Gets or sets the root view for this. Used to hold and maintain DraggedAppointment and DragStarted variables.
+        /// </summary>
+        /// <value>The root view associated with this.</value>
+        [CascadingParameter]
+        public SchedulerViewBase Root { get; set; }
+
         /// <summary>
         /// Gets or sets the appointment move event callback.
         /// </summary>
@@ -22,19 +28,20 @@ namespace Radzen.Blazor.Rendering
         /// Handles on slot drop.
         /// </summary>
         /// <param name="slotDate"></param>
+        /// <param name="resourceFilterList"></param>
         /// <returns>Task</returns>
-        public async Task OnDrop(DateTime slotDate)
+        public async Task OnDrop(DateTime slotDate, IList<(string Field, string Value)> resourceFilterList = default)
         {
-            if (draggedAppointment != null)
+            if (Root.DraggedAppointment != null)
             {
-                TimeSpan timespan = slotDate - draggedAppointment.Start;
+                TimeSpan timespan = slotDate - Root.DraggedAppointment.Start;
 
-                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { Appointment = draggedAppointment, TimeSpan = timespan });
+                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { Appointment = Root.DraggedAppointment, TimeSpan = timespan, ResourceFilters = resourceFilterList });
 
-                draggedAppointment = null;
+                Root.DraggedAppointment = null;
             }
 
-            dragStarted = false;
+            Root.DragStarted = false;
         }
 
         /// <summary>
@@ -44,10 +51,10 @@ namespace Radzen.Blazor.Rendering
         /// <returns></returns>
         public void OnAppointmentDragStart(AppointmentData data)
         {
-            if (!dragStarted)
+            if (!Root.DragStarted)
             {
-                dragStarted = true;
-                draggedAppointment = data;
+                Root.DragStarted = true;
+                Root.DraggedAppointment = data;
             }
         }
     }

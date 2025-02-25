@@ -23,6 +23,11 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The text.</value>
         string Text { get; }
+        /// <summary>
+        /// Gets or sets whether resource grouping is displayed
+        /// </summary>
+        /// <value>The value.</value>
+        bool ShowResourceGrouping { get; set; }
 
         /// <summary>
         /// Returns a new date when the user clicks the next button of RadzenScheduler.
