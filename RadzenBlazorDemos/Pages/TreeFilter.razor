@@ -6,23 +6,23 @@
 <RadzenTree Style="height:300px;width:100%;">
     @foreach (var category in examples)
     {
-        <RadzenTreeItem @key=category @bind-Expanded=@category.Expanded Text="@category.Name">
+        <RadzenTreeItem @key=category Expanded=@category.Expanded Text="@category.Name">
             @if (category.Children != null)
             {
                 @foreach (var example in category.Children)
                 {
                     if (example.Children != null)
                     {
-                        <RadzenTreeItem @key=example @bind-Expanded=@example.Expanded Text="@example.Name">
+                        <RadzenTreeItem @key=example Expanded=@example.Expanded Text="@example.Name">
                             @foreach (var child in example.Children)
                             {
-                                <RadzenTreeItem @key=child @bind-Expanded=@child.Expanded Text="@child.Name" />
+                                <RadzenTreeItem @key=child Expanded=@child.Expanded Text="@child.Name" />
                             }
                         </RadzenTreeItem>
                     }
                     else
                     {
-                        <RadzenTreeItem @key=example @bind-Expanded=@example.Expanded Text="@example.Name" />
+                        <RadzenTreeItem @key=example Expanded=@example.Expanded Text="@example.Name" />
                     }
                 }
             }
