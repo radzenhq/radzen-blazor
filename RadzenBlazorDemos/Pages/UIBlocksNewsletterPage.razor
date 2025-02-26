@@ -1,0 +1,96 @@
+﻿@page "/ui-blocks-newsletter"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Newsletter
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    Capture leads and keep your audience engaged with updates, promotions, and valuable content.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Centered layout
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-">
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+                            <RadzenText Text="Newsletter" TextStyle="Radzen.Blazor.TextStyle.Overline" TextAlign="Radzen.TextAlign.Center" class="rz-color-primary" Style="font-size: 1rem" />
+                            <RadzenText Text="Stay in the Loop!" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="" />
+                            <RadzenText Text="Subscribe to our newsletter for the latest updates, exclusive deals, and insider content—delivered straight to your inbox!" TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+                            <RadzenTemplateForm TItem="dynamic" class="rz-w-100">
+                                <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-8" Gap="0.5rem">
+                                    <RadzenCard Style="--rz-card-padding: 0.5rem; border-radius: calc(var(--rz-button-border-radius) + var(--rz-card-padding)); max-width: 500px;  " class="rz-w-100" Variant="Radzen.Variant.Outlined">
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" Wrap="Radzen.FlexWrap.Wrap">
+                                            <RadzenTextBox Name="NewsletterEmail" Placeholder="Enter your email" Style=" border-radius: var(--rz-button-border-radius); flex:1;  " />
+                                            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="Subscribe" Variant="Variant.Flat" />
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                    <RadzenRequiredValidator Component="NewsletterEmail" Text="* Email is required." />
+                                    <RadzenEmailValidator Component="NewsletterEmail" Text="* Provide a valid email address." />
+                                    <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body2" class="rz-m-0 ">
+                                        No spam, just great content. Read our <RadzenLink Text="Privacy Policy" Path="/ui-blocks-newsletter"></RadzenLink> to learn more.
+                                    </RadzenText>
+                                </RadzenStack>
+                            </RadzenTemplateForm>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#footer-with-sitemap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Left-aligned with image
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-">
+                    <RadzenColumn Size="12" SizeMD="6" Order="1" OrderMD="2">
+                        <RadzenImage class="rz-w-100 rz-h-100" Path="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABdwAAAPoBAMAAAA2ICHWAAAAIVBMVEVHcEx3d3d3d3d4eHh/f396enp/f394eHh3d3d0dHR5eXnDUJ2RAAAAC3RSTlMAgEBwEDAIaHgYUBsLwmIAABNKSURBVHhe7dQxip5lFIbhw6CC6f6IRKycJQhZgJANJDtIZ51meks7y5S6Uy2+MBPmH6aRge/cV/t077lfrpm5vfzw28zMzeXydubB8OrL8M9Tw+/H8N2n++HuGN58fDh88+sxvLtc/j6Gn+ep4ZdjeP3V8P0fx/D5qeHbyzF8uB9+/DK8/2q4/W84Xv3nMfz016Ph6l1unr3Lqyt3eXvtLvfDu2N4dJdrw+vrh/r87KE+XDnU+6uHujmGJ+9yDP/HBzrO8AIf6Jmccr6UBzy4ewEPQjnxjvdQTrzjPZQT73gfOfGO94058Y73UE684z2UE+94D+XEO95DOfGO91BOvOO9kxPveA/lxDveQznxjvdQTrzjPZQT73gP5cQ73kM58Y73UE684z2UE+94D+XEO95HTrzjfWNOvOM9lBPveA/lxDveQznxjvdQTrzjPZQT73jv5MQ73kM58Y73UE684z2UE+94D+XEO95DOfGO91BOvOM9lBPveA/lxDveQznxjveRE+9435gT73gP5cQ73kM58Y73UE684z2UE+94D+XEO947OfGO91BOvOM9lBPveA/lxDveQznxjvdQTrzjPZQT73gP5cQ73kM58Y73UE68433kxDveN+bEO95DOfGO91BOvOM9lBPveA/lxDveQznxjvdOTrzjPZQT73gP5cQ73kM58Y73UE684z2UE+94D+XEO95DOfGO91BOvOM9lBPveB858Y73jTnxjvdQTrzjPZQT73gP5cQ73kM58Y73UE68472TE+94D+XEO95DOfGO91BOvOM9lBPveA/lxDveQznxjvdQTrzjPZQT73gP5cQ73kdOvON9Y0684z2UE+94D+XEO95DOfGO91BOvOM9lBPveO/kxDveQznxjvdQTrzjPZQT73gP5cQ73kM58Y73UE684z2UE+94D+XEO95DOfGO95ET73jfmBPveA/lxDveQznxjvdQTrzjPZQT73gP5cQ73js58Y73UE684z2UE+94D+XEO95DOfGO91BOvOM9lBPveA/lxDveQznxjvdQTrzjfeTEO9435sQ73kM58Y73UE684z2UE+94D+XEO95DOfGO905OvOM9lBPveA/lxDveQznxjvdQTrzjPZQT73gP5cQ73kM58Y73UE684z2UE+94HznxjveNOfGO91BOvOM9lBPveA/lxDveQznxjvdQTrzjvZMT73gP5cQ73kM58Y73UE684z2UE+94D+XEO95DOfGO91BOvOM9lBPveA/lxDveR068431jTrzjPZQT73gP5cQ73kM58Y73UE684z2UE+947+TEO95DOfGO91BOvOM9lBPveA/lxDveQznxjvdQTrzjPZQT73gP5cQ73kM58Y73kRPveN+YE+94D+XEO95DOfGO91BOvOM9lBPveA/lxDveOznxjvdQTrzjPZQT73gP5cQ73kM58Y73UE684z2UE+94D+XEO95DOfGO91BOvON95MQ73jfmxDveQznxjvdQTrzjPZQT73gP5cQ73kM58Y73Tk684z2UE+94D+XEOw9COfHOg1BOvPMglBPvPAjlxDsPQjnxzoNQTrzzIJQT7zwYOfGO94058c6DUE688yCUE+88COXEOw9COfHOg1BOvPOgkxPvPAjlxDsPQjnxzoNQTrzzIJQT7zwI5cQ7D0I58c6DUE688yCUE+88COXEOw9GTrzjfWNOvPMglBPvPAjlxDsPQjnxzoNQTrzzIJQT7zzo5MQ7D0I58c6DUE688yCUE+88COXEOw9COfHOg1BOvPMglBPvPAjlxDsP5MQ73uXEO97PnRPvPAjlxDsPQjnxzoNQTrzzIJQT7zwI5cQ7Dzo58c6DUE688yCUE+88COXEOw9COfHOg1BOvPMglBPvPAjlxDsPQjnxzgM58Y53OfGO93PnxDsPQjnxzoNQTrzzIJQT7zwI5cQ7D0I58c6DTk688yCUE+88COXEOw9COfHOg1BOvPMglBPvPAjlxDsPQjnxzoNQTrzzQE68411OvOP93DnxzoNQTrzzIJQT7zwI5cQ7D0I58c6DUE6886CTE+88COXEOw9COfHOg1BOvPMglBPvPAjlxDsPQjnxzoNQTrzzIJQT7zyQE+94lxPveD93TrzzIJQT7zwI5cQ7D0I58c6DUE688yCUE+886OTEOw9COfHOg1BOvPMglBPvPAjlxDsPQjnxzoNQTrzzIJQT7zwI5cQ7D+TEO97lxDvez50T7zwI5cQ7D0I58c6DUE68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"></RadzenImage>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="6" Order="2" OrderMD="1" class="rz-py-12 rz-px-6 rz-px-sm-12">
+                        <RadzenStack Gap="0" class="rz-h-100" JustifyContent="Radzen.JustifyContent.Center">
+                            <RadzenText Text="Newsletter" TextStyle="Radzen.Blazor.TextStyle.Overline" Style="max-width: 800px; font-size: 1rem" class="rz-color-primary" />
+                            <RadzenText Text="Stay in the Loop!" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" Style="max-width: 800px" class="" />
+                            <RadzenText Text="Subscribe to our newsletter for the latest updates, exclusive deals, and insider content—delivered straight to your inbox!" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+                            <RadzenStack Gap="1rem" class="rz-mt-6">
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                    <RadzenIcon Icon="shoppingmode" IconStyle="Radzen.IconStyle.Primary" ></RadzenIcon>
+                                    <RadzenText Text="Special offers & discounts" class="rz-m-0 " />
+                                </RadzenStack>
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                    <RadzenIcon Icon="rocket_launch" IconStyle="Radzen.IconStyle.Primary" ></RadzenIcon>
+                                    <RadzenText Text="New product launches" class="rz-m-0 " />
+                                </RadzenStack>
+                                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                    <RadzenIcon Icon="lightbulb" IconStyle="Radzen.IconStyle.Primary" ></RadzenIcon>
+                                    <RadzenText Text="Helpful tips & insights" class="rz-m-0 " />
+                                </RadzenStack>
+                            </RadzenStack>
+                            <RadzenTemplateForm TItem="dynamic" class="rz-w-100 rz-mt-10">
+                                <RadzenStack Gap="0.5rem" AlignItems="Radzen.AlignItems.Center" Orientation="Radzen.Orientation.Horizontal" Wrap="Radzen.FlexWrap.Wrap">
+                                    <RadzenTextBox Name="NewsletterEmail" Placeholder="Enter your email" class="rz-w-100" Style=" border-radius: var(--rz-button-border-radius); max-width: 400px;  " />
+                                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="Subscribe" Variant="Variant.Flat" />
+                                </RadzenStack>
+                                <RadzenRequiredValidator Component="NewsletterEmail" Text="Email is required." />
+                                <RadzenEmailValidator Component="NewsletterEmail" Text="Provide a valid email address." />
+                            </RadzenTemplateForm>
+                        </RadzenStack>
+                        <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body2" class="rz-m-0 ">
+                            No spam, just great content. Read our <RadzenLink Text="Privacy Policy" Path="/ui-blocks-newsletter"></RadzenLink> to learn more.
+                        </RadzenText>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>

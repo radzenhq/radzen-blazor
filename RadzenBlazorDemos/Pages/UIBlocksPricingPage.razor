@@ -1,0 +1,167 @@
+﻿@page "/ui-blocks-pricing"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Pricing
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    Well-structured pricing sections for your product or service.
+</RadzenText>
+
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Pricing Cards
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example">
+                <RadzenRow class="rz-w-100 rz-mx-auto" Style="max-width: 1440px">
+                    <RadzenColumn Size="12" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+                            <RadzenText Text="Choose your plan" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" />
+                            <RadzenText Text="Unlock endless possibilities" TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+                            <RadzenRow Gap="1rem" RowGap="1rem" AlignItems="Radzen.AlignItems.Center" class="rz-mt-12 rz-w-100 rz-w-md-75" >
+                                <RadzenColumn Size="12" SizeSM="4" Style="height: fit-content; z-index: 1;">
+                                    <RadzenCard class="rz-pt-6" Style="flex: 1;">
+                                        <RadzenStack class="rz-p-6" Gap="0">
+                                            <RadzenText Text="Basic" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.H3" />
+                                            <RadzenText Text="For personal use and exploration of the technonlogy." TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color" />
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center" class="rz-my-6" JustifyContent="Radzen.JustifyContent.Center">
+                                                <RadzenText Text="Free" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" class="rz-m-0" TagName="Radzen.Blazor.TagName.H4" />
+                                                <RadzenText Text="/ forever" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenLink Text="Get Started" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-shade-lighter rz-my-3" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-pricing" />
+                                            <RadzenStack Gap="0.5rem" class="rz-mt-6">
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="50 requests per day" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Free trial feature access" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Limited API access" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeSM="4" Style="height: fit-content; z-index: 1;">
+                                    <RadzenCard Style="flex: 1;">
+                                        <RadzenStack class="rz-p-6 rz-py-12" Gap="0" Style="position: relative">
+                                            <RadzenBadge Text="Popular" Style="position: absolute; top: -1.25rem; padding: 8px 12px; left: 50%; width: 6rem; margin-left: -3rem" Shade="Radzen.Shade.Lighter" Variant="Radzen.Variant.Flat" BadgeStyle="Radzen.BadgeStyle.Danger"></RadzenBadge>
+                                            <RadzenText Text="Premium" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-color-primary" TagName="Radzen.Blazor.TagName.H3" />
+                                            <RadzenText Text="Perfect for professionals and small businesses." TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color" />
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center" class="rz-my-6" JustifyContent="Radzen.JustifyContent.Center">
+                                                <RadzenText Text="$79" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" class="rz-m-0" TagName="Radzen.Blazor.TagName.H4" />
+                                                <RadzenText Text="/ month" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenLink Text="Get Started" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-shade-default rz-my-3" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-pricing" />
+                                            <RadzenStack Gap="0.5rem" class="rz-mt-6">
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Unlimited requests" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Full new feature access" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Priority support" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeSM="4" Style="height: fit-content; z-index: 1;">
+                                    <RadzenCard class="rz-pt-6" Style="flex: 1;">
+                                        <RadzenStack class="rz-p-6" Gap="0">
+                                            <RadzenText Text="Enterprise" TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.H3" />
+                                            <RadzenText Text="Ideal for large businesses and organizations." TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color" />
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center" class="rz-my-6" JustifyContent="Radzen.JustifyContent.Center">
+                                                <RadzenIcon Icon="alternate_email" Style="font-size: 48px"></RadzenIcon>
+                                            </RadzenStack>
+                                            <RadzenLink Text="Contact us" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-shade-lighter rz-my-3" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-pricing" />
+                                            <RadzenStack Gap="0.5rem" class="rz-mt-6">
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Custom deployment" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="On-Premises installation" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                                                <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                                                <RadzenText Text="Phone support" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-text-tertiary-color rz-m-0" />
+                                            </RadzenStack>
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#footer-with-sitemap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Basic pricing
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example">
+                <RadzenRow class="rz-w-100 rz-mx-auto" >
+                    <RadzenColumn Size="12" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+                            <RadzenText Text="Choose the Perfect Plan for You" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" />
+                            <RadzenText Text="Pick a plan that fits your needs—whether you're just starting out or ready to scale up!" TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+                            <RadzenRow RowGap="1rem" Gap="0" class="rz-mt-12 rz-w-100 rz-w-md-75" AlignItems="Radzen.AlignItems.Center">
+                                <RadzenColumn Size="12" SizeSM="4" Style="height: fit-content;">
+                                    <RadzenCard class="rz-pt-6">
+                                        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-p-6" Gap="1rem">
+                                            <RadzenText Text="Community" TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.H3" />
+                                            <RadzenText Text="Free" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="forever" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" TextAlign="Radzen.TextAlign.Center" class="rz-text-tertiary-color" />
+                                            <RadzenLink Text="Download Now" class="rz-button rz-button-lg rz-variant-outlined rz-text-align-center rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-pricing" />
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeSM="4" Style="height: fit-content; z-index: 1;">
+                                    <RadzenCard class="rz-background-color-base-light">
+                                        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-p-12" Gap="1rem">
+                                            <RadzenText Text="Professional" TextStyle="Radzen.Blazor.TextStyle.H4" TextAlign="Radzen.TextAlign.Center" class="rz-color-primary" TagName="Radzen.Blazor.TagName.H3" />
+                                            <RadzenText Text="$799" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" class="rz-color-on-base-light" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="annual subscription" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" TextAlign="Radzen.TextAlign.Center" class="rz-color-on-base-light" />
+                                            <RadzenLink Text="Get Professional" class="rz-button rz-button-lg rz-variant-flat rz-text-align-center rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-pricing" />
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeSM="4" Style="height: fit-content;">
+                                    <RadzenCard class="rz-pt-6">
+                                        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-p-6" Gap="1rem">
+                                            <RadzenText Text="Enterprise" TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.H3" />
+                                            <RadzenText Text="$1599" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.H4" />
+                                            <RadzenText Text="annual subscription" TextStyle="Radzen.Blazor.TextStyle.Subtitle2" TextAlign="Radzen.TextAlign.Center" class="rz-text-tertiary-color" />
+                                            <RadzenLink Text="Go Enterprise" class="rz-button rz-button-lg rz-variant-outlined rz-text-align-center rz-primary rz-shade-default" Style="--rz-link-hover-text-decoration: none" Path="/ui-blocks-pricing" />
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>

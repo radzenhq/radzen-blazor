@@ -1,0 +1,163 @@
+﻿@page "/ui-blocks-faq"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    FAQ - Frequently Asked Questions
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    Use the FAQ UI Block to provide answers to common questions users might have.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-footers#footer-with-sitemap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    FAQ in 2 columns
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-" Style="max-width: 1440px">
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+                            <RadzenText Text="Got Questions? " TextStyle="Radzen.Blazor.TextStyle.Overline" TextAlign="Radzen.TextAlign.Center" class="rz-color-primary" Style="font-size: 1rem" />
+                            <RadzenText Text="We've Got Answers!" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="" />
+                            <RadzenText Text="Everything you need to know, all in one place." TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-text-secondary-color" />
+                        </RadzenStack>        <RadzenRow Gap="2rem" class="rz-my-6 rz-my-sm-12">
+                            <RadzenColumn Size="12" SizeXS="6">
+                                <RadzenText Text="Is Radzen Blazor Studio free?" TextStyle="Radzen.Blazor.TextStyle.H5" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H4" class="" />
+                                <RadzenText Text="Radzen Blazor Studio has free and premium features. The premium features are available during the 15 day trial period." TextStyle="Radzen.Blazor.TextStyle.Body1" Style="max-width: 800px" class="rz-mb-8 rz-text-secondary-color" />
+                                <RadzenText Text="What editions does Radzen Blazor Studio have?" TextStyle="Radzen.Blazor.TextStyle.H5" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H4" class="" />
+                                <RadzenText Text="Radzen Blazor Studio has the following editions: Community, Professional, Enterprise and Trial. " TextStyle="Radzen.Blazor.TextStyle.Body1" Style="max-width: 800px" class="rz-text-secondary-color" />
+                            </RadzenColumn>            <RadzenColumn Size="12" SizeXS="6">
+                                <RadzenText Text="Does the license include support?" TextStyle="Radzen.Blazor.TextStyle.H5" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H4" class="" />
+                                <RadzenText Text="Radzen Blazor Studio Professional and Radzen Blazor Studio Enterprise include dedicated support over email during the subscription period. " TextStyle="Radzen.Blazor.TextStyle.Body1" Style="max-width: 800px" class="rz-mb-8 rz-text-secondary-color" />
+                                <RadzenText Text="How many licenses do I need?" TextStyle="Radzen.Blazor.TextStyle.H5" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H4" class="" />
+                                <RadzenText Text="Radzen Blazor Studio is licensed per developer seat. Each developer who uses Radzen Blazor Studio needs a separate license." TextStyle="Radzen.Blazor.TextStyle.Body1" Style="max-width: 800px" class="rz-text-secondary-color" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    FAQ to the right
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Dark">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-base-darker" >
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenRow Gap="2rem" class="rz-my-6 rz-my-sm-12">
+                            <RadzenColumn Size="12" SizeXS="4">
+                                <RadzenStack Gap="0">
+                                    <RadzenText Text="Got Questions? " TextStyle="Radzen.Blazor.TextStyle.Overline" class="rz-color-primary" Style="font-size: 1rem" />
+                                    <RadzenText Text="We've Got Answers!" TextStyle="Radzen.Blazor.TextStyle.DisplayH4" Style="max-width: 800px" class="rz-m-0 rz-color-on-base-darker" />
+                                    <RadzenText Text="Everything you need to know, all in one place." TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-base-darker" />
+                                </RadzenStack>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeXS="8" class="rz-pt-8">
+                                <RadzenText Text="Is Radzen Blazor Studio free?" TextStyle="Radzen.Blazor.TextStyle.H5" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H4" class="rz-color-on-base-darker" />
+                                <RadzenText Text="Radzen Blazor Studio has free and premium features. The premium features are available during the 15 day trial period." TextStyle="Radzen.Blazor.TextStyle.Body1" Style="max-width: 800px" class="rz-mb-8 rz-color-on-base-darker" />
+                                <RadzenText Text="What editions does Radzen Blazor Studio have?" TextStyle="Radzen.Blazor.TextStyle.H5" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H4" class="rz-color-on-base-darker" />
+                                <RadzenText Text="Radzen Blazor Studio has the following editions: Community, Professional, Enterprise and Trial. " TextStyle="Radzen.Blazor.TextStyle.Body1" Style="max-width: 800px" class="rz-mb-8 rz-color-on-base-darker" />
+                                <RadzenText Text="Does the license include support?" TextStyle="Radzen.Blazor.TextStyle.H5" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H4" class="rz-color-on-base-darker" />
+                                <RadzenText Text="Radzen Blazor Studio Professional and Radzen Blazor Studio Enterprise include dedicated support over email during the subscription period. " TextStyle="Radzen.Blazor.TextStyle.Body1" Style="max-width: 800px" class="rz-mb-8 rz-color-on-base-darker" />
+                                <RadzenText Text="How many licenses do I need?" TextStyle="Radzen.Blazor.TextStyle.H5" Style="max-width: 800px" TagName="Radzen.Blazor.TagName.H4" class="rz-color-on-base-darker" />
+                                <RadzenText Text="Radzen Blazor Studio is licensed per developer seat. Each developer who uses Radzen Blazor Studio needs a separate license." TextStyle="Radzen.Blazor.TextStyle.Body1" Style="max-width: 800px" class="rz-color-on-base-darker" />
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    FAQ Accordion to the right
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Primary">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-primary">
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenRow Gap="2rem" class="rz-my-6 rz-my-sm-12">
+                            <RadzenColumn Size="12" SizeXS="4">
+                                <RadzenStack Gap="0">
+                                    <RadzenText Text="Got Questions? " TextStyle="Radzen.Blazor.TextStyle.Overline" class="rz-color-on-primary" Style="font-size: 1rem" />
+                                    <RadzenText Text="We've Got Answers!" TextStyle="Radzen.Blazor.TextStyle.DisplayH4" Style="max-width: 800px" class="rz-m-0 rz-color-on-primary" />
+                                    <RadzenText Text="Everything you need to know, all in one place." TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-primary" />
+                                </RadzenStack>
+                            </RadzenColumn>
+                            <RadzenColumn Size="12" SizeXS="8">
+                                <RadzenAccordion Multiple="true">
+                                    <Items>
+                                        <RadzenAccordionItem Expanded="True" Text="What is your return policy?">
+                                            <RadzenText>
+                                                We offer hassle-free returns within 30 days of purchase. Items must be in original condition. Visit our <RadzenLink Text="Return Policy"></RadzenLink> page for details.                            </RadzenText>
+                                        </RadzenAccordionItem>
+                                        <RadzenAccordionItem Text="How long does shipping take?">
+                                            <RadzenText Text="Shipping times vary based on location and shipping method. Standard: 5-7 business days; Express: 2-3 business days; International: 7-14 business days." />
+                                        </RadzenAccordionItem>
+                                        <RadzenAccordionItem Text="Do you offer international shipping?">
+                                            <RadzenText Text="Yes! We ship worldwide. Shipping rates and delivery times vary depending on your location." />
+                                        </RadzenAccordionItem>
+                                        <RadzenAccordionItem Text="How can I track my order?">
+                                            <RadzenText Text="Once your order ships, you'll receive a tracking number via email." />
+                                        </RadzenAccordionItem>
+                                    </Items>
+                                </RadzenAccordion>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    FAQ in centered Accordion
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <RadzenRow class="rz-w-100 rz-mx-auto rz-background-color-base-lighter" >
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" Gap="0" class="rz-my-6 rz-my-sm-12">
+                            <RadzenText Text="Got Questions? " TextStyle="Radzen.Blazor.TextStyle.Overline" TextAlign="Radzen.TextAlign.Center" class="rz-color-primary" Style="font-size: 1rem" />
+                            <RadzenText Text="We've Got Answers!" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="rz-color-on-base-lighter" />
+                            <RadzenText Text="Everything you need to know, all in one place." TextStyle="Radzen.Blazor.TextStyle.H5" TextAlign="Radzen.TextAlign.Center" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" class="rz-color-on-base-lighter" />
+                        </RadzenStack>
+                        <RadzenAccordion Multiple="true">
+                            <Items>
+                                <RadzenAccordionItem Expanded="True" Text="What is your return policy?">
+                                    <RadzenText>
+                                        We offer hassle-free returns within 30 days of purchase. Items must be in original condition. Visit our <RadzenLink Text="Return Policy"></RadzenLink> page for details.                            </RadzenText>
+                                </RadzenAccordionItem>
+                                <RadzenAccordionItem Text="How long does shipping take?">
+                                    <RadzenText Text="Shipping times vary based on location and shipping method. Standard: 5-7 business days; Express: 2-3 business days; International: 7-14 business days." />
+                                </RadzenAccordionItem>
+                                <RadzenAccordionItem Text="Do you offer international shipping?">
+                                    <RadzenText Text="Yes! We ship worldwide. Shipping rates and delivery times vary depending on your location." />
+                                </RadzenAccordionItem>
+                                <RadzenAccordionItem Text="How can I track my order?">
+                                    <RadzenText Text="Once your order ships, you'll receive a tracking number via email." />
+                                </RadzenAccordionItem>
+                            </Items>
+                        </RadzenAccordion>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>

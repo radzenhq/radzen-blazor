@@ -1,0 +1,370 @@
+﻿@page "/ui-blocks-testimonials"
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+
+@inherits DbContextPage
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Testimonials
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4" Style="max-width: 1000px;">
+    Add credibility and build trust by showcasing positive feedback from real users. Here are well-structured layouts for your testimonials section.
+</RadzenText>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Quotes in Carousel
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example">
+                <RadzenCarousel ButtonShade="Radzen.Shade.Dark" AllowNavigation="false" Interval="6000" class="rz-w-100 rz-mx-auto rz-p-6 rz-pb-8 rz-p-sm-12 rz-background-color-" Style="max-width: 1440px">
+                    <Items>
+                        <RadzenCarouselItem>
+                            <RadzenRow RowGap="3rem" Gap="1rem">
+                                <RadzenColumn Size="12">
+                                    <RadzenStack Style="max-width: 800px" Gap="3.5rem" class="rz-mx-auto">
+                                        <RadzenStack Gap="1rem">
+                                            <RadzenText Text="" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 500; line-height: 1em" class="">
+                                                <span>I was blown away by the quality and service!</span>
+                                                <span Style="font-weight: 300" class="rz-m-0 rz-text-tertiary-color">From start to finish, the process was seamless, and the product exceeded my expectations. Highly recommend!</span>
+                                            </RadzenText>
+                                            <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
+                                                <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                                <RadzenStack Gap="0">
+                                                    <RadzenText Text="Jessica M." Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-tertiary-color" />
+                                                    <RadzenText Text="Product Manager" class="rz-m-0 rz-text-disabled-color" />
+                                                </RadzenStack>
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenCarouselItem>
+                        <RadzenCarouselItem>
+                            <RadzenRow RowGap="3rem" Gap="1rem">
+                                <RadzenColumn Size="12">
+                                    <RadzenStack Style="max-width: 800px" Gap="3.5rem" class="rz-mx-auto">
+                                        <RadzenStack Gap="1rem">
+                                            <RadzenText Text="" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 500; line-height: 1em" class="">
+                                                <span>Absolutely fantastic experience!</span>
+                                                <span Style="font-weight: 300" class="rz-m-0 rz-text-tertiary-color">The team was super helpful, and the attention to detail was top-notch. Will definitely be coming back for more!</span>
+                                            </RadzenText>
+                                            <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
+                                                <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                                <RadzenStack Gap="0">
+                                                    <RadzenText Text="Linda R." Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-tertiary-color" />
+                                                    <RadzenText Text="Product Manager" class="rz-m-0 rz-text-disabled-color" />
+                                                </RadzenStack>
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenCarouselItem>
+                        <RadzenCarouselItem>
+                            <RadzenRow RowGap="3rem" Gap="1rem">
+                                <RadzenColumn Size="12">
+                                    <RadzenStack Style="max-width: 800px" Gap="3.5rem" class="rz-mx-auto">
+                                        <RadzenStack Gap="1rem">
+                                            <RadzenText Text="" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 500; line-height: 1em" class="">
+                                                <span>I couldn't be happier with my purchase.</span>
+                                                <span Style="font-weight: 300" class="rz-m-0 rz-text-tertiary-color">Great value for money, fast delivery, and outstanding customer support. 10/10!</span>
+                                            </RadzenText>
+                                            <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
+                                                <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                                <RadzenStack Gap="0">
+                                                    <RadzenText Text="Sophia L." Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-tertiary-color" />
+                                                    <RadzenText Text="Product Manager" class="rz-m-0 rz-text-disabled-color" />
+                                                </RadzenStack>
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenCarouselItem>
+                    </Items>
+                </RadzenCarousel>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#footer-with-sitemap" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Quotes on a row
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Dark">
+                <RadzenRow RowGap="3rem" Gap="1rem" class="rz-w-100 rz-mx-auto rz-background-color-base-darker" >
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center"class="rz-my-6 rz-my-sm-12" Gap="3rem">
+                            <RadzenText Text="What Our Customers Say" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="rz-color-on-base-darker" />
+                            <RadzenRow class="rz-w-100" Gap="3rem" RowGap="2rem">
+                                <RadzenColumn Size="12" SizeSM="4">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                        <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                            <RadzenText Text="5" class="rz-m-0 rz-color-on-base-darker" />
+                                            <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                    <RadzenText Text="I was blown away by the quality and service! From start to finish, the process was seamless, and the product exceeded my expectations. Highly recommend!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 rz-color-on-base-darker" />
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                        <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                        <RadzenText Text="— Jessica M." class="rz-m-0 rz-text-tertiary-color" />
+                                    </RadzenStack>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeSM="4">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                        <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                            <RadzenText Text="5" class="rz-m-0 rz-color-on-base-darker" />
+                                            <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                    <RadzenText Text="Absolutely fantastic experience! The team was super helpful, and the attention to detail was top-notch. Will definitely be coming back for more!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 rz-color-on-base-darker" />
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                        <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                        <RadzenText Text="— Linda R." class="rz-m-0 rz-text-tertiary-color" />
+                                    </RadzenStack>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeSM="4">
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                        <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                            <RadzenText Text="5" class="rz-m-0 rz-color-on-base-darker" />
+                                            <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                    <RadzenText Text="I couldn't be happier with my purchase. Great value for money, fast delivery, and outstanding customer support. 10/10!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 rz-color-on-base-darker" />
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                        <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                        <RadzenText Text="— Sophia L." class="rz-m-0 rz-text-tertiary-color" />
+                                    </RadzenStack>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Quotes in Cards
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Light">
+                <RadzenRow RowGap="3rem" Gap="1rem" class="rz-w-100 rz-mx-auto rz-background-color-base-lighter" >
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center"class="rz-my-6 rz-my-sm-12" Gap="3rem">
+                            <RadzenText Text="Rated by the best in the field" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="rz-color-on-base-lighter" />
+                            <RadzenRow class="rz-w-100" Gap="2rem" RowGap="2rem">
+                                <RadzenColumn Size="12" SizeSM="4">
+                                    <RadzenCard Variant="Radzen.Variant.Outlined" class="rz-p-6 rz-p-sm-12 rz-w-100 rz-h-100">
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                            <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                                <RadzenText Text="5" class="rz-m-0 rz-color-on-base-lighter" />
+                                                <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                        <RadzenText Text="I was blown away by the quality and service! From start to finish, the process was seamless, and the product exceeded my expectations. Highly recommend!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 rz-color-on-base-lighter" />
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                            <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                            <RadzenText Text="— Jessica M." class="rz-m-0 rz-text-tertiary-color" />
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeSM="4">
+                                    <RadzenCard Variant="Radzen.Variant.Outlined" class="rz-p-6 rz-p-sm-12 rz-w-100 rz-h-100">
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                            <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                                <RadzenText Text="5" class="rz-m-0 rz-color-on-base-lighter" />
+                                                <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                        <RadzenText Text="Absolutely fantastic experience! The team was super helpful, and the attention to detail was top-notch. Will definitely be coming back for more!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 rz-color-on-base-lighter" />
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                            <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                            <RadzenText Text="— Linda R." class="rz-m-0 rz-text-tertiary-color" />
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                                <RadzenColumn Size="12" SizeSM="4">
+                                    <RadzenCard Variant="Radzen.Variant.Outlined" class="rz-p-6 rz-p-sm-12 rz-w-100 rz-h-100">
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                            <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                            <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                                <RadzenText Text="5" class="rz-m-0 rz-color-on-base-lighter" />
+                                                <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                            </RadzenStack>
+                                        </RadzenStack>
+                                        <RadzenText Text="I couldn't be happier with my purchase. Great value for money, fast delivery, and outstanding customer support. 10/10!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 rz-color-on-base-lighter" />
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                            <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                            <RadzenText Text="— Sophia L." class="rz-m-0 rz-text-tertiary-color" />
+                                        </RadzenStack>
+                                    </RadzenCard>
+                                </RadzenColumn>
+                            </RadzenRow>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Quotes in a CardGroup
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example">
+                <RadzenRow RowGap="3rem" Gap="1rem" class="rz-w-100 rz-mx-auto rz-background-color-">
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center"class="rz-my-6 rz-my-sm-12" Gap="3rem">
+                            <RadzenText Text="Rated by the best in the field" TextStyle="Radzen.Blazor.TextStyle.DisplayH3" TextAlign="Radzen.TextAlign.Center" Style="max-width: 800px" class="" />
+                            <RadzenCardGroup>                <RadzenCard class="rz-p-6 rz-p-sm-12" Variant="Radzen.Variant.Outlined">                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                        <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                            <RadzenText Text="5" class="rz-m-0 " />
+                                            <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                    <RadzenText Text="I was blown away by the quality and service! From start to finish, the process was seamless, and the product exceeded my expectations. Highly recommend!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 " />
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                        <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                        <RadzenText Text="— Jessica M." class="rz-m-0 rz-text-tertiary-color" />
+                                    </RadzenStack>
+                                </RadzenCard>
+                                <RadzenCard class="rz-p-6 rz-p-sm-12" Variant="Radzen.Variant.Outlined">                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                        <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                            <RadzenText Text="5" class="rz-m-0 " />
+                                            <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                    <RadzenText Text="Absolutely fantastic experience! The team was super helpful, and the attention to detail was top-notch. Will definitely be coming back for more!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 " />
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                        <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                        <RadzenText Text="— Linda R." class="rz-m-0 rz-text-tertiary-color" />
+                                    </RadzenStack>
+                                </RadzenCard>
+                                <RadzenCard class="rz-p-6 rz-p-sm-12" Variant="Radzen.Variant.Outlined">                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.SpaceBetween" Gap="0">
+                                        <RadzenRating Disabled="false" ReadOnly="true" Value="5"></RadzenRating>
+                                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" JustifyContent="Radzen.JustifyContent.End" Gap="0.25rem">
+                                            <RadzenText Text="5" class="rz-m-0 " />
+                                            <RadzenText Text="/ 5" class="rz-m-0 rz-text-disabled-color" />
+                                        </RadzenStack>
+                                    </RadzenStack>
+                                    <RadzenText Text="I couldn't be happier with my purchase. Great value for money, fast delivery, and outstanding customer support. 10/10!" TextStyle="Radzen.Blazor.TextStyle.H6" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.5" class="rz-mt-4 " />
+                                    <RadzenStack Orientation="Radzen.Orientation.Horizontal" AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem">
+                                        <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                        <RadzenText Text="— Sophia L." class="rz-m-0 rz-text-tertiary-color" />
+                                    </RadzenStack>
+                                </RadzenCard>
+                            </RadzenCardGroup>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Centered quotes
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Primary">
+                <RadzenRow RowGap="3rem" Gap="1rem" class="rz-w-100 rz-mx-auto rz-background-color-primary" >
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack Style="max-width: 800px" Gap="3.5rem" class="rz-mx-auto">
+                            <RadzenStack Style="margin-top: 60px" Gap="1rem">
+                                <RadzenText Text="&ldquo;" TextStyle="Radzen.Blazor.TextStyle.DisplayH1" TagName="Radzen.Blazor.TagName.P" Style="line-height: 8px; font-weight: 700; font-family: Georgia, serif" class="rz-m-0 rz-color-on-primary" />
+                                <RadzenText Text="I was blown away by the quality and service! From start to finish, the process was seamless, and the product exceeded my expectations. Highly recommend!" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="line-height: 1.1em; font-weight: 600" class="rz-color-on-primary" />
+                                <RadzenText Text="— Jessica M." TextStyle="Radzen.Blazor.TextStyle.H4" Style="font-weight: 600" class="rz-m-0 rz-color-on-primary" />
+                            </RadzenStack>
+                            <RadzenStack Style="margin-top: 60px" Gap="1rem">
+                                <RadzenText Text="&ldquo;" TextStyle="Radzen.Blazor.TextStyle.DisplayH1" TagName="Radzen.Blazor.TagName.P" Style="line-height: 8px; font-weight: 700; font-family: Georgia, serif" class="rz-m-0 rz-color-on-primary" />
+                                <RadzenText Text="Absolutely fantastic experience! The team was super helpful, and the attention to detail was top-notch. Will definitely be coming back for more!" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 600; line-height: 1.1em" class="rz-color-on-primary" />
+                                <RadzenText Text="— Linda R." TextStyle="Radzen.Blazor.TextStyle.H4" Style="font-weight: 600" class="rz-m-0 rz-color-on-primary" />
+                            </RadzenStack>
+                            <RadzenStack Style="margin-top: 60px" Gap="1rem">
+                                <RadzenText Text="&ldquo;" TextStyle="Radzen.Blazor.TextStyle.DisplayH1" TagName="Radzen.Blazor.TagName.P" Style="line-height: 8px; font-weight: 700; font-family: Georgia, serif" class="rz-m-0 rz-color-on-primary" />
+                                <RadzenText Text="I couldn't be happier with my purchase. Great value for money, fast delivery, and outstanding customer support. 10/10!" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 600; line-height: 1.1em" class="rz-color-on-primary" />
+                                <RadzenText Text="— Sophia L." TextStyle="Radzen.Blazor.TextStyle.H4" Style="font-weight: 600" class="rz-m-0 rz-color-on-primary" />
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+
+<RadzenText Anchor="ui-blocks-footers#centered-footer" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Single quote
+</RadzenText>
+<RadzenCard class="rz-p-0 rz-material-3-demo-card">
+    <RadzenTabs class="example-tabs">
+        <Tabs>
+            <RadzenTabsItem Text="Example">
+                <RadzenRow RowGap="3rem" Gap="1rem" class="rz-w-100 rz-mx-auto rz-background-color-" >
+                    <RadzenColumn Size="12" Style="height: fit-content" class="rz-p-6 rz-p-sm-12">
+                        <RadzenStack Style="max-width: 800px" Gap="3.5rem" class="rz-mx-auto">
+                            <RadzenStack Style="margin-top: 60px" Gap="1rem">
+                                <RadzenText Text="&ldquo;" TextStyle="Radzen.Blazor.TextStyle.DisplayH1" TagName="Radzen.Blazor.TagName.P" Style="line-height: 8px; font-weight: 700; font-family: Georgia, serif" class="rz-m-0 rz-text-disabled-color" />
+                                <RadzenText Text="" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 500; line-height: 1em" class="">
+                                    <span>I was blown away by the quality and service!</span>
+                                    <span Style="font-weight: 300" class="rz-m-0 rz-text-disabled-color">From start to finish, the process was seamless, and the product exceeded my expectations. Highly recommend!</span>
+                                </RadzenText>
+                                <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
+                                    <RadzenImage Path="@order?.Employee?.Photo" Style="border-radius: 50%; width: 4rem; height: 4rem"></RadzenImage>
+                                    <RadzenStack Gap="0">
+                                        <RadzenText Text="Jessica M." Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-disabled-color" />
+                                        <RadzenText Text="Product Manager" class="rz-m-0 rz-text-disabled-color" />
+                                    </RadzenStack>
+                                </RadzenStack>
+                            </RadzenStack>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
+            </RadzenTabsItem>
+            <UIBlocks />
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+
+@code {
+    Order order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        order = dbContext.Orders.Include("Customer").Include("Employee").LastOrDefault();
+    }
+}
