@@ -1086,6 +1086,15 @@ namespace RadzenBlazorDemos
                             Description = "This example demonstrates how to refresh a lazily loaded RadzenTree.",
                             Path = "tree-data-binding-refresh",
                             Tags = new [] { "tree", "treeview", "nodes" },
+                        },
+                        new Example
+                        {
+                            New = true,
+                            Name = "Tree filtering",
+                            Title = "Blazor Tree Component - Filtering | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to filter RadzenTree.",
+                            Path = "tree-filter",
+                            Tags = new [] { "tree", "treeview", "filter" },
                         }
                     }
                 }
