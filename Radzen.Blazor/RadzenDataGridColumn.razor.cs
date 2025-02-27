@@ -391,6 +391,14 @@ namespace Radzen.Blazor
         [Parameter]
         public string MinWidth { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets the max-width.
+        /// </summary>
+        /// <value>The max-width.</value>
+        [Parameter]
+        public string MaxWidth { get; set; }
+
         /// <summary>
         /// Gets or sets the format string.
         /// </summary>
@@ -670,6 +678,11 @@ namespace Radzen.Blazor
             if (!string.IsNullOrEmpty(MinWidth))
             {
                 style.Add($"min-width:{MinWidth}");
+            }
+
+            if (!string.IsNullOrEmpty(MaxWidth))
+            {
+                style.Add($"max-width:{MaxWidth}");
             }
 
             return string.Join(";", style);

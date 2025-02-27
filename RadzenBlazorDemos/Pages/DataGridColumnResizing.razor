@@ -7,7 +7,7 @@
 <RadzenDataGrid GridLines="Radzen.DataGridGridLines.Vertical" Data="@employees" TItem="Employee" ColumnWidth="300px" AllowColumnResize="true" ColumnResized=@OnColumnResized>
     <Columns>
         <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Title="ID" Width="50px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn Title="Photo" Sortable="false" Width="200px" MinWidth="100px">
+        <RadzenDataGridColumn Title="Photo" Sortable="false" Width="200px" MinWidth="100px" MaxWidth="200px">
             <Template Context="data">
                 <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
             </Template>
