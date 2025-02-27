@@ -285,8 +285,23 @@ namespace Radzen.Blazor
             YearTo = max.HasValue ? max.Value.Year : int.Parse(YearRange.Split(':').Last());
             months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture.DateTimeFormat.GetMonthName(i), Value = i }).ToList();
             years = Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
-                .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
+                .Select(i => new NameValue() { Name = FormatYear(i), Value = i }).ToList();
         }
+
+        private string FormatYear(int year)
+        {
+            year = Culture.Calendar.GetYear(new DateTime(year, 1, 1));
+
+            var date = new DateTime(year, 1, 1);
+
+            return date.ToString(YearFormat, Culture);
+        }
+
+        /// <summary>
+        /// Gets ot sets the year format. Set to <c>yyyy</c> by default.
+        /// </summary>
+        [Parameter]
+        public string YearFormat { get; set; } = "yyyy";
 
         /// <summary>
         /// Gets or sets a value indicating whether value can be cleared.
