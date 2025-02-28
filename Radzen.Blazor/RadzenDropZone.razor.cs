@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web.Virtualization;
 
 namespace Radzen.Blazor
 {
@@ -31,12 +33,84 @@ namespace Radzen.Blazor
         [CascadingParameter]
         RadzenDropZoneContainer<TItem> Container { get; set; }
 
+        [Parameter]
+        public bool AllowVirtualization { get; set; }
+
+        internal Virtualize<TItem> virtualize = default!;
+
         IEnumerable<TItem> Items
         {
             get
             {
                 return Container.ItemSelector != null ? Container.Data.Where(i => Container.ItemSelector(i, this)) : Enumerable.Empty<TItem>();
             }
+        }
+        private async ValueTask<ItemsProviderResult<TItem>> LoadItems(ItemsProviderRequest request)
+        {
+            var top = request.Count;
+
+            var totalItemsCount = Items.Count(); 
+
+            var virtualDataItems = Items.Skip(request.StartIndex).Take(top);
+            
+            return new ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
+        }
+        RenderFragment DrawDropZoneItems()
+        {
+            return new RenderFragment(builder =>
+            {
+                if (AllowVirtualization)
+                {
+                    builder.OpenComponent(0, typeof(Virtualize<TItem>));
+                    builder.AddAttribute(1, "ItemsProvider", new ItemsProviderDelegate<TItem>(LoadItems));
+                    
+                    builder.AddAttribute(2, "ChildContent", (RenderFragment<TItem>)((context) =>
+                    {
+                        return (RenderFragment)((b) =>
+                        {
+                            DrawItem(b, context);
+                        });
+                    }));
+
+                    builder.AddComponentReferenceCapture(4, c => { virtualize = (Virtualize<TItem>)c; });
+
+                    builder.CloseComponent();
+                }
+                else
+                {
+                    DrawItems(builder);
+                }
+            });
+        }  
+
+        internal void DrawItems(RenderTreeBuilder builder)
+        {
+            
+            foreach (var item in Items)
+            {
+               
+                DrawItem(builder, item);
+            }
+        }    
+
+        internal void DrawItem(RenderTreeBuilder builder, TItem item)
+        {
+            var result = ItemAttributes(item);
+
+            builder.OpenComponent<CascadingValue<TItem>>(0);
+            builder.AddAttribute(1, "Value", item);
+            builder.AddAttribute(2, "ChildContent", (RenderFragment)((builder2) => {
+                        builder2.OpenComponent<CascadingValue<RadzenDropZone<TItem>>>(3);
+                        builder2.AddAttribute(4, "Value", this);
+                        builder2.AddAttribute(5, "ChildContent", (RenderFragment)((builder3) => {
+                                    builder3.OpenComponent<RadzenDropZoneItem<TItem>>(6);
+                                    builder3.AddAttribute(7, "Visible", result.Item1.Visible);
+                                    builder3.AddAttribute(8, "Attributes", result.Item2);
+                                    builder3.CloseComponent();
+                                }));
+                        builder2.CloseComponent();
+                    }));
+            builder.CloseComponent();
         }
 
         internal bool CanDrop()
