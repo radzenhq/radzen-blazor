@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Radzen
@@ -126,6 +127,26 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Opens a dialog with the specified arguments.
+        /// </summary>
+        /// <typeparam name="T">The type of the Blazor component which will be displayed in a dialog.</typeparam>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="componentType">The type of the component to be displayed in the dialog. Must inherit from <see cref="ComponentBase"/>.</param>
+        /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
+        /// <param name="options">The dialog options.</param>
+        public virtual void Open(string title, Type componentType, Dictionary<string, object> parameters = null, DialogOptions options = null)
+        {
+            if (!typeof(ComponentBase).IsAssignableFrom(componentType))
+            {
+                throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
+            }
+
+            var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.Public);
+
+            method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters, options });
+        }
+
+        /// <summary>
         /// Invokes <see cref="OnRefresh" />.
         /// </summary>
         public void Refresh()
@@ -158,6 +179,33 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Opens a dialog with the specified arguments dynamically.
+        /// </summary>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="componentType">The type of the Blazor component to be displayed in a dialog. Must inherit from <see cref="ComponentBase"/>.</param>
+        /// <param name="parameters">The dialog parameters, passed as property values of the specified component.</param>
+        /// <param name="options">The dialog options.</param>
+        /// <returns>A task that represents the result passed as an argument to <see cref="Close"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
+        public virtual Task<dynamic> OpenAsync(string title, Type componentType, Dictionary<string, object> parameters = null, DialogOptions options = null)
+        {
+            if (!typeof(ComponentBase).IsAssignableFrom(componentType))
+            {
+                throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
+            }
+
+            var task = new TaskCompletionSource<dynamic>();
+            tasks.Add(task);
+
+            var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.Public);
+
+            method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters, options });
+
+            return task.Task;
+        }
+
+
+        /// <summary>
         /// Opens a side dialog with the specified arguments
         /// </summary>
         /// <typeparam name="T">The type of Blazor component which will be displayed in the side dialog.</typeparam>
@@ -181,6 +229,37 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Opens a side dialog with the specified arguments dynamically.
+        /// </summary>
+        /// <param name="title">The text displayed in the title bar of the side dialog.</param>
+        /// <param name="componentType">The type of the Blazor component to be displayed in the side dialog. Must inherit from <see cref="ComponentBase"/>.</param>
+        /// <param name="parameters">The dialog parameters, passed as property values of the specified component.</param>
+        /// <param name="options">The side dialog options.</param>
+        /// <returns>A task that represents the result passed as an argument to <see cref="CloseSide"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
+        public Task<dynamic> OpenSideAsync(string title, Type componentType, Dictionary<string, object> parameters = null, SideDialogOptions options = null)
+        {
+            if (!typeof(ComponentBase).IsAssignableFrom(componentType))
+            {
+                throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
+            }
+
+            CloseSide();
+            _sideDialogTask = new TaskCompletionSource<dynamic>();
+
+            if (options == null)
+            {
+                options = new SideDialogOptions();
+            }
+
+            options.Title = title;
+            OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
+
+            return _sideDialogTask.Task;
+        }
+
+
+        /// <summary>
         /// Opens a side dialog with the specified arguments
         /// </summary>
         /// <typeparam name="T">The type of Blazor component which will be displayed in the side dialog.</typeparam>
@@ -200,6 +279,33 @@ namespace Radzen
             options.Title = title;
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
         }
+
+        /// <summary>
+        /// Opens a side dialog with the specified arguments dynamically.
+        /// </summary>
+        /// <param name="title">The text displayed in the title bar of the side dialog.</param>
+        /// <param name="componentType">The type of the Blazor component to be displayed in the side dialog. Must inherit from <see cref="ComponentBase"/>.</param>
+        /// <param name="parameters">The dialog parameters, passed as property values of the specified component.</param>
+        /// <param name="options">The side dialog options.</param>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
+        public void OpenSide(string title, Type componentType, Dictionary<string, object> parameters = null, SideDialogOptions options = null)
+        {
+            if (!typeof(ComponentBase).IsAssignableFrom(componentType))
+            {
+                throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
+            }
+
+            CloseSide();
+
+            if (options == null)
+            {
+                options = new SideDialogOptions();
+            }
+
+            options.Title = title;
+            OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
+        }
+
 
         /// <summary>
         /// Closes the side dialog
