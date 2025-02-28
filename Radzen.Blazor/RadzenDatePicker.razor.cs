@@ -297,6 +297,9 @@ namespace Radzen.Blazor
             return date.ToString(YearFormat, Culture);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RadzenDatePicker{TValue}"/> class.
+        /// </summary>
         public RadzenDatePicker()
         {
             YearFormatter = FormatYear;
