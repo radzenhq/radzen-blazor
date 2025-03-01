@@ -1582,7 +1582,7 @@ namespace Radzen
 
                 if (ignoreCase)
                 {
-                    propertyExpression = Expression.Call(propertyExpression, "ToLower", Type.EmptyTypes);
+                    propertyExpression = Expression.Call(notNullCheck(propertyExpression), "ToLower", Type.EmptyTypes);
                 }
 
                 var constantExpression = Expression.Constant(ignoreCase ? value.ToLower() : value, typeof(string));

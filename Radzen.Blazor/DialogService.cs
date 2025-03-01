@@ -119,7 +119,7 @@ namespace Radzen
         /// </summary>
         /// <typeparam name="T">The type of the Blazor component which will be displayed in a dialog.</typeparam>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
-        /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
+        /// <param name="parameters">The dialog parameters.</param>
         /// <param name="options">The dialog options.</param>
         public virtual void Open<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
         {
@@ -129,10 +129,9 @@ namespace Radzen
         /// <summary>
         /// Opens a dialog with the specified arguments.
         /// </summary>
-        /// <typeparam name="T">The type of the Blazor component which will be displayed in a dialog.</typeparam>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="componentType">The type of the component to be displayed in the dialog. Must inherit from <see cref="ComponentBase"/>.</param>
-        /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
+        /// <param name="parameters">The dialog parameters.</param>
         /// <param name="options">The dialog options.</param>
         public virtual void Open(string title, Type componentType, Dictionary<string, object> parameters = null, DialogOptions options = null)
         {
