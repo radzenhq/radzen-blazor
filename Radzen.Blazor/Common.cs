@@ -733,9 +733,14 @@ namespace Radzen
         public AppointmentData Appointment { get; set; }
 
         /// <summary>
-        /// Gets or sets the time span.
+        /// Gets or sets the time span which represents the difference between slot start and appointment start.
         /// </summary>
         public TimeSpan TimeSpan { get; set; }
+
+        /// <summary>
+        /// Gets or sets the date of the slot where the appointment is moved.
+        /// </summary> <summary>
+        public DateTime SlotDate { get; set; }
     }
 
     /// <summary>
