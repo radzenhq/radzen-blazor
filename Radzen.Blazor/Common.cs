@@ -739,7 +739,7 @@ namespace Radzen
 
         /// <summary>
         /// Gets or sets the date of the slot where the appointment is moved.
-        /// </summary> <summary>
+        /// </summary>
         public DateTime SlotDate { get; set; }
     }
 
