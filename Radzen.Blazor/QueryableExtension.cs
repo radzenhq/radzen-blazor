@@ -1562,20 +1562,66 @@ namespace Radzen
         /// <returns>IQueryable&lt;T&gt;.</returns>
         public static IQueryable Where(this IQueryable source, string property, string value, StringFilterOperator op, FilterCaseSensitivity cs)
         {
-            if (!string.IsNullOrEmpty(value) && !string.IsNullOrEmpty(property))
+            IQueryable result;
+
+            if (!string.IsNullOrEmpty(value))
             {
-                return source.Where(new FilterDescriptor[] { new FilterDescriptor() 
-                    { 
-                        Property = property,
-                        FilterValue = value,
-                        FilterOperator = op == StringFilterOperator.Contains ? FilterOperator.Contains : 
-                            op == StringFilterOperator.StartsWith ? FilterOperator.StartsWith : 
-                                op == StringFilterOperator.EndsWith ? FilterOperator.EndsWith : FilterOperator.Equals,
-                    } 
-                }, LogicalFilterOperator.And, cs);
+                var ignoreCase = cs == FilterCaseSensitivity.CaseInsensitive;
+                var parameter = Expression.Parameter(source.ElementType, "it");
+                var inMemory = typeof(EnumerableQuery).IsAssignableFrom(source.GetType());
+
+                Expression propertyExpression = parameter;
+
+                if (!string.IsNullOrEmpty(property))
+                {
+                    propertyExpression = GetNestedPropertyExpression(parameter, property);
+                }
+
+                if (string.IsNullOrEmpty(property) && inMemory || 
+                    propertyExpression != null && propertyExpression.Type != typeof(string))
+                {
+                    propertyExpression = Expression.Call(notNullCheck(parameter), "ToString", Type.EmptyTypes);
+                }
+
+                if (ignoreCase)
+                {
+                    propertyExpression = Expression.Call(notNullCheck(propertyExpression), "ToLower", Type.EmptyTypes);
+                }
+
+                var constantExpression = Expression.Constant(ignoreCase ? value.ToLower() : value, typeof(string));
+                Expression comparisonExpression = null;
+
+                switch (op)
+                {
+                    case StringFilterOperator.Contains:
+                        comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "Contains", null, constantExpression);
+                        break;
+                    case StringFilterOperator.StartsWith:
+                        comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "StartsWith", null, constantExpression);
+                        break;
+                    case StringFilterOperator.EndsWith:
+                        comparisonExpression = Expression.Call(notNullCheck(propertyExpression), "EndsWith", null, constantExpression);
+                        break;
+                    default:
+                        comparisonExpression = Expression.Equal(propertyExpression, constantExpression);
+                        break;
+                }
+
+                var lambda = Expression.Lambda(comparisonExpression, parameter);
+                result = source.Provider.CreateQuery(Expression.Call(
+                    typeof(Queryable),
+                    "Where",
+                    new Type[] { source.ElementType },
+                    source.Expression,
+                    lambda
+                ));
+            }
+            else
+            {
+                result = source;
             }
 
-            return source;
+            return result;
         }
 
         /// <summary>
