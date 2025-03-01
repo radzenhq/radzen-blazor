@@ -84,11 +84,15 @@ namespace Radzen.Blazor
             {
                 var stackedBarSeries = BarSeries.Cast<IChartStackedBarSeries>();
                 var count = stackedBarSeries.Max(series => series.Count);
-                var sums = Enumerable.Range(0, count).Select(i => stackedBarSeries.Sum(series => series.ValueAt(i)));
-                var max = sums.Max();
-                var min = Items.Min(Value);
+                var categories = Enumerable.Range(0, count);
 
-                scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+                var positiveSums = categories.Select(i => stackedBarSeries.Sum(series => Math.Max(0, series.ValueAt(i))));
+                var negativeSums = categories.Select(i => stackedBarSeries.Sum(series => Math.Min(0, series.ValueAt(i))));
+
+                var maxPositive = positiveSums.Max();
+                var minNegative = negativeSums.Min();
+
+                scale.Input.MergeWidth(new ScaleRange { Start = minNegative, End = maxPositive });
             }
 
             return scale;
@@ -162,29 +166,47 @@ namespace Radzen.Blazor
             return category(item) - BarHeight / 2;
         }
 
-        private static double Sum(int barIndex, IEnumerable<IChartStackedBarSeries> stackedBarSeries, double category)
+        private static (double positiveSum, double negativeSum) Sum(int barIndex, IEnumerable<IChartStackedBarSeries> stackedBarSeries, double category)
         {
-            return stackedBarSeries.Take(barIndex).SelectMany(series => series.ValuesForCategory(category)).DefaultIfEmpty(0).Sum();
+            var values = stackedBarSeries.Take(barIndex).SelectMany(series => series.ValuesForCategory(category)).DefaultIfEmpty(0).ToList();
+            var positiveSum = values.Where(v => v >= 0).DefaultIfEmpty(0).Sum();
+            var negativeSum = values.Where(v => v < 0).DefaultIfEmpty(0).Sum();
+            return (positiveSum, negativeSum);
         }
-
         private double GetBarRight(TItem item, int barIndex, Func<TItem, double> category, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
         {
-            var count = stackedBarSeries.Max(series => series.Count);
+            var value = Value(item);
+            var (positiveSum, negativeSum) = Sum(barIndex, stackedBarSeries, category(item));
 
-            var sum = Sum(barIndex, stackedBarSeries, category(item));
-
-            var y = Chart.CategoryScale.Scale(Value(item) + sum);
-
-            return y;
+            if (value >= 0)
+            {
+                var y = Chart.CategoryScale.Scale(value + positiveSum);
+                return y;
+            }
+            else
+            {
+                var y = Chart.CategoryScale.Scale(negativeSum);
+                return y;
+            }
         }
 
         private double GetBarLeft(TItem item, int barIndex, Func<TItem, double> category, IEnumerable<IChartStackedBarSeries> stackedBarSeries)
         {
-            var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
+            var value = Value(item);
+            var (positiveSum, negativeSum) = Sum(barIndex, stackedBarSeries, category(item));
 
-            var sum = Sum(barIndex, stackedBarSeries, category(item));
-
-            return Chart.CategoryScale.Scale(Math.Max(ticks.Start, sum));
+            if (value >= 0)
+            {
+                var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
+                var sum = Math.Max(ticks.Start, positiveSum);
+                return Chart.CategoryScale.Scale(sum);
+            }
+            else
+            {
+                var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
+                var sum = Math.Max(ticks.Start, negativeSum + value);
+                return Chart.CategoryScale.Scale(sum);
+            }
         }
 
         int IChartBarSeries.Count
