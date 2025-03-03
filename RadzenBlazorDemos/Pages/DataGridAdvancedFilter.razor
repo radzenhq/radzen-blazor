@@ -23,7 +23,8 @@ LogicalFilterOperator="LogicalFilterOperator.Or" FilterPopupRenderMode="PopupRen
         <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="150px"/>
         <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" 
         Type="typeof(IEnumerable<string>)" LogicalFilterOperator=LogicalFilterOperator.Or
-        FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains"
+                              FilterValue="@selectedTitles" FilterOperator="FilterOperator.Contains" 
+                              FilterOperators="new FilterOperator[] { FilterOperator.Contains, FilterOperator.DoesNotContain }"
         SecondFilterValue="@selectedSecondTitles" SecondFilterOperator="FilterOperator.Contains"
         Width="200px">
             <FilterValueTemplate>
