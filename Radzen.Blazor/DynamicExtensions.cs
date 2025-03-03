@@ -99,6 +99,10 @@ namespace System.Linq.Dynamic.Core
         {
             try
             {
+                if (string.IsNullOrEmpty(selector))
+                {
+                    return source;
+                }
 
                 if (!selector.Contains("=>"))
                 {
@@ -109,11 +113,6 @@ namespace System.Linq.Dynamic.Core
                     selector = string.Join(", ", properties
                         .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim().Replace(".", "_")) +
                             " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", "?.").Trim()}"));
-                }
-
-                if (string.IsNullOrEmpty(selector))
-                {
-                    return source;
                 }
 
                 var lambda = lambdaCreator(selector.Contains("=>") ? selector : $"it => new {{ {selector} }}");
