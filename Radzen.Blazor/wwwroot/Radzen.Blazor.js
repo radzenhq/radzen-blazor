@@ -2225,7 +2225,7 @@ window.Radzen = {
                       widthFloat = minWidth;
                   }
 
-                  if (widthFloat > maxWidth) {
+                  if (cell.style.maxWidth && widthFloat > maxWidth) {
                       widthFloat = maxWidth;
                   }
 
