@@ -99,20 +99,24 @@ namespace System.Linq.Dynamic.Core
         {
             try
             {
-                var properties = selector
-                    .Replace("new (", "").Replace(")", "").Replace("new {", "").Replace("}", "").Trim()
-                    .Split(",", StringSplitOptions.RemoveEmptyEntries);
 
-                selector = string.Join(", ", properties
-                    .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim().Replace(".", "_")) +
-                        " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", "?.").Trim()}"));
+                if (!selector.Contains("=>"))
+                {
+                    var properties = selector
+                        .Replace("new (", "").Replace(")", "").Replace("new {", "").Replace("}", "").Trim()
+                        .Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+                    selector = string.Join(", ", properties
+                        .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim().Replace(".", "_")) +
+                            " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", "?.").Trim()}"));
+                }
 
                 if (string.IsNullOrEmpty(selector))
                 {
                     return source;
                 }
 
-                var lambda = lambdaCreator($"it => new {{ {selector} }}");
+                var lambda = lambdaCreator(selector.Contains("=>") ? selector : $"it => new {{ {selector} }}");
 
                 return source.Provider.CreateQuery(Expression.Call(typeof(Queryable), nameof(Queryable.Select),
                           [source.ElementType, lambda.Body.Type], source.Expression, Expression.Quote(lambda)));
