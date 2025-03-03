@@ -11,6 +11,11 @@
             operators = operators.Where(o => 
                 o != FilterOperator.IsNull && o != FilterOperator.IsNotNull && 
                 o != FilterOperator.Equals && o != FilterOperator.NotEquals);
+        } 
+        else if (QueryableExtension.IsEnumerable(FilterPropertyType) && 
+            QueryableExtension.IsEnumerable(typeof(TItem).GetProperty(Property).PropertyType))
+        {
+            operators = operators.Where(o => o == FilterOperator.In || o == FilterOperator.NotIn);
         }
 
         return operators;

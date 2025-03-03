@@ -20,13 +20,13 @@
                         Change=@OnSelectedIdsChange Data="@(orderIds)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
             </RadzenDataFilterProperty>
-            <RadzenDataFilterProperty Property="@nameof(Order.ProductIds)" Title="ProductIds" FilterValue="@finalSelectedProductIds"
+            <MyCustomDataFilterProperty Property="@nameof(Order.ProductIds)" Title="ProductIds" FilterValue="@finalSelectedProductIds"
                                       Type="typeof(IEnumerable<int>)" FilterOperator="FilterOperator.In">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedProductIds Style="width:100%;"
                                     Change=@OnSelectedProductIdsChange Data="@(productIds)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
-            </RadzenDataFilterProperty>
+            </MyCustomDataFilterProperty>
             <RadzenDataFilterProperty Property="OrderDetails" FilterProperty="Product.ProductName" Title="Products"
                                       Type="typeof(IEnumerable<OrderDetail>)" FilterOperator="FilterOperator.Contains"/>
             <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
