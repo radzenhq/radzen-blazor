@@ -139,6 +139,12 @@ namespace Radzen
         public object Payload { get; set; }
 
         /// <summary>
+        /// Gets or sets if progress should be shown during duration.
+        /// </summary>
+        /// <value>If true, then the progress will be shown during duration.</value>
+        public bool ShowProgress { get; set; }
+
+        /// <summary>
         /// Gets or sets the detail content.
         /// </summary>
         /// <value>The detail content.</value>
