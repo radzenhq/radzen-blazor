@@ -15,14 +15,14 @@
         <Properties>
             <RadzenDataFilterProperty Property="@nameof(Order.OrderID)" Title="Order ID" />
             <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
-            <MyCustomEnumerableDataFilterProperty Property="Employee.Title" Title="Employee Title" FilterValue="@finalSelectedTitles"
-                                                    Type="typeof(IEnumerable<string>)" FilterOperator="FilterOperator.Contains">
+            <RadzenDataFilterProperty Property="Employee.Title" Title="Employee Title" FilterValue="@finalSelectedTitles"
+                Type="typeof(IEnumerable<string>)" FilterOperator="FilterOperator.Contains" FilterOperators="@(new [] { FilterOperator.Contains, FilterOperator.DoesNotContain})">
                 <FilterTemplate>
                     <RadzenDropDown @bind-Value=@selectedTitles Style="width:100%;"
                                     Change=@OnSelectedTitlesChange Data="@(titles)" AllowClear="true" Multiple="true" />
                 </FilterTemplate>
-            </MyCustomEnumerableDataFilterProperty>
-            <MyCustomDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date" />
+            </RadzenDataFilterProperty>
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date" />
             <RadzenDataFilterProperty Property="@nameof(Order.Freight)" Title="Freight" />
         </Properties>
     </RadzenDataFilter>
