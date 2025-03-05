@@ -1280,7 +1280,7 @@ window.Radzen = {
             if (firstFocusable) {
                 firstFocusable.focus();
             }
-        }, 500);
+        }, 200);
     }
   },
   closeAllPopups: function (e, id) {
