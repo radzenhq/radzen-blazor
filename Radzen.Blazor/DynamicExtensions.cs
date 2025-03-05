@@ -1,6 +1,5 @@
 ﻿using Radzen;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 
 namespace System.Linq.Dynamic.Core
 {
@@ -84,6 +83,13 @@ namespace System.Linq.Dynamic.Core
         /// </summary>
         public static IQueryable Select<T>(this IQueryable<T> source, string selector, object[] parameters = null)
         {
+            if (source?.ElementType == typeof(object))
+            {
+                var type = source.FirstOrDefault()?.GetType() ?? typeof(object);
+
+                return source.Cast(type).Select(selector, expression => ExpressionParser.ParseLambda(expression, type));
+            }
+
             return source.Select(selector, expression => ExpressionParser.ParseLambda<T>(expression));
         }
 
