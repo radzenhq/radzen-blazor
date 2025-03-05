@@ -3383,9 +3383,9 @@ namespace Radzen.Blazor
         public EventCallback<int> PageSizeChanged { get; set; }
 
         /// <summary>
-        /// Gets DataGrid settings as JSON string.
+        /// Saves DataGrid settings as JSON string.
         /// </summary>
-        internal void SaveSettings()
+        public void SaveSettings()
         {
             if (SettingsChanged.HasDelegate && canSaveSettings)
             {
