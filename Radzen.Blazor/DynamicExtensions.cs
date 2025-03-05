@@ -83,6 +83,13 @@ namespace System.Linq.Dynamic.Core
         /// </summary>
         public static IQueryable Select<T>(this IQueryable<T> source, string selector, object[] parameters = null)
         {
+            
+            if (source.Provider.ToString() == "Microsoft.EntityFrameworkCore.Query.Internal.EntityQueryProvider")
+            {
+                return source.Cast(source.ElementType).Select(selector,
+                    expression => ExpressionParser.ParseLambda(expression, source.ElementType));
+            }
+            
             if (source?.ElementType == typeof(object))
             {
                 var type = source.FirstOrDefault()?.GetType() ?? typeof(object);
