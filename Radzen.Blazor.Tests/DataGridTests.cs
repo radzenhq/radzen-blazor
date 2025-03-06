@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -362,82 +362,6 @@ namespace Radzen.Blazor.Tests
             component.Find(".rz-sortable-column").FirstElementChild.Click();
 
             Assert.Contains(@$"rzi-sort-desc", component.Markup);
-
-            component.Find(".rz-sortable-column").FirstElementChild.Click();
-
-            Assert.DoesNotContain(@$"rzi-sort-desc", component.Markup);
-            Assert.DoesNotContain(@$"rzi-sort-asc", component.Markup);
-        }
-
-
-        // clear Sorting tests
-        [Fact]
-        public void DataGrid_Renders_ClearSorting()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
-
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
-            {
-                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
-                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
-                {
-                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
-                    builder.AddAttribute(1, "Property", "Id");
-                    builder.AddAttribute(2, "Title", "Id");
-                    builder.CloseComponent();
-                });
-                parameterBuilder.Add<bool>(p => p.AllowSorting, true);
-            });
-
-            component.Find(".rz-sortable-column").FirstElementChild.Click();
-            Assert.Contains(@$"rzi-sort-asc", component.Markup);
-
-            component.Instance.Sorts.Clear();
-
-            Assert.DoesNotContain(@$"rzi-sort-desc", component.Markup);
-            Assert.DoesNotContain(@$"rzi-sort-asc", component.Markup);
-        }
-
-        // sorting with load data event test.
-        [Fact]
-        public void DataGrid_Renders_LoadDataWithOrdering()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
-
-            List<LoadDataArgs> loadDataArgs = [];
-
-            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
-            {
-                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, Enumerable.Range(0, 100).Select(i => new { Id = i }));
-                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
-                {
-                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
-                    builder.AddAttribute(1, "Property", "Id");
-                    builder.AddAttribute(2, "Title", "Id");
-                    builder.CloseComponent();
-                });
-                parameterBuilder.Add<bool>(p => p.AllowSorting, true);
-                parameterBuilder.Add(p => p.LoadData, args => loadDataArgs.Add(args));
-            });
-
-            component.Find(".rz-sortable-column").FirstElementChild.Click();
-            Assert.Contains(@$"rzi-sort-asc", component.Markup);
-
-            component.Instance.Sorts.Clear();
-            component.Render();
-
-            Assert.DoesNotContain(@$"rzi-sort-desc", component.Markup);
-            Assert.DoesNotContain(@$"rzi-sort-asc", component.Markup);
-
-            Assert.Equal(4, loadDataArgs.Count);
-            Assert.Equal("", loadDataArgs[0].OrderBy);
-            Assert.Equal("Id asc", loadDataArgs[1].OrderBy);
-            Assert.Equal("Id asc", loadDataArgs[2].OrderBy);
-            Assert.Equal("", loadDataArgs[3].OrderBy);
         }
 
         // Paging tests

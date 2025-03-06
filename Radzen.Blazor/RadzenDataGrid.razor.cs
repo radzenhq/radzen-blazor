@@ -678,11 +678,11 @@ namespace Radzen.Blazor
                 }
             }
 
-            var descriptor = Sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
+            var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
             if (descriptor == null && column.SortOrder.HasValue)
             {
                 descriptor = new SortDescriptor() { Property = column.GetSortProperty(), SortOrder = column.SortOrder.Value };
-                Sorts.Add(descriptor);
+                sorts.Add(descriptor);
             }
 
             if (!allColumns.Contains(column))
@@ -1685,7 +1685,7 @@ namespace Radzen.Blazor
 
         internal string GetOrderBy()
         {
-            return string.Join(",", Sorts.Select(d => GetSortOrderAsString(d, IsOData())));
+            return string.Join(",", sorts.Select(d => GetSortOrderAsString(d, IsOData())));
         }
 
         internal string GetSortOrderAsString(SortDescriptor d, bool isOData)
@@ -2071,7 +2071,7 @@ namespace Radzen.Blazor
                     c.SetVisible(null);
                 });
                 selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
-                Sorts.Clear();
+                sorts.Clear();
                 columns = allColumns.Where(c => c.Parent == null).ToList();
            }
         }
@@ -2184,7 +2184,7 @@ namespace Radzen.Blazor
                 .ToList();
 
             Query.Filters = filters;
-            Query.Sorts = Sorts.ToList();
+            Query.Sorts = sorts;
             if (LoadData.HasDelegate)
             {
                 await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
@@ -2194,7 +2194,7 @@ namespace Radzen.Blazor
                     OrderBy = orderBy,
                     Filter = IsOData() ? allColumns.ToList().ToODataFilterString<TItem>() : filterString,
                     Filters = filters,
-                    Sorts = Sorts.ToList()
+                    Sorts = sorts
                 });
             }
         }
@@ -3032,46 +3032,48 @@ namespace Radzen.Blazor
             return isOData != null ? isOData.Value : false;
         }
 
+        internal List<SortDescriptor> sorts = new List<SortDescriptor>();
+
         internal void SetColumnSortOrder(RadzenDataGridColumn<TItem> column)
         {
-            var CurrentSortDescriptor = Sorts.FirstOrDefault(d => d.Property == column?.GetSortProperty());
             if (!AllowMultiColumnSorting)
             {
                 foreach (var c in allColumns.ToList().Where(c => c != column))
                 {
                     c.SetSortOrderInternal(null);
                 }
-                Sorts.Clear();
+                sorts.Clear();
             }
 
-            if (CurrentSortDescriptor == null)
+            var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
+            if (descriptor == null)
             {
-                CurrentSortDescriptor = new SortDescriptor() { Property = column.GetSortProperty() };
+                descriptor = new SortDescriptor() { Property = column.GetSortProperty() };
             }
 
-            if (CurrentSortDescriptor.SortOrder == null)
+            if (column.GetSortOrder() == null)
             {
                 column.SetSortOrderInternal(SortOrder.Ascending);
-                CurrentSortDescriptor.SortOrder = SortOrder.Ascending;
+                descriptor.SortOrder = SortOrder.Ascending;
             }
-            else if (CurrentSortDescriptor.SortOrder == SortOrder.Ascending)
+            else if (column.GetSortOrder() == SortOrder.Ascending)
             {
                 column.SetSortOrderInternal(SortOrder.Descending);
-                CurrentSortDescriptor.SortOrder = SortOrder.Descending;
+                descriptor.SortOrder = SortOrder.Descending;
             }
-            else if (CurrentSortDescriptor.SortOrder == SortOrder.Descending)
+            else if (column.GetSortOrder() == SortOrder.Descending)
             {
                 column.SetSortOrderInternal(null);
-                if (Sorts.Any(d => d.Property == column?.GetSortProperty()))
+                if (sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
                 {
-                    Sorts.Remove(CurrentSortDescriptor);
+                    sorts.Remove(descriptor);
                 }
-                CurrentSortDescriptor = null;
+                descriptor = null;
             }
 
-            if (CurrentSortDescriptor != null && !Sorts.Any(d => d.Property == column?.GetSortProperty()))
+            if (descriptor != null && !sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
             {
-                Sorts.Add(CurrentSortDescriptor);
+                sorts.Add(descriptor);
             }
         }
 
