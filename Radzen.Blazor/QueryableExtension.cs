@@ -266,14 +266,7 @@ namespace Radzen
             string currentPart = parts[0];
             Expression member;
 
-            if (expression.Type.IsInterface)
-            {
-                member = Expression.Property(expression,
-                    new[] { expression.Type }.Concat(expression.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(currentPart) != null),
-                    currentPart
-                );
-            }
-            else if (typeof(IDictionary<string, object>).IsAssignableFrom(expression.Type))
+            if (typeof(IDictionary<string, object>).IsAssignableFrom(expression.Type))
             {
                 var key = currentPart.Split('"')[1];
                 var typeString = currentPart.Split('(')[0];
@@ -310,6 +303,13 @@ namespace Radzen
                 {
                     throw new ArgumentException($"Invalid index format: {indexString}");
                 }
+            }
+            else if (expression.Type.IsInterface)
+            {
+                member = Expression.Property(expression,
+                    new[] { expression.Type }.Concat(expression.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(currentPart) != null),
+                    currentPart
+                );
             }
             else
             {
