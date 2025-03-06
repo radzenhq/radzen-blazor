@@ -158,9 +158,10 @@ namespace Radzen
             foreach (var o in (selector ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 var nameAndOrder = o.Trim();
+                var name = nameAndOrder.Replace("asc", "").Replace("desc", "");
 
                 Expression property = !string.IsNullOrEmpty(nameAndOrder) ?
-                        GetNestedPropertyExpression(parameters.FirstOrDefault(), nameAndOrder.Split(' ').FirstOrDefault()) : parameters.FirstOrDefault();
+                        GetNestedPropertyExpression(parameters.FirstOrDefault(), name) : parameters.FirstOrDefault();
 
                 expression = Expression.Call(
                     typeof(Queryable), o.Split(' ').Contains("desc") ? methodDesc : methodAsc,
