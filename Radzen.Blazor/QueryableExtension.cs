@@ -22,7 +22,7 @@ namespace Radzen
         /// <summary>
         /// Projects each element of a sequence into a collection of property values.
         /// </summary>
-        public static IQueryable Select(this IQueryable source, string propertyName)
+        internal static IQueryable Select(this IQueryable source, string propertyName)
         {
             var parameter = Expression.Parameter(source.ElementType, "x");
 
