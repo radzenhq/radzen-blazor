@@ -83,11 +83,20 @@ namespace System.Linq.Dynamic.Core
         /// </summary>
         public static IQueryable Select<T>(this IQueryable<T> source, string selector, object[] parameters = null)
         {
-            if (source?.ElementType == typeof(object))
+            if (source.ElementType == typeof(object))
             {
-                var type = source.FirstOrDefault()?.GetType() ?? typeof(object);
+                var elementType = source.ElementType;
 
-                return source.Cast(type).Select(selector, expression => ExpressionParser.ParseLambda(expression, type));
+                if (source.Expression is MethodCallExpression methodCall && methodCall.Method.Name == "Cast")
+                {
+                    elementType = methodCall.Arguments[0].Type.GetGenericArguments().FirstOrDefault() ?? typeof(object);
+                }
+                else if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
+                {
+                    elementType = source.FirstOrDefault()?.GetType() ?? typeof(object);
+                }
+
+                return source.Cast(elementType).Select(selector, expression => ExpressionParser.ParseLambda(expression, elementType));
             }
 
             return source.Select(selector, expression => ExpressionParser.ParseLambda<T>(expression));
