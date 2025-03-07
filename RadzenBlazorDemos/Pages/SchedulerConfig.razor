@@ -112,9 +112,18 @@
 
         if (draggedAppointment != null)
         {
-            draggedAppointment.Start = draggedAppointment.Start + args.TimeSpan;
+            var duration = draggedAppointment.End - draggedAppointment.Start;
 
-            draggedAppointment.End = draggedAppointment.End + args.TimeSpan;
+            if (args.SlotDate.TimeOfDay == TimeSpan.Zero)
+            {
+                draggedAppointment.Start = args.SlotDate.Date.Add(draggedAppointment.Start.TimeOfDay);
+            }
+            else
+            {
+                draggedAppointment.Start = args.SlotDate;
+            }
+
+            draggedAppointment.End = draggedAppointment.Start.Add(duration);
 
             await scheduler.Reload();
         }

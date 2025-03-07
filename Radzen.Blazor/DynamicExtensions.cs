@@ -1,6 +1,5 @@
 ﻿using Radzen;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 
 namespace System.Linq.Dynamic.Core
 {
@@ -84,6 +83,22 @@ namespace System.Linq.Dynamic.Core
         /// </summary>
         public static IQueryable Select<T>(this IQueryable<T> source, string selector, object[] parameters = null)
         {
+            if (source.ElementType == typeof(object))
+            {
+                var elementType = source.ElementType;
+
+                if (source.Expression is MethodCallExpression methodCall && methodCall.Method.Name == "Cast")
+                {
+                    elementType = methodCall.Arguments[0].Type.GetGenericArguments().FirstOrDefault() ?? typeof(object);
+                }
+                else if (typeof(EnumerableQuery).IsAssignableFrom(source.GetType()))
+                {
+                    elementType = source.FirstOrDefault()?.GetType() ?? typeof(object);
+                }
+
+                return source.Cast(elementType).Select(selector, expression => ExpressionParser.ParseLambda(expression, elementType));
+            }
+
             return source.Select(selector, expression => ExpressionParser.ParseLambda<T>(expression));
         }
 
@@ -99,20 +114,23 @@ namespace System.Linq.Dynamic.Core
         {
             try
             {
-                var properties = selector
-                    .Replace("new (", "").Replace(")", "").Replace("new {", "").Replace("}", "").Trim()
-                    .Split(",", StringSplitOptions.RemoveEmptyEntries);
-
-                selector = string.Join(", ", properties
-                    .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim().Replace(".", "_")) +
-                        " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", "?.").Trim()}"));
-
                 if (string.IsNullOrEmpty(selector))
                 {
                     return source;
                 }
 
-                var lambda = lambdaCreator($"it => new {{ {selector} }}");
+                if (!selector.Contains("=>"))
+                {
+                    var properties = selector
+                        .Replace("new (", "").Replace(")", "").Replace("new {", "").Replace("}", "").Trim()
+                        .Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+                    selector = string.Join(", ", properties
+                        .Select(s => (s.Contains(" as ") ? s.Split(" as ").LastOrDefault().Trim().Replace(".", "_") : s.Trim().Replace(".", "_")) +
+                            " = " + $"it.{s.Split(" as ").FirstOrDefault().Replace(".", "?.").Trim()}"));
+                }
+
+                var lambda = lambdaCreator(selector.Contains("=>") ? selector : $"it => new {{ {selector} }}");
 
                 return source.Provider.CreateQuery(Expression.Call(typeof(Queryable), nameof(Queryable.Select),
                           [source.ElementType, lambda.Body.Type], source.Expression, Expression.Quote(lambda)));

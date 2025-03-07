@@ -30,12 +30,12 @@
             <RadzenDataFilterProperty Property="OrderDetails" FilterProperty="Product.ProductName" Title="Products"
                                       Type="typeof(IEnumerable<OrderDetail>)" FilterOperator="FilterOperator.Contains"/>
             <RadzenDataFilterProperty Property="Employee.LastName" Title="Employee Last Name" />
-            <MyCustomDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date">
+            <RadzenDataFilterProperty Property="@nameof(Order.OrderDate)" Title="Order Date">
                 <FilterTemplate>
                     <RadzenDatePicker @bind-Value="@context.FilterValue" Style="width:100%" ShowTime=false DateFormat="d"
                                       Change="@ApplyOrderDateFilter" />
                 </FilterTemplate>
-            </MyCustomDataFilterProperty>
+            </RadzenDataFilterProperty>
             <RadzenDataFilterProperty Property="@nameof(Order.Freight)" Title="Freight" />
         </Properties>
     </RadzenDataFilter>

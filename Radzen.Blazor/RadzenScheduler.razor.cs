@@ -630,7 +630,7 @@ namespace Radzen.Blazor
         {
             if (Data == null)
             {
-                return Array.Empty<AppointmentData>();
+                return [];
             }
 
             if (start == rangeStart && end == rangeEnd && appointments != null)
@@ -642,21 +642,10 @@ namespace Radzen.Blazor
             rangeEnd = end;
 
             appointments = Data.AsQueryable()
-                               .Where(
-                                new FilterDescriptor[] {
-                                    new FilterDescriptor
-                                    {
-                                       Property = StartProperty,
-                                       FilterValue = start,
-                                       FilterOperator = FilterOperator.GreaterThanOrEquals
-                                    },
-                                    new FilterDescriptor
-                                    {
-                                       Property = EndProperty,
-                                       FilterValue = end,
-                                       FilterOperator = FilterOperator.LessThanOrEquals
-                                    }
-                                }, LogicalFilterOperator.And, FilterCaseSensitivity.Default)
+                               .Where([
+                                    new FilterDescriptor { Property = EndProperty, FilterValue = start, FilterOperator = FilterOperator.GreaterThanOrEquals },
+                                    new FilterDescriptor { Property = StartProperty, FilterValue = end, FilterOperator = FilterOperator.LessThanOrEquals }
+                                ], LogicalFilterOperator.And, FilterCaseSensitivity.Default)
                                .ToList()
                                .Select(item => new AppointmentData { Start = startGetter(item), End = endGetter(item), Text = textGetter(item), Data = item });
 

@@ -57,6 +57,13 @@
                 Click="@(args => ShowNotificationWithCustomContent())" />
         </RadzenCard>
     </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Notification with duration progress</RadzenText>
+            <RadzenButton Text="Show notification with duration progress" Style="width: 100%;"
+                          Click="@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Click Summary", Detail = "Click Me", Duration = 4000, ShowProgress = true, Click=NotificationClick, CloseOnClick = true, Payload = DateTime.Now }))" />
+        </RadzenCard>
+    </RadzenColumn>
 </RadzenRow>
 
 <EventConsole @ref=@console />

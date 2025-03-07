@@ -31,12 +31,22 @@
                 var x = GetBarRight(data, barIndex, category, barSeries);
                 var itemValue = Value(data);
                 var radius = Chart.BarOptions.Radius;
-
                 var x0 = GetBarLeft(data, barIndex, category, barSeries);
+
+                if (itemValue < 0)
+                {
+                    (x, x0) = (x0, x);
+                }
 
                 if (radius > 0)
                 {
-                    var items = barSeries.SelectMany(series => series.ItemsForCategory(category(data))).OfType<TItem>().ToList();
+                    var items = barSeries.SelectMany(series => series.ItemsForCategory(category(data))).OfType<TItem>()
+                        .Where(item =>
+                        {
+                            var value = Value(item);
+                            return itemValue >= 0 ? value >= 0 : value < 0;
+                        }).ToList();
+
                     var index = items.IndexOf(data);
                     var width = Math.Abs(x0 - x);
 
@@ -56,6 +66,7 @@
                 {
                     path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
                 }
+
                 var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
                 var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);
 

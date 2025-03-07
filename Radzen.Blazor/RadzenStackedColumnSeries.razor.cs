@@ -186,25 +186,44 @@ namespace Radzen.Blazor
 
         private double GetColumnTop(TItem item, int columnIndex, Func<TItem, double> category, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
         {
-            var sum = Sum(columnIndex, stackedColumnSeries, category(item));
+            var value = Value(item);
+            var (positiveSum, negativeSum) = Sum(columnIndex, stackedColumnSeries, category(item));
 
-            var y = Chart.ValueScale.Scale(Value(item) + sum);
-
-            return y;
+            if (value >= 0)
+            {
+                return Chart.ValueScale.Scale(value + positiveSum);
+            }
+            else
+            {
+                return Chart.ValueScale.Scale(negativeSum);
+            }
         }
 
-        private static double Sum(int columnIndex, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries, double category)
+        private static (double positiveSum, double negativeSum) Sum(int columnIndex, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries, double category)
         {
-            return stackedColumnSeries.Take(columnIndex).SelectMany(series => series.ValuesForCategory(category)).DefaultIfEmpty(0).Sum();
+            var values = stackedColumnSeries.Take(columnIndex).SelectMany(series => series.ValuesForCategory(category)).DefaultIfEmpty(0).ToList();
+            var positiveSum = values.Where(v => v >= 0).DefaultIfEmpty(0).Sum();
+            var negativeSum = values.Where(v => v < 0).DefaultIfEmpty(0).Sum();
+            return (positiveSum, negativeSum);
         }
 
         private double GetColumnBottom(TItem item, int columnIndex, Func<TItem, double> category, IEnumerable<IChartStackedColumnSeries> stackedColumnSeries)
         {
-            var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+            var value = Value(item);
+            var (positiveSum, negativeSum) = Sum(columnIndex, stackedColumnSeries, category(item));
 
-            var sum = Sum(columnIndex, stackedColumnSeries, category(item));
-
-            return Chart.ValueScale.Scale(Math.Max(ticks.Start, sum));
+            if (value >= 0)
+            {
+                var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+                var sum = Math.Max(ticks.Start, positiveSum);
+                return Chart.ValueScale.Scale(sum);
+            }
+            else
+            {
+                var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+                var sum = Math.Max(ticks.Start, negativeSum + value);
+                return Chart.ValueScale.Scale(sum);
+            }
         }
 
         int ColumnIndex => VisibleColumnSeries.IndexOf(this);
@@ -281,11 +300,14 @@ namespace Radzen.Blazor
             {
                 var stackedColumnSeries = ColumnSeries.Cast<IChartStackedColumnSeries>();
                 var count = stackedColumnSeries.Max(series => series.Count);
-                var sums = Enumerable.Range(0, count).Select(i => stackedColumnSeries.Sum(series => series.ValueAt(i)));
-                var max = sums.Max();
-                var min = Items.Min(Value);
+                var categories = Enumerable.Range(0, count);
+                var positiveSums = categories.Select(i => stackedColumnSeries.Sum(series => Math.Max(0, series.ValueAt(i))));
+                var negativeSums = categories.Select(i => stackedColumnSeries.Sum(series => Math.Min(0, series.ValueAt(i))));
 
-                scale.Input.MergeWidth(new ScaleRange { Start = min, End = max });
+                var maxPositive = positiveSums.Max();
+                var minNegative = negativeSums.Min();
+
+                scale.Input.MergeWidth(new ScaleRange { Start = minNegative, End = maxPositive });
             }
 
             return scale;

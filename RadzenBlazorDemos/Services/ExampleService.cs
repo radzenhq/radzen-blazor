@@ -207,6 +207,15 @@ namespace RadzenBlazorDemos
             Children = new[] {
                 new Example
                 {
+                    Name = "Call-to-Action",
+                    Title = "Blazor Call-to-Action | UI Blocks by Radzen",
+                    Icon = "&#xe06c",
+                    Description = "Examples of CTA UI Blocks",
+                    Path = "ui-blocks-cta",
+                    Tags = new [] { "cta", "call-to-action", "call", "action", "button" }
+                },
+                new Example
+                {
                     Name = "Cards",
                     Title = "Blazor Cards | UI Blocks by Radzen",
                     Icon = "&#xe991",
@@ -216,12 +225,13 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Call-to-Action",
-                    Title = "Blazor Call-to-Action | UI Blocks by Radzen",
-                    Icon = "&#xe06c",
-                    Description = "Examples of CTA UI Blocks",
-                    Path = "ui-blocks-cta",
-                    Tags = new [] { "cta", "call-to-action", "call", "action", "button" }
+                    Name = "FAQ",
+                    New = true,
+                    Title = "Blazor FAQ - Frequently Asked Questions | UI Blocks by Radzen",
+                    Icon = "&#xf04c",
+                    Description = "Examples of FAQ Blocks",
+                    Path = "ui-blocks-faq",
+                    Tags = new [] { "faq", "question", "answer" }
                 },
                 new Example
                 {
@@ -243,12 +253,52 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Logo Clouds",
+                    New = true,
+                    Title = "Blazor Logo Clouds | UI Blocks by Radzen",
+                    Icon = "&#xe574",
+                    Description = "Examples of Customers Logo Blocks",
+                    Path = "ui-blocks-logos",
+                    Tags = new [] { "logo", "customer", "logos" }
+                },
+                new Example
+                {
+                    Name = "Newsletter",
+                    New = true,
+                    Title = "Blazor Newsletter | UI Blocks by Radzen",
+                    Icon = "&#xf18c",
+                    Description = "Examples of Newsletter subscription form UI Blocks",
+                    Path = "ui-blocks-newsletter",
+                    Tags = new [] { "newsletter", "subscribe", "subscription" }
+                },
+                new Example
+                {
                     Name = "Page Headings",
                     Title = "Blazor Page Heading | UI Blocks by Radzen",
                     Icon = "&#xe9ea",
                     Description = "Preconfigured Page Heading UI Blocks",
                     Path = "ui-blocks-page-headings",
                     Tags = new [] { "headings", "heading", "page", "title" }
+                },
+                new Example
+                {
+                    Name = "Pricing",
+                    New = true,
+                    Title = "Blazor Pricing | UI Blocks by Radzen",
+                    Icon = "&#xf05b",
+                    Description = "Examples of Pricing UI Blocks",
+                    Path = "ui-blocks-pricing",
+                    Tags = new [] { "pricing", "table" }
+                },
+                new Example
+                {
+                    Name = "Testimonials",
+                    New = true,
+                    Title = "Blazor Customer Testimonials | UI Blocks by Radzen",
+                    Icon = "&#xf054",
+                    Description = "Examples of Customer Testimonials UI Blocks",
+                    Path = "ui-blocks-testimonials",
+                    Tags = new [] { "testimonial", "quote", "customer" }
                 }
             }
         },
@@ -1036,6 +1086,15 @@ namespace RadzenBlazorDemos
                             Description = "This example demonstrates how to refresh a lazily loaded RadzenTree.",
                             Path = "tree-data-binding-refresh",
                             Tags = new [] { "tree", "treeview", "nodes" },
+                        },
+                        new Example
+                        {
+                            New = true,
+                            Name = "Tree filtering",
+                            Title = "Blazor Tree Component - Filtering | Free UI Components by Radzen",
+                            Description = "This example demonstrates how to filter RadzenTree.",
+                            Path = "tree-filter",
+                            Tags = new [] { "tree", "treeview", "filter" },
                         }
                     }
                 }

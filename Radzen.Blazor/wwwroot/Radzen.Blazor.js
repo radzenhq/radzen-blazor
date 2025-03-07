@@ -1280,7 +1280,7 @@ window.Radzen = {
             if (firstFocusable) {
                 firstFocusable.focus();
             }
-        }, 500);
+        }, 200);
     }
   },
   closeAllPopups: function (e, id) {
@@ -1734,6 +1734,7 @@ window.Radzen = {
     document.addEventListener('click', target.clickHandler);
   },
   destroyChart: function (ref) {
+    if(!ref) return;
     ref.removeEventListener('mouseleave', ref.mouseLeaveHandler);
     delete ref.mouseLeaveHandler;
     ref.removeEventListener('mouseenter', ref.mouseEnterHandler);
@@ -2218,9 +2219,14 @@ window.Radzen = {
               if (Radzen[el]) {
                   var widthFloat = (Radzen[el].width - (Radzen.isRTL(cell) ? -1 : 1) * (Radzen[el].clientX - e.clientX));
                   var minWidth = parseFloat(cell.style.minWidth || 0)
+                  var maxWidth = parseFloat(cell.style.maxWidth || 0)
 
                   if (widthFloat < minWidth) {
                       widthFloat = minWidth;
+                  }
+
+                  if (cell.style.maxWidth && widthFloat > maxWidth) {
+                      widthFloat = maxWidth;
                   }
 
                   var width = widthFloat + 'px';

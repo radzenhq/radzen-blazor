@@ -285,8 +285,38 @@ namespace Radzen.Blazor
             YearTo = max.HasValue ? max.Value.Year : int.Parse(YearRange.Split(':').Last());
             months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture.DateTimeFormat.GetMonthName(i), Value = i }).ToList();
             years = Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
-                .Select(i => new NameValue() { Name = $"{i}", Value = i }).ToList();
+                .Select(i => new NameValue() { Name = YearFormatter(i), Value = i }).ToList();
         }
+
+        private string FormatYear(int year)
+        {
+            year = Culture.Calendar.GetYear(new DateTime(year, 1, 1));
+
+            var date = new DateTime(year, 1, 1);
+
+            return date.ToString(YearFormat, Culture);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RadzenDatePicker{TValue}"/> class.
+        /// </summary>
+        public RadzenDatePicker()
+        {
+            YearFormatter = FormatYear;
+        }
+
+        /// <summary>
+        /// Gets or sets the year formatter. Set to <c>FormatYear</c> by default.
+        /// If set, this function will take precedence over <see cref="YearFormat"/>.
+        /// </summary>
+        [Parameter]
+        public Func<int, string> YearFormatter { get; set; }
+
+        /// <summary>
+        /// Gets ot sets the year format. Set to <c>yyyy</c> by default.
+        /// </summary>
+        [Parameter]
+        public string YearFormat { get; set; } = "yyyy";
 
         /// <summary>
         /// Gets or sets a value indicating whether value can be cleared.

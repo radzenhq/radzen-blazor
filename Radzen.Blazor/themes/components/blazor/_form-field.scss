@@ -337,8 +337,8 @@ $form-field-helper-padding: 0 0.5rem !default;
         inset-block-start: var(--rz-form-field-label-textarea-top);
         transform: translate(0, 0);
 
-        .rz-variant-filled &,
-        .rz-variant-flat & {
+        .rz-form-field.rz-variant-filled &,
+        .rz-form-field.rz-variant-flat & {
             transform: translate(0, 0.625rem);
         }
     }
@@ -350,14 +350,14 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-autocomplete:focus-within ~ &,
     .rz-textbox:not(:placeholder-shown) ~ &,
     :not(.rz-state-empty) ~ &,
-    .rz-variant-filled .rz-textarea:focus ~ &,
-    .rz-variant-flat .rz-textarea:focus ~ &,
-    .rz-variant-filled :not(.rz-state-empty) ~ &,
-    .rz-variant-flat :not(.rz-state-empty) ~ &,
+    .rz-form-field.rz-variant-filled .rz-textarea:focus ~ &,
+    .rz-form-field.rz-variant-flat .rz-textarea:focus ~ &,
+    .rz-form-field.rz-variant-filled :not(.rz-state-empty) ~ &,
+    .rz-form-field.rz-variant-flat :not(.rz-state-empty) ~ &,
     .rz-radio-button-list-vertical ~ &,
     .rz-radio-button-list-horizontal ~ &,
     .rz-checkbox-list-vertical ~ &,
-    .rz-checkbox-list-horizontal  ~ &,
+    .rz-checkbox-list-horizontal ~ &,
     .rz-chkbox ~ &,
     .rz-fileupload ~ &,
     .rz-state-empty:has(.rz-placeholder) ~ &,
@@ -381,7 +381,7 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-vertical ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-radio-button-list-horizontal ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-vertical ~ &,
-    .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-horizontal  ~ &,
+    .rz-form-field:not(.rz-variant-outlined) .rz-checkbox-list-horizontal ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-chkbox ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-fileupload ~ &,
     .rz-form-field:not(.rz-variant-outlined) .rz-state-empty:has(.rz-placeholder) ~ &,
@@ -394,21 +394,15 @@ $form-field-helper-padding: 0 0.5rem !default;
     }
 
     .rz-state-focused &,
-    .rz-variant-filled.rz-state-focused &,
-    .rz-variant-flat.rz-state-focused &,
-    .rz-form-field.rz-state-focused & {
-        color: var(--rz-form-field-label-focus-color);
-    }
-
+    .rz-form-field.rz-state-focused &,
+    .rz-form-field.rz-variant-filled.rz-state-focused ~ &,
+    .rz-form-field.rz-variant-flat.rz-state-focused ~ &,
     .rz-textbox:focus ~ &,
     .rz-textarea:focus ~ &,
     .rz-numeric:focus-within ~ &,
-    .rz-autocomplete:focus-within ~ &  {
+    .rz-autocomplete:focus-within ~ &,
+    .rz-form-field.rz-variant-filled .rz-textbox:focus ~ &,
+    .rz-form-field.rz-variant-flat .rz-textbox:focus ~ & {
         color: var(--rz-form-field-label-focus-color);
-
-        .rz-variant-filled &,
-        .rz-variant-flat & {
-            color: var(--rz-form-field-label-focus-color);
-        }
     }
 }

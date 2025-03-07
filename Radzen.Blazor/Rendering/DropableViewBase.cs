@@ -29,7 +29,7 @@ namespace Radzen.Blazor.Rendering
             {
                 TimeSpan timespan = slotDate - draggedAppointment.Start;
 
-                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { Appointment = draggedAppointment, TimeSpan = timespan });
+                await AppointmentMove.InvokeAsync(new SchedulerAppointmentMoveEventArgs { SlotDate = slotDate, Appointment = draggedAppointment, TimeSpan = timespan });
 
                 draggedAppointment = null;
             }
