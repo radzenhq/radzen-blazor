@@ -757,7 +757,7 @@ namespace Radzen
                 itemIndex = itemIndex + 1 >= filteredItems.Count() ? 0 : itemIndex + 1;
                 var itemToSelect = filteredItems.ElementAtOrDefault(itemIndex);
 
-                if (itemToSelect != null)
+                if (itemToSelect is not null)
                 {
                     if (!Multiple)
                     {
