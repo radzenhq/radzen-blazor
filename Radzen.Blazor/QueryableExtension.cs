@@ -158,7 +158,7 @@ namespace Radzen
             foreach (var o in (selector ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 var nameAndOrder = o.Trim();
-                var name = nameAndOrder.Replace("asc", "").Replace("desc", "");
+                var name = nameAndOrder.Replace("asc", "").Replace("desc", "").Trim();
 
                 Expression property = !string.IsNullOrEmpty(nameAndOrder) ?
                         GetNestedPropertyExpression(parameters.FirstOrDefault(), name) : parameters.FirstOrDefault();
