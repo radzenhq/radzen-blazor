@@ -25,6 +25,7 @@ $numeric-button-disabled-color: var(--rz-text-disabled-color) !default;
     height: 100%;
     border: none;
     background-color: transparent;
+    font-family: inherit;
     line-height: var(--rz-numeric-line-height);
     padding-block: var(--rz-numeric-input-padding-block);
     padding-inline: var(--rz-numeric-input-padding-inline);
