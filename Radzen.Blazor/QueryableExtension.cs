@@ -154,17 +154,19 @@ namespace Radzen
 
             string methodAsc = "OrderBy";
             string methodDesc = "OrderByDescending";
+            string[] sortStrings = new string[] { "asc", "desc" }; 
 
             foreach (var o in (selector ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 var nameAndOrder = o.Trim();
-                var name = nameAndOrder.Replace("asc", "").Replace("desc", "").Trim();
+                var name = string.Join(" ", nameAndOrder.Split(' ').Where(i => !sortStrings.Contains(i.Trim()))).Trim();
+                var order = nameAndOrder.Split(' ').FirstOrDefault(i => sortStrings.Contains(i.Trim())) ?? sortStrings.First();
 
                 Expression property = !string.IsNullOrEmpty(nameAndOrder) ?
                         GetNestedPropertyExpression(parameters.FirstOrDefault(), name) : parameters.FirstOrDefault();
 
                 expression = Expression.Call(
-                    typeof(Queryable), o.Split(' ').Contains("desc") ? methodDesc : methodAsc,
+                    typeof(Queryable), order.Equals(sortStrings.First(), StringComparison.OrdinalIgnoreCase) ? methodAsc : methodDesc,
                     new Type[] { source.ElementType, property.Type },
                     expression, Expression.Quote(Expression.Lambda(notNullCheck(property), parameters)));
 
