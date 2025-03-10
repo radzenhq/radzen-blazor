@@ -8,6 +8,25 @@ using Microsoft.JSInterop;
 namespace Radzen
 {
     /// <summary>
+    /// Specifies the SameSite attribute for the cookie.
+    /// </summary>
+    public enum CookieSameSiteMode
+    {
+        /// <summary>
+        /// No SameSite attribute.
+        /// </summary>
+        None,
+        /// <summary>
+        /// Lax SameSite attribute.
+        /// </summary>
+        Lax,
+        /// <summary>
+        /// Strict SameSite attribute.
+        /// </summary>
+        Strict
+    }
+
+    /// <summary>
     /// Options for the <see cref="CookieThemeService" />.
     /// </summary>
     public class CookieThemeServiceOptions
@@ -21,6 +40,16 @@ namespace Radzen
         /// Gets or sets the cookie duration.
         /// </summary>
         public TimeSpan Duration { get; set; } = TimeSpan.FromDays(365);
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to use secure cookies.
+        /// </summary>
+        public bool IsSecure { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the SameSite attribute for the cookie.
+        /// </summary>
+        public CookieSameSiteMode? SameSite { get; set; } = null;
     }
 
     /// <summary>
@@ -75,8 +104,19 @@ namespace Radzen
         private void OnThemeChanged()
         {
             var expiration = DateTime.Now.Add(options.Duration);
+            var cookie = $"{options.Name}={themeService.Theme}; expires={expiration:R}; path=/";
 
-            _ = jsRuntime.InvokeVoidAsync("eval", $"document.cookie = \"{options.Name}={themeService.Theme}; expires={expiration:R}; path=/\"");
+            if (options.SameSite.HasValue)
+            {
+                cookie += $"; SameSite={options.SameSite}";
+            }
+
+            if (options.IsSecure)
+            {
+                cookie += "; Secure";
+            }
+
+            _ = jsRuntime.InvokeVoidAsync("eval", $"document.cookie = \"{cookie}\"");
         }
     }
 
