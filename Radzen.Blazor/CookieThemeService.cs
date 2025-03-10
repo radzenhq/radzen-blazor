@@ -10,7 +10,7 @@ namespace Radzen
     /// <summary>
     /// Specifies the SameSite attribute for the cookie.
     /// </summary>
-    public enum CookieThemeServiceOptionsSameSiteMode
+    public enum CookieSameSiteMode
     {
         /// <summary>
         /// No SameSite attribute.
@@ -49,7 +49,7 @@ namespace Radzen
         /// <summary>
         /// Gets or sets the SameSite attribute for the cookie.
         /// </summary>
-        public CookieThemeServiceOptionsSameSiteMode? SameSite { get; set; } = null;
+        public CookieSameSiteMode? SameSite { get; set; } = null;
     }
 
     /// <summary>
