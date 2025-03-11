@@ -2697,7 +2697,7 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task OnRowSelect(TItem item, bool raiseChange = true)
         {
-            var focusedIndexResult = PagedView
+            var focusedIndexResult = PagedView.ToList()
                 .Select((x, i) => new { Item = x, Index = i })
                 .Where(itemWithIndex => ItemEquals(itemWithIndex.Item, item))
                 .FirstOrDefault();
