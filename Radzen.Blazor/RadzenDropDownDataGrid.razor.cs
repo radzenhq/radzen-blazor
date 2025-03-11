@@ -57,6 +57,13 @@ namespace Radzen.Blazor
         public bool Chips { get; set; }
 
         /// <summary>
+        /// Gets or sets the Popup style.
+        /// </summary>
+        /// <value>The number Popup style.</value>
+        [Parameter]
+        public string PopupStyle { get; set; } = "display:none;min-width:400px;padding:0px;";
+
+        /// <summary>
         /// Executes CellRender callback.
         /// </summary>
         protected virtual void OnCellRender(DataGridCellRenderEventArgs<object> args)
