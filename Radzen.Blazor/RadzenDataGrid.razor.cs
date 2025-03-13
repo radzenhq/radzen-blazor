@@ -2424,12 +2424,14 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Force load of the DataGrid Settings.
+        /// This method triggers a reload of the DataGrid settings, optionally forcing a reload even if the settings are already loaded.
         /// </summary>
-        public async Task ReloadSettings()
+        /// <param name="forceReload">If true, forces a reload of the settings regardless of their current state. Default is false.</param>
+        public async Task ReloadSettings(bool forceReload = false)
         {
             if (settings != null)
             {
-                await LoadSettingsInternal(settings);
+                await LoadSettingsInternal(settings, forceReload);
             }
         }
 
@@ -2697,7 +2699,7 @@ namespace Radzen.Blazor
 
         internal async System.Threading.Tasks.Task OnRowSelect(TItem item, bool raiseChange = true)
         {
-            var focusedIndexResult = PagedView
+            var focusedIndexResult = PagedView.ToList()
                 .Select((x, i) => new { Item = x, Index = i })
                 .Where(itemWithIndex => ItemEquals(itemWithIndex.Item, item))
                 .FirstOrDefault();
@@ -3422,13 +3424,16 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Load DataGrid settings saved from GetSettings() method.
+        /// Load DataGrid settings saved from the GetSettings() method.
+        /// This internal method handles the actual loading or updating of the DataGrid settings.
         /// </summary>
-        internal async Task LoadSettingsInternal(DataGridSettings settings)
+        /// <param name="settings">The DataGridSettings object containing the settings to be loaded.</param>
+        /// <param name="forceUpdate">If true, forces an update of the settings even if they haven't changed. Default is false.</param>
+        internal async Task LoadSettingsInternal(DataGridSettings settings, bool forceUpdate = false)
         {
             if (SettingsChanged.HasDelegate)
             {
-                var shouldUpdateState = false;
+                var shouldUpdateState = forceUpdate;
                 var hasFilter = settings.Columns != null && settings.Columns.Any(c =>
                     c.FilterValue != null || c.SecondFilterValue != null ||
                     c.FilterOperator == FilterOperator.IsNull || c.FilterOperator == FilterOperator.IsNotNull ||

@@ -112,7 +112,7 @@
         </div>
 
         <div id="@PopupID" class="@(Multiple ? "rz-multiselect-panel" : "rz-dropdown-panel")"
-             style="display:none;min-width:400px;padding:0px;">
+             style="@PopupStyle">
             <div class="rz-lookup-panel" @onkeydown="@CloseOnEscape">
                 @if (AllowFiltering || HeaderTemplate != null)
                 {
