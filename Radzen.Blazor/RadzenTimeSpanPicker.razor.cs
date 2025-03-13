@@ -66,14 +66,14 @@ namespace Radzen.Blazor
         #region Parameters: input field config
         /// <summary>
         /// Specifies whether the value can be cleared.
-        /// Set to <c>true</c> by default if <typeparamref name="TValue"/> is nullable, <c>false</c> otherwise.
         /// </summary>
         /// <value><c>true</c> if value can be cleared; otherwise, <c>false</c>.</value>
         [Parameter]
-        public bool AllowClear { get; set; } = _isNullable;
+        public bool AllowClear { get; set; }
 
         /// <summary>
         /// Specifies whether input in the input field is allowed.
+        /// Set to <c>true</c> by default.
         /// </summary>
         /// <value><c>true</c> if input is allowed; otherwise, <c>false</c>.</value>
         [Parameter]
