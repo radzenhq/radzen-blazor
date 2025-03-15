@@ -21,9 +21,6 @@
     <Content Update="Pages\SelectBarOrientation.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
-    <Content Update="Pages\TimeSpanPickerFormat.razor">
-      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-    </Content>
     <Content Update="Shared\KeyboardNavigationDataGrid.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
