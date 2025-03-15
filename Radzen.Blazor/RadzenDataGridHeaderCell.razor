@@ -163,7 +163,7 @@
                                             <Template>
                                                 @if (context as Enum != null)
                                                 {
-                                                    @EnumExtensions.GetDisplayDescription(context as Enum)
+                                                    @EnumExtensions.GetDisplayDescription(context as Enum, Grid.EnumFilterTranslationFunc)
                                                 }
                                                 else
                                                 {
