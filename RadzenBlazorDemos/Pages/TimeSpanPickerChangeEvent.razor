@@ -1,0 +1,13 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Time Span" Component="RadzenTimeSpanPickerChangeEvent"/>
+    <RadzenTimeSpanPicker Value="@value" Change="@(args => OnChange(args))" Name="RadzenTimeSpanPickerChangeEvent" />
+</RadzenStack>
+
+@code {
+    TimeSpan? value;
+
+    void OnChange(TimeSpan? newValue)
+    {
+        value = newValue;
+    }
+}

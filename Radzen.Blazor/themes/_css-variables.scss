@@ -1141,6 +1141,26 @@
   --rz-timeline-line-width: #{$rz-timeline-line-width};
   --rz-timeline-line-border-radius: #{$rz-timeline-line-border-radius};
 
+  /* TimestampPicker */
+  --rz-timespanpicker-line-height: #{$timespanpicker-line-height};
+  --rz-timespanpicker-trigger-icon-width: #{$timespanpicker-trigger-icon-width};
+  --rz-timespanpicker-trigger-icon-height: #{$timespanpicker-trigger-icon-height};
+  --rz-timespanpicker-trigger-icon-color: #{$timespanpicker-trigger-icon-color};
+  --rz-timespanpicker-trigger-icon-hover-color: #{$timespanpicker-trigger-icon-hover-color};
+  --rz-timespanpicker-focus-outline: #{$timespanpicker-focus-outline};
+  --rz-timespanpicker-focus-outline-offset: #{$timespanpicker-focus-outline-offset};
+  --rz-timespanpicker-popup-border: #{$timespanpicker-popup-border};
+  --rz-timespanpicker-popup-shadow: #{$timespanpicker-popup-shadow};
+  --rz-timespanpicker-popup-margin: #{$timespanpicker-popup-margin};
+  --rz-timespanpicker-popup-width: #{$timespanpicker-popup-width};
+  --rz-timespanpicker-panel-background-color: #{$timespanpicker-panel-background-color};
+  --rz-timespanpicker-panel-text-color: #{$timespanpicker-panel-text-color};
+  --rz-timespanpicker-panel-padding-block: #{$timespanpicker-panel-padding-block};
+  --rz-timespanpicker-panel-padding-inline: #{$timespanpicker-panel-padding-inline};
+  --rz-timespanpicker-panel-gap: #{$timespanpicker-panel-gap};
+  --rz-timespanpicker-panel-unit-gap: #{$timespanpicker-panel-unit-gap};
+  --rz-timespanpicker-panel-field-min-width: #{$timespanpicker-panel-field-min-width};
+
   /* Tooltip */
   --rz-tooltip-background-color: #{$tooltip-background-color};
   --rz-tooltip-color: #{$tooltip-color};

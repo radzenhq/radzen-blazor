@@ -125,7 +125,7 @@ $form-field-helper-padding: 0 0.5rem !default;
         .rz-form-field-start {
             padding-inline-end: 0;
         }
-    
+
         .rz-form-field-end {
             padding-inline-start: 0;
         }
@@ -156,11 +156,16 @@ $form-field-helper-padding: 0 0.5rem !default;
 
             .rz-textarea {
                 margin-top: 1rem;
-
             }
 
-            .rz-datepicker-trigger {
+            .rz-datepicker-trigger,
+            .rz-timespanpicker-trigger {
                 top: calc(50% + 0.4375rem);
+            }
+
+            .rz-datepicker .rz-dropdown-clear-icon,
+            .rz-timespanpicker .rz-dropdown-clear-icon {
+                top: 0.4375rem;
             }
         }
     }
@@ -173,7 +178,7 @@ $form-field-helper-padding: 0 0.5rem !default;
                     box-shadow: var(--rz-input-hover-shadow);
                 }
             }
-        
+
             &.rz-state-focused {
                 .rz-form-field-content {
                     border: var(--rz-input-focus-border);
@@ -203,7 +208,7 @@ $form-field-helper-padding: 0 0.5rem !default;
                     background-color: var(--rz-form-field-filled-hover-background-color);
                 }
             }
-        
+
             &.rz-state-focused,
             &.rz-state-focused:hover {
                 .rz-form-field-content {
@@ -238,7 +243,7 @@ $form-field-helper-padding: 0 0.5rem !default;
         .rz-form-field-start {
             padding-inline-start: 0;
         }
-    
+
         .rz-form-field-end {
             padding-inline-end: 0;
         }
@@ -262,7 +267,7 @@ $form-field-helper-padding: 0 0.5rem !default;
                             inset-inline-end var(--rz-transition), 
                             border-width var(--rz-transition);
             }
-        
+
             &:after {
                 content: "";
                 position: absolute;
@@ -272,7 +277,7 @@ $form-field-helper-padding: 0 0.5rem !default;
                 border-bottom: var(--rz-input-border);
             }
         }
-    
+
         &:hover {
             .rz-form-field-content:after {
                 border-bottom: var(--rz-input-hover-border);
@@ -285,7 +290,7 @@ $form-field-helper-padding: 0 0.5rem !default;
                 border-bottom: var(--rz-input-disabled-border);
             }
         }
-    
+
         &.rz-state-focused:not(.rz-state-disabled) {
             .rz-form-field-content:before {
                 inset-inline-start: calc(-1 * var(--rz-border-width));
@@ -304,7 +309,6 @@ $form-field-helper-padding: 0 0.5rem !default;
     .rz-numeric:focus-within .rz-numeric-button {
         display: block;
     }
-
 }
 
 .rz-form-field-label {

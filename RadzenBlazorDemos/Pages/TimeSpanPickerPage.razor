@@ -1,0 +1,93 @@
+﻿@page "/timespanpicker"
+@page "/docs/guides/components/timespanpicker.html"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    TimeSpanPicker
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>TimeSpanPicker</strong> component.
+</RadzenText>
+
+<RadzenText Anchor="timespanpicker#bind-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Bind the value of TimeSpanPicker
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    As all Radzen Blazor input components, the <strong>TimeSpanPicker</strong> has a <code>Value</code> property which gets and sets the value of the component. Use <code>@@bind-Value</code> to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerBindValue">
+    <TimeSpanPickerBindValue />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#value-and-change-event" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Get and Set the value of TimeSpanPicker using Value and Change event.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <code>Value</code> property can be used to set the value of the component and <code>Change</code> event to get the user input.
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerChangeEvent">
+    <TimeSpanPickerChangeEvent />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#min-max-values" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Min and Max values
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    In this example, you can only set a value between 0 and 12h.<br />
+    Note that the + and - buttons are hidden because you cannot choose a negative value.
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerMinMax">
+    <TimeSpanPickerMinMax />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#inline" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Inline picker
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerInline">
+    <TimeSpanPickerInline />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#various-config" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Various configurations
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerConfig">
+    <TimeSpanPickerConfig />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#format" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Time span format
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerFormat">
+    <TimeSpanPickerFormat />
+</RadzenExample>
+
+<RadzenText Anchor="timespanpicker#custom-input-parsing" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom input parsing
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <code>ParseInput</code> parameter allows you to use a custom input parsing method.<br />
+    This way you can accept inputs like '30h 15min' or '-120s', or support more than one input format.
+</RadzenText>
+<RadzenExample ComponentName="TimeSpanPicker" Example="TimeSpanPickerParseInput">
+    <TimeSpanPickerParseInput />
+</RadzenExample>
+
+
+<RadzenText Anchor="timespanpicker#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor TimeSpanPicker component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a TimeSpanPicker component." },
+        new KeyboardShortcut { Key = "Enter", Action = "Open the popup." },
+        new KeyboardShortcut { Key = "Tab on open popup", Action = "Navigate forward across available picker components." },
+        new KeyboardShortcut { Key = "Shift + Tab on open popup", Action = "Navigate backward across available picker components." },
+        new KeyboardShortcut { Key = "Esc in an opened popup", Action = "Close the popup." }
+    };
+}

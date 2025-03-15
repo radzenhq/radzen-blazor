@@ -1,0 +1,58 @@
+﻿<RadzenFieldset AllowCollapse="false" Text="Field config">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value="@allowClear" Name="AllowClear" />
+            <RadzenLabel Text="Allow clear" Component="AllowClear" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value="@allowInput" Name="AllowInput" />
+            <RadzenLabel Text="Allow input" Component="AllowInput" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value="@readOnly" Name="ReadOnly" />
+            <RadzenLabel Text="Read only" Component="ReadOnly" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value="@disabled" Name="Disabled" />
+            <RadzenLabel Text="Disabled" Component="Disabled" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value="@showPopupButton" Name="ShowPopupButton" />
+            <RadzenLabel Text="Show popup button" Component="ShowPopupButton" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenFieldset>
+<RadzenFieldset AllowCollapse="false" Text="Panel config">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenLabel Text="Field precision" Component="FieldPrecision" />
+            <RadzenDropDown Name="FieldPrecision" @bind-Value="@fieldPrecision" Data="@(Enum.GetValues<TimeSpanUnit>())" Style="width: 9rem;" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value="@padTimeValues" Name="PadTimeValues" />
+            <RadzenLabel Text="Pad time values" Component="PadTimeValues" />
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+            <RadzenCheckBox @bind-Value="@showConfirmationButton" Name="ShowConfirmationButton" />
+            <RadzenLabel Text="Show confirmation button" Component="ShowConfirmationButton" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenFieldset>
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Time Span" Component="RadzenTimeSpanPickerBoolConfig" />
+    <RadzenTimeSpanPicker @bind-Value="@value" AllowClear="@allowClear" AllowInput="@allowInput" ReadOnly="@readOnly" Disabled="@disabled" ShowPopupButton="@showPopupButton" FieldPrecision="@fieldPrecision" PadTimeValues="@padTimeValues" ShowConfirmationButton="@showConfirmationButton" Name="RadzenTimeSpanPickerBoolConfig"  />
+</RadzenStack>
+
+@code {
+    TimeSpan? value = new TimeSpan(1, 12, 30, 0);
+
+    bool allowClear = true;
+    bool allowInput = true;
+    bool readOnly = false;
+    bool disabled = false;
+    bool showPopupButton = true;
+
+    TimeSpanUnit fieldPrecision = TimeSpanUnit.Second;
+    bool padTimeValues = false;
+    bool showConfirmationButton = false;
+}

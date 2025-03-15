@@ -1,0 +1,56 @@
+﻿@using System.Text.RegularExpressions
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Time Span" Component="RadzenTimeSpanPickerParseInput"/>
+    <RadzenTimeSpanPicker @bind-Value="@value" Name="RadzenTimeSpanPickerParseInput" ParseInput="@ParseTimeSpan" />
+</RadzenStack>
+
+@code {
+    TimeSpan? value;
+
+    string[] standardFormats = { "c", "g", "G" };
+    Regex customTimeSpanRegex = new Regex(@"(?:(?<days>-?\d+)\w?d)|(?:(?<hours>-?\d+)\w?h)|(?:(?<minutes>-?\d+)\w?min)|(?:(?<seconds>-?\d+)\w?s)");
+
+    public TimeSpan? ParseTimeSpan(string input)
+    {
+        foreach (var format in standardFormats)
+        {
+            if (TimeSpan.TryParseExact(input, format, null, System.Globalization.TimeSpanStyles.None, out var standardResult))
+            {
+                return standardResult;
+            }
+        }
+
+        var regexGroups = customTimeSpanRegex.Matches(input.Trim())
+            .Where(x => x.Success)
+            .SelectMany(x => x.Groups.Cast<System.Text.RegularExpressions.Group>())
+            .Where(x => x.Success)
+            .ToArray();
+
+        if (regexGroups.Length == 0)
+        {
+            return null;
+        }
+
+        var timeUnitToValue = new Dictionary<string, int>() {
+            {"days", 0},
+            {"hours", 0},
+            {"minutes", 0},
+            {"seconds", 0}
+        };
+
+        foreach (var timeUnitWithValue in timeUnitToValue)
+        {
+            var unit = timeUnitWithValue.Key;
+            var valueString = regexGroups.FirstOrDefault(x => x.Name == unit)?.Value ?? "0";
+
+            if (Int32.TryParse(valueString, out int value))
+            {
+                timeUnitToValue[unit] = value;
+            }
+        }
+
+        var result = new TimeSpan(timeUnitToValue["days"], timeUnitToValue["hours"], timeUnitToValue["minutes"], timeUnitToValue["seconds"]);
+
+        return result;
+    }
+}

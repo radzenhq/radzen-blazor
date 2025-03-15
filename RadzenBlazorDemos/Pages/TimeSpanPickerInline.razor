@@ -1,0 +1,8 @@
+﻿<RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenTimeSpanPicker @bind-Value="@value" Inline />
+    <div>Current value: @value</div>
+</RadzenStack>
+
+@code {
+    TimeSpan value = TimeSpan.Zero;
+}
