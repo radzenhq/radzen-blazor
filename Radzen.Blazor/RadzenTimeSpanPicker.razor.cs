@@ -495,6 +495,7 @@ namespace Radzen.Blazor
 
             var shouldClose =
                 parameters.DidParameterChange(nameof(Visible), Visible) && parameters.GetValueOrDefault<bool>(nameof(Visible)) is false
+                || parameters.DidParameterChange(nameof(Inline), Inline) && parameters.GetValueOrDefault<bool>(nameof(Inline))
                 || parameters.DidParameterChange(nameof(Disabled), Disabled) && parameters.GetValueOrDefault<bool>(nameof(Disabled))
                 || parameters.DidParameterChange(nameof(ReadOnly), ReadOnly) && parameters.GetValueOrDefault<bool>(nameof(ReadOnly));
 
@@ -693,13 +694,13 @@ namespace Radzen.Blazor
         #endregion
 
         #region Internal: popup general actions
-        private PopupOrInline _popupHolder;
+        private Popup _popup;
 
         private Task TogglePopup()
-            => Inline ? Task.CompletedTask : _popupHolder.Popup?.ToggleAsync(Element) ?? Task.CompletedTask;
+            => Inline ? Task.CompletedTask : _popup?.ToggleAsync(Element) ?? Task.CompletedTask;
 
         private Task ClosePopup()
-            => Inline ? Task.CompletedTask : _popupHolder.Popup?.CloseAsync(Element) ?? Task.CompletedTask;
+            => Inline ? Task.CompletedTask : _popup?.CloseAsync(Element) ?? Task.CompletedTask;
 
         private async Task PopupKeyDown(KeyboardEventArgs args)
         {
