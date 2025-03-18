@@ -6,6 +6,7 @@ namespace Radzen.Blazor.Markdown;
 
 class BlazorRenderer(RenderTreeBuilder builder, Action<int> renderer) : NodeVisitorBase
 {
+    public const string Outlet = "<!--rz-outlet-{0}-->";
     public override void VisitHeading(Heading heading)
     {
         builder.OpenElement(0, $"h{heading.Level}");
@@ -61,9 +62,16 @@ class BlazorRenderer(RenderTreeBuilder builder, Action<int> renderer) : NodeVisi
 
     public override void VisitParagraph(Paragraph paragraph)
     {
-        builder.OpenElement(0, "p");
-        VisitChildren(paragraph.Children);
-        builder.CloseElement();
+        if (paragraph.Parent is ListItem item && item.Parent is List list && list.Tight)
+        {
+            VisitChildren(paragraph.Children);
+        }
+        else
+        {
+            builder.OpenElement(0, "p");
+            VisitChildren(paragraph.Children);
+            builder.CloseElement();
+        }
     }
 
     public override void VisitBlockQuote(BlockQuote blockQuote)
@@ -162,11 +170,11 @@ class BlazorRenderer(RenderTreeBuilder builder, Action<int> renderer) : NodeVisi
         builder.AddContent(0, text.Value);
     }
 
-    private static readonly Regex ComponentMarker = new ("<!--COMPONENT_MARKER_([^-]*)-->");
+    private static readonly Regex OutletRegex = new (@"<!--rz-outlet-(\d+)-->");
 
     private void VisitHtml(string html)
     {
-        var match = ComponentMarker.Match(html);
+        var match = OutletRegex.Match(html);
 
         if (match.Success)
         {
