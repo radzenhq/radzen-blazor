@@ -69,7 +69,4 @@
     {
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), Reference, nameof(OnClose));
     }
-    public async ValueTask DisposeAsync()
-    {
-        if (IsJSRuntimeAvailable)
 }
