@@ -9,6 +9,22 @@
 
 <RadzenExample ComponentName="Markdown" Example="MarkdownConfig">
     <MarkdownConfig />
+<RadzenAlert AlertStyle="AlertStyle.Light" class="rz-mt-4">
+Blazor tags inside RadzenMarkdown will be processed. To avoid that you can use a multline string literal.
+    <pre><code>
+&lt;RadzenMarkdown&gt;
+```
+@@($@@"&lt;RadzenButton Click=@@@@Click /&gt;
+@@@@code {
+    public void Click()
+    {
+        Console.WriteLine(""Button clicked"");
+    }
+}
+```
+&lt;/RadzenMarkdown&gt;
+    </code></pre>
+</RadzenAlert>
 </RadzenExample>
 
 <RadzenText Anchor="markdown#text" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
@@ -19,4 +35,11 @@
 </RadzenText>
 <RadzenExample ComponentName="Markdown" Example="MarkdownText">
     <MarkdownText />
+</RadzenExample>
+
+<RadzenText Anchor="markdown#blazor" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Blazor components within the markdown content
+</RadzenText>
+<RadzenExample ComponentName="Markdown" Example="MarkdownBlazor">
+    <MarkdownBlazor />
 </RadzenExample>
