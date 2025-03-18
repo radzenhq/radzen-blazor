@@ -1,0 +1,20 @@
+﻿<RadzenMarkdown>
+### RadzenMarkdown
+
+**RadzenMarkdown** allows you to render Markdown content in your Blazor applications.
+
+#### Supported markdown syntax
+1. Everything from the [basic syntax](https://www.markdownguide.org/basic-syntax/)
+1. [Tables](https://www.markdownguide.org/extended-syntax/#tables)
+1. [Fenced code blocks](https://www.markdownguide.org/extended-syntax/#fenced-code-blocks)
+
+#### Features
+Use markdown content right in your Blazor components - no need to create separate files. Type it directly in your .razor file:
+
+```razor
+@($@"<RadzenMarkdown>
+# Hello, Blazor!
+This is a **bold** text.
+</RadzenMarkdown>")
+```
+</RadzenMarkdown>

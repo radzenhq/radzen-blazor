@@ -195,7 +195,15 @@ namespace RadzenBlazorDemos
                 }
             }
         },
-
+        new Example
+        {
+            Name = "Markdown",
+            Icon = "&#xf552",
+            Path = "markdown",
+            Description = "Use Radzen Blazor Markdown component to render markdown content.",
+            Tags = new[] { "markdown", "text", "content" },
+            New = true
+        },
         new Example
         {
             Name = "UI Blocks",
@@ -982,6 +990,7 @@ namespace RadzenBlazorDemos
                         }
                     }
                 },
+
                 new Example
                 {
                     Name = "Pager",
@@ -993,7 +1002,6 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "PickList",
-                    New = true,
                     Description = "Use Radzen Blazor PickList component to transfer items between two collections.",
                     Path = "picklist",
                     Icon = "&#xe0b8",
