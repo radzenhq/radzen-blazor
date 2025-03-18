@@ -17,7 +17,7 @@
         </RadzenColumn>
     </RadzenRow>
     <RadzenRow class="rz-w-100 rz-mx-auto rz-px-6 rz-px-sm-12 rz-pt-6 rz-pt-sm-12" Gap="3rem">
-        <RadzenColumn Size="12" SizeMD="12" SizeLG="6" class="rz-pb-6 rz-pb-sm-12">
+        <RadzenColumn Size="12" SizeLG="8" class="rz-pb-6 rz-pb-sm-12">
             <RadzenStack Gap="0" class="rz-h-100">
                 <RadzenText Text="Overview" TextStyle="Radzen.Blazor.TextStyle.Overline" Style="max-width: 800px; font-size: 1rem" class="rz-color-primary" />
                 <RadzenText Text="This blazor website template is a modern, responsive, and user-friendly one-page design tailored for auto repair workshops, mechanics, and car service centers. It offers a clean, professional layout with simple navigation, making it easy for customers to learn about services, book appointments, and contact the shop." TextStyle="Radzen.Blazor.TextStyle.H5" TagName="Radzen.Blazor.TagName.P" Style="max-width: 800px; line-height: 1.5" />
@@ -33,9 +33,13 @@
                 </RadzenStack>
             </RadzenStack>
         </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6" class="rz-pb-6 rz-pb-sm-12">
+        <RadzenColumn Size="12"  SizeLG="4" class="rz-pb-6 rz-pb-sm-12">
             <RadzenStack Gap="1rem" class="rz-h-100">
                 <RadzenText Text="Key Features" TextStyle="Radzen.Blazor.TextStyle.Overline" Style="max-width: 800px; font-size: 1rem" class="rz-color-primary" />
+                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
+                    <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                    <RadzenText Text="Light and Dark Material 3 based custom color themes." TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-m-0" />
+                </RadzenStack>
                 <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem" AlignItems="Radzen.AlignItems.Center">
                     <RadzenIcon Icon="check_circle" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
                     <RadzenText Text="Engaging Hero section – Eye-catching banner with a call-to-action for quick bookings." TextStyle="Radzen.Blazor.TextStyle.Subtitle2" class="rz-m-0" />
@@ -58,18 +62,30 @@
                 </RadzenStack>
             </RadzenStack>
         </RadzenColumn>
-        <RadzenColumn Size="12" SizeMD="6" class="rz-pb-6 rz-pb-sm-12">
+        <RadzenColumn Size="12" SizeLG="8" class="rz-pb-6 rz-pb-sm-12">
             <RadzenStack Gap="1rem" class="rz-h-100">
                 <RadzenText Text="How to use?" TextStyle="Radzen.Blazor.TextStyle.Overline" Style="max-width: 800px; font-size: 1rem" class="rz-color-primary" />
                 <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1">
                     This template is exclusively available with an active <RadzenLink Text="Radzen Professional or Enterprise subscription" Path="https://www.radzen.com/pricing/" title="See Radzen Pricing" target="_blank" />.
                 </RadzenText>
-                <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem">
-                    <RadzenIcon Icon="arrow_right_alt" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
-                    <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-m-0" >
-                        In <RadzenLink Path="https://www.radzen.com/blazor-studio/download/" target="_blank" title="Get Radzen Blazor Studio">Radzen Blazor Studio</RadzenLink> click the <strong>‘+’</strong> button in the bottom left corner to start the New application wizard.
-                    </RadzenText>
-                </RadzenStack>
+                <RadzenRow Gap="1rem">
+                    <RadzenColumn Size="12" SizeSM="6">
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem">
+                            <RadzenIcon Icon="arrow_right_alt" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                            <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-m-0" >
+                                In <RadzenLink Path="https://www.radzen.com/blazor-studio/download/" target="_blank" title="Get Radzen Blazor Studio">Radzen Blazor Studio</RadzenLink> click the <strong>‘+’</strong> button in the bottom left corner to start the New application wizard.
+                            </RadzenText>
+                        </RadzenStack>
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeSM="6">
+                        <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem">
+                            <RadzenIcon Icon="arrow_right_alt" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
+                            <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-m-0" >
+                                In <RadzenLink Path="https://www.radzen.com/blazor-visual-studio/download/" target="_blank" title="Get Radzen Blazor for Visual Studio">Radzen Blazor for Visual Studio</RadzenLink> create a new application and pick the <strong>Radzen Blazor Application</strong> template.
+                            </RadzenText>
+                        </RadzenStack>
+                    </RadzenColumn>
+                </RadzenRow>
                 <RadzenStack Orientation="Radzen.Orientation.Horizontal" Gap="0.5rem">
                     <RadzenIcon Icon="arrow_right_alt" IconStyle="Radzen.IconStyle.Primary"></RadzenIcon>
                     <RadzenText TextStyle="Radzen.Blazor.TextStyle.Body1" class="rz-m-0">
