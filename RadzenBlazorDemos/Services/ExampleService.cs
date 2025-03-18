@@ -20,15 +20,6 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Name = "Dashboard",
-            Path = "/dashboard",
-            Updated = true,
-            Title = "Sample Dashboard | Free UI Components by Radzen",
-            Description = "Rich dashboard created with the Radzen Blazor Components library.",
-            Icon = "&#xe868"
-        },
-        new Example
-        {
             Name = "Get Started",
             Path = "/get-started",
             Title = "Get Started | Free UI Components by Radzen",
@@ -307,6 +298,47 @@ namespace RadzenBlazorDemos
                     Description = "Examples of Customer Testimonials UI Blocks",
                     Path = "ui-blocks-testimonials",
                     Tags = new [] { "testimonial", "quote", "customer" }
+                }
+            }
+        },
+
+        new Example
+        {
+            Name = "App Templates",
+            New = true,
+            Title = "Blazor App Templates",
+            Description = "Ready to use Blazor application and website templates",
+            Icon = "&#xe5c3",
+            Children = new[] {
+                new Example
+                {
+                    Name = "Issues Dashboard",
+                    Path = "/dashboard",
+                    Title = "Sample Dashboard | Free UI Components by Radzen",
+                    Description = "Rich dashboard created with the Radzen Blazor Components library.",
+                    Icon = "&#xe868"
+                },
+                new Example
+                {
+                    Name = "Healthcare",
+                    New = true,
+                    Pro = true,
+                    Title = "Healthcare Blazor Website | Premium App Templates by Radzen",
+                    Icon = "&#xeb4c",
+                    Description = "A modern, responsive healthcare blazor website template.",
+                    Path = "templates-healthcare",
+                    Tags = new [] { "template", "health", "healthcare", "website", "app", "application", "page", "landing" }
+                },
+                new Example
+                {
+                    Name = "Repair Workshop",
+                    New = true,
+                    Pro = true,
+                    Title = "Repair Workshop Blazor Website | Premium App Templates by Radzen",
+                    Icon = "&#xf56c",
+                    Description = "A modern, responsive auto repair blazor website template.",
+                    Path = "templates-repairshop",
+                    Tags = new [] { "template", "repair", "workshop", "website", "app", "application", "page", "landing" }
                 }
             }
         },
