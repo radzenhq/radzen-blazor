@@ -55,7 +55,21 @@ class BlazorMarkdownRenderer(RenderTreeBuilder builder, Action<RenderTreeBuilder
     {
         builder.OpenComponent<RadzenTableCell>(0);
         builder.AddAttribute(1, nameof(RadzenTableCell.ChildContent), RenderChildren(cell.Children));
+        RenderCellAlignment(builder, cell.Alignment);
         builder.CloseComponent();
+    }
+
+    private static void RenderCellAlignment(RenderTreeBuilder builder, TableCellAlignment alignment)
+    {
+        switch (alignment)
+        {
+            case TableCellAlignment.Center:
+                builder.AddAttribute(2, nameof(RadzenTableCell.Style), "text-align: center");
+                break;
+            case TableCellAlignment.Right:
+                builder.AddAttribute(2, nameof(RadzenTableCell.Style), "text-align: right");
+                break;
+        }
     }
 
     public override void VisitTableHeaderRow(TableHeaderRow header)
@@ -70,6 +84,7 @@ class BlazorMarkdownRenderer(RenderTreeBuilder builder, Action<RenderTreeBuilder
                 {
                     headerRowBuilder.OpenComponent<RadzenTableHeaderCell>(0);
                     headerRowBuilder.AddAttribute(1, nameof(RadzenTableHeaderCell.ChildContent), RenderChildren(cell.Children));
+                    RenderCellAlignment(headerRowBuilder, cell.Alignment);
                     headerRowBuilder.CloseComponent();
                 }
             }));
