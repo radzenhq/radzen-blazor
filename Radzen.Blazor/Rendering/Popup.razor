@@ -1,5 +1,5 @@
 @inherits RadzenComponent
-@implements IAsyncDisposable
+
 @using Microsoft.JSInterop
 <div @ref=@Element @onmousedown:preventDefault=@PreventDefault @attributes=@Attributes style=@Style id=@GetId()>
     @if (open || !Lazy)
@@ -69,19 +69,7 @@
     {
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), Reference, nameof(OnClose));
     }
-
     public async ValueTask DisposeAsync()
     {
         if (IsJSRuntimeAvailable)
-        {
-            try
-            {
-                await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", GetId());
-            }
-            catch
-            {
-                // ignored
-            }
-        }
-    }
 }
