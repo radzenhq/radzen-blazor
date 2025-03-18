@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Markdown;
 /// <summary>
 /// Base class for markdown leaf block nodes.
 /// </summary>
-public abstract class Leaf : Block
+public abstract class Leaf : Block, IBlockInlineContainer
 {
     /// <summary>
     /// Gets or sets the value of the leaf node.
@@ -26,7 +26,6 @@ public abstract class Leaf : Block
     {
         children.Add(node);
     }
-
     internal void AddLine(BlockParser blockParser)
     {
         if (blockParser.PartiallyConsumedTab)

@@ -6,7 +6,7 @@ class InlineVisitor(Dictionary<string, LinkReference> references) : NodeVisitorB
 {
     public override void VisitHeading(Heading heading) => ParseChildren(heading, references);
 
-    private static void ParseChildren(Leaf node, Dictionary<string, LinkReference> references)
+    private static void ParseChildren(IBlockInlineContainer node, Dictionary<string, LinkReference> references)
     {
         var inlines = InlineParser.Parse(node.Value, references);
 

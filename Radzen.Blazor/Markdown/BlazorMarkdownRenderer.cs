@@ -1,54 +1,81 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Radzen.Blazor.Markdown;
 
-class BlazorRenderer(RenderTreeBuilder builder, Action<int> renderer) : NodeVisitorBase
+class BlazorMarkdownRenderer(RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
 {
     public const string Outlet = "<!--rz-outlet-{0}-->";
+
     public override void VisitHeading(Heading heading)
     {
-        builder.OpenElement(0, $"h{heading.Level}");
-        VisitChildren(heading.Children);
-        builder.CloseElement();
+        builder.OpenComponent<RadzenText>(0);
+        builder.AddAttribute(1, nameof(RadzenText.ChildContent), RenderChildren(heading.Children));
+        switch (heading.Level)
+        {
+            case 1:
+                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H1);
+                break;
+            case 2:
+                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H2);
+                break;
+            case 3:
+                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H3);
+                break;
+            case 4:
+                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H4);
+                break;
+            case 5:
+                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H5);
+                break;
+            case 6:
+                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H6);
+                break;
+        }
+        builder.CloseComponent();
     }
 
     public override void VisitTable(Table table)
     {
-        builder.OpenElement(0, "table");
-        base.VisitTable(table);
-        builder.CloseElement();
+        builder.OpenComponent<RadzenTable>(0);
+        builder.AddAttribute(1, nameof(RadzenTable.ChildContent), RenderChildren(table.Rows));
+        builder.CloseComponent();
     }
 
     public override void VisitTableRow(TableRow row)
     {
-        builder.OpenElement(0, "tr");
-        base.VisitTableRow(row);
-        builder.CloseElement();
+        builder.OpenComponent<RadzenTableRow>(0);
+        builder.AddAttribute(1, nameof(RadzenTableRow.ChildContent), RenderChildren(row.Cells));
+        builder.CloseComponent();
     }
-
     public override void VisitTableCell(TableCell cell)
     {
-        builder.OpenElement(0, "td");
-        base.VisitTableCell(cell);
-        builder.CloseElement();
+        builder.OpenComponent<RadzenTableCell>(0);
+        builder.AddAttribute(1, nameof(RadzenTableCell.ChildContent), RenderChildren(cell.Children));
+        builder.CloseComponent();
     }
 
     public override void VisitTableHeaderRow(TableHeaderRow header)
     {
-        builder.OpenElement(0, "thead");
-        builder.OpenElement(1, "tr");
-
-        foreach (var cell in header.Cells)
+        builder.OpenComponent<RadzenTableHeader>(0);
+        builder.AddAttribute(1, nameof(RadzenTableHeader.ChildContent), new RenderFragment(headerBuilder =>
         {
-            builder.OpenElement(2, "th");
-            VisitChildren(cell.Children);
-            builder.CloseElement();
-        }
-
-        builder.CloseElement();
-        builder.CloseElement();
+            headerBuilder.OpenComponent<RadzenTableHeaderRow>(0);
+            headerBuilder.AddAttribute(1, nameof(RadzenTableHeaderRow.ChildContent), new RenderFragment(headerRowBuilder =>
+            {
+                foreach (var cell in header.Cells)
+                {
+                    headerRowBuilder.OpenComponent<RadzenTableHeaderCell>(0);
+                    headerRowBuilder.AddAttribute(1, nameof(RadzenTableHeaderCell.ChildContent), RenderChildren(cell.Children));
+                    headerRowBuilder.CloseComponent();
+                }
+            }));
+            headerBuilder.CloseComponent();
+        }));
+        builder.CloseComponent();
     }
 
     public override void VisitIndentedCodeBlock(IndentedCodeBlock code)
@@ -68,10 +95,19 @@ class BlazorRenderer(RenderTreeBuilder builder, Action<int> renderer) : NodeVisi
         }
         else
         {
-            builder.OpenElement(0, "p");
-            VisitChildren(paragraph.Children);
-            builder.CloseElement();
+            builder.OpenComponent<RadzenText>(0);
+            builder.AddAttribute(1, nameof(RadzenText.ChildContent), RenderChildren(paragraph.Children));
+            builder.CloseComponent();
         }
+    }
+
+    private RenderFragment RenderChildren(IEnumerable<INode> children)
+    {
+        return innerBuilder =>
+        {
+            var inner = new BlazorMarkdownRenderer(innerBuilder, outlet);
+            inner.VisitChildren(children);
+        };
     }
 
     public override void VisitBlockQuote(BlockQuote blockQuote)
@@ -104,17 +140,28 @@ class BlazorRenderer(RenderTreeBuilder builder, Action<int> renderer) : NodeVisi
 
     public override void VisitLink(Link link)
     {
-        builder.OpenElement(0, "a");
-        builder.AddAttribute(1, "href", link.Destination);
-        VisitChildren(link.Children);
-        builder.CloseElement();
+        builder.OpenComponent<RadzenLink>(0);
+        builder.AddAttribute(1, nameof(RadzenLink.Path), link.Destination);
+        builder.AddAttribute(2, nameof(RadzenLink.ChildContent), RenderChildren(link.Children));
+
+        if (!string.IsNullOrEmpty(link.Title))
+        {
+            builder.AddAttribute(3, "title", link.Title);
+        }
+
+        builder.CloseComponent();
     }
 
     public override void VisitImage(Image image)
     {
-        builder.OpenElement(0, "img");
-        builder.AddAttribute(1, "src", image.Destination);
-        builder.AddAttribute(2, "alt", image.Title);
+        builder.OpenComponent<RadzenImage>(0);
+        builder.AddAttribute(1, nameof(RadzenImage.Path), image.Destination);
+        
+        if (!string.IsNullOrEmpty(image.Title))
+        {
+            builder.AddAttribute(2, nameof(RadzenImage.AlternateText), image.Title);
+        }
+
         builder.CloseElement();
     }
 
@@ -180,14 +227,13 @@ class BlazorRenderer(RenderTreeBuilder builder, Action<int> renderer) : NodeVisi
         {
             var markerId = Convert.ToInt32(match.Groups[1].Value);
 
-            renderer(markerId);
+            outlet(builder, markerId);
         }
         else
         {
             builder.AddMarkupContent(0, html);
         }
     }
-
     public override void VisitHtmlInline(HtmlInline html)
     {
         VisitHtml(html.Value);

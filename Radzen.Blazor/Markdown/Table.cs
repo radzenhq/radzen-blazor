@@ -304,7 +304,7 @@ public class TableRow : INode
 /// <summary>
 /// Represents a table cell in a Markdown table.
 /// </summary>
-public class TableCell : Leaf
+public class TableCell : INode, IBlockInlineContainer
 {
     /// <summary>
     /// Gets the alignment of the table cell.
@@ -320,9 +320,29 @@ public class TableCell : Leaf
         Alignment = alignment;
     }
 
+    /// <summary>
+    /// Gets or sets the inline content of the cell
+    /// </summary>
+    public string Value { get; set; }
+
     /// <inheritdoc />
-    public override void Accept(INodeVisitor visitor)
+    public void Accept(INodeVisitor visitor)
     {
         visitor.VisitTableCell(this);
+    }
+
+    private readonly List<Inline> children = [];
+
+    /// <summary>
+    /// Gets the children of the table cell.
+    /// </summary>
+    public IReadOnlyList<Inline> Children => children;
+
+    /// <summary>
+    /// Appends a child to table cell.
+    /// </summary>
+    public void Add(Inline node)
+    {
+        children.Add(node);
     }
 }

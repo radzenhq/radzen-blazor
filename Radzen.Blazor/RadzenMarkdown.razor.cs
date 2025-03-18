@@ -59,10 +59,14 @@ public partial class RadzenMarkdown : RadzenComponent
         {
             var document = MarkdownParser.Parse(Text);
             
-            var visitor = new BlazorRenderer(builder, _ => { });
+            var visitor = new BlazorMarkdownRenderer(builder, Empty);
 
             document.Accept(visitor);
         }
+    }
+
+    private static void Empty(RenderTreeBuilder builder, int marker) 
+    { 
     }
 
     private static void ProcessFramesWithMarkers(RenderTreeBuilder builder, ArrayRange<RenderTreeFrame> frames)
@@ -85,7 +89,7 @@ public partial class RadzenMarkdown : RadzenComponent
             else if (frame.FrameType == RenderTreeFrameType.Component || frame.FrameType == RenderTreeFrameType.Element)
             {
                 // Insert a marker for this component
-                var marker = string.Format(BlazorRenderer.Outlet, markerId);
+                var marker = string.Format(BlazorMarkdownRenderer.Outlet, markerId);
                 markdownBuilder.Append(marker);
 
                 // Store the component information for later
@@ -105,15 +109,15 @@ public partial class RadzenMarkdown : RadzenComponent
 
         var document = MarkdownParser.Parse(markdownBuilder.ToString());
 
-        void Render(int markerId)
+        void RenderOutlet(RenderTreeBuilder outletBuilder, int markerId)
         {
             if (componentFrames.TryGetValue(markerId, out var componentFrame))
             {
-                CopyFrames(builder, frames, componentFrame.startIndex, componentFrame.endIndex);
+                CopyFrames(outletBuilder, frames, componentFrame.startIndex, componentFrame.endIndex);
             }
         }
 
-        var visitor = new BlazorRenderer(builder, Render);
+        var visitor = new BlazorMarkdownRenderer(builder, RenderOutlet);
 
         document.Accept(visitor);
     }
@@ -157,10 +161,12 @@ public partial class RadzenMarkdown : RadzenComponent
                     builder.AddComponentReferenceCapture(frame.Sequence, frame.ComponentReferenceCaptureAction);
                     startIndex ++;
                     break;
+#if NET8_0_OR_GREATER
                 case RenderTreeFrameType.ComponentRenderMode:
                     builder.AddComponentRenderMode(frame.ComponentRenderMode);
                     startIndex ++;
                     break;
+#endif
                 case RenderTreeFrameType.Text:
                     builder.AddContent(frame.Sequence, frame.TextContent);
                     startIndex ++;
