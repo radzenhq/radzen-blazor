@@ -31,16 +31,16 @@ $card-heading-margin-bottom: 0.5rem !default;
     background: transparent;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
+  > h1,
+  > h2,
+  > h3,
+  > h4,
+  > h5,
+  > h6 {
     margin-bottom: var(--rz-card-heading-margin-bottom);
   }
 
-  p {
+  > p {
     margin-bottom: 0;
   }
 }
