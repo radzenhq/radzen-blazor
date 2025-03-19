@@ -240,7 +240,18 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
 
     public override void VisitHtmlBlock(HtmlBlock htmlBlock)
     {
-        VisitHtml(htmlBlock.Value);
+            var match = OutletRegex.Match(htmlBlock.Value);
+
+        if (match.Success)
+        {
+            var markerId = Convert.ToInt32(match.Groups[1].Value);
+            outlet(builder, markerId);
+            return;
+        }
+        else
+        {
+            builder.AddMarkupContent(0, htmlBlock.Value);
+        }
     }
 
     public override void VisitLineBreak(LineBreak lineBreak)
@@ -254,9 +265,32 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.AddContent(0, text.Value);
     }
 
-    private void VisitHtml(string html)
+    private static bool IsVoidElement(string tagName)
     {
-        var match = OutletRegex.Match(html);
+        return tagName.ToLowerInvariant() switch
+        {
+            "area" => true,
+            "base" => true,
+            "br" => true,
+            "col" => true,
+            "embed" => true,
+            "hr" => true,
+            "img" => true,
+            "input" => true,
+            "link" => true,
+            "meta" => true,
+            "param" => true,
+            "source" => true,
+            "track" => true,
+            "wbr" => true,
+            _ => false
+        };
+
+    }
+
+    public override void VisitHtmlInline(HtmlInline html)
+    {
+        var match = OutletRegex.Match(html.Value);
 
         if (match.Success)
         {
@@ -265,7 +299,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
             return;
         }
 
-        var closingMatch = HtmlClosingTagRegex.Match(html);
+        var closingMatch = HtmlClosingTagRegex.Match(html.Value);
 
         if (closingMatch.Success)
         {
@@ -273,7 +307,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
             return;
         }
 
-        var openingMatch = HtmlTagRegex.Match(html);
+        var openingMatch = HtmlTagRegex.Match(html.Value);
 
         if (openingMatch.Success)
         {
@@ -305,38 +339,10 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
                 }
             }
 
-            if (html.EndsWith("/>") || IsVoidElement(tagName))
+            if (html.Value.EndsWith("/>") || IsVoidElement(tagName))
             {
                 builder.CloseElement();
             }
         }
-    }
-
-    private static bool IsVoidElement(string tagName)
-    {
-        return tagName.ToLowerInvariant() switch
-        {
-            "area" => true,
-            "base" => true,
-            "br" => true,
-            "col" => true,
-            "embed" => true,
-            "hr" => true,
-            "img" => true,
-            "input" => true,
-            "link" => true,
-            "meta" => true,
-            "param" => true,
-            "source" => true,
-            "track" => true,
-            "wbr" => true,
-            _ => false
-        };
-
-    }
-
-    public override void VisitHtmlInline(HtmlInline html)
-    {
-        VisitHtml(html.Value);
     }
 }
