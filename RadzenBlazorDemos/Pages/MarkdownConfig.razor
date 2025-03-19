@@ -1,4 +1,10 @@
-﻿<RadzenMarkdown class="rz-p-0 rz-p-md-12">
+﻿<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenCheckBox @bind-Value="@autoLinkHeadings" Name="autoLinkHeadings"></RadzenCheckBox>
+        <RadzenLabel Text="Auto link headings" Component="autoLinkHeadings" />
+    </RadzenStack>
+</RadzenCard>
+<RadzenMarkdown class="rz-p-0 rz-p-md-12" AutoLinkHeadings=@autoLinkHeadings>
 ### RadzenMarkdown
 
 **RadzenMarkdown** allows you to render Markdown content in your Blazor applications.
@@ -18,3 +24,6 @@ This is a **bold** text.
 </RadzenMarkdown>")
 ```
 </RadzenMarkdown>
+@code {
+    bool autoLinkHeadings = true;
+}

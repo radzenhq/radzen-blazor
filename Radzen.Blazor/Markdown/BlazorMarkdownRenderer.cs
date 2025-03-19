@@ -6,7 +6,12 @@ using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Radzen.Blazor.Markdown;
 
-class BlazorMarkdownRenderer(RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
+class BlazorMarkdownRendererOptions
+{
+    public bool AutoLinkHeadings { get; set; }
+}
+
+class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
 {
     public const string Outlet = "<!--rz-outlet-{0}-->";
 
@@ -14,27 +19,39 @@ class BlazorMarkdownRenderer(RenderTreeBuilder builder, Action<RenderTreeBuilder
     {
         builder.OpenComponent<RadzenText>(0);
         builder.AddAttribute(1, nameof(RadzenText.ChildContent), RenderChildren(heading.Children));
+
         switch (heading.Level)
         {
             case 1:
                 builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H1);
                 break;
             case 2:
-                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H2);
+                builder.AddAttribute(3, nameof(RadzenText.TextStyle), TextStyle.H2);
                 break;
             case 3:
-                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H3);
+                builder.AddAttribute(4, nameof(RadzenText.TextStyle), TextStyle.H3);
                 break;
             case 4:
-                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H4);
+                builder.AddAttribute(5, nameof(RadzenText.TextStyle), TextStyle.H4);
                 break;
             case 5:
-                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H5);
+                builder.AddAttribute(6, nameof(RadzenText.TextStyle), TextStyle.H5);
                 break;
             case 6:
-                builder.AddAttribute(2, nameof(RadzenText.TextStyle), TextStyle.H6);
+                builder.AddAttribute(7, nameof(RadzenText.TextStyle), TextStyle.H6);
                 break;
         }
+
+        if (options.AutoLinkHeadings)
+        {
+            var anchor = Regex.Replace(heading.Value, @"[^\w\s-]", string.Empty).Replace(' ', '-').ToLowerInvariant().Trim();
+            builder.AddAttribute(8, nameof(RadzenText.Anchor), anchor);
+        }
+        else
+        {
+            builder.AddAttribute(9, nameof(RadzenText.Anchor), (string)null);
+        }
+
         builder.CloseComponent();
     }
 
@@ -67,7 +84,7 @@ class BlazorMarkdownRenderer(RenderTreeBuilder builder, Action<RenderTreeBuilder
                 builder.AddAttribute(2, nameof(RadzenTableCell.Style), "text-align: center");
                 break;
             case TableCellAlignment.Right:
-                builder.AddAttribute(2, nameof(RadzenTableCell.Style), "text-align: right");
+                builder.AddAttribute(3, nameof(RadzenTableCell.Style), "text-align: right");
                 break;
         }
     }
@@ -120,7 +137,7 @@ class BlazorMarkdownRenderer(RenderTreeBuilder builder, Action<RenderTreeBuilder
     {
         return innerBuilder =>
         {
-            var inner = new BlazorMarkdownRenderer(innerBuilder, outlet);
+            var inner = new BlazorMarkdownRenderer(options, innerBuilder, outlet);
             inner.VisitChildren(children);
         };
     }

@@ -37,6 +37,12 @@ public partial class RadzenMarkdown : RadzenComponent
     [Parameter]
     public string? Text { get; set; }
 
+    /// <summary>
+    /// Whether to create anchor links for headings.
+    /// </summary>
+    [Parameter]
+    public bool AutoLinkHeadings { get; set; } = true;
+
     /// <inheritdoc />
     protected override string GetComponentCssClass()
     {
@@ -58,21 +64,31 @@ public partial class RadzenMarkdown : RadzenComponent
         else
         {
             var document = MarkdownParser.Parse(Text);
-            
-            var visitor = new BlazorMarkdownRenderer(builder, Empty);
 
-            document.Accept(visitor);
+            Render(document, builder, Empty);
         }
+    }
+
+    private void Render(Document document, RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet)
+    {
+        var options = new BlazorMarkdownRendererOptions
+        {
+            AutoLinkHeadings = AutoLinkHeadings
+        };
+
+        var visitor = new BlazorMarkdownRenderer(options, builder, outlet);
+
+        document.Accept(visitor);
     }
 
     private static void Empty(RenderTreeBuilder builder, int marker) 
     { 
     }
 
-    private static void ProcessFramesWithMarkers(RenderTreeBuilder builder, ArrayRange<RenderTreeFrame> frames)
+    private void ProcessFramesWithMarkers(RenderTreeBuilder builder, ArrayRange<RenderTreeFrame> frames)
     {
-        var markdownBuilder = new StringBuilder();
-        var componentFrames = new Dictionary<int, (int startIndex, int endIndex)>();
+        var markdown = new StringBuilder();
+        var outletFrames = new Dictionary<int, (int startIndex, int endIndex)>();
         var markerId = 0;
         var index = 0;
 
@@ -83,18 +99,18 @@ public partial class RadzenMarkdown : RadzenComponent
             if (frame.FrameType == RenderTreeFrameType.Text || frame.FrameType == RenderTreeFrameType.Markup)
             {
                 var content = frame.FrameType == RenderTreeFrameType.Text ? frame.TextContent : frame.MarkupContent;
-                markdownBuilder.Append(content);
+                markdown.Append(content);
                 index++;
             }
             else if (frame.FrameType == RenderTreeFrameType.Component || frame.FrameType == RenderTreeFrameType.Element)
             {
                 // Insert a marker for this component
                 var marker = string.Format(BlazorMarkdownRenderer.Outlet, markerId);
-                markdownBuilder.Append(marker);
+                markdown.Append(marker);
 
                 // Store the component information for later
                 var subtreeLength = GetSubtreeLength(frame);
-                componentFrames.Add(markerId, (index, index + subtreeLength));
+                outletFrames.Add(markerId, (index, index + subtreeLength));
 
                 // Increment marker ID and skip past this component
                 markerId++;
@@ -107,19 +123,17 @@ public partial class RadzenMarkdown : RadzenComponent
             }
         }
 
-        var document = MarkdownParser.Parse(markdownBuilder.ToString());
+        var document = MarkdownParser.Parse(markdown.ToString());
 
         void RenderOutlet(RenderTreeBuilder outletBuilder, int markerId)
         {
-            if (componentFrames.TryGetValue(markerId, out var componentFrame))
+            if (outletFrames.TryGetValue(markerId, out var componentFrame))
             {
                 CopyFrames(outletBuilder, frames, componentFrame.startIndex, componentFrame.endIndex);
             }
         }
 
-        var visitor = new BlazorMarkdownRenderer(builder, RenderOutlet);
-
-        document.Accept(visitor);
+        Render(document, builder, RenderOutlet);
     }
 
     private static void CopyFrames(RenderTreeBuilder builder, ArrayRange<RenderTreeFrame> frames, int startIndex, int endIndex)
