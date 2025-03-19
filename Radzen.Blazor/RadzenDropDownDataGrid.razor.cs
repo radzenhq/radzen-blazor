@@ -510,12 +510,12 @@ namespace Radzen.Blazor
 
                             foreach (string word in words)
                             {
-                                query = query.Where(TextProperty, word, FilterOperator, FilterCaseSensitivity);
+                                query = query.Where(TextProperty, word, FilterOperator, FilterCaseSensitivity, FilterIgnoreDiactritics);
                             }
                         }
                         else
                         {
-                            query = query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
+                            query = query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity, FilterIgnoreDiactritics);
                         }
                     }
                 }

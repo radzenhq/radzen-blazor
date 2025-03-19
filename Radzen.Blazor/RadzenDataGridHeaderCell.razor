@@ -242,7 +242,7 @@ else
             if(!string.IsNullOrEmpty(loadDataArgs.Filter))
             {
                 query = Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column))
-                    .Where(property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive);
+                    .Where(property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive, FilterIgnoreDiactritics.Default);
             }
             else
             {

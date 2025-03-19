@@ -743,7 +743,7 @@ namespace Radzen
             else
             {
                 var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
-                    Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
+                    Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive, FilterIgnoreDiactritics.IgnoreDiactritics) :
                     Query)
                     .Cast(Query.ElementType).Cast<dynamic>().ToList();
 
@@ -1057,7 +1057,7 @@ namespace Radzen
             {
                 if (_view == null && Query != null)
                 {
-                    _view = Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
+                    _view = Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity, FilterIgnoreDiactritics);
                 }
 
                 return _view;

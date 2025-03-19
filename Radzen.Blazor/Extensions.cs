@@ -70,5 +70,23 @@ namespace Radzen.Blazor
                 .Trim().ToLower();
         }
     }
+    /// <summary>
+    /// Class StringExtensions.
+    /// </summary>
+    public static class StringExtensions
+    {
+        /// <summary>
+        /// Removes the diacritics.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static string RemoveDiacritics(this string text)
+        {
+            if (string.IsNullOrEmpty(text)) return text;
+            text = text.Normalize(System.Text.NormalizationForm.FormD);
+            var chars = text.Where(c => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark).ToArray();
+            return new string(chars).Normalize(System.Text.NormalizationForm.FormC);
+        }
+    }
 }
 

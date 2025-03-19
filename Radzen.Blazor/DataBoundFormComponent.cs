@@ -36,6 +36,11 @@ namespace Radzen
         public FilterCaseSensitivity FilterCaseSensitivity { get; set; } = FilterCaseSensitivity.Default;
 
         /// <summary>
+        /// Gets or sets the filter ignore diactritics.
+        /// </summary>
+        [Parameter]
+        public FilterIgnoreDiactritics FilterIgnoreDiactritics { get; set; } = FilterIgnoreDiactritics.Default;
+        /// <summary>
         /// Gets or sets the filter operator.
         /// </summary>
         /// <value>The filter operator.</value>
@@ -259,7 +264,7 @@ namespace Radzen
                 {
                     if (!string.IsNullOrEmpty(searchText))
                     {
-                        _view = Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
+                        _view = Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity, FilterIgnoreDiactritics);
                     }
                     else
                     {

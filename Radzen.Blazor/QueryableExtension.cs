@@ -1568,15 +1568,16 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Wheres the specified filters.
+        /// Wheres the specified filters with ignoring diacritics.
         /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="property">The property.</param>
-        /// <param name="value">The value.</param>
-        /// <param name="op">The StringFilterOperator.</param>
-        /// <param name="cs">The FilterCaseSensitivity.</param>
-        /// <returns>IQueryable&lt;T&gt;.</returns>
-        public static IQueryable Where(this IQueryable source, string property, string value, StringFilterOperator op, FilterCaseSensitivity cs)
+        /// <param name="source"></param>
+        /// <param name="property"></param>
+        /// <param name="value"></param>
+        /// <param name="op"></param>
+        /// <param name="cs"></param>
+        /// <param name="dc"></param>
+        /// <returns></returns>
+        public static IQueryable Where(this IQueryable source, string property, string value, StringFilterOperator op, FilterCaseSensitivity cs, FilterIgnoreDiactritics dc)
         {
             IQueryable result;
 
@@ -1593,7 +1594,7 @@ namespace Radzen
                     propertyExpression = GetNestedPropertyExpression(parameter, property);
                 }
 
-                if (string.IsNullOrEmpty(property) && inMemory || 
+                if (string.IsNullOrEmpty(property) && inMemory ||
                     propertyExpression != null && propertyExpression.Type != typeof(string))
                 {
                     propertyExpression = Expression.Call(notNullCheck(parameter), "ToString", Type.EmptyTypes);
@@ -1607,6 +1608,14 @@ namespace Radzen
                 var constantExpression = Expression.Constant(ignoreCase ? value.ToLower() : value, typeof(string));
                 Expression comparisonExpression = null;
 
+                if (dc == FilterIgnoreDiactritics.IgnoreDiactritics)
+                {
+                    var removeDiacriticsMethod = typeof(StringExtensions)
+                        .GetMethod("RemoveDiacritics", new[] { typeof(string) });
+                    propertyExpression = Expression.Call(null, removeDiacriticsMethod, notNullCheck(propertyExpression));
+                    string normalizedConstant = (ignoreCase ? value.ToLower() : value).RemoveDiacritics();
+                    constantExpression = Expression.Constant(normalizedConstant, typeof(string));
+                }                
                 switch (op)
                 {
                     case StringFilterOperator.Contains:

@@ -1894,6 +1894,20 @@ namespace Radzen
         /// </summary>
         CaseInsensitive
     }
+    /// <summary>
+    /// Specifies the filter ignore diacritics of a component.
+    /// </summary>
+    public enum FilterIgnoreDiactritics
+    {
+        /// <summary>
+        /// Relies on the underlying provider (LINQ to Objects, Entity Framework etc.) to handle diacritics. LINQ to Objects is case sensitive. Entity Framework relies on the database collection settings.
+        /// </summary>
+        Default,
+        /// <summary>
+        /// Filters are case insensitive regardless of the underlying provider.
+        /// </summary>
+        IgnoreDiactritics
+    }
 
     /// <summary>
     /// Specifies the logical operator between filters.
