@@ -67,6 +67,17 @@ public class ImageTests
         <image destination=""/url"" title="""" />
     </paragraph>
 </document>")]
+    [InlineData(@"__Applications__ ![macOS DMG](/assets/img/macOS-drag-and-drop.png)", @"<document>
+    <paragraph>
+        <strong>
+            <text>Applications</text>
+        </strong>
+        <text> </text>
+        <image destination=""/assets/img/macOS-drag-and-drop.png"" title="""">
+            <text>macOS DMG</text>
+        </image>
+    </paragraph>
+</document>")]
     public void Parse_BasicImages_ReturnsImageElement(string markdown, string expected)
     {
         Assert.Equal(expected, ToXml(markdown));

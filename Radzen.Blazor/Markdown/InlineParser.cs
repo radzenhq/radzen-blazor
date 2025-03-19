@@ -936,7 +936,7 @@ class InlineParser
             }
             else
             {
-                delimiters.RemoveAt(closerIndex);
+                break;
             }
         }
     }
