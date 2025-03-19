@@ -16,7 +16,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
 {
     public const string Outlet = "<!--rz-outlet-{0}-->";
     private static readonly Regex OutletRegex = new (@"<!--rz-outlet-(\d+)-->");
-    private static readonly Regex HtmlTagRegex = new(@"<(\w+)((?:\s+[^>]*)?)>");
+    private static readonly Regex HtmlTagRegex = new(@"<(\w+)((?:\s+[^>]*)?)\/?>");
     private static readonly Regex HtmlClosingTagRegex = new(@"</(\w+)>");
     private static readonly Regex AttributeRegex = new(@"(\w+)(?:\s*=\s*(?:([""'])(.*?)\2|([^\s>]+)))?");
 
@@ -278,6 +278,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         if (openingMatch.Success)
         {
             var tagName = openingMatch.Groups[1].Value;
+
             builder.OpenElement(0, tagName);
 
             var attributes = openingMatch.Groups[2].Value;
@@ -303,7 +304,35 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
                     builder.AddAttribute(1, name, value);
                 }
             }
+
+            if (html.EndsWith("/>") || IsVoidElement(tagName))
+            {
+                builder.CloseElement();
+            }
         }
+    }
+
+    private static bool IsVoidElement(string tagName)
+    {
+        return tagName.ToLowerInvariant() switch
+        {
+            "area" => true,
+            "base" => true,
+            "br" => true,
+            "col" => true,
+            "embed" => true,
+            "hr" => true,
+            "img" => true,
+            "input" => true,
+            "link" => true,
+            "meta" => true,
+            "param" => true,
+            "source" => true,
+            "track" => true,
+            "wbr" => true,
+            _ => false
+        };
+
     }
 
     public override void VisitHtmlInline(HtmlInline html)
