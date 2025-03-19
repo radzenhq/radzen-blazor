@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components.Rendering;
 
 namespace Radzen.Blazor.Markdown;
 
+#nullable enable
 class BlazorMarkdownRendererOptions
 {
     public bool AutoLinkHeadings { get; set; }
@@ -14,6 +15,10 @@ class BlazorMarkdownRendererOptions
 class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
 {
     public const string Outlet = "<!--rz-outlet-{0}-->";
+    private static readonly Regex OutletRegex = new (@"<!--rz-outlet-(\d+)-->");
+    private static readonly Regex HtmlTagRegex = new(@"<(\w+)((?:\s+[^>]*)?)>");
+    private static readonly Regex HtmlClosingTagRegex = new(@"</(\w+)>");
+    private static readonly Regex AttributeRegex = new(@"(\w+)(?:\s*=\s*(?:([""'])(.*?)\2|([^\s>]+)))?");
 
     public override void VisitHeading(Heading heading)
     {
@@ -49,7 +54,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         }
         else
         {
-            builder.AddAttribute(9, nameof(RadzenText.Anchor), (string)null);
+            builder.AddAttribute(9, nameof(RadzenText.Anchor), (string?)null);
         }
 
         builder.CloseComponent();
@@ -249,8 +254,6 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.AddContent(0, text.Value);
     }
 
-    private static readonly Regex OutletRegex = new (@"<!--rz-outlet-(\d+)-->");
-
     private void VisitHtml(string html)
     {
         var match = OutletRegex.Match(html);
@@ -258,14 +261,51 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         if (match.Success)
         {
             var markerId = Convert.ToInt32(match.Groups[1].Value);
-
             outlet(builder, markerId);
+            return;
         }
-        else
+
+        var closingMatch = HtmlClosingTagRegex.Match(html);
+
+        if (closingMatch.Success)
         {
-            builder.AddMarkupContent(0, html);
+            builder.CloseElement();
+            return;
+        }
+
+        var openingMatch = HtmlTagRegex.Match(html);
+
+        if (openingMatch.Success)
+        {
+            var tagName = openingMatch.Groups[1].Value;
+            builder.OpenElement(0, tagName);
+
+            var attributes = openingMatch.Groups[2].Value;
+
+            if (!string.IsNullOrEmpty(attributes))
+            {
+                var matches = AttributeRegex.Matches(attributes);
+
+                foreach (Match attribute in matches)
+                {
+                    var name = attribute.Groups[1].Value;
+                    var value = name;
+
+                    if (attribute.Groups[2].Success) // Quoted value (either single or double)
+                    {
+                        value = attribute.Groups[3].Value;
+                    }
+                    else if (attribute.Groups[4].Success) // Unquoted value
+                    {
+                        value = attribute.Groups[4].Value;
+                    }
+
+                    builder.AddAttribute(1, name, value);
+                }
+            }
         }
     }
+
     public override void VisitHtmlInline(HtmlInline html)
     {
         VisitHtml(html.Value);
