@@ -3641,6 +3641,14 @@ namespace Radzen.Blazor
                 {
                     return element.GetDateTime();
                 }
+                else if (type == typeof(DateOnly) || type == typeof(DateOnly?))
+                {
+                    return DateOnly.FromDateTime(element.GetDateTime());
+                }
+                else if (type == typeof(TimeOnly) || type == typeof(TimeOnly?))
+                {
+                    return TimeOnly.FromDateTime(element.GetDateTime());
+                }
                 else if (type == typeof(DateTimeOffset) || type == typeof(DateTimeOffset?))
                 {
                     return element.GetDateTimeOffset();
