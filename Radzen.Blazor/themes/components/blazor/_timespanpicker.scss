@@ -10,12 +10,11 @@ $timespanpicker-popup-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
 $timespanpicker-popup-margin: 0 !default;
 $timespanpicker-popup-width: fit-content !default;
 $timespanpicker-panel-background-color: var(--rz-base-background-color) !default;
-$timespanpicker-panel-text-color: var(--rz-text-color) !default;
-$timespanpicker-panel-padding-block: 0.5rem !default;
-$timespanpicker-panel-padding-inline: 0.5rem !default;
+$timespanpicker-panel-padding: 0.5rem !default;
 $timespanpicker-panel-gap: 0.5rem !default;
 $timespanpicker-panel-unit-gap: 0 !default;
 $timespanpicker-panel-field-min-width: 4rem !default;
+$timespanpicker-unit-label-color: var(--rz-text-tertiary-color) !default;
 
 /* input field */
 
@@ -148,9 +147,7 @@ $timespanpicker-panel-field-min-width: 4rem !default;
 }
 
 .rz-timespanpicker-panel {
-  padding-block: var(--rz-timespanpicker-panel-padding-block);
-  padding-inline: var(--rz-timespanpicker-panel-padding-inline);
-  color: var(--rz-timespanpicker-panel-text-color);
+  padding: var(--rz-timespanpicker-panel-padding);
 }
 
 .rz-timespanpicker-panel, .rz-timespanpicker-panel-fieldcontainer {
@@ -169,12 +166,23 @@ $timespanpicker-panel-field-min-width: 4rem !default;
   width: min-content;
 }
 
+.rz-timespanpicker-unit-label {
+  color: var(--rz-timespanpicker-unit-label-color);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+
 .rz-timespanpicker-unitvaluepicker {
-  background-color: var(--rz-timespanpicker-panel-background-color);
   width: fit-content;
   min-width: var(--rz-timespanpicker-panel-field-min-width);
 }
 
-.rz-timespanpicker-sign {
-  line-height: var(--rz-input-height);
+.rz-timespanpicker-signpicker {
+  align-self: stretch;
+  
+  > .rz-button {
+    flex: 1;
+    --rz-selectbar-border-radius: var(--rz-input-border-radius);
+  }
 }

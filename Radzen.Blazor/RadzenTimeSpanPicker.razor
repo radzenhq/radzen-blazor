@@ -115,7 +115,7 @@
             {
                 var inputName = $"{UniqueID}-{unitSymbol}";
                 <div class="rz-timespanpicker-panel-fieldwithunit rz-timespanpicker-@(unit.ToString().ToLowerInvariant())s">
-                    <label for="@inputName" class="rz-timespanpicker-unit">@label</label>
+                    <label for="@inputName" class="rz-timespanpicker-unit-label">@label</label>
                     <RadzenNumeric TValue="int" Name="@inputName" Culture="@Culture"
                                    Value="@Math.Abs(value)"
                                    Min="0" Max="@TimeFieldsMaxValues[unit]" Step="@step"
