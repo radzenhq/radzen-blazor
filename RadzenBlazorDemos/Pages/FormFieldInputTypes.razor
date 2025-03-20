@@ -34,6 +34,9 @@
                 <RadzenFormField Text="RadzenDatePicker" Variant="@variant">
                     <RadzenDatePicker @bind-Value="@date" ShowTime="@true" />
                 </RadzenFormField>
+                <RadzenFormField Text="RadzenTimeSpanPicker" Variant="@variant">
+                    <RadzenTimeSpanPicker @bind-Value="@timeSpan" />
+                </RadzenFormField>
                 <RadzenFormField Text="RadzenColorPicker" Variant="@variant">
                     <RadzenColorPicker @bind-Value="@color" />
                 </RadzenFormField>
@@ -65,6 +68,7 @@
     string autoCompleteValue = "";
     string color = "rgb(68, 58, 110)";
     DateTime? date = DateTime.Today;
+    TimeSpan? timeSpan = new TimeSpan(5, 15, 30);
 
     IEnumerable<string> companyNames;
 
