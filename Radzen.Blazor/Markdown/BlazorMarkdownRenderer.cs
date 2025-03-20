@@ -9,7 +9,7 @@ namespace Radzen.Blazor.Markdown;
 #nullable enable
 class BlazorMarkdownRendererOptions
 {
-    public bool AutoLinkHeadings { get; set; }
+    public int AutoLinkHeadingDepth { get; set; }
 }
 
 class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
@@ -47,7 +47,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
                 break;
         }
 
-        if (options.AutoLinkHeadings)
+        if (heading.Level <= options.AutoLinkHeadingDepth)
         {
             var anchor = Regex.Replace(heading.Value, @"[^\w\s-]", string.Empty).Replace(' ', '-').ToLowerInvariant().Trim();
             builder.AddAttribute(8, nameof(RadzenText.Anchor), anchor);

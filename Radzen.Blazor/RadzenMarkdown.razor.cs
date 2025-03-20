@@ -38,10 +38,10 @@ public partial class RadzenMarkdown : RadzenComponent
     public string? Text { get; set; }
 
     /// <summary>
-    /// Whether to create anchor links for headings.
+    /// The maximum heading depth to create anchor links for. Set to <c>0</c> to disable auto-linking.
     /// </summary>
     [Parameter]
-    public bool AutoLinkHeadings { get; set; } = true;
+    public int AutoLinkHeadingDepth { get; set; }
 
     /// <inheritdoc />
     protected override string GetComponentCssClass()
@@ -73,7 +73,7 @@ public partial class RadzenMarkdown : RadzenComponent
     {
         var options = new BlazorMarkdownRendererOptions
         {
-            AutoLinkHeadings = AutoLinkHeadings
+            AutoLinkHeadingDepth = AutoLinkHeadingDepth
         };
 
         var visitor = new BlazorMarkdownRenderer(options, builder, outlet);

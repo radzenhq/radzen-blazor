@@ -1,10 +1,10 @@
 ﻿<RadzenCard Variant="Variant.Outlined">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
-        <RadzenCheckBox @bind-Value="@autoLinkHeadings" Name="autoLinkHeadings"></RadzenCheckBox>
-        <RadzenLabel Text="Auto link headings" Component="autoLinkHeadings" />
+        <RadzenDropDown @bind-Value=@autoLinkHeadingDepth Data=@autoLinkHeadings TextProperty=@nameof(AutoLinkDepth.Text) ValueProperty=@nameof(AutoLinkDepth.Value) Name="autoLinkHeadings" />
+        <RadzenLabel Text="Auto link heading depth" Component="autoLinkHeadings" />
     </RadzenStack>
 </RadzenCard>
-<RadzenMarkdown class="rz-p-0 rz-p-md-12" AutoLinkHeadings=@autoLinkHeadings>
+<RadzenMarkdown class="rz-p-0 rz-p-md-12" AutoLinkHeadingDepth=@autoLinkHeadingDepth>
 ### RadzenMarkdown
 
 **RadzenMarkdown** allows you to render Markdown content in your Blazor applications.
@@ -25,5 +25,21 @@ This is a **bold** text.
 ```
 </RadzenMarkdown>
 @code {
-    bool autoLinkHeadings = true;
+    class AutoLinkDepth
+    {
+        public string Text { get; set; }
+        public int Value { get; set; }
+    }
+
+    List<AutoLinkDepth> autoLinkHeadings = new List<AutoLinkDepth>()
+    {
+        new AutoLinkDepth() { Text = "None", Value = 0 },
+        new AutoLinkDepth() { Text = "1", Value = 1 },
+        new AutoLinkDepth() { Text = "2", Value = 2 },
+        new AutoLinkDepth() { Text = "3", Value = 3 },
+        new AutoLinkDepth() { Text = "4", Value = 4 },
+        new AutoLinkDepth() { Text = "5", Value = 5 },
+        new AutoLinkDepth() { Text = "6", Value = 6 }
+    };
+    int autoLinkHeadingDepth = 4;
 }
