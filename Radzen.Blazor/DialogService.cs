@@ -112,12 +112,26 @@ namespace Radzen
         /// <summary>
         /// Occurs when [on refresh].
         /// </summary>
-        public event Action OnRefresh;
+        [Obsolete($"Use {nameof(OnDialogRefresh)} instead. Changed for consistent naming. {ObsoleteReferences.Version_6_3_3}")]
+#pragma warning disable CS0067
+		public event Action OnRefresh;
+#pragma warning restore CS0067
 
         /// <summary>
-        /// Occurs when a new dialog is open.
+        /// Occurs when the dialog is refreshed.
         /// </summary>
+        public event Action OnDialogRefresh;
+
+        /// <summary>
+        /// Occurs when a new dialog is opened.
+        /// </summary>
+        [Obsolete($"Use {nameof(OnDialogOpen)} instead. Changed for consistent naming. {ObsoleteReferences.Version_6_3_3}")]
         public event Action<string, Type, Dictionary<string, object>, DialogOptions> OnOpen;
+
+        /// <summary>
+        /// Occurs when a new dialog is opened.
+        /// </summary>
+        public event Action<string, Type, Dictionary<string, object>, DialogOptions> OnDialogOpen;
 
         /// <summary>
         /// Raises the Close event for the side dialog
@@ -161,11 +175,12 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Invokes <see cref="OnRefresh" />.
+        /// Invokes <see cref="OnDialogRefresh" />.
         /// </summary>
         public void Refresh()
         {
-            OnRefresh?.Invoke();
+            OnDialogRefresh?.Invoke();
+            OnRefresh?.Invoke(); // Obsolete since version 6.3.3 (2025-03-21)
         }
 
         /// <summary>
@@ -400,7 +415,8 @@ namespace Radzen
         private void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
         {
             dialogs.Add(options);
-            OnOpen?.Invoke(title, typeof(T), parameters, new DialogOptions()
+
+            var dialogOptions = new DialogOptions()
             {
                 Width = options != null && !string.IsNullOrEmpty(options.Width) ? options.Width : "600px",
                 Left = options != null && !string.IsNullOrEmpty(options.Left) ? options.Left : "",
@@ -424,7 +440,10 @@ namespace Radzen
                 Resize = options?.Resize,
                 Drag = options?.Drag,
                 Tags = options?.Tags
-            });
+            };
+
+            OnOpen?.Invoke(title, typeof(T), parameters, dialogOptions); // Obsolete since version 6.3.3 (2025-03-21)
+            OnDialogOpen?.Invoke(title, typeof(T), parameters, dialogOptions);
         }
 
         /// <summary>

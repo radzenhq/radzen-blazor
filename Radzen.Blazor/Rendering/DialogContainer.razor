@@ -205,10 +205,11 @@
 
     protected override void OnInitialized()
     {
-        Service.OnRefresh += OnRefresh;
+        Service.OnDialogRefresh += OnDialogRefresh;
+		Service.OnRefresh += OnDialogRefresh; // Obsolete since version 6.3.3 (2025-03-21)
     }
 
-    void OnRefresh()
+    void OnDialogRefresh()
     {
         var stateHasChanged = reference?.GetType().GetMethod("StateHasChanged", BindingFlags.NonPublic | BindingFlags.Instance);
 
@@ -222,7 +223,8 @@
 
     public void Dispose()
     {
-        Service.OnRefresh -= OnRefresh;
+        Service.OnDialogRefresh -= OnDialogRefresh;
+		Service.OnRefresh -= OnDialogRefresh; // Obsolete since version 6.3.3 (2025-03-21)
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
