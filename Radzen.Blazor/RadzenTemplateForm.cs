@@ -204,17 +204,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Submits the form.
-        /// </summary>
-        /// <remarks>
-        /// Validates the form and invokes the appropriate callback based on the validation result.
-        /// </remarks>
-        public async Task SubmitForm()
-        {
-            await OnSubmit();
-        }
-
         readonly List<IRadzenFormComponent> components = new List<IRadzenFormComponent>();
 
         /// <inheritdoc />
