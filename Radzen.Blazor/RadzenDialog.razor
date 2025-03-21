@@ -93,10 +93,7 @@
 	public void Dispose()
 	{
 		Service.OnDialogOpen -= OnOpen;
-		Service.OnOpen -= OnOpen; // Obsolete since version 6.3.3 (2025-03-21)
-
 		Service.OnDialogClose -= OnDialogClose;
-		Service.OnClose -= OnClose; // Obsolete since version 6.3.3 (2025-03-21)
 
 		Service.OnSideOpen -= OnSideOpen;
 		Service.OnSideClose -= OnSideClose;
@@ -105,10 +102,7 @@
 	protected override void OnInitialized()
 	{
 		Service.OnDialogOpen += OnOpen;
-		Service.OnOpen += OnOpen; // // Obsolete since version 6.3.3 (2025-03-21)
-
 		Service.OnDialogClose += OnDialogClose;
-		Service.OnClose += OnClose; // Obsolete since version 6.3.3 (2025-03-21)
 
 		Service.OnSideOpen += OnSideOpen;
 		Service.OnSideClose += OnSideClose;

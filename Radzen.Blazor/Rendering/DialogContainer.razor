@@ -206,7 +206,6 @@
     protected override void OnInitialized()
     {
         Service.OnDialogRefresh += OnDialogRefresh;
-		Service.OnRefresh += OnDialogRefresh; // Obsolete since version 6.3.3 (2025-03-21)
     }
 
     void OnDialogRefresh()
@@ -224,7 +223,6 @@
     public void Dispose()
     {
         Service.OnDialogRefresh -= OnDialogRefresh;
-		Service.OnRefresh -= OnDialogRefresh; // Obsolete since version 6.3.3 (2025-03-21)
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

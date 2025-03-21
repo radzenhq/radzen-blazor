@@ -113,9 +113,7 @@ namespace Radzen
         /// Occurs when [on refresh].
         /// </summary>
         [Obsolete($"Use {nameof(OnDialogRefresh)} instead. Changed for consistent naming. {ObsoleteReferences.Version_6_3_3}")]
-#pragma warning disable CS0067
 		public event Action OnRefresh;
-#pragma warning restore CS0067
 
         /// <summary>
         /// Occurs when the dialog is refreshed.
