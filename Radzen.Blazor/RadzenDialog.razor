@@ -5,161 +5,161 @@
 
 @foreach (var dialog in dialogs)
 {
-	<DialogContainer @key=@dialog Dialog=@dialog ShowMask=@(dialog==dialogs.LastOrDefault()) />
+    <DialogContainer @key=@dialog Dialog=@dialog ShowMask=@(dialog==dialogs.LastOrDefault()) />
 }
 
 @if (isSideDialogOpen)
 {
-	<aside class="@GetSideDialogCssClass()"
-		   tabindex="@(isSideDialogOpen ? "0" : "-1")"
-		   style="@GetSideDialogStyle()"
-		   aria-labelledby="rz-dialog-side-label">
-		@if (sideDialogOptions.ShowTitle)
-		{
-			<div class="rz-dialog-side-titlebar">
-				<div class="rz-dialog-side-title" style="display: inline" id="rz-dialog-side-label">@((MarkupString)sideDialogOptions.Title)</div>
-				@if (sideDialogOptions.ShowClose)
-				{
-					<a id="@(sideDialogOptions.GetHashCode() + "cl")" aria-label="@CloseSideDialogAriaLabel" @onclick:preventDefault="true" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service.CloseSide(null))" role="button" tabindex="@sideDialogOptions.CloseTabIndex">
-						<span class="notranslate rzi rzi-times"></span>
-					</a>
-				}
-			</div>
-		}
-		<div class="@SideDialogContentCssClass" style="@sideDialogOptions.Style">
-			@sideDialogContent
-		</div>
-	</aside>
-	@if (dialogs.Count == 0 && sideDialogOptions.ShowMask)
-	{
-		@if (sideDialogOptions.CloseDialogOnOverlayClick)
-		{
-			<div @onclick="@Service.CloseSide" class="rz-dialog-mask"></div>
-		}
-		else
-		{
-			<div class="rz-dialog-mask"></div>
-		}
-	}
+    <aside class="@GetSideDialogCssClass()"
+           tabindex="@(isSideDialogOpen ? "0" : "-1")"
+           style="@GetSideDialogStyle()"
+           aria-labelledby="rz-dialog-side-label">
+        @if (sideDialogOptions.ShowTitle)
+        {
+            <div class="rz-dialog-side-titlebar">
+                <div class="rz-dialog-side-title" style="display: inline" id="rz-dialog-side-label">@((MarkupString)sideDialogOptions.Title)</div>
+                @if (sideDialogOptions.ShowClose)
+                {
+                    <a id="@(sideDialogOptions.GetHashCode() + "cl")" aria-label="@CloseSideDialogAriaLabel" @onclick:preventDefault="true" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service.CloseSide(null))" role="button" tabindex="@sideDialogOptions.CloseTabIndex">
+                        <span class="notranslate rzi rzi-times"></span>
+                    </a>
+                }
+            </div>
+        }
+        <div class="@SideDialogContentCssClass" style="@sideDialogOptions.Style">
+            @sideDialogContent
+        </div>
+    </aside>
+    @if (dialogs.Count == 0 && sideDialogOptions.ShowMask)
+    {
+        @if (sideDialogOptions.CloseDialogOnOverlayClick)
+        {
+            <div @onclick="@Service.CloseSide" class="rz-dialog-mask"></div>
+        }
+        else
+        {
+            <div class="rz-dialog-mask"></div>
+        }
+    }
 }
 
 @code {
-	string SideDialogContentCssClass
-	{
-		get
-		{
-			var baseCss = "rz-dialog-side-content";
-			return string.IsNullOrEmpty(sideDialogOptions.ContentCssClass) ? baseCss : $"{baseCss} {sideDialogOptions.ContentCssClass}";
-		}
+    string SideDialogContentCssClass
+    {
+        get
+        {
+            var baseCss = "rz-dialog-side-content";
+            return string.IsNullOrEmpty(sideDialogOptions.ContentCssClass) ? baseCss : $"{baseCss} {sideDialogOptions.ContentCssClass}";
+        }
 
-	}
-	[Inject]
-	DialogService Service { get; set; }
+    }
+    [Inject]
+    DialogService Service { get; set; }
 
-	/// <summary>
-	/// Gets or sets the close side dialog aria label text.
-	/// </summary>
-	/// <value>The close side dialog aria label text.</value>
-	[Parameter]
-	public string CloseSideDialogAriaLabel { get; set; } = "Close side dialog";
+    /// <summary>
+    /// Gets or sets the close side dialog aria label text.
+    /// </summary>
+    /// <value>The close side dialog aria label text.</value>
+    [Parameter]
+    public string CloseSideDialogAriaLabel { get; set; } = "Close side dialog";
 
-	List<Dialog> dialogs = new List<Dialog>();
-	bool isSideDialogOpen = false;
-	RenderFragment sideDialogContent;
-	SideDialogOptions sideDialogOptions;
+    List<Dialog> dialogs = new List<Dialog>();
+    bool isSideDialogOpen = false;
+    RenderFragment sideDialogContent;
+    SideDialogOptions sideDialogOptions;
 
-	public async Task Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
-	{
-		dialogs.Add(new Dialog() { Title = title, Type = type, Parameters = parameters, Options = options });
+    public async Task Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        dialogs.Add(new Dialog() { Title = title, Type = type, Parameters = parameters, Options = options });
 
-		await InvokeAsync(() => { StateHasChanged(); });
-	}
+        await InvokeAsync(() => { StateHasChanged(); });
+    }
 
-	public async Task Close(dynamic result)
-	{
-		var lastDialog = dialogs.LastOrDefault();
-		if (lastDialog != null)
-		{
-			dialogs.Remove(lastDialog);
-			if (dialogs.Count == 0) await JSRuntime.InvokeAsync<string>("Radzen.closeDialog");
-		}
+    public async Task Close(dynamic result)
+    {
+        var lastDialog = dialogs.LastOrDefault();
+        if (lastDialog != null)
+        {
+            dialogs.Remove(lastDialog);
+            if (dialogs.Count == 0) await JSRuntime.InvokeAsync<string>("Radzen.closeDialog");
+        }
 
-		await InvokeAsync(() =>
-		{
-			StateHasChanged();
-		});
-	}
+        await InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
 
-	public void Dispose()
-	{
-		Service.OnDialogOpen -= OnDialogOpen;
-		Service.OnDialogClose -= OnDialogClose;
+    public void Dispose()
+    {
+        Service.OnDialogOpen -= OnDialogOpen;
+        Service.OnDialogClose -= OnDialogClose;
 
-		Service.OnSideOpen -= OnSideOpen;
-		Service.OnSideClose -= OnSideClose;
-	}
+        Service.OnSideOpen -= OnSideOpen;
+        Service.OnSideClose -= OnSideClose;
+    }
 
-	protected override void OnInitialized()
-	{
-		Service.OnDialogOpen += OnDialogOpen;
-		Service.OnDialogClose += OnDialogClose;
+    protected override void OnInitialized()
+    {
+        Service.OnDialogOpen += OnDialogOpen;
+        Service.OnDialogClose += OnDialogClose;
 
-		Service.OnSideOpen += OnSideOpen;
-		Service.OnSideClose += OnSideClose;
-	}
+        Service.OnSideOpen += OnSideOpen;
+        Service.OnSideClose += OnSideClose;
+    }
 
-	void OnSideOpen(Type sideComponent, Dictionary<string, object> parameters, SideDialogOptions options)
-	{
-		sideDialogOptions = options;
-		sideDialogContent = new RenderFragment(builder =>
-		{
-			builder.OpenComponent(0, sideComponent);
-			foreach (var parameter in parameters)
-			{
-				builder.AddAttribute(1, parameter.Key, parameter.Value);
-			}
-			builder.CloseComponent();
-		});
-		isSideDialogOpen = true;
-		StateHasChanged();
-	}
+    void OnSideOpen(Type sideComponent, Dictionary<string, object> parameters, SideDialogOptions options)
+    {
+        sideDialogOptions = options;
+        sideDialogContent = new RenderFragment(builder =>
+        {
+            builder.OpenComponent(0, sideComponent);
+            foreach (var parameter in parameters)
+            {
+                builder.AddAttribute(1, parameter.Key, parameter.Value);
+            }
+            builder.CloseComponent();
+        });
+        isSideDialogOpen = true;
+        StateHasChanged();
+    }
 
-	void OnSideClose(dynamic _)
-	{
-		isSideDialogOpen = false;
-		StateHasChanged();
-	}
+    void OnSideClose(dynamic _)
+    {
+        isSideDialogOpen = false;
+        StateHasChanged();
+    }
 
-	void OnDialogOpen(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
-	{
-		Open(title, type, parameters, options).ConfigureAwait(false);
-	}
+    void OnDialogOpen(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+    {
+        Open(title, type, parameters, options).ConfigureAwait(false);
+    }
 
-	void OnDialogClose(DialogOptions options, dynamic result)
-	{
-		Close(result).ConfigureAwait(false);
-	}
+    void OnDialogClose(DialogOptions options, dynamic result)
+    {
+        Close(result).ConfigureAwait(false);
+    }
 
-	string GetSideDialogCssClass()
-	{
-		return $"rz-dialog-side rz-dialog-side-position-{sideDialogOptions.Position.ToString().ToLower()} {sideDialogOptions.CssClass}";
-	}
+    string GetSideDialogCssClass()
+    {
+        return $"rz-dialog-side rz-dialog-side-position-{sideDialogOptions.Position.ToString().ToLower()} {sideDialogOptions.CssClass}";
+    }
 
-	string GetSideDialogStyle()
-	{
-		string widthStyle = string.IsNullOrEmpty(sideDialogOptions.Width) ? string.Empty : $"width: {sideDialogOptions.Width};";
-		string heightStyle = string.IsNullOrEmpty(sideDialogOptions.Height) ? string.Empty : $"height: {sideDialogOptions.Height};";
+    string GetSideDialogStyle()
+    {
+        string widthStyle = string.IsNullOrEmpty(sideDialogOptions.Width) ? string.Empty : $"width: {sideDialogOptions.Width};";
+        string heightStyle = string.IsNullOrEmpty(sideDialogOptions.Height) ? string.Empty : $"height: {sideDialogOptions.Height};";
 
-		return $"{widthStyle}{heightStyle}{sideDialogOptions.Style}";
-	}
+        return $"{widthStyle}{heightStyle}{sideDialogOptions.Style}";
+    }
 
-	protected override async Task OnAfterRenderAsync(bool firstRender)
-	{
-		await base.OnAfterRenderAsync(firstRender);
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
 
-		if (isSideDialogOpen)
-		{
-			await JSRuntime.InvokeAsync<string>("Radzen.openSideDialog", sideDialogOptions);
-		}
-	}
+        if (isSideDialogOpen)
+        {
+            await JSRuntime.InvokeAsync<string>("Radzen.openSideDialog", sideDialogOptions);
+        }
+    }
 }
