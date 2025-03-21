@@ -125,21 +125,30 @@
     public bool ShowMask { get; set; } = true;
 
     RenderFragment ChildContent => new RenderFragment(builder =>
+    {
+        // Wrap the Dialog component in a CascadingValue
+
+        builder.OpenComponent<CascadingValue<Dialog>>(0); // Open CascadingValue
+        builder.AddAttribute(1, "Value", Dialog);
+        builder.AddAttribute(2, "IsFixed", true);
+        builder.AddAttribute(3, "ChildContent", (RenderFragment)((builder2) =>
         {
-            builder.OpenComponent(0, Dialog.Type);
+            builder2.OpenComponent(0, Dialog.Type); // Open Dialog
 
             if (Dialog.Parameters != null)
             {
                 foreach (var parameter in Dialog.Parameters)
                 {
-                    builder.AddAttribute(1, parameter.Key, parameter.Value);
+                    builder2.AddAttribute(1, parameter.Key, parameter.Value);
                 }
             }
 
-            builder.AddComponentReferenceCapture(2, component => reference = component);
+            builder2.AddComponentReferenceCapture(2, component => reference = component); // Capture reference
+            builder2.CloseComponent(); // Close Dialog
 
-            builder.CloseComponent();
-        });
+        }));
+        builder.CloseComponent(); // Close CascadingValue
+    });
 
     object reference;
 
