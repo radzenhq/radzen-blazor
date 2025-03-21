@@ -204,6 +204,18 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Submits the form. 
+        /// This can be used to programmatically submit the form by using the <b>@ref</b> to <see cref="RadzenTemplateForm{TItem}" />
+        /// </summary>
+        /// <remarks>
+        /// Validates the form and invokes the appropriate callback based on the validation result.
+        /// </remarks>
+        public async Task SubmitForm()
+        {
+            await OnSubmit();
+        }
+
         readonly List<IRadzenFormComponent> components = new List<IRadzenFormComponent>();
 
         /// <inheritdoc />
