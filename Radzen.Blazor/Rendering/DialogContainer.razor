@@ -250,6 +250,7 @@
                     CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                     CssClass = options != null ? options.CssClass : "",
                     CloseTabIndex = options != null ? options.CloseTabIndex : 0,
+                    Tags = options?.Tags
                 };
 
             await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference, DotNetReference);

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Interfaces;
+using Radzen.Blazor.Internal;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -92,7 +94,20 @@ namespace Radzen
         /// <summary>
         /// Raises the Close event.
         /// </summary>
+        /// <remarks>
+        /// The first parameter is the result passed to <see cref="Close(dynamic)" />.
+        /// </remarks>
+        [Obsolete($"Use {nameof(OnDialogClose)} instead. Changed for consistent naming and added DialogOptions parameter. {ObsoleteReferences.Version_6_3_3}")]
         public event Action<dynamic> OnClose;
+
+        /// <summary>
+        /// Raises the Close event.
+        /// </summary>
+        /// <remarks>
+        /// The first parameter is the <see cref="DialogOptions"/> supplied when the dialog was opened.
+        /// The second parameter is the result passed to <see cref="Close(dynamic)" />.
+        /// </remarks>
+        public event Action<DialogOptions, dynamic> OnDialogClose;
 
         /// <summary>
         /// Occurs when [on refresh].
@@ -217,10 +232,10 @@ namespace Radzen
         {
             CloseSide();
             _sideDialogTask = new TaskCompletionSource<dynamic>();
-            if (options == null)
-            {
-                options = new SideDialogOptions();
-            }
+            options ??= new SideDialogOptions()
+            { 
+                Tags = null
+            };
 
             options.Title = title;
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
@@ -246,10 +261,10 @@ namespace Radzen
             CloseSide();
             _sideDialogTask = new TaskCompletionSource<dynamic>();
 
-            if (options == null)
-            {
-                options = new SideDialogOptions();
-            }
+            options ??= new SideDialogOptions()
+            { 
+                Tags = null
+            };
 
             options.Title = title;
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
@@ -270,10 +285,10 @@ namespace Radzen
         {
             CloseSide();
 
-            if (options == null)
-            {
-                options = new SideDialogOptions();
-            }
+            options ??= new SideDialogOptions() 
+            { 
+                Tags = null 
+            };
 
             options.Title = title;
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
@@ -296,10 +311,10 @@ namespace Radzen
 
             CloseSide();
 
-            if (options == null)
+            options ??= new SideDialogOptions()
             {
-                options = new SideDialogOptions();
-            }
+                Tags = null
+            };
 
             options.Title = title;
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
@@ -332,7 +347,10 @@ namespace Radzen
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
 
-            options = options ?? new DialogOptions();
+            options ??= new DialogOptions()
+            { 
+                Tags = null
+            };
 
             options.ChildContent = childContent;
 
@@ -353,7 +371,10 @@ namespace Radzen
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
 
-            options = options ?? new DialogOptions();
+            options ??= new DialogOptions()
+            {
+                Tags = null
+            };
 
             options.ChildContent = childContent;
 
@@ -372,7 +393,10 @@ namespace Radzen
         /// <param name="options">The dialog options.</param>
         public virtual void Open(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
         {
-            options = options ?? new DialogOptions();
+            options ??= new DialogOptions()
+            {
+                Tags = null    
+            };
 
             options.ChildContent = childContent;
 
@@ -382,11 +406,11 @@ namespace Radzen
         /// <summary>
         /// The dialogs
         /// </summary>
-        protected List<object> dialogs = new List<object>();
+        protected List<DialogOptions> dialogs = new List<DialogOptions>();
 
         private void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
         {
-            dialogs.Add(new object());
+            dialogs.Add(options);
             OnOpen?.Invoke(title, typeof(T), parameters, new DialogOptions()
             {
                 Width = options != null && !string.IsNullOrEmpty(options.Width) ? options.Width : "600px",
@@ -409,7 +433,8 @@ namespace Radzen
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
                 ContentCssClass = options != null ? options.ContentCssClass : "",
                 Resize = options?.Resize,
-                Drag = options?.Drag
+                Drag = options?.Drag,
+                Tags = options?.Tags
             });
         }
 
@@ -424,7 +449,9 @@ namespace Radzen
 
             if (dialog != null)
             {
-                OnClose?.Invoke(result);
+                OnClose?.Invoke(result); // Obsolete since version 6.3.3 (2025-03-21)
+                OnDialogClose?.Invoke(dialog, result);
+
                 dialogs.Remove(dialog);
             }
 
@@ -473,6 +500,7 @@ namespace Radzen
                 CssClass = options != null ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm",
                 WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
+                Tags = options?.Tags
             };
 
             return await OpenAsync(title, ds =>
@@ -534,6 +562,7 @@ namespace Radzen
                 WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
                 ContentCssClass = options != null ? $"rz-dialog-content {options.ContentCssClass}" : "rz-dialog-content",
                 CloseTabIndex = options != null ? options.CloseTabIndex : 0,
+                Tags = options?.Tags
             };
 
             return await OpenAsync(title, ds =>
@@ -564,7 +593,7 @@ namespace Radzen
     /// <summary>
     /// Base Class for dialog options
     /// </summary>
-    public abstract class DialogOptionsBase
+    public abstract class DialogOptionsBase : IHasTags
     {
         /// <summary>
         /// Gets or sets a value indicating whether to show the title bar. Set to <c>true</c> by default.
@@ -618,6 +647,16 @@ namespace Radzen
         /// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.
         /// </summary>
         public int CloseTabIndex { get; set; } = 0;
+
+        /// <summary>
+        /// Gets or sets dialog tags.
+        /// </summary>
+        /// <value>Used to store a custom payload that can be retreived later in the event handlers.</value>
+        public
+#if NET7_0_OR_GREATER
+    required
+#endif
+            Dictionary<string, object> Tags { get; set; }
     }
 
     /// <summary>

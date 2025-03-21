@@ -11,11 +11,11 @@
 @if (isSideDialogOpen)
 {
     <aside
-        class="@GetSideDialogCssClass()"
-        tabindex="@(isSideDialogOpen ? "0" : "-1")"
-        style="@GetSideDialogStyle()"
-        aria-labelledby="rz-dialog-side-label"
-        >
+    class="@GetSideDialogCssClass()"
+    tabindex="@(isSideDialogOpen ? "0" : "-1")"
+    style="@GetSideDialogStyle()"
+    aria-labelledby="rz-dialog-side-label"
+    >
         @if (sideDialogOptions.ShowTitle)
         {
             <div class="rz-dialog-side-titlebar">
@@ -95,7 +95,7 @@
     public void Dispose()
     {
         Service.OnOpen -= OnOpen;
-        Service.OnClose -= OnClose;
+        Service.OnDialogClose -= OnDialogClose;
 
         Service.OnSideOpen -= OnSideOpen;
         Service.OnSideClose -= OnSideClose;
@@ -104,7 +104,7 @@
     protected override void OnInitialized()
     {
         Service.OnOpen += OnOpen;
-        Service.OnClose += OnClose;
+        Service.OnDialogClose += OnDialogClose;
 
         Service.OnSideOpen += OnSideOpen;
         Service.OnSideClose += OnSideClose;
@@ -137,7 +137,7 @@
         Open(title, type, parameters, options).ConfigureAwait(false);
     }
 
-    void OnClose(dynamic result)
+    void OnDialogClose(DialogOptions options, dynamic result)
     {
         Close(result).ConfigureAwait(false);
     }
