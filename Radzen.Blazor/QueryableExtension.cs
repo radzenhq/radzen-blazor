@@ -168,7 +168,7 @@ namespace Radzen
                 expression = Expression.Call(
                     typeof(Queryable), order.Equals(sortStrings.First(), StringComparison.OrdinalIgnoreCase) ? methodAsc : methodDesc,
                     new Type[] { source.ElementType, property.Type },
-                    expression, Expression.Quote(Expression.Lambda(nameAndOrder.Contains(".") ? notNullCheck(property) : property, parameters)));
+                    expression, Expression.Quote(Expression.Lambda(property, parameters)));
 
                 methodAsc = "ThenBy";
                 methodDesc = "ThenByDescending";
