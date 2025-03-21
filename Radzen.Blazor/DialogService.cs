@@ -351,11 +351,7 @@ namespace Radzen
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
 
-            options ??= new DialogOptions()
-            { 
-                Tags = null
-            };
-
+            options ??= new DialogOptions();
             options.ChildContent = childContent;
 
             OpenDialog<object>(title, null, options);
@@ -375,13 +371,8 @@ namespace Radzen
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
 
-            options ??= new DialogOptions()
-            {
-                Tags = null
-            };
-
+            options ??= new DialogOptions();
             options.ChildContent = childContent;
-
             options.TitleContent = titleContent;
 
             OpenDialog<object>(null, null, options);
@@ -397,11 +388,7 @@ namespace Radzen
         /// <param name="options">The dialog options.</param>
         public virtual void Open(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
         {
-            options ??= new DialogOptions()
-            {
-                Tags = null    
-            };
-
+            options ??= new DialogOptions();
             options.ChildContent = childContent;
 
             OpenDialog<object>(title, null, options);
