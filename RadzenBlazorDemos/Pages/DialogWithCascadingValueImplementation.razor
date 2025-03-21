@@ -1,0 +1,37 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+	<RadzenButton Text="Update counter from dialog" ButtonStyle="ButtonStyle.Secondary" Click=@UpdateCounter />
+</div>
+
+@code {
+
+	[CascadingParameter] private Dialog _dialog { get; set; }
+	[Inject] private DialogService _dialogService { get; set; }
+	int _counter { get; set; }
+
+	protected override void OnInitialized()
+	{
+		// Change the dialog title content
+		_dialog.Options.TitleContent = service => @<RadzenCard>
+			<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+				<RadzenText TextStyle="TextStyle.Subtitle1">
+					Title with a counter: @_counter
+				</RadzenText>
+				<RadzenRow>
+					<RadzenButton Text="Update counter from title" ButtonStyle="ButtonStyle.Secondary" Click=@UpdateCounter />
+				</RadzenRow>
+			</RadzenStack>
+		</RadzenCard>;
+
+		// reflect the changes
+		_dialogService.Refresh();
+	}
+
+
+	void UpdateCounter()
+	{
+		_counter++;
+		_dialogService.Refresh();
+	}
+
+
+}
