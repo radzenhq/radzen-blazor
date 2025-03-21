@@ -232,12 +232,10 @@ namespace Radzen
         {
             CloseSide();
             _sideDialogTask = new TaskCompletionSource<dynamic>();
-            options ??= new SideDialogOptions()
-            { 
-                Tags = null
-            };
-
+            
+            options ??= new SideDialogOptions();
             options.Title = title;
+
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
             return _sideDialogTask.Task;
         }
@@ -261,12 +259,9 @@ namespace Radzen
             CloseSide();
             _sideDialogTask = new TaskCompletionSource<dynamic>();
 
-            options ??= new SideDialogOptions()
-            { 
-                Tags = null
-            };
-
+            options ??= new SideDialogOptions();
             options.Title = title;
+
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
 
             return _sideDialogTask.Task;
@@ -285,12 +280,9 @@ namespace Radzen
         {
             CloseSide();
 
-            options ??= new SideDialogOptions() 
-            { 
-                Tags = null 
-            };
-
+            options ??= new SideDialogOptions();
             options.Title = title;
+
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
         }
 
@@ -311,12 +303,9 @@ namespace Radzen
 
             CloseSide();
 
-            options ??= new SideDialogOptions()
-            {
-                Tags = null
-            };
-
+            options ??= new SideDialogOptions();
             options.Title = title;
+
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
         }
 
@@ -593,7 +582,7 @@ namespace Radzen
     /// <summary>
     /// Base Class for dialog options
     /// </summary>
-    public abstract class DialogOptionsBase : IHasTags
+    public abstract class DialogOptionsBase
     {
         /// <summary>
         /// Gets or sets a value indicating whether to show the title bar. Set to <c>true</c> by default.
@@ -647,16 +636,6 @@ namespace Radzen
         /// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.
         /// </summary>
         public int CloseTabIndex { get; set; } = 0;
-
-        /// <summary>
-        /// Gets or sets dialog tags.
-        /// </summary>
-        /// <value>Used to store a custom payload that can be retreived later in the event handlers.</value>
-        public
-#if NET7_0_OR_GREATER
-    required
-#endif
-            Dictionary<string, object> Tags { get; set; }
     }
 
     /// <summary>
@@ -711,7 +690,7 @@ namespace Radzen
     /// <summary>
     /// Class DialogOptions.
     /// </summary>
-    public class DialogOptions : DialogOptionsBase
+    public class DialogOptions : DialogOptionsBase, IHasTags
     {
         /// <summary>
         /// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
@@ -771,6 +750,9 @@ namespace Radzen
         /// </summary>
         /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
         public bool CloseDialogOnEsc { get; set; } = true;
+
+        /// <inheritdoc />
+        public Dictionary<string, object> Tags { get; set; }
     }
 
     /// <summary>
