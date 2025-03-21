@@ -92,7 +92,7 @@
 
 	public void Dispose()
 	{
-		Service.OnDialogOpen -= OnOpen;
+		Service.OnDialogOpen -= OnDialogOpen;
 		Service.OnDialogClose -= OnDialogClose;
 
 		Service.OnSideOpen -= OnSideOpen;
@@ -101,7 +101,7 @@
 
 	protected override void OnInitialized()
 	{
-		Service.OnDialogOpen += OnOpen;
+		Service.OnDialogOpen += OnDialogOpen;
 		Service.OnDialogClose += OnDialogClose;
 
 		Service.OnSideOpen += OnSideOpen;
@@ -130,17 +130,12 @@
 		StateHasChanged();
 	}
 
-	void OnOpen(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
+	void OnDialogOpen(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
 	{
 		Open(title, type, parameters, options).ConfigureAwait(false);
 	}
 
 	void OnDialogClose(DialogOptions options, dynamic result)
-	{
-		Close(result).ConfigureAwait(false);
-	}
-
-	void OnClose(dynamic result)
 	{
 		Close(result).ConfigureAwait(false);
 	}
