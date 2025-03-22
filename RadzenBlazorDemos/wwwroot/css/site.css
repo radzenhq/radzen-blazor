@@ -604,3 +604,93 @@ svg.illustration {
     width: 100%;
     height: 100%;
 }
+
+
+@keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes fadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+.rz-open {
+    animation: fadeIn;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.rz-dialog-side.rz-close {
+    animation: slideOut .5s;
+}
+
+.rz-dialog-side.rz-open {
+    animation: slideIn .5s;
+}
+
+.rz-close {
+    animation: fadeOut;
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+.rz-navigation-menu-wrapper.rz-open {
+    display: block;
+    animation: slideDown .5s;
+}
+
+.rz-navigation-menu-wrapper.rz-close {
+    animation: slideUp .5s;
+}
+
+.rz-navigation-item {
+    overflow: hidden;
+}
+
+@keyframes slideDown {
+    from {
+        grid-template-rows: 0fr;
+    }
+    to {
+        grid-template-rows: 1fr;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        grid-template-rows: 1fr;
+    }
+    to {
+        grid-template-rows: 0fr;
+    }
+}

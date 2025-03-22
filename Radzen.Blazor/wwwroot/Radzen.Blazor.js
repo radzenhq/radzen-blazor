@@ -1137,6 +1137,9 @@ window.Radzen = {
 
     popup.style.display = 'block';
 
+    popup.classList.add("rz-open");
+    popup.classList.remove("rz-close");
+
     var rect = popup.getBoundingClientRect();
     rect.width = x ? rect.width + 20 : rect.width;
     rect.height = y ? rect.height + 20 : rect.height;
@@ -1330,7 +1333,12 @@ window.Radzen = {
         Radzen[id + 'FZL'] = null;
       }
 
-      popup.style.display = 'none';
+      popup.classList.add("rz-close");
+      popup.classList.remove("rz-open");
+      popup.onanimationend = function () {
+          popup.style.display = 'none';
+          popup.onanimationend = null;
+      }
     }
     document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
