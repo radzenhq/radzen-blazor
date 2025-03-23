@@ -1,5 +1,6 @@
 @using Microsoft.JSInterop
 @using System.Reflection;
+@using System.ComponentModel
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 <div class="@WrapperCssClass">
@@ -206,6 +207,23 @@
     protected override void OnInitialized()
     {
         Service.OnRefresh += OnRefresh;
+
+		// Subscribe to PropertyChanged event to auto refresh the dialog when properties change
+        Dialog.PropertyChanged += OnPropertyChanged;
+
+		// Subscribe to PropertyChanged event to auto refresh the dialog when properties change
+		if (Dialog.Options != null)
+			Dialog.Options.PropertyChanged += OnPropertyChanged;
+    }
+
+    /// <summary>
+    /// Handles the property changed event and triggers a refresh.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The <see cref="PropertyChangedEventArgs"/> instance containing the event data.</param>
+    void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        OnRefresh();
     }
 
     void OnRefresh()
@@ -223,6 +241,14 @@
     public void Dispose()
     {
         Service.OnRefresh -= OnRefresh;
+
+		// Unsubscribe from PropertyChanged event
+        Dialog.PropertyChanged -= OnPropertyChanged;
+
+		// Unsubscribe from PropertyChanged event
+        if (Dialog.Options != null)
+            Dialog.Options.PropertyChanged -= OnPropertyChanged;
+
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
