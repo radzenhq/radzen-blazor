@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Radzen
@@ -327,14 +328,19 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="childContent">The content displayed in the dialog.</param>
         /// <param name="options">The dialog options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public virtual Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
+        public virtual Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null, CancellationToken? cancellationToken = null)
         {
             var task = new TaskCompletionSource<dynamic>();
+
+            // register the cancellation token
+            if (cancellationToken.HasValue)
+                cancellationToken.Value.Register(() => task.TrySetCanceled());
+
             tasks.Add(task);
 
-            options = options ?? new DialogOptions();
-
+            options ??= new DialogOptions();
             options.ChildContent = childContent;
 
             OpenDialog<object>(title, null, options);
@@ -348,16 +354,20 @@ namespace Radzen
         /// <param name="titleContent">The content displayed in the title bar of the dialog.</param>
         /// <param name="childContent">The content displayed in the dialog.</param>
         /// <param name="options">The dialog options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public virtual Task<dynamic> OpenAsync(RenderFragment<DialogService> titleContent, RenderFragment<DialogService> childContent, DialogOptions options = null)
+        public virtual Task<dynamic> OpenAsync(RenderFragment<DialogService> titleContent, RenderFragment<DialogService> childContent, DialogOptions options = null, CancellationToken? cancellationToken = null)
         {
             var task = new TaskCompletionSource<dynamic>();
+
+            // register the cancellation token
+            if (cancellationToken.HasValue)
+                cancellationToken.Value.Register(() => task.TrySetCanceled());
+            
             tasks.Add(task);
 
-            options = options ?? new DialogOptions();
-
+            options ??= new DialogOptions();
             options.ChildContent = childContent;
-
             options.TitleContent = titleContent;
 
             OpenDialog<object>(null, null, options);
@@ -385,7 +395,7 @@ namespace Radzen
         /// </summary>
         protected List<object> dialogs = new List<object>();
 
-        private void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
+        internal void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
         {
             dialogs.Add(new object());
 
@@ -442,18 +452,16 @@ namespace Radzen
         /// <param name="message">The message displayed to the user.</param>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null)
+        public virtual async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null, CancellationToken? cancellationToken = null)
         {
-            var useDefault = options == null;
-
             // Validate and set default values for the dialog options
             options ??= new();
-
-            options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";
+            options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : ""; // Width is set to 600px by default by OpenAsync
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
-            options.CssClass = !useDefault ? $"rz-dialog-confirm ${options.CssClass}" : "rz-dialog-confirm";
-            options.WrapperCssClass = !useDefault ? $"rz-dialog-wrapper ${options.WrapperCssClass}" : "rz-dialog-wrapper";
+            options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm";
+            options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";    
             
             return await OpenAsync(title, ds =>
             {
@@ -482,7 +490,7 @@ namespace Radzen
                     b.CloseElement();
                 };
                 return content;
-            }, options);
+            }, options, cancellationToken);
         }
 
         /// <summary>
@@ -491,19 +499,17 @@ namespace Radzen
         /// <param name="message">The message displayed to the user.</param>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions options = null)
+        public virtual async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions options = null, CancellationToken? cancellationToken = null)
         {
             // Validate and set default values for the dialog options
-            var useDefault = options == null;
-
             options ??= new();
-
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";  
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
-            options.CssClass = !useDefault ? $"rz-dialog-alert ${options.CssClass}" : "rz-dialog-alert";
-            options.WrapperCssClass = !useDefault ? $"rz-dialog-wrapper ${options.WrapperCssClass}" : "rz-dialog-wrapper";
-            options.ContentCssClass = !useDefault ? $"rz-dialog-content ${options.ContentCssClass}" : "rz-dialog-content";
+            options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
+            options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+            options.ContentCssClass = !String.IsNullOrEmpty(options.ContentCssClass) ? $"rz-dialog-content {options.ContentCssClass}" : "rz-dialog-content";
 
             return await OpenAsync(title, ds =>
             {
@@ -526,7 +532,7 @@ namespace Radzen
                     b.CloseElement();
                 };
                 return content;
-            }, options);
+            }, options, cancellationToken);
         }
     }
 
