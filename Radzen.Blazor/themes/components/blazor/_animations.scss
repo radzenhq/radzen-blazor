@@ -1,6 +1,6 @@
 // Fade animations
 
-@keyframes fadeIn {
+@keyframes rz-open {
   from {
     opacity: 0;
   }
@@ -9,7 +9,7 @@
   }
 }
 
-@keyframes fadeOut {
+@keyframes rz-close {
   from {
     opacity: 1;
   }
@@ -18,40 +18,10 @@
   }
 }
 
-// Slide animations
-
-@keyframes slideIn {
-  from {
-      transform: translateX(100%);
-  }
-  to {
-      transform: translateX(0);
-  }
+.rz-open {
+  animation: rz-open .3s;
 }
 
-@keyframes slideOut {
-  from {
-      transform: translateX(0);
-  }
-  to {
-      transform: translateX(100%);
-  }
-}
-
-@keyframes slideDown {
-  from {
-      grid-template-rows: 0fr;
-  }
-  to {
-      grid-template-rows: 1fr;
-  }
-}
-
-@keyframes slideUp {
-  from {
-      grid-template-rows: 1fr;
-  }
-  to {
-      grid-template-rows: 0fr;
-  }
+.rz-close {
+  animation: rz-close .3s;
 }
