@@ -1,0 +1,57 @@
+// Fade animations
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+// Slide animations
+
+@keyframes slideIn {
+  from {
+      transform: translateX(100%);
+  }
+  to {
+      transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+      transform: translateX(0);
+  }
+  to {
+      transform: translateX(100%);
+  }
+}
+
+@keyframes slideDown {
+  from {
+      grid-template-rows: 0fr;
+  }
+  to {
+      grid-template-rows: 1fr;
+  }
+}
+
+@keyframes slideUp {
+  from {
+      grid-template-rows: 1fr;
+  }
+  to {
+      grid-template-rows: 0fr;
+  }
+}
