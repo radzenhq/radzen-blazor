@@ -178,6 +178,34 @@ $dialog-zindex: 1001 !default;
   width: 100%;
 }
 
+
+// Dialog Animations
+
+.rz-open {
+  animation: fadeIn;
+  animation-duration: 0.3s;
+  animation-fill-mode: forwards;
+}
+
+.rz-close {
+  animation: fadeOut;
+  animation-duration: 0.3s;
+  animation-fill-mode: forwards;
+}
+
+.rz-dialog-side {
+  
+  &.rz-open {
+    animation: slideIn .3s;
+  }
+
+  &.rz-close {
+    animation: slideOut .3s;
+  }
+}
+
+// Dialog Responsive Styles
+
 @media (max-width: 768px) {
   .rz-dialog {
     &:not(.rz-dialog-confirm):not(.rz-dialog-alert) {
