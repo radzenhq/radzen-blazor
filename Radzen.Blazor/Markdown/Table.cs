@@ -115,7 +115,7 @@ public class Table : Leaf
                 }
                 else
                 {
-                    currentCell += '\\' + c; // Keep the escape character for other escaped chars
+                    currentCell += $"\\{c}"; // Keep the escape character for other escaped chars
                 }
                 escaped = false;
             }

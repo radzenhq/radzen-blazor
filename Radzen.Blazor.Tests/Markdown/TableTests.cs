@@ -136,6 +136,28 @@ bar | baz", @"<document>
         </row>
     </table>
 </document>")]
+[InlineData(@"| abc | def |
+| --- | --- |
+  c:\\foo", @"<document>
+    <table>
+        <header>
+            <cell>
+                <text>abc</text>
+            </cell>
+            <cell>
+                <text>def</text>
+            </cell>
+        </header>
+        <row>
+            <cell>
+                <text>c:</text>
+                <text>\</text>
+                <text>foo</text>
+            </cell>
+            <cell />
+        </row>
+    </table>
+</document>")]
     public void Parse_Table(string markdown, string expected)
     {
         Assert.Equal(expected, ToXml(markdown));
