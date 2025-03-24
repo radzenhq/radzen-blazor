@@ -181,26 +181,132 @@ $dialog-zindex: 1001 !default;
 
 // Dialog Animations
 
-.rz-open {
-  animation: fadeIn;
-  animation-duration: 0.3s;
-  animation-fill-mode: forwards;
+@keyframes rz-dialog-open {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
-.rz-close {
-  animation: fadeOut;
-  animation-duration: 0.3s;
-  animation-fill-mode: forwards;
-}
-
-.rz-dialog-side {
-  
+.rz-dialog {
   &.rz-open {
-    animation: slideIn .3s;
+    animation: rz-dialog-open .3s;
+  }
+}
+
+@keyframes rz-side-dialog-right-open {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes rz-side-dialog-right-close {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.rz-dialog-side-position-right {
+  &.rz-open {
+    animation: rz-side-dialog-right-open .3s;
   }
 
   &.rz-close {
-    animation: slideOut .3s;
+    animation: rz-side-dialog-right-close .3s;
+  }
+}
+
+@keyframes rz-side-dialog-top-open {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes rz-side-dialog-top-close {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.rz-dialog-side-position-top {
+  &.rz-open {
+    animation: rz-side-dialog-top-open .3s;
+  }
+
+  &.rz-close {
+    animation: rz-side-dialog-top-close .3s;
+  }
+}
+
+@keyframes rz-side-dialog-bottom-open {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes rz-side-dialog-bottom-close {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+.rz-dialog-side-position-bottom {
+  &.rz-open {
+    animation: rz-side-dialog-bottom-open .3s;
+  }
+
+  &.rz-close {
+    animation: rz-side-dialog-bottom-close .3s;
+  }
+}
+
+@keyframes rz-side-dialog-left-open {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes rz-side-dialog-left-close {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.rz-dialog-side-position-left {
+  &.rz-open {
+    animation: rz-side-dialog-left-open .3s;
+  }
+
+  &.rz-close {
+    animation: rz-side-dialog-left-close .3s;
   }
 }
 
