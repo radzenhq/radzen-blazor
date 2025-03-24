@@ -20,7 +20,7 @@
                 </div>
                 @if (Dialog.Options.ShowClose)
                 {
-                    <a @onclick:preventDefault="true" @onclick=@CloseAsync @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                    <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
                         <span class="notranslate rzi rzi-times"></span>
                     </a>
                 }
@@ -153,31 +153,16 @@
 
     object reference;
 
-    async Task CloseAsync()
-    {
-        closing = true;
-
-        StateHasChanged();
-
-        await Task.Delay(500);
-
-        Close();
-    }
-
     void Close()
     {
         Service.Close();
     }
 
-    bool closing = false;
-
     string CssClass
     {
         get
         {
-            var classList = ClassList.Create("rz-dialog")
-                .Add("rz-open", !closing)
-                .Add("rz-close", closing)
+            var classList = ClassList.Create("rz-dialog rz-open")
                 .Add(Dialog.Options.CssClass);
             
             return classList.ToString();
