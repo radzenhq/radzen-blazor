@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -130,13 +131,17 @@ namespace Radzen.Blazor
         [Parameter]
         public string CollapseAriaLabel { get; set; } = null;
         
-        string contentStyle = "display: block;";
         string summaryContentStyle = "display: none";
 
         async System.Threading.Tasks.Task Toggle(MouseEventArgs args)
         {
+            closing = !collapsed;
+
+            StateHasChanged();
+
+            await Task.Delay(100);
+
             collapsed = !collapsed;
-            contentStyle = collapsed ? "display: none;" : "display: block;";
             summaryContentStyle = !collapsed ? "display: none" : "display: block";
 
             if (collapsed)
@@ -150,6 +155,15 @@ namespace Radzen.Blazor
 
             StateHasChanged();
         }
+
+        string ContentStyle => !collapsed || closing == false ? "" : "display: none";
+
+        string ContentClass => ClassList.Create("rz-panel-content-wrapper")
+                                        .Add("rz-open", closing == false)
+                                        .Add("rz-close", closing == true)
+                                        .ToString();
+
+        bool? closing;
 
         /// <inheritdoc />
         protected override void OnInitialized()
@@ -175,7 +189,6 @@ namespace Radzen.Blazor
         /// <returns>Task.</returns>
         protected override Task OnParametersSetAsync()
         {
-            contentStyle = collapsed ? "display: none;" : "display: block;";
             summaryContentStyle = !collapsed ? "display: none" : "display: block";
 
             return base.OnParametersSetAsync();

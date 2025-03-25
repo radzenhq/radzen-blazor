@@ -31,11 +31,21 @@ $panel-shadow: none !default;
 
 .rz-panel-content {
   margin: var(--rz-panel-content-margin);
+  overflow: hidden;
 }
 
 .rz-panel-content-wrapper {
+  display: grid;
   &[aria-hidden='true'] {
     display: none;
+  }
+
+  &.rz-open {
+    animation: var(--rz-transition) rz-slide-down;
+  }
+
+  &.rz-close {
+    animation: var(--rz-transition) rz-slide-up;
   }
 }
 
