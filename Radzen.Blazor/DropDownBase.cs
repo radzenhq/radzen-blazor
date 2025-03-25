@@ -678,7 +678,32 @@ namespace Radzen
                     //
                 }
             }
-            else if (key == "Enter" || key == "NumpadEnter" || key == "Space")
+            else if(key == "Space")
+            {
+                preventKeydown = true;
+
+                if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
+                {
+                    var itemToSelect = items.ElementAtOrDefault(selectedIndex);
+
+                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, $"{searchText}".Trim());
+
+                    if (itemToSelect != null)
+                    {
+                        await OnSelectItem(itemToSelect, true);
+                    }
+                    var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
+
+                    if (popupOpened)
+                    {
+                        if (!Multiple)
+                        {
+                            await ClosePopup(key);
+                        }
+                    }
+                }
+            }
+            else if (key == "Enter" || key == "NumpadEnter")
             {
                 preventKeydown = true;
 
