@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
-using Radzen.Blazor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -654,7 +653,7 @@ namespace Radzen
             }
 
             var key = args.Code != null ? args.Code : args.Key;
-
+            
             if (!args.AltKey && (key == "ArrowDown" || key == "ArrowLeft" || key == "ArrowUp" || key == "ArrowRight"))
             {
                 preventKeydown = true;
@@ -679,7 +678,7 @@ namespace Radzen
                     //
                 }
             }
-            else if (key == "Enter" || key == "NumpadEnter")
+            else if (key == "Enter" || key == "NumpadEnter" || key == "Space")
             {
                 preventKeydown = true;
 
