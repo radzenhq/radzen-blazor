@@ -160,6 +160,18 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     transition: var(--rz-panel-menu-item-transition);
   }
 
+  .rz-navigation-menu-container {
+    display: grid;
+
+    &.rz-open {
+      animation: var(--rz-transition) rz-slide-down;
+    }
+
+    &.rz-close {
+      animation: var(--rz-transition) rz-slide-up;
+    }
+  }
+
   /* Second level items */
   .rz-navigation-menu {
     list-style: none;
