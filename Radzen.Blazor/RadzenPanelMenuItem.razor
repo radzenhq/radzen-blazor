@@ -58,11 +58,13 @@
         </div>
         @if (ChildContent != null)
         {
-            <ul class="rz-navigation-menu" style="@getItemStyle()">
-                <CascadingValue Value=this>
-                    @ChildContent
-                </CascadingValue>
-            </ul>
+            <div class=@ContainerClass style=@ContainerStyle>
+                <ul class="rz-navigation-menu">
+                    <CascadingValue Value=this>
+                        @ChildContent
+                    </CascadingValue>
+                </ul>
+            </div>
         }
     </li>
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -134,10 +135,18 @@ namespace Radzen.Blazor
                 Parent.CollapseAll(itemsToSkip);
             }
 
+            closing = ExpandedInternal;
+
+            await Task.Delay(100);
+
             ExpandedInternal = !ExpandedInternal;
+
             await ExpandedChanged.InvokeAsync(ExpandedInternal);
+
             StateHasChanged();
         }
+
+        bool? closing;
 
         internal async System.Threading.Tasks.Task Collapse()
         {
@@ -160,10 +169,12 @@ namespace Radzen.Blazor
             return $"{(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon ? "margin-inline-end:0px;" : "")}{(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : "")}";
         }
 
-        string getItemStyle()
-        {
-            return ExpandedInternal ? "" : "display:none";
-        }
+        string ContainerStyle => ExpandedInternal ? "" : "display: none";
+
+        string ContainerClass => ClassList.Create("rz-navigation-menu-container")
+                                     .Add("rz-open", closing == false)
+                                     .Add("rz-close", closing == true)
+                                     .ToString();
 
         void Expand()
         {
