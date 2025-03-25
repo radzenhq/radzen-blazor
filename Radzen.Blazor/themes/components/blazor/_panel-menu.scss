@@ -173,13 +173,14 @@ $panel-menu-toggle-icon-opacity: 1 !default;
 
   .rz-navigation-menu-container {
     display: grid;
+    transition: grid-template-rows var(--rz-transition);
 
     &.rz-open {
-      animation: var(--rz-transition) rz-slide-down;
+      grid-template-rows: 1fr;
     }
 
     &.rz-close {
-      animation: var(--rz-transition) rz-slide-up;
+      grid-template-rows: 0fr;
     }
   }
 
