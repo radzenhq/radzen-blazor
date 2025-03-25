@@ -45,7 +45,7 @@
         </div>
         @if (IsSelected(i, item))
         {
-            <div class="rz-accordion-content-wrapper" role="tabpanel"
+            <div class="rz-accordion-content-wrapper rz-open" role="tabpanel"
                  id="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-hidden="false" aria-labelledby="@($"rz-accordiontab-{items.IndexOf(item)}")">
                 <div class="rz-accordion-content" @onkeydown:stopPropagation>
                     @item.ChildContent

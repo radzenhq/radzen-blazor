@@ -141,6 +141,8 @@ namespace Radzen.Blazor
 
             await Task.Delay(100);
 
+            closing = null;
+
             collapsed = !collapsed;
             summaryContentStyle = !collapsed ? "display: none" : "display: block";
 

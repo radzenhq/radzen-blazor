@@ -141,6 +141,8 @@ namespace Radzen.Blazor
 
             await Task.Delay(100);
 
+            closing = null;
+
             ExpandedInternal = !ExpandedInternal;
 
             await ExpandedChanged.InvokeAsync(ExpandedInternal);
@@ -160,11 +162,12 @@ namespace Radzen.Blazor
             }
         }
 
-        string getStyle()
-        {
-            string deg = ExpandedInternal ? "180" : "0";
-            return $@"transform: rotate({deg}deg);";
-        }
+        string ToggleClass => ClassList.Create("notranslate rzi rz-navigation-item-icon-children")
+                            .Add("rz-open", closing == false)
+                            .Add("rz-close", closing == true)
+                            .Add("rz-open", ExpandedInternal)
+                            .Add("rz-close", !ExpandedInternal)
+                            .ToString();
 
         string getIconStyle()
         { 

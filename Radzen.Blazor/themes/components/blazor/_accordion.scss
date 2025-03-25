@@ -121,8 +121,16 @@ $accordion-shadow: none !default;
   overflow: hidden;
 }
 
+.rz-accordion-content-wrapper {
+  display: grid;
+  &.rz-open {
+    animation: var(--rz-transition) rz-slide-down;
+  }
+}
+
 .rz-accordion-content {
   font-size: var(--rz-accordion-content-font-size);
+  overflow: hidden;
   background-color: var(--rz-accordion-item-background-color);
   padding-block: var(--rz-accordion-content-padding-block);
   padding-inline: var(--rz-accordion-content-padding-inline);
