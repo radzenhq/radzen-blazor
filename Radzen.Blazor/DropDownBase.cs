@@ -693,14 +693,6 @@ namespace Radzen
                         await OnSelectItem(itemToSelect, true);
                     }
                     var popupOpened = await JSRuntime.InvokeAsync<bool>("Radzen.popupOpened", PopupID);
-
-                    if (popupOpened)
-                    {
-                        if (!Multiple)
-                        {
-                            await ClosePopup(key);
-                        }
-                    }
                 }
             }
             else if (key == "Enter" || key == "NumpadEnter")
