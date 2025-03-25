@@ -141,9 +141,6 @@ namespace Radzen.Blazor
 
             StateHasChanged();
         }
-
-        bool? closing;
-
         internal async System.Threading.Tasks.Task Collapse()
         {
             if (ExpandedInternal)
@@ -163,8 +160,6 @@ namespace Radzen.Blazor
         { 
             return $"{(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon ? "margin-inline-end:0px;" : "")}{(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : "")}";
         }
-
-        string ContainerStyle => ExpandedInternal || closing == false ? "" : "display: none";
 
         string ContainerClass => ClassList.Create("rz-navigation-menu-container")
                                      .Add("rz-open", ExpandedInternal)
