@@ -27,7 +27,7 @@
                 </a>
             }
         </div>
-        <div class=@ContentClass role="region" aria-hidden="false" style=@ContentStyle>
+        <div class=@ContentClass role="region" aria-hidden="false">
             <div class="rz-panel-content">
                 @ChildContent
             </div>
@@ -40,7 +40,7 @@
         </div>
         @if (SummaryTemplate != null)
         {
-            <div class="rz-panel-content-wrapper" role="region" aria-hidden="false" style="@summaryContentStyle">
+            <div class=@SummaryClass role="region" aria-hidden="false">
                 <div class="rz-panel-content rz-panel-content-summary">
                     @SummaryTemplate
                 </div>

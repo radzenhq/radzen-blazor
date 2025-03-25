@@ -131,20 +131,9 @@ namespace Radzen.Blazor
         [Parameter]
         public string CollapseAriaLabel { get; set; } = null;
         
-        string summaryContentStyle = "display: none";
-
-        async System.Threading.Tasks.Task Toggle(MouseEventArgs args)
+        async Task Toggle(MouseEventArgs args)
         {
-            closing = !collapsed;
-
-            StateHasChanged();
-
-            await Task.Delay(100);
-
-            closing = null;
-
             collapsed = !collapsed;
-            summaryContentStyle = !collapsed ? "display: none" : "display: block";
 
             if (collapsed)
             {
@@ -157,15 +146,15 @@ namespace Radzen.Blazor
 
             StateHasChanged();
         }
-
-        string ContentStyle => !collapsed || closing == false ? "" : "display: none";
-
         string ContentClass => ClassList.Create("rz-panel-content-wrapper")
-                                        .Add("rz-open", closing == false)
-                                        .Add("rz-close", closing == true)
+                                        .Add("rz-open", !collapsed)
+                                        .Add("rz-close", collapsed)
                                         .ToString();
 
-        bool? closing;
+        string SummaryClass => ClassList.Create("rz-panel-content-wrapper")
+                                        .Add("rz-open", collapsed)
+                                        .Add("rz-close", !collapsed)
+                                        .ToString();
 
         /// <inheritdoc />
         protected override void OnInitialized()
@@ -183,17 +172,6 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
-        }
-
-        /// <summary>
-        /// Called when parameters set asynchronous.
-        /// </summary>
-        /// <returns>Task.</returns>
-        protected override Task OnParametersSetAsync()
-        {
-            summaryContentStyle = !collapsed ? "display: none" : "display: block";
-
-            return base.OnParametersSetAsync();
         }
 
         bool preventKeyPress = false;
