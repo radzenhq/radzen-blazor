@@ -234,7 +234,7 @@ namespace Radzen.Blazor
 
         private void OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
-            IsOpen = !IsOpen;
+            IsOpen = false;
             StateHasChanged();
         }
 
