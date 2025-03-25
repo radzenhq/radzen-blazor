@@ -19,9 +19,9 @@
 }
 
 .rz-open {
-  animation: rz-open .3s;
+  animation: var(--rz-transition) rz-open;
 }
 
 .rz-close {
-  animation: rz-close .3s;
+  animation: var(--rz-transition) rz-close;
 }

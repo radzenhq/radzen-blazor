@@ -194,7 +194,7 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog {
   &.rz-open {
-    animation: rz-dialog-open .3s;
+    animation: var(--rz-transition) rz-dialog-open;
   }
 }
 
@@ -218,11 +218,12 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog-side-position-right {
   &.rz-open {
-    animation: rz-side-dialog-right-open .3s;
+    animation: var(--rz-transition) rz-side-dialog-right-open;
   }
 
   &.rz-close {
-    animation: rz-side-dialog-right-close .3s;
+    animation: var(--rz-transition) rz-side-dialog-right-close;
+    transform: translateX(100%);
   }
 }
 
@@ -246,11 +247,12 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog-side-position-top {
   &.rz-open {
-    animation: rz-side-dialog-top-open .3s;
+    animation: var(--rz-transition) rz-side-dialog-top-open;
   }
 
   &.rz-close {
-    animation: rz-side-dialog-top-close .3s;
+    animation: var(--rz-transition) rz-side-dialog-top-close;
+    transform: translateX(-100%);
   }
 }
 
@@ -274,11 +276,12 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog-side-position-bottom {
   &.rz-open {
-    animation: rz-side-dialog-bottom-open .3s;
+    animation: var(--rz-transition) rz-side-dialog-bottom-open;
   }
 
   &.rz-close {
-    animation: rz-side-dialog-bottom-close .3s;
+    animation: var(--rz-transition) rz-side-dialog-bottom-close;
+    transform: translateY(100%);
   }
 }
 
@@ -302,11 +305,12 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog-side-position-left {
   &.rz-open {
-    animation: rz-side-dialog-left-open .3s;
+    animation: var(--rz-transition) rz-side-dialog-left-open;
   }
 
   &.rz-close {
-    animation: rz-side-dialog-left-close .3s;
+    animation: var(--rz-transition) rz-side-dialog-left-close;
+    transform: translateX(-100%);
   }
 }
 
