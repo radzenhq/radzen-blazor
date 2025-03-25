@@ -29,9 +29,10 @@ $panel-shadow: none !default;
   justify-content: space-between;
 }
 
+
+
 .rz-panel-content {
   margin: var(--rz-panel-content-margin);
-  overflow: hidden;
 }
 
 .rz-panel-content-wrapper {
@@ -42,10 +43,17 @@ $panel-shadow: none !default;
 
   &.rz-open {
     animation: var(--rz-transition) rz-slide-down;
+
+    .rz-panel-content {
+      overflow: hidden;
+    }
   }
 
   &.rz-close {
     animation: var(--rz-transition) rz-slide-up;
+    .rz-panel-content {
+      overflow: hidden;
+    }
   }
 }
 

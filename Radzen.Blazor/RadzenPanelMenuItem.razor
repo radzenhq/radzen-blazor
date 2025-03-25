@@ -26,7 +26,7 @@
                     }
                     @if (items.Any() && Parent?.ShowArrow == true)
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
+                        <i class=@ToggleClass @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
                     }
                 </NavLink>
             }
@@ -51,7 +51,7 @@
                     }
                     @if (items.Any() && Parent?.ShowArrow == true)
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon-children" style="@getStyle()">keyboard_arrow_down</i>
+                        <i class=@ToggleClass>keyboard_arrow_down</i>
                     }
                 </div>
             }
