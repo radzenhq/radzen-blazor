@@ -604,16 +604,3 @@ svg.illustration {
     width: 100%;
     height: 100%;
 }
-
-.rz-navigation-menu-wrapper.rz-open {
-    display: block;
-    animation: slideDown .5s;
-}
-
-.rz-navigation-menu-wrapper.rz-close {
-    animation: slideUp .5s;
-}
-
-.rz-navigation-item {
-    overflow: hidden;
-}
