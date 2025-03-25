@@ -135,14 +135,6 @@ namespace Radzen.Blazor
                 Parent.CollapseAll(itemsToSkip);
             }
 
-            closing = ExpandedInternal;
-
-            StateHasChanged();
-
-            await Task.Delay(100);
-
-            closing = null;
-
             ExpandedInternal = !ExpandedInternal;
 
             await ExpandedChanged.InvokeAsync(ExpandedInternal);
@@ -163,8 +155,6 @@ namespace Radzen.Blazor
         }
 
         string ToggleClass => ClassList.Create("notranslate rzi rz-navigation-item-icon-children")
-                            .Add("rz-open", closing == false)
-                            .Add("rz-close", closing == true)
                             .Add("rz-open", ExpandedInternal)
                             .Add("rz-close", !ExpandedInternal)
                             .ToString();
@@ -177,8 +167,8 @@ namespace Radzen.Blazor
         string ContainerStyle => ExpandedInternal || closing == false ? "" : "display: none";
 
         string ContainerClass => ClassList.Create("rz-navigation-menu-container")
-                                     .Add("rz-open", closing == false)
-                                     .Add("rz-close", closing == true)
+                                     .Add("rz-open", ExpandedInternal)
+                                     .Add("rz-close", !ExpandedInternal)
                                      .ToString();
 
         void Expand()
