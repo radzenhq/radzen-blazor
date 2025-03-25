@@ -170,14 +170,15 @@ window.Radzen = {
     }
   },
   preventSpace: function (el) {
-    console.log("preventSpace function loaded");
-    el.addEventListener('keydown', function (e) {
-        if (e.keyCode === 32) {
-            console.log("Spacebar pressed, preventing default.");
-            e.preventDefault();
-            return false;
-        }
-    }, false);
+    var preventDefault = function (e) {
+      if (e.keyCode === 32) {
+        e.preventDefault();
+        return false;
+      }
+    };
+    if (el) {
+      el.addEventListener('keydown', preventDefault, false);
+    }
   },
   selectTab: function (id, index) {
     var el = document.getElementById(id);

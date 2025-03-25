@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.Web;
+using System.Collections.Generic;
+using System;
+using System.Xml.Linq;
 
 namespace Radzen.Blazor
 {
@@ -281,11 +283,16 @@ namespace Radzen.Blazor
                     if (!Disabled)
                     {
                         await JSRuntime.InvokeVoidAsync("Radzen.preventArrows", Element);
-                        var preventSpaceExists = await JSRuntime.InvokeAsync<bool>("Boolean", "(typeof preventSpace !== 'undefined')");
-                        if (preventSpaceExists)
+                        
+                        try
                         {
                             await JSRuntime.InvokeVoidAsync("Radzen.preventSpace", Element);
                         }
+                        catch(Exception)
+                        {
+                            //
+                        }
+
                     }
 
                     if (reload)
