@@ -137,6 +137,8 @@ namespace Radzen.Blazor
 
             closing = ExpandedInternal;
 
+            StateHasChanged();
+
             await Task.Delay(100);
 
             ExpandedInternal = !ExpandedInternal;
@@ -169,7 +171,7 @@ namespace Radzen.Blazor
             return $"{(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon ? "margin-inline-end:0px;" : "")}{(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : "")}";
         }
 
-        string ContainerStyle => ExpandedInternal ? "" : "display: none";
+        string ContainerStyle => ExpandedInternal || closing == false ? "" : "display: none";
 
         string ContainerClass => ClassList.Create("rz-navigation-menu-container")
                                      .Add("rz-open", closing == false)
