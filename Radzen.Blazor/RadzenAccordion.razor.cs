@@ -112,13 +112,8 @@ namespace Radzen.Blazor
         }
 
         string ToggleIconClass(RadzenAccordionItem item) => ClassList.Create("notranslate rz-accordion-toggle-icon rzi")
-                                               .Add("rz-open", item.GetSelected())
-                                               .Add("rz-close", !item.GetSelected())
-                                               .ToString();
-
-        string ContentWrapperClass(RadzenAccordionItem item) => ClassList.Create("rz-accordion-content-wrapper")
-                                               .Add("rz-open", item.GetSelected())
-                                               .Add("rz-close", !item.GetSelected())
+                                               .Add("rz-state-expanded", item.GetSelected())
+                                               .Add("rz-state-collapsed", !item.GetSelected())
                                                .ToString();
 
         /// <summary>
