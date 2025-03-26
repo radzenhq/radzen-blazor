@@ -79,12 +79,11 @@ public partial class Expander : ComponentBase
     }
 
     /// <inheritdoc/>
-    protected override void OnAfterRender(bool firstRender)
+    protected override void OnInitialized()
     {
-        if (firstRender && Expanded)
+        if (Expanded)
         {
             state = ExpandState.Expanded;
-            StateHasChanged();
         }
     }
 
