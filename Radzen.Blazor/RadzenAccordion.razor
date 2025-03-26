@@ -1,4 +1,5 @@
 ﻿@using System.Linq
+@using Radzen.Blazor.Rendering
 
 @inherits RadzenComponent
 
@@ -36,12 +37,12 @@
                 }
             </a>
         </div>
-        <div class=@ContentWrapperClass(item) role="tabpanel"
-                id="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-hidden="false" aria-labelledby="@($"rz-accordiontab-{items.IndexOf(item)}")">
+        <Expander Expanded=@item.GetSelected() role="tabpanel"
+                id="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-labelledby="@($"rz-accordiontab-{items.IndexOf(item)}")">
             <div class="rz-accordion-content" @onkeydown:stopPropagation>
                 @item.ChildContent
             </div>
-        </div>
+        </Expander>
     }
 </div>
 }

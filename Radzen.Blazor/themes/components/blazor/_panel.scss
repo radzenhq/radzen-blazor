@@ -31,20 +31,6 @@ $panel-shadow: none !default;
 
 .rz-panel-content {
   margin: var(--rz-panel-content-margin);
-  overflow: hidden;
-}
-
-.rz-panel-content-wrapper {
-  display: grid;
-  transition: grid-template-rows var(--rz-transition);
-
-  &.rz-open {
-    grid-template-rows: 1fr;
-  }
-
-  &.rz-close {
-    grid-template-rows: 0fr;
-  }
 }
 
 .rz-panel-title {

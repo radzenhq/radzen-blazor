@@ -152,19 +152,14 @@ namespace Radzen.Blazor
         }
 
         string ToggleClass => ClassList.Create("notranslate rzi rz-navigation-item-icon-children")
-                            .Add("rz-open", ExpandedInternal)
-                            .Add("rz-close", !ExpandedInternal)
+                            .Add("rz-state-expanded", ExpandedInternal)
+                            .Add("rz-state-collapsed", !ExpandedInternal)
                             .ToString();
 
         string getIconStyle()
         { 
             return $"{(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon ? "margin-inline-end:0px;" : "")}{(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : "")}";
         }
-
-        string ContainerClass => ClassList.Create("rz-navigation-menu-container")
-                                     .Add("rz-open", ExpandedInternal)
-                                     .Add("rz-close", !ExpandedInternal)
-                                     .ToString();
 
         void Expand()
         {

@@ -104,12 +104,12 @@ $accordion-shadow: none !default;
     margin-inline: var(--rz-accordion-toggle-icon-margin-inline);
   }
 
-  &.rz-open {
+  &.rz-state-expanded {
     transform: rotate(180deg);
     transition: transform var(--rz-transition);
   }
 
-  &.rz-close {
+  &.rz-state-collapsed {
     transform: rotate(0);
     transition: transform var(--rz-transition);
   }
@@ -119,23 +119,8 @@ $accordion-shadow: none !default;
   overflow: hidden;
 }
 
-.rz-accordion-content-wrapper {
-  display: grid;
-  overflow: hidden;
-  transition: grid-template-rows var(--rz-transition);
-
-  &.rz-open {
-    grid-template-rows: 1fr;
-  }
-
-  &.rz-close {
-    grid-template-rows: 0fr;
-  }
-}
-
 .rz-accordion-content {
   font-size: var(--rz-accordion-content-font-size);
-  overflow: hidden;
   background-color: var(--rz-accordion-item-background-color);
   padding-block: var(--rz-accordion-content-padding-block);
   padding-inline: var(--rz-accordion-content-padding-inline);
