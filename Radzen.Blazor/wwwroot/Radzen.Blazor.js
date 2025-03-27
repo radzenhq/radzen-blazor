@@ -2504,5 +2504,73 @@ window.Radzen = {
         tooltipContent.classList.remove('rz-top-chart-tooltip');
         tooltipContent.classList.remove('rz-bottom-chart-tooltip');
         tooltipContent.classList.add(tooltipContentClassName);
+    },
+    navigateTo: function (selector, scroll) {
+      if (selector.startsWith('#')) {
+        history.replaceState(null, '', window.location.pathname + selector);
+      }
+
+      if (scroll) {
+        const target = document.querySelector(selector);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
+        }
+      }
+    },
+    registerScrollListener: function (element, ref, selectors, selector) {
+      let currentSelector;
+
+      const elements = selectors.map(document.querySelector, document);
+      const container = document.querySelector(selector);
+
+      this.unregisterScrollListener(element);
+      element.scrollHandler = function () {
+        const containerTop = container.tagName === 'HTML' ? 0 : container.getBoundingClientRect().top;
+        const center = containerTop + container.clientHeight / 2;
+
+        let min = Number.MAX_SAFE_INTEGER;
+        let found = false;
+        let match;
+
+        for (let i = 0; i < elements.length; i++) {
+          const element = elements[i];
+
+          if (!element) {
+            continue;
+          }
+
+          const rect = element.getBoundingClientRect();
+          const diff = Math.abs(rect.top - center);
+
+          if (!found && rect.top < center) {
+            found = true;
+            min = diff;
+            match = selectors[i];
+            continue;
+          }
+
+          if (found && rect.top >= center) {
+            continue;
+          }
+
+          if (diff < min) {
+            min = diff;
+            match = selectors[i];
+          }
+        }
+
+        if (match !== currentSelector) {
+          currentSelector = match;
+          Radzen.navigateTo(match, false);
+          ref.invokeMethodAsync('ScrollIntoView', match);
+        }
+      };
+
+      document.addEventListener('scroll', element.scrollHandler, true);
+      window.addEventListener('resize', element.scrollHandler, true);
+    },
+    unregisterScrollListener: function (element) {
+      document.removeEventListener('scroll', element.scrollHandler, true);
+      window.removeEventListener('resize', element.scrollHandler, true);
     }
 };
