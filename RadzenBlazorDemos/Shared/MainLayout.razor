@@ -109,6 +109,13 @@
         <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
     </div>
     <div style="flex: 1; overflow: auto">
+<RadzenToc>
+    <RadzenTocItem Text="Button">
+        <RadzenTocItem Text="Filled Buttons" Path="#filled-buttons"></RadzenTocItem>
+        <RadzenTocItem Text="Flat Buttons" Path="#flat-buttons"></RadzenTocItem>
+        <RadzenTocItem Text="Outlined Buttons" Path="#outlined-buttons"></RadzenTocItem>
+    </RadzenTocItem>
+</RadzenToc>
     <RadzenPanelMenu Match="NavLinkMatch.Prefix">
         @foreach (var category in examples)
         {
