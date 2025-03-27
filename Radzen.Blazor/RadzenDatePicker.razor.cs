@@ -92,7 +92,7 @@ namespace Radzen.Blazor
             var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour, CurrentDate.Minute, CurrentDate.Second);
 
             hour = newValue.Hour;
-            await UpdateValueFromTime(newValue);
+            await UpdateValueFromTime(newValue, false);
         }
 
         int GetHour24FormatFrom12Format(int hour12)
@@ -146,12 +146,17 @@ namespace Radzen.Blazor
             seconds = Math.Max(Math.Min(v, 59), 0);
         }
 
-        async Task UpdateValueFromTime(DateTime newValue)
+        private DateTime valueInPopup;
+        async Task UpdateValueFromTime(DateTime newValue, bool updateParent)
         {
+            valueInPopup = newValue;
             if (ShowTimeOkButton)
             {
-                DateTimeValue = newValue;
-                CurrentDate = newValue;
+                if (updateParent)
+                {
+                    DateTimeValue = newValue;
+                    CurrentDate = newValue;
+                }
             }
             else
             {
@@ -177,7 +182,7 @@ namespace Radzen.Blazor
             var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, newHour > 23 || newHour < 0 ? 0 : newHour, newMinute, newSecond);
 
             hour = newValue.Hour;
-            await UpdateValueFromTime(newValue);
+            await UpdateValueFromTime(newValue, false);
         }
 
         async Task UpdateMinutes(int v)
@@ -185,7 +190,7 @@ namespace Radzen.Blazor
             var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, CurrentDate.Hour, v, CurrentDate.Second);
 
             minutes = newValue.Minute;
-            await UpdateValueFromTime(newValue);
+            await UpdateValueFromTime(newValue, false);
         }
 
         async Task UpdateSeconds(int v)
@@ -193,7 +198,7 @@ namespace Radzen.Blazor
             var newValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, CurrentDate.Hour, CurrentDate.Minute, v);
 
             seconds = newValue.Second;
-            await UpdateValueFromTime(newValue);
+            await UpdateValueFromTime(newValue, false);
         }
 
         async Task OkClick(bool shouldClose = true)
