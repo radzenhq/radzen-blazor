@@ -1374,6 +1374,11 @@ namespace RadzenBlazorDemos
                     Description = "Demonstration and configuration of the RadzenButton Blazor component.",
                     Path = "button",
                     Icon = "\ue72f"
+                    Toc = [
+                        new () { Text = "Filled Buttons", Anchor = "#filled-buttons" },
+                        new () { Text = "Flat Buttons", Anchor = "#flat-buttons" },
+                        new () { Text = "Outlined Buttons", Anchor = "#outlined-buttons" },
+                    ]
                 },
                 new Example
                 {
