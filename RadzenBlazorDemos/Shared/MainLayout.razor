@@ -227,18 +227,14 @@
 
         UriHelper.LocationChanged += OnLocationChanged;
 
-        var path = new Uri(UriHelper.Uri).GetComponents(UriComponents.Path, UriFormat.Unescaped);
-
-        example = examples.SelectManyRecursive(e => e.Children ?? []).FirstOrDefault(e => e.Path?.Equals(path) == true);
+        example = ExampleService.FindCurrent(new Uri(UriHelper.Uri));
 
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
     }
 
     void OnLocationChanged(object sender, LocationChangedEventArgs args)
     {
-        var path = new Uri(args.Location).GetComponents(UriComponents.Path, UriFormat.Unescaped);
-
-        var currentExample = examples.SelectManyRecursive(e => e.Children ?? []).FirstOrDefault(e => e.Path?.Equals(path) == true);
+        var currentExample = ExampleService.FindCurrent(new Uri(args.Location));
 
         if (currentExample != example)
         {
