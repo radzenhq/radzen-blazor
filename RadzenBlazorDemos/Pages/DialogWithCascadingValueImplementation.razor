@@ -1,0 +1,57 @@
+﻿<div class="rz-p-12 rz-text-align-center">
+	<RadzenButton Text="Set title (static text)" ButtonStyle="ButtonStyle.Primary" Click=@SetTitle />
+	<RadzenButton Text="Set title (RenderFragment)" ButtonStyle="ButtonStyle.Primary" Click=@SetTitleContent />
+	<RadzenButton Text="Update counter" ButtonStyle="ButtonStyle.Secondary" Click=@UpdateCounter />
+	<hr />
+	<RadzenButton Text="Toggle close" ButtonStyle="ButtonStyle.Primary" Click=@ToggleClose />
+	<RadzenButton Text="Toggle close on overlay click" ButtonStyle="ButtonStyle.Primary" Click=@ToggleCloseOnOverlayClick />
+</div>
+
+@code {
+	[CascadingParameter] private Dialog _dialog { get; set; }
+	[Inject] private DialogService _dialogService { get; set; }
+
+	int _counter { get; set; }
+
+	void SetTitle()
+	{
+		// Set dialog title (static text)
+		_dialog.Title = $"Title with a counter: {_counter}";
+		_dialog.Options.TitleContent = null;
+	}
+	void SetTitleContent()
+	{
+		// Set dialog title (RenderFragment)
+		_dialog.Title = null;
+		_dialog.Options.TitleContent = service => @<RadzenCard>
+			<RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+				<RadzenText TextStyle="TextStyle.Subtitle1">
+					Title with a counter: @_counter
+				</RadzenText>
+				<RadzenRow>
+					<RadzenButton Text="Update counter from title" ButtonStyle="ButtonStyle.Secondary" Click=@UpdateCounter />
+				</RadzenRow>
+			</RadzenStack>
+		</RadzenCard>
+	;
+	}
+
+	void UpdateCounter()
+	{
+		// Increment the counter
+		_counter++;
+
+		// Notify Blazor that the state has changed and the component needs to be re-rendered (in case of a RenderFragment)
+		_dialogService.Refresh();
+	}
+
+	void ToggleClose()
+	{
+		_dialog.Options.ShowClose = !_dialog.Options.ShowClose;
+	}
+
+	void ToggleCloseOnOverlayClick()
+	{
+		_dialog.Options.CloseDialogOnOverlayClick = !_dialog.Options.CloseDialogOnOverlayClick;
+	}
+}

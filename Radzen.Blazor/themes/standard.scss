@@ -401,6 +401,11 @@ $timepicker-button-background-color: var(--rz-primary) !default;
 $timepicker-button-color: var(--rz-on-primary) !default;
 $timepicker-button-border-radius: var(--rz-border-radius) !default;
 
+// TimeSpanPicker
+$timespanpicker-trigger-icon-color: var(--rz-text-color) !default;
+$timespanpicker-trigger-icon-hover-color: var(--rz-text-title-color) !default;
+$timespanpicker-popup-shadow: $rz-shadow-3 !default;
+
 // Fieldset
 $fieldset-border: var(--rz-border-base-300) !default;
 $fieldset-border-radius: var(--rz-border-radius) !default;

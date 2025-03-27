@@ -1,0 +1,46 @@
+@page "/markdown"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Markdown
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Markdown</strong> component.
+</RadzenText>
+
+<RadzenExample ComponentName="Markdown" Example="MarkdownConfig">
+    <MarkdownConfig />
+</RadzenExample>
+
+<RadzenAlert AlertStyle="AlertStyle.Light" class="rz-mt-4">
+Blazor tags inside RadzenMarkdown will be processed. To avoid that you can use a multline string literal.
+    <pre><code>
+&lt;RadzenMarkdown&gt;
+```
+@@($@@"&lt;RadzenButton Click=@@@@Click /&gt;
+@@@@code {
+    public void Click()
+    {
+        Console.WriteLine(""Button clicked"");
+    }
+}
+```
+&lt;/RadzenMarkdown&gt;
+    </code></pre>
+</RadzenAlert>
+
+<RadzenText Anchor="markdown#text" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Get and set the text
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Text</code> property to get or set the markdown content of <strong>RadzenMarkdown</strong>.
+</RadzenText>
+<RadzenExample ComponentName="Markdown" Example="MarkdownText">
+    <MarkdownText />
+</RadzenExample>
+
+<RadzenText Anchor="markdown#blazor" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+Markdown with Blazor components inside
+</RadzenText>
+<RadzenExample ComponentName="Markdown" Example="MarkdownBlazor">
+    <MarkdownBlazor />
+</RadzenExample>

@@ -65,3 +65,16 @@
 <RadzenExample ComponentName="Dialog" Example="DialogCss">
     <DialogCss />
 </RadzenExample>
+
+<RadzenText Anchor="dialog#cascading-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Update dialog properties
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Use the <code>Dialog</code> 
+    <RadzenLink Text="Cascading Value" Path="https://learn.microsoft.com/en-us/aspnet/core/blazor/components/cascading-values-and-parameters#cascadingvalue-component" target="_blank" />
+    to update dialog properties
+</RadzenText>
+
+<RadzenExample ComponentName="Dialog" Example="DialogWithCascadingValueCaller" AdditionalSourceCodePages=@(new List<string>() { "DialogWithCascadingValueImplementation.razor" })>
+    <DialogWithCascadingValueCaller />
+</RadzenExample>

@@ -67,6 +67,7 @@ namespace Radzen.Blazor
         /// Gets or sets the additional content to be rendered in place of the default navigation buttons in the scheduler.
         /// This property allows for complete customization of the navigation controls, replacing the native date navigation buttons (such as year, month, and day) with user-defined content or buttons.
         /// Use this to add custom controls or interactive elements that better suit your application's requirements.
+        /// This requires that the <c>ShowHeader</c> parameter to be set to true (enabled by default).
         /// </summary>
         /// <value>The custom navigation template to replace default navigation buttons.</value>
         [Parameter]

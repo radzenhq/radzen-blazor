@@ -177,6 +177,12 @@ namespace Radzen.Blazor
                 shouldRefresh = true;
             }
 
+            if (parameters.DidParameterChange(nameof(Visible), Visible))
+            {
+                _visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
+                shouldRefresh = true;
+            }
+
             await base.SetParametersAsync(parameters);
 
             if (shouldRefresh)

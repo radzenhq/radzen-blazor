@@ -1,0 +1,188 @@
+$timespanpicker-line-height: 1.25rem !default;
+$timespanpicker-trigger-icon-width: var(--rz-icon-size) !default;
+$timespanpicker-trigger-icon-height: $timespanpicker-trigger-icon-width !default;
+$timespanpicker-trigger-icon-color: var(--rz-input-value-color) !default;
+$timespanpicker-trigger-icon-hover-color: var(--rz-input-value-color) !default;
+$timespanpicker-focus-outline: var(--rz-outline-focus) !default;
+$timespanpicker-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
+$timespanpicker-popup-border: var(--rz-border-normal) !default;
+$timespanpicker-popup-shadow: 0 6px 14px 0 rgba(0, 0, 0, 0.06) !default;
+$timespanpicker-popup-margin: 0 !default;
+$timespanpicker-popup-width: fit-content !default;
+$timespanpicker-panel-background-color: var(--rz-base-background-color) !default;
+$timespanpicker-panel-padding: 0.5rem !default;
+$timespanpicker-panel-gap: 0.5rem !default;
+$timespanpicker-panel-unit-gap: 0 !default;
+$timespanpicker-panel-field-min-width: 4rem !default;
+$timespanpicker-unit-label-color: var(--rz-text-tertiary-color) !default;
+
+/* input field */
+
+.rz-timespanpicker {
+  display: inline-block;
+  position: relative;
+
+  .rz-readonly {
+    cursor: pointer;
+  }
+
+  > .rz-inputtext {
+    @extend %input;
+    width: 100%;
+    line-height: var(--rz-timespanpicker-line-height);
+  }
+
+  &:has(.rz-timespanpicker-trigger) > .rz-inputtext {
+    padding-inline-end: calc(1rem + var(--rz-timespanpicker-trigger-icon-width));
+  }
+
+  &:has(.rz-dropdown-clear-icon) > .rz-inputtext {
+    padding-inline-end: calc(1rem + var(--rz-dropdown-trigger-icon-width));
+  }
+
+  &:has(.rz-timespanpicker-trigger):has(.rz-dropdown-clear-icon) > .rz-inputtext {
+    padding-inline-end: calc(var(--rz-dropdown-trigger-icon-width) + 1rem + var(--rz-timespanpicker-trigger-icon-width));
+  }
+
+  &:not(.rz-state-disabled) {
+    &:hover {
+      .rz-timespanpicker-trigger {
+        box-shadow: none;
+        color: var(--rz-timespanpicker-trigger-icon-hover-color);
+      }
+    }
+  }
+
+  &.rz-state-disabled {
+    > .rz-inputtext {
+      color: var(--rz-input-disabled-color);
+      box-shadow: var(--rz-input-disabled-shadow);
+      background-color: var(--rz-input-disabled-background-color);
+      border: var(--rz-input-disabled-border);
+      opacity: var(--rz-input-disabled-opacity);
+
+      &::placeholder {
+        color: var(--rz-input-disabled-placeholder-color);
+      }
+    }
+  }
+
+  &:not(:has(.rz-timespanpicker-trigger)) .rz-dropdown-clear-icon {
+    inset-inline-end: 0.5rem;
+  }
+}
+
+/* popup trigger button */
+
+.rz-timespanpicker-trigger {
+  box-shadow: none;
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-end: 0.625rem;
+  transform: translateY(-50%);
+  background-color: transparent;
+  padding: 0;
+  vertical-align: text-top;
+
+  &.rz-state-disabled {
+    border: none;
+    box-shadow: none;
+    cursor: initial;
+    opacity: 1;
+    color: var(--rz-input-disabled-color);
+  }
+
+  color: var(--rz-timespanpicker-trigger-icon-color);
+  width: var(--rz-timespanpicker-trigger-icon-width);
+  height: var(--rz-timespanpicker-trigger-icon-height);
+  font-size: var(--rz-timespanpicker-trigger-icon-height);
+
+  &:not(.rz-state-disabled) {
+    &:hover {
+      &:not(:active),
+      &:active {
+      background-color: transparent;
+      }
+    }
+
+    &:active {
+      box-shadow: none !important;
+      background-image: none !important;
+    }
+  }
+
+  .rzi-timespan {
+    font-size: inherit;
+    vertical-align: top;
+  }
+
+  .rzi-timespan:before {
+    content: 'timer';
+  }
+
+  .rz-button-text {
+    display: none;
+  }
+}
+
+/* panel */
+
+.rz-timespanpicker-inline {
+  border: var(--rz-input-border);
+  border-radius: var(--rz-border-radius);
+  background-color: var(--rz-timespanpicker-panel-background-color);
+  overflow: auto;
+}
+
+.rz-timespanpicker-popup-container {
+  display: none;
+  box-sizing: content-box;
+  position: absolute;
+  width: var(--rz-timespanpicker-popup-width);
+  margin: var(--rz-timespanpicker-popup-margin);
+  box-shadow: var(--rz-timespanpicker-popup-shadow);
+  border: var(--rz-timespanpicker-popup-border);
+  border-radius: var(--rz-border-radius);
+  background-color: var(--rz-timespanpicker-panel-background-color);
+}
+
+.rz-timespanpicker-panel {
+  padding: var(--rz-timespanpicker-panel-padding);
+}
+
+.rz-timespanpicker-panel, .rz-timespanpicker-panel-fieldcontainer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--rz-timespanpicker-panel-gap);
+}
+
+.rz-timespanpicker-panel-fieldwithunit {
+  display: flex;
+  flex-flow: column;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--rz-timespanpicker-panel-unit-gap);
+  width: min-content;
+}
+
+.rz-timespanpicker-unit-label {
+  color: var(--rz-timespanpicker-unit-label-color);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+
+.rz-timespanpicker-unitvaluepicker {
+  width: fit-content;
+  min-width: var(--rz-timespanpicker-panel-field-min-width);
+}
+
+.rz-timespanpicker-signpicker {
+  align-self: stretch;
+  
+  > .rz-button {
+    flex: 1;
+    --rz-selectbar-border-radius: var(--rz-input-border-radius);
+  }
+}

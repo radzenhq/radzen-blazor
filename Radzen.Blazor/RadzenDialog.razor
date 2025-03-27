@@ -28,7 +28,7 @@
                 }
             </div>
         }
-        <div class="rz-dialog-side-content" style="@sideDialogOptions.Style">
+        <div class="@SideDialogContentCssClass" style="@sideDialogOptions.Style">
             @sideDialogContent
         </div>
     </aside>
@@ -46,6 +46,15 @@
 }
 
 @code {
+    string SideDialogContentCssClass
+    {
+        get
+        {
+            var baseCss = "rz-dialog-side-content";
+            return string.IsNullOrEmpty(sideDialogOptions.ContentCssClass) ? baseCss : $"{baseCss} {sideDialogOptions.ContentCssClass}";
+        }
+
+    }
     [Inject] 
     DialogService Service { get; set; }
 

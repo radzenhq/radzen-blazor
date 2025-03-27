@@ -2,9 +2,11 @@
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Radzen
@@ -326,14 +328,19 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="childContent">The content displayed in the dialog.</param>
         /// <param name="options">The dialog options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public virtual Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
+        public virtual Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null, CancellationToken? cancellationToken = null)
         {
             var task = new TaskCompletionSource<dynamic>();
+
+            // register the cancellation token
+            if (cancellationToken.HasValue)
+                cancellationToken.Value.Register(() => task.TrySetCanceled());
+
             tasks.Add(task);
 
-            options = options ?? new DialogOptions();
-
+            options ??= new DialogOptions();
             options.ChildContent = childContent;
 
             OpenDialog<object>(title, null, options);
@@ -347,16 +354,20 @@ namespace Radzen
         /// <param name="titleContent">The content displayed in the title bar of the dialog.</param>
         /// <param name="childContent">The content displayed in the dialog.</param>
         /// <param name="options">The dialog options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public virtual Task<dynamic> OpenAsync(RenderFragment<DialogService> titleContent, RenderFragment<DialogService> childContent, DialogOptions options = null)
+        public virtual Task<dynamic> OpenAsync(RenderFragment<DialogService> titleContent, RenderFragment<DialogService> childContent, DialogOptions options = null, CancellationToken? cancellationToken = null)
         {
             var task = new TaskCompletionSource<dynamic>();
+
+            // register the cancellation token
+            if (cancellationToken.HasValue)
+                cancellationToken.Value.Register(() => task.TrySetCanceled());
+            
             tasks.Add(task);
 
-            options = options ?? new DialogOptions();
-
+            options ??= new DialogOptions();
             options.ChildContent = childContent;
-
             options.TitleContent = titleContent;
 
             OpenDialog<object>(null, null, options);
@@ -384,33 +395,23 @@ namespace Radzen
         /// </summary>
         protected List<object> dialogs = new List<object>();
 
-        private void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
+        internal void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
         {
             dialogs.Add(new object());
-            OnOpen?.Invoke(title, typeof(T), parameters, new DialogOptions()
-            {
-                Width = options != null && !string.IsNullOrEmpty(options.Width) ? options.Width : "600px",
-                Left = options != null && !string.IsNullOrEmpty(options.Left) ? options.Left : "",
-                Top = options != null && !string.IsNullOrEmpty(options.Top) ? options.Top : "",
-                Bottom = options != null && !string.IsNullOrEmpty(options.Bottom) ? options.Bottom : "",
-                Height = options != null && !string.IsNullOrEmpty(options.Height) ? options.Height : "",
-                ShowTitle = options != null ? options.ShowTitle : true,
-                ShowClose = options != null ? options.ShowClose : true,
-                Resizable = options != null ? options.Resizable : false,
-                Draggable = options != null ? options.Draggable : false,
-                ChildContent = options?.ChildContent,
-                TitleContent = options?.TitleContent,
-                Style = options != null ? options.Style : "",
-                AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
-                CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
-                CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
-                CssClass = options != null ? options.CssClass : "",
-                WrapperCssClass = options != null ? options.WrapperCssClass : "",
-                CloseTabIndex = options != null ? options.CloseTabIndex : 0,
-                ContentCssClass = options != null ? options.ContentCssClass : "",
-                Resize = options?.Resize,
-                Drag = options?.Drag
-            });
+
+            // Validate and set default values for the dialog options
+            options ??= new();
+			options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "600px";
+			options.Left = !String.IsNullOrEmpty(options.Left) ? options.Left : "";
+			options.Top = !String.IsNullOrEmpty(options.Top) ? options.Top : "";
+			options.Bottom = !String.IsNullOrEmpty(options.Bottom) ? options.Bottom : "";
+			options.Height = !String.IsNullOrEmpty(options.Height) ? options.Height : "";
+			options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
+			options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? options.CssClass : "";
+			options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? options.WrapperCssClass : "";
+			options.ContentCssClass = !String.IsNullOrEmpty(options.ContentCssClass) ? options.ContentCssClass : "";
+
+            OnOpen?.Invoke(title, typeof(T), parameters, options);
         }
 
         /// <summary>
@@ -451,30 +452,17 @@ namespace Radzen
         /// <param name="message">The message displayed to the user.</param>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null)
+        public virtual async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null, CancellationToken? cancellationToken = null)
         {
-            var dialogOptions = new DialogOptions()
-            {
-                Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "" : "",
-                Height = options != null ? options.Height : null,
-                Left = options != null ? options.Left : null,
-                Top = options != null ? options.Top : null,
-                Bottom = options != null ? options.Bottom : null,
-                ChildContent = options != null ? options.ChildContent : null,
-                ShowTitle = options != null ? options.ShowTitle : true,
-                ShowClose = options != null ? options.ShowClose : true,
-                Resizable = options != null ? options.Resizable : false,
-                Draggable = options != null ? options.Draggable : false,
-                Style = options != null ? options.Style : "",
-                AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
-                CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
-                CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
-                CssClass = options != null ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm",
-                WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
-                CloseTabIndex = options != null ? options.CloseTabIndex : 0,
-            };
-
+            // Validate and set default values for the dialog options
+            options ??= new();
+            options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : ""; // Width is set to 600px by default by OpenAsync
+            options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
+            options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm";
+            options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";    
+            
             return await OpenAsync(title, ds =>
             {
                 RenderFragment content = b =>
@@ -502,7 +490,7 @@ namespace Radzen
                     b.CloseElement();
                 };
                 return content;
-            }, dialogOptions);
+            }, options, cancellationToken);
         }
 
         /// <summary>
@@ -511,30 +499,17 @@ namespace Radzen
         /// <param name="message">The message displayed to the user.</param>
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions options = null)
+        public virtual async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions options = null, CancellationToken? cancellationToken = null)
         {
-            var dialogOptions = new DialogOptions()
-            {
-                Width = options != null ? !string.IsNullOrEmpty(options.Width) ? options.Width : "" : "",
-                Height = options != null ? options.Height : null,
-                Left = options != null ? options.Left : null,
-                Top = options != null ? options.Top : null,
-                Bottom = options != null ? options.Bottom : null,
-                ChildContent = options != null ? options.ChildContent : null,
-                ShowTitle = options != null ? options.ShowTitle : true,
-                ShowClose = options != null ? options.ShowClose : true,
-                Resizable = options != null ? options.Resizable : false,
-                Draggable = options != null ? options.Draggable : false,
-                Style = options != null ? options.Style : "",
-                AutoFocusFirstElement = options != null ? options.AutoFocusFirstElement : true,
-                CloseDialogOnOverlayClick = options != null ? options.CloseDialogOnOverlayClick : false,
-                CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
-                CssClass = options != null ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert",
-                WrapperCssClass = options != null ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper",
-                ContentCssClass = options != null ? $"rz-dialog-content {options.ContentCssClass}" : "rz-dialog-content",
-                CloseTabIndex = options != null ? options.CloseTabIndex : 0,
-            };
+            // Validate and set default values for the dialog options
+            options ??= new();
+            options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";  
+            options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
+            options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
+            options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+            options.ContentCssClass = !String.IsNullOrEmpty(options.ContentCssClass) ? $"rz-dialog-content {options.ContentCssClass}" : "rz-dialog-content";
 
             return await OpenAsync(title, ds =>
             {
@@ -557,67 +532,204 @@ namespace Radzen
                     b.CloseElement();
                 };
                 return content;
-            }, dialogOptions);
+            }, options, cancellationToken);
         }
     }
 
-    /// <summary>
-    /// Base Class for dialog options
-    /// </summary>
-    public abstract class DialogOptionsBase
-    {
+	/// <summary>
+	/// Base Class for dialog options
+	/// </summary>
+	public abstract class DialogOptionsBase : INotifyPropertyChanged
+	{
+		/// <summary>
+		/// Occurs when a property value changes.
+		/// </summary>
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		/// <summary>
+		/// Raises the <see cref="PropertyChanged" /> event.
+		/// </summary>
+		/// <param name="propertyName">The name of the property that changed.</param>
+		protected virtual void OnPropertyChanged(string propertyName)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
+
+		private bool showTitle = true;
         /// <summary>
         /// Gets or sets a value indicating whether to show the title bar. Set to <c>true</c> by default.
         /// </summary>
-        /// <value><c>true</c> if title bar is shown; otherwise, <c>false</c>.</value>
-        public bool ShowTitle { get; set; } = true;
+        /// <value><c>true</c> if title bar is shown; otherwise, <c>false</c>. Default is <c>true</c>.</value>
+        public bool ShowTitle
+		{
+			get => showTitle;
+			set
+			{
+				if (showTitle != value)
+				{
+					showTitle = value;
+					OnPropertyChanged(nameof(ShowTitle));
+				}
+			}
+		}
 
+		private bool showClose = true;
         /// <summary>
         /// Gets or sets a value indicating whether to show the close button. Set to <c>true</c> by default.
         /// </summary>
-        /// <value><c>true</c> if the close button is shown; otherwise, <c>false</c>.</value>
-        public bool ShowClose { get; set; } = true;
-        /// <summary>
-        /// Gets or sets the width of the dialog.
-        /// </summary>
-        /// <value>The width.</value>
-        public string Width { get; set; }
-        /// <summary>
-        /// Gets or sets the height of the dialog.
-        /// </summary>
-        /// <value>The height.</value>
-        public string Height { get; set; }
-        /// <summary>
-        /// Gets or sets the CSS style of the dialog
-        /// </summary>
-        /// <value>The style.</value>
-        public string Style { get; set; }
+        /// <value><c>true</c> if the close button is shown; otherwise, <c>false</c>. Default is <c>true</c>.</value>
+        public bool ShowClose
+		{
+			get => showClose;
+			set
+			{
+				if (showClose != value)
+				{
+					showClose = value;
+					OnPropertyChanged(nameof(ShowClose));
+				}
+			}
+		}
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.
-        /// </summary>
-        /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
-        public bool CloseDialogOnOverlayClick { get; set; } = false;
+		private string width;
+		/// <summary>
+		/// Gets or sets the width of the dialog.
+		/// </summary>
+		/// <value>The width.</value>
+		public string Width
+		{
+			get => width;
+			set
+			{
+				if (width != value)
+				{
+					width = value;
+					OnPropertyChanged(nameof(Width));
+				}
+			}
+		}
 
-        /// <summary>
-        /// Gets or sets dialog box custom class
-        /// </summary>
-        public string CssClass { get; set; }
+		private string height;
+		/// <summary>
+		/// Gets or sets the height of the dialog.
+		/// </summary>
+		/// <value>The height.</value>
+		public string Height
+		{
+			get => height;
+			set
+			{
+				if (height != value)
+				{
+					height = value;
+					OnPropertyChanged(nameof(Height));
+				}
+			}
+		}
 
-        /// <summary>
-        /// Gets or sets the CSS classes added to the dialog's wrapper element.
-        /// </summary>
-        public string WrapperCssClass { get; set; }
+		private string style;
+		/// <summary>
+		/// Gets or sets the CSS style of the dialog
+		/// </summary>
+		/// <value>The style.</value>
+		public string Style
+		{
+			get => style;
+			set
+			{
+				if (style != value)
+				{
+					style = value;
+					OnPropertyChanged(nameof(Style));
+				}
+			}
+		}
 
-        /// <summary>
-        /// Gets or sets the CSS classes added to the dialog's content element.
-        /// </summary>
-        public string ContentCssClass { get; set; }
+		private bool closeDialogOnOverlayClick = false;
+		/// <summary>
+		/// Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.
+		/// </summary>
+		/// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
+		public bool CloseDialogOnOverlayClick
+		{
+			get => closeDialogOnOverlayClick;
+			set
+			{
+				if (closeDialogOnOverlayClick != value)
+				{
+					closeDialogOnOverlayClick = value;
+					OnPropertyChanged(nameof(CloseDialogOnOverlayClick));
+				}
+			}
+		}
 
-        /// <summary>
-        /// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.
-        /// </summary>
-        public int CloseTabIndex { get; set; } = 0;
+		private string cssClass;
+		/// <summary>
+		/// Gets or sets dialog box custom class
+		/// </summary>
+		public string CssClass
+		{
+			get => cssClass;
+			set
+			{
+				if (cssClass != value)
+				{
+					cssClass = value;
+					OnPropertyChanged(nameof(CssClass));
+				}
+			}
+		}
+
+		private string wrapperCssClass;
+		/// <summary>
+		/// Gets or sets the CSS classes added to the dialog's wrapper element.
+		/// </summary>
+		public string WrapperCssClass
+		{
+			get => wrapperCssClass;
+			set
+			{
+				if (wrapperCssClass != value)
+				{
+					wrapperCssClass = value;
+					OnPropertyChanged(nameof(WrapperCssClass));
+				}
+			}
+		}
+
+		private string contentCssClass;
+		/// <summary>
+		/// Gets or sets the CSS classes added to the dialog's content element.
+		/// </summary>
+		public string ContentCssClass
+		{
+			get => contentCssClass;
+			set
+			{
+				if (contentCssClass != value)
+				{
+					contentCssClass = value;
+					OnPropertyChanged(nameof(ContentCssClass));
+				}
+			}
+		}
+
+		private int closeTabIndex = 0;
+		/// <summary>
+		/// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.
+		/// </summary>
+		public int CloseTabIndex
+		{
+			get => closeTabIndex;
+			set
+			{
+				if (closeTabIndex != value)
+				{
+					closeTabIndex = value;
+					OnPropertyChanged(nameof(CloseTabIndex));
+				}
+			}
+        }
     }
 
     /// <summary>
@@ -625,25 +737,78 @@ namespace Radzen
     /// </summary>
     public class SideDialogOptions : DialogOptionsBase
     {
+        private string title;
+
         /// <summary>
         /// The title displayed on the dialog.
         /// </summary>
-        public string Title { get; set; }
+        public string Title
+        {
+            get => title;
+            set
+            {
+                if (title != value)
+                {
+                    title = value;
+                    OnPropertyChanged(nameof(Title));
+                }
+            }
+        }
+
+        private DialogPosition position = DialogPosition.Right;
 
         /// <summary>
         /// The Position on which the dialog will be positioned
         /// </summary>
-        public DialogPosition Position { get; set; } = DialogPosition.Right;
+        public DialogPosition Position
+        {
+            get => position;
+            set
+            {
+                if (position != value)
+                {
+                    position = value;
+                    OnPropertyChanged(nameof(Position));
+                }
+            }
+        }
+
+        private bool showMask = true;
+
 
         /// <summary>
-        /// Whether to show a mask on the background or not
+        /// Whether to show a mask on the background or not. Set to <c>true</c> by default.
         /// </summary>
-        public bool ShowMask { get; set; } = true;
+        public bool ShowMask
+        {
+            get => showMask;
+            set
+            {
+                if (showMask != value)
+                {
+                    showMask = value;
+                    OnPropertyChanged(nameof(ShowMask));
+                }
+            }
+        }
+
+        private bool autoFocusFirstElement = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether to focus the first focusable HTML element. Set to <c>true</c> by default.
         /// </summary>
-        public bool AutoFocusFirstElement { get; set; } = false;
+        public bool AutoFocusFirstElement
+        {
+            get => autoFocusFirstElement;
+            set
+            {
+                if (autoFocusFirstElement != value)
+                {
+                    autoFocusFirstElement = value;
+                    OnPropertyChanged(nameof(AutoFocusFirstElement));
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -669,80 +834,242 @@ namespace Radzen
         Bottom
     }
 
-    /// <summary>
-    /// Class DialogOptions.
-    /// </summary>
-    public class DialogOptions : DialogOptionsBase
-    {
-        /// <summary>
-        /// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
-        /// </summary>
-        /// <value><c>true</c> if resizable; otherwise, <c>false</c>.</value>
-        public bool Resizable { get; set; } = false;
+	/// <summary>
+	/// Class DialogOptions.
+	/// </summary>
+	public class DialogOptions : DialogOptionsBase
+	{
+		private bool resizable;
+		/// <summary>
+		/// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
+		/// </summary>
+		/// <value><c>true</c> if resizable; otherwise, <c>false</c>.</value>
+		public bool Resizable
+		{
+			get => resizable;
+			set
+			{
+				if (resizable != value)
+				{
+					resizable = value;
+					OnPropertyChanged(nameof(Resizable));
+				}
+			}
+		}
+
+        private Action<Size> resize;
 
         /// <summary>
         /// Gets or sets the change.
         /// </summary>
         /// <value>The change.</value>
-        public Action<Size> Resize { get; set; }
+        public Action<Size> Resize
+		{
+			get => resize;
+			set
+			{
+				if (resize != value)
+				{
+					resize = value;
+					OnPropertyChanged(nameof(Resize));
+				}
+			}
+		}
+
+        private bool draggable;
 
         /// <summary>
         /// Gets or sets a value indicating whether the dialog is draggable. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if draggable; otherwise, <c>false</c>.</value>
-        public bool Draggable { get; set; } = false;
+        public bool Draggable
+		{
+			get => draggable;
+			set
+			{
+				if (draggable != value)
+				{
+					draggable = value;
+					OnPropertyChanged(nameof(Draggable));
+				}
+			}
+		}
+
+        private Action<Point> drag;
 
         /// <summary>
         /// Gets or sets the change.
         /// </summary>
         /// <value>The change.</value>
-        public Action<Point> Drag { get; set; }
+        public Action<Point> Drag
+		{
+			get => drag;
+			set
+			{
+				if (drag != value)
+				{
+					drag = value;
+					OnPropertyChanged(nameof(Drag));
+				}
+			}
+		}
+
+        private string left;
 
         /// <summary>
         /// Gets or sets the X coordinate of the dialog. Maps to the <c>left</c> CSS attribute.
         /// </summary>
         /// <value>The left.</value>
-        public string Left { get; set; }
+        public string Left
+		{
+			get => left;
+			set
+			{
+				if (left != value)
+				{
+					left = value;
+					OnPropertyChanged(nameof(Left));
+				}
+			}
+		}
+
+        private string top;
+
         /// <summary>
         /// Gets or sets the Y coordinate of the dialog. Maps to the <c>top</c> CSS attribute.
         /// </summary>
         /// <value>The top.</value>
-        public string Top { get; set; }
+        public string Top
+		{
+			get => top;
+			set
+			{
+				if (top != value)
+				{
+					top = value;
+					OnPropertyChanged(nameof(Top));
+				}
+			}
+		}
+
+        private string bottom;
+
         /// <summary>
         /// Specifies the <c>bottom</c> CSS attribute.
         /// </summary>
         /// <value>The bottom.</value>
-        public string Bottom { get; set; }
+        public string Bottom
+		{
+			get => bottom;
+			set
+			{
+				if (bottom != value)
+				{
+					bottom = value;
+					OnPropertyChanged(nameof(Bottom));
+				}
+			}
+		}
+
+        private RenderFragment<DialogService> childContent;
+
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>
-        public RenderFragment<DialogService> ChildContent { get; set; }
+        public RenderFragment<DialogService> ChildContent
+		{
+			get => childContent;
+			set
+			{
+				if (childContent != value)
+				{
+					childContent = value;
+					OnPropertyChanged(nameof(ChildContent));
+				}
+			}
+		}
+
+        private RenderFragment<DialogService> titleContent;
+
         /// <summary>
         /// Gets or sets the title content.
         /// </summary>
         /// <value>The title content.</value>
-        public RenderFragment<DialogService> TitleContent { get; set; }
+        public RenderFragment<DialogService> TitleContent
+		{
+			get => titleContent;
+			set
+			{
+				if (titleContent != value)
+				{
+					titleContent = value;
+					OnPropertyChanged(nameof(TitleContent));
+				}
+			}
+		}
+
+        private bool autoFocusFirstElement = true;
+
         /// <summary>
-        /// Gets or sets a value indicating whether to focus the first focusable HTML element. Set to <c>true</c> by default.
+        /// Gets or sets a value indicating whether to focus the first focusable HTML element. 
         /// </summary>
-        public bool AutoFocusFirstElement { get; set; } = true;
+        /// <value><c>true</c> if the first focusable element is focused; otherwise, <c>false</c>. Default is <c>true</c>.</value>
+        public bool AutoFocusFirstElement
+		{
+			get => autoFocusFirstElement;
+			set
+			{
+				if (autoFocusFirstElement != value)
+				{
+					autoFocusFirstElement = value;
+					OnPropertyChanged(nameof(AutoFocusFirstElement));
+				}
+			}
+		}
+
+        private bool closeDialogOnEsc = true;
+
         /// <summary>
         /// Gets or sets a value indicating whether the dialog should be closed on ESC key press.
         /// </summary>
-        /// <value><c>true</c> if closeable; otherwise, <c>false</c>.</value>
-        public bool CloseDialogOnEsc { get; set; } = true;
-    }
+        /// <value><c>true</c> if closeable; otherwise, <c>false</c>. Default is <c>true</c>.</value>
+        public bool CloseDialogOnEsc
+		{
+			get => closeDialogOnEsc;
+			set
+			{
+				if (closeDialogOnEsc != value)
+				{
+					closeDialogOnEsc = value;
+					OnPropertyChanged(nameof(CloseDialogOnEsc));
+				}
+			}
+		}
+	}
 
     /// <summary>
     /// Class ConfirmOptions.
     /// </summary>
     public class AlertOptions : DialogOptions
     {
+        private string okButtonText;
+
         /// <summary>
         /// Gets or sets the text of the OK button.
         /// </summary>
-        public string OkButtonText { get; set; }
+        public string OkButtonText
+        {
+            get => okButtonText;
+            set
+            {
+                if (okButtonText != value)
+                {
+                    okButtonText = value;
+                    OnPropertyChanged(nameof(OkButtonText));
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -750,36 +1077,118 @@ namespace Radzen
     /// </summary>
     public class ConfirmOptions : AlertOptions
     {
+        private string cancelButtonText;
+
         /// <summary>
         /// Gets or sets the text of the Cancel button.
         /// </summary>
-        public string CancelButtonText { get; set; }
+        public string CancelButtonText
+        {
+            get => cancelButtonText;
+            set
+            {
+                if (cancelButtonText != value)
+                {
+                    cancelButtonText = value;
+                    OnPropertyChanged(nameof(CancelButtonText));
+                }
+            }
+        }
     }
 
     /// <summary>
     /// Class Dialog.
     /// </summary>
-    public class Dialog
-    {
-        /// <summary>
-        /// Gets or sets the title.
-        /// </summary>
-        /// <value>The title.</value>
-        public string Title { get; set; }
+    public class Dialog : INotifyPropertyChanged
+	{
+		private string title;
+	
+		/// <summary>
+		/// Gets or sets the title.
+		/// </summary>
+		/// <value>The title.</value>
+		public string Title
+		{
+			get => title;
+			set
+			{
+				if (title != value)
+				{
+					title = value;
+					OnPropertyChanged(nameof(Title));
+				}
+			}
+		}
+
+        private Type type;
+
         /// <summary>
         /// Gets or sets the type.
         /// </summary>
         /// <value>The type.</value>
-        public Type Type { get; set; }
+        public Type Type
+		{
+			get => type;
+			set
+			{
+				if (type != value)
+				{
+					type = value;
+					OnPropertyChanged(nameof(Type));
+				}
+			}
+		}
+
+        private Dictionary<string, object> parameters;
+
         /// <summary>
         /// Gets or sets the parameters.
         /// </summary>
         /// <value>The parameters.</value>
-        public Dictionary<string, object> Parameters { get; set; }
+        public Dictionary<string, object> Parameters
+		{
+			get => parameters;
+			set
+			{
+				if (parameters != value)
+				{
+					parameters = value;
+					OnPropertyChanged(nameof(Parameters));
+				}
+			}
+		}
+
+        private DialogOptions options;
+
         /// <summary>
         /// Gets or sets the options.
         /// </summary>
         /// <value>The options.</value>
-        public DialogOptions Options { get; set; }
-    }
+        public DialogOptions Options
+		{
+			get => options;
+			set
+			{
+				if (options != value)
+				{
+                    options = value;
+                    OnPropertyChanged(nameof(Options));
+				}
+			}
+		}
+
+		/// <summary>
+		/// Occurs when a property value changes.
+		/// </summary>
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		/// <summary>
+		/// Raises the <see cref="PropertyChanged"/> event.
+		/// </summary>
+		/// <param name="propertyName">The name of the property that changed.</param>
+		protected virtual void OnPropertyChanged(string propertyName)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
+	}
 }

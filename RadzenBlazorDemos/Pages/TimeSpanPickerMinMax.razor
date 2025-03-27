@@ -1,0 +1,8 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Time Span" Component="RadzenTimeSpanPickerMinMax"/>
+    <RadzenTimeSpanPicker @bind-Value="@value" Name="RadzenTimeSpanPickerMinMax" Min="@TimeSpan.Zero" Max="@TimeSpan.FromHours(12)" />
+</RadzenStack>
+
+@code {
+    TimeSpan? value;
+}

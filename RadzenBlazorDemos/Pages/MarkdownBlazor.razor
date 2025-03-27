@@ -1,0 +1,26 @@
+﻿<RadzenMarkdown class="rz-p-0 rz-p-md-12">
+### You can use arbitrary Blazor components within the markdown content.
+
+| Blazor component | Description |
+| --- | --- |
+| `RadzenButton` | <RadzenButton Text="Focus RadzenDatePicker" Click=@FocusDatePicker />|
+| `RadzenDatePicker` | <RadzenDatePicker @ref=@datePicker @bind-Value=@date /> |
+| `button` | <button type="button" @onclick=@FocusInput>Focus input</button>|
+| `input` | <input @ref=@input /> |
+| Text `@@date`| @date |
+</RadzenMarkdown>
+@code {
+    DateTime date = DateTime.Today;
+    RadzenDatePicker<DateTime> datePicker;
+    ElementReference input;
+
+    void FocusDatePicker()
+    {
+        datePicker.FocusAsync();
+    }
+
+    void FocusInput()
+    {
+        input.FocusAsync();
+    }
+}
