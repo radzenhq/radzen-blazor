@@ -15,5 +15,12 @@ namespace RadzenBlazorDemos
         public bool Expanded { get; set; }
         public IEnumerable<Example> Children { get; set; }
         public IEnumerable<string> Tags { get; set; }
+        public IEnumerable<ExampleSection> Toc { get; set; }
+    }
+
+    public class ExampleSection
+    {
+        public string Text { get; set; }
+        public string Anchor { get; set; }
     }
 }
