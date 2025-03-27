@@ -30,14 +30,17 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
 
     internal async Task SelectItemAsync(RadzenTocItem item)
     {
-        await JSRuntime.InvokeVoidAsync("Radzen.navigateTo", item.Path, true);
+        if (!string.IsNullOrEmpty(item.Selector))
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.navigateTo", item.Selector, true);
+        }
     }
 
     void ActivateItem(string? path)
     {
         foreach (var item in items)
         {
-            if (item.Path == path)
+            if (item.Selector == path)
             {
                 item.Activate();
             }
@@ -101,7 +104,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
         {
             try
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.registerScrollListener", Element, Reference, items.Select(items => items.Path), Selector);
+                await JSRuntime.InvokeVoidAsync("Radzen.registerScrollListener", Element, Reference, items.Select(items => items.Selector), Selector);
             } 
             catch (JSDisconnectedException)
             {

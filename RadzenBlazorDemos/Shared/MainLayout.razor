@@ -107,7 +107,7 @@
                                         <RadzenTocItem Text="@example.Name">
                                             @foreach (var item in example.Toc)
                                             {
-                                                <RadzenTocItem Text=@item.Text Path=@item.Anchor />
+                                                <RadzenTocItem Text=@item.Text Selector=@item.Anchor />
                                             }
                                         </RadzenTocItem>
                                     </RadzenToc>
