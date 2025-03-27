@@ -1416,6 +1416,14 @@ namespace RadzenBlazorDemos
                     Path = "tabs",
                     Icon = "\ue8d8",
                     Tags = new [] { "tabstrip", "tabview", "container" }
+                },
+                new Example
+                {
+                    Name = "Toc",
+                    Description = "Table of contents component",
+                    Path = "toc",
+                    Icon = "&#xe241",
+                    Tags = [ "toc", "content", "navigation" ]
                 }
             }
         },

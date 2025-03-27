@@ -24,10 +24,10 @@ public partial class RadzenTocItem : ComponentBase, IAsyncDisposable
     public string? Text { get; set; }
 
     /// <summary>
-    /// Gets or sets the path to the anchor which the table of contents item links to.
+    /// Gets or sets the CSS selector of the element to scroll to.
     /// </summary>
     [Parameter]
-    public string? Path { get; set; }
+    public string? Selector { get; set; }
 
     [CascadingParameter]
     RadzenToc? Toc { get; set; }
