@@ -1408,6 +1408,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Sticky", Anchor = "#sticky" } ],
                     Name = "Toc",
                     Description = "Table of contents component",
                     Path = "toc",
