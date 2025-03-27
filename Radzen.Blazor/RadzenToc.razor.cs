@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor;
 
@@ -20,13 +21,21 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
-    /// Gets or sets the CSS selector of the element to monitor for scroll events.
+    /// Gets or sets the orientation of the table of contents.
     /// </summary>
     [Parameter]
-    public string Selector { get; set; } = ".rz-body";
+    public Orientation Orientation { get; set; } = Orientation.Vertical;
+
+    /// <summary>
+    /// Gets or sets the CSS selector of the element to monitor for scroll events. By default the entire page is monitored.
+    /// </summary>
+    [Parameter]
+    public string? Selector { get; set; }
 
     /// <inheritdoc />
-    protected override string GetComponentCssClass() => "rz-toc";
+    protected override string GetComponentCssClass() => ClassList.Create("rz-toc")
+        .Add($"rz-toc-{Orientation.ToString().ToLowerInvariant()}")
+        .ToString();
 
     internal async Task SelectItemAsync(RadzenTocItem item)
     {

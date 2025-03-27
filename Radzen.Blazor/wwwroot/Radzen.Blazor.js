@@ -2516,7 +2516,7 @@ window.Radzen = {
     },
     registerScrollListener: function (element, ref, selectors, selector) {
       let currentSelector;
-      const container = document.querySelector(selector);
+      const container = selector ? document.querySelector(selector) : document.documentElement;
       const elements = selectors.map(document.querySelector, document);
 
       this.unregisterScrollListener(element);

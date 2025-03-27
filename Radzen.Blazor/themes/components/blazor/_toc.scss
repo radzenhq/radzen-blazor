@@ -13,3 +13,9 @@
 .rz-toc-item-active {
     border: 1px solid red;
 }
+
+.rz-toc-horizontal {
+    .rz-toc--list {
+        display: flex;
+    }
+}
