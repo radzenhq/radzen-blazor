@@ -2519,50 +2519,41 @@ window.Radzen = {
     },
     registerScrollListener: function (element, ref, selectors, selector) {
       let currentSelector;
-
-      const elements = selectors.map(document.querySelector, document);
       const container = document.querySelector(selector);
+      const elements = selectors.map(document.querySelector, document);
 
       this.unregisterScrollListener(element);
-      element.scrollHandler = function () {
-        const containerTop = container.tagName === 'HTML' ? 0 : container.getBoundingClientRect().top;
-        const center = containerTop + container.clientHeight / 2;
+      element.scrollHandler = () => {
+        const center = (container.tagName === 'HTML' ? 0 : container.getBoundingClientRect().top) + container.clientHeight / 2;
 
         let min = Number.MAX_SAFE_INTEGER;
-        let found = false;
         let match;
 
         for (let i = 0; i < elements.length; i++) {
           const element = elements[i];
-
-          if (!element) {
-            continue;
-          }
+          if (!element) continue;
 
           const rect = element.getBoundingClientRect();
           const diff = Math.abs(rect.top - center);
 
-          if (!found && rect.top < center) {
-            found = true;
-            min = diff;
+          if (!match && rect.top < center) {
             match = selectors[i];
+            min = diff;
             continue;
           }
 
-          if (found && rect.top >= center) {
-            continue;
-          }
+          if (match && rect.top >= center) continue;
 
           if (diff < min) {
-            min = diff;
             match = selectors[i];
+            min = diff;
           }
         }
 
         if (match !== currentSelector) {
           currentSelector = match;
-          Radzen.navigateTo(match, false);
-          ref.invokeMethodAsync('ScrollIntoView', match);
+          this.navigateTo(currentSelector, false);
+          ref.invokeMethodAsync('ScrollIntoView', currentSelector);
         }
       };
 
