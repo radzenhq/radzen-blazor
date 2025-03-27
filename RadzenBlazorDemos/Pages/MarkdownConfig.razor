@@ -1,0 +1,45 @@
+﻿<RadzenCard Variant="Variant.Outlined">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+        <RadzenDropDown @bind-Value=@autoLinkHeadingDepth Data=@autoLinkHeadings TextProperty=@nameof(AutoLinkDepth.Text) ValueProperty=@nameof(AutoLinkDepth.Value) Name="autoLinkHeadings" />
+        <RadzenLabel Text="Auto link heading depth" Component="autoLinkHeadings" />
+    </RadzenStack>
+</RadzenCard>
+<RadzenMarkdown class="rz-p-0 rz-p-md-12" AutoLinkHeadingDepth=@autoLinkHeadingDepth>
+### RadzenMarkdown
+
+**RadzenMarkdown** allows you to render Markdown content in your Blazor applications.
+
+#### Supported markdown syntax
+1. Everything from the [basic syntax](https://www.markdownguide.org/basic-syntax/)
+1. [Tables](https://www.markdownguide.org/extended-syntax/#tables)
+1. [Fenced code blocks](https://www.markdownguide.org/extended-syntax/#fenced-code-blocks)
+
+#### Features
+Use markdown content right in your Blazor components - no need to create separate files. Type it directly in your .razor file:
+
+```razor
+@($@"<RadzenMarkdown>
+# Hello, Blazor!
+This is a **bold** text.
+</RadzenMarkdown>")
+```
+</RadzenMarkdown>
+@code {
+    class AutoLinkDepth
+    {
+        public string Text { get; set; }
+        public int Value { get; set; }
+    }
+
+    List<AutoLinkDepth> autoLinkHeadings = new List<AutoLinkDepth>()
+    {
+        new AutoLinkDepth() { Text = "None", Value = 0 },
+        new AutoLinkDepth() { Text = "1", Value = 1 },
+        new AutoLinkDepth() { Text = "2", Value = 2 },
+        new AutoLinkDepth() { Text = "3", Value = 3 },
+        new AutoLinkDepth() { Text = "4", Value = 4 },
+        new AutoLinkDepth() { Text = "5", Value = 5 },
+        new AutoLinkDepth() { Text = "6", Value = 6 }
+    };
+    int autoLinkHeadingDepth = 4;
+}

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -214,6 +215,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
+            if (Attributes != null && Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
+            {
+                return $"rz-splitter-pane rz-splitter-pane-{ClassName} {@class}";
+            }
+
             return $"rz-splitter-pane rz-splitter-pane-{ClassName}";
         }
 

@@ -119,6 +119,7 @@ namespace Radzen.Blazor
                 return false;
             }
 
+
             var currentAbsoluteUrl = UriHelper.ToAbsoluteUri(UriHelper.Uri).AbsoluteUri;
             var absoluteUrl = UriHelper.ToAbsoluteUri(item.Path).AbsoluteUri;
 
@@ -134,8 +135,7 @@ namespace Radzen.Blazor
 
             var match = item.Match != NavLinkMatch.Prefix ? item.Match : Match;
 
-            if (match == NavLinkMatch.Prefix
-                && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
+            if (match == NavLinkMatch.Prefix && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
             {
                 return true;
             }
@@ -164,7 +164,7 @@ namespace Radzen.Blazor
 
         private static bool IsSeparator(char c)
         {
-            return c == '?' || c == '/';
+            return c == '?' || c == '/' || c == '#';
         }
 
         private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)

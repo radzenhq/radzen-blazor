@@ -1239,7 +1239,7 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                if (!DateAttributes(FocusedDate).Disabled)
+                if (!DateAttributes(FocusedDate).Disabled && !ReadOnly)
                 {
                     await SetDay(FocusedDate);
 

@@ -225,5 +225,24 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string ToggleAriaLabel { get; set; } = "Toggle";
+
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            NavigationManager.LocationChanged += OnLocationChanged;
+        }
+
+        private void OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+        {
+            IsOpen = false;
+            StateHasChanged();
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            NavigationManager.LocationChanged -= OnLocationChanged;
+        }
     }
 }

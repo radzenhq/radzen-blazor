@@ -69,7 +69,7 @@ $rz-carousel-border-radius: var(--rz-card-border-radius) !default;
     scroll-snap-type: x mandatory;
     border-radius: var(--rz-carousel-border-radius);
     scrollbar-width: none;
-    touch-action: none;
+    touch-action: pan-y;
     -ms-overflow-style: none;
 
     &::-webkit-scrollbar {

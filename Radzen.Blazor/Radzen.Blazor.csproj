@@ -10,7 +10,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>6.2.4</Version>
+    <Version>6.3.3</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Radzen Blazor is a set of 90+ free native Blazor UI controls packed with DataGrid, Scheduler, Charts and robust theming including Material design and Fluent UI.</Description>
@@ -73,4 +73,10 @@
     <Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
   </Target>
 
+  <ItemGroup Label="Allow internal method to be visible to the unit tests">
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Radzen.Blazor.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  
 </Project>
