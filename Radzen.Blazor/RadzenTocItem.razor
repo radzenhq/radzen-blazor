@@ -1,5 +1,5 @@
 <li class=@Class>
-    <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Text" Text=@Text Click=@OnClickAsync />
+    <a href=@Selector class="rz-toc-link rz-link" @onclick:preventDefault @onclick=@OnClickAsync>@Text</a>
 @if (ChildContent != null)
 {
     <ul class="rz-toc-list">
