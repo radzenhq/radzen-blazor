@@ -643,15 +643,3 @@ svg.illustration {
     width: 100%;
     height: 100%;
 }
-
-.rz-toc {
-    list-style-type: none;
-}
-
-.rz-toc-list {
-    list-style-type: none;
-}
-
-.rz-toc-item-active {
-    border: 1px solid red;
-}
