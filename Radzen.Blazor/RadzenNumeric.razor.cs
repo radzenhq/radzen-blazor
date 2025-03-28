@@ -307,6 +307,13 @@ namespace Radzen.Blazor
         public bool ReadOnly { get; set; }
 
         /// <summary>
+        /// Gets or sets the maximum allowed text length.
+        /// </summary>
+        /// <value>The maximum length.</value>
+        [Parameter]
+        public long? MaxLength { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether up down buttons are shown.
         /// </summary>
         /// <value><c>true</c> if up down buttons are shown; otherwise, <c>false</c>.</value>
