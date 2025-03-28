@@ -101,7 +101,7 @@
       &:before {
         transition: background-size 0s, opacity 0s;
         opacity: .32;
-        background-size: 100%;
+        background-size: 0%;
       }
     }
 
@@ -114,7 +114,7 @@
     &:not(.rz-state-disabled):active {
         background-color: $ripple-background;
         transition: background-size 0s;
-        background-size: 100%;
+        background-size: 0%;
     }
   }
 }
