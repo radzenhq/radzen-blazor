@@ -1,5 +1,3 @@
-// Fade animations
-
 @keyframes rz-open {
   from {
     opacity: 0;
@@ -24,22 +22,4 @@
 
 .rz-close {
   animation: var(--rz-transition) rz-close;
-}
-
-@keyframes rz-slide-down {
-  from {
-    grid-template-rows: 0fr;
-  }
-  to {
-    grid-template-rows: 1fr;
-  }
-}
-
-@keyframes rz-slide-up {
-  from {
-    grid-template-rows: 1fr;
-  }
-  to {
-    grid-template-rows: 0fr;
-  }
 }

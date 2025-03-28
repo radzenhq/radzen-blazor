@@ -1333,12 +1333,12 @@ window.Radzen = {
         Radzen[id + 'FZL'] = null;
       }
 
-      popup.classList.add("rz-close");
-      popup.classList.remove("rz-open");
       popup.onanimationend = function () {
           popup.style.display = 'none';
           popup.onanimationend = null;
       }
+      popup.classList.add("rz-close");
+      popup.classList.remove("rz-open");
     }
     document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
