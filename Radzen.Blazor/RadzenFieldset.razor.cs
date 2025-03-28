@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Threading.Tasks;
 
@@ -26,10 +27,10 @@ namespace Radzen.Blazor
     public partial class RadzenFieldset : RadzenComponent
     {
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            return AllowCollapse ? "rz-fieldset rz-fieldset-toggleable" : "rz-fieldset";
-        }
+        protected override string GetComponentCssClass() => 
+            ClassList.Create("rz-fieldset")
+                     .Add("rz-fieldset-toggleable", AllowCollapse)
+                     .ToString();
 
         /// <summary>
         /// Gets or sets a value indicating whether collapsing is allowed. Set to <c>false</c> by default.
@@ -131,14 +132,9 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback Collapse { get; set; }
 
-        string contentStyle = "";
-        string summaryContentStyle = "display: none";
-
-        async System.Threading.Tasks.Task Toggle(EventArgs args)
+        async Task Toggle(EventArgs args)
         {
             collapsed = !collapsed;
-            contentStyle = collapsed ? "display: none;" : "";
-            summaryContentStyle = !collapsed ? "display: none" : "";
 
             if (collapsed)
             {
@@ -186,15 +182,6 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
-        }
-
-        /// <inheritdoc />
-        protected override Task OnParametersSetAsync()
-        {
-            contentStyle = collapsed ? "display: none;" : "";
-            summaryContentStyle = !collapsed ? "display: none" : "";
-
-            return base.OnParametersSetAsync();
         }
 
         bool preventKeyPress = false;
