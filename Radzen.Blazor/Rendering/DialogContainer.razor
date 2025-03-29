@@ -166,7 +166,7 @@
     /// If the dialog has a before close handler (<see cref="DialogOptions.OnBeforeDialogClose" /> or <see cref="DialogOptions.OnBeforeDialogCloseAsync" />)
     /// it will be called before closing the dialog, this can be used to prevent the dialog from closing.
     /// </remarks>
-    async Task CloseAsync()
+    internal async Task CloseAsync()
     {
         // Prevent multiple close calls due to async nature of the method
         if (_isClosing)
@@ -241,7 +241,7 @@
     }
 
     [Inject] 
-    DialogService Service { get; set; }
+    internal DialogService Service { get; set; }
 
     protected override void OnInitialized()
     {

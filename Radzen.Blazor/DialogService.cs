@@ -431,7 +431,8 @@ namespace Radzen
             reference?.Dispose();
             reference = null;
 
-            UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
+            if (UriHelper != null)
+                UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
         }
 
         /// <summary>
