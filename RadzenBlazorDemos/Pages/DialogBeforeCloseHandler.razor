@@ -1,0 +1,31 @@
+﻿@inject DialogService DialogService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Dialog with before close handler" 
+                  ButtonStyle="ButtonStyle.Secondary"
+                  Click=@ShowDialogWithBeforeCloseHandler />
+</div>
+
+@code {
+    async Task ShowDialogWithBeforeCloseHandler()
+    {
+        await DialogService.OpenAsync("Dialog with before close handler", dialogService =>
+        @<div>
+            This dialog has a before close handler.
+        </div>,
+        new () 
+        {
+            CloseDialogOnOverlayClick = true,
+            OnBeforeDialogCloseAsync = async dialog => 
+            {
+                // Return true to close the dialog
+                return await DialogService.Confirm("Are you sure you want to close this dialog?", options: new ()
+                {
+                    OkButtonText = "Yes, please",
+					CancelButtonText = "No, thanks",
+                    ShowClose = false
+                }) ?? true;
+            }
+        });
+    }
+}

@@ -20,7 +20,7 @@
                 </div>
                 @if (Dialog.Options.ShowClose)
                 {
-                    <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                    <a @onclick:preventDefault="true" @onclick=@CloseAsync @onkeydown="@OnKeyPressAsync" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
                         <span class="notranslate rzi rzi-times"></span>
                     </a>
                 }
@@ -42,7 +42,7 @@
     {
         @if (Dialog.Options.CloseDialogOnOverlayClick)
         {
-            <div @onclick="@Close" class="rz-dialog-mask"></div>
+            <div @onclick="@CloseAsync" class="rz-dialog-mask"></div>
         }
         else
         {
@@ -53,13 +53,13 @@
 </div>
 
 @code {
-    void OnKeyPress(KeyboardEventArgs args)
+    async Task OnKeyPressAsync(KeyboardEventArgs args)
     {
         var key = args.Code != null ? args.Code : args.Key;
 
         if (key == "Space" || key == "Enter")
         {
-            Close();
+            await CloseAsync();
         }
     }
 
@@ -153,9 +153,48 @@
 
     object reference;
 
-    void Close()
+
+    /// <summary>
+    /// Keeps track of whether the dialog is closing.
+    /// </summary>
+    bool _isClosing { get; set; }
+
+    /// <summary>
+    /// Closes the dialog.
+    /// </summary>
+    /// <remarks>
+    /// If the dialog has a before close handler (<see cref="DialogOptions.OnBeforeDialogClose" /> or <see cref="DialogOptions.OnBeforeDialogCloseAsync" />)
+    /// it will be called before closing the dialog, this can be used to prevent the dialog from closing.
+    /// </remarks>
+    async Task CloseAsync()
     {
-        Service.Close();
+        // Prevent multiple close calls due to async nature of the method
+        if (_isClosing)
+            return;
+
+        try
+        {
+            _isClosing = true;
+
+            var shouldClose = true;
+
+            // Check if there is a synchronous before close handler
+            if (Dialog.Options.OnBeforeDialogClose != null)
+                shouldClose = Dialog.Options.OnBeforeDialogClose.Invoke(Dialog);
+
+            // Check if there is an asynchronous before close handler
+            if (shouldClose && Dialog.Options.OnBeforeDialogCloseAsync != null)
+                shouldClose = await Dialog.Options.OnBeforeDialogCloseAsync.Invoke(Dialog);
+
+            // Close the dialog if all before close handlers allow it or if there are no handlers
+            if (shouldClose)
+                Service.Close();
+        }
+        finally
+        {
+			// Reset the closing flag
+            _isClosing = false;
+        }       
     }
 
     string CssClass

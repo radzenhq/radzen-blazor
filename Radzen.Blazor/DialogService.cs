@@ -219,12 +219,10 @@ namespace Radzen
         {
             CloseSide();
             _sideDialogTask = new TaskCompletionSource<dynamic>();
-            if (options == null)
-            {
-                options = new SideDialogOptions();
-            }
 
+            options ??= new SideDialogOptions();
             options.Title = title;
+
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
             return _sideDialogTask.Task;
         }
@@ -248,12 +246,9 @@ namespace Radzen
             CloseSide();
             _sideDialogTask = new TaskCompletionSource<dynamic>();
 
-            if (options == null)
-            {
-                options = new SideDialogOptions();
-            }
-
+            options ??= new SideDialogOptions();
             options.Title = title;
+
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
 
             return _sideDialogTask.Task;
@@ -272,12 +267,9 @@ namespace Radzen
         {
             CloseSide();
 
-            if (options == null)
-            {
-                options = new SideDialogOptions();
-            }
-
+            options ??= new SideDialogOptions();
             options.Title = title;
+
             OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
         }
 
@@ -298,12 +290,9 @@ namespace Radzen
 
             CloseSide();
 
-            if (options == null)
-            {
-                options = new SideDialogOptions();
-            }
-
+            options ??= new SideDialogOptions();
             options.Title = title;
+
             OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
         }
 
@@ -383,8 +372,7 @@ namespace Radzen
         /// <param name="options">The dialog options.</param>
         public virtual void Open(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
         {
-            options = options ?? new DialogOptions();
-
+            options ??= new DialogOptions();
             options.ChildContent = childContent;
 
             OpenDialog<object>(title, null, options);
@@ -393,7 +381,7 @@ namespace Radzen
         /// <summary>
         /// The dialogs
         /// </summary>
-        protected List<object> dialogs = new List<object>();
+        protected List<object> dialogs = [];
 
         internal void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
         {
@@ -1046,7 +1034,31 @@ namespace Radzen
 				}
 			}
 		}
-	}
+
+#nullable enable
+
+        /// <summary>
+        /// The action to be executed before closing the dialog from the UI.<br />
+        /// Return <c>true</c> to close the dialog, <c>false</c> to keep it open.
+        /// </summary>
+        /// <remarks>
+        /// This will not be called if you are closing the dialog programmatically by using <see cref="DialogService.Close(dynamic) "/>
+        /// </remarks>
+        public Func<Dialog, bool>? OnBeforeDialogClose { get; set; }
+
+        /// <summary>
+        /// The action to be executed before closing the dialog from the UI asynchronously.<br />
+        /// Return <c>true</c> to close the dialog, <c>false</c> to keep it open.
+        /// </summary>
+        /// <remarks>
+        /// When this property is set, the dialog will not be closed until the task is completed.<br />
+        /// This will not be called if you are closing the dialog programmatically by using <see cref="DialogService.Close(dynamic) "/>
+        /// </remarks>
+        public Func<Dialog, Task<bool>>? OnBeforeDialogCloseAsync { get; set; }
+
+#nullable restore
+
+    }
 
     /// <summary>
     /// Class ConfirmOptions.
