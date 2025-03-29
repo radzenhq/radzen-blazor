@@ -1423,7 +1423,7 @@ namespace RadzenBlazorDemos
                     Name = "Toc",
                     Description = "Table of contents component",
                     Path = "toc",
-                    Icon = "&#xe241",
+                    Icon = "\ue241",
                     Tags = [ "toc", "content", "navigation" ]
                 }
             }
