@@ -114,7 +114,9 @@ namespace Radzen.Blazor.Tests
 
 				// Assert
 				Assert.NotNull(resultingOptions);
-				Assert.Equal("600px", resultingOptions.Width);
+                Assert.Equal("Ok", resultingOptions.OkButtonText);
+                Assert.Equal("Cancel", resultingOptions.CancelButtonText);
+                Assert.Equal("600px", resultingOptions.Width);
 				Assert.Equal("", resultingOptions.Style);
 				Assert.Equal("rz-dialog-confirm", resultingOptions.CssClass);
 				Assert.Equal("rz-dialog-wrapper", resultingOptions.WrapperCssClass);
@@ -143,7 +145,9 @@ namespace Radzen.Blazor.Tests
 
 				// Assert
 				Assert.NotNull(resultingOptions);
-				Assert.Equal("600px", resultingOptions.Width);
+                Assert.Equal("Ok", resultingOptions.OkButtonText);
+                Assert.Equal("Cancel", resultingOptions.CancelButtonText);
+                Assert.Equal("600px", resultingOptions.Width);
 				Assert.Equal("", resultingOptions.Style);
 				Assert.Equal("rz-dialog-confirm", resultingOptions.CssClass);
 				Assert.Equal("rz-dialog-wrapper", resultingOptions.WrapperCssClass);
@@ -155,7 +159,9 @@ namespace Radzen.Blazor.Tests
 				var dialogService = new DialogService(null, null);
 				var options = new ConfirmOptions
 				{
-					Width = "800px",
+                    OkButtonText = "XXX",
+                    CancelButtonText = "YYY",
+                    Width = "800px",
 					Style = "background-color: red;",
 					CssClass = "custom-class",
 					WrapperCssClass = "wrapper-class"
@@ -179,7 +185,9 @@ namespace Radzen.Blazor.Tests
 
 				// Assert
 				Assert.NotNull(resultingOptions);
-				Assert.Equal("800px", resultingOptions.Width);
+                Assert.Equal("XXX", resultingOptions.OkButtonText);
+                Assert.Equal("YYY", resultingOptions.CancelButtonText);
+                Assert.Equal("800px", resultingOptions.Width);
 				Assert.Equal("background-color: red;", resultingOptions.Style);
 				Assert.Equal("rz-dialog-confirm custom-class", resultingOptions.CssClass);
 				Assert.Equal("rz-dialog-wrapper wrapper-class", resultingOptions.WrapperCssClass);
@@ -212,6 +220,7 @@ namespace Radzen.Blazor.Tests
 
 				// Assert
 				Assert.NotNull(resultingOptions);
+                Assert.Equal("Ok", resultingOptions.OkButtonText);
 				Assert.Equal("600px", resultingOptions.Width);
 				Assert.Equal("", resultingOptions.Style);
 				Assert.Equal("rz-dialog-alert", resultingOptions.CssClass);
@@ -241,6 +250,7 @@ namespace Radzen.Blazor.Tests
 
 				// Assert
 				Assert.NotNull(resultingOptions);
+                Assert.Equal("Ok", resultingOptions.OkButtonText);
 				Assert.Equal("600px", resultingOptions.Width);
 				Assert.Equal("", resultingOptions.Style);
 				Assert.Equal("rz-dialog-alert", resultingOptions.CssClass);
@@ -253,6 +263,7 @@ namespace Radzen.Blazor.Tests
 				var dialogService = new DialogService(null, null);
 				var options = new AlertOptions
 				{
+                    OkButtonText = "XXX",
 					Width = "800px",
 					Style = "background-color: red;",
 					CssClass = "custom-class",
@@ -277,6 +288,7 @@ namespace Radzen.Blazor.Tests
 
 				// Assert
 				Assert.NotNull(resultingOptions);
+				Assert.Equal("XXX", resultingOptions.OkButtonText);
 				Assert.Equal("800px", resultingOptions.Width);
 				Assert.Equal("background-color: red;", resultingOptions.Style);
 				Assert.Equal("rz-dialog-alert custom-class", resultingOptions.CssClass);
