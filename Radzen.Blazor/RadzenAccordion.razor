@@ -32,7 +32,7 @@
                 }
                 @if (!string.IsNullOrEmpty(item.Icon))
                 {
-            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@((MarkupString)item.Icon)</i>
+            <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@item.Icon</i>
                 }
                 @if (item.Template != null)
                 {
@@ -40,7 +40,7 @@
                 }
                 else if(!string.IsNullOrEmpty(item.Text))
                 {
-                    <span>@((MarkupString)item.Text)</span>
+                    <span>@item.Text</span>
                 }
             </a>
         </div>

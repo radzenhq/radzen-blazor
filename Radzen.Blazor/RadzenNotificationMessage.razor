@@ -10,8 +10,8 @@
             <div class="rz-notification-message-wrapper">
                 <span class="notranslate rzi rz-notification-icon @classes.Item2" @onclick="NotificationClicked"></span>
                 <div class="rz-notification-message" @onclick="NotificationClicked">
-                    <div class="rz-notification-title">@if (Message.SummaryContent != null) { @Message.SummaryContent(Service); } else { @((MarkupString)Message.Summary); }</div>
-                    <div class="rz-notification-content">@if (Message.DetailContent != null) { @Message.DetailContent(Service); } else { @((MarkupString)Message.Detail); }</div>
+                    <div class="rz-notification-title">@if (Message.SummaryContent != null) { @Message.SummaryContent(Service) } else { @Message.Summary }</div>
+                    <div class="rz-notification-content">@if (Message.DetailContent != null) { @Message.DetailContent(Service) } else { @Message.Detail }</div>
                 </div>
             </div>
             <div class="notranslate rzi rz-notification-close" @onclick="@Close"></div>

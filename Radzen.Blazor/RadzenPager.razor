@@ -6,13 +6,13 @@
          @onfocus=@OnFocus>
         @if(ShowPagingSummary)
         {
-        <span class="rz-pager-summary">@((MarkupString)string.Format(PagingSummaryFormat, CurrentPage + 1, numberOfPages, Count))</span>        
+        <span class="rz-pager-summary">@(string.Format(PagingSummaryFormat, CurrentPage + 1, numberOfPages, Count))</span>        
         }
-        <a d="@(GetId() + "fp")" class="rz-pager-first rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -2 ? "rz-state-focused": "")" @onclick:preventDefault="true" @onclick="@(() => OnFirstPageClick())" aria-label="@FirstPageAriaLabel" role="button" title="@FirstPageTitle" disabled="@(CurrentPage <= 0)">
+        <a id="@(GetId() + "fp")" class="rz-pager-first rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -2 ? "rz-state-focused": "")" @onclick:preventDefault="true" @onclick="@(() => OnFirstPageClick())" aria-label="@FirstPageAriaLabel" role="button" title="@FirstPageTitle" disabled="@(CurrentPage <= 0)">
             <span class="notranslate rz-pager-icon rzi rzi-step-backward"></span>
         </a>
 
-            <a id="@(GetId() + "pp")" class="rz-pager-prev rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -1 ? "rz-state-focused": "")" @onclick:preventDefault="true" @onclick="@(() => OnPrevPageClick())" aria-label="@PrevPageAriaLabel" role="button" title="@PrevPageTitle" disabled="@(CurrentPage <= 0)">
+        <a id="@(GetId() + "pp")" class="rz-pager-prev rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -1 ? "rz-state-focused": "")" @onclick:preventDefault="true" @onclick="@(() => OnPrevPageClick())" aria-label="@PrevPageAriaLabel" role="button" title="@PrevPageTitle" disabled="@(CurrentPage <= 0)">
             <span class="notranslate rz-pager-icon rzi rzi-caret-left"></span>
             @if (PrevPageLabel != null)
             {

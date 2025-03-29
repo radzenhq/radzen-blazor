@@ -11,8 +11,11 @@
             Country: @context.Country
         </Template>
     </RadzenAutoComplete>
-   <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. France
-        @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))</RadzenText>
+   <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. France</RadzenText>
+    @if (!string.IsNullOrEmpty(companyName))
+    {
+        <RadzenText TextStyle="TextStyle.Body2">Value is: <strong>@companyName</strong></RadzenText>
+    }
 </div>
 
 @code {

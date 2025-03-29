@@ -6,17 +6,17 @@
     <a @onclick=@OnClick role="tab" @onclick:preventDefault="true" id="@($"{Tabs.Id}-tabpanel-{Index}-label")"
         aria-selected=@(IsSelected? "true" : "false") aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")" @onkeydown:stopPropagation>
         @if (!string.IsNullOrEmpty(Icon))
-            {
-                <span class="notranslate rzi rz-tabview-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)Icon)</span>
-            }
-            @if (Template != null)
-            {
-                @Template(this)
-            }
-            else
-            {
-                <span class="rz-tabview-title">@Text</span>
-            }
+        {
+            <span class="notranslate rzi rz-tabview-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</span>
+        }
+        @if (Template != null)
+        {
+            @Template(this)
+        }
+        else
+        {
+            <span class="rz-tabview-title">@Text</span>
+        }
         </a>
     </li>
 }

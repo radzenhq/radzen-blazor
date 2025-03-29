@@ -9,11 +9,15 @@
     <RadzenAutoComplete @bind-Value=@companyName @bind-SelectedItem=@selectedItem
                         Data=@customers TextProperty="@nameof(Customer.CompanyName)"
                         Style="width: 13rem" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Company Name" }})" />
-    <RadzenText TextStyle="TextStyle.Body2">
-        Start typing e.g. France
-        @((MarkupString)(selectedItem != null ? $", CustomerID is: <strong>{((Customer)selectedItem).CustomerID}</strong>" : ""))
-        @((MarkupString)(!string.IsNullOrEmpty(companyName) ? $", Value is: <strong>{companyName}</strong>" : ""))
-    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. France</RadzenText>
+    @if (selectedItem != null)
+    {
+        <RadzenText TextStyle="TextStyle.Body2">CustomerID is: <strong>@(((Customer)selectedItem).CustomerID)</strong></RadzenText>
+    }
+    @if (!string.IsNullOrEmpty(companyName))
+    {
+        <RadzenText>Value is: <strong>@companyName</strong></RadzenText>
+    }
 </div>
 
 @code {
