@@ -18,7 +18,11 @@
     </RadzenCard>
 
     <RadzenDataGrid @ref=@dataGrid Data="@orderDetails" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Center" AllowSorting="true" 
-    PageSizeOptions="@pageSizeOptions" ShowPagingSummary="@showPagerSummary" PagingSummaryTemplate="@pagingSummaryTemplate" Page="@OnPage">
+    PageSizeOptions="@pageSizeOptions" ShowPagingSummary="@showPagerSummary" Page="@OnPage">
+        <PagingSummaryTemplate>
+            <RadzenIcon Icon="database" Style="color: var(--rz-primary); font-size: var(--rz-pager-summary-font-size);" />
+            Displaying page @context.CurrentPage of @context.NumberOfPages <b>(total @context.TotalCount records)</b>
+        </PagingSummaryTemplate>
         <Columns>
             <RadzenDataGridColumn Property="OrderID" Title="OrderID" />
             <RadzenDataGridColumn Property="ProductID" Title="ProductID" />
@@ -38,10 +42,6 @@
 </RadzenStack>
 
 @code {
-    RenderFragment<PagingInformation> pagingSummaryTemplate = (info) =>@<span>
-        <RadzenIcon Icon="database" Style="color: var(--rz-primary); font-size: var(--rz-pager-summary-font-size);" />
-        Displaying page @info.CurrentPage of @info.NumberOfPages <b>(total @info.TotalCount records)</b>
-    </span>;
 
     RadzenDataGrid<OrderDetail> dataGrid;
     IEnumerable<int> pageSizeOptions = new int[] { 10, 20, 30 };
