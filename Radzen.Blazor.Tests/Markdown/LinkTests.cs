@@ -354,6 +354,15 @@ bar)", @"<document>
         </link>
     </paragraph>
 </document>")]
+    [InlineData(@"[![alt](img)](url)", @"<document>
+    <paragraph>
+        <link destination=""url"" title="""">
+            <image destination=""img"" title="""">
+                <text>alt</text>
+            </image>
+        </link>
+    </paragraph>
+</document>")]
 
     public void Parse_LinkTextIsInlineContent(string markdown, string expected)
     {

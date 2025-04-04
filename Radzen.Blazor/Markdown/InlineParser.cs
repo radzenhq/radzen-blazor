@@ -2,7 +2,6 @@ using System.Text.RegularExpressions;
 using System.Text;
 using System.Collections.Generic;
 using System;
-using System.Linq;
 
 namespace Radzen.Blazor.Markdown;
 
@@ -177,7 +176,7 @@ class InlineParser
     {
         var ch = text[index];
 
-        if (ch is not (Asterisk or Underscore or OpenBracket) && (ch is not Exclamation || next is not  OpenBracket))
+        if (ch is not (Asterisk or Underscore or OpenBracket) && (ch is not Exclamation || next is not OpenBracket))
         {
             newIndex = index;
             return false;
@@ -223,11 +222,11 @@ class InlineParser
                 canOpen = leftFlanking && (!rightFlanking || prev.IsPunctuation());
             }
 
-            var delimiter = new Delimiter 
-            { 
-                Node = node, 
-                Char = ch, 
-                Length = buffer.Length, 
+            var delimiter = new Delimiter
+            {
+                Node = node,
+                Char = ch,
+                Length = buffer.Length,
                 Position = index,
                 CanClose = canClose,
                 CanOpen = canOpen
@@ -374,12 +373,7 @@ class InlineParser
                 continue;
             }
 
-            if (TryParseLink(text, index, out index))
-            {
-                continue;
-            }
-
-            if (TryParseImage(text, index, out index))
+            if (TryParseLinkOrImage(text, index, out index))
             {
                 continue;
             }
@@ -538,7 +532,7 @@ class InlineParser
 
         var angleBrackets = position < text.Length && text[position] is OpenAngleBracket;
 
-        if (angleBrackets) 
+        if (angleBrackets)
         {
             position++;
         }
@@ -550,13 +544,13 @@ class InlineParser
             var ch = text[position];
             var prev = position > 0 ? text[position - 1] : Null;
             var next = position < text.Length - 1 ? text[position + 1] : Null;
-            
+
             if (angleBrackets && ch is CloseAngleBracket && prev is not Backslash)
             {
                 position++;
                 break;
             }
-            
+
             if (!angleBrackets)
             {
                 if (ch is OpenParenthesis && prev is not Backslash)
@@ -693,47 +687,11 @@ class InlineParser
         return true;
     }
 
-    private bool TryGetOpenerIndex(string text, int index, char ch, out int openerIndex, out int position)
-    {
-        position = index;
-        openerIndex = -1;
-
-        if (text[index] is not CloseBracket)
-        {
-            return false;
-        }
-
-        openerIndex = FindOpenBracketIndex(ch);
-
-        if (openerIndex < 0)
-        {
-            return false;
-        }
-
-        AddTextNode();
-
-        var opener = delimiters[openerIndex];
-        position = index + 1;
-
-        var active = opener.Active || ch is Exclamation;
-
-        // Skip if not followed by opening parenthesis
-        if (!active || position >= text.Length || text[position] is not OpenParenthesis)
-        {
-            delimiters.RemoveAt(openerIndex);
-            return false;
-        }
-
-        position++; // Skip opening parenthesis
-
-        return true;
-    }
-
-    private bool TryParseImage(string text, int index, out int newIndex)
+    private bool TryParseLinkOrImage(string text, int index, out int newIndex)
     {
         newIndex = index;
 
-        if (!TryGetOpenerIndex(text, index, Exclamation, out var openerIndex, out var position))
+        if (!TryGetOpenerIndex(text, index, out var openerIndex, out var position))
         {
             return false;
         }
@@ -748,13 +706,72 @@ class InlineParser
             return false;
         }
 
-        var image = new Image { Destination = destination, Title = title };
+        var opener = delimiters[openerIndex];
 
-        ReplaceOpener(openerIndex, image);
+        InlineContainer container = opener.Char == Exclamation ? new Image { Destination = destination, Title = title } : new Link { Destination = destination, Title = title };
+
+        ReplaceOpener(openerIndex, container);
 
         newIndex = position + 1;
 
-        delimiters.RemoveAt(openerIndex);
+        if (container is Link)
+        {
+            for (var delimiterIndex = 0; delimiterIndex < openerIndex; delimiterIndex++)
+            {
+                if (delimiters[delimiterIndex].Char == OpenBracket)
+                {
+                    delimiters[delimiterIndex].Active = false;
+                }
+            }
+        }
+
+        delimiters.Remove(opener);
+
+        return true;
+    }
+
+
+    private bool TryGetOpenerIndex(string text, int index, out int openerIndex, out int position)
+    {
+        position = index;
+        openerIndex = -1;
+
+        if (text[index] is not CloseBracket)
+        {
+            return false;
+        }
+        var di = delimiters.Count - 1;
+
+        while (di >= 0)
+        {
+            var delimiter = delimiters[di];
+
+            if ((delimiter.Active && delimiter.Char is OpenBracket) || delimiter.Char is Exclamation)
+            {
+                openerIndex = di;
+                break;
+            }
+
+            di--;
+        }
+
+        if (di < 0)
+        {
+            return false;
+        }
+
+        AddTextNode();
+
+        position = index + 1;
+
+        // Skip if not followed by opening parenthesis
+        if (position >= text.Length || text[position] is not OpenParenthesis)
+        {
+            delimiters.RemoveAt(openerIndex);
+            return false;
+        }
+
+        position++; // Skip opening parenthesis
 
         return true;
     }
@@ -779,39 +796,6 @@ class InlineParser
         inlines.Insert(startIndex, parent);
     }
 
-    private bool TryParseLink(string text, int index, out int newIndex)
-    {
-        newIndex = index;
-
-        if (!TryGetOpenerIndex(text, index, OpenBracket, out var openerIndex, out var position))
-        {
-            return false;
-        }
-
-        if (!TryParseDestinationAndTitle(text, position, out var destination, out var title, out position))
-        {
-            return false;
-        }
-        if (position >= text.Length || text[position] is not CloseParenthesis)
-        {
-            return false;
-        }
-
-        var link = new Link { Destination = destination, Title = title };
-
-        ReplaceOpener(openerIndex, link);
-
-        newIndex = position + 1;
-
-        for (var delimiterIndex = 0; delimiterIndex < openerIndex; delimiterIndex++)
-        {
-            delimiters[delimiterIndex].Active = false;
-        }
-
-        delimiters.RemoveAt(openerIndex);
-
-        return true;
-    }
 
     private bool TryParseLinkFromReference(string text, int index, Dictionary<string, LinkReference> references, out int newIndex)
     {
@@ -884,7 +868,7 @@ class InlineParser
 
     private void ParseEmphasisAndStrong(int index = -1)
     {
-         var closerIndex = 0;
+        var closerIndex = 0;
 
         while ((closerIndex = FindCloserIndex()) > 0)
         {

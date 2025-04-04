@@ -8,9 +8,7 @@
         <div class="rz-tooltip-content @getCssClass(tooltip)" style="@tooltip.Options.Style">
             @if (!string.IsNullOrEmpty(tooltip.Options.Text))
             {
-                <div>
-                    @((MarkupString)tooltip.Options.Text)
-                </div>
+                <div>@tooltip.Options.Text</div>
             }
             else if (tooltip.Options.ChildContent != null)
             {

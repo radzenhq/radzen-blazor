@@ -9,7 +9,19 @@
         @foreach (var item in Data)
         {
             <RadzenTableRow>
-                <RadzenTableCell>@GetKeysAsMarkupString(item.Key)</RadzenTableCell>
+                <RadzenTableCell>
+                    @foreach (var key in item.Key.Split(' '))
+                    {
+                        if (Keys.Contains(key))
+                        {
+                            <span class="rz-badge rz-badge-primary rz-variant-filled rz-shade-default">@key</span>
+                        }
+                        else
+                        {
+                            @($" {key} ")
+                        }
+                    }
+                    </RadzenTableCell>
                 <RadzenTableCell>@item.Action</RadzenTableCell>
             </RadzenTableRow>
         }
@@ -18,14 +30,8 @@
 
 
 @code {
-    string[] keys = new string[] { "Tab", "DownArrow", "UpArrow", "LeftArrow", "RightArrow", "Enter", "Space", "Shift", "Alt", "Esc", "Escape" };
+    static readonly string[] Keys = [ "Tab", "DownArrow", "UpArrow", "LeftArrow", "RightArrow", "Enter", "Space", "Shift", "Alt", "Esc", "Escape" ];
 
     [Parameter]
     public IEnumerable<KeyboardShortcut> Data { get; set; }
-
-    MarkupString GetKeysAsMarkupString(string value)
-    {
-        return (MarkupString)string.Join(" ", value.Split(" ")
-            .Select(s => keys.Contains(s) ? $@"<span class=""rz-badge rz-badge-primary rz-variant-filled rz-shade-default"">{s}</span>" : s));
-    }
 }
