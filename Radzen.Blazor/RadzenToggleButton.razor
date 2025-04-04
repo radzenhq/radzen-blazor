@@ -28,7 +28,7 @@
                 {
                     @if (!string.IsNullOrEmpty(getIcon()))
                     {
-                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@((MarkupString)getIcon())</i>
+                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@getIcon()</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {

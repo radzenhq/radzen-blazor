@@ -27,7 +27,7 @@
                 {
                     @if (!string.IsNullOrEmpty(item.Icon))
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon" style="margin-right:2px;@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : "")">@((MarkupString)item.Icon)</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" style="margin-right:2px;@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : "")">@item.Icon</i>
                     }
                     @if (!string.IsNullOrEmpty(item.Image))
                     {
