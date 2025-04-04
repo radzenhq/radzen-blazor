@@ -37,11 +37,11 @@ namespace Radzen.Blazor.Tests
 
 #pragma warning disable BL0005 // Component parameter should not be set outside of its component.
 
-            [Fact(DisplayName = "CloseAsync should invoke OnBeforeDialogClose")]
-            public async Task CloseAsync_Should_Invoke_OnBeforeDialogClose()
+            [Fact(DisplayName = "CloseAsync should invoke OnBeforeClose")]
+            public async Task CloseAsync_Should_Invoke_OnBeforeClose()
             {
                 // Arrange
-                var beforeDialogCloseHasBeenCalled = false;
+                var beforeCloseHasBeenCalled = false;
 
                 // Create a mock dialog service
                 using var dialogService = new DialogMockService();
@@ -53,10 +53,10 @@ namespace Radzen.Blazor.Tests
                     {
                         Options = new DialogOptions
                         {
-                            // Set the OnBeforeDialogClose callback to set the flag to true
-                            OnBeforeDialogClose = dialog =>
+                            // Set the OnBeforeClose callback to set the flag to true
+                            OnBeforeClose = () =>
                             {
-                                beforeDialogCloseHasBeenCalled = true;
+                                beforeCloseHasBeenCalled = true;
                                 return true;
                             }
                         }
@@ -68,17 +68,17 @@ namespace Radzen.Blazor.Tests
                 await dialogContainer.CloseAsync();
 
                 // Assert
-                // Verify that the OnBeforeDialogClose callback was called
-                Assert.True(beforeDialogCloseHasBeenCalled);
+                // Verify that the OnBeforeClose callback was called
+                Assert.True(beforeCloseHasBeenCalled);
                 // Verify that the Close method on the dialog service was called
                 Assert.True(dialogService.CloseHasBeenCalled);
             }
 
-            [Fact(DisplayName = "CloseAsync should invoke OnBeforeDialogCloseAsync")]
-            public async Task CloseAsync_Should_Invoke_OnBeforeDialogCloseAsync()
+            [Fact(DisplayName = "CloseAsync should invoke OnBeforeCloseAsync")]
+            public async Task CloseAsync_Should_Invoke_OnBeforeCloseAsync()
             {
                 // Arrange
-                var beforeDialogCloseHasBeenCalled = false;
+                var beforeCloseHasBeenCalled = false;
 
                 // Create a mock dialog service
                 using var dialogService = new DialogMockService();
@@ -90,10 +90,10 @@ namespace Radzen.Blazor.Tests
                     {
                         Options = new DialogOptions
                         {
-                            // Set the OnBeforeDialogCloseAsync callback to set the flag to true
-                            OnBeforeDialogCloseAsync = async dialog =>
+                            // Set the OnBeforeCloseAsync callback to set the flag to true
+                            OnBeforeCloseAsync = async () =>
                             {
-                                beforeDialogCloseHasBeenCalled = true;
+                                beforeCloseHasBeenCalled = true;
                                 await Task.CompletedTask;
                                 return true;
                             }
@@ -106,14 +106,14 @@ namespace Radzen.Blazor.Tests
                 await dialogContainer.CloseAsync();
 
                 // Assert
-                // Verify that the OnBeforeDialogCloseAsync callback was called
-                Assert.True(beforeDialogCloseHasBeenCalled);
+                // Verify that the OnBeforeCloseAsync callback was called
+                Assert.True(beforeCloseHasBeenCalled);
                 // Verify that the Close method on the dialog service was called
                 Assert.True(dialogService.CloseHasBeenCalled);
             }
 
-            [Fact(DisplayName = "CloseAsync should not close if OnBeforeDialogCloseAsync returns false")]
-            public async Task CloseAsync_Should_Not_Close_If_OnBeforeDialogCloseAsync_Returns_False()
+            [Fact(DisplayName = "CloseAsync should not close if OnBeforeCloseAsync returns false")]
+            public async Task CloseAsync_Should_Not_Close_If_OnBeforeCloseAsync_Returns_False()
             {
                 // Arrange
                 // Create a mock dialog service
@@ -126,8 +126,8 @@ namespace Radzen.Blazor.Tests
                     {
                         Options = new DialogOptions
                         {
-                            // Set the OnBeforeDialogCloseAsync callback to return false
-                            OnBeforeDialogCloseAsync = async dialog =>
+                            // Set the OnBeforeCloseAsync callback to return false
+                            OnBeforeCloseAsync = async () =>
                             {
                                 await Task.CompletedTask;
                                 return false;
@@ -145,8 +145,8 @@ namespace Radzen.Blazor.Tests
                 Assert.False(dialogService.CloseHasBeenCalled);
             }
 
-            [Fact(DisplayName = "CloseAsync should not close if OnBeforeDialogClose returns false")]
-            public async Task CloseAsync_Should_Not_Close_If_OnBeforeDialogClose_Returns_False()
+            [Fact(DisplayName = "CloseAsync should not close if OnBeforeClose returns false")]
+            public async Task CloseAsync_Should_Not_Close_If_OnBeforeClose_Returns_False()
             {
                 // Arrange
                 // Create a mock dialog service
@@ -159,8 +159,8 @@ namespace Radzen.Blazor.Tests
                     {
                         Options = new DialogOptions
                         {
-                            // Set the OnBeforeDialogClose callback to return false
-                            OnBeforeDialogClose = dialog => false
+                            // Set the OnBeforeClose callback to return false
+                            OnBeforeClose = () => false
                         }
                     }
                 };
@@ -174,8 +174,8 @@ namespace Radzen.Blazor.Tests
                 Assert.False(dialogService.CloseHasBeenCalled);
             }
 
-            [Fact(DisplayName = "CloseAsync should close if no OnBeforeDialogClose or OnBeforeDialogCloseAsync supplied")]
-            public async Task CloseAsync_Should_Close_If_No_BeforeDialogClose_Or_BeforeDialogCloseAsync_Supplied()
+            [Fact(DisplayName = "CloseAsync should close if no OnBeforeClose or OnBeforeCloseAsync supplied")]
+            public async Task CloseAsync_Should_Close_If_No_BeforeClose_Or_BeforeCloseAsync_Supplied()
             {
                 // Arrange
                 // Create a mock dialog service

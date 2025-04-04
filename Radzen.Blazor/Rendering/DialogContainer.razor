@@ -157,34 +157,36 @@
     /// <summary>
     /// Keeps track of whether the dialog is closing.
     /// </summary>
-    bool _isClosing { get; set; }
+    bool isClosing { get; set; }
 
     /// <summary>
     /// Closes the dialog.
     /// </summary>
     /// <remarks>
-    /// If the dialog has a before close handler (<see cref="DialogOptions.OnBeforeDialogClose" /> or <see cref="DialogOptions.OnBeforeDialogCloseAsync" />)
+    /// If the dialog has a before close handler (<see cref="DialogOptions.OnBeforeClose" /> or <see cref="DialogOptions.OnBeforeDialogAsync" />)
     /// it will be called before closing the dialog, this can be used to prevent the dialog from closing.
     /// </remarks>
     internal async Task CloseAsync()
     {
         // Prevent multiple close calls due to async nature of the method
-        if (_isClosing)
+        if (isClosing)
+        {
             return;
+        }
 
         try
         {
-            _isClosing = true;
+            isClosing = true;
 
             var shouldClose = true;
 
             // Check if there is a synchronous before close handler
-            if (Dialog.Options.OnBeforeDialogClose != null)
-                shouldClose = Dialog.Options.OnBeforeDialogClose.Invoke(Dialog);
+            if (Dialog.Options.OnBeforeClose != null)
+                shouldClose = Dialog.Options.OnBeforeClose.Invoke();
 
             // Check if there is an asynchronous before close handler
-            if (shouldClose && Dialog.Options.OnBeforeDialogCloseAsync != null)
-                shouldClose = await Dialog.Options.OnBeforeDialogCloseAsync.Invoke(Dialog);
+            if (shouldClose && Dialog.Options.OnBeforeCloseAsync != null)
+                shouldClose = await Dialog.Options.OnBeforeCloseAsync.Invoke();
 
             // Close the dialog if all before close handlers allow it or if there are no handlers
             if (shouldClose)
@@ -193,7 +195,7 @@
         finally
         {
 			// Reset the closing flag
-            _isClosing = false;
+            isClosing = false;
         }       
     }
 

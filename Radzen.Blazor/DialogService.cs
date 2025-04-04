@@ -1045,7 +1045,7 @@ namespace Radzen
         /// <remarks>
         /// This will not be called if you are closing the dialog programmatically by using <see cref="DialogService.Close(dynamic) "/>
         /// </remarks>
-        public Func<Dialog, bool>? OnBeforeDialogClose { get; set; }
+        public Func<bool>? OnBeforeClose { get; set; }
 
         /// <summary>
         /// The action to be executed before closing the dialog from the UI asynchronously.<br />
@@ -1055,7 +1055,7 @@ namespace Radzen
         /// When this property is set, the dialog will not be closed until the task is completed.<br />
         /// This will not be called if you are closing the dialog programmatically by using <see cref="DialogService.Close(dynamic) "/>
         /// </remarks>
-        public Func<Dialog, Task<bool>>? OnBeforeDialogCloseAsync { get; set; }
+        public Func<Task<bool>>? OnBeforeCloseAsync { get; set; }
 
 #nullable restore
 

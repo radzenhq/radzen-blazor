@@ -16,7 +16,7 @@
         new () 
         {
             CloseDialogOnOverlayClick = true,
-            OnBeforeDialogCloseAsync = async dialog => 
+            OnBeforeCloseAsync = async () => 
             {
                 // Return true to close the dialog
                 return await DialogService.Confirm("Are you sure you want to close this dialog?", options: new ()
