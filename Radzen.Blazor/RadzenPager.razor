@@ -2,11 +2,20 @@
 @if (GetVisible())
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()" 
-         @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="true" tabindex=0
-         @onfocus=@OnFocus>
+    @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="true" tabindex=0
+    @onfocus=@OnFocus>
         @if(ShowPagingSummary)
         {
-        <span class="rz-pager-summary">@(string.Format(PagingSummaryFormat, CurrentPage + 1, numberOfPages, Count))</span>        
+            <span class="rz-pager-summary">
+                @if (PagingSummaryTemplate != null)
+                {
+                    @PagingSummaryTemplate(new(CurrentPage + 1, numberOfPages, Count))
+                }
+                else
+                {
+                    @(string.Format(PagingSummaryFormat, CurrentPage + 1, numberOfPages, Count))   
+                }
+            </span>
         }
         <a id="@(GetId() + "fp")" class="rz-pager-first rz-pager-element @(skip > 0 ? "": "rz-state-disabled") @(focusedIndex == -2 ? "rz-state-focused": "")" @onclick:preventDefault="true" @onclick="@(() => OnFirstPageClick())" aria-label="@FirstPageAriaLabel" role="button" title="@FirstPageTitle" disabled="@(CurrentPage <= 0)">
             <span class="notranslate rz-pager-icon rzi rzi-step-backward"></span>
