@@ -1203,7 +1203,11 @@ namespace Radzen.Blazor
                     ? !string.IsNullOrEmpty(FilterProperty) && FilterProperty != Property ? FilterOperator.In : FilterOperator.Contains
                     : default(FilterOperator);
 
-            SetFilterOperator(fo);
+            if (FilterOperators.Contains(fo))
+            {
+                SetFilterOperator(fo);
+            }
+
             SetSecondFilterOperator(null);
 
             filterValue = null;
