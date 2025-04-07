@@ -35,7 +35,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
-    <PackageReference Include="Radzen.Terser.MSBuild" Version="0.0.3" PrivateAssets="All" />
+    <PackageReference Include="Radzen.Terser.MSBuild" Version="0.0.4" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
