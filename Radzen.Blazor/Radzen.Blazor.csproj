@@ -23,6 +23,7 @@
     <RepositoryUrl>https://github.com/radzenhq/radzen-blazor</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
     <PackageReference Include="DartSassBuilder" Version="1.1.0" PrivateAssets="All" />
@@ -34,6 +35,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
+    <PackageReference Include="Radzen.Terser.MSBuild" Version="0.0.3" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
@@ -73,10 +75,14 @@
     <Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
   </Target>
 
+  <Target Name="MinifyTest" BeforeTargets="Build" Condition="'$(TargetFramework)' == 'net8.0'">
+    <TerserMinify InputFile="wwwroot\Radzen.Blazor.js" OutputFile="wwwroot\Radzen.Blazor.min.js" />
+  </Target>
+
   <ItemGroup Label="Allow internal method to be visible to the unit tests">
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Radzen.Blazor.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-  
+
 </Project>
