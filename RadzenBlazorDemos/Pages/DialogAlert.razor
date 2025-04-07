@@ -3,4 +3,17 @@
 <div class="rz-p-12 rz-text-align-center">
     <RadzenButton Text="Alert dialog" ButtonStyle="ButtonStyle.Secondary" 
         Click=@(args => DialogService.Alert("Some message!", "MyTitle", new AlertOptions() { OkButtonText = "Yes" })) />
+    <RadzenButton Text="Alert dialog with markup" ButtonStyle="ButtonStyle.Secondary"
+                  Click=@(args => DialogService.Alert(GetMessage(), "MyTitle", new AlertOptions() { OkButtonText = "Yes" })) />
 </div>
+@code {
+    RenderFragment GetMessage()
+    {
+        return __builder =>
+        {
+            <text>
+                Some <b>message</b>!
+            </text>
+        };
+    }
+}

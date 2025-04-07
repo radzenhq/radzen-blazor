@@ -496,6 +496,55 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Displays a confirmation dialog.
+        /// </summary>
+        /// <param name="message">The message displayed to the user.</param>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
+        public virtual async Task<bool?> Confirm(RenderFragment message, string title = "Confirm", ConfirmOptions options = null, CancellationToken? cancellationToken = null)
+        {
+            // Validate and set default values for the dialog options
+            options ??= new();
+            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : "Ok";
+            options.CancelButtonText = !String.IsNullOrEmpty(options.CancelButtonText) ? options.CancelButtonText : "Cancel";
+            options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : ""; // Width is set to 600px by default by OpenAsync
+            options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
+            options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm";
+            options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+
+            return await OpenAsync(title, ds =>
+            {
+                RenderFragment content = b =>
+                {
+                    var i = 0;
+                    b.OpenElement(i++, "p");
+                    b.AddAttribute(i++, "class", "rz-dialog-confirm-message");
+                    b.AddContent(i++, message);
+                    b.CloseElement();
+
+                    b.OpenElement(i++, "div");
+                    b.AddAttribute(i++, "class", "rz-dialog-confirm-buttons");
+
+                    b.OpenComponent<Blazor.RadzenButton>(i++);
+                    b.AddAttribute(i++, "Text", options.OkButtonText);
+                    b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(true)));
+                    b.CloseComponent();
+
+                    b.OpenComponent<Blazor.RadzenButton>(i++);
+                    b.AddAttribute(i++, "Text", options.CancelButtonText);
+                    b.AddAttribute(i++, "ButtonStyle", ButtonStyle.Base);
+                    b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(false)));
+                    b.CloseComponent();
+
+                    b.CloseElement();
+                };
+                return content;
+            }, options, cancellationToken);
+        }
+
+        /// <summary>
         /// Displays a alert dialog.
         /// </summary>
         /// <param name="message">The message displayed to the user.</param>
@@ -509,6 +558,49 @@ namespace Radzen
             options ??= new();
             options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : "Ok";
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";  
+            options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
+            options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
+            options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+            options.ContentCssClass = !String.IsNullOrEmpty(options.ContentCssClass) ? $"rz-dialog-content {options.ContentCssClass}" : "rz-dialog-content";
+
+            return await OpenAsync(title, ds =>
+            {
+                RenderFragment content = b =>
+                {
+                    var i = 0;
+                    b.OpenElement(i++, "p");
+                    b.AddAttribute(i++, "class", "rz-dialog-alert-message");
+                    b.AddContent(i++, message);
+                    b.CloseElement();
+
+                    b.OpenElement(i++, "div");
+                    b.AddAttribute(i++, "class", "rz-dialog-alert-buttons");
+
+                    b.OpenComponent<Blazor.RadzenButton>(i++);
+                    b.AddAttribute(i++, "Text", options.OkButtonText);
+                    b.AddAttribute(i++, "Click", EventCallback.Factory.Create<Microsoft.AspNetCore.Components.Web.MouseEventArgs>(this, () => ds.Close(true)));
+                    b.CloseComponent();
+
+                    b.CloseElement();
+                };
+                return content;
+            }, options, cancellationToken);
+        }
+
+        /// <summary>
+        /// Displays a alert dialog.
+        /// </summary>
+        /// <param name="message">The message displayed to the user.</param>
+        /// <param name="title">The text displayed in the title bar of the dialog.</param>
+        /// <param name="options">The options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
+        public virtual async Task<bool?> Alert(RenderFragment message, string title = "Message", AlertOptions options = null, CancellationToken? cancellationToken = null)
+        {
+            // Validate and set default values for the dialog options
+            options ??= new();
+            options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : "Ok";
+            options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
             options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";

@@ -3,4 +3,18 @@
 <div class="rz-p-12 rz-text-align-center">
     <RadzenButton Text="Confirm dialog" ButtonStyle="ButtonStyle.Secondary" 
         Click=@(args => DialogService.Confirm("Are you sure?", "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
+    <RadzenButton Text="Confirm dialog with markup" ButtonStyle="ButtonStyle.Secondary"
+        Click=@(args => DialogService.Confirm(GetMessage(), "MyTitle", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" })) />
 </div>
+
+@code{
+    RenderFragment GetMessage()
+    {
+        return __builder =>
+        {
+            <text>
+                Are <b>you</b> sure?
+            </text>
+        };
+    }
+}
