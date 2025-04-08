@@ -1,0 +1,39 @@
+﻿<RadzenCard Variant="Variant.Outlined">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select a file to upload</RadzenText>
+    <RadzenUpload Url="upload/single" Progress=@OnProgress Complete=@OnComplete Style="width: 100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})" />
+    <RadzenProgressBar Value=@progress class="rz-mt-6" Visible=@showProgress />
+    <RadzenButton Text="Cancel" Click=@OnCancel class="rz-mt-4" Visible=@showProgress />
+    <RadzenLabel Visible=@showComplete class="rz-mt-6" Text=@completionMessage />
+</RadzenCard>
+@code {
+    int progress;
+    bool showProgress;
+    bool showComplete;
+    string completionMessage;
+    bool cancelUpload = false;
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        completionMessage = args.Cancelled ? "Upload Cancelled!" : "Upload Complete!";
+        showProgress = false;
+        showComplete = true;
+    }
+
+    void OnProgress(UploadProgressArgs args)
+    {
+        showProgress = true;
+        showComplete = false;
+        progress = args.Progress;
+
+        // cancel upload
+        args.Cancel = cancelUpload;
+
+        // reset cancel flag
+        cancelUpload = false;
+    }
+
+    void OnCancel()
+    {
+        cancelUpload = true;
+    }
+}

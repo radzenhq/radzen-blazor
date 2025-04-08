@@ -1,0 +1,20 @@
+﻿
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenUpload Url="upload/custom-header" Style="width: 100%" Complete=@OnComplete
+        InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})">
+        <RadzenUploadHeader Name="Authorization" Value=@($"Bearer {token}") />
+        <RadzenUploadHeader Name="X-Uploaded-By" Value="Radzen" />
+    </RadzenUpload>
+</RadzenCard>
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    private string token = "<token>";
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        console.Log($"Custom headers as returned from the server: {args.RawResponse}");
+    }
+}

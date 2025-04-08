@@ -1,0 +1,32 @@
+﻿
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenUpload Multiple="true" Change=@OnChange Style="width: 100%"
+        InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})" />
+</RadzenCard>
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    void OnChange(UploadChangeEventArgs args)
+    {
+        console.Log($"Files uploaded:");
+
+        foreach (var file in args.Files)
+        {
+            console.Log($"File: {file.Name} / {file.Size} bytes");
+
+            try
+            {
+                long maxFileSize = 10 * 1024 * 1024;
+                // read file
+                var stream = file.OpenReadStream(maxFileSize);
+                stream.Close();
+            }
+            catch (Exception ex)
+            {
+                console.Log($"Client-side file read error: {ex.Message}");
+            }
+        }
+    }
+}

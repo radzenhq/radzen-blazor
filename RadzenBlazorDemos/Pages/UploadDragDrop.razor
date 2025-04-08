@@ -1,0 +1,46 @@
+﻿<style>
+    #uploadWithDragAndDrop {
+        left: 0;
+        --rz-upload-button-bar-background-color: transparent;
+        --rz-upload-button-bar-padding: 0;
+    }
+
+    #uploadWithDragAndDrop .rz-fileupload-buttonbar .rz-fileupload-choose {
+        width: 100%;
+        text-align: center;
+        font-size: 16px;
+        padding: 100px 0;
+    }
+</style>
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Drag and drop files to upload</RadzenText>
+    <RadzenUpload id="uploadWithDragAndDrop" @ref="upload" ChooseText="Drag and drop here or click to choose files" 
+                Auto="false" Multiple="true" Url="upload/multiple" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+                Progress=@OnProgress Style="width: 100%" />
+    <RadzenButton Text="Upload" Click=@OnUpload class="rz-mt-4" />
+</RadzenCard>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    RadzenUpload upload;
+
+    void OnUpload()
+    {
+        upload.Upload();
+    }
+
+    void OnProgress(UploadProgressArgs args)
+    {
+        console.Log($"Upload progress: {args.Progress}% / {args.Loaded} of {args.Total} bytes.");
+
+        if (args.Progress == 100)
+        {
+            foreach (var file in args.Files)
+            {
+                console.Log($"Uploaded: {file.Name} / {file.Size} bytes");
+            }
+        }
+    }
+}

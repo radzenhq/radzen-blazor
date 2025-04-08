@@ -1,0 +1,31 @@
+﻿<RadzenCard Variant="Variant.Outlined">
+    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Select a file to upload and click Upload</RadzenText>
+    <RadzenUpload @ref="upload" Auto="false" Multiple="true" Url="upload/multiple" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "select file" }})"
+                Progress=@OnProgress Style="width: 100%" />
+    <RadzenButton Text="Upload" Click=@OnUpload class="rz-mt-4" />
+</RadzenCard>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+    RadzenUpload upload;
+
+    void OnUpload()
+    {
+        upload.Upload();
+    }
+
+    void OnProgress(UploadProgressArgs args)
+    {
+        console.Log($"Upload progress: {args.Progress}% / {args.Loaded} of {args.Total} bytes.");
+
+        if (args.Progress == 100)
+        {
+            foreach (var file in args.Files)
+            {
+                console.Log($"Uploaded: {file.Name} / {file.Size} bytes");
+            }
+        }
+    }
+}

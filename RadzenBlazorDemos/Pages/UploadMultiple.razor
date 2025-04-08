@@ -1,0 +1,22 @@
+﻿<RadzenCard Variant="Variant.Outlined">
+    <RadzenUpload Multiple="true" Url="upload/multiple" Style="width: 100%" Progress=@OnProgress 
+        InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})" />
+</RadzenCard>
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    void OnProgress(UploadProgressArgs args)
+    {
+        console.Log($"Upload progress: {args.Progress}% / {args.Loaded} of {args.Total} bytes.");
+
+        if (args.Progress == 100)
+        {
+            foreach (var file in args.Files)
+            {
+                console.Log($"Uploaded: {file.Name} / {file.Size} bytes");
+            }
+        }
+    }
+}

@@ -1,0 +1,24 @@
+﻿
+<RadzenText TextStyle="TextStyle.Body1">
+    Upload URL set to: <code>@Url</code>
+</RadzenText>
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenUpload Url=@Url Style="width: 100%" Complete=@OnComplete
+        InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})">
+    </RadzenUpload>
+</RadzenCard>
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    private int id = 42;
+    private string query = "query";
+
+    private string Url => $"upload/{id}?query={query}";
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        console.Log($"Parameters as returned from the server: {args.RawResponse}");
+    }
+}

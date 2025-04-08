@@ -1,0 +1,15 @@
+﻿
+<RadzenCard Variant="Variant.Outlined">
+    <RadzenUpload Style="width: 100%" Multiple="true" Accept="image/*" Url="upload/multiple"
+        InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})" />
+</RadzenCard>
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    void OnComplete(UploadCompleteEventArgs args)
+    {
+        console.Log($"Upload complete");
+    }
+}

@@ -8,8 +8,96 @@
     Demonstration and configuration of the Radzen Blazor <strong>Upload</strong> component.
 </RadzenText>
 
-<RadzenExample ComponentName="Upload" Example="UploadConfig">
-    <UploadConfig />
+<RadzenText Anchor="example-upload#change" TextStyle="TextStyle.H5" TagName="TagName.H2">
+    Upload files
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To get uploaded files handle the <strong>Change</strong> event and use its event arguments.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="UploadChange">
+    <UploadChange />
+</RadzenExample>
+<RadzenText Anchor="example-upload#url" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Upload files to a server
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To upload files to a server set the <code>Url</code> property of the component. The URL should point to an action method in your server-side code that handles the file upload.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadUrl)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadUrl />
+</RadzenExample>
+<RadzenText Anchor="example-upload#multiple" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Upload multiple files
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To upload multiple files set the <code>Multiple</code> property of the component to <code>true</code>. 
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadMultiple)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadMultiple />
+</RadzenExample>
+<RadzenText Anchor="example-upload#from-code" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Trigger upload from code
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To trigger the upload from code set the <code>Auto</code> property of the component to <code>false</code>. The upload can be triggered by calling the <code>Upload()</code> method of the component.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadFromCode)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadFromCode />
+</RadzenExample>
+<RadzenText Anchor="example-upload#filter" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    File filter
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To filter the files that can be uploaded use the <code>Accept</code> property of the component. The Value should be a comma separated list <RadzenLink Path="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/accept#unique_file_type_specifiers">unique file type specifiers</RadzenLink>
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadImage)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadImage />
+</RadzenExample>
+<RadzenText Anchor="example-upload#parameters" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Use parameters
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To send additional parameters with the upload request use the <code>Url</code> property of the component. 
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadParameters)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadParameters />
+</RadzenExample>
+<RadzenText Anchor="example-upload#progress" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Show upload progress
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    This demo shows how to use the <code>RadzenProgressBar</code> component to show upload progress by handling the <code>Progress</code> event.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadProgress)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadProgress />
+</RadzenExample>
+<RadzenText Anchor="example-upload#drag-drop" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Drag and drop files to upload
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    This demo shows how to use the <code>RadzenUpload</code> component to allow users to drag and drop files for upload. The <code>ChooseText</code> property is used to set the text displayed when no files are selected.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadDragDrop)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadDragDrop />
+</RadzenExample>
+<RadzenText Anchor="example-upload#custom-headers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Send custom HTTP headers
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To send custom HTTP headers with the upload request use <code>RadzenUploadHeader</code>.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadCustomHeaders)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadCustomHeaders />
+</RadzenExample>
+<RadzenText Anchor="example-upload#parameter-name" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Specify action method parameter name
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To specify the action method parameter name use the <code>ParameterName</code> property of the component. The value should be a string. By default the parameter name is <code>file</code>
+    or <code>files</code> if the <code>Multiple</code> property is set to <code>true</code>.
+</RadzenText>
+<RadzenExample ComponentName="Upload" Example="@nameof(UploadParameterName)" AdditionalSourceCodePages=@(["../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"])>
+    <UploadParameterName />
 </RadzenExample>
 
 <RadzenText Anchor="example-upload#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">

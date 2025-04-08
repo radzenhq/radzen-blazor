@@ -91,13 +91,28 @@ namespace RadzenBlazorDemos
             }
         }
 
-        [HttpPost("upload/{id}")]
-        public IActionResult Post(IFormFile[] files, int id)
+        [HttpPost("upload/custom-header")]
+        public IActionResult CustomHeader(IFormFile file)
         {
             try
             {
-                // Put your code here
-                return StatusCode(200);
+                var uploadedBy = Request.Headers["X-Uploaded-By"].ToString();
+                var authorization = Request.Headers["Authorization"].ToString();
+
+                return Ok(new { uploadedBy, authorization});
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpPost("upload/{id}")]
+        public IActionResult Post(IFormFile[] files, int id, [FromQuery] string query)
+        {
+            try
+            {
+                return Ok(new { id, query});
             }
             catch (Exception ex)
             {
