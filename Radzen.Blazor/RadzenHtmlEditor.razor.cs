@@ -309,6 +309,8 @@ namespace Radzen.Blazor
                 }
             }
 
+            var requiresUpdate = false;
+
             if (valueChanged || visibleChanged)
             {
                 valueChanged = false;
@@ -318,8 +320,22 @@ namespace Radzen.Blazor
 
                 if (Visible)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.innerHTML", ContentEditable, Value);
+                    requiresUpdate = true;
                 }
+            }
+            else if (sourceChanged)
+            {
+                sourceChanged = false;
+
+                if (Visible)
+                {
+                    requiresUpdate = true;
+                }
+            }
+
+            if (requiresUpdate)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.innerHTML", ContentEditable, Html);
             }
         }
 
@@ -383,14 +399,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            valueChanged = sourceChanged;
-
             if (parameters.DidParameterChange(nameof(Value), Value))
             {
                 valueChanged = Html != parameters.GetValueOrDefault<string>(nameof(Value));
             }
-
-            sourceChanged = false;
 
             if (parameters.DidParameterChange(nameof(Mode), Mode))
             {
