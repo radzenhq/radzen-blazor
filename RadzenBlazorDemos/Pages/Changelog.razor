@@ -2,6 +2,38 @@
 
 <div class="changelog">
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v6 Changelog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Track and review changes to Radzen Blazor Components v6
+</RadzenText>
+<RadzenText Anchor="changelog#v6-dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Dependencies
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" />
+    Starting from Radzen Blazor v6.0.0 we have dropped the dependency on the System.Linq.Dynamic.Core NuGet package.
+    We are now using a home-grown solution based on Roslyn (the C# compiler API).
+    More information can be found in the <RadzenLink Text="forum" Path="https://forum.radzen.com/t/just-released-our-new-major-version-of-radzen-blazor-6-0-0-without-reference-to-system-linq-dynamic-core-nuget-package/19748" />.
+</RadzenText>
+<RadzenText Anchor="changelog#v6-markupstring" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    <code>MarkupString</code> support
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" />
+    Starting from v6.4.0 Radzen.Blazor <RadzenLink Path="https://github.com/radzenhq/radzen-blazor/pull/2066">no longer accepts HTML content</RadzenLink> in certain string properties - like <code>Text</code>, <code>Icon</code>, <code>PagingSummaryFormat</code>, etc.
+    We have introduced <code>RenderFragment</code> based properties where needed.
+    This change is made to improve the security of our components and to prevent certain XSS attacks.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">OLD:</RadzenText>
+<pre><code>PagingSummaryFormat="Displaying page {0} of {1} &lt;b&gt;(total {2} records)&lt;/b&gt;</code></pre>
+<RadzenText TextStyle="TextStyle.Body1">New:</RadzenText>
+<pre><code>&lt;PagingSummaryTemplate&gt;
+    Displaying page @@context.CurrentPage of @@context.NumberOfPages &lt;b&gt;(total @@context.TotalCount records)&lt;/b&gt;
+&lt;/PagingSummaryTemplate&gt;
+</code></pre>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Components v5 Changelog
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">

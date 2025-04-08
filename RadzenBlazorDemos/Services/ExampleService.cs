@@ -2020,11 +2020,11 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Name = "V5 Changelog",
+            Name = "Changelog",
             Path = "/changelog",
-            New = true,
-            Title = "Track and review changes to Radzen Blazor Components v5",
-            Description = "See what's new in Radzen Blazor Components v5",
+            Updated = true,
+            Title = "Track and review changes to Radzen Blazor Components",
+            Description = "See what's new in Radzen Blazor Components",
             Icon = "\ue8e1"
         },
     };
