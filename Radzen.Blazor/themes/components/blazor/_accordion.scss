@@ -80,16 +80,16 @@ $accordion-shadow: none !default;
       span:not(.rz-accordion-toggle-icon) {
         flex-grow: 1;
       }
+
+      > .rzi {
+        font-size: var(--rz-accordion-icon-font-size);
+        margin-inline: var(--rz-accordion-icon-margin-inline);
+      }
     }
 
     :focus-visible &.rz-state-focused {
       outline: var(--rz-accordion-item-focus-outline);
       outline-offset: var(--rz-accordion-item-focus-outline-offset);
-    }
-
-    .rzi {
-      font-size: var(--rz-accordion-icon-font-size);
-      margin-inline: var(--rz-accordion-icon-margin-inline);
     }
   }
 }
