@@ -1232,6 +1232,9 @@ window.Radzen = {
             if (Radzen.closeAllPopups) {
                 Radzen.closeAllPopups();
             }
+            if (closestLink && closestLink.closest && closestLink.closest('a')) {
+                closestLink.closest('a').click();
+            }
         }
         if (currentPopup.parent) {
           if (e.type == 'mousedown' && !currentPopup.parent.contains(e.target) && !currentPopup.contains(e.target)) {
