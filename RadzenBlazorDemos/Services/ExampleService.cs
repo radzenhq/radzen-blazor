@@ -331,6 +331,17 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Real Estate",
+                    New = true,
+                    Pro = true,
+                    Title = "Real Estate Blazor Website | Premium App Templates by Radzen",
+                    Icon = "\ue73a",
+                    Description = "A real estate website template designed to showcase listings, build trust, and convert leads. Featuring clean layout and responsive design.",
+                    Path = "templates-realestate",
+                    Tags = new [] { "template", "real estate", "apartment", "home", "website", "app", "application", "page", "landing" }
+                },
+                new Example
+                {
                     Name = "Repair Workshop",
                     New = true,
                     Pro = true,
