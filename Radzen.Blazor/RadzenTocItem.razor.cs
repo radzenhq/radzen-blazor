@@ -35,31 +35,31 @@ public partial class RadzenTocItem : ComponentBase, IAsyncDisposable
     [CascadingParameter(Name = nameof(Level))]
     int Level { get; set; }
 
-    private bool active;
+    private bool selected;
 
     private string Class => ClassList.Create("rz-toc-item")
-        .Add("rz-toc-item-active", active)
+        .Add("rz-toc-item-selected", selected)
         .ToString();
 
-    private string LinkClass => ClassList.Create("rz-toc-link rz-link")
+    private string LinkClass => ClassList.Create("rz-toc-link rz-py-2")
         .Add(Level switch
         {
-            0 => "rz-p-4",
-            1 => "rz-p-8",
-            2 => "rz-p-12",
-            _ => "rz-p-16",
+            0 => "rz-ps-2",
+            1 => "rz-ps-4",
+            2 => "rz-ps-6",
+            _ => "rz-ps-8",
         })
         .ToString();
     
     internal void Activate()
     {
-        active = true;
+        selected = true;
         StateHasChanged();
     }
 
     internal void Deactivate()
     {
-        active = false;
+        selected = false;
         StateHasChanged();
     }
 
