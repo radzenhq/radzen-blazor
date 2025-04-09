@@ -1,6 +1,9 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
+
+#nullable enable
 
 namespace Radzen.Blazor
 {
@@ -13,7 +16,7 @@ namespace Radzen.Blazor
         /// Gets or sets the theme.
         /// </summary>
         [Parameter]
-        public string Theme { get; set; }
+        public string? Theme { get; set; }
 
         /// <summary>
         /// Enables WCAG contrast requirements. If set to true additional CSS file will be loaded.
@@ -21,11 +24,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Wcag { get; set; }
 
-        private string theme;
+        private PersistentComponentState? persistentComponentState;
+
+        private string? theme;
 
         private bool wcag;
 
-        private static readonly string Version = typeof(RadzenTheme).Assembly.GetName().Version.ToString();
+        private static readonly string? Version = typeof(RadzenTheme).Assembly.GetName().Version?.ToString();
 
         private string Href => $"{Path}/{theme}-base.css?v={Version}";
 
@@ -48,28 +53,30 @@ namespace Radzen.Blazor
             _ => false
         };
 
-        private PersistingComponentStateSubscription persistingSubscription;
+        private PersistingComponentStateSubscription? persistingSubscription;
 
         /// <inheritdoc />
         protected override void OnInitialized()
         {
+            persistentComponentState = ServiceProvider.GetService<PersistentComponentState>();
+
             theme = ThemeService.Theme ?? GetCurrentTheme();
             wcag = ThemeService.Wcag ?? Wcag;
 
             ThemeService.SetTheme(theme, true);
 
-            theme = theme.ToLowerInvariant();
+            theme = theme?.ToLowerInvariant();
 
             ThemeService.ThemeChanged += OnThemeChanged;
 
-            persistingSubscription = PersistentComponentState.RegisterOnPersisting(PersistTheme);
+            persistingSubscription = persistentComponentState?.RegisterOnPersisting(PersistTheme);
 
             base.OnInitialized();
         }
 
-        private string GetCurrentTheme()
+        private string? GetCurrentTheme()
         {
-            if (PersistentComponentState.TryTakeFromJson(nameof(Theme), out string theme))
+            if (persistentComponentState?.TryTakeFromJson(nameof(Theme), out string? theme) == true)
             {
                 return theme;
             }
@@ -79,7 +86,7 @@ namespace Radzen.Blazor
 
         private Task PersistTheme()
         {
-            PersistentComponentState.PersistAsJson(nameof(Theme), theme);
+            persistentComponentState?.PersistAsJson(nameof(Theme), theme);
 
             return Task.CompletedTask;
         }
@@ -119,7 +126,8 @@ namespace Radzen.Blazor
             {
                 ThemeService.ThemeChanged -= OnThemeChanged;
             }
-            persistingSubscription.Dispose();
+
+            persistingSubscription?.Dispose();
         }
     }
 }
