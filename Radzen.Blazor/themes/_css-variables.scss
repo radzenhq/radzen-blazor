@@ -1162,6 +1162,18 @@
   --rz-timespanpicker-panel-field-min-width: #{$timespanpicker-panel-field-min-width};
   --rz-timespanpicker-unit-label-color: #{$timespanpicker-unit-label-color};
 
+  /* Toc */
+  --rz-toc-link-font-size: #{$rz-toc-link-font-size};
+  --rz-toc-link-font-weight: #{$rz-toc-link-font-weight};
+  --rz-toc-link-color: #{$rz-toc-link-color};
+  --rz-toc-link-background-color: #{$rz-toc-link-background-color};
+  --rz-toc-link-hover-color: #{$rz-toc-link-hover-color};
+  --rz-toc-link-hover-background-color: #{$rz-toc-link-hover-background-color};
+  --rz-toc-link-selected-color: #{$rz-toc-link-selected-color};
+  --rz-toc-link-selected-background-color: #{$rz-toc-link-selected-background-color};
+  --rz-toc-link-selected-marker-color: #{$rz-toc-link-selected-marker-color};
+  --rz-toc-link-selected-marker-width: #{$rz-toc-link-selected-marker-width};
+
   /* Tooltip */
   --rz-tooltip-background-color: #{$tooltip-background-color};
   --rz-tooltip-color: #{$tooltip-color};
