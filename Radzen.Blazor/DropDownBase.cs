@@ -629,7 +629,7 @@ namespace Radzen
         /// <param name="shouldSelectOnChange">Should select item on item change with keyboard.</param>
         protected virtual async System.Threading.Tasks.Task HandleKeyPress(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args, bool isFilter = false, bool? shouldSelectOnChange = null)
         {
-            if (Disabled || View == null || Query == null)
+            if (Disabled || Data == null)
                 return;
 
             List<object> items = Enumerable.Empty<object>().ToList();
