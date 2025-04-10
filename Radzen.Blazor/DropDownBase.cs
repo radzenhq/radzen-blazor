@@ -745,7 +745,7 @@ namespace Radzen
 
                 Debounce(DebounceFilter, FilterDelay);
             }
-            else
+            else if(isFilter)
             {
                 var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
                     Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
