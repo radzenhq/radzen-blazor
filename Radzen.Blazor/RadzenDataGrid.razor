@@ -114,14 +114,14 @@
                                     @foreach (var g in Groups)
                                     {
                                         <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                            <span class="rz-column-title"></span>
+                                            <span class="rz-column-title"><span style="visibility:hidden">GEC</span></span>
                                         </th>
                                     }
                                 }
                                     @if (Template != null && ShowExpandColumn && i == 0)
                                     {
                                         <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                            <span class="rz-column-title"></span>
+                                            <span class="rz-column-title"><span style="visibility:hidden">EC</span></span>
                                         </th>
                                     }
                             }
