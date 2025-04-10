@@ -1,0 +1,9 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Date" Component="DatePickerNoInputBox" />
+    <RadzenDatePicker @bind-Value=@value Name="DatePickerNoInputBox" AllowClear="true" ShowInput="false" />
+</RadzenStack>
+<RadzenText TextAlign="TextAlign.Center">You selected <strong>@(value == null ? "(no date)" : value.Value.ToShortDateString())</strong>.</RadzenText>
+
+@code {
+    DateTime? value;
+}
