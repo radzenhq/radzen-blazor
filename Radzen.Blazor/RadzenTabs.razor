@@ -5,9 +5,8 @@
 @if (Visible)
 {
     <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
-         tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
-         @onfocus=@(args => focusedIndex = focusedIndex == -1 ? 0: focusedIndex)>
-        <ul role="tablist" class="rz-tabview-nav">
+         tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+        <ul role="tablist" class="rz-tabview-nav" @onfocus=@(args => focusedIndex = focusedIndex == -1 ? 0: focusedIndex)>
             @Tabs
         </ul>
         <div class="rz-tabview-panels">
