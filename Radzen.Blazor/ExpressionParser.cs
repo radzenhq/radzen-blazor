@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -62,6 +63,7 @@ static class DynamicTypeFactory
     }
 }
 
+[RequiresUnreferencedCode("The method references the PropertyOrField method of the Expression class which are subject to trimming.")]
 class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
 {
     private readonly ParameterExpression parameter;
@@ -479,6 +481,7 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
 /// <summary>
 /// Parse lambda expressions from strings.
 /// </summary>
+[RequiresUnreferencedCode("The method references the various methods of Expression class which are subject to trimming.")]
 public static class ExpressionParser
 {
     /// <summary>

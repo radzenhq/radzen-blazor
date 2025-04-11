@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -13,6 +14,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Class EnumExtensions.
     /// </summary>
+    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public static class EnumExtensions
     {
         /// <summary>

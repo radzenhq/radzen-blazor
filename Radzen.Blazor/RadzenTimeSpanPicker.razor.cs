@@ -5,6 +5,7 @@ using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -21,6 +22,7 @@ namespace Radzen.Blazor
     /// &lt;RadzenTimeSpanPicker @bind-Value="@someValue" TValue="TimeSpan" Change=@(args => Console.WriteLine($"Selected time span: {args}")) /&gt;
     /// </code>
     /// </example>
+    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenTimeSpanPicker<TValue> : RadzenComponent, IRadzenFormComponent
     {
         #region Parameters: value

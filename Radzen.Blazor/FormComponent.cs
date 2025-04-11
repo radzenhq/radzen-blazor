@@ -8,12 +8,14 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen
 {
     /// <summary>
     /// Class FormComponentWithAutoComplete.
     /// </summary>
+    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public class FormComponentWithAutoComplete<T> : FormComponent<T>
     {
         /// <summary>
