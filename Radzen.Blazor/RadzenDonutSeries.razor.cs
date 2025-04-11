@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor
 {
@@ -6,6 +7,7 @@ namespace Radzen.Blazor
     /// Renders donut series in <see cref="RadzenChart" />.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
+    [RequiresUnreferencedCode("The method references the various methods of the Expression class which are subject to trimming.")]
     public partial class RadzenDonutSeries<TItem> : RadzenPieSeries<TItem>, IChartDonutSeries
     {
         /// <summary>

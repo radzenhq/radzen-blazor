@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Web;
 using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen
 {
@@ -72,6 +73,7 @@ namespace Radzen
     /// <summary>
     /// Class ODataJsonSerializer.
     /// </summary>
+    [RequiresUnreferencedCode("The method requires various properties and methods of TValue class which are subject to trimming.")]
     public static class ODataJsonSerializer
     {
         /// <summary>
@@ -130,6 +132,7 @@ namespace Radzen
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="JsonConverter{T}" />
+    [RequiresUnreferencedCode("The method requires various properties and methods of T class which are subject to trimming.")]
     public class ComplexPropertiesConverter<T> : JsonConverter<T>
     {
         /// <summary>

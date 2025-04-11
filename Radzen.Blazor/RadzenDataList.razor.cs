@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -20,6 +21,7 @@ namespace Radzen.Blazor
 #if NET6_0_OR_GREATER
     [CascadingTypeParameter(nameof(TItem))]
 #endif
+    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenDataList<TItem> : PagedDataBoundComponent<TItem>
     {
         /// <inheritdoc />

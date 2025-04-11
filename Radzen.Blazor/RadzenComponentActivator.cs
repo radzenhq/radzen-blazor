@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen
@@ -19,6 +20,7 @@ namespace Radzen
     /// builder.Services.AddSingleton&lt;IComponentActivator&gt;(activator);
     /// </code>
     /// </example>
+    [RequiresUnreferencedCode("The method requires public constructor of class which are subject to trimming.")]
     public class RadzenComponentActivator : IComponentActivator
     {
         private readonly Dictionary<Type, Type> replacedTypes = new Dictionary<Type, Type>();
@@ -49,7 +51,7 @@ namespace Radzen
         /// <param name="componentType"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public IComponent CreateInstance(Type componentType)
+        public IComponent CreateInstance([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors)] Type componentType)
         {
             if (!typeof(IComponent).IsAssignableFrom(componentType))
             {
