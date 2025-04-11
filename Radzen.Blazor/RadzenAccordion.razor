@@ -11,8 +11,7 @@
 @if (Visible)
 {
 <div @ref="@Element" role="tablist" style=@Style @attributes="Attributes" class="@GetCssClass()" id="@GetId()" 
-    tabindex="0" @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation=preventKeyPress 
-    @onfocus=@(args => focusedIndex = focusedIndex == -1 ? 0: focusedIndex)>
+    tabindex="0" @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation=preventKeyPress>
     @for (var i = 0; i < items.Count; i++)
     {
         var item = items[i];    

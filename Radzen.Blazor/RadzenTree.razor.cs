@@ -570,5 +570,13 @@ namespace Radzen.Blazor
         {
             await InvokeAsync(StateHasChanged);
         }
+
+        /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+
+            base.OnInitialized();
+        }
     }
 }

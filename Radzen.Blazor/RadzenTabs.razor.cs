@@ -204,6 +204,8 @@ namespace Radzen.Blazor
         {
             selectedIndex = SelectedIndex;
 
+            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+
             base.OnInitialized();
         }
 
