@@ -1,4 +1,5 @@
 ﻿using Radzen;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace System.Linq.Dynamic.Core
@@ -6,6 +7,7 @@ namespace System.Linq.Dynamic.Core
     /// <summary>
     /// Class DynamicExtensions used to replace System.Linq.Dynamic.Core library.
     /// </summary>
+    [RequiresUnreferencedCode("The method references the Where, OrderBy and Select methods of the Queryable class which are subject to trimming.")]
     public static class DynamicExtensions
     {
         static readonly Func<string, Type> typeLocator = type => AppDomain.CurrentDomain.GetAssemblies()

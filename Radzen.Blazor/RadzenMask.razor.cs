@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor
 {
@@ -11,6 +12,7 @@ namespace Radzen.Blazor
     /// &lt;RadzenMask Mask="(***) ***-****" Pattern="[^0-9]" Placeholder="(000) 000-0000" @bind-Value=@phone Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
     /// </code>
     /// </example>
+    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public partial class RadzenMask : FormComponentWithAutoComplete<string>
     {
         /// <summary>

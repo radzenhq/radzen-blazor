@@ -4,6 +4,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor
 {
@@ -15,6 +16,7 @@ namespace Radzen.Blazor
     /// &lt;RadzenColorPicker @bind-Value=@color Change=@(args => Console.WriteLine($"Selected color: {args}")) /&gt;
     /// </code>
     /// </example>
+    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenColorPicker : FormComponent<string>
     {
         /// <summary>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -12,6 +13,7 @@ namespace Radzen
     /// Base classes of components that support paging.
     /// </summary>
     /// <typeparam name="T">The type of the data item</typeparam>
+    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public class PagedDataBoundComponent<T> : RadzenComponent
     {
         /// <summary>
