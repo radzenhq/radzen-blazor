@@ -17,5 +17,9 @@ namespace  Radzen.Blazor.Rendering
         /// The text anchor of the label.
         /// </summary>
         public string TextAnchor { get; set; }
-   }
+        /// <summary>
+        /// Defines the fill color of the component.
+        /// </summary>
+        public string Fill { get; set; }
+    }
 }

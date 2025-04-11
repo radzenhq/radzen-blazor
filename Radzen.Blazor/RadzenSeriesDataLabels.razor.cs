@@ -41,5 +41,16 @@ namespace Radzen.Blazor
         /// <summary>Determines the visibility of the data labels. Set to <c>true</c> by default.</summary>
         [Parameter]
         public bool Visible { get; set; } = true;
+
+        /// <summary>Defines the fill color of the component.</summary>
+        [Parameter]
+        public string Fill { get; set; }
+
+        /// <summary>
+        /// Gets the CSS class for the data labels.
+        /// </summary>
+        /// <returns></returns>
+        public string GetSeriesDataLabelClass()
+                      => string.IsNullOrWhiteSpace(Fill) ? "rz-series-data-label" : "rz-series-data-label-fill";
     }
 }
