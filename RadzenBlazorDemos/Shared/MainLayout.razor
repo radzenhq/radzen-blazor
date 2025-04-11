@@ -103,13 +103,12 @@
                         {
                             <RadzenColumn Size="2">
                                 <div class="demos-right-nav">
+                                    <RadzenText Text="On this page" TextStyle="TextStyle.H6" class="rz-mt-lg-12 rz-mb-4" />
                                     <RadzenToc Selector=".rz-body">
-                                        <RadzenTocItem Text="@example.Name">
-                                            @foreach (var item in example.Toc)
-                                            {
-                                                <RadzenTocItem Text=@item.Text Selector=@item.Anchor />
-                                            }
-                                        </RadzenTocItem>
+                                        @foreach (var item in example.Toc)
+                                        {
+                                            <RadzenTocItem Text=@item.Text Selector=@item.Anchor />
+                                        }
                                     </RadzenToc>
                                 </div>
                             </RadzenColumn>

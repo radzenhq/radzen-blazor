@@ -1,13 +1,22 @@
-$rz-toc-link-font-size: 0.875rem !default;
+$rz-toc-link-padding-block: 0.5rem !default;
+$rz-toc-link-padding-inline: 0.5rem !default;
+$rz-toc-link-font-size: var(--rz-body-font-size) !default;
 $rz-toc-link-font-weight: 400 !default;
+$rz-toc-link-border: none !default;
+$rz-toc-link-border-radius: var(--rz-border-radius) !default;
 $rz-toc-link-color: var(--rz-text-color) !default;
 $rz-toc-link-background-color: transparent !default;
-$rz-toc-link-hover-color: var(--rz-primary-dark) !default;
+$rz-toc-link-hover-color: var(--rz-secondary-dark) !default;
 $rz-toc-link-hover-background-color: transparent !default;
-$rz-toc-link-selected-color: var(--rz-primary) !default;
+$rz-toc-link-selected-font-weight: 400 !default;
+$rz-toc-link-selected-border: none !default;
+$rz-toc-link-selected-color: var(--rz-secondary) !default;
 $rz-toc-link-selected-background-color: transparent !default;
-$rz-toc-link-selected-marker-color: var(--rz-primary) !default;
-$rz-toc-link-selected-marker-width: 0.25rem !default;
+$rz-toc-link-selected-indicator-color: var(--rz-secondary) !default;
+$rz-toc-link-selected-indicator-width: 0.125rem !default;
+$rz-toc-link-selected-indicator-inset-block: 0.5rem !default;
+$rz-toc-link-selected-indicator-inset-inline: 0 auto !default;
+$rz-toc-link-selected-indicator-border-radius: 0 !default;
 
 .rz-toc {
     list-style-type: none;
@@ -24,17 +33,34 @@ $rz-toc-link-selected-marker-width: 0.25rem !default;
 
 .rz-toc-link {
     display: inline-block;
+    padding-block: var(--rz-toc-link-padding-block);
+    padding-inline: var(--rz-toc-link-padding-inline);
     text-decoration: none;
+    font-size: var(--rz-toc-link-font-size);
+    font-weight: var(--rz-toc-link-font-weight);
+    border: var(--rz-toc-link-border);
+    border-radius: var(--rz-toc-link-border-radius);
     color: var(--rz-toc-link-color);
     background-color: var(--rz-toc-link-background-color);
-    transition: color var(--rz-transition), background-color var(--rz-transition);
+    transition: border var(--rz-transition), color var(--rz-transition), background-color var(--rz-transition);
 
     &:hover {
         color: var(--rz-toc-link-hover-color);
         background-color: var(--rz-toc-link-hover-background-color);
     }
 
+    &:focus {
+        outline: var(--rz-outline-normal);
+    }
+
+    &:focus-visible {
+        outline: var(--rz-link-focus-outline);
+        outline-offset: calc(-1 * var(--rz-outline-width));
+    }
+
     .rz-toc-item-selected & {
+        font-weight: var(--rz-toc-link-selected-font-weight);
+        border: var(--rz-toc-link-selected-border);
         color: var(--rz-toc-link-selected-color);
         background-color: var(--rz-toc-link-selected-background-color);
     }
@@ -47,10 +73,10 @@ $rz-toc-link-selected-marker-width: 0.25rem !default;
     &:after {
         content: "";
         position: absolute;
-        inset-block-start: 0;
-        inset-block-end: 0;
-        inset-inline-start: 0;
-        width: var(--rz-toc-link-selected-marker-width);
+        inset-block: var(--rz-toc-link-selected-indicator-inset-block);
+        inset-inline: var(--rz-toc-link-selected-indicator-inset-inline);
+        width: var(--rz-toc-link-selected-indicator-width);
+        border-radius: var(--rz-toc-link-selected-indicator-border-radius);
         background-color: transparent;
         transition: background-color var(--rz-transition);
     }
@@ -59,7 +85,7 @@ $rz-toc-link-selected-marker-width: 0.25rem !default;
 .rz-toc-item-selected {
 
     &:after {
-        background-color: var(--rz-toc-link-selected-marker-color);
+        background-color: var(--rz-toc-link-selected-indicator-color);
     }
 }
 

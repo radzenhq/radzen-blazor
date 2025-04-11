@@ -424,45 +424,6 @@ svg.illustration {
 .demos-right-nav {
     position: sticky;
     inset-block-start: 2rem;
-    border-inline-start: var(--rz-border-disabled);
-}
-
-.article-toc {
-    border-inline-start: var(--rz-border-disabled);
-}
-
-.article-toc h2 {
-    padding-inline-start: calc(1rem + 2px);
-}
-
-.article-toc ul,
-.article-toc li {
-    margin: 0;
-    padding: 0;
-    list-style-type: none;
-}
-
-.article-toc a {
-    display: block;
-    padding: 0.25rem 0.25rem 0.25rem 1rem;
-    text-decoration: none;
-    color: var(--rz-tabs-tab-color);
-    border-inline-start: 2px solid transparent;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: var(--rz-transition-all);
-}
-
-.article-toc .active a {
-    color: var(--rz-tabs-tab-selected-color);
-    border-inline-start-color: var(--rz-tabs-tab-selected-color);
-}
-
-.article-toc a:hover,
-.article-toc .active a:hover {
-    text-decoration: none;
-    color: var(--rz-tabs-tab-hover-color);
-    border-inline-start-color: var(--rz-tabs-tab-hover-color);
 }
 
 /* Promo */

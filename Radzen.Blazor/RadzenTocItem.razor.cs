@@ -39,16 +39,16 @@ public partial class RadzenTocItem : ComponentBase, IAsyncDisposable
 
     private string Class => ClassList.Create("rz-toc-item")
         .Add("rz-toc-item-selected", selected)
-        .ToString();
-
-    private string LinkClass => ClassList.Create("rz-toc-link rz-py-2")
         .Add(Level switch
         {
-            0 => "rz-ps-2",
-            1 => "rz-ps-4",
-            2 => "rz-ps-6",
-            _ => "rz-ps-8",
+            0 => "rz-ps-0",
+            1 => "rz-ps-2",
+            2 => "rz-ps-4",
+            _ => "rz-ps-6",
         })
+        .ToString();
+
+    private string LinkClass => ClassList.Create("rz-toc-link")
         .ToString();
     
     internal void Activate()

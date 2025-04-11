@@ -554,6 +554,11 @@ $form-field-focus-shadow: var(--rz-input-focus-shadow) !default;
 // Layout
 $layout-background-color: transparent !default;
 
+// Toc
+$rz-toc-link-hover-color: var(--rz-primary-dark) !default;
+$rz-toc-link-selected-color: var(--rz-primary) !default;
+$rz-toc-link-selected-indicator-color: var(--rz-primary) !default;
+
 @import 'fonts';
 @import 'components';
 
