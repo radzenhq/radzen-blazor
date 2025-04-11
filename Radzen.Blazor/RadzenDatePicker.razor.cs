@@ -770,6 +770,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowButton { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the input box is shown. Ignored if ShowButton is false.
+        /// </summary>
+        /// <value><c>true</c> to show the input box; <c>false</c> to hide the input box.</value>
+        [Parameter]
+        public bool ShowInput { get; set; } = true;
+
         private bool IsReadonly => ReadOnly || !AllowInput;
 
         /// <summary>
@@ -1344,12 +1351,17 @@ namespace Radzen.Blazor
         /// <inheritdoc/>
         public async ValueTask FocusAsync()
         {
-           try
-           {
-               await input.FocusAsync();
+            // If ShowButton is false, the input box is always shown
+            if (ShowInput || !ShowButton)
+            {
+                try
+                {
+                    await input.FocusAsync();
+                }
+                catch
+                { }
             }
-            catch
-            {}
+            
         }
     }
 }

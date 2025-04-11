@@ -112,10 +112,6 @@ $timepicker-border: none !default;
 
 .rz-datepicker-trigger {
   box-shadow: none;
-  position: absolute;
-  inset-block-start: 50%;
-  inset-inline-end: 0.625rem;
-  transform: translateY(-50%);
   background-color: transparent;
   padding: 0;
   vertical-align: text-top;
@@ -164,6 +160,13 @@ $timepicker-border: none !default;
   .rz-button-text {
     display: none;
   }
+}
+
+.rz-datepicker-field-button {
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-end: 0.625rem;
+    transform: translateY(-50%);
 }
 
 .rz-datepicker-popup-container {

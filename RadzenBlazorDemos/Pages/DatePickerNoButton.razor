@@ -1,0 +1,8 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Date" Component="DatePickerNoButton" />
+    <RadzenDatePicker @bind-Value=@value Name="DatePickerNoButton" AllowClear="true" ShowButton="false" />
+</RadzenStack>
+
+@code {
+    DateOnly? value;
+}
