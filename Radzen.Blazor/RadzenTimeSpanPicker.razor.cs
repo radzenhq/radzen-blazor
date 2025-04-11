@@ -425,18 +425,22 @@ namespace Radzen.Blazor
             }
         }
 
+        private TimeSpan _unconfirmedValueOnPanelInput;
         private TimeSpan _unconfirmedValue;
         private TimeSpan UnconfirmedValue
         {
             get => _unconfirmedValue;
             set
             {
-                if (_unconfirmedValue == value)
+                if (_unconfirmedValue == value && _unconfirmedValueOnPanelInput == value)
                 {
                     return;
                 }
 
                 var newValue = AdjustToBounds(value);
+                if (_unconfirmedValueOnPanelInput != newValue)
+                    _unconfirmedValueOnPanelInput = newValue;
+
                 if (_unconfirmedValue == newValue)
                 {
                     return;
@@ -725,6 +729,32 @@ namespace Radzen.Blazor
         #endregion
 
         #region Internal: panel fields setup
+        private static TimeSpan GetTimeSpanFromUnit(TimeSpanUnit unit, int value)
+            => unit switch
+            {
+                TimeSpanUnit.Day => TimeSpan.FromDays(value),
+                TimeSpanUnit.Hour => TimeSpan.FromHours(value),
+                TimeSpanUnit.Minute => TimeSpan.FromMinutes(value),
+                TimeSpanUnit.Second => TimeSpan.FromSeconds(value),
+                TimeSpanUnit.Millisecond => TimeSpan.FromMilliseconds(value),
+                #if NET7_0_OR_GREATER
+                TimeSpanUnit.Microsecond => TimeSpan.FromMicroseconds(value),
+                #endif
+                _ => TimeSpan.Zero,
+            };
+        private static int GetTimeSpanUnitValue(TimeSpanUnit unit, TimeSpan timeSpan)
+            => unit switch
+            {
+                TimeSpanUnit.Day => timeSpan.Days,
+                TimeSpanUnit.Hour => timeSpan.Hours,
+                TimeSpanUnit.Minute => timeSpan.Minutes,
+                TimeSpanUnit.Second => timeSpan.Seconds,
+                TimeSpanUnit.Millisecond => timeSpan.Milliseconds,
+                #if NET7_0_OR_GREATER
+                TimeSpanUnit.Microsecond => timeSpan.Microseconds,
+                #endif
+                _ => 0,
+            };
         private static readonly Dictionary<TimeSpanUnit, int> _timeUnitMaxAbsoluteValues = new()
             {
                 { TimeSpanUnit.Day, TimeSpan.MaxValue.Days },
@@ -827,56 +857,30 @@ namespace Radzen.Blazor
             return UpdateValueFromPanelFields(UnconfirmedValue.Negate());
         }
 
-        private Task UpdateDays(int days)
+        private void UpdateUnconfirmedValueOnPanelInput(TimeSpanUnit unit, string stringValue)
+        {
+            if (string.IsNullOrEmpty(stringValue)
+                || int.TryParse(stringValue, NumberStyles.Any, Culture, out int value) is false)
+            {
+                _unconfirmedValueOnPanelInput = UnconfirmedValue;
+                return;
+            }
+
+            value = Math.Min(Math.Max(value, 0), TimeFieldsMaxValues[unit]);
+
+            _unconfirmedValueOnPanelInput = UnconfirmedValue
+                - GetTimeSpanFromUnit(unit, GetTimeSpanUnitValue(unit, UnconfirmedValue))
+                + GetTimeSpanFromUnit(unit, value * UnconformedValueSign);
+        }
+
+        private Task UpdateValueOfUnit(TimeSpanUnit unit, int value)
         {
             var newValue = UnconfirmedValue
-                - TimeSpan.FromDays(UnconfirmedValue.Days)
-                + TimeSpan.FromDays(days * UnconformedValueSign);
+                - GetTimeSpanFromUnit(unit, GetTimeSpanUnitValue(unit, UnconfirmedValue))
+                + GetTimeSpanFromUnit(unit, value * UnconformedValueSign);
 
             return UpdateValueFromPanelFields(newValue);
         }
-        private Task UpdateHours(int hours)
-        {
-            var newValue = UnconfirmedValue
-                - TimeSpan.FromHours(UnconfirmedValue.Hours)
-                + TimeSpan.FromHours(hours * UnconformedValueSign);
-
-            return UpdateValueFromPanelFields(newValue);
-        }
-        private Task UpdateMinutes(int minutes)
-        {
-            var newValue = UnconfirmedValue
-                - TimeSpan.FromMinutes(UnconfirmedValue.Minutes)
-                + TimeSpan.FromMinutes(minutes * UnconformedValueSign);
-
-            return UpdateValueFromPanelFields(newValue);
-        }
-        private Task UpdateSeconds(int seconds)
-        {
-            var newValue = UnconfirmedValue
-                - TimeSpan.FromSeconds(UnconfirmedValue.Seconds)
-                + TimeSpan.FromSeconds(seconds * UnconformedValueSign);
-
-            return UpdateValueFromPanelFields(newValue);
-        }
-        private Task UpdateMilliseconds(int milliseconds)
-        {
-            var newValue = UnconfirmedValue
-                - TimeSpan.FromMilliseconds(UnconfirmedValue.Milliseconds)
-                + TimeSpan.FromMilliseconds(milliseconds * UnconformedValueSign);
-
-            return UpdateValueFromPanelFields(newValue);
-        }
-#if NET7_0_OR_GREATER
-        private Task UpdateMicroseconds(int microseconds)
-        {
-            var newValue = UnconfirmedValue
-                - TimeSpan.FromMicroseconds(UnconfirmedValue.Microseconds)
-                + TimeSpan.FromMicroseconds(microseconds);
-
-            return UpdateValueFromPanelFields(newValue * UnconformedValueSign);
-        }
-#endif
 
         private Task UpdateValueFromPanelFields(TimeSpan newValue)
         {
@@ -898,6 +902,9 @@ namespace Radzen.Blazor
 
         private async Task ConfirmValue()
         {
+            if (UnconfirmedValue != _unconfirmedValueOnPanelInput)
+                UnconfirmedValue = _unconfirmedValueOnPanelInput;
+
             if (ConfirmedValue != UnconfirmedValue)
             {
                 ConfirmedValue = UnconfirmedValue;

@@ -75,20 +75,20 @@
                         }
                     }
 
-                    @RenderUnitField(TimeSpanUnit.Day, DaysUnitText, "d", UnconfirmedValue.Days, DaysStep, null, UpdateDays)
+                    @RenderUnitField(TimeSpanUnit.Day, DaysUnitText, "d", UnconfirmedValue.Days, DaysStep, null)
 
-                    @RenderUnitField(TimeSpanUnit.Hour, HoursUnitText, "h", UnconfirmedValue.Hours, HoursStep, "00", UpdateHours)
+                    @RenderUnitField(TimeSpanUnit.Hour, HoursUnitText, "h", UnconfirmedValue.Hours, HoursStep, "00")
 
-                    @RenderUnitField(TimeSpanUnit.Minute, MinutesUnitText, "min", UnconfirmedValue.Minutes, MinutesStep, "00", UpdateMinutes)
+                    @RenderUnitField(TimeSpanUnit.Minute, MinutesUnitText, "min", UnconfirmedValue.Minutes, MinutesStep, "00")
 
-                    @RenderUnitField(TimeSpanUnit.Second, SecondsUnitText, "s", UnconfirmedValue.Seconds, SecondsStep, "00", UpdateSeconds)
+                    @RenderUnitField(TimeSpanUnit.Second, SecondsUnitText, "s", UnconfirmedValue.Seconds, SecondsStep, "00")
 
-                    @RenderUnitField(TimeSpanUnit.Millisecond, MillisecondsUnitText, "ms", UnconfirmedValue.Milliseconds, MillisecondsStep, "000", UpdateMilliseconds)
+                    @RenderUnitField(TimeSpanUnit.Millisecond, MillisecondsUnitText, "ms", UnconfirmedValue.Milliseconds, MillisecondsStep, "000")
 
                     @{
                     #if NET7_0_OR_GREATER
                         {
-                            @RenderUnitField(TimeSpanUnit.Microsecond, MicrosecondsUnitText, "us", UnconfirmedValue.Microseconds, MicrosecondsStep, "000", UpdateMicroseconds)
+                            @RenderUnitField(TimeSpanUnit.Microsecond, MicrosecondsUnitText, "us", UnconfirmedValue.Microseconds, MicrosecondsStep, "000")
                         }
                     #endif
                     }
@@ -106,7 +106,7 @@
         };
     }
 
-    private RenderFragment RenderUnitField(TimeSpanUnit unit, string label, string unitSymbol, int value, string step, string valuePaddingFormat, Func<int, Task> change)
+    private RenderFragment RenderUnitField(TimeSpanUnit unit, string label, string unitSymbol, int value, string step, string valuePaddingFormat)
     {
         return __builder =>
         {
@@ -120,8 +120,10 @@
                                    Value="@Math.Abs(value)"
                                    Min="0" Max="@TimeFieldsMaxValues[unit]" Step="@step"
                                    Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? valuePaddingFormat : null)"
+                                   AutoCompleteType="@AutoCompleteType.Off"
                                    class="rz-timespanpicker-unitvaluepicker"
-                                   Change="@change" />
+                                   @oninput="@(args => UpdateUnconfirmedValueOnPanelInput(unit, args.Value?.ToString()))"
+                                   Change="@(value => UpdateValueOfUnit(unit, value))" />
                 </div>
             }
             </text>
