@@ -425,21 +425,20 @@ namespace Radzen.Blazor
             }
         }
 
-        private TimeSpan _unconfirmedValueOnPanelInput;
         private TimeSpan _unconfirmedValue;
         private TimeSpan UnconfirmedValue
         {
             get => _unconfirmedValue;
             set
             {
-                if (_unconfirmedValue == value && _unconfirmedValueOnPanelInput == value)
+                _lastFieldInput.Value = null;
+
+                if (_unconfirmedValue == value)
                 {
                     return;
                 }
 
                 var newValue = AdjustToBounds(value);
-                if (_unconfirmedValueOnPanelInput != newValue)
-                    _unconfirmedValueOnPanelInput = newValue;
 
                 if (_unconfirmedValue == newValue)
                 {
@@ -857,20 +856,21 @@ namespace Radzen.Blazor
             return UpdateValueFromPanelFields(UnconfirmedValue.Negate());
         }
 
-        private void UpdateUnconfirmedValueOnPanelInput(TimeSpanUnit unit, string stringValue)
+        private (TimeSpanUnit Unit, string Value) _lastFieldInput = (TimeSpanUnit.Day, null);
+
+        private void SetLastFieldInput(TimeSpanUnit unit, string value)
+            => _lastFieldInput = (unit, value);
+
+        private Task UpdateValueOfUnit(TimeSpanUnit unit, string stringValue)
         {
             if (string.IsNullOrEmpty(stringValue)
                 || int.TryParse(stringValue, NumberStyles.Any, Culture, out int value) is false)
             {
-                _unconfirmedValueOnPanelInput = UnconfirmedValue;
-                return;
+                return Task.CompletedTask;
             }
 
             value = Math.Min(Math.Max(value, 0), TimeFieldsMaxValues[unit]);
-
-            _unconfirmedValueOnPanelInput = UnconfirmedValue
-                - GetTimeSpanFromUnit(unit, GetTimeSpanUnitValue(unit, UnconfirmedValue))
-                + GetTimeSpanFromUnit(unit, value * UnconformedValueSign);
+            return UpdateValueOfUnit(unit, value);
         }
 
         private Task UpdateValueOfUnit(TimeSpanUnit unit, int value)
@@ -902,8 +902,7 @@ namespace Radzen.Blazor
 
         private async Task ConfirmValue()
         {
-            if (UnconfirmedValue != _unconfirmedValueOnPanelInput)
-                UnconfirmedValue = _unconfirmedValueOnPanelInput;
+            await UpdateValueOfUnit(_lastFieldInput.Unit, _lastFieldInput.Value);
 
             if (ConfirmedValue != UnconfirmedValue)
             {

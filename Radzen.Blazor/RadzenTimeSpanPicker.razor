@@ -122,7 +122,7 @@
                                    Disabled="@Disabled" ReadOnly="@ReadOnly" Format="@(PadTimeValues ? valuePaddingFormat : null)"
                                    AutoCompleteType="@AutoCompleteType.Off"
                                    class="rz-timespanpicker-unitvaluepicker"
-                                   @oninput="@(args => UpdateUnconfirmedValueOnPanelInput(unit, args.Value?.ToString()))"
+                                   @oninput="@(args => SetLastFieldInput(unit, args.Value?.ToString()))"
                                    Change="@(value => UpdateValueOfUnit(unit, value))" />
                 </div>
             }
