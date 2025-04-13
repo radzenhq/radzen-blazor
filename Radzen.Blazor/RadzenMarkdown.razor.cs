@@ -32,6 +32,27 @@ public partial class RadzenMarkdown : RadzenComponent
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether to allow HTML content in the markdown. Certain dangerous HTML tags (script, style, object, iframe) and attributes are removed.
+    /// Set to <c>true</c> by default.
+    /// </summary>
+    [Parameter]
+    public bool AllowHtml { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a list of allowed HTML tags. If set, only these tags will be allowed in the markdown content. By default would use a list of safe HTML tags.
+    /// Considered only if <see cref="AllowHtml"/> is set to <c>true</c>.
+    /// </summary>
+    [Parameter]
+    public IEnumerable<string>? AllowedHtmlTags { get; set; }
+
+    /// <summary>
+    /// Gets or sets a list of allowed HTML attributes. If set, only these attributes will be allowed in the markdown content. By default would use a list of safe HTML attributes.
+    /// Considered only if <see cref="AllowHtml"/> is set to <c>true</c>.
+    /// </summary>
+    [Parameter]
+    public IEnumerable<string>? AllowedHtmlAttributes { get; set; }
+
+    /// <summary>
     /// Gets or sets the markdown content as a string. Overrides <see cref="ChildContent"/> if set.
     /// </summary>
     [Parameter]
@@ -73,7 +94,10 @@ public partial class RadzenMarkdown : RadzenComponent
     {
         var options = new BlazorMarkdownRendererOptions
         {
-            AutoLinkHeadingDepth = AutoLinkHeadingDepth
+            AutoLinkHeadingDepth = AutoLinkHeadingDepth,
+            AllowHtml = AllowHtml,
+            AllowedHtmlAttributes = AllowedHtmlAttributes,
+            AllowedHtmlTags = AllowedHtmlTags,
         };
 
         var visitor = new BlazorMarkdownRenderer(options, builder, outlet);

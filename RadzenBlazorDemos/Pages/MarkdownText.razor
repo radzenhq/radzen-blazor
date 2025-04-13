@@ -1,12 +1,17 @@
-﻿<RadzenRow class="rz-p-0 rz-p-md-12" Gap="3rem" RowGap="1rem">
+﻿<RadzenStack Gap="3rem" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+    <RadzenLabel Component="html">Allow HTML</RadzenLabel>
+    <RadzenSwitch @bind-Value=@allowHtml />
+</RadzenStack>
+<RadzenRow class="rz-pt-6" Gap="3rem" RowGap="1rem">
     <RadzenColumn SizeMD=6>
         <RadzenTextArea Value=@markdown @oninput=@OnInput Style="width: 100%; height: 400px" />
     </RadzenColumn>
     <RadzenColumn SizeMD=6>
-        <RadzenMarkdown Text=@markdown />
+        <RadzenMarkdown Text=@markdown AllowHtml=@allowHtml />
     </RadzenColumn>
 </RadzenRow>
 @code {
+    bool allowHtml = true;
     string markdown = @"# Hello, Blazor!
 - Try the **RadzenMarkdown** component.
 - Update this text";

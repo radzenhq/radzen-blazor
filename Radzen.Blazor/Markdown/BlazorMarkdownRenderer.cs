@@ -7,9 +7,15 @@ using Microsoft.AspNetCore.Components.Rendering;
 namespace Radzen.Blazor.Markdown;
 
 #nullable enable
+
 class BlazorMarkdownRendererOptions
 {
     public int AutoLinkHeadingDepth { get; set; }
+    public bool AllowHtml { get; set; }
+
+    public IEnumerable<string>? AllowedHtmlTags { get; set; }
+
+    public IEnumerable<string>? AllowedHtmlAttributes { get; set; }
 }
 
 class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
@@ -19,6 +25,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
     private static readonly Regex HtmlTagRegex = new(@"<(\w+)((?:\s+[^>]*)?)\/?>");
     private static readonly Regex HtmlClosingTagRegex = new(@"</(\w+)>");
     private static readonly Regex AttributeRegex = new(@"(\w+)(?:\s*=\s*(?:([""'])(.*?)\2|([^\s>]+)))?");
+    private readonly HtmlSanitizer sanitizer = new (options.AllowedHtmlTags, options.AllowedHtmlAttributes);
 
     public override void VisitHeading(Heading heading)
     {
@@ -238,19 +245,24 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+
     public override void VisitHtmlBlock(HtmlBlock htmlBlock)
     {
-            var match = OutletRegex.Match(htmlBlock.Value);
+        var match = OutletRegex.Match(htmlBlock.Value);
 
         if (match.Success)
         {
             var markerId = Convert.ToInt32(match.Groups[1].Value);
             outlet(builder, markerId);
-            return;
+        }
+        else if (options.AllowHtml)
+        {
+            var html = sanitizer.Sanitize(htmlBlock.Value);
+            builder.AddMarkupContent(0, html);
         }
         else
         {
-            builder.AddMarkupContent(0, htmlBlock.Value);
+            builder.AddContent(0, htmlBlock.Value);
         }
     }
 
@@ -288,9 +300,9 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
 
     }
 
-    public override void VisitHtmlInline(HtmlInline html)
+    public override void VisitHtmlInline(HtmlInline htmlInline)
     {
-        var match = OutletRegex.Match(html.Value);
+        var match = OutletRegex.Match(htmlInline.Value);
 
         if (match.Success)
         {
@@ -299,7 +311,15 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
             return;
         }
 
-        var closingMatch = HtmlClosingTagRegex.Match(html.Value);
+        if (!options.AllowHtml)
+        {
+            builder.AddContent(0, htmlInline.Value);
+            return;
+        }
+
+        var html = sanitizer.Sanitize(htmlInline.Value);
+
+        var closingMatch = HtmlClosingTagRegex.Match(html);
 
         if (closingMatch.Success)
         {
@@ -307,7 +327,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
             return;
         }
 
-        var openingMatch = HtmlTagRegex.Match(html.Value);
+        var openingMatch = HtmlTagRegex.Match(html);
 
         if (openingMatch.Success)
         {
@@ -339,7 +359,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
                 }
             }
 
-            if (html.Value.EndsWith("/>") || IsVoidElement(tagName))
+            if (html.EndsWith("/>") || IsVoidElement(tagName))
             {
                 builder.CloseElement();
             }
