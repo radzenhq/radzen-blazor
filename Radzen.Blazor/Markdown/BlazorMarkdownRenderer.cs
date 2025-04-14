@@ -185,7 +185,12 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
     public override void VisitLink(Link link)
     {
         builder.OpenComponent<RadzenLink>(0);
-        builder.AddAttribute(1, nameof(RadzenLink.Path), link.Destination);
+
+        if (!HtmlSanitizer.IsDangerousUrl(link.Destination))
+        {
+            builder.AddAttribute(1, nameof(RadzenLink.Path), link.Destination);
+        }
+
         builder.AddAttribute(2, nameof(RadzenLink.ChildContent), RenderChildren(link.Children));
 
         if (!string.IsNullOrEmpty(link.Title))
@@ -199,7 +204,11 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
     public override void VisitImage(Image image)
     {
         builder.OpenComponent<RadzenImage>(0);
-        builder.AddAttribute(1, nameof(RadzenImage.Path), image.Destination);
+
+        if (!HtmlSanitizer.IsDangerousUrl(image.Destination))
+        {
+            builder.AddAttribute(1, nameof(RadzenImage.Path), image.Destination);
+        }
         
         if (!string.IsNullOrEmpty(image.Title))
         {

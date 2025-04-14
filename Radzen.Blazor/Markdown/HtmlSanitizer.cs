@@ -116,7 +116,7 @@ class HtmlSanitizer
         return System.Web.HttpUtility.HtmlDecode(input);
     }
 
-    private static bool IsDangerousUrl(string value)
+    public static bool IsDangerousUrl(string value)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
