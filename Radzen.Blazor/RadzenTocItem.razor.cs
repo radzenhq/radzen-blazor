@@ -39,6 +39,9 @@ public partial class RadzenTocItem : ComponentBase, IAsyncDisposable
 
     private string Class => ClassList.Create("rz-toc-item")
         .Add("rz-toc-item-selected", selected)
+        .ToString();
+        
+    private string WrapperClass => ClassList.Create("rz-toc-item-wrapper")
         .Add(Level switch
         {
             0 => "rz-ps-0",

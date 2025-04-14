@@ -1178,9 +1178,20 @@
   --rz-toc-link-selected-color: #{$rz-toc-link-selected-color};
   --rz-toc-link-selected-background-color: #{$rz-toc-link-selected-background-color};
   --rz-toc-link-selected-indicator-color: #{$rz-toc-link-selected-indicator-color};
-  --rz-toc-link-selected-indicator-width: #{$rz-toc-link-selected-indicator-width};
+  --rz-toc-link-selected-indicator-size: #{$rz-toc-link-selected-indicator-size};
   --rz-toc-link-selected-indicator-inset-block: #{$rz-toc-link-selected-indicator-inset-block};
   --rz-toc-link-selected-indicator-inset-inline: #{$rz-toc-link-selected-indicator-inset-inline};
+  --rz-toc-horizontal-shadow: #{$rz-toc-horizontal-shadow};
+  --rz-toc-horizontal-border-radius: #{$rz-toc-horizontal-border-radius};
+  --rz-toc-horizontal-background-color: #{$rz-toc-horizontal-background-color};
+  --rz-toc-horizontal-link-padding-block: #{$rz-toc-horizontal-link-padding-block};
+  --rz-toc-horizontal-link-padding-inline: #{$rz-toc-horizontal-link-padding-inline};
+  --rz-toc-horizontal-link-font-size: #{$rz-toc-horizontal-link-font-size};
+  --rz-toc-horizontal-link-selected-indicator-inset-block: #{$rz-toc-horizontal-link-selected-indicator-inset-block};
+  --rz-toc-horizontal-link-selected-indicator-inset-inline: #{$rz-toc-horizontal-link-selected-indicator-inset-inline};
+  --rz-toc-horizontal-link-selected-border: #{$rz-toc-horizontal-link-selected-border};
+  --rz-toc-horizontal-link-selected-color: #{$rz-toc-horizontal-link-selected-color};
+  --rz-toc-horizontal-link-selected-background-color: #{$rz-toc-horizontal-link-selected-background-color};
   --rz-toc-link-selected-indicator-border-radius: #{$rz-toc-link-selected-indicator-border-radius};
 
   /* Tooltip */

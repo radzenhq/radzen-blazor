@@ -1,5 +1,7 @@
 <li class=@Class role="presentation">
-    <a href=@Selector class=@LinkClass @onclick:preventDefault @onclick=@OnClickAsync>@Text</a>
+    <div class=@WrapperClass>
+        <a href=@Selector class=@LinkClass @onclick:preventDefault @onclick=@OnClickAsync>@Text</a>
+    </div>
 @if (ChildContent != null)
 {
     <ul class="rz-toc-list">
