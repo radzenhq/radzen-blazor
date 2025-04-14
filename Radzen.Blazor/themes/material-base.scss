@@ -1050,6 +1050,8 @@ $grid-apply-filter-button-shadow: none !default;
 $grid-header-filter-icon-margin-inline: auto 1rem !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-title-color) !default;
 $grid-header-filter-icon-font-size: 1.25rem !default;
+$grid-simple-filter-icon-active-color: var(--rz-on-primary-lighter) !default;
+$grid-simple-filter-icon-active-background-color: var(--rz-primary-lighter) !default;
 $grid-border: var(--rz-border-base-300) !default;
 $grid-sort-icon-width: 1.25rem !default;
 $grid-shadow: none !default;

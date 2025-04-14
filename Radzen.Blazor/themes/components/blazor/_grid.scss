@@ -57,6 +57,8 @@ $grid-header-filter-icon-margin-inline: auto 0.5rem !default;
 $grid-header-filter-icon-hover-color: var(--rz-text-color) !default;
 $grid-header-filter-icon-active-color: var(--rz-primary) !default;
 $grid-header-filter-icon-font-size: 1rem !default;
+$grid-simple-filter-icon-active-color: var(--rz-on-secondary-lighter) !default;
+$grid-simple-filter-icon-active-background-color: var(--rz-secondary-lighter) !default;
 $grid-border: var(--rz-border-normal) !default;
 $grid-border-radius: 0 !default;
 $grid-sort-icon-width: 1rem !default;
@@ -1045,9 +1047,14 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   }
 }
 
-.rz-grid-filter-active {
+.rzi.rz-grid-filter-active {
   color: var(--rz-grid-header-filter-icon-active-color) !important;
   --rz-icon-fill: 1;
+}
+
+.rz-button.rz-grid-filter-active {
+  color: var(--rz-grid-simple-filter-icon-active-color) !important;
+  background-color: var(--rz-grid-simple-filter-icon-active-background-color) !important;
 }
 
 .rz-data-grid {

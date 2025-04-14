@@ -101,5 +101,9 @@ $rz-outline-offset: 2px !default;
 $rz-outline-width: 2px !default;
 $rz-outline-color: var(--rz-primary) !default;
 
+// Grid
+$grid-simple-filter-icon-active-color: var(--rz-secondary-darker) !default;
+$grid-simple-filter-icon-active-background-color: var(--rz-secondary-lighter) !default;
+
 @import 'fonts';
 @import 'components';
