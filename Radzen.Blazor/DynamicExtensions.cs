@@ -70,7 +70,36 @@ namespace System.Linq.Dynamic.Core
         {
             try
             {
-                return QueryableExtension.OrderBy(source, selector);
+                selector = $"{selector}";
+
+                if (selector.Contains("=>"))
+                {
+                    var identifierName = selector.Split("=>")[0];
+
+                    selector = selector.Replace($"{identifierName}=>", "").Trim();
+
+                    string methodAsc = "OrderBy";
+                    string methodDesc = "OrderByDescending";
+
+                    Expression expression = source.Expression;
+
+                    foreach (var part in selector.Split(","))
+                    {
+                        var lambda = ExpressionParser.ParseLambda<T>($"{identifierName.Trim()} => {part}");
+
+                        expression = Expression.Call(
+                            typeof(Queryable), part.Trim().ToLower().Contains(" desc") ? methodDesc : methodAsc,
+                            new Type[] { source.ElementType, lambda.ReturnType },
+                            expression, Expression.Quote(lambda));
+
+                        methodAsc = "ThenBy";
+                        methodDesc = "ThenByDescending";
+                    }
+
+                    return (IOrderedQueryable<T>)source.Provider.CreateQuery(expression);
+                }
+
+                return (IOrderedQueryable<T>)QueryableExtension.OrderBy((IQueryable)source, selector);
             }
             catch (Exception ex)
             {
