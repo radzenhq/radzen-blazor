@@ -1419,11 +1419,12 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Sticky", Anchor = "#sticky" } ],
+                    Toc = [ new () { Text = "Sticky TOC", Anchor = "#sticky" }, new () { Text = "Orientation", Anchor = "#orientation" } ],
                     Name = "Toc",
                     Description = "Table of contents component",
                     Path = "toc",
                     Icon = "\ue241",
+                    New = true,
                     Tags = [ "toc", "content", "navigation" ]
                 }
             }
