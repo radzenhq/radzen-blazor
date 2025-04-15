@@ -1518,5 +1518,17 @@ $form-field-label-textarea-top: 0.5rem !default;
 $form-field-label-floating-top: -0.5625rem !default;
 $form-field-helper-padding: 0 1rem !default;
 
+// Toc
+$rz-toc-link-hover-color: var(--rz-primary-dark) !default;
+$rz-toc-link-selected-color: var(--rz-primary) !default;
+$rz-toc-link-selected-indicator-inset-block: 0 !default;
+$rz-toc-link-selected-indicator-color: var(--rz-primary) !default;
+$rz-toc-horizontal-link-selected-color: var(--rz-primary) !default;
+$rz-toc-horizontal-link-selected-indicator-inset-inline: 0 !default;
+
+.rz-toc-link {
+  @include rz-ripple($pseudo: true);
+}
+
 @import 'fonts';
 @import 'components';

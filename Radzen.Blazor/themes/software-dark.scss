@@ -433,5 +433,11 @@ $switch-background-color: var(--rz-base-700) !default;
 $form-field-filled-background-color: var(--rz-base-700) !default;
 $form-field-filled-hover-background-color: var(--rz-base-700) !default;
 
+// Toc 
+$rz-toc-link-color: var(--rz-text-secondary-color) !default;
+$rz-toc-link-hover-color: var(--rz-text-color) !default;
+$rz-toc-link-selected-color: var(--rz-text-title-color) !default;
+$rz-toc-horizontal-link-selected-color: var(--rz-text-title-color) !default;
+
 @import 'fonts';
 @import 'components';

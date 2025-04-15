@@ -1,0 +1,73 @@
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebar1Expanded = !sidebar1Expanded)" />
+            <RadzenLabel Text="Header" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebar1Expanded">
+        <div class="rz-p-4">
+            Sidebar
+        </div>
+    </RadzenSidebar>
+    <RadzenBody class="inner-body" style="position: relative;">
+        <RadzenRow>
+            <RadzenColumn Size="10">
+                <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H5">
+                    Title
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#config-section1">
+                    Section 1
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 1 content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#config-section2">
+                    Section 2
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 2 content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#config-section3">
+                    Section 3
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 3 content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#config-section4">
+                    Section 4
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 4 content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#config-section5">
+                    Section 5
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 5 content
+                </RadzenText>
+                <h5 id="config-html-heading">HTML heading</h5>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    HTML heading content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-py-12">
+                    Copyright &copy; 2025 Radzen Ltd. All rights reserved.
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn Size="2">
+                <RadzenToc Selector=".inner-body" style="position: sticky; top: 0; right: 0;">
+                    <RadzenTocItem Text="Section 1" Selector="#config-section1"></RadzenTocItem>
+                    <RadzenTocItem Text="Section 2" Selector="#config-section2"></RadzenTocItem>
+                    <RadzenTocItem Text="Section 3" Selector="#config-section3"></RadzenTocItem>
+                    <RadzenTocItem Text="Section 4" Selector="#config-section4"></RadzenTocItem>
+                    <RadzenTocItem Text="Section 5" Selector="#config-section5"></RadzenTocItem>
+                    <RadzenTocItem Text="HTML Heading" Selector="#config-html-heading"></RadzenTocItem>
+                </RadzenToc>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenBody>
+</RadzenLayout>
+
+@code {
+    bool sidebar1Expanded = true;
+}

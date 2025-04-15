@@ -1,0 +1,71 @@
+<RadzenLayout Style="grid-template-areas: 'rz-header rz-header' 'rz-body rz-body'">
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0" class="rz-p-4">
+            <RadzenLabel Text="Header" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenBody class="horizontal-and-vertical-toc" style="position: relative;">
+        <RadzenToc Orientation="Orientation.Horizontal" Selector=".horizontal-and-vertical-toc" style="position: sticky; top: 0; z-index: 1;">
+            <RadzenTocItem Text="Section 1" Selector="#orientation-section1"></RadzenTocItem>
+            <RadzenTocItem Text="Section 2" Selector="#orientation-section2"></RadzenTocItem>
+            <RadzenTocItem Text="Section 3" Selector="#orientation-section3"></RadzenTocItem>
+            <RadzenTocItem Text="Section 4" Selector="#orientation-section4"></RadzenTocItem>
+            <RadzenTocItem Text="Section 5" Selector="#orientation-section5"></RadzenTocItem>
+            <RadzenTocItem Text="HTML Heading" Selector="#orientation-html-heading"></RadzenTocItem>
+        </RadzenToc>
+        <RadzenRow>
+            <RadzenColumn Size="10">
+                <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H5">
+                    Title
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#orientation-section1">
+                    Section 1
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 1 content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#orientation-section2">
+                    Section 2
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 2 content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#orientation-section3">
+                    Section 3
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 3 content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#orientation-section4">
+                    Section 4
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 4 content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H5" Anchor="toc#orientation-section5">
+                    Section 5
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    Section 5 content
+                </RadzenText>
+                <h5 id="orientation-html-heading">HTML heading</h5>
+                <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-py-8">
+                    HTML heading content
+                </RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-py-12">
+                    Copyright &copy; 2025 Radzen Ltd. All rights reserved.
+                </RadzenText>
+            </RadzenColumn>
+            <RadzenColumn Size="2">
+                <RadzenToc Orientation="Orientation.Vertical" Selector=".horizontal-and-vertical-toc" style="position: sticky; top: 5rem; right: 0;">
+                    <RadzenTocItem Text="Section 1" Selector="#orientation-section1"></RadzenTocItem>
+                    <RadzenTocItem Text="Section 2" Selector="#orientation-section2"></RadzenTocItem>
+                    <RadzenTocItem Text="Section 3" Selector="#orientation-section3"></RadzenTocItem>
+                    <RadzenTocItem Text="Section 4" Selector="#orientation-section4"></RadzenTocItem>
+                    <RadzenTocItem Text="Section 5" Selector="#orientation-section5"></RadzenTocItem>
+                    <RadzenTocItem Text="HTML Heading" Selector="#orientation-html-heading"></RadzenTocItem>
+                </RadzenToc>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenBody>
+</RadzenLayout>

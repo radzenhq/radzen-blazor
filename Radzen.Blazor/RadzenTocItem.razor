@@ -1,0 +1,13 @@
+<li class=@Class role="presentation">
+    <div class=@WrapperClass>
+        <a href=@Selector class=@LinkClass @onclick:preventDefault @onclick=@OnClickAsync>@Text</a>
+    </div>
+@if (ChildContent != null)
+{
+    <ul class="rz-toc-list">
+        <CascadingValue Name=@nameof(Level) Value=@(Level + 1)>
+            @ChildContent
+        </CascadingValue>
+    </ul>
+}
+</li>

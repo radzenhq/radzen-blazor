@@ -1,0 +1,44 @@
+@page "/toc"
+<style>
+    .example-tabs .rz-layout {
+        height: 500px;
+    }
+</style>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Table of Contents
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Radzen Blazor <strong>Toc</strong> displays a table of contents for the current page.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    You can link to any element of the current page by setting the <strong>Selector</strong> property of <code>RadzenTocItem</code>.
+</RadzenText>
+<pre><code>
+&lt;h3 id="toc"&gt;Table of Contents&lt;/h3&gt;
+&lt;RadzenText Anchor="current-page#heading"&gt;Heading&lt;/RadzenText&gt;
+&lt;RadzenToc Selector="#toc"&gt;
+    &lt;RadzenTocItem Selector="#toc" Text="Table of Contents" /&gt;
+    &lt;RadzenTocItem Selector="#heading" Text="Heading" /&gt;
+&lt;/RadzenToc&gt;
+
+</code></pre>
+<RadzenText Anchor="toc#sticky" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Sticky TOC
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    To make the component stick to the top of a scrolling container, add <code>Style="position: sticky; top: 0;"</code>.
+</RadzenText>
+<RadzenExample ComponentName="Toc" Example="TocConfig">
+    <TocConfig />
+</RadzenExample>
+
+<RadzenText Anchor="toc#orientation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Orientation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    RadzenToc supports a horizontal layout with built-in styling. Just set <code>Orientation="Orientation.Horizontal"</code> to enable it.
+</RadzenText>
+<RadzenExample ComponentName="Toc" Example="TocOrientation">
+    <TocOrientation />
+</RadzenExample>

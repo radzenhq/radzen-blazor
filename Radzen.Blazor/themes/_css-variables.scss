@@ -1162,6 +1162,38 @@
   --rz-timespanpicker-panel-field-min-width: #{$timespanpicker-panel-field-min-width};
   --rz-timespanpicker-unit-label-color: #{$timespanpicker-unit-label-color};
 
+  /* Toc */
+  --rz-toc-link-padding-block: #{$rz-toc-link-padding-block};
+  --rz-toc-link-padding-inline: #{$rz-toc-link-padding-inline};
+  --rz-toc-link-font-size: #{$rz-toc-link-font-size};
+  --rz-toc-link-font-weight: #{$rz-toc-link-font-weight};
+  --rz-toc-link-border: #{$rz-toc-link-border};
+  --rz-toc-link-border-radius: #{$rz-toc-link-border-radius};
+  --rz-toc-link-color: #{$rz-toc-link-color};
+  --rz-toc-link-background-color: #{$rz-toc-link-background-color};
+  --rz-toc-link-hover-color: #{$rz-toc-link-hover-color};
+  --rz-toc-link-hover-background-color: #{$rz-toc-link-hover-background-color};
+  --rz-toc-link-selected-font-weight: #{$rz-toc-link-selected-font-weight};
+  --rz-toc-link-selected-border: #{$rz-toc-link-selected-border};
+  --rz-toc-link-selected-color: #{$rz-toc-link-selected-color};
+  --rz-toc-link-selected-background-color: #{$rz-toc-link-selected-background-color};
+  --rz-toc-link-selected-indicator-color: #{$rz-toc-link-selected-indicator-color};
+  --rz-toc-link-selected-indicator-size: #{$rz-toc-link-selected-indicator-size};
+  --rz-toc-link-selected-indicator-inset-block: #{$rz-toc-link-selected-indicator-inset-block};
+  --rz-toc-link-selected-indicator-inset-inline: #{$rz-toc-link-selected-indicator-inset-inline};
+  --rz-toc-horizontal-shadow: #{$rz-toc-horizontal-shadow};
+  --rz-toc-horizontal-border-radius: #{$rz-toc-horizontal-border-radius};
+  --rz-toc-horizontal-background-color: #{$rz-toc-horizontal-background-color};
+  --rz-toc-horizontal-link-padding-block: #{$rz-toc-horizontal-link-padding-block};
+  --rz-toc-horizontal-link-padding-inline: #{$rz-toc-horizontal-link-padding-inline};
+  --rz-toc-horizontal-link-font-size: #{$rz-toc-horizontal-link-font-size};
+  --rz-toc-horizontal-link-selected-indicator-inset-block: #{$rz-toc-horizontal-link-selected-indicator-inset-block};
+  --rz-toc-horizontal-link-selected-indicator-inset-inline: #{$rz-toc-horizontal-link-selected-indicator-inset-inline};
+  --rz-toc-horizontal-link-selected-border: #{$rz-toc-horizontal-link-selected-border};
+  --rz-toc-horizontal-link-selected-color: #{$rz-toc-horizontal-link-selected-color};
+  --rz-toc-horizontal-link-selected-background-color: #{$rz-toc-horizontal-link-selected-background-color};
+  --rz-toc-link-selected-indicator-border-radius: #{$rz-toc-link-selected-indicator-border-radius};
+
   /* Tooltip */
   --rz-tooltip-background-color: #{$tooltip-background-color};
   --rz-tooltip-color: #{$tooltip-color};
