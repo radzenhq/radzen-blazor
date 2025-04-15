@@ -1759,7 +1759,19 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [  
+                        new () { Text = "Upload files", Anchor = "#change" }, 
+                        new () { Text = "Upload files to server", Anchor = "#url" }, 
+                        new () { Text = "Upload multiple files", Anchor = "#multiple" }, 
+                        new () { Text = "Trigger from code", Anchor = "#from-code" }, 
+                        new () { Text = "File filter", Anchor = "#filter" }, 
+                        new () { Text = "Use parameters", Anchor = "#parameters" }, 
+                        new () { Text = "Show upload progress", Anchor = "#progress" }, 
+                        new () { Text = "Drag and drop to upload", Anchor = "#drag-drop" }, 
+                        new () { Text = "Custom HTTP headers", Anchor = "#custom-headers" }, 
+                        new () { Text = "Specify parameter name", Anchor = "#parameter-name" }, 
+                        new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } 
+                    ],
                     Name = "Upload",
                     Description = "Demonstration and configuration of the Radzen Blazor Upload component.",
                     Path = "example-upload",
