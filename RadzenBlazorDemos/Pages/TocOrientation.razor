@@ -4,8 +4,8 @@
             <RadzenLabel Text="Header" />
         </RadzenStack>
     </RadzenHeader>
-    <RadzenBody class="horizontal-and-vertical-toc" style="position: relative;">
-        <RadzenToc Orientation="Orientation.Horizontal" Selector=".horizontal-and-vertical-toc" style="position: sticky; top: 0; z-index: 1;">
+    <RadzenBody class="horizontal-and-vertical-toc" Style="position: relative;">
+        <RadzenToc Orientation="Orientation.Horizontal" Selector=".horizontal-and-vertical-toc" Style="position: sticky; top: 0; z-index: 1;" class="rz-display-none rz-display-md-flex">
             <RadzenTocItem Text="Section 1" Selector="#orientation-section1"></RadzenTocItem>
             <RadzenTocItem Text="Section 2" Selector="#orientation-section2"></RadzenTocItem>
             <RadzenTocItem Text="Section 3" Selector="#orientation-section3"></RadzenTocItem>
@@ -13,8 +13,8 @@
             <RadzenTocItem Text="Section 5" Selector="#orientation-section5"></RadzenTocItem>
             <RadzenTocItem Text="HTML Heading" Selector="#orientation-html-heading"></RadzenTocItem>
         </RadzenToc>
-        <RadzenRow>
-            <RadzenColumn Size="10">
+        <RadzenRow class="rz-w-75 rz-w-sm-100">
+            <RadzenColumn Size="8" SizeSM="6" SizeMD="8" SizeLG="9" Order="2" OrderSM="1">
                 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H5">
                     Title
                 </RadzenText>
@@ -56,8 +56,8 @@
                     Copyright &copy; 2025 Radzen Ltd. All rights reserved.
                 </RadzenText>
             </RadzenColumn>
-            <RadzenColumn Size="2">
-                <RadzenToc Orientation="Orientation.Vertical" Selector=".horizontal-and-vertical-toc" style="position: sticky; top: 5rem; right: 0;">
+            <RadzenColumn Size="8" SizeSM="6" SizeMD="4" SizeLG="3" Order="1" OrderSM="2">
+                <RadzenToc Orientation="Orientation.Vertical" Selector=".horizontal-and-vertical-toc" Style="position: sticky; top: 5rem; right: 0;">
                     <RadzenTocItem Text="Section 1" Selector="#orientation-section1"></RadzenTocItem>
                     <RadzenTocItem Text="Section 2" Selector="#orientation-section2"></RadzenTocItem>
                     <RadzenTocItem Text="Section 3" Selector="#orientation-section3"></RadzenTocItem>

@@ -42,7 +42,7 @@
             <RadzenRow Gap="2rem" class="rz-pt-6 rz-px-0 rz-px-sm-8 rz-px-xl-12">
                 <RadzenColumn Size="12">
                     <RadzenRow class="rz-mx-auto" Style="max-width: 1600px;">
-                        <RadzenColumn Size=@(example?.Toc != null ? 10 : 12)>
+                        <RadzenColumn Size="12" SizeMD=@(example?.Toc != null ? 10 : 12)>
                             <RadzenAlert AlertStyle="AlertStyle.Dark" Icon="mode_heat" Size="AlertSize.Large" Variant="Variant.Flat" class="rz-my-lg-12 promo-alert">
                                 <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-3 rz-color-on-base-darker"><strong>NEW: Radzen Blazor for Visual Studio</strong></RadzenText>
                                 <RadzenText TextStyle="TextStyle.Body1" class="rz-color-on-base-darker">The extension brings Radzen’s rich feature set and productivity tools directly into the familiar Visual Studio 2022 environment. Connect to data, design, code seamlessly, and work faster within Visual Studio. <RadzenLink Path="https://www.radzen.com/blazor-visual-studio" target="_blank" Style="color: #FFB9FF !important;">Learn More ↗</RadzenLink></RadzenText>
@@ -101,7 +101,7 @@
                         </RadzenColumn>
                         @if (example?.Toc != null)
                         {
-                            <RadzenColumn Size="2">
+                            <RadzenColumn Size="2" class="rz-display-none rz-display-md-block">
                                 <div class="demos-right-nav">
                                     <RadzenText Text="On this page" TextStyle="TextStyle.H6" class="rz-mt-lg-12 rz-mb-4" />
                                     <RadzenToc Selector=".rz-body">
