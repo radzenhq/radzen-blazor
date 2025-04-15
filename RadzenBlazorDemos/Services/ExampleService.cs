@@ -1320,7 +1320,7 @@ namespace RadzenBlazorDemos
             Children = new[] {
                 new Example
                 {
-                    Toc = [ new () { Text = "Accordion with single expand", Anchor = "#single-expand" }, new () { Text = "Accordion with multiple expand", Anchor = "#multiple-expand" }, new () { Text = "Dynamically create Accordion items", Anchor = "#dynamic-items" }, new () { Text = "Expand/Collapse events", Anchor = "#expand-collapse-events" }, new () { Text = "Disable expand/collapse", Anchor = "#expand-collapse-events" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Accordion with single expand", Anchor = "#single-expand" }, new () { Text = "Accordion with multiple expand", Anchor = "#multiple-expand" }, new () { Text = "Dynamically create Accordion items", Anchor = "#dynamic-items" }, new () { Text = "Expand/Collapse events", Anchor = "#expand-collapse-events" }, new () { Text = "Disable expand/collapse", Anchor = "#disable-expand-collapse" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Accordion",
                     Path = "accordion",
                     Description = "Demonstration and configuration of the Blazor RadzenAccordion component.",
