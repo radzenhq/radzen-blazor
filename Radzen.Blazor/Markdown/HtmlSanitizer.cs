@@ -99,13 +99,16 @@ class HtmlSanitizer
             {
                 return string.Empty;
             }
-
-            return $" style=\"{value}\"";
         }
 
         if (UriAttributes.Contains(name) && IsDangerousUrl(value))
         {
             return string.Empty;
+        }
+
+        if ((value.StartsWith('\'') && value.EndsWith('\'')) || (value.StartsWith('"') && value.EndsWith('"')))
+        {
+            value = value[1..^1];
         }
 
         return $" {name}=\"{value}\"";
