@@ -11,6 +11,17 @@ public class EmphasisTests
     }
 
     [Theory]
+    [InlineData(@"**foo** bar
+baz",@"<document>
+    <paragraph>
+        <strong>
+            <text>foo</text>
+        </strong>
+        <text> bar</text>
+        <softbreak />
+        <text>baz</text>
+    </paragraph>
+</document>")]
     [InlineData("*foo bar*",
 @"<document>
     <paragraph>

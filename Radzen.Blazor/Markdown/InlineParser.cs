@@ -71,7 +71,7 @@ class InlineParser
 
             if (trim)
             {
-                value = value.Trim();
+                value = value.TrimEnd();
             }
 
             inlines.Add(new Text(value));

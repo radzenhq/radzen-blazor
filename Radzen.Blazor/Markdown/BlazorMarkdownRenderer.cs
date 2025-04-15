@@ -254,7 +254,6 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
-
     public override void VisitHtmlBlock(HtmlBlock htmlBlock)
     {
         var match = OutletRegex.Match(htmlBlock.Value);
@@ -306,7 +305,11 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
             "wbr" => true,
             _ => false
         };
+    }
 
+    public override void VisitSoftLineBreak(SoftLineBreak softBreak)
+    {
+        builder.AddContent(0, "\n");
     }
 
     public override void VisitHtmlInline(HtmlInline htmlInline)
