@@ -1,0 +1,19 @@
+﻿@inject NotificationService NotificationService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Show notification with custom content" 
+                  Click="@(args => ShowNotificationWithCustomContent())" />
+</div>
+
+@code {
+    void ShowNotificationWithCustomContent()
+    {
+        NotificationService.Notify(new NotificationMessage
+        {
+                Severity = NotificationSeverity.Warning,
+                Duration = 40000,
+                SummaryContent = ns =>@<RadzenText TextStyle="TextStyle.H6">Custom summary: <br /> @DateTime.Now</RadzenText>,
+                DetailContent = ns => @<RadzenButton Text="Clear" Click="@(args => ns.Messages.Clear())" />
+        });
+    }
+}

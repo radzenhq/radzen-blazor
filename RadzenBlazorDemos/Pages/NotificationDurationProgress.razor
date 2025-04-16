@@ -1,0 +1,13 @@
+﻿@inject NotificationService NotificationService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Show notification with duration progress" 
+                  Click="@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Click Summary", Detail = "Click Me", Duration = 4000, ShowProgress = true, CloseOnClick = true, Payload = DateTime.Now }))" />
+</div>
+
+@code {
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+}

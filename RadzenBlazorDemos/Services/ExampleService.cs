@@ -2036,6 +2036,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Severity", Anchor = "#severity" }, new () { Text = "Position", Anchor = "#position" }, new () { Text = "Custom click handler", Anchor = "#click-handler" }, new () { Text = "Custom content", Anchor = "#custom-content" }, new () { Text = "Duration progress", Anchor = "#duration-progress" } ],
                     Name = "Notification",
                     Path = "notification",
                     Updated = true,

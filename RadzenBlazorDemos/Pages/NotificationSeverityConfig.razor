@@ -1,0 +1,43 @@
+﻿@inject NotificationService NotificationService
+
+<RadzenRow Gap="1rem" RowGap="1rem" class="rz-m-0 rz-m-md-12">
+    <RadzenColumn Size="12" SizeMD="3">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-info-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Info</RadzenText>
+            <RadzenButton Text="Show info notification" Style="width: 100%;"
+                ButtonStyle="ButtonStyle.Info"
+                Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Summary", Detail = "Info Detail", Duration = 4000 })) />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="3">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-warning-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Warning</RadzenText>
+            <RadzenButton Text="Show warning notification" Style="width: 100%;"
+                ButtonStyle="ButtonStyle.Warning"
+                Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Warning, Summary = "Warning Summary", Detail = "Warning Detail", Duration = 4000 })) />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="3">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-danger-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Error</RadzenText>
+            <RadzenButton Text="Show error notification" Style="width: 100%;"
+                ButtonStyle="ButtonStyle.Danger"
+                Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Error, Summary = "Error Summary", Detail = "Error Detail", Duration = 4000 })) />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="3">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-success-lighter">
+            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Success</RadzenText>
+            <RadzenButton Text="Show success notification" Style="width: 100%;"
+                ButtonStyle="ButtonStyle.Success"
+                Click=@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Success, Summary = "Success Summary", Detail = "Success Detail", Duration = 4000 })) />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+    }
+}

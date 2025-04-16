@@ -1,0 +1,24 @@
+﻿@inject NotificationService NotificationService
+
+<div class="rz-p-12 rz-text-align-center">
+    <RadzenButton Text="Show notification with custom click handler" 
+                  Click="@(args => ShowNotification(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "Info Click Summary", Detail = "Click Me", Duration = 4000, Click=NotificationClick, CloseOnClick = true, Payload = DateTime.Now }))" />
+</div>
+
+<EventConsole @ref=@console />
+
+@code {
+    EventConsole console;
+
+    void ShowNotification(NotificationMessage message)
+    {
+        NotificationService.Notify(message);
+
+        console.Log($"{message.Severity} notification");
+    }
+
+    void NotificationClick(NotificationMessage message)
+    {
+        console.Log($"{message.Summary} clicked, Payload = {message.Payload}");
+    }
+}
