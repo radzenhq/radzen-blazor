@@ -160,6 +160,13 @@ namespace Radzen.Blazor
         public EventCallback<RadzenSplitButtonItem> Click { get; set; }
 
         /// <summary>
+        /// Gets or sets the type of the button.
+        /// </summary>
+        /// <value>The type of the button.</value>
+        [Parameter]
+        public ButtonType ButtonType { get; set; } = ButtonType.Button;
+
+        /// <summary>
         /// Handles the <see cref="E:Click" /> event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
