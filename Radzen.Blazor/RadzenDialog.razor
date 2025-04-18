@@ -2,6 +2,40 @@
 @using Microsoft.JSInterop
 @using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime
+<style>
+    .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .fade-out {
+        animation: fadeOut 0.3s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        to {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+    }
+</style>
+
 
 @foreach (var dialog in dialogs)
 {
@@ -11,7 +45,7 @@
 @if (isSideDialogOpen)
 {
     <aside
-        class="@GetSideDialogCssClass()"
+        class="@($"{GetSideDialogCssClass()} {GetAnimationCssClass()}")"
         tabindex="@(isSideDialogOpen ? "0" : "-1")"
         style="@GetSideDialogStyle()"
         aria-labelledby="rz-dialog-side-label"
@@ -153,6 +187,11 @@
         string heightStyle = string.IsNullOrEmpty(sideDialogOptions.Height) ? string.Empty : $"height: {sideDialogOptions.Height};";
 
         return $"{widthStyle}{heightStyle}{sideDialogOptions.Style}";
+    }
+
+    private string GetAnimationCssClass()
+    {
+        return isSideDialogOpen ? "fade-in" : "fade-out";
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

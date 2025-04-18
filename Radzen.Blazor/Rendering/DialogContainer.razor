@@ -1,14 +1,47 @@
-@using Microsoft.JSInterop
+﻿@using Microsoft.JSInterop
 @using System.Reflection;
 @using System.ComponentModel
 @inject IJSRuntime JSRuntime
 @implements IDisposable
-<div class="@WrapperCssClass">
+<style>
+    .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .fade-out {
+        animation: fadeOut 0.3s ease-in-out;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @@keyframes fadeOut {
+        from {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        to {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+    }
+</style>
+<div class="@($"{WrapperCssClass} {GetAnimationCssClass()}")">
     <div @ref="dialog" class="@CssClass" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
-            <div class="rz-dialog-titlebar">
-                <div class="rz-dialog-title" id="rz-dialog-0-label">
+                <div class="rz-dialog-titlebar">
+                    <div class="rz-dialog-title" id="rz-dialog-0-label">
                     @if (Dialog.Options.TitleContent != null)
                     {
                         @Dialog.Options.TitleContent(Service)
@@ -17,14 +50,14 @@
                     {
                         @Dialog.Title
                     }
-                </div>
+                    </div>
                 @if (Dialog.Options.ShowClose)
                 {
-                    <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
-                        <span class="notranslate rzi rzi-times"></span>
-                    </a>
+                            <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                                <span class="notranslate rzi rzi-times"></span>
+                            </a>
                 }
-            </div>
+                </div>
         }
         <div class="@ContentCssClass">
             @if (Dialog.Options.ChildContent != null)
@@ -42,17 +75,17 @@
     {
         @if (Dialog.Options.CloseDialogOnOverlayClick)
         {
-            <div @onclick="@Close" class="rz-dialog-mask"></div>
+                    <div @onclick="@Close" class="rz-dialog-mask"></div>
         }
         else
         {
-            <div class="rz-dialog-mask" style="pointer-events: none;"></div>
+                    <div class="rz-dialog-mask" style="pointer-events: none;"></div>
         }
     }
-
 </div>
 
 @code {
+    private bool isDialogOpen = true;
     void OnKeyPress(KeyboardEventArgs args)
     {
         var key = args.Code != null ? args.Code : args.Key;
@@ -153,9 +186,21 @@
 
     object reference;
 
+    private string GetAnimationCssClass()
+    {
+        return isDialogOpen ? "fade-in" : "fade-out";
+    }
+
     void Close()
     {
-        Service.Close();
+        isDialogOpen = false;
+        StateHasChanged();
+
+        // Delay actual close to allow animation to complete
+        Task.Delay(300).ContinueWith(_ =>
+        {
+            Service.Close();
+        });
     }
 
     string CssClass
