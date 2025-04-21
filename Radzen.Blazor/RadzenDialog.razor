@@ -192,10 +192,10 @@
     <DialogContainer @key=@dialog Dialog=@dialog ShowMask=@(dialog.Options.ShowMask == true && dialog==dialogs.LastOrDefault()) />
 }
 
-@if (isSideDialogOpen)
+@if (sideDialogOptions != null)
 {
     <aside
-    class="@($"{GetSideDialogCssClass()} {GetSideDialogAnimationCssClass()} {GetSideDialogShadowCssClass()}")"
+    class="@($"{GetSideDialogCssClass()} {GetSideDialogAnimationCssClass} {GetSideDialogShadowCssClass()}")"
     tabindex="@(isSideDialogOpen ? "0" : "-1")"
     style="@GetSideDialogStyle()"
     aria-labelledby="rz-dialog-side-label"
@@ -250,8 +250,9 @@
     public string CloseSideDialogAriaLabel { get; set; } = "Close side dialog";
 
     List<Dialog> dialogs = new List<Dialog>();
-    bool isSideDialogVisible = false;
     bool isSideDialogOpen = false;
+    string sideDialogAnimationClass = string.Empty;
+
 
     RenderFragment sideDialogContent;
     SideDialogOptions sideDialogOptions;
@@ -312,10 +313,10 @@
         StateHasChanged();
     }
 
-    void OnSideClose(dynamic _)
+    async void OnSideClose(dynamic _)
     {
-        isSideDialogOpen = false;  
-        StateHasChanged();  
+        isSideDialogOpen = false;
+        StateHasChanged();
     }
 
     void OnOpen(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)

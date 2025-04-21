@@ -5,7 +5,7 @@
 @implements IDisposable
 
 <div class="@WrapperCssClass">
-    <div class="@($"{CssClass} {GetAnimationCssClass()}")" @ref="dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
+    <div class="@($"{CssClass} {GetAnimationCssClass()} {GetShadowCssClass()}")" @ref="dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
             <div class="rz-dialog-titlebar">
@@ -156,13 +156,60 @@
 
     private string GetAnimationCssClass()
     {
-       return Dialog.Options.Animation switch
-       {
-           DialogAnimation.None => string.Empty,
-           DialogAnimation.Fade => isDialogOpen ? "fade-in" : "fade-out",
-           DialogAnimation.Zoom => isDialogOpen ? "zoom-in" : "zoom-out",
-           _ => string.Empty
-       };
+        return Dialog.Options.Animation switch
+        {
+            DialogAnimation.None => string.Empty,
+            DialogAnimation.Fade => isDialogOpen ? "fade-in" : "fade-out",
+            DialogAnimation.Zoom => isDialogOpen ? "zoom-in" : "zoom-out",
+            DialogAnimation.Slide => isDialogOpen ? GetSlideCssClass("in") : GetSlideCssClass("out"),
+            _ => string.Empty
+        };
+    }
+
+    private string GetSlideCssClass(string direction)
+    {
+        if (!string.IsNullOrEmpty(Dialog.Options.Left) &&
+            !string.IsNullOrEmpty(Dialog.Options.Top) &&
+            !string.IsNullOrEmpty(Dialog.Options.Width) &&
+            !string.IsNullOrEmpty(Dialog.Options.Height))
+        {
+            double left = double.Parse(Dialog.Options.Left.Replace("px", "").Trim());
+            double top = double.Parse(Dialog.Options.Top.Replace("px", "").Trim());
+            double width = double.Parse(Dialog.Options.Width.Replace("px", "").Trim());
+            double height = double.Parse(Dialog.Options.Height.Replace("px", "").Trim());
+
+            // Assuming screen dimensions are known (you can pass these dynamically if needed)
+            double screenWidth = 1920;  // Example screen width
+            double screenHeight = 1080; // Example screen height
+
+            double right = screenWidth - (left + width);
+            double bottom = screenHeight - (top + height);
+
+            var distances = new Dictionary<string, double>
+        {
+            { "top", top },
+            { "left", left },
+            { "bottom", bottom },
+            { "right", right }
+        };
+
+            var closest = distances.OrderBy(kvp => kvp.Value).First().Key;
+
+            return $"slide-{direction}-{closest}";
+        }
+
+        // Fallback if not enough data is provided
+        if (!string.IsNullOrEmpty(Dialog.Options.Left))
+            return $"slide-{direction}-left";
+        if (!string.IsNullOrEmpty(Dialog.Options.Top))
+            return $"slide-{direction}-top";
+
+        return $"slide-{direction}-bottom";
+    }
+
+    private string GetShadowCssClass()
+    {
+        return Dialog.Options.ShowShadow ? "rz-shadow-2" : string.Empty;
     }
 
     void Close()
