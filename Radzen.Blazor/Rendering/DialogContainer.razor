@@ -1,10 +1,11 @@
-@using Microsoft.JSInterop
+﻿@using Microsoft.JSInterop
 @using System.Reflection;
 @using System.ComponentModel
 @inject IJSRuntime JSRuntime
 @implements IDisposable
+
 <div class="@WrapperCssClass">
-    <div @ref="dialog" class="@CssClass" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
+    <div class="@($"{CssClass} {GetAnimationCssClass()} {GetShadowCssClass()}")" @ref="dialog" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
             <div class="rz-dialog-titlebar">
@@ -49,10 +50,10 @@
             <div class="rz-dialog-mask" style="pointer-events: none;"></div>
         }
     }
-
 </div>
 
 @code {
+    private bool isDialogOpen = true;
     void OnKeyPress(KeyboardEventArgs args)
     {
         var key = args.Code != null ? args.Code : args.Key;
@@ -153,9 +154,74 @@
 
     object reference;
 
+    private string GetAnimationCssClass()
+    {
+        return Dialog.Options.Animation switch
+        {
+            DialogAnimation.None => string.Empty,
+            DialogAnimation.Fade => isDialogOpen ? "fade-in" : "fade-out",
+            DialogAnimation.Zoom => isDialogOpen ? "zoom-in" : "zoom-out",
+            DialogAnimation.Slide => isDialogOpen ? GetSlideCssClass("in") : GetSlideCssClass("out"),
+            _ => string.Empty
+        };
+    }
+
+    private string GetSlideCssClass(string direction)
+    {
+        if (!string.IsNullOrEmpty(Dialog.Options.Left) &&
+            !string.IsNullOrEmpty(Dialog.Options.Top) &&
+            !string.IsNullOrEmpty(Dialog.Options.Width) &&
+            !string.IsNullOrEmpty(Dialog.Options.Height))
+        {
+            double left = double.Parse(Dialog.Options.Left.Replace("px", "").Trim());
+            double top = double.Parse(Dialog.Options.Top.Replace("px", "").Trim());
+            double width = double.Parse(Dialog.Options.Width.Replace("px", "").Trim());
+            double height = double.Parse(Dialog.Options.Height.Replace("px", "").Trim());
+
+            // Assuming screen dimensions are known (you can pass these dynamically if needed)
+            double screenWidth = 1920;  // Example screen width
+            double screenHeight = 1080; // Example screen height
+
+            double right = screenWidth - (left + width);
+            double bottom = screenHeight - (top + height);
+
+            var distances = new Dictionary<string, double>
+        {
+            { "top", top },
+            { "left", left },
+            { "bottom", bottom },
+            { "right", right }
+        };
+
+            var closest = distances.OrderBy(kvp => kvp.Value).First().Key;
+
+            return $"slide-{direction}-{closest}";
+        }
+
+        // Fallback if not enough data is provided
+        if (!string.IsNullOrEmpty(Dialog.Options.Left))
+            return $"slide-{direction}-left";
+        if (!string.IsNullOrEmpty(Dialog.Options.Top))
+            return $"slide-{direction}-top";
+
+        return $"slide-{direction}-bottom";
+    }
+
+    private string GetShadowCssClass()
+    {
+        return Dialog.Options.ShowShadow ? "rz-shadow-2" : string.Empty;
+    }
+
     void Close()
     {
-        Service.Close();
+        isDialogOpen = false;
+        StateHasChanged();
+
+        // Delay actual close to allow animation to complete
+        Task.Delay(300).ContinueWith(_ =>
+        {
+            Service.Close();
+        });
     }
 
     string CssClass
@@ -276,6 +342,9 @@
                     CloseDialogOnEsc = options != null ? options.CloseDialogOnEsc : true,
                     CssClass = options != null ? options.CssClass : "",
                     CloseTabIndex = options != null ? options.CloseTabIndex : 0,
+                    ShowMask = options != null ? options.ShowMask : true,
+                    Animation = options != null ? options.Animation : DialogAnimation.None,
+                    ShowShadow = options != null ? options.ShowShadow : false
                 };
 
             await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference, DotNetReference);

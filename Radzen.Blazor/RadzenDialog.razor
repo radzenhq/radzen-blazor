@@ -2,20 +2,204 @@
 @using Microsoft.JSInterop
 @using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime
+<style>
+    /* Fade animations */
+    .fade-in {
+    animation: fadeIn 0.4s forwards;
+    }
+
+    .fade-out {
+    animation: fadeOut 0.4s forwards;
+    }
+
+    @@keyframes fadeIn {
+    from {
+    opacity: 0;
+    }
+    to {
+    opacity: 1;
+    }
+    }
+
+    @@keyframes fadeOut {
+    from {
+    opacity: 1;
+    }
+    to {
+    opacity: 0;
+    }
+    }
+
+    /* Zoom animations */
+    .zoom-in {
+    animation: zoomIn 0.4s forwards;
+    }
+
+    .zoom-out {
+    animation: zoomOut 0.4s forwards;
+    }
+
+    @@keyframes zoomIn {
+    from {
+    transform: scale(0.5);
+    opacity: 0;
+    }
+    to {
+    transform: scale(1);
+    opacity: 1;
+    }
+    }
+
+    @@keyframes zoomOut {
+    from {
+    transform: scale(1);
+    opacity: 1;
+    }
+    to {
+    transform: scale(0.5);
+    opacity: 0;
+    }
+    }
+
+    /* Slide-in/out right */
+    .slide-in-right {
+    animation: slideInRight 0.4s ease-out forwards;
+    }
+
+    .slide-out-right {
+    animation: slideOutRight 0.4s ease-in forwards;
+    }
+
+    @@keyframes slideInRight {
+    from {
+    transform: translateX(100%);
+    opacity: 0;
+    }
+    to {
+    transform: translateX(0);
+    opacity: 1;
+    }
+    }
+
+    @@keyframes slideOutRight {
+    from {
+    transform: translateX(0);
+    opacity: 1;
+    }
+    to {
+    transform: translateX(100%);
+    opacity: 0;
+    }
+    }
+
+    /* Slide-in/out top */
+    .slide-in-top {
+    animation: slideInTop 0.4s ease-out forwards;
+    }
+
+    .slide-out-top {
+    animation: slideOutTop 0.4s ease-in forwards;
+    }
+
+    @@keyframes slideInTop {
+    from {
+    transform: translateY(-100%);
+    opacity: 0;
+    }
+    to {
+    transform: translateY(0);
+    opacity: 1;
+    }
+    }
+
+    @@keyframes slideOutTop {
+    from {
+    transform: translateY(0);
+    opacity: 1;
+    }
+    to {
+    transform: translateY(-100%);
+    opacity: 0;
+    }
+    }
+
+    /* Slide-in/out bottom */
+    .slide-in-bottom {
+    animation: slideInBottom 0.4s ease-out forwards;
+    }
+
+    .slide-out-bottom {
+    animation: slideOutBottom 0.4s ease-in forwards;
+    }
+
+    @@keyframes slideInBottom {
+    from {
+    transform: translateY(100%);
+    opacity: 0;
+    }
+    to {
+    transform: translateY(0);
+    opacity: 1;
+    }
+    }
+
+    @@keyframes slideOutBottom {
+    from {
+    transform: translateY(0);
+    opacity: 1;
+    }
+    to {
+    transform: translateY(100%);
+    opacity: 0;
+    }
+    }
+
+    /* Slide-in/out left */
+    .slide-in-left {
+    animation: slideInLeft 0.4s ease-out forwards;
+    }
+
+    .slide-out-left {
+    animation: slideOutLeft 0.4s ease-in forwards;
+    }
+
+    @@keyframes slideInLeft {
+    from {
+    transform: translateX(-100%);
+    opacity: 0;
+    }
+    to {
+    transform: translateX(0);
+    opacity: 1;
+    }
+    }
+
+    @@keyframes slideOutLeft {
+    from {
+    transform: translateX(0);
+    opacity: 1;
+    }
+    to {
+    transform: translateX(-100%);
+    opacity: 0;
+    }
+    }
+</style>
+
 
 @foreach (var dialog in dialogs)
 {
-    <DialogContainer @key=@dialog Dialog=@dialog ShowMask=@(dialog==dialogs.LastOrDefault()) />
+    <DialogContainer @key=@dialog Dialog=@dialog ShowMask=@(dialog.Options.ShowMask == true && dialog==dialogs.LastOrDefault()) />
 }
 
-@if (isSideDialogOpen)
+@if (sideDialogOptions != null)
 {
     <aside
-        class="@GetSideDialogCssClass()"
-        tabindex="@(isSideDialogOpen ? "0" : "-1")"
-        style="@GetSideDialogStyle()"
-        aria-labelledby="rz-dialog-side-label"
-        >
+    class="@($"{GetSideDialogCssClass()} {GetSideDialogAnimationCssClass} {GetSideDialogShadowCssClass()}")"
+    tabindex="@(isSideDialogOpen ? "0" : "-1")"
+    style="@GetSideDialogStyle()"
+    aria-labelledby="rz-dialog-side-label"
+    >
         @if (sideDialogOptions.ShowTitle)
         {
             <div class="rz-dialog-side-titlebar">
@@ -67,6 +251,9 @@
 
     List<Dialog> dialogs = new List<Dialog>();
     bool isSideDialogOpen = false;
+    string sideDialogAnimationClass = string.Empty;
+
+
     RenderFragment sideDialogContent;
     SideDialogOptions sideDialogOptions;
 
@@ -126,7 +313,7 @@
         StateHasChanged();
     }
 
-    void OnSideClose(dynamic _)
+    async void OnSideClose(dynamic _)
     {
         isSideDialogOpen = false;
         StateHasChanged();
@@ -153,6 +340,24 @@
         string heightStyle = string.IsNullOrEmpty(sideDialogOptions.Height) ? string.Empty : $"height: {sideDialogOptions.Height};";
 
         return $"{widthStyle}{heightStyle}{sideDialogOptions.Style}";
+    }
+
+    private string GetSideDialogAnimationCssClass()
+    {
+        var dialogPosition = sideDialogOptions.Position.ToString().ToLower();
+        return sideDialogOptions.Animation switch
+        {
+            DialogAnimation.None => string.Empty,
+            DialogAnimation.Fade => isSideDialogOpen ? "fade-in" : "fade-out",
+            DialogAnimation.Zoom => isSideDialogOpen ? "zoom-in" : "zoom-out",
+            DialogAnimation.Slide => isSideDialogOpen ? $"slide-in-{dialogPosition}" : $"slide-out-{dialogPosition}",
+            _ => string.Empty
+        };
+    }
+
+    private string GetSideDialogShadowCssClass()
+    {
+        return sideDialogOptions.ShowShadow ? "rz-shadow-2" : string.Empty;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
