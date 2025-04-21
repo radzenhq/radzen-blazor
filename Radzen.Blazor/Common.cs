@@ -371,7 +371,7 @@ namespace Radzen
         December = 11,
     }
 
-        /// <summary>
+    /// <summary>
     /// Specifies the time unit of <see cref="TimeSpan"/>.
     /// </summary>
     public enum TimeSpanUnit
@@ -396,13 +396,13 @@ namespace Radzen
         /// Millisecond.
         /// </summary>
         Millisecond = 4
-    #if NET7_0_OR_GREATER
+#if NET7_0_OR_GREATER
         ,
         /// <summary>
         /// Microsecond.
         /// </summary>
         Microsecond = 5
-    #endif
+#endif
     }
 
     /// <summary>
@@ -3078,7 +3078,7 @@ namespace Radzen
                     if (body.Type.IsInterface)
                     {
                         body = Expression.Property(body,
-                            new [] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null),
+                            new[] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null),
                             member
                         );
                     }
@@ -3894,5 +3894,28 @@ namespace Radzen
         /// Freeze column to the right
         /// </summary>
         Right
+    }
+
+    /// <summary>
+    /// Specifies the animation types for a dialog component.
+    /// </summary>
+    public enum DialogAnimation
+    {
+        /// <summary>
+        /// No animation.
+        /// </summary>
+        None,
+        /// <summary>
+        /// Fade in and out animation.
+        /// </summary>
+        Fade,
+        /// <summary>
+        /// Zoom in and out animation.
+        /// </summary>
+        Zoom,
+        /// <summary>
+        /// Slide in and out animation.
+        /// </summary>
+        Slide
     }
 }

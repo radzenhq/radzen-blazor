@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -825,6 +826,60 @@ namespace Radzen
 				}
 			}
         }
+
+        private DialogAnimation animation = DialogAnimation.None;
+        /// <summary>
+        /// The animation used when opening the dialog. Set to <c>DialogAnimation.None</c> by default.
+        /// </summary>
+        public DialogAnimation Animation
+        {
+            get => animation;
+            set
+            {
+                if (animation != value)
+                {
+                    animation = value;
+                    OnPropertyChanged(nameof(Animation));
+                }
+            }
+        }
+
+        private bool showShadow = false;
+
+        /// <summary>
+        /// Whether to show a shadow on the dialog or not. Set to <c>false</c> by default.
+        /// </summary>
+        public bool ShowShadow
+        {
+            get => showShadow;
+            set
+            {
+                if (showShadow != value)
+                {
+                    showShadow = value;
+                    OnPropertyChanged(nameof(ShowShadow));
+                }
+            }
+        }
+
+        private bool showMask = true;
+
+
+        /// <summary>
+        /// Whether to show a mask on the background or not. Set to <c>true</c> by default.
+        /// </summary>
+        public bool ShowMask
+        {
+            get => showMask;
+            set
+            {
+                if (showMask != value)
+                {
+                    showMask = value;
+                    OnPropertyChanged(nameof(ShowMask));
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -864,25 +919,6 @@ namespace Radzen
                 {
                     position = value;
                     OnPropertyChanged(nameof(Position));
-                }
-            }
-        }
-
-        private bool showMask = true;
-
-
-        /// <summary>
-        /// Whether to show a mask on the background or not. Set to <c>true</c> by default.
-        /// </summary>
-        public bool ShowMask
-        {
-            get => showMask;
-            set
-            {
-                if (showMask != value)
-                {
-                    showMask = value;
-                    OnPropertyChanged(nameof(ShowMask));
                 }
             }
         }
