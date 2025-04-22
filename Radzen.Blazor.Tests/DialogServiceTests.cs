@@ -1,4 +1,4 @@
-﻿using Radzen;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -87,6 +87,48 @@ namespace Radzen.Blazor.Tests
 				Assert.Equal("", resultingOptions.WrapperCssClass);
 				Assert.Equal("", resultingOptions.ContentCssClass);
 			}
+
+            [Fact(DisplayName = "Open with dynamic component type reflective calls are resolved without exception")]
+            public void Open_DynamicComponentType_Reflective_Calls_Resolve()
+            {
+                // Arrange
+                string resultingTitle = null;
+                Type resultingType = null;
+                var dialogService = new DialogService(null, null);
+                dialogService.OnOpen += (title, type, _, _) =>
+                {
+                    resultingTitle = title;
+                    resultingType = type;
+                };
+                
+                dialogService.Open("Dynamic Open", typeof(RadzenButton), []);
+                
+                // Assert
+                Assert.Equal("Dynamic Open", resultingTitle);
+                Assert.Equal(typeof(RadzenButton), resultingType);
+            }
+            
+            [Fact(DisplayName = "OpenAsync with dynamic component type reflective calls are resolved without exception")]
+            public async Task OpenAsync_DynamicComponentType_Reflective_Calls_Resolve()
+            {
+                // Arrange
+                string resultingTitle = null;
+                Type resultingType = null;
+                var dialogService = new DialogService(null, null);
+                dialogService.OnOpen += (title, type, _, _) =>
+                {
+                    resultingTitle = title;
+                    resultingType = type;
+                };
+
+                var openTask = dialogService.OpenAsync("Dynamic Open", typeof(RadzenButton), []);
+                dialogService.Close();
+                await openTask;
+                
+                // Assert
+                Assert.Equal("Dynamic Open", resultingTitle);
+                Assert.Equal(typeof(RadzenButton), resultingType);
+            }
 		}
 
 		public class ConfirmTests
