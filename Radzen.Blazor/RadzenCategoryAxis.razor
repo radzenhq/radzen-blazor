@@ -14,11 +14,11 @@
 
           if (chart.ShouldInvertAxes())
           {
-              return AxisMeasurer.XAxis(chart.ValueAxis.Title);
+              return AxisMeasurer.XAxis(chart.ValueScale, chart.ValueAxis, chart.ValueAxis.Title);
           }
           else
           {
-              return AxisMeasurer.XAxis(Title);
+              return AxisMeasurer.XAxis(chart.CategoryScale, this, Title);
           }
       }
 
