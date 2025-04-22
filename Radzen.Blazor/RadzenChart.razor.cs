@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Radzen.Blazor
 {
@@ -52,7 +53,7 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public EventCallback<LegendClickEventArgs> LegendClick { get; set; }
-        
+
         [Inject]
         TooltipService TooltipService { get; set; }
 
@@ -95,7 +96,7 @@ namespace Radzen.Blazor
 
         internal ScaleBase CategoryScale { get; set; } = new LinearScale();
         internal ScaleBase ValueScale { get; set; } = new LinearScale();
-        public IList<IChartSeries> Series { get; set; } = new List<IChartSeries>();
+        internal IList<IChartSeries> Series { get; set; } = new List<IChartSeries>();
         internal RadzenColumnOptions ColumnOptions { get; set; } = new RadzenColumnOptions();
         internal RadzenBarOptions BarOptions { get; set; } = new RadzenBarOptions();
         internal RadzenLegend Legend { get; set; } = new RadzenLegend();
@@ -114,6 +115,11 @@ namespace Radzen.Blazor
         {
             Series.Remove(series);
         }
+        /// <summary>
+        /// Returns the Series used by the Chart.
+        /// </summary>
+        /// <returns></returns>
+        public IReadOnlyList<IChartSeries> GetSeries() => Series.ToList();
 
         /// <summary>
         /// Returns whether the chart should render axes.
@@ -442,19 +448,8 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                Point ttpos = null;
-                try
-                {
-                    ttpos = series.GetTooltipPosition(data);
-                }
-                catch (Exception e)
-                {
-                    throw new ArgumentException($"{nameof(data)} does not exist in {nameof(series)}", e);
-                }
-                if (ttpos is not null)
-                {
-                    await MouseMove(ttpos.X + MarginLeft, ttpos.Y + MarginTop);
-                }
+                var point = series.GetTooltipPosition(data);
+                await MouseMove(point.X + MarginLeft, point.Y + MarginTop);
             }
         }
 
