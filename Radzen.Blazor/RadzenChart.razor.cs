@@ -95,7 +95,7 @@ namespace Radzen.Blazor
 
         internal ScaleBase CategoryScale { get; set; } = new LinearScale();
         internal ScaleBase ValueScale { get; set; } = new LinearScale();
-        internal IList<IChartSeries> Series { get; set; } = new List<IChartSeries>();
+        public IList<IChartSeries> Series { get; set; } = new List<IChartSeries>();
         internal RadzenColumnOptions ColumnOptions { get; set; } = new RadzenColumnOptions();
         internal RadzenBarOptions BarOptions { get; set; } = new RadzenBarOptions();
         internal RadzenLegend Legend { get; set; } = new RadzenLegend();
@@ -424,6 +424,37 @@ namespace Radzen.Blazor
 
                 TooltipService.Close();
                 await Task.Yield();
+            }
+        }
+
+        /// <summary>
+        /// Displays a Tooltip on a chart without user interaction, given a series, and the data associated with it.
+        /// </summary>
+        /// <param name="series"></param>
+        /// <param name="data"></param>
+        /// <exception cref="ArgumentException"></exception>
+        public async Task DisplayTooltipFor(IChartSeries series, object data)
+        {
+            if (!Series.Contains(series))
+            {
+                throw new ArgumentException($"Series:{series.GetTitle()} does not exist in {nameof(this.Series)}");
+            }
+
+            if (IsJSRuntimeAvailable)
+            {
+                Point ttpos = null;
+                try
+                {
+                    ttpos = series.GetTooltipPosition(data);
+                }
+                catch (Exception e)
+                {
+                    throw new ArgumentException($"{nameof(data)} does not exist in {nameof(series)}", e);
+                }
+                if (ttpos is not null)
+                {
+                    await MouseMove(ttpos.X + MarginLeft, ttpos.Y + MarginTop);
+                }
             }
         }
 
