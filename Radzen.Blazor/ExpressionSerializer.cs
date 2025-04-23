@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -187,15 +188,15 @@ public class ExpressionSerializer : ExpressionVisitor
         {
             string str => $"\"{str}\"",
             char c => $"'{c}'",
-            bool b => b.ToString().ToLower(),
-            DateTime dt => $"DateTime.Parse(\"{dt:yyyy-MM-ddTHH:mm:ss.fffZ}\")",
-            DateOnly dateOnly => $"DateOnly.Parse(\"{dateOnly:yyyy-MM-dd}\")",
-            TimeOnly timeOnly => $"TimeOnly.Parse(\"{timeOnly:HH:mm:ss}\")",
-            Guid guid => $"Guid.Parse(\"{guid:D}\")",
+            bool b => b.ToString().ToLowerInvariant(),
+            DateTime dt => $"DateTime.Parse(\"{dt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
+            DateOnly dateOnly => $"DateOnly.Parse(\"{dateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
+            TimeOnly timeOnly => $"TimeOnly.Parse(\"{timeOnly.ToString("HH:mm:ss", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
+            Guid guid => $"Guid.Parse(\"{guid.ToString("D", CultureInfo.InvariantCulture)}\")",
             IEnumerable enumerable when value is not string => FormatEnumerable(enumerable),
             _ => value.GetType().IsEnum
-                ? $"({value.GetType().FullName.Replace("+", ".")})" + Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType())).ToString()
-                : value.ToString()
+                ? $"({value.GetType().FullName.Replace("+", ".")})" + Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()), CultureInfo.InvariantCulture).ToString()
+                : Convert.ToString(value, CultureInfo.InvariantCulture)
         };
     }
 
