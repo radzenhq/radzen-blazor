@@ -1,5 +1,4 @@
 @typeparam TItem
-@attribute [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
 @if (Filter.Filters != null)
 {
     <RadzenSelectBar @bind-Value=Filter.LogicalFilterOperator Change="@((LogicalFilterOperator args) => { InvokeAsync(ChangeState); InvokeAsync(ApplyFilter); })" Size="ButtonSize.Small">

@@ -7,7 +7,6 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -280,7 +279,6 @@ namespace Radzen
     /// <summary>
     /// Class with IServiceCollection extensions methods.
     /// </summary>
-    [RequiresUnreferencedCode("The method references dynamic type which are subject to trimming.")]
     public static class ServiceCollectionExtensions
     {
         /// <summary>
@@ -3006,7 +3004,6 @@ namespace Radzen
         /// <param name="type">The type.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>System.Object</returns>
-        [RequiresUnreferencedCode("The method references the AsQueryable method of the Enumerable class which are subject to trimming.")]
         public static object ChangeType(object value, Type type, CultureInfo culture = null)
         {
             if (culture == null)
@@ -3047,7 +3044,6 @@ namespace Radzen
     /// <summary>
     /// Utility class that provides property access based on strings.
     /// </summary>
-    [RequiresUnreferencedCode("The method references the PropertyOrField method of the Expression class which are subject to trimming.")]
     public static class PropertyAccess
     {
         /// <summary>

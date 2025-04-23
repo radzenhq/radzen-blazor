@@ -237,7 +237,7 @@ public class ExpressionParser
                 else
                 {
                     var access = Expression.PropertyOrField(expression, token.Value);
-
+                    
                     expression = Expression.Condition(check, Expression.Default(access.Type), access);
 
                     var nextToken = Peek();

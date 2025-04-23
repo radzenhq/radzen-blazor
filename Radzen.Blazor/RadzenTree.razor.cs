@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Components.Web;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Threading.Tasks;
@@ -32,7 +31,6 @@ namespace Radzen.Blazor
     /// &lt;/RadzenTree&gt;
     ///   </code>
     /// </example>
-    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenTree : RadzenComponent
     {
         /// <summary>

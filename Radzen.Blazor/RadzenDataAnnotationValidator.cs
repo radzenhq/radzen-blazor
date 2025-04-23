@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -29,7 +28,6 @@ namespace Radzen.Blazor
     /// }
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("The method references the various methods of the Expression class which are subject to trimming.")]
     public class RadzenDataAnnotationValidator : ValidatorBase
     {
         /// <summary>

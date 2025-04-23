@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +10,6 @@ namespace Radzen.Blazor
     /// <summary>
     /// Registers and manages the current theme. Requires <see cref="ThemeService" /> to be registered in the DI container.
     /// </summary>
-    [RequiresUnreferencedCode("The method is using JSON serrialize/deserialize which are subject to trimming.")]
     public partial class RadzenTheme : IDisposable
     {
         /// <summary>

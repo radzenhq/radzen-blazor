@@ -22,9 +22,6 @@
     <Title>Radzen Components for Blazor</Title>
     <RepositoryUrl>https://github.com/radzenhq/radzen-blazor</RepositoryUrl>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <IsTrimmable>true</IsTrimmable>
-    <TrimMode>link</TrimMode>
-    <EnableTrimAnalyzer>true</EnableTrimAnalyzer>
   </PropertyGroup>
 
   <ItemGroup>
@@ -63,7 +60,7 @@
 
  <Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net8.0'">
     <PropertyGroup>
-      <_SassFileList>@(Sass->'"%(FullPath)"', ' ')</_SassFileList>
+      <_SassFileList>@(Sass->'&quot;%(FullPath)&quot;', ' ')</_SassFileList>
       <DartSassBuilderArgs>files $(_SassFileList) --outputstyle $(DartSassOutputStyle) --level $(DartSassOutputLevel)</DartSassBuilderArgs>
     </PropertyGroup>
     <Message Text="$(DartSassBuilderArgs)" Importance="$(DartSassMessageLevel)" />

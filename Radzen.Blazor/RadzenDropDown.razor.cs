@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
 using System;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor
 {
@@ -18,7 +17,6 @@ namespace Radzen.Blazor
     /// &lt;RadzenDropDown @bind-Value=@customerID TValue="string" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => Console.WriteLine($"Selected CustomerID: {args}")) /&gt;
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenDropDown<TValue> : DropDownBase<TValue>
     {
         bool isOpen;

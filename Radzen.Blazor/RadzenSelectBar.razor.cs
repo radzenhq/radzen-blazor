@@ -4,7 +4,6 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,7 +24,6 @@ namespace Radzen.Blazor
     /// &lt;/RadzenSelectBar&gt;
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
         private string getButtonSize()

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -11,7 +10,6 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenColumn component.
     /// </summary>
-    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public partial class RadzenColumn : RadzenComponentWithChildren
     {
         /// <summary>

@@ -5,7 +5,6 @@ using Radzen.Blazor;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
@@ -20,7 +19,6 @@ namespace Radzen
     /// <typeparam name="T"></typeparam>
     /// <seealso cref="Radzen.RadzenComponent" />
     /// <seealso cref="Radzen.IRadzenFormComponent" />
-    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public class DataBoundFormComponent<T> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>

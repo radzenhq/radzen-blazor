@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -23,7 +22,6 @@ namespace Radzen.Blazor
     /// &lt;/RadzenRadioButtonList&gt;
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
     {
         ClassList ItemClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")

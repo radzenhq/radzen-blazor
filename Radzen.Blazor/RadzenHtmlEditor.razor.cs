@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,7 +19,6 @@ namespace Radzen.Blazor
     /// }
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("The method requires public constructor of T class which are subject to trimming.")]
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>

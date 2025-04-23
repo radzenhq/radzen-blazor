@@ -3,7 +3,6 @@
 @using System.ComponentModel
 @inject IJSRuntime JSRuntime
 @implements IDisposable
-@attribute [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
 <div class="@WrapperCssClass">
     <div @ref="dialog" class="@CssClass" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
