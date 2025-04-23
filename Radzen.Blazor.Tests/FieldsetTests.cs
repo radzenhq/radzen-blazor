@@ -184,13 +184,13 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("SummaryContent", component.Markup);
             Assert.Equal(
-                "",
-                component.Find(".rz-fieldset-content-summary").ParentElement.Attributes.First(attr => attr.Name == "style").Value
+                "false",
+                component.Find(".rz-fieldset-content-summary").ParentElement.ParentElement.Attributes.First(attr => attr.Name == "aria-hidden").Value
             );
         }
 
         [Fact]
-        public void Fieldset_DontRenders_SummaryWhenOpen()
+        public void Fieldset_DoesNotRender_SummaryWhenOpen()
         {
             using var ctx = new TestContext();
             var component = ctx.RenderComponent<RadzenFieldset>();
@@ -210,8 +210,8 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("SummaryContent", component.Markup);
             Assert.Equal(
-                "display: none",
-                component.Find(".rz-fieldset-content-summary").ParentElement.Attributes.First(attr => attr.Name == "style").Value
+                "true",
+                component.Find(".rz-fieldset-content-summary").ParentElement.ParentElement.Attributes.First(attr => attr.Name == "aria-hidden").Value
             );
         }
     }
