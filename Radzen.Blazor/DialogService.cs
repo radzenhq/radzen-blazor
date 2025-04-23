@@ -142,7 +142,7 @@ namespace Radzen
                 throw new ArgumentException("The component type must be a subclass of ComponentBase.", nameof(componentType));
             }
 
-            var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.Public);
+            var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.NonPublic);
 
             method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters, options });
         }
@@ -198,7 +198,7 @@ namespace Radzen
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
 
-            var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.Public);
+            var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.NonPublic);
 
             method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters, options });
 
