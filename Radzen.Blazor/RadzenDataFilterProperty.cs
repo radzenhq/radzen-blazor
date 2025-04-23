@@ -3,7 +3,6 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +13,6 @@ namespace Radzen.Blazor
     /// Must be placed inside a <see cref="RadzenDataFilter{TItem}" />
     /// </summary>
     /// <typeparam name="TItem">The type of the DataFilter item.</typeparam>
-    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenDataFilterProperty<TItem> : ComponentBase, IDisposable
     {
         internal event Action<object> FilterValueChange;

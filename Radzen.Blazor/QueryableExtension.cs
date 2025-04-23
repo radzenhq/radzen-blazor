@@ -3,7 +3,6 @@ using Radzen.Blazor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -15,7 +14,6 @@ namespace Radzen
     /// <summary>
     /// Class QueryableExtension.
     /// </summary>
-    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public static class QueryableExtension
     {
         static Expression notNullCheck(Expression property) => Nullable.GetUnderlyingType(property.Type) != null || property.Type == typeof(string) ?

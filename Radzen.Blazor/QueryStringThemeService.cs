@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Web;
@@ -34,7 +33,6 @@ namespace Radzen
     /// <summary>
     /// Persist the current theme in the query string. Requires <see cref="ThemeService" /> to be registered in the DI container.
     /// </summary>
-    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public class QueryStringThemeService : IDisposable
     {
         private readonly NavigationManager navigationManager;
@@ -164,7 +162,6 @@ namespace Radzen
     /// <summary>
     /// Extension methods to register the <see cref="QueryStringThemeService" />.
     /// </summary>
-    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public static class QueryStringThemeServiceCollectionExtensions
     {
         /// <summary>

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor
 {
@@ -11,7 +10,6 @@ namespace Radzen.Blazor
     /// &lt;RadzenPassword Placeholder="Enter password..." Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public partial class RadzenPassword : FormComponentWithAutoComplete<string>, IRadzenFormComponent
     {
         /// <summary>

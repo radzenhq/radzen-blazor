@@ -1,5 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+﻿using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
@@ -13,7 +12,6 @@ namespace Radzen.Blazor
     /// &lt;RadzenTextBox @bind-Value=@value Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public partial class RadzenTextBox : FormComponentWithAutoComplete<string>
     {
         /// <summary>

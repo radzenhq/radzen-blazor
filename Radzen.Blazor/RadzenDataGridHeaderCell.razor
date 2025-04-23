@@ -4,7 +4,7 @@
 @using System.Globalization
 @using System.Collections
 @using Radzen
-@attribute [System.Diagnostics.CodeAnalysis.RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
+
 @if (RowIndex == Column.GetLevel())
 {
     <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>

@@ -9,7 +9,6 @@ using System.Linq;
 using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor
 {
@@ -21,7 +20,6 @@ namespace Radzen.Blazor
     /// &lt;RadzenAutoComplete Data=@customers TextProperty="CompanyName" Change=@(args => Console.WriteLine($"Selected text: {args}")) /&gt;
     /// </code>
     /// </example>
-    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenAutoComplete : DataBoundFormComponent<string>
     {
         object selectedItem = null;
