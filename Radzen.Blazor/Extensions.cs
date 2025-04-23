@@ -14,12 +14,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// Class EnumExtensions.
     /// </summary>
+    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public static class EnumExtensions
     {
         /// <summary>
         /// Gets enum description.
         /// </summary>
-        [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
         public static string GetDisplayDescription(this Enum enumValue, Func<string, string> translationFunction = null)
         {
             var enumValueAsString = enumValue.ToString();
@@ -35,7 +35,6 @@ namespace Radzen.Blazor
         /// <summary>
         /// Converts Enum to IEnumerable of Value/Text.
         /// </summary>
-        [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
         public static IEnumerable<object> EnumAsKeyValuePair(Type enumType, Func<string, string> translationFunction = null)
         {
             Type underlyingType = Enum.GetUnderlyingType(enumType);
