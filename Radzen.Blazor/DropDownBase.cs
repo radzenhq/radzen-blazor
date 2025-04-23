@@ -5,6 +5,7 @@ using Radzen.Blazor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,6 +15,7 @@ namespace Radzen
     /// Base class of components that display a list of items.
     /// </summary>
     /// <typeparam name="T"></typeparam>
+    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public class DropDownBase<T> : DataBoundFormComponent<T>
     {
         /// <summary>

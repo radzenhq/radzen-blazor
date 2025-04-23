@@ -4,6 +4,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// A component which is an item in a <see cref="RadzenTree" />
     /// </summary>
+    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenTreeItem : IDisposable
     {
         /// <summary>

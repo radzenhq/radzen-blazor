@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Linq;
 using System.Reflection;
@@ -39,6 +40,7 @@ namespace Radzen
     /// }
     /// </code>
     /// </example>
+    [RequiresUnreferencedCode("The method references dynamic type which are subject to trimming.")]
     public class DialogService : IDisposable
     {
         private DotNetObjectReference<DialogService> reference;

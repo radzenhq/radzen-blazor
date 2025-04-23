@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.RenderTree;
 using Radzen.Blazor.Markdown;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Radzen.Blazor;
@@ -23,6 +24,7 @@ namespace Radzen.Blazor;
 /// > This is a blockquote
 /// &lt;/RadzenMarkdown&gt;
 /// </example>
+[RequiresUnreferencedCode("The method requires public constructor of class which are subject to trimming.")]
 public partial class RadzenMarkdown : RadzenComponent
 {
     /// <summary>
