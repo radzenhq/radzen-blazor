@@ -1,4 +1,5 @@
-﻿@using Microsoft.AspNetCore.Components.Routing
+﻿@using Radzen.Blazor.Rendering
+@using Microsoft.AspNetCore.Components.Routing
 @inject NavigationManager UriHelper
 @inherits RadzenComponent
 @if (Visible)
@@ -26,7 +27,7 @@
                     }
                     @if (items.Any() && Parent?.ShowArrow == true)
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon-children" style="@getStyle()" @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
+                        <i class=@ToggleClass @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
                     }
                 </NavLink>
             }
@@ -51,18 +52,20 @@
                     }
                     @if (items.Any() && Parent?.ShowArrow == true)
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon-children" style="@getStyle()">keyboard_arrow_down</i>
+                        <i class=@ToggleClass>keyboard_arrow_down</i>
                     }
                 </div>
             }
         </div>
         @if (ChildContent != null)
         {
-            <ul class="rz-navigation-menu" style="@getItemStyle()">
-                <CascadingValue Value=this>
-                    @ChildContent
-                </CascadingValue>
-            </ul>
+            <Expander Expanded=@ExpandedInternal>
+                <ul class="rz-navigation-menu">
+                    <CascadingValue Value=this>
+                        @ChildContent
+                    </CascadingValue>
+                </ul>
+            </Expander>
         }
     </li>
 }

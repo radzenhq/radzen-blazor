@@ -1,6 +1,7 @@
 // Blazor
 @import 'components/blazor/utilities';
 @import 'components/blazor/spacing';
+@import 'components/blazor/animations';
 @import 'components/blazor/typography';
 @import 'components/blazor/icons';
 @import 'components/blazor/image';
@@ -77,4 +78,5 @@
 @import 'components/blazor/carousel';
 @import 'components/blazor/timespanpicker';
 @import 'components/blazor/toc';
+@import 'components/blazor/expander';
 @import 'css-variables';
