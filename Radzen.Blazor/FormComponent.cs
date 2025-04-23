@@ -15,7 +15,6 @@ namespace Radzen
     /// <summary>
     /// Class FormComponentWithAutoComplete.
     /// </summary>
-    [RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
     public class FormComponentWithAutoComplete<T> : FormComponent<T>
     {
         /// <summary>
