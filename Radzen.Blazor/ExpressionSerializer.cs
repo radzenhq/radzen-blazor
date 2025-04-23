@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,7 +10,6 @@ using System.Text;
 /// <summary>
 /// Serializes LINQ Expression Trees into C# string representations.
 /// </summary>
-[RequiresUnreferencedCode("The method references the AsQueryable method of the Enumerable class which are subject to trimming.")]
 public class ExpressionSerializer : ExpressionVisitor
 {
     private readonly StringBuilder _sb = new StringBuilder();
