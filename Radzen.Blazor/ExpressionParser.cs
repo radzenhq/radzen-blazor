@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen;
 
@@ -13,6 +14,7 @@ namespace Radzen;
 /// <summary>
 /// Parse lambda expressions from strings.
 /// </summary>
+[RequiresUnreferencedCode("The method requires reflection which are subject to trimming.")]
 public class ExpressionParser
 {
     /// <summary>
