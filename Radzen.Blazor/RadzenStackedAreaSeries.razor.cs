@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -9,6 +10,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Renders stacked area series in <see cref="RadzenChart" />.
     /// </summary>
+    [RequiresUnreferencedCode("The method references the various methods of the Expression class which are subject to trimming.")]
     public partial class RadzenStackedAreaSeries<TItem> : CartesianSeries<TItem>, IChartStackedAreaSeries
     {
         /// <summary>

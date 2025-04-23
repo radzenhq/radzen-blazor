@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor
 {
@@ -22,6 +23,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenPanelMenu&gt;
     /// </code>
     /// </example>
+    [RequiresUnreferencedCode("The method references the various methods of the Queryable, Enumerable and Expression classes which are subject to trimming.")]
     public partial class RadzenPanelMenu : RadzenComponentWithChildren
     {
         /// <summary>

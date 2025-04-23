@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -10,6 +11,7 @@ namespace Radzen.Blazor
     /// Renders column series in <see cref="RadzenChart" />
     /// </summary>
     /// <typeparam name="TItem">The type of the series data item.</typeparam>
+    [RequiresUnreferencedCode("The method references the various methods of the Expression class which are subject to trimming.")]
     public partial class RadzenColumnSeries<TItem> : CartesianSeries<TItem>, IChartColumnSeries
     {
         /// <summary>

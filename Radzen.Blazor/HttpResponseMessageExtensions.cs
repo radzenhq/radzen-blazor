@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
@@ -10,6 +11,7 @@ namespace Radzen
     /// <summary>
     /// Class HttpResponseMessageExtensions.
     /// </summary>
+    [RequiresUnreferencedCode("The method requires various properties and methods of T class which are subject to trimming.")]
     public static class HttpResponseMessageExtensions
     {
         /// <summary>

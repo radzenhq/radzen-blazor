@@ -6,6 +6,7 @@ using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
 using System.Net.Mime;
 using Microsoft.AspNetCore.Components.Rendering;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor
 {
@@ -13,6 +14,7 @@ namespace Radzen.Blazor
     /// Base class of <see cref="RadzenChart" /> series.
     /// </summary>
     /// <typeparam name="TItem">The type of the series data.</typeparam>
+    [RequiresUnreferencedCode("The method references the various methods of the Expression class which are subject to trimming.")]
     public abstract class CartesianSeries<TItem> : RadzenChartComponentBase, IChartSeries, IDisposable
     {
         /// <summary>
