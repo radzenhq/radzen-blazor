@@ -162,8 +162,10 @@
     {
         get
         {
-            var baseCss = "rz-dialog";
-            return string.IsNullOrEmpty(Dialog.Options.CssClass) ? baseCss : $"{baseCss} {Dialog.Options.CssClass}";
+            var classList = ClassList.Create("rz-dialog rz-open")
+                .Add(Dialog.Options.CssClass);
+            
+            return classList.ToString();
         }
     }
 

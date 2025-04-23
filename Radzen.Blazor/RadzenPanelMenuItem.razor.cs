@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -135,10 +136,11 @@ namespace Radzen.Blazor
             }
 
             ExpandedInternal = !ExpandedInternal;
+
             await ExpandedChanged.InvokeAsync(ExpandedInternal);
+
             StateHasChanged();
         }
-
         internal async System.Threading.Tasks.Task Collapse()
         {
             if (ExpandedInternal)
@@ -149,20 +151,14 @@ namespace Radzen.Blazor
             }
         }
 
-        string getStyle()
-        {
-            string deg = ExpandedInternal ? "180" : "0";
-            return $@"transform: rotate({deg}deg);";
-        }
+        string ToggleClass => ClassList.Create("notranslate rzi rz-navigation-item-icon-children")
+                            .Add("rz-state-expanded", ExpandedInternal)
+                            .Add("rz-state-collapsed", !ExpandedInternal)
+                            .ToString();
 
         string getIconStyle()
         { 
             return $"{(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon ? "margin-inline-end:0px;" : "")}{(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : "")}";
-        }
-
-        string getItemStyle()
-        {
-            return ExpandedInternal ? "" : "display:none";
         }
 
         void Expand()

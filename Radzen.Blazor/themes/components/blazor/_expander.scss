@@ -1,0 +1,32 @@
+.rz-expander {
+    display: grid;
+    transition: grid-template-rows var(--rz-transition);
+
+    &.rz-state-expanded {
+        grid-template-rows: 1fr;
+    }
+
+    &.rz-state-expanding {
+        grid-template-rows: 1fr;
+
+        .rz-expander-content {
+            overflow: hidden;
+        }
+    }
+
+    &.rz-state-collapsed {
+        grid-template-rows: 0fr;
+
+        .rz-expander-content {
+            overflow: hidden;
+        }
+    }
+
+    &.rz-state-collapsing {
+        grid-template-rows: 0fr;
+
+        .rz-expander-content {
+            overflow: hidden;
+        }
+    }
+}

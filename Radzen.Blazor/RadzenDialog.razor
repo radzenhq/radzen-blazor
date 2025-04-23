@@ -126,10 +126,28 @@
         StateHasChanged();
     }
 
+    bool sideDialogClosing = false;
+
+    async Task OnSideCloseAsync()
+    {
+        sideDialogClosing = true;
+
+        StateHasChanged();
+
+        await Task.Delay(300);
+
+        isSideDialogOpen = false;
+        sideDialogClosing = false;
+
+        StateHasChanged();
+    }
+
     void OnSideClose(dynamic _)
     {
-        isSideDialogOpen = false;
-        StateHasChanged();
+        if (isSideDialogOpen)
+        {
+            InvokeAsync(OnSideCloseAsync);
+        }
     }
 
     void OnOpen(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
@@ -144,7 +162,12 @@
 
     string GetSideDialogCssClass()
     {
-        return $"rz-dialog-side rz-dialog-side-position-{sideDialogOptions.Position.ToString().ToLower()} {sideDialogOptions.CssClass}";
+        var classList = ClassList.Create("rz-dialog-side")
+            .Add($"rz-dialog-side-position-{sideDialogOptions.Position.ToString().ToLower()}")
+            .Add(sideDialogOptions.CssClass)
+            .Add("rz-open", !sideDialogClosing)
+            .Add("rz-close", sideDialogClosing);
+        return classList.ToString();
     }
 
     string GetSideDialogStyle()

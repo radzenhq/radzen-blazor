@@ -1136,6 +1136,9 @@ window.Radzen = {
     }
 
     popup.style.display = 'block';
+    popup.onanimationend = null;
+    popup.classList.add("rz-open");
+    popup.classList.remove("rz-close");
 
     var rect = popup.getBoundingClientRect();
     rect.width = x ? rect.width + 20 : rect.width;
@@ -1330,7 +1333,12 @@ window.Radzen = {
         Radzen[id + 'FZL'] = null;
       }
 
-      popup.style.display = 'none';
+      popup.onanimationend = function () {
+          popup.style.display = 'none';
+          popup.onanimationend = null;
+      }
+      popup.classList.add("rz-close");
+      popup.classList.remove("rz-open");
     }
     document.removeEventListener('mousedown', Radzen[id]);
     window.removeEventListener('resize', Radzen[id]);
@@ -1705,7 +1713,19 @@ window.Radzen = {
       var children = item.querySelector('.rz-navigation-menu');
 
       if (children) {
-        children.style.display = active ? '' : 'none';
+        if (active) {
+          children.onanimationend = null;
+          children.style.display = '';
+          children.classList.add('rz-open');
+          children.classList.remove('rz-close');
+        } else {
+          children.onanimationend = function () {
+            children.style.display = 'none';
+            children.onanimationend = null;
+          }
+          children.classList.remove('rz-open');
+          children.classList.add('rz-close');
+        }
       }
 
       var icon = item.querySelector('.rz-navigation-item-icon-children');

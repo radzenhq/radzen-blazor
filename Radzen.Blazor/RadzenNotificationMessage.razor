@@ -5,7 +5,7 @@
 {
     var classes = GetMessageCssClasses();
 
-    <div aria-live="polite" class="rz-notification-item-wrapper @classes.Item1" style="@(Message.Click != null || Message.CloseOnClick ? "cursor: pointer;" : "") @Style">
+    <div aria-live="polite" class="rz-notification-item-wrapper rz-open @classes.Item1" style="@(Message.Click != null || Message.CloseOnClick ? "cursor: pointer;" : "") @Style">
         <div class="rz-notification-item">
             <div class="rz-notification-message-wrapper">
                 <span class="notranslate rzi rz-notification-icon @classes.Item2" @onclick="NotificationClicked"></span>

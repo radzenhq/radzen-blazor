@@ -104,16 +104,14 @@ $accordion-shadow: none !default;
     margin-inline: var(--rz-accordion-toggle-icon-margin-inline);
   }
 
-  &.rzi-chevron-right {
-    &:before {
-      content: $accordion-toggle-icon-collapsed;
-    }
+  &.rz-state-expanded {
+    transform: rotate(180deg);
+    transition: transform var(--rz-transition);
   }
 
-  &.rzi-chevron-down {
-    &:before {
-      content: $accordion-toggle-icon-expanded;
-    }
+  &.rz-state-collapsed {
+    transform: rotate(0);
+    transition: transform var(--rz-transition);
   }
 }
 

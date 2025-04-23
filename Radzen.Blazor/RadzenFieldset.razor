@@ -1,4 +1,5 @@
-﻿@inherits RadzenComponent
+﻿@using Radzen.Blazor.Rendering
+@inherits RadzenComponent
 
 @if (Visible)
 {
@@ -6,7 +7,6 @@
         @if(AllowCollapse || !string.IsNullOrEmpty(Text) || !string.IsNullOrEmpty(Icon) || HeaderTemplate != null)
         {
         <legend class="rz-fieldset-legend" style="white-space:nowrap">
-
             @if (AllowCollapse)
             {
                 <a id="@(GetId() + "expc")" title="@TitleAttribute()" aria-label="@AriaLabelAttribute()" @onclick:preventDefault="true"
@@ -46,18 +46,18 @@
             }
         </legend>
         }
-        <div class="rz-fieldset-content-wrapper" role="region" id="rz-fieldset-0-content" aria-hidden="false" style="@contentStyle">
+        <Expander Expanded=@(!collapsed) CssClass="rz-fieldset-content-wrapper" id="rz-fieldset-0-content">
             <div class="rz-fieldset-content">
                 @ChildContent
             </div>
-        </div>
+        </Expander>
         @if (SummaryTemplate != null)
         {
-            <div class="rz-fieldset-content-wrapper" role="region" aria-hidden="false" style="@summaryContentStyle">
-                <div class="rz-fieldset-content rz-fieldset-content-summary">
-                    @SummaryTemplate
-                </div>
+        <Expander Expanded=@collapsed CssClass="rz-fieldset-content-wrapper">
+            <div class="rz-fieldset-content rz-fieldset-content-summary">
+                @SummaryTemplate
             </div>
+        </Expander>
         }
     </fieldset>
 }
