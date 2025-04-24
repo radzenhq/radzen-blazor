@@ -187,7 +187,7 @@ namespace Radzen.Blazor
 
             if (Visible)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyGauge", Element);
+                JSRuntime.InvokeVoid("Radzen.destroyGauge", Element);
             }
         }
 

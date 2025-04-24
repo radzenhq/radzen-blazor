@@ -1161,8 +1161,8 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
-                JSRuntime.InvokeVoidAsync("Radzen.destroyDatePicker", UniqueID, Element);
+                JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
+                JSRuntime.InvokeVoid("Radzen.destroyDatePicker", UniqueID, Element);
             }
         }
 
