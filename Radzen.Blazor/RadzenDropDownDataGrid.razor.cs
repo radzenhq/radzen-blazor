@@ -969,7 +969,11 @@ namespace Radzen.Blazor
             OpenOnFocus = of;
         }
 
-        private async Task OnChipRemove(object item)
+        /// <summary>
+        /// Event handler for when an item is unselected by clicking a chip
+        /// </summary>
+        /// <param name="item">The item that is to be removed</param>
+        protected virtual async Task OnChipRemove(object item)
         {
             if (!Disabled)
             {
