@@ -3364,7 +3364,7 @@ namespace Radzen.Blazor
             {
                 foreach (var column in allColumns.ToList().Where(c => c.GetVisible()))
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
+                    JSRuntime.InvokeVoid("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
                 }
             }
         }

@@ -586,7 +586,7 @@ namespace Radzen.Blazor
 
             if (Visible && IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyChart", Element);
+                JSRuntime.InvokeVoid("Radzen.destroyChart", Element);
             }
         }
 

@@ -223,7 +223,7 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyMap", UniqueID);
+                JSRuntime.InvokeVoid("Radzen.destroyMap", UniqueID);
             }
         }
     }

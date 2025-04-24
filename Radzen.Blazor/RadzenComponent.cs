@@ -302,17 +302,17 @@ namespace Radzen
             {
                 if (ContextMenu.HasDelegate)
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.removeContextMenu", UniqueID);
+                    JSRuntime.InvokeVoid("Radzen.removeContextMenu", UniqueID);
                 }
 
                 if (MouseEnter.HasDelegate)
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.removeMouseEnter", UniqueID);
+                    JSRuntime.InvokeVoid("Radzen.removeMouseEnter", UniqueID);
                 }
 
                 if (MouseLeave.HasDelegate)
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.removeMouseLeave", UniqueID);
+                    JSRuntime.InvokeVoid("Radzen.removeMouseLeave", UniqueID);
                 }
             }
         }

@@ -108,7 +108,7 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroySecurityCode", GetId(), Element);
+                JSRuntime.InvokeVoid("Radzen.destroySecurityCode", GetId(), Element);
             }
         }
 
