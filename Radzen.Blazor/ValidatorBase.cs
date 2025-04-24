@@ -122,6 +122,7 @@ namespace Radzen.Blazor
 
             if (component.FieldIdentifier.FieldName != null)
             {
+                var previousIsValid = IsValid;
                 IsValid = Validate(component);
 
                 messages.Clear(component.FieldIdentifier);
@@ -131,7 +132,10 @@ namespace Radzen.Blazor
                     messages.Add(component.FieldIdentifier, Text);
                 }
 
-                EditContext?.NotifyValidationStateChanged();
+                if (previousIsValid != IsValid)
+                {
+                    EditContext?.NotifyValidationStateChanged();
+                }
             }
 
             FieldIdentifier = component.FieldIdentifier;
