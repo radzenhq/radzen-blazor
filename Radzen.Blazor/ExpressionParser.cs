@@ -28,7 +28,7 @@ public class ExpressionParser
     /// </summary>
     public static Expression<Func<T, TResult>> ParseLambda<T, TResult>(string expression, Func<string, Type?>? typeResolver = null)
     {
-        var lambda = ParseLambda<T>(expression, typeResolver);
+        var lambda = ParseLambda(expression, typeof(T), typeResolver);
 
         return Expression.Lambda<Func<T, TResult>>(lambda.Body, lambda.Parameters[0]);
     }
