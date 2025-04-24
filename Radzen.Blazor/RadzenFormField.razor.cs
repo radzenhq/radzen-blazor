@@ -106,7 +106,13 @@ namespace Radzen.Blazor
         /// </example>
         [Parameter]
         public RenderFragment Helper { get; set; }
+        /// <summary>
+        /// Gets or sets the custom content for the label using a Razor template.
+        /// When provided, this template will be rendered instead of the plain text specified in the Text parameter.
+        /// </summary>
 
+        [Parameter]
+        public RenderFragment TextTemplate { get; set; }
         /// <summary>
         /// Gets or sets the label text.
         /// </summary>
