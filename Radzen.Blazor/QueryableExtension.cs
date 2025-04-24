@@ -108,6 +108,35 @@ namespace Radzen
         /// <returns>A <see cref="IQueryable{T}"/> whose elements are sorted according to the specified <paramref name="selector"/>.</returns>
         public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> source, string selector = null)
         {
+            selector = $"{selector}";
+
+            if (selector.Contains("=>"))
+            {
+                var identifierName = selector.Split("=>")[0];
+
+                selector = selector.Replace($"{identifierName}=>", "").Trim();
+
+                string methodAsc = "OrderBy";
+                string methodDesc = "OrderByDescending";
+
+                Expression expression = source.Expression;
+
+                foreach (var part in selector.Split(","))
+                {
+                    var lambda = ExpressionParser.ParseLambda<T>($"{identifierName.Trim()} => {part}");
+
+                    expression = Expression.Call(
+                        typeof(Queryable), part.Trim().ToLower().Contains(" desc") ? methodDesc : methodAsc,
+                        new Type[] { source.ElementType, lambda.ReturnType },
+                        expression, Expression.Quote(lambda));
+
+                    methodAsc = "ThenBy";
+                    methodDesc = "ThenByDescending";
+                }
+
+                return (IOrderedQueryable<T>)source.Provider.CreateQuery(expression);
+            }
+
             return (IOrderedQueryable<T>)OrderBy((IQueryable)source, selector);
         }
 
