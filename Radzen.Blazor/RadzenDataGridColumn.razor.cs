@@ -1306,7 +1306,10 @@ namespace Radzen.Blazor
             {
                 await headerCell.CloseFilter();
             }
-            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{GetFilterProperty()}");
+
+            var filterModePrefix = (FilterMode ?? Grid.FilterMode) == Radzen.FilterMode.Advanced ? "adv-" :
+                                   (FilterMode ?? Grid.FilterMode) == Radzen.FilterMode.SimpleWithMenu ? "swm-" : "";
+            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{filterModePrefix}{GetFilterProperty()}");
         }
 
         string runtimeWidth;

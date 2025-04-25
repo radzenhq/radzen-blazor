@@ -442,8 +442,10 @@ else
     string getColumnPopupID()
     {
         var fiterProperty = Column.GetFilterProperty();
+        var filterModePrefix = (Column.FilterMode ?? Grid.FilterMode) == FilterMode.Advanced ? "adv-" : 
+                              (Column.FilterMode ?? Grid.FilterMode) == FilterMode.SimpleWithMenu ? "swm-" : "";
 
-        return $"{Grid.PopupID}{(string.IsNullOrEmpty(fiterProperty) ? Grid.allColumns.IndexOf(Column).ToString() : fiterProperty)}";
+        return $"{Grid.PopupID}{filterModePrefix}{(string.IsNullOrEmpty(fiterProperty) ? Grid.allColumns.IndexOf(Column).ToString() : fiterProperty)}";
     }
 
     protected override void OnParametersSet()

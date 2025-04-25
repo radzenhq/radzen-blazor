@@ -979,7 +979,9 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
+                    var filterModePrefix = (column.FilterMode ?? FilterMode) == FilterMode.Advanced ? "adv-" : 
+                                          (column.FilterMode ?? FilterMode) == FilterMode.SimpleWithMenu ? "swm-" : "";
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{filterModePrefix}{column.GetFilterProperty()}");
                 }
             }
 
@@ -1016,7 +1018,9 @@ namespace Radzen.Blazor
 
             if (closePopup)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{column.GetFilterProperty()}");
+                var filterModePrefix = (column.FilterMode ?? FilterMode) == FilterMode.Advanced ? "adv-" : 
+                                      (column.FilterMode ?? FilterMode) == FilterMode.SimpleWithMenu ? "swm-" : "";
+                await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{filterModePrefix}{column.GetFilterProperty()}");
             }
 
             if (shouldReload)
@@ -1038,14 +1042,18 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{column.GetFilterProperty()}");
+                    var filterModePrefix = (column.FilterMode ?? FilterMode) == FilterMode.Advanced ? "adv-" : 
+                                          (column.FilterMode ?? FilterMode) == FilterMode.SimpleWithMenu ? "swm-" : "";
+                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{PopupID}{filterModePrefix}{column.GetFilterProperty()}");
                 }
             }
             await OnFilter(new ChangeEventArgs() { Value = column.GetFilterValue() }, column, true);
 
             if (closePopup)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{column.GetFilterProperty()}");
+                var filterModePrefix = (column.FilterMode ?? FilterMode) == FilterMode.Advanced ? "adv-" : 
+                                      (column.FilterMode ?? FilterMode) == FilterMode.SimpleWithMenu ? "swm-" : "";
+                await JSRuntime.InvokeVoidAsync("Radzen.closeAllPopups", $"{PopupID}{filterModePrefix}{column.GetFilterProperty()}");
             }
         }
 
