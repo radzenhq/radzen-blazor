@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
- <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()" onclick="@($"Radzen.togglePopup(this.parentNode, '{Grid.PopupID}{Column.GetFilterProperty()}')")">
+ <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()" onclick="@($"Radzen.togglePopup(this.parentNode, '{filterId}')")">
      <i class="notranslate rzi">@Grid.FilterIcon</i>
     @if (Column.GetFilterOperator() == FilterOperator.DoesNotContain)
     {
@@ -13,7 +13,7 @@
         @Column.GetFilterOperatorSymbol(Column.GetFilterOperator())
     }
 </button>
-<div id="@($"{Grid.PopupID}{Column.GetFilterProperty()}")" class="rz-overlaypanel"
+<div id="@($"{filterId}")" class="rz-overlaypanel"
         style="display:none;" tabindex="0">
     <div class="rz-overlaypanel-content">
         <ul class="rz-listbox-list">
@@ -129,6 +129,15 @@
     [Parameter]
     public RadzenDataGrid<TItem> Grid { get; set; }
 
+    string filterId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        filterId = $"{Grid.PopupID}{Column.GetFilterProperty()}fm";
+    }
+
     protected string FilterOperatorStyle(RadzenDataGridColumn<TItem> column, FilterOperator value)
     {
         return column.GetFilterOperator() == value ?
@@ -166,7 +175,7 @@
             LogicalFilterOperator = Column.GetLogicalFilterOperator()
         });
 
-        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
+        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{filterId}");
         await Grid.ReloadInternal();
     }
 
@@ -176,7 +185,7 @@
 
         Grid.SaveSettings();
 
-        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{Column.GetFilterProperty()}");
+        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", $"{filterId}");
 
         await Grid.FilterCleared.InvokeAsync(new DataGridColumnFilterEventArgs<TItem>()
         {
