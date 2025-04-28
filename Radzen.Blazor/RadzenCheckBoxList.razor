@@ -15,7 +15,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-        @onfocus=@(args => {focusedIndex = focusedIndex == -1 ? 0: focusedIndex; })
+         @onfocus=@(args => {focusedIndex = focusedIndex == -1 ? 0: focusedIndex; }) role="checkboxgroup"
         tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         @if (AllowSelectAll)
         {
@@ -27,7 +27,7 @@
         }
         @foreach (var item in allItems.Where(i => i.Visible))
         {
-            <div @ref="@item.Element" id="@item.GetItemId()" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style">
+            <div @ref="@item.Element" id="@item.GetItemId()" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" role="checkbox" aria-checked=@(IsSelected(item)? "true" : "false") aria-label="@item.Text">
                 <div class="rz-chkbox">
                     <div class="rz-helper-hidden-accessible">
                         <input type="checkbox" name="@Name" value="@item.Value" disabled="@Disabled" readonly="@ReadOnly" tabindex="-1" aria-label="@(item.Text + " " + item.Value)" aria-checked="@(IsSelected(item).ToString().ToLowerInvariant())">

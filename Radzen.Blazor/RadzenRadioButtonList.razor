@@ -19,7 +19,7 @@
         tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         @foreach (var item in allItems.Where(i => i.Visible))
         {
-            <div @ref="@item.Element" id="@item.GetItemId()" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" role="radio" aria-checked=@(IsSelected(item)? "true" : "false")>
+            <div @ref="@item.Element" id="@item.GetItemId()" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" role="radio" aria-checked=@(IsSelected(item)? "true" : "false") aria-label="@item.Text">
                 <div class="rz-radiobutton">
                     <div class="rz-helper-hidden-accessible">
                         <input type="radio" disabled="@Disabled" name="@Name" value="@item.Value" tabindex="-1" aria-label="@(item.Text + " " + item.Value)" @attributes="item.InputAttributes">
