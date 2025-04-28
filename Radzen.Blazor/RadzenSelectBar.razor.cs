@@ -230,7 +230,7 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        internal int focusedIndex = 0;
+        internal int focusedIndex = -1;
         bool preventKeyPress = true;
         async Task OnKeyPress(KeyboardEventArgs args)
         {

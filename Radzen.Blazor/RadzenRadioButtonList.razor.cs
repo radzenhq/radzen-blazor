@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace Radzen.Blazor
     {
         ClassList ItemClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
                                                                             .Add("rz-state-active", IsSelected(item))
+                                                                            .Add("rz-state-focused", IsFocused(item))
                                                                             .AddDisabled(Disabled || item.Disabled);
 
         ClassList IconClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
@@ -193,21 +195,51 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        internal int focusedIndex = -1;
         bool preventKeyPress = true;
-        async Task OnKeyPress(KeyboardEventArgs args, Task task)
+        async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "Space" || key == "Enter")
+            var item = items.ElementAtOrDefault(focusedIndex) ?? items.FirstOrDefault();
+
+            if (item == null) return;
+
+            if (key == "ArrowLeft" || key == "ArrowRight")
             {
                 preventKeyPress = true;
 
-                await task;
+                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
+            }
+            else if (key == "Home" || key == "End")
+            {
+                preventKeyPress = true;
+
+                focusedIndex = key == "Home" ? 0 : items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
+            }
+            else if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
+                {
+                    await SelectItem(items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex]);
+                }
             }
             else
             {
                 preventKeyPress = false;
             }
+        }
+
+        bool HasInvisibleBefore(RadzenRadioButtonListItem<TValue> item)
+        {
+            return items.Take(items.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
+        }
+
+        bool IsFocused(RadzenRadioButtonListItem<TValue> item)
+        {
+            return items.IndexOf(item) == focusedIndex;
         }
     }
 }
