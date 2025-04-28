@@ -31,6 +31,10 @@ $radio-checked-border: var(--rz-input-border) !default;
     margin-inline: var(--rz-radio-margin-inline);
     align-items: center;
   }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
 }
 
 .rz-radio-button-list-horizontal {
@@ -40,6 +44,10 @@ $radio-checked-border: var(--rz-input-border) !default;
   .rz-radio-btn {
     display: inline-flex;
     align-items: center;
+  }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
   }
 }
 
@@ -62,15 +70,6 @@ $radio-checked-border: var(--rz-input-border) !default;
   width: var(--rz-radio-width);
   height: var(--rz-radio-height);
   border-radius: var(--rz-radio-border-radius);
-
-  &:focus {
-    outline: var(--rz-outline-normal);
-  }
-
-  &:focus-visible {
-    outline: var(--rz-radio-focus-outline);
-    outline-offset: var(--rz-radio-focus-outline-offset);
-  }
 }
 
 .rz-radiobutton-box {
@@ -143,5 +142,10 @@ $radio-checked-border: var(--rz-input-border) !default;
       border-width: var(--rz-radio-border-width);
       opacity: 0.5;
     }
+  }
+
+  &.rz-state-focused:not(.rz-state-disabled) { 
+    outline: var(--rz-radio-focus-outline);
+    outline-offset: var(--rz-radio-focus-outline-offset);
   }
 }
