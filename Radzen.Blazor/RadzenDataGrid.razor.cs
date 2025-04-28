@@ -627,6 +627,13 @@ namespace Radzen.Blazor
         public RenderFragment HeaderTemplate { get; set; }
 
         /// <summary>
+        /// Indicates if HeaderTemplate should be rendered before or after Column Grouping / Column Picker.
+        /// Defaults to true to retain current behavior.
+        /// </summary>
+        [Parameter]
+        public bool RenderHeaderTemplateFirst { get; set; } = true;
+
+        /// <summary>
         /// Gives the grid a custom footer, allowing the adding of components to create custom tool bars or custom pagination
         /// </summary>
         [Parameter]
