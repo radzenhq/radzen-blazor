@@ -1002,6 +1002,9 @@
   --rz-selectbar-selected-color: #{$selectbar-selected-color};
   --rz-selectbar-selected-border: #{$selectbar-selected-border};
   --rz-selectbar-border-radius: #{$selectbar-border-radius};
+  --rz-selectbar-focused-background-color: #{$selectbar-focused-background-color};
+  --rz-selectbar-focused-color: #{$selectbar-focused-color};
+  --rz-selectbar-focused-border: #{$selectbar-focused-border};
 
   /* SidebarToggle */
   --rz-sidebar-toggle-icon-width: #{$sidebar-toggle-icon-width};
