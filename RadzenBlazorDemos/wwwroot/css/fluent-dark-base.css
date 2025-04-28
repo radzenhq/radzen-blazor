@@ -23585,7 +23585,7 @@ button.rz-colorpicker-trigger .rzi:before {
   --rz-selectbar-focus-outline: var(--rz-outline-focus);
   --rz-selectbar-focus-outline-offset: var(--rz-outline-offset);
   --rz-selectbar-button-focus-outline: var(--rz-outline-width) solid var(--rz-text-color);
-  --rz-selectbar-button-focus-outline-offset: calc(-1 * var(--rz-outline-width) / 2);
+  --rz-selectbar-button-focus-outline-offset: calc(-1 * var(--rz-outline-width));
   /* SidebarToggle */
   --rz-sidebar-toggle-icon-width: var(--rz-icon-size);
   --rz-sidebar-toggle-icon-height: var(--rz-icon-size);
