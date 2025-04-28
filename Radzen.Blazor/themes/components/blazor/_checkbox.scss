@@ -159,7 +159,7 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
     }
   }
 
-  &.rz-state-focused:not(.rz-state-disabled) { 
+  :focus-visible &.rz-state-focused:not(.rz-state-disabled) { 
     outline: var(--rz-checkbox-focus-outline);
     outline-offset: var(--rz-checkbox-focus-outline-offset);
   }

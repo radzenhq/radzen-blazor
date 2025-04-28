@@ -12828,7 +12828,7 @@ ul.rz-profile-menu .rz-navigation-menu .rzi {
   border: var(--rz-checkbox-checked-disabled-border);
   opacity: 0.5;
 }
-.rz-chkbox-box.rz-state-focused:not(.rz-state-disabled) {
+:focus-visible .rz-chkbox-box.rz-state-focused:not(.rz-state-disabled) {
   outline: var(--rz-checkbox-focus-outline);
   outline-offset: var(--rz-checkbox-focus-outline-offset);
 }
@@ -13025,7 +13025,7 @@ ul.rz-profile-menu .rz-navigation-menu .rzi {
   border-width: var(--rz-radio-border-width);
   opacity: 0.5;
 }
-.rz-radiobutton-box.rz-state-focused:not(.rz-state-disabled) {
+:focus-visible .rz-radiobutton-box.rz-state-focused:not(.rz-state-disabled) {
   outline: var(--rz-radio-focus-outline);
   outline-offset: var(--rz-radio-focus-outline-offset);
 }

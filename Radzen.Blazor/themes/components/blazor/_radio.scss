@@ -154,7 +154,7 @@ $radio-checked-border: var(--rz-input-border) !default;
     }
   }
 
-  &.rz-state-focused:not(.rz-state-disabled) { 
+  :focus-visible &.rz-state-focused:not(.rz-state-disabled) { 
     outline: var(--rz-radio-focus-outline);
     outline-offset: var(--rz-radio-focus-outline-offset);
   }
