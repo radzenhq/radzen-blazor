@@ -8,7 +8,7 @@ $selectbar-border-radius: var(--rz-border-radius) !default;
 $selectbar-focus-outline: var(--rz-outline-focus) !default;
 $selectbar-focus-outline-offset: var(--rz-outline-offset) !default;
 $selectbar-button-focus-outline: var(--rz-outline-width) solid var(--rz-text-color) !default;
-$selectbar-button-focus-outline-offset: calc(-1 * var(--rz-outline-width) / 2) !default;
+$selectbar-button-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 $selectbar-sizes: xs, sm, md, lg;
 
 .rz-selectbar {
