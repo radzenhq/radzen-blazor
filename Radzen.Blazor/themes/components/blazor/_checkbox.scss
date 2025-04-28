@@ -36,6 +36,10 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
     margin-inline: var(--rz-checkbox-margin-inline);
     cursor: pointer;
   }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
+  }
 }
 
 .rz-checkbox-list-horizontal {
@@ -45,6 +49,10 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   .rz-checkbox {
     display: inline-flex;
     align-items: center;
+  }
+
+  &:focus {
+    outline: var(--rz-outline-normal);
   }
 }
 
@@ -68,18 +76,6 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   min-width: var(--rz-checkbox-width);
   height: var(--rz-checkbox-height);
   border-radius: var(--rz-checkbox-border-radius);
-
-  &:focus {
-    outline: var(--rz-outline-normal);
-  }
-
-  &:focus-visible {
-    .rz-chkbox-box {
-      outline: var(--rz-checkbox-focus-outline);
-      outline-offset: var(--rz-checkbox-focus-outline-offset);
-    }
-  }
-
 }
 
 .rz-chkbox-box {
@@ -151,5 +147,10 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
       border: var(--rz-checkbox-checked-disabled-border);
       opacity: 0.5;
     }
+  }
+
+  &.rz-state-focused:not(.rz-state-disabled) { 
+    outline: var(--rz-checkbox-focus-outline);
+    outline-offset: var(--rz-checkbox-focus-outline-offset);
   }
 }
