@@ -107,6 +107,8 @@ namespace Radzen.Blazor
                 return;
             }
 
+            focusedIndex = -1;
+
             if (value == true)
             {
                 Value = allItems.Where(i => !i.Disabled).Select(i => i.Value);
@@ -250,6 +252,8 @@ namespace Radzen.Blazor
         {
             if (Disabled || item.Disabled || ReadOnly || item.ReadOnly)
                 return;
+
+            focusedIndex = -1;
 
             List<TValue> selectedValues = new List<TValue>(Value != null ? Value : Enumerable.Empty<TValue>());
 

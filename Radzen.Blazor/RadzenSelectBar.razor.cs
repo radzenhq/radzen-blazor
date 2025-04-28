@@ -193,6 +193,8 @@ namespace Radzen.Blazor
             if (Disabled || item.Disabled)
                 return;
 
+            focusedIndex = -1;
+
             if (Multiple)
             {
                 var type = typeof(TValue).IsGenericType ? typeof(TValue).GetGenericArguments()[0] : typeof(TValue);
@@ -243,6 +245,8 @@ namespace Radzen.Blazor
             if (key == "ArrowLeft" || key == "ArrowRight")
             {
                 preventKeyPress = true;
+
+                focusedIndex = items.IndexOf(items.FirstOrDefault(i => IsSelected(i)) ?? item);
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
             }

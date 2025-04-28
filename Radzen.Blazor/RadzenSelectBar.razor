@@ -14,7 +14,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-         @onfocus=@(args => {focusedIndex = focusedIndex == -1 ? 0: focusedIndex; }) role="toolbar" aria-orientation="horizontal"
+         @onfocus=@(args => {focusedIndex = focusedIndex == -1 ? 0: focusedIndex; }) role="toolbar" aria-orientation="horizontal" @onblur=@(args => focusedIndex = -1)
          tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         @foreach (var item in allItems.Where(i => i.Visible))
         {
