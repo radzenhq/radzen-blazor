@@ -105,8 +105,8 @@ namespace Radzen.Blazor
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
-            => GetClassList("rz-selectbutton rz-buttonset")
-                .Add($"rz-selectbutton-{(Orientation == Orientation.Vertical ? "vertical" : "horizontal")}")
+            => GetClassList("rz-selectbar rz-buttonset")
+                .Add($"rz-selectbar-{(Orientation == Orientation.Vertical ? "vertical" : "horizontal")}")
                 .Add($"rz-buttonset-{items.Count}")
                 .ToString();
 
