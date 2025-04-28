@@ -13694,7 +13694,7 @@ a:focus-visible .rz-fieldset-toggler {
   outline: var(--rz-selectbar-focus-outline);
   outline-offset: var(--rz-selectbar-focus-outline-offset);
 }
-.rz-selectbar:focus-visible .rz-button.rz-state-focused {
+.rz-selectbar:focus-visible .rz-button.rz-state-focused:not(.rz-state-disabled) {
   outline: var(--rz-selectbar-button-focus-outline);
   outline-offset: var(--rz-selectbar-button-focus-outline-offset);
   z-index: 1;
