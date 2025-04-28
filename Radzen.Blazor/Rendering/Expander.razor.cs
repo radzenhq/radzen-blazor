@@ -16,13 +16,7 @@ public static class EventHandlers;
 /// </summary>
 public partial class Expander : ComponentBase
 {
-    enum ExpandState
-    {
-        Expanding,
-        Expanded,
-        Collapsing,
-        Collapsed
-    }
+    enum ExpandState { Expanding, Expanded, Collapsing, Collapsed }
 
     private ExpandState state = ExpandState.Collapsed;
 
@@ -92,12 +86,12 @@ public partial class Expander : ComponentBase
         if (state == ExpandState.Expanding)
         {
             state = ExpandState.Expanded;
+            StateHasChanged();
         }
         else if (state == ExpandState.Collapsing)
         {
             state = ExpandState.Collapsed;
+            StateHasChanged();
         }
-
-        StateHasChanged();
     }
 }

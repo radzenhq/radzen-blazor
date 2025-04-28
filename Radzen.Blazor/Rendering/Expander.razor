@@ -1,4 +1,4 @@
-<div role="region" aria-hidden=@Hidden @ontransitionend=@OnTransitionEnd class=@Class @attributes=@Attributes>
+<div role="region" aria-hidden=@Hidden @ontransitionend=@this.AsNonRenderingEventHandler(OnTransitionEnd) class=@Class @attributes=@Attributes>
     <div class="rz-expander-content">
         @ChildContent
     </div>
