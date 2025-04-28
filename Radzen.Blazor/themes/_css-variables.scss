@@ -1002,9 +1002,11 @@
   --rz-selectbar-selected-color: #{$selectbar-selected-color};
   --rz-selectbar-selected-border: #{$selectbar-selected-border};
   --rz-selectbar-border-radius: #{$selectbar-border-radius};
-  --rz-selectbar-focused-background-color: #{$selectbar-focused-background-color};
-  --rz-selectbar-focused-color: #{$selectbar-focused-color};
-  --rz-selectbar-focused-border: #{$selectbar-focused-border};
+  --rz-selectbar-focus-outline: #{$selectbar-focus-outline};
+  --rz-selectbar-focus-outline-offset: #{$selectbar-focus-outline-offset};
+  --rz-selectbar-button-focus-background-color: #{$selectbar-button-focus-background-color};
+  --rz-selectbar-button-focus-color: #{$selectbar-button-focus-color};
+  --rz-selectbar-button-focus-border: #{$selectbar-button-focus-border};
 
   /* SidebarToggle */
   --rz-sidebar-toggle-icon-width: #{$sidebar-toggle-icon-width};

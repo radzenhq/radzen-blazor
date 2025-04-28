@@ -35,6 +35,11 @@ $radio-checked-border: var(--rz-input-border) !default;
   &:focus {
     outline: var(--rz-outline-normal);
   }
+
+  &:focus-visible {
+    outline: var(--rz-radio-focus-outline);
+    outline-offset: var(--rz-radio-focus-outline-offset);
+  }
 }
 
 .rz-radio-button-list-horizontal {
@@ -48,6 +53,11 @@ $radio-checked-border: var(--rz-input-border) !default;
 
   &:focus {
     outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-radio-focus-outline);
+    outline-offset: var(--rz-radio-focus-outline-offset);
   }
 }
 

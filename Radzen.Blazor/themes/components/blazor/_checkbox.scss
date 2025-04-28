@@ -40,6 +40,11 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
   &:focus {
     outline: var(--rz-outline-normal);
   }
+
+  &:focus-visible {
+    outline: var(--rz-checkbox-focus-outline);
+    outline-offset: var(--rz-checkbox-focus-outline-offset);
+  }
 }
 
 .rz-checkbox-list-horizontal {
@@ -53,6 +58,11 @@ $checkbox-tri-icon-font-size: $checkbox-icon-font-size !default;
 
   &:focus {
     outline: var(--rz-outline-normal);
+  }
+
+  &:focus-visible {
+    outline: var(--rz-checkbox-focus-outline);
+    outline-offset: var(--rz-checkbox-focus-outline-offset);
   }
 }
 

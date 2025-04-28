@@ -5,9 +5,11 @@ $selectbar-selected-background-color: var(--rz-secondary) !default;
 $selectbar-selected-color: var(--rz-on-secondary) !default;
 $selectbar-selected-border: var(--rz-border-secondary) !default;
 $selectbar-border-radius: var(--rz-border-radius) !default;
-$selectbar-focused-background-color: var(--rz-secondary) !default;
-$selectbar-focused-color: var(--rz-on-secondary) !default;
-$selectbar-focused-border: var(--rz-border-secondary) !default;
+$selectbar-focus-outline: var(--rz-button-focus-outline) !default;
+$selectbar-focus-outline-offset: var(--rz-button-focus-outline-offset) !default;
+$selectbar-button-focus-background-color: var(--rz-secondary) !default;
+$selectbar-button-focus-color: var(--rz-on-secondary) !default;
+$selectbar-button-focus-border: var(--rz-border-secondary) !default;
 $selectbar-sizes: xs, sm, md, lg;
 
 .rz-selectbutton {
@@ -23,11 +25,15 @@ $selectbar-sizes: xs, sm, md, lg;
       flex-direction: column;
   }
 
-  .rz-button {
-    &:focus-visible {
-      z-index: 1;
-    }
+  &:focus {
+    outline: var(--rz-outline-normal);
   }
+
+  &:focus-visible {
+    outline: var(--rz-selectbar-focus-outline);
+    outline-offset: var(--rz-selectbar-focus-outline-offset);
+  }
+
 }
 
 @each $size in $selectbar-sizes {
@@ -46,9 +52,10 @@ $selectbar-sizes: xs, sm, md, lg;
       }
 
       &.rz-state-focused {
-        background-color: var(--rz-selectbar-focused-background-color);
-        color: var(--selectbar-focused-color);
-        border: var(--rz-selectbar-focused-border);
+        background-color: var(--rz-selectbar-button-focus-background-color);
+        color: var(--selectbar-button-focus-color);
+        border: var(--rz-selectbar-button-focus-border);
+        z-index: 1;
       }
     }
 
