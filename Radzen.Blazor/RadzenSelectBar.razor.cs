@@ -246,7 +246,10 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                focusedIndex = items.IndexOf(items.FirstOrDefault(i => IsSelected(i)) ?? item);
+                if (!Multiple)
+                {
+                    focusedIndex = items.IndexOf(items.FirstOrDefault(i => IsSelected(i)) ?? item);
+                }
 
                 focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
             }
