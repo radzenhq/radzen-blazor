@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -50,7 +51,6 @@ namespace Radzen.Blazor
         public bool ShowIcon { get; set; } = true;
 
         string contentStyle = "display:none;position:absolute;z-index:1;";
-        string iconStyle = "transform: rotate(0deg);";
 
         /// <summary>
         /// Toggles the menu open/close state.
@@ -58,10 +58,16 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         public async Task Toggle(MouseEventArgs args)
         {
-            contentStyle = contentStyle.IndexOf("display:none;") != -1 ? "display:block;" : "display:none;position:absolute;z-index:1;";
-            iconStyle = iconStyle.IndexOf("rotate(0deg)") != -1 ? "transform: rotate(-180deg);" : "transform: rotate(0deg);";
+            contentStyle = Collapsed ?  "display:block;" : "display:none;position:absolute;z-index:1;";
             await InvokeAsync(StateHasChanged);
         }
+
+        bool Collapsed => contentStyle.Contains("display:none;", StringComparison.CurrentCulture);
+
+        string ToggleClass => ClassList.Create("notranslate rzi rz-navigation-item-icon-children")
+                            .Add("rz-state-expanded", !Collapsed)
+                            .Add("rz-state-collapsed", Collapsed)
+                            .ToString();
 
         /// <summary>
         /// Closes this instance.
@@ -69,7 +75,6 @@ namespace Radzen.Blazor
         public void Close()
         {
             contentStyle = "display:none;";
-            iconStyle = "transform: rotate(0deg);";
             StateHasChanged();
         }
 
@@ -93,7 +98,7 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                if (!contentStyle.Contains("display:none;") && focusedIndex >= 0 && focusedIndex < items.Count)
+                if (!Collapsed && focusedIndex >= 0 && focusedIndex < items.Count)
                 {
                     var item = items[focusedIndex];
 
@@ -110,7 +115,7 @@ namespace Radzen.Blazor
                 {
                     await Toggle(new MouseEventArgs());
 
-                    if (!contentStyle.Contains("display:none;"))
+                    if (!Collapsed)
                     {
                         focusedIndex = focusedIndex != -1 ? focusedIndex : 0;
                     }

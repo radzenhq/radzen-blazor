@@ -1731,8 +1731,8 @@ window.Radzen = {
       var icon = item.querySelector('.rz-navigation-item-icon-children');
 
       if (icon) {
-        var deg = active ? '180deg' : 0;
-        icon.style.transform = 'rotate(' + deg + ')';
+        icon.classList.toggle('rz-state-expanded', active);
+        icon.classList.toggle('rz-state-collapsed', !active);
       }
     }
 
