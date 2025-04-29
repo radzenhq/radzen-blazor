@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -120,7 +121,7 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        internal async System.Threading.Tasks.Task Toggle()
+        internal async Task Toggle()
         {
             if (!ExpandedInternal && !Parent.Multiple)
             {
@@ -138,17 +139,15 @@ namespace Radzen.Blazor
             ExpandedInternal = !ExpandedInternal;
 
             await ExpandedChanged.InvokeAsync(ExpandedInternal);
-
-            //StateHasChanged();
         }
 
-        internal async System.Threading.Tasks.Task Collapse()
+        internal async Task Collapse()
         {
             if (ExpandedInternal)
             {
                 ExpandedInternal = false;
+
                 await ExpandedChanged.InvokeAsync(ExpandedInternal);
-                //StateHasChanged();
             }
         }
 
@@ -167,8 +166,6 @@ namespace Radzen.Blazor
             ExpandedInternal = true;
         }
 
-        RadzenPanelMenu _parent;
-
         /// <summary>
         /// Gets or sets the click callback.
         /// </summary>
@@ -176,55 +173,19 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
-        RadzenPanelMenuItem _parentItem;
-
         /// <summary>
         /// Gets or sets the parent item.
         /// </summary>
         /// <value>The parent item.</value>
         [CascadingParameter]
-        public RadzenPanelMenuItem ParentItem
-        {
-            get
-            {
-                return _parentItem;
-            }
-            set
-            {
-                if (_parentItem != value)
-                {
-                    _parentItem = value;
-                    _parentItem.AddItem(this);
-
-                    EnsureVisible();
-                }
-            }
-        }
+        public RadzenPanelMenuItem ParentItem { get; set;}
 
         /// <summary>
         /// Gets or sets the parent.
         /// </summary>
         /// <value>The parent.</value>
         [CascadingParameter]
-        public RadzenPanelMenu Parent
-        {
-            get
-            {
-                return _parent;
-            }
-            set
-            {
-                if (_parent != value)
-                {
-                    _parent = value;
-
-                    if (ParentItem == null)
-                    {
-                        _parent.AddItem(this);
-                    }
-                }
-            }
-        }
+        public RadzenPanelMenu Parent { get; set; }
 
         internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
@@ -234,53 +195,179 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void AddItem(RadzenPanelMenuItem item)
         {
-            if (items.IndexOf(item) == -1)
+            if (!items.Contains(item))
             {
                 items.Add(item);
-                Parent.SelectItem(item);
             }
-        }
-
-        /// <summary>
-        /// Selects the specified item by value.
-        /// </summary>
-        /// <param name="value">if set to <c>true</c> [value].</param>
-        public void Select(bool value)
-        {
-            Selected = value;
-
-            StateHasChanged();
         }
 
         void EnsureVisible()
         {
-            if (Selected)
+            if (selected)
             {
                 var parent = ParentItem;
 
                 while (parent != null)
                 {
                     parent.Expand();
+
+                    if (parent.ParentItem == null)
+                    {
+                        parent.StateHasChanged();
+                    }
+
                     parent = parent.ParentItem;
                 }
             }
         }
 
+        [Inject]
+        NavigationManager NavigationManager { get; set; }
+
         /// <inheritdoc />
         protected override void OnInitialized()
         {
             ExpandedInternal = Expanded;
+
+            selected = Selected;
+
+            NavigationManager.LocationChanged += OnLocationChanged;
+
+            if (ParentItem != null)
+            {
+                ParentItem.AddItem(this);
+            }
+            else if (Parent != null)
+            {
+                Parent.AddItem(this);
+            }
+
+            SyncWithNavigationManager();
+        }
+
+        string WrapperClass => ClassList.Create("rz-navigation-item-wrapper")
+            .Add("rz-navigation-item-wrapper-active", selected)
+            .ToString();
+
+        string LinkClass => ClassList.Create("rz-navigation-item-link")
+            .Add("rz-navigation-item-link-active", selected)
+            .ToString();
+
+        private bool selected = false;
+
+        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+        {
+            SyncWithNavigationManager();
+        }
+
+        private void SyncWithNavigationManager()
+        {
+            var matches = ShouldMatch();
+
+            if (matches != selected)
+            {
+                selected = matches;
+
+                EnsureVisible();
+
+                StateHasChanged();
+            }
+        }
+
+        bool ShouldMatch()
+        {
+            if (string.IsNullOrEmpty(Path))
+            {
+                return false;
+            }
+
+            var currentAbsoluteUrl = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsoluteUri;
+            var absoluteUrl = NavigationManager.ToAbsoluteUri(Path).AbsoluteUri;
+
+            if (EqualsHrefExactlyOrIfTrailingSlashAdded(absoluteUrl, currentAbsoluteUrl))
+            {
+                return true;
+            }
+
+            if (Path == "/")
+            {
+                return false;
+            }
+
+            var match = Match != NavLinkMatch.Prefix ? Match : Parent.Match;
+
+            if (match == NavLinkMatch.Prefix && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool EqualsHrefExactlyOrIfTrailingSlashAdded(string absoluteUrl, string currentAbsoluteUrl)
+        {
+            if (string.Equals(currentAbsoluteUrl, absoluteUrl, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (currentAbsoluteUrl.Length == absoluteUrl.Length - 1)
+            {
+                if (absoluteUrl[absoluteUrl.Length - 1] == '/' && absoluteUrl.StartsWith(currentAbsoluteUrl, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static bool IsSeparator(char c)
+        {
+            return c == '?' || c == '/' || c == '#';
+        }
+
+        private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
+        {
+            var prefixLength = prefix.Length;
+            if (value.Length > prefixLength)
+            {
+                return value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                    && (
+                        prefixLength == 0
+                        || IsSeparator(prefix[prefixLength - 1])
+                        || IsSeparator(value[prefixLength])
+                    );
+            }
+            else
+            {
+                return false;
+            }
         }
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            if (parameters.DidParameterChange(nameof(Expanded), Expanded))
-            {
-                ExpandedInternal = parameters.GetValueOrDefault<bool>(nameof(Expanded));
-            }
+            var expandedChanged = parameters.DidParameterChange(nameof(Expanded), Expanded);
+
+            var selectedChanged = parameters.DidParameterChange(nameof(Selected), Selected);
 
             await base.SetParametersAsync(parameters);
+
+            if (expandedChanged)
+            {
+                ExpandedInternal = Expanded;
+            }
+
+            if (selectedChanged)
+            {
+                selected = Selected;
+
+                if (selected)
+                {
+                    EnsureVisible();
+                }
+            }
         }
 
         bool HasClickDelegate => Click.HasDelegate || Parent?.Click.HasDelegate == true;
@@ -330,7 +417,7 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            items.Remove(this);
+            NavigationManager.LocationChanged -= OnLocationChanged; 
 
             if (Parent != null)
             {

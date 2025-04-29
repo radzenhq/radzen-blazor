@@ -56,7 +56,6 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowArrow { get; set; } = true;
 
-
         internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
         /// <summary>
@@ -65,33 +64,10 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void AddItem(RadzenPanelMenuItem item)
         {
-            if (items.IndexOf(item) == -1)
+            if (!items.Contains(item))
             {
                 items.Add(item);
-                SelectItem(item);
             }
-        }
-
-        /// <inheritdoc />
-        protected override void OnInitialized()
-        {
-            UriHelper.LocationChanged += UriHelper_OnLocationChanged;
-        }
-
-        private void UriHelper_OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
-        {
-            var allExpandedItems = items.Concat(items.SelectManyRecursive(i => i.ExpandedInternal ? i.items : Enumerable.Empty<RadzenPanelMenuItem>()));
-            foreach (var item in allExpandedItems)
-            {
-                SelectItem(item);
-            }
-        }
-
-        /// <inheritdoc />
-        public override void Dispose()
-        {
-            base.Dispose();
-            UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
         }
 
         internal void CollapseAll(IEnumerable<RadzenPanelMenuItem> itemsToSkip)
@@ -109,85 +85,6 @@ namespace Radzen.Blazor
             }
 
             await base.SetParametersAsync(parameters);
-        }
-
-        bool ShouldMatch(RadzenPanelMenuItem item)
-        {
-            if (string.IsNullOrEmpty(item.Path))
-            {
-                return false;
-            }
-
-
-            var currentAbsoluteUrl = UriHelper.ToAbsoluteUri(UriHelper.Uri).AbsoluteUri;
-            var absoluteUrl = UriHelper.ToAbsoluteUri(item.Path).AbsoluteUri;
-
-            if (EqualsHrefExactlyOrIfTrailingSlashAdded(absoluteUrl, currentAbsoluteUrl))
-            {
-                return true;
-            }
-
-            if (item.Path == "/")
-            {
-                return false;
-            }
-
-            var match = item.Match != NavLinkMatch.Prefix ? item.Match : Match;
-
-            if (match == NavLinkMatch.Prefix && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private static bool EqualsHrefExactlyOrIfTrailingSlashAdded(string absoluteUrl, string currentAbsoluteUrl)
-        {
-            if (string.Equals(currentAbsoluteUrl, absoluteUrl, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            if (currentAbsoluteUrl.Length == absoluteUrl.Length - 1)
-            {
-                if (absoluteUrl[absoluteUrl.Length - 1] == '/'
-                    && absoluteUrl.StartsWith(currentAbsoluteUrl, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsSeparator(char c)
-        {
-            return c == '?' || c == '/' || c == '#';
-        }
-
-        private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
-        {
-            var prefixLength = prefix.Length;
-            if (value.Length > prefixLength)
-            {
-                return value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-                    && (
-                        prefixLength == 0
-                        || IsSeparator(prefix[prefixLength - 1])
-                        || IsSeparator(value[prefixLength])
-                    );
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        internal void SelectItem(RadzenPanelMenuItem item)
-        {
-            var selected = ShouldMatch(item);
-            item.Select(selected);
         }
 
         /// <inheritdoc />

@@ -1,14 +1,13 @@
 ﻿@using Radzen.Blazor.Rendering
 @using Microsoft.AspNetCore.Components.Routing
-@inject NavigationManager UriHelper
 @inherits RadzenComponent
 @if (Visible)
 {
     <li @ref="@Element" id="@GetId()" style="@Style" @attributes="Attributes" class="@GetItemCssClass()" @onclick="@(HasClickDelegate ? OnClick : null)" @onclick:stopPropagation>
-        <div class=@(Selected ? "rz-navigation-item-wrapper rz-navigation-item-wrapper-active" : "rz-navigation-item-wrapper")>
+        <div class=@WrapperClass>
             @if (Path != null)
             {
-                <NavLink tabindex="-1" target="@Target" class=@(Selected ? "rz-navigation-item-link rz-navigation-item-link-active" : "rz-navigation-item-link") style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")" href="@Path" Match="@Match">
+                <NavLink tabindex="-1" target="@Target" class=@LinkClass style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")" href="@Path" Match="@Match">
                     @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
                         <i class="notranslate rzi rz-navigation-item-icon" style="@getIconStyle()">@Icon</i>
