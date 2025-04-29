@@ -61,31 +61,37 @@ namespace Radzen.Blazor
         [Parameter]
         public string ReadOnlyProperty { get; set; }
 
-        IEnumerable<RadzenCheckBoxListItem<TValue>> allItems
+        void UpdateAllItems()
         {
-            get
+            allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
             {
-                return items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
+                var item = new RadzenCheckBoxListItem<TValue>();
+                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
+                item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+
+                if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
                 {
-                    var item = new RadzenCheckBoxListItem<TValue>();
-                    item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
-                    item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+                    item.SetDisabled(disabledResult);
+                }
 
-                    if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
-                    {
-                        item.SetDisabled(disabledResult);
-                    }
+                if (ReadOnlyProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, ReadOnlyProperty, out var readOnlyResult))
+                {
+                    item.SetReadOnly(readOnlyResult);
+                }
 
-                    if (ReadOnlyProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, ReadOnlyProperty, out var readOnlyResult))
-                    {
-                        item.SetReadOnly(readOnlyResult);
-                    }
-
-                    return item;
-                }));
-            }
+                return item;
+            })).ToList();
         }
 
+        /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            UpdateAllItems();
+        }
+
+        List<RadzenCheckBoxListItem<TValue>> allItems;
         /// <summary>
         /// Gets or sets a value indicating whether the user can select all values. Set to <c>false</c> by default.
         /// </summary>
@@ -106,8 +112,6 @@ namespace Radzen.Blazor
             {
                 return;
             }
-
-            focusedIndex = -1;
 
             if (value == true)
             {
@@ -214,6 +218,7 @@ namespace Radzen.Blazor
             if (items.IndexOf(item) == -1)
             {
                 items.Add(item);
+                UpdateAllItems();
                 StateHasChanged();
             }
         }
@@ -227,6 +232,7 @@ namespace Radzen.Blazor
             if (items.Contains(item))
             {
                 items.Remove(item);
+                UpdateAllItems();
                 if (!disposed)
                 {
                     try { InvokeAsync(StateHasChanged); } catch { }
@@ -253,7 +259,7 @@ namespace Radzen.Blazor
             if (Disabled || item.Disabled || ReadOnly || item.ReadOnly)
                 return;
 
-            focusedIndex = -1;
+            focusedIndex = allItems.IndexOf(item);
 
             List<TValue> selectedValues = new List<TValue>(Value != null ? Value : Enumerable.Empty<TValue>());
 
@@ -275,35 +281,43 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        internal int focusedIndex = -1;
+        bool focused;
+        int focusedIndex = -1;
         bool preventKeyPress = true;
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            var item = items.ElementAtOrDefault(focusedIndex) ?? items.FirstOrDefault();
+            var item = allItems.ElementAtOrDefault(focusedIndex) ?? allItems.FirstOrDefault();
 
             if (item == null) return;
 
-            if (key == "ArrowLeft" || key == "ArrowRight")
+            if ((Orientation == Orientation.Horizontal && (key == "ArrowLeft" || key == "ArrowRight")) ||
+                (Orientation == Orientation.Vertical && (key == "ArrowUp" || key == "ArrowDown")))
             {
                 preventKeyPress = true;
+                var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
 
-                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
+                focusedIndex = Math.Clamp(focusedIndex + direction, 0, allItems.FindLastIndex(t => t.Visible && !t.Disabled));
+
+                while (allItems.ElementAtOrDefault(focusedIndex)?.Disabled == true)
+                {
+                    focusedIndex = focusedIndex + direction;
+                }
             }
             else if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
 
-                focusedIndex = key == "Home" ? 0 : items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
+                focusedIndex = key == "Home" ? 0 : allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
 
-                if (focusedIndex >= 0 && focusedIndex < items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
+                if (focusedIndex >= 0 && focusedIndex < allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
                 {
-                    await SelectItem(items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex]);
+                    await SelectItem(allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex]);
                 }
             }
             else
@@ -314,12 +328,12 @@ namespace Radzen.Blazor
 
         bool HasInvisibleBefore(RadzenCheckBoxListItem<TValue> item)
         {
-            return items.Take(items.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
+            return allItems.Take(allItems.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
         }
 
         bool IsFocused(RadzenCheckBoxListItem<TValue> item)
         {
-            return items.IndexOf(item) == focusedIndex;
+            return allItems.IndexOf(item) == focusedIndex;
         }
     }
 }

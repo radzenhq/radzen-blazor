@@ -49,7 +49,7 @@ namespace Radzen.Blazor
         ClassList ButtonClassList(RadzenSelectBarItem item)
             => ClassList.Create($"rz-button rz-button-{getButtonSize()} rz-button-text-only")
                         .Add("rz-state-active", IsSelected(item))
-                        .Add("rz-state-focused", IsFocused(item))
+                        .Add("rz-state-focused", IsFocused(item) && focused)
                         .AddDisabled(Disabled || item.Disabled);
 
         /// <summary>
@@ -66,19 +66,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string TextProperty { get; set; }
 
-        IEnumerable<RadzenSelectBarItem> allItems
-        {
-            get
-            {
-                return items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
-                {
-                    var item = new RadzenSelectBarItem();
-                    item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
-                    item.SetValue(PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
-                    return item;
-                }));
-            }
-        }
+        List<RadzenSelectBarItem> allItems;
 
         IEnumerable _data = null;
 
@@ -104,10 +92,29 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            UpdateAllItems();
+        }
+
+        void UpdateAllItems()
+        {
+            allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
+            {
+                var item = new RadzenSelectBarItem();
+                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
+                item.SetValue(PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+                return item;
+            })).ToList();
+        }
+
+        /// <inheritdoc />
         protected override string GetComponentCssClass()
             => GetClassList("rz-selectbar rz-buttonset")
                 .Add($"rz-selectbar-{(Orientation == Orientation.Vertical ? "vertical" : "horizontal")}")
-                .Add($"rz-buttonset-{items.Count}")
+                .Add($"rz-buttonset-{allItems.Count}")
                 .ToString();
 
         /// <summary>
@@ -135,6 +142,7 @@ namespace Radzen.Blazor
             if (items.IndexOf(item) == -1)
             {
                 items.Add(item);
+                UpdateAllItems();
                 StateHasChanged();
             }
         }
@@ -148,6 +156,7 @@ namespace Radzen.Blazor
             if (items.Contains(item))
             {
                 items.Remove(item);
+                UpdateAllItems();
                 if (!disposed)
                 {
                     try { InvokeAsync(StateHasChanged); } catch { }
@@ -193,7 +202,7 @@ namespace Radzen.Blazor
             if (Disabled || item.Disabled)
                 return;
 
-            focusedIndex = -1;
+            focusedIndex = allItems.IndexOf(item);
 
             if (Multiple)
             {
@@ -232,13 +241,14 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        internal int focusedIndex = -1;
+        bool focused;
+        int focusedIndex = -1;
         bool preventKeyPress = true;
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            var item = items.ElementAtOrDefault(focusedIndex) ?? items.FirstOrDefault();
+            var item = allItems.ElementAtOrDefault(focusedIndex) ?? allItems.FirstOrDefault();
 
             if (item == null) return;
 
@@ -246,26 +256,28 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                if (!Multiple)
-                {
-                    focusedIndex = items.IndexOf(items.FirstOrDefault(i => IsSelected(i)) ?? item);
-                }
+                var direction = key == "ArrowLeft" ? -1 : 1;
 
-                focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowLeft" ? -1 : 1), 0, items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1);
+                focusedIndex = Math.Clamp(focusedIndex + direction, 0, allItems.FindLastIndex(t => t.Visible && !t.Disabled));
+
+                while (allItems.ElementAtOrDefault(focusedIndex)?.Disabled == true)
+                {
+                    focusedIndex = focusedIndex + direction;
+                }               
             }
             else if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
 
-                focusedIndex = key == "Home" ? 0 : items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
+                focusedIndex = key == "Home" ? 0 : allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
             }
             else if (key == "Space" || key == "Enter")
             {
                 preventKeyPress = true;
 
-                if (focusedIndex >= 0 && focusedIndex < items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
+                if (focusedIndex >= 0 && focusedIndex < allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
                 {
-                    await SelectItem(items.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex]);
+                    await SelectItem(allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex]);
                 }
             }
             else
@@ -276,12 +288,12 @@ namespace Radzen.Blazor
 
         bool HasInvisibleBefore(RadzenSelectBarItem item)
         {
-            return items.Take(items.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
+            return allItems.Take(allItems.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
         }
 
         bool IsFocused(RadzenSelectBarItem item)
         {
-            return items.IndexOf(item) == focusedIndex;
+            return allItems.ToList().IndexOf(item) == focusedIndex;
         }
     }
 }
