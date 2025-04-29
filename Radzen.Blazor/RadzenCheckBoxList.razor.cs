@@ -27,7 +27,7 @@ namespace Radzen.Blazor
     {
         ClassList ItemClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
                                                                             .Add("rz-state-active", IsSelected(item))
-                                                                            .Add("rz-state-focused", IsFocused(item))
+                                                                            .Add("rz-state-focused", IsFocused(item) && focused)
                                                                             .AddDisabled(Disabled || item.Disabled);
 
         ClassList IconClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
