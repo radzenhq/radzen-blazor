@@ -267,6 +267,12 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
+        protected override void OnInitialized()
+        {
+            ExpandedInternal = Expanded;
+        }
+
+        /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             if (parameters.DidParameterChange(nameof(Expanded), Expanded))

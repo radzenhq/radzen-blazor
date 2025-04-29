@@ -1,0 +1,28 @@
+@inject ExampleService ExampleService
+
+<RadzenPanelMenu Match="NavLinkMatch.Prefix">
+    @foreach (var category in ExampleService.Examples)
+    {
+        <NavigationItem @key=category Example=@category>
+            @if (category.Children != null)
+            {
+                @foreach (var example in category.Children)
+                {
+                    if (example.Children != null)
+                    {
+                        <NavigationItem @key=example Example=@example>
+                        @foreach (var child in example.Children)
+                        {
+                            <NavigationItem @key=child Example=@child />
+                        }
+                        </NavigationItem>
+                    }
+                    else
+                    {
+                        <NavigationItem @key=example Example=@example />
+                    }
+                }
+            }
+        </NavigationItem>
+    }
+</RadzenPanelMenu>
