@@ -17,9 +17,9 @@
 }
 
 .rz-open {
-  animation: var(--rz-transition) rz-open;
+  animation: var(--rz-expander-transition) rz-open;
 }
 
 .rz-close {
-  animation: var(--rz-transition) rz-close;
+  animation: var(--rz-expander-transition) rz-close;
 }

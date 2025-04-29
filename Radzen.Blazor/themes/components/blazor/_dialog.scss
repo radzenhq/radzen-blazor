@@ -18,6 +18,7 @@ $dialog-mask-background-color: var(--rz-base-800) !default;
 $dialog-border-radius: var(--rz-border-radius) !default;
 $dialog-mask-zindex: 1000 !default;
 $dialog-zindex: 1001 !default;
+$dialog-transition: .1s ease-in-out !default;
 
 .rz-dialog-wrapper {
   box-sizing: border-box;
@@ -194,7 +195,7 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog {
   &.rz-open {
-    animation: var(--rz-transition) rz-dialog-open;
+    animation: var(--rz-dialog-transition) rz-dialog-open;
   }
 }
 
@@ -218,11 +219,11 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog-side-position-right {
   &.rz-open {
-    animation: var(--rz-transition) rz-side-dialog-right-open;
+    animation: var(--rz-dialog-transition) rz-side-dialog-right-open;
   }
 
   &.rz-close {
-    animation: var(--rz-transition) rz-side-dialog-right-close;
+    animation: var(--rz-dialog-transition) rz-side-dialog-right-close;
     transform: translateX(100%);
   }
 }
@@ -247,11 +248,11 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog-side-position-top {
   &.rz-open {
-    animation: var(--rz-transition) rz-side-dialog-top-open;
+    animation: var(--rz-dialog-transition) rz-side-dialog-top-open;
   }
 
   &.rz-close {
-    animation: var(--rz-transition) rz-side-dialog-top-close;
+    animation: var(--rz-dialog-transition) rz-side-dialog-top-close;
     transform: translateX(-100%);
   }
 }
@@ -276,11 +277,11 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog-side-position-bottom {
   &.rz-open {
-    animation: var(--rz-transition) rz-side-dialog-bottom-open;
+    animation: var(--rz-dialog-transition) rz-side-dialog-bottom-open;
   }
 
   &.rz-close {
-    animation: var(--rz-transition) rz-side-dialog-bottom-close;
+    animation: var(--rz-dialog-transition) rz-side-dialog-bottom-close;
     transform: translateY(100%);
   }
 }
@@ -305,11 +306,11 @@ $dialog-zindex: 1001 !default;
 
 .rz-dialog-side-position-left {
   &.rz-open {
-    animation: var(--rz-transition) rz-side-dialog-left-open;
+    animation: var(--rz-dialog-transition) rz-side-dialog-left-open;
   }
 
   &.rz-close {
-    animation: var(--rz-transition) rz-side-dialog-left-close;
+    animation: var(--rz-dialog-transition) rz-side-dialog-left-close;
     transform: translateX(-100%);
   }
 }

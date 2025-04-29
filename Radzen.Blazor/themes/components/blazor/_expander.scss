@@ -1,6 +1,8 @@
+$rz-expander-transition: .2s ease-in-out !default;
+
 .rz-expander {
     display: grid;
-    transition: grid-template-rows var(--rz-transition);
+    transition: grid-template-rows var(--rz-expander-transition);
 
     &.rz-state-expanded {
         grid-template-rows: 1fr;

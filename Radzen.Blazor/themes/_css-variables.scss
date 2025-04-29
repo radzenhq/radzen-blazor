@@ -65,6 +65,7 @@
   /* Transition */
   --rz-transition: #{$rz-transition};
   --rz-transition-all: #{$rz-transition-all};
+  --rz-expander-transition: #{$rz-expander-transition};
 
   /* Layout Body */
   --rz-layout-body-margin: #{$layout-body-margin};
@@ -356,6 +357,7 @@
   --rz-dialog-border-radius: #{$dialog-border-radius};
   --rz-dialog-mask-zindex: #{$dialog-mask-zindex};
   --rz-dialog-zindex: #{$dialog-zindex};
+  --rz-dialog-transition: #{$dialog-transition};
 
   /* DropDown */
   --rz-dropdown-trigger-icon-width: #{$dropdown-trigger-icon-width};
