@@ -127,14 +127,14 @@
     <RadzenPanelMenu Match="NavLinkMatch.Prefix">
         @foreach (var category in examples)
         {
-            <RadzenPanelMenuItem @key=category @bind-Expanded=@category.Expanded Template=@ItemTemplate(category) Path=@ItemPath(category) Icon=@category.Icon>
+            <RadzenPanelMenuItem @key=category Template=@ItemTemplate(category) Path=@ItemPath(category) Icon=@category.Icon>
                 @if (category.Children != null)
                 {
                     @foreach (var example in category.Children)
                     {
                         if (example.Children != null)
                         {
-                            <RadzenPanelMenuItem @key=example @bind-Expanded=@example.Expanded Template=@ItemTemplate(example) Path=@ItemPath(example) Icon=@example.Icon>
+                            <RadzenPanelMenuItem @key=example Template=@ItemTemplate(example) Path=@ItemPath(example) Icon=@example.Icon>
                             @foreach (var child in example.Children)
                             {
                                 <RadzenPanelMenuItem @key=child  Template=@ItemTemplate(child) Path=@ItemPath(child) Icon=@child.Icon />
