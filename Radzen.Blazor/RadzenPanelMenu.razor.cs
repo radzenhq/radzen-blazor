@@ -69,7 +69,6 @@ namespace Radzen.Blazor
             {
                 items.Add(item);
                 SelectItem(item);
-                StateHasChanged();
             }
         }
 
@@ -223,7 +222,7 @@ namespace Radzen.Blazor
                     currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent.items).ToList();
                     focusedIndex = currentItems.IndexOf(parentItem);
                 }
-                else if (key == "ArrowDown" && currentItems.ElementAtOrDefault(focusedIndex) != null && 
+                else if (key == "ArrowDown" && currentItems.ElementAtOrDefault(focusedIndex) != null &&
                     currentItems.ElementAtOrDefault(focusedIndex).ExpandedInternal && currentItems.ElementAtOrDefault(focusedIndex).items.Any())
                 {
                     currentItems = currentItems.ElementAtOrDefault(focusedIndex).items.Where(i => i.Visible).ToList();
@@ -301,6 +300,12 @@ namespace Radzen.Blazor
 
             focusedIndex = -1;
             currentItems = null;
+        }
+
+        void OnFocus()
+        {
+            focusedIndex = focusedIndex == -1 ? 0: focusedIndex;
+            currentItems ??= [.. items.Where(i => i.Visible)];
         }
     }
 }

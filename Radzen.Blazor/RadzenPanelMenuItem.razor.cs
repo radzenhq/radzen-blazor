@@ -139,15 +139,16 @@ namespace Radzen.Blazor
 
             await ExpandedChanged.InvokeAsync(ExpandedInternal);
 
-            StateHasChanged();
+            //StateHasChanged();
         }
+
         internal async System.Threading.Tasks.Task Collapse()
         {
             if (ExpandedInternal)
             {
                 ExpandedInternal = false;
                 await ExpandedChanged.InvokeAsync(ExpandedInternal);
-                StateHasChanged();
+                //StateHasChanged();
             }
         }
 
@@ -237,7 +238,6 @@ namespace Radzen.Blazor
             {
                 items.Add(item);
                 Parent.SelectItem(item);
-                StateHasChanged();
             }
         }
 
@@ -276,6 +276,8 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
         }
+
+        bool HasClickDelegate => Click.HasDelegate || Parent?.Click.HasDelegate == true;
 
         /// <summary>
         /// Handles the <see cref="E:Click" /> event.
@@ -329,5 +331,17 @@ namespace Radzen.Blazor
                 Parent.RemoveItem(this);
             }
         }
+
+#if DEBUG
+        int renderCount = 0;
+
+        /// <inheritdoc />
+        protected override void OnAfterRender(bool firstRender)
+        {
+            renderCount++;
+            base.OnAfterRender(firstRender);
+            System.Console.WriteLine($"RadzenPanelMenu.OnAfterRender : {Text} {renderCount} times");
+        }
+#endif 
     }
 }

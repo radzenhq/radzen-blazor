@@ -4,7 +4,7 @@
 @inherits RadzenComponent
 @if (Visible)
 {
-    <li @ref="@Element" id="@GetId()" style="@Style" @attributes="Attributes" class="@GetItemCssClass()" @onclick="@OnClick" @onclick:stopPropagation>
+    <li @ref="@Element" id="@GetId()" style="@Style" @attributes="Attributes" class="@GetItemCssClass()" @onclick="@(HasClickDelegate ? OnClick : null)" @onclick:stopPropagation>
         <div class=@(Selected ? "rz-navigation-item-wrapper rz-navigation-item-wrapper-active" : "rz-navigation-item-wrapper")>
             @if (Path != null)
             {
