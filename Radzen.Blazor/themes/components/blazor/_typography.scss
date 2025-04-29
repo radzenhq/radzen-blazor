@@ -82,7 +82,7 @@ $text: (
     }
   }
   .rz-stack {
-    .rz-text-#{$element} {
+    > .rz-text-#{$element} {
       margin-block: 0;
     }
   }
