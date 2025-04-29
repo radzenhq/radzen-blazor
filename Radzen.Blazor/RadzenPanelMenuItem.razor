@@ -25,7 +25,7 @@
                     {
                         <span class="rz-navigation-item-text" @onclick="@Toggle">@Text</span>
                     }
-                    @if (items.Any() && Parent?.ShowArrow == true)
+                    @if (ChildContent != null && Parent?.ShowArrow == true)
                     {
                         <i class=@ToggleClass @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
                     }
@@ -50,7 +50,7 @@
                     {
                         <span class="rz-navigation-item-text">@Text</span>
                     }
-                    @if (items.Any() && Parent?.ShowArrow == true)
+                    @if (ChildContent != null && Parent?.ShowArrow == true)
                     {
                         <i class=@ToggleClass>keyboard_arrow_down</i>
                     }

@@ -3,26 +3,30 @@
 <RadzenPanelMenu Match="NavLinkMatch.Prefix">
     @foreach (var category in ExampleService.Examples)
     {
+        @if (category.Children != null)
+        {
         <NavigationItem @key=category Example=@category>
-            @if (category.Children != null)
+        @foreach (var example in category.Children)
+        {
+            if (example.Children != null)
             {
-                @foreach (var example in category.Children)
+                <NavigationItem @key=example Example=@example>
+                @foreach (var child in example.Children)
                 {
-                    if (example.Children != null)
-                    {
-                        <NavigationItem @key=example Example=@example>
-                        @foreach (var child in example.Children)
-                        {
-                            <NavigationItem @key=child Example=@child />
-                        }
-                        </NavigationItem>
-                    }
-                    else
-                    {
-                        <NavigationItem @key=example Example=@example />
-                    }
+                    <NavigationItem @key=child Example=@child />
                 }
+                </NavigationItem>
             }
+            else
+            {
+                <NavigationItem @key=example Example=@example />
+            }
+        }
         </NavigationItem>
+        }
+        else
+        {
+            <NavigationItem @key=category Example=@category />
+        }
     }
 </RadzenPanelMenu>
