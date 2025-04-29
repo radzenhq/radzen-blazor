@@ -11991,11 +11991,15 @@ input::placeholder {
   box-sizing: border-box;
   border-radius: var(--rz-accordion-border-radius);
   box-shadow: var(--rz-accordion-shadow);
+  overflow: hidden;
 }
 .rz-accordion > div:first-child {
   border-radius: var(--rz-accordion-border-radius) var(--rz-accordion-border-radius) 0 0;
 }
-.rz-accordion > div:last-child, .rz-accordion > div:last-child > div {
+.rz-accordion > div:nth-last-child(2):has(+ .rz-state-collapsed), .rz-accordion > div:nth-last-child(2):has(+ .rz-state-collapsed) > div {
+  border-radius: 0 0 var(--rz-accordion-border-radius) var(--rz-accordion-border-radius);
+}
+.rz-accordion > div:last-child .rz-accordion-content {
   border-radius: 0 0 var(--rz-accordion-border-radius) var(--rz-accordion-border-radius);
 }
 .rz-accordion > div:only-child {
@@ -12040,6 +12044,9 @@ input::placeholder {
   outline: var(--rz-accordion-item-focus-outline);
   outline-offset: var(--rz-accordion-item-focus-outline-offset);
 }
+.rz-accordion > .rz-expander {
+  background-color: var(--rz-accordion-item-background-color);
+}
 
 .rz-accordion-toggle-icon {
   width: var(--rz-accordion-icon-width);
@@ -12057,10 +12064,6 @@ input::placeholder {
 .rz-accordion-toggle-icon.rz-state-collapsed {
   transform: rotate(0);
   transition: transform var(--rz-transition);
-}
-
-.rz-accordion-content-wrapper-overflown {
-  overflow: hidden;
 }
 
 .rz-accordion-content {
