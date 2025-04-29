@@ -1,0 +1,47 @@
+@inject NavigationManager navigationManager;
+@if (!Example.New && !Example.Updated && !Example.Pro)
+{
+    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@GetUrl()" Icon="@Example.Icon" aria-label="@Example.Name">
+        @ChildContent
+    </RadzenPanelMenuItem>
+}
+else
+{
+    <RadzenPanelMenuItem @bind-Expanded=@Expanded Text="@Example.Name" Path="@GetUrl()" Icon="@Example.Icon" aria-label="@Example.Name">
+        <Template>
+            @Example.Name
+            <RadzenBadge Text="Updated" Visible=@Example.Updated BadgeStyle="BadgeStyle.Info"/>
+            <RadzenBadge Text="New" Visible=@Example.New BadgeStyle="BadgeStyle.Success"/>
+            <RadzenBadge Text="Pro" Visible=@Example.Pro BadgeStyle="BadgeStyle.Danger"/>
+        </Template>
+        <ChildContent>@ChildContent</ChildContent>
+    </RadzenPanelMenuItem>
+}
+@code {
+    [Parameter]
+    public Example Example { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Expanded
+    {
+        get
+        {
+            return Example.Expanded;
+        }
+        set
+        {
+            Example.Expanded = value;
+        }
+    }
+
+    string GetUrl()
+    {
+        return Example.Path == null ? Example.Path : $"{Example.Path}{new Uri(navigationManager.Uri).Query}";
+    }
+
+    [Parameter]
+    public EventCallback<bool> ExpandedChanged { get; set; }
+}

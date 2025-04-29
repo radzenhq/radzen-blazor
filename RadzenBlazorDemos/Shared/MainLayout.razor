@@ -127,27 +127,27 @@
     <RadzenPanelMenu Match="NavLinkMatch.Prefix">
         @foreach (var category in examples)
         {
-            <RadzenPanelMenuItem @key=category Template=@ItemTemplate(category) Path=@ItemPath(category) Icon=@category.Icon>
+            <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category>
                 @if (category.Children != null)
                 {
                     @foreach (var example in category.Children)
                     {
                         if (example.Children != null)
                         {
-                            <RadzenPanelMenuItem @key=example Template=@ItemTemplate(example) Path=@ItemPath(example) Icon=@example.Icon>
+                            <NavigationItem @key=example @bind-Expanded=@example.Expanded Example=@example>
                             @foreach (var child in example.Children)
                             {
-                                <RadzenPanelMenuItem @key=child  Template=@ItemTemplate(child) Path=@ItemPath(child) Icon=@child.Icon />
+                                <NavigationItem @key=child @bind-Expanded=@child.Expanded Example=@child />
                             }
-                            </RadzenPanelMenuItem>
+                            </NavigationItem>
                         }
                         else
                         {
-                            <RadzenPanelMenuItem @key=example Template=@ItemTemplate(example) Path=@ItemPath(example) Icon=@example.Icon />
+                            <NavigationItem @key=example @bind-Expanded=@example.Expanded Example=@example />
                         }
                     }
                 }
-            </RadzenPanelMenuItem>
+            </NavigationItem>
         }
     </RadzenPanelMenu>
     </div>
@@ -219,15 +219,6 @@
     IEnumerable<Example> examples;
 
     Example example;
-
-    RenderFragment<Example> ItemTemplate => example => @<text>
-        @example.Name
-        <RadzenBadge Text="Updated" Visible=@example.Updated BadgeStyle="BadgeStyle.Info"/>
-        <RadzenBadge Text="New" Visible=@example.New BadgeStyle="BadgeStyle.Success"/>
-        <RadzenBadge Text="Pro" Visible=@example.Pro BadgeStyle="BadgeStyle.Danger"/>
-    </text>;
-
-    string ItemPath(Example example) => example.Path == null ? example.Path : $"{example.Path}{new Uri(UriHelper.Uri).Query}";
 
     protected override void OnInitialized()
     {
