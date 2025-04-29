@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -16,10 +14,7 @@ namespace Radzen.Blazor
     public partial class RadzenPanelMenuItem : RadzenComponent
     {
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            return "rz-navigation-item";
-        }
+        protected override string GetComponentCssClass() => "rz-navigation-item";
 
         /// <summary>
         /// Gets or sets the target.
@@ -105,7 +100,9 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Expanded { get; set; }
 
-        internal bool ExpandedInternal { get; set; }
+        private bool expanded;
+
+        internal bool IsExpanded => expanded;
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenPanelMenuItem"/> is selected.
@@ -123,7 +120,7 @@ namespace Radzen.Blazor
 
         internal async Task Toggle()
         {
-            if (!ExpandedInternal && !Parent.Multiple)
+            if (!expanded && !Parent.Multiple)
             {
                 var itemsToSkip = new List<RadzenPanelMenuItem>();
                 var p = ParentItem;
@@ -136,24 +133,24 @@ namespace Radzen.Blazor
                 Parent.CollapseAll(itemsToSkip);
             }
 
-            ExpandedInternal = !ExpandedInternal;
+            expanded = !expanded;
 
-            await ExpandedChanged.InvokeAsync(ExpandedInternal);
+            await ExpandedChanged.InvokeAsync(expanded);
         }
 
         internal async Task Collapse()
         {
-            if (ExpandedInternal)
+            if (expanded)
             {
-                ExpandedInternal = false;
+                expanded = false;
 
-                await ExpandedChanged.InvokeAsync(ExpandedInternal);
+                await ExpandedChanged.InvokeAsync(expanded);
             }
         }
 
         string ToggleClass => ClassList.Create("notranslate rzi rz-navigation-item-icon-children")
-                            .Add("rz-state-expanded", ExpandedInternal)
-                            .Add("rz-state-collapsed", !ExpandedInternal)
+                            .Add("rz-state-expanded", expanded)
+                            .Add("rz-state-collapsed", !expanded)
                             .ToString();
 
         string getIconStyle()
@@ -163,7 +160,7 @@ namespace Radzen.Blazor
 
         void Expand()
         {
-            ExpandedInternal = true;
+            expanded = true;
         }
 
         /// <summary>
@@ -227,7 +224,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnInitialized()
         {
-            ExpandedInternal = Expanded;
+            expanded = Expanded;
 
             selected = Selected;
 
@@ -313,7 +310,7 @@ namespace Radzen.Blazor
 
             if (currentAbsoluteUrl.Length == absoluteUrl.Length - 1)
             {
-                if (absoluteUrl[absoluteUrl.Length - 1] == '/' && absoluteUrl.StartsWith(currentAbsoluteUrl, StringComparison.OrdinalIgnoreCase))
+                if (absoluteUrl[^1] == '/' && absoluteUrl.StartsWith(currentAbsoluteUrl, StringComparison.OrdinalIgnoreCase))
                 {
                     return true;
                 }
@@ -356,7 +353,7 @@ namespace Radzen.Blazor
 
             if (expandedChanged)
             {
-                ExpandedInternal = Expanded;
+                expanded = Expanded;
             }
 
             if (selectedChanged)
@@ -433,7 +430,7 @@ namespace Radzen.Blazor
         {
             renderCount++;
             base.OnAfterRender(firstRender);
-            System.Console.WriteLine($"RadzenPanelMenu.OnAfterRender : {Text} {renderCount} times");
+            Console.WriteLine($"RadzenPanelMenu.OnAfterRender : {Text} {renderCount} times");
         }
 #endif 
     }

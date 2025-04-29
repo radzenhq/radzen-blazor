@@ -120,7 +120,7 @@ namespace Radzen.Blazor
                     focusedIndex = currentItems.IndexOf(parentItem);
                 }
                 else if (key == "ArrowDown" && currentItems.ElementAtOrDefault(focusedIndex) != null &&
-                    currentItems.ElementAtOrDefault(focusedIndex).ExpandedInternal && currentItems.ElementAtOrDefault(focusedIndex).items.Any())
+                    currentItems.ElementAtOrDefault(focusedIndex).IsExpanded && currentItems.ElementAtOrDefault(focusedIndex).items.Any())
                 {
                     currentItems = currentItems.ElementAtOrDefault(focusedIndex).items.Where(i => i.Visible).ToList();
                     focusedIndex = 0;
@@ -132,7 +132,7 @@ namespace Radzen.Blazor
                     focusedIndex = parentItem != null ? currentItems.IndexOf(parentItem) + 1 : focusedIndex;
                 }
                 else if (key == "ArrowUp" && currentItems.ElementAtOrDefault(focusedIndex - 1) != null &&
-                    currentItems.ElementAtOrDefault(focusedIndex - 1).ExpandedInternal && currentItems.ElementAtOrDefault(focusedIndex - 1).items.Any())
+                    currentItems.ElementAtOrDefault(focusedIndex - 1).IsExpanded && currentItems.ElementAtOrDefault(focusedIndex - 1).items.Any())
                 {
                     currentItems = currentItems.ElementAtOrDefault(focusedIndex - 1).items.Where(i => i.Visible).ToList();
                     focusedIndex = currentItems.Count - 1;
@@ -161,11 +161,11 @@ namespace Radzen.Blazor
                     {
                         await item.Toggle();
 
-                        currentItems = (item.ExpandedInternal ?
+                        currentItems = (item.IsExpanded ?
                                 item.items :
                                 item.ParentItem != null ? item.ParentItem.items : item.Parent.items).Where(i => i.Visible).ToList();
 
-                        focusedIndex = item.ExpandedInternal ? 0 : currentItems.IndexOf(item);
+                        focusedIndex = item.IsExpanded ? 0 : currentItems.IndexOf(item);
                     }
                     else
                     {
