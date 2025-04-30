@@ -204,7 +204,15 @@ namespace Radzen.Blazor
 
         void OnFocus()
         {
-            focusedIndex = focusedIndex == -1 ? 0: focusedIndex;
+            currentItems ??= [.. items.Where(i => i.Visible)];
+
+            if (focusedIndex == -1)
+            {
+                Console.WriteLine("OnFocus");
+                focusedIndex = 0;
+
+                StateHasChanged();
+            }
         }
     }
 }
