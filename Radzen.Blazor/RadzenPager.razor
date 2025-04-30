@@ -3,7 +3,7 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()" 
     @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="true" tabindex=0
-    @onfocus=@OnFocus>
+    @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         @if(ShowPagingSummary)
         {
             <span class="rz-pager-summary">

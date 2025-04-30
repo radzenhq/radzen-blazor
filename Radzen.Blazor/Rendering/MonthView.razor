@@ -19,7 +19,7 @@
         var points = new Dictionary<AppointmentData, double>();
     }
     <div @ref=contentView class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
-         @onfocus=@(args => {if(CurrentDate == default(DateTime)) { CurrentDate = StartDate; }})>
+         @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
     @for (var date = StartDate; date < EndDate; date = date.AddDays(7))
     {
         <div class="rz-week">
@@ -94,6 +94,14 @@
 </div>
 
 @code {
+    void OnFocus()
+    {
+        if (CurrentDate == default(DateTime)) 
+        { 
+            CurrentDate = StartDate; 
+        }
+    }
+
     [Parameter]
     public DateTime StartDate { get; set; }
 

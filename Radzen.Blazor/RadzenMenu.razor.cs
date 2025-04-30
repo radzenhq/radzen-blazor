@@ -244,5 +244,10 @@ namespace Radzen.Blazor
             base.Dispose();
             NavigationManager.LocationChanged -= OnLocationChanged;
         }
+
+        void OnFocus()
+        {
+            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+        }
     }
 }

@@ -97,7 +97,7 @@ namespace Radzen.Blazor
         [Parameter]
         public bool OpenOnFocus { get; set; }
 
-        private async Task OnFocus(Microsoft.AspNetCore.Components.Web.FocusEventArgs args)
+        private async Task OnFocus()
         {
             if (OpenOnFocus)
             {

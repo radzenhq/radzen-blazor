@@ -550,7 +550,7 @@ namespace Radzen.Blazor
 
         bool shouldFocus;
 
-        void OnFocus(FocusEventArgs args)
+        void OnFocus()
         {
             focusedIndex = focusedIndex == -3 ? 0 : focusedIndex;
 

@@ -17,7 +17,7 @@
     <div class="rz-view-content">
         <Hours Start=@StartTime End=@EndTime TimeFormat=@TimeFormat MinutesPerSlot=@MinutesPerSlot />
         <div @ref=view class="rz-week-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
-             @onfocus=@(args => {if(CurrentDate == default(DateTime)) { CurrentDate = StartDate; }})>
+             @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
         {
             var start = day.Add(StartTime);
@@ -35,6 +35,14 @@
     </div>
 </div>
 @code {
+    void OnFocus()
+    {
+        if (CurrentDate == default(DateTime)) 
+        { 
+            CurrentDate = StartDate; 
+        }
+    }
+
     ElementReference view;
 
     [Parameter]

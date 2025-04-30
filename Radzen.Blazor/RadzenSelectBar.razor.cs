@@ -295,5 +295,15 @@ namespace Radzen.Blazor
         {
             return allItems.ToList().IndexOf(item) == focusedIndex;
         }
+
+        void OnFocus()
+        {
+            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+            focused = true;
+        }
+        void OnBlur()
+        {
+            focused = false;
+        }
     }
 }
