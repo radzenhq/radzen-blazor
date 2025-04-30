@@ -1,25 +1,14 @@
 using Microsoft.AspNetCore.Components;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor.Rendering;
 
 /// <summary>
-/// Adds support for the ontransitionend event.
-/// </summary>
-[EventHandler("ontransitionend", typeof(EventArgs), true, false)]
-public static class EventHandlers;
-
-/// <summary>
 /// Expandable content.
 /// </summary>
 public partial class Expander : ComponentBase
 {
-    enum ExpandState { Expanding, Expanded, Collapsing, Collapsed }
-
-    private ExpandState state = ExpandState.Collapsed;
-
     /// <summary>
     /// Gets or sets the child content.
     /// </summary>
@@ -45,12 +34,15 @@ public partial class Expander : ComponentBase
     [Parameter]
     public bool Expanded { get; set; }
 
+    bool expanded;
+
     string Class => ClassList.Create("rz-expander")
-        .Add($"rz-state-{state.ToString().ToLowerInvariant()}")
+        .Add($"rz-state-expanded", expanded)
+        .Add($"rz-state-collapsed", !expanded)
         .Add(CssClass)
         .ToString();
 
-    string Hidden => state == ExpandState.Collapsed ? "true" : "false";
+    string Hidden => expanded ? "false" : "true";
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -61,37 +53,13 @@ public partial class Expander : ComponentBase
 
         if (expandedChanged)
         {
-            if (Expanded)
-            {
-                state = ExpandState.Expanding;
-            }
-            else
-            {
-                state = ExpandState.Collapsing;
-            }
+            expanded = Expanded;
         }
     }
 
     /// <inheritdoc/>
     protected override void OnInitialized()
     {
-        if (Expanded)
-        {
-            state = ExpandState.Expanded;
-        }
-    }
-
-    private void OnTransitionEnd()
-    {
-        if (state == ExpandState.Expanding)
-        {
-            state = ExpandState.Expanded;
-            StateHasChanged();
-        }
-        else if (state == ExpandState.Collapsing)
-        {
-            state = ExpandState.Collapsed;
-            StateHasChanged();
-        }
+        expanded = Expanded;
     }
 }
