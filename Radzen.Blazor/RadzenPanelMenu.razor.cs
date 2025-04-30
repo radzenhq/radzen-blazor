@@ -100,14 +100,12 @@ namespace Radzen.Blazor
         List<RadzenPanelMenuItem> currentItems;
 
         bool preventKeyPress = false;
+
         async Task OnKeyPress(KeyboardEventArgs args)
         {
-            var key = args.Code != null ? args.Code : args.Key;
+            var key = args.Code ?? args.Key;
 
-            if (currentItems == null)
-            {
-                currentItems = items.Where(i => i.Visible).ToList();
-            }
+            currentItems ??= [.. items.Where(i => i.Visible)];
 
             if (key == "ArrowUp" || key == "ArrowDown")
             {
@@ -157,7 +155,7 @@ namespace Radzen.Blazor
                 {
                     var item = currentItems[focusedIndex];
 
-                    if (item.items.Any())
+                    if (item.items.Count > 0)
                     {
                         await item.Toggle();
 
@@ -184,6 +182,11 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = false;
             }
+
+            if (preventKeyPress)
+            {
+                StateHasChanged();
+            }
         }
 
         internal bool IsFocused(RadzenPanelMenuItem item)
@@ -202,7 +205,6 @@ namespace Radzen.Blazor
         void OnFocus()
         {
             focusedIndex = focusedIndex == -1 ? 0: focusedIndex;
-            currentItems ??= [.. items.Where(i => i.Visible)];
         }
     }
 }

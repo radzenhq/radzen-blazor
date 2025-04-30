@@ -14,7 +14,9 @@ namespace Radzen.Blazor
     public partial class RadzenPanelMenuItem : RadzenComponent
     {
         /// <inheritdoc />
-        protected override string GetComponentCssClass() => "rz-navigation-item";
+        protected override string GetComponentCssClass() => ClassList.Create("rz-navigation-item")
+            .Add("rz-state-focused", Parent?.IsFocused(this) == true)
+            .ToString();
 
         /// <summary>
         /// Gets or sets the target.
@@ -154,7 +156,7 @@ namespace Radzen.Blazor
                             .ToString();
 
         string getIconStyle()
-        { 
+        {
             return $"{(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon ? "margin-inline-end:0px;" : "")}{(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : "")}";
         }
 
@@ -402,34 +404,17 @@ namespace Radzen.Blazor
             }
         }
 
-        internal string GetItemCssClass()
-        {
-            return $"{GetCssClass()} {(Parent.IsFocused(this) ? "rz-state-focused" : "")}".Trim();
-        }
-
         /// <inheritdoc />
         public override void Dispose()
         {
             base.Dispose();
 
-            NavigationManager.LocationChanged -= OnLocationChanged; 
+            NavigationManager.LocationChanged -= OnLocationChanged;
 
             if (Parent != null)
             {
                 Parent.RemoveItem(this);
             }
         }
-
-#if DEBUG
-        int renderCount = 0;
-
-        /// <inheritdoc />
-        protected override void OnAfterRender(bool firstRender)
-        {
-            renderCount++;
-            base.OnAfterRender(firstRender);
-            Console.WriteLine($"RadzenPanelMenu.OnAfterRender : {Text} {renderCount} times");
-        }
-#endif 
     }
 }
