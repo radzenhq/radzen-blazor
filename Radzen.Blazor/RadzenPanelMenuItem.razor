@@ -3,7 +3,7 @@
 @inherits RadzenComponent
 @if (Visible)
 {
-    <li @ref="@Element" id="@GetId()" style="@Style" @attributes="Attributes" class="@GetItemCssClass()" @onclick="@(HasClickDelegate ? OnClick : null)" @onclick:stopPropagation>
+    <li @ref="@Element" id="@GetId()" style="@Style" @attributes="Attributes" class="@GetItemCssClass()" @onclick="@(this.AsNonRenderingEventHandler<MouseEventArgs>(OnClick))" @onclick:stopPropagation>
         <div class=@WrapperClass>
             @if (Path != null)
             {

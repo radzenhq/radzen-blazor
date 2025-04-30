@@ -367,8 +367,6 @@ namespace Radzen.Blazor
             }
         }
 
-        bool HasClickDelegate => Click.HasDelegate || Parent?.Click.HasDelegate == true;
-
         /// <summary>
         /// Handles the <see cref="E:Click" /> event.
         /// </summary>
