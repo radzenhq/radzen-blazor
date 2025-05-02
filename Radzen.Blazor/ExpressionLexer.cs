@@ -84,7 +84,9 @@ enum TokenType
     CloseParen,
     Comma,
     AmpersandAmpersand,
+    Ampersand,
     BarBar,
+    Bar,
     GreaterThan,
     LessThan,
     LessThanOrEqual,
@@ -120,7 +122,9 @@ static class TokenTypeExtensions
             TokenType.NotEquals => ExpressionType.NotEqual,
             TokenType.EqualsGreaterThan => ExpressionType.GreaterThanOrEqual,
             TokenType.AmpersandAmpersand => ExpressionType.AndAlso,
+            TokenType.Ampersand => ExpressionType.And,
             TokenType.BarBar => ExpressionType.OrElse,
+            TokenType.Bar => ExpressionType.Or,
             TokenType.GreaterThan => ExpressionType.GreaterThan,
             TokenType.LessThan => ExpressionType.LessThan,
             TokenType.LessThanOrEqual => ExpressionType.LessThanOrEqual,
@@ -289,14 +293,16 @@ class ExpressionLexer(string expression)
                     Advance(1);
                     return new Token(TokenType.AmpersandAmpersand);
                 }
-                throw new InvalidOperationException($"Unexpected character '{ch}' at position {position}.");
+                Advance(1);
+                return new Token(TokenType.Ampersand);
             case '|':
                 if (TryAdvance('|'))
                 {
                     Advance(1);
                     return new Token(TokenType.BarBar);
                 }
-                throw new InvalidOperationException($"Unexpected character '{ch}' at position {position}.");
+                Advance(1);
+                return new Token(TokenType.Bar);
             case '?':
                 if (TryAdvance('.'))
                 {

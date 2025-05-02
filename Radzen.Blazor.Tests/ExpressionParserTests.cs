@@ -392,6 +392,42 @@ public class ExpressionParserTests
     }
 
     [Fact]
+    public void Should_ParseBinaryAndExpressionWithAddition()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value + 5 & 1");
+        var func = expression.Compile();
+
+        Assert.Equal(25 + 5 & 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseBinaryAndExpressionWithMultiplication()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 5 & 1");
+        var func = expression.Compile();
+
+        Assert.Equal(25 * 5 & 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseBinaryOrExpressionWithAddition()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value + 5 | 1");
+        var func = expression.Compile();
+
+        Assert.Equal(25 + 5 | 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseBinaryOrExpressionWithMultiplication()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 5 | 1");
+        var func = expression.Compile();
+
+        Assert.Equal(25 * 5 | 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
     public void Should_ParseMultipleAdditions()
     {
         var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age + 5 + 10 > 30");

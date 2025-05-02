@@ -834,6 +834,34 @@ public class ExpressionParser
             token = Peek();
         }
 
+        return ParseBinaryAnd(left, parameter);
+    }
+
+    private Expression ParseBinaryAnd(Expression left, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type == TokenType.Ampersand)
+        {
+            Advance(1);
+            var right = ParseMultiplicative(parameter) ?? throw new InvalidOperationException($"Expected expression after & at position {position}");
+            left = Expression.MakeBinary(ExpressionType.And, left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
+        return ParseBinaryOr(left, parameter);
+    }
+
+    private Expression ParseBinaryOr(Expression left, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type == TokenType.Bar)
+        {
+            Advance(1);
+            var right = ParseMultiplicative(parameter) ?? throw new InvalidOperationException($"Expected expression after | at position {position}");
+            left = Expression.MakeBinary(ExpressionType.Or, left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
         return left;
     }
 
