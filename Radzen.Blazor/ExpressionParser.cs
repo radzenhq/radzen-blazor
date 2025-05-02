@@ -44,7 +44,6 @@ public class ExpressionParser
     /// <summary>
     /// Parses a lambda expression that returns untyped result.
     /// </summary>
-    /// 
     public static LambdaExpression ParseLambda(string expression, Type type, Func<string, Type?>? typeResolver = null)
     {
         var parser = new ExpressionParser(expression, typeResolver);
@@ -237,7 +236,7 @@ public class ExpressionParser
                 else
                 {
                     var access = Expression.PropertyOrField(expression, token.Value);
-                    
+
                     expression = Expression.Condition(check, Expression.Default(access.Type), access);
 
                     var nextToken = Peek();
@@ -789,32 +788,80 @@ public class ExpressionParser
 
     private Expression ParseComparison(ParameterExpression parameter)
     {
-        var left = ParseAdditive(parameter) ?? throw new InvalidOperationException($"Expected expression at position {position}");
+        var left = ParseShift(parameter);
 
         var token = Peek();
         if (token.Type is TokenType.EqualsEquals or TokenType.NotEquals or TokenType.GreaterThan or TokenType.LessThan or TokenType.LessThanOrEqual or TokenType.GreaterThanOrEqual)
         {
             Advance(1);
-            var right = ParseAdditive(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
-            return Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
+            var right = ParseShift(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
+        }
+
+        return ParseBinaryAnd(left, parameter);
+    }
+
+    private Expression ParseBinaryAnd(Expression left, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type == TokenType.Ampersand)
+        {
+            Advance(1);
+            var right = ParseShift(parameter) ?? throw new InvalidOperationException($"Expected expression after & at position {position}");
+            left = Expression.MakeBinary(ExpressionType.And, left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
+        return ParseBinaryXor(left, parameter);
+    }
+
+    private Expression ParseBinaryXor(Expression left, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type == TokenType.Caret)
+        {
+            Advance(1);
+            var right = ParseBinaryAnd(ParseShift(parameter), parameter) ?? throw new InvalidOperationException($"Expected expression after ^ at position {position}");
+            left = Expression.MakeBinary(ExpressionType.ExclusiveOr, left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
+        return ParseBinaryOr(left, parameter);
+    }
+
+    private Expression ParseBinaryOr(Expression left, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type == TokenType.Bar)
+        {
+            Advance(1);
+            var right = ParseBinaryXor(ParseShift(parameter), parameter) ?? throw new InvalidOperationException($"Expected expression after | at position {position}");
+            left = Expression.MakeBinary(ExpressionType.Or, left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
         }
 
         return left;
     }
 
-    private static Expression ConvertIfNeeded(Expression expression, Type targetType)
+    private Expression ParseShift(ParameterExpression parameter)
     {
-        if (expression is not LambdaExpression)
+        var left = ParseAdditive(parameter);
+
+        var token = Peek();
+        while (token.Type is TokenType.LessThanLessThan or TokenType.GreaterThanGreaterThan)
         {
-            return expression.Type == targetType ? expression : Expression.Convert(expression, targetType);
+            Advance(1);
+            var right = ParseAdditive(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
         }
 
-        return expression;
+        return left;
     }
 
     private Expression ParseAdditive(ParameterExpression parameter)
     {
-        var left = ParseMultiplicative(parameter) ?? throw new InvalidOperationException($"Expected expression at position {position}");
+        var left = ParseMultiplicative(parameter);
 
         var token = Peek();
         while (token.Type is TokenType.Plus or TokenType.Minus)
@@ -831,34 +878,6 @@ public class ExpressionParser
                 left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
             }
 
-            token = Peek();
-        }
-
-        return ParseBinaryAnd(left, parameter);
-    }
-
-    private Expression ParseBinaryAnd(Expression left, ParameterExpression parameter)
-    {
-        var token = Peek();
-        while (token.Type == TokenType.Ampersand)
-        {
-            Advance(1);
-            var right = ParseMultiplicative(parameter) ?? throw new InvalidOperationException($"Expected expression after & at position {position}");
-            left = Expression.MakeBinary(ExpressionType.And, left, ConvertIfNeeded(right, left.Type));
-            token = Peek();
-        }
-
-        return ParseBinaryOr(left, parameter);
-    }
-
-    private Expression ParseBinaryOr(Expression left, ParameterExpression parameter)
-    {
-        var token = Peek();
-        while (token.Type == TokenType.Bar)
-        {
-            Advance(1);
-            var right = ParseMultiplicative(parameter) ?? throw new InvalidOperationException($"Expected expression after | at position {position}");
-            left = Expression.MakeBinary(ExpressionType.Or, left, ConvertIfNeeded(right, left.Type));
             token = Peek();
         }
 
@@ -879,5 +898,15 @@ public class ExpressionParser
         }
 
         return left;
+    }
+
+    private static Expression ConvertIfNeeded(Expression expression, Type targetType)
+    {
+        if (expression is not LambdaExpression)
+        {
+            return expression.Type == targetType ? expression : Expression.Convert(expression, targetType);
+        }
+
+        return expression;
     }
 }

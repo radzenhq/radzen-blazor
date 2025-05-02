@@ -428,6 +428,60 @@ public class ExpressionParserTests
     }
 
     [Fact]
+    public void Should_ParseBinaryXorExpressionWithAddition()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value + 5 ^ 1");
+        var func = expression.Compile();
+
+        Assert.Equal(25 + 5 ^ 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseBinaryXorExpressionWithMultiplication()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 5 ^ 1");
+        var func = expression.Compile();
+
+        Assert.Equal(25 * 5 ^ 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseLeftShiftExpressionWithAddition()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => (p.Value + 5) << 1");
+        var func = expression.Compile();
+
+        Assert.Equal((25 + 5) << 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseLeftShiftExpressionWithMultiplication()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => (p.Value * 5) << 1");
+        var func = expression.Compile();
+
+        Assert.Equal((25 * 5) << 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseRightShiftExpressionWithAddition()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => (p.Value + 5) >> 1");
+        var func = expression.Compile();
+
+        Assert.Equal((25 + 5) >> 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
+    public void Should_ParseRightShiftExpressionWithMultiplication()
+    {
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => (p.Value * 5) >> 1");
+        var func = expression.Compile();
+
+        Assert.Equal((25 * 5) >> 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+    }
+
+    [Fact]
     public void Should_ParseMultipleAdditions()
     {
         var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age + 5 + 10 > 30");
@@ -1440,5 +1494,59 @@ public class ExpressionParserTests
         var result = DynamicExtensions.Select(list, "Product.ProductName as ProductName");
 
         Assert.Equal("Chai", result.ElementType.GetProperty("ProductName")?.GetValue(result.FirstOrDefault()));
+    }
+
+    [Fact]
+    public void Should_RespectBinaryOperatorPrecedence()
+    {
+        // Test AND, OR, XOR precedence
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value & 3 | 4 ^ 1");
+        var func = expression.Compile();
+        Assert.Equal(25 & 3 | 4 ^ 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test shift operators precedence
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value << 2 >> 1");
+        func = expression.Compile();
+        Assert.Equal(25 << 2 >> 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test arithmetic and shift precedence
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 2 << 1 + 1");
+        func = expression.Compile();
+        Assert.Equal(25 * 2 << 1 + 1, func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test complex combination of bitwise operators
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value & 7 | 12 ^ 3 & 5");
+        func = expression.Compile();
+        Assert.Equal(25 & 7 | 12 ^ 3 & 5, func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test arithmetic and bitwise operator precedence
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 2 & 15 + 3");
+        func = expression.Compile();
+        Assert.Equal(25 * 2 & 15 + 3, func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test shift and bitwise operator precedence
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value << 2 & 15 | 7");
+        func = expression.Compile();
+        Assert.Equal(25 << 2 & 15 | 7, func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test parentheses with mixed operators
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => (p.Value & 15) << (2 + 1)");
+        func = expression.Compile();
+        Assert.Equal((25 & 15) << (2 + 1), func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test complex expression with multiple operators and parentheses
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => (p.Value * 2 + 1) << 2 & 15 | 7 ^ 3");
+        func = expression.Compile();
+        Assert.Equal((25 * 2 + 1) << 2 & 15 | 7 ^ 3, func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test shift operators with multiplication and addition
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 2 >> 1 + 1 << 2");
+        func = expression.Compile();
+        Assert.Equal(25 * 2 >> 1 + 1 << 2, func(new ItemWithGenericProperty<int> { Value = 25 }));
+
+        // Test nested parentheses with mixed operators
+        expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => ((p.Value & 7) << 2) | (15 & (3 + 2))");
+        func = expression.Compile();
+        Assert.Equal(((25 & 7) << 2) | (15 & (3 + 2)), func(new ItemWithGenericProperty<int> { Value = 25 }));
     }
 }

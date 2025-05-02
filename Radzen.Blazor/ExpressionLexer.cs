@@ -110,6 +110,9 @@ enum TokenType
     CloseBrace,
     ExclamationMark,
     Equals,
+    Caret,
+    GreaterThanGreaterThan,
+    LessThanLessThan,
 }
 
 static class TokenTypeExtensions
@@ -133,6 +136,9 @@ static class TokenTypeExtensions
             TokenType.Minus => ExpressionType.Subtract,
             TokenType.Star => ExpressionType.Multiply,
             TokenType.Slash => ExpressionType.Divide,
+            TokenType.Caret => ExpressionType.ExclusiveOr,
+            TokenType.GreaterThanGreaterThan => ExpressionType.RightShift,
+            TokenType.LessThanLessThan => ExpressionType.LeftShift,
             _ => throw new InvalidOperationException($"Unsupported token type: {tokenType}")
         };
     }
@@ -241,9 +247,19 @@ class ExpressionLexer(string expression)
                     Advance(1);
                     return new Token(TokenType.GreaterThanOrEqual);
                 }
+                if (TryAdvance('>'))
+                {
+                    Advance(1);
+                    return new Token(TokenType.GreaterThanGreaterThan);
+                }
                 Advance(1);
                 return new Token(TokenType.GreaterThan);
             case '<':
+                if (TryAdvance('<'))
+                {
+                    Advance(1);
+                    return new Token(TokenType.LessThanLessThan);
+                }
                 if (TryAdvance('='))
                 {
                     Advance(1);
@@ -321,6 +337,9 @@ class ExpressionLexer(string expression)
             case ':':
                 Advance(1);
                 return new Token(TokenType.Colon);
+            case '^':
+                Advance(1);
+                return new Token(TokenType.Caret);
             case >= '0' and <= '9':
                 return ScanNumericLiteral();
             case '_':
