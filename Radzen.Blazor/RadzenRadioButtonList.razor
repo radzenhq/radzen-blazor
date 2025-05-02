@@ -17,6 +17,7 @@
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          role="radiogroup" @onfocus=@this.AsNonRenderingEventHandler(OnFocus) @onblur=@this.AsNonRenderingEventHandler(OnBlur)
         tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
+        <RadzenStack Orientation="@Orientation" JustifyContent="@JustifyContent" AlignItems="@AlignItems" Gap="@Gap" Wrap="@Wrap">
         @foreach (var item in allItems.Where(i => i.Visible))
         {
             <div @ref="@item.Element" id="@item.GetItemId()" @onclick="@(args => SelectItem(item))" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" role="radio" aria-checked=@(IsSelected(item)? "true" : "false") aria-label="@item.Text">
@@ -40,5 +41,6 @@
                 }
             </div>
         }
+        </RadzenStack>
     </div>
 }

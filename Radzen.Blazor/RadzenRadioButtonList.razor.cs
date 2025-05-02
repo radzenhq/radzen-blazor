@@ -47,6 +47,34 @@ namespace Radzen.Blazor
         public string TextProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets the content justify.
+        /// </summary>
+        /// <value>The content justify.</value>
+        [Parameter]
+        public JustifyContent JustifyContent { get; set; } = JustifyContent.Center;
+
+        /// <summary>
+        /// Gets or sets the items alignment.
+        /// </summary>
+        /// <value>The items alignment.</value>
+        [Parameter]
+        public AlignItems AlignItems { get; set; }
+
+        /// <summary>
+        /// Gets or sets the spacing between items
+        /// </summary>
+        /// <value>The spacing between items.</value>
+        [Parameter]
+        public string Gap { get; set; } = "0";
+
+        /// <summary>
+        /// Gets or sets the wrap.
+        /// </summary>
+        /// <value>The wrap.</value>
+        [Parameter]
+        public FlexWrap Wrap { get; set; } = FlexWrap.Wrap;
+
+        /// <summary>
         /// Gets or sets the disabled property.
         /// </summary>
         /// <value>The disabled property.</value>
@@ -90,6 +118,13 @@ namespace Radzen.Blazor
             base.OnParametersSet();
 
             UpdateAllItems();
+
+            AlignItems = Orientation switch
+            {
+                Orientation.Horizontal => AlignItems.Center,
+                Orientation.Vertical => AlignItems.Start,
+                _ => AlignItems.Center
+            };
         }
 
         IEnumerable _data = null;
@@ -118,7 +153,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList(Orientation == Orientation.Horizontal ? "rz-radio-button-list-horizontal" : "rz-radio-button-list-vertical").ToString();
+            var horizontal = Orientation == Orientation.Horizontal;
+
+            return $"rz-radio-button-list rz-radio-button-list-{(horizontal ? "horizontal" : "vertical")}";
+            
         }
 
         /// <summary>
