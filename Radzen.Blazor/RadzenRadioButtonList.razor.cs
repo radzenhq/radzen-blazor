@@ -58,14 +58,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The items alignment.</value>
         [Parameter]
-        public AlignItems AlignItems { get; set; }
+        public AlignItems AlignItems { get; set; } = AlignItems.Start;
 
         /// <summary>
         /// Gets or sets the spacing between items
         /// </summary>
         /// <value>The spacing between items.</value>
         [Parameter]
-        public string Gap { get; set; } = "0";
+        public string Gap { get; set; }
 
         /// <summary>
         /// Gets or sets the wrap.
@@ -118,13 +118,6 @@ namespace Radzen.Blazor
             base.OnParametersSet();
 
             UpdateAllItems();
-
-            AlignItems = Orientation switch
-            {
-                Orientation.Horizontal => AlignItems.Center,
-                Orientation.Vertical => AlignItems.Start,
-                _ => AlignItems.Center
-            };
         }
 
         IEnumerable _data = null;

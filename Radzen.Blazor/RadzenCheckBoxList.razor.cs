@@ -48,6 +48,34 @@ namespace Radzen.Blazor
         public string TextProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets the content justify.
+        /// </summary>
+        /// <value>The content justify.</value>
+        [Parameter]
+        public JustifyContent JustifyContent { get; set; } = JustifyContent.Center;
+
+        /// <summary>
+        /// Gets or sets the items alignment.
+        /// </summary>
+        /// <value>The items alignment.</value>
+        [Parameter]
+        public AlignItems AlignItems { get; set; } = AlignItems.Start;
+
+        /// <summary>
+        /// Gets or sets the spacing between items
+        /// </summary>
+        /// <value>The spacing between items.</value>
+        [Parameter]
+        public string Gap { get; set; }
+
+        /// <summary>
+        /// Gets or sets the wrap.
+        /// </summary>
+        /// <value>The wrap.</value>
+        [Parameter]
+        public FlexWrap Wrap { get; set; } = FlexWrap.Wrap;
+
+        /// <summary>
         /// Gets or sets the disabled property.
         /// </summary>
         /// <value>The disabled property.</value>
@@ -178,7 +206,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList(Orientation == Orientation.Horizontal ? "rz-checkbox-list-horizontal" : "rz-checkbox-list-vertical").ToString();
+            return GetClassList("rz-checkbox-list").Add(Orientation == Orientation.Horizontal ? "rz-checkbox-list-horizontal" : "rz-checkbox-list-vertical").ToString();
         }
 
         /// <summary>

@@ -3,8 +3,8 @@ $radio-height: $radio-width !default;
 $radio-border-radius: 50% !default;
 $radio-border-width: inherit !default;
 $radio-label-margin-block: 0 !default;
-$radio-label-margin-inline: 0.5rem 1rem !default;
-$radio-margin-block: 1rem !default;
+$radio-label-margin-inline: 1rem !default;
+$radio-margin-block: 0 !default;
 $radio-margin-inline: 0 !default;
 $radio-focus-outline: var(--rz-outline-focus) !default;
 $radio-focus-outline-offset: var(--rz-outline-offset) !default;
@@ -21,15 +21,17 @@ $radio-icon-width: 0.5rem !default;
 $radio-icon-height: $radio-icon-width !default;
 $radio-checked-border: var(--rz-input-border) !default;
 
-.rz-radio-button-list-vertical {
+
+.rz-radio-button-list {
   box-sizing: border-box;
   border-radius: var(--rz-border-radius);
 
   .rz-radio-btn {
-    display: flex;
+    display: inline-flex;
+    align-items: center;
     margin-block: var(--rz-radio-margin-block);
     margin-inline: var(--rz-radio-margin-inline);
-    align-items: center;
+    cursor: pointer;
   }
 
   &:focus {
@@ -43,22 +45,11 @@ $radio-checked-border: var(--rz-input-border) !default;
 }
 
 .rz-radio-button-list-horizontal {
-  box-sizing: border-box;
-  border-radius: var(--rz-border-radius);
-  
-  .rz-radio-btn {
-    display: inline-flex;
-    align-items: center;
-  }
+  --rz-gap: 0;
+}
 
-  &:focus {
-    outline: var(--rz-outline-normal);
-  }
-
-  &:focus-visible {
-    outline: var(--rz-radio-focus-outline);
-    outline-offset: var(--rz-radio-focus-outline-offset);
-  }
+.rz-radio-button-list-vertical {
+  --rz-gap: 1rem;
 }
 
 .rz-state-disabled .rz-radiobutton {
@@ -72,7 +63,6 @@ $radio-checked-border: var(--rz-input-border) !default;
 }
 
 .rz-radiobutton {
-  display: inline-block;
   position: relative;
   vertical-align: middle;
   white-space: nowrap;
@@ -154,7 +144,7 @@ $radio-checked-border: var(--rz-input-border) !default;
     }
   }
 
-  :focus-visible &.rz-state-focused:not(.rz-state-disabled) { 
+  .rz-radio-button-list:focus-visible &.rz-state-focused:not(.rz-state-disabled) { 
     outline: var(--rz-radio-focus-outline);
     outline-offset: var(--rz-radio-focus-outline-offset);
   }
