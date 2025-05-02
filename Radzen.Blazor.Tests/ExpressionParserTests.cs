@@ -383,12 +383,11 @@ public class ExpressionParserTests
     [Fact]
     public void Should_ParseAdditionExpression()
     {
-        var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age + 5 > 30");
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value + 5");
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person() { Age = 26 }));
-        Assert.False(func(new Person() { Age = 25 }));
+        Assert.Equal(26 + 5, func(new ItemWithGenericProperty<int> { Value = 26 }));
     }
 
     [Fact]
@@ -484,96 +483,83 @@ public class ExpressionParserTests
     [Fact]
     public void Should_ParseMultipleAdditions()
     {
-        var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age + 5 + 10 > 30");
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value + 5 + 10");
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person() { Age = 16 }));
-        Assert.False(func(new Person() { Age = 15 }));
+        Assert.Equal(16 + 5 + 10, func(new ItemWithGenericProperty<int> { Value = 16 }));
     }
 
     [Fact]
     public void Should_ParseSubtractionExpression()
     {
-        var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age - 5 > 30");
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value - 5");
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person() { Age = 36 }));
-        Assert.False(func(new Person() { Age = 35 }));
+        Assert.Equal(36 - 5, func(new ItemWithGenericProperty<int> { Value = 36 }));
     }
 
     [Fact]
     public void Should_ParseMixedAdditionAndSubtraction()
     {
-        var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age + 10 - 5 > 30");
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value + 10 - 5");
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person() { Age = 26 }));
-        Assert.False(func(new Person() { Age = 25 }));
+        Assert.Equal(26 + 10 - 5, func(new ItemWithGenericProperty<int> { Value = 26 }));
     }
 
     [Fact]
     public void Should_ParseMultiplicationExpression()
     {
-        var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age * 2 > 30");
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 2");
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person() { Age = 16 }));
-        Assert.False(func(new Person() { Age = 15 }));
+        Assert.Equal(16 * 2, func(new ItemWithGenericProperty<int> { Value = 16 }));
     }
 
     [Fact]
     public void Should_RespectOperatorPrecedence()
     {
-        // This should evaluate as: (p.Age * 2) + 5 > 30
-        var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age * 2 + 5 > 30");
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 2 + 5");
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person() { Age = 13 }));  // 13 * 2 + 5 = 31 > 30
-        Assert.False(func(new Person() { Age = 12 })); // 12 * 2 + 5 = 29 < 30
+        Assert.Equal(13 * 2 + 5, func(new ItemWithGenericProperty<int> { Value = 13 })); 
 
-        // This should evaluate differently than: p.Age * (2 + 5)
-        var expression2 = ExpressionParser.ParsePredicate<Person>("p => p.Age * (2 + 5) > 30");
+        var expression2 = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * (2 + 5)");
 
         var func2 = expression2.Compile();
 
-        Assert.True(func2(new Person() { Age = 5 }));   // 5 * (2 + 5) = 35 > 30
-        Assert.False(func2(new Person() { Age = 4 }));  // 4 * (2 + 5) = 28 < 30
+        Assert.Equal(5 * (2 + 5), func2(new ItemWithGenericProperty<int> { Value = 5 }));
     }
 
     [Fact]
     public void Should_ParseDivisionExpression()
     {
-        var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age / 2 > 15");
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value / 2");
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person() { Age = 32 }));
-        Assert.False(func(new Person() { Age = 30 }));
+        Assert.Equal(32 / 2, func(new ItemWithGenericProperty<int> { Value = 32 }));
     }
 
     [Fact]
     public void Should_ParseMixedMultiplicationAndDivision()
     {
-        // This should evaluate as: (p.Age * 2) / 4 > 15
-        var expression = ExpressionParser.ParsePredicate<Person>("p => p.Age * 2 / 4 > 15");
+        var expression = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * 2 / 4");
 
         var func = expression.Compile();
 
-        Assert.True(func(new Person() { Age = 32 }));  // 32 * 2 / 4 = 16 > 15
-        Assert.False(func(new Person() { Age = 30 })); // 30 * 2 / 4 = 15 <= 15
+        Assert.Equal(32 * 2 / 4, func(new ItemWithGenericProperty<int> { Value = 32 }));
 
-        // This should evaluate differently than: p.Age * (2 / 4)
-        var expression2 = ExpressionParser.ParsePredicate<Person>("p => p.Age * (8 / 4) > 15");
+        var expression2 = ExpressionParser.ParseLambda<ItemWithGenericProperty<int>, int>("p => p.Value * (8 / 4)");
 
         var func2 = expression2.Compile();
 
-        Assert.True(func2(new Person() { Age = 8 }));   // 8 * 2 = 16 > 15
-        Assert.False(func2(new Person() { Age = 7 }));  // 7 * 2 = 14 <= 15
+        Assert.Equal(8 * (8 / 4), func2(new ItemWithGenericProperty<int> { Value = 8 }));
     }
 
     [Fact]
