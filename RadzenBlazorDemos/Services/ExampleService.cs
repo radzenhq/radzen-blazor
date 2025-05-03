@@ -1471,9 +1471,10 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of CheckBoxList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBoxList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set CheckBoxList orientation", Anchor = "#orientation" }, new () { Text = "Populate CheckBoxList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated CheckBoxList items from data", Anchor = "#statically-declared" }, new () { Text = "Select all CheckBoxList items", Anchor = "#select-all-items" }, new () { Text = "Disabled CheckBoxList item", Anchor = "#disabled-item" }, new () { Text = "ReadOnly CheckBoxList item", Anchor = "#readonly-item" }, new () { Text = "Templated CheckBoxList item", Anchor = "#templated-item" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Get and Set the value of CheckBoxList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of CheckBoxList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set CheckBoxList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate CheckBoxList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated CheckBoxList items from data", Anchor = "#statically-declared" }, new () { Text = "Select all CheckBoxList items", Anchor = "#select-all-items" }, new () { Text = "Disabled CheckBoxList item", Anchor = "#disabled-item" }, new () { Text = "ReadOnly CheckBoxList item", Anchor = "#readonly-item" }, new () { Text = "Templated CheckBoxList item", Anchor = "#templated-item" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "CheckBoxList",
                     Path = "checkboxlist",
+                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor CheckBoxList component.",
                     Icon = "\ue6b1",
                     Tags = new [] { "form", "edit" }
@@ -1653,9 +1654,10 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of RadioButtonList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of RadioButtonList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set RadioButtonList orientation", Anchor = "#orientation" }, new () { Text = "Populate RadioButtonList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated RadioButtonList items from data", Anchor = "#populate-items-statically" }, new () { Text = "RadioButtonList with null value", Anchor = "#null-value" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Get and Set the value of RadioButtonList", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of RadioButtonList using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Set RadioButtonList orientation and layout", Anchor = "#orientation" }, new () { Text = "Populate RadioButtonList items from data", Anchor = "#populate-items" }, new () { Text = "Statically declared and populated RadioButtonList items from data", Anchor = "#populate-items-statically" }, new () { Text = "RadioButtonList with null value", Anchor = "#null-value" }, new () { Text = "Populate items programmatically and disable item", Anchor = "#populate-items-programmatically" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "RadioButtonList",
                     Path = "radiobuttonlist",
+                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor radio button list component.",
                     Icon = "\ue837",
                     Tags = new [] { "toggle", "form", "edit" }
