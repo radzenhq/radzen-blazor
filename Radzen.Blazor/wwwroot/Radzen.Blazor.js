@@ -2507,7 +2507,7 @@ window.Radzen = {
     },
     navigateTo: function (selector, scroll) {
       if (selector.startsWith('#')) {
-        history.replaceState(null, '', window.location.pathname + selector);
+        history.replaceState(null, '', location.pathname + location.search + selector);
       }
 
       if (scroll) {
