@@ -19,7 +19,7 @@ $radio-circle-shadow: inset 0 4px 7px 0 rgba(0, 0, 0, 0.03) !default;
 $radio-circle-hover-background-color: var(--rz-base-100) !default;
 $radio-icon-width: 0.5rem !default;
 $radio-icon-height: $radio-icon-width !default;
-$radio-checked-border: var(--rz-input-border) !default;
+$radio-checked-border: var(--rz-input-border-block-end) !default;
 
 
 .rz-radio-button-list {
@@ -80,7 +80,7 @@ $radio-checked-border: var(--rz-input-border) !default;
   justify-content: center;
   width: inherit;
 
-  border: var(--rz-input-border);
+  border: var(--rz-input-border-block-end);
   border-width: var(--rz-radio-border-width);
   border-radius: var(--rz-radio-border-radius);
   box-shadow: var(--rz-input-shadow);
@@ -88,7 +88,9 @@ $radio-checked-border: var(--rz-input-border) !default;
   transition: var(--rz-transition-all);
 
   &:hover:not(.rz-state-disabled) {
-    @extend %input-hover;
+    box-shadow: var(--rz-input-hover-shadow);
+    background-color: var(--rz-input-hover-background-color);
+    border: var(--rz-input-hover-border);
     border-width: var(--rz-radio-border-width);
   }
 
