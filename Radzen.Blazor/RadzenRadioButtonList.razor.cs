@@ -51,7 +51,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The content justify.</value>
         [Parameter]
-        public JustifyContent JustifyContent { get; set; } = JustifyContent.Center;
+        public JustifyContent JustifyContent { get; set; } = JustifyContent.Start;
 
         /// <summary>
         /// Gets or sets the items alignment.
