@@ -15,7 +15,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-         role="checkboxgroup" @onfocus=@this.AsNonRenderingEventHandler(OnFocus) @onblur=@this.AsNonRenderingEventHandler(OnBlur)
+         role="checkboxgroup" @onfocus=@OnFocus @onblur=@OnBlur
         tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         @if (AllowSelectAll)
         {
