@@ -292,7 +292,7 @@ namespace Radzen.Blazor
         {
             year = Culture.Calendar.GetYear(new DateTime(year, 1, 1));
 
-            var date = new DateTime(year, 1, 1);
+            var date = new DateTime(year, 1, 1, Culture.Calendar);
 
             return date.ToString(YearFormat, Culture);
         }
