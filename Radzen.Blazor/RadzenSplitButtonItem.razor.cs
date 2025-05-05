@@ -80,7 +80,7 @@ namespace Radzen.Blazor
             }
         }
 
-        ClassList ItemClassList => ClassList.Create("rz-menuitem").AddDisabled(Disabled).Add("rz-state-focused", SplitButton.IsFocused(this));
+        ClassList ItemClassList => ClassList.Create("rz-menuitem").AddDisabled(Disabled).Add("rz-state-highlight", SplitButton.IsFocused(this));
 
         /// <inheritdoc />
         public override void Dispose()
