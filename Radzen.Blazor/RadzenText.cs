@@ -348,16 +348,17 @@ namespace Radzen.Blazor
                     break;
             }
 
-            var classList = ClassList.Create(className)
-                                     .Add(Attributes)
-                                     .Add(alignClassName, TextAlign != TextAlign.Left);
+            var @class = ClassList.Create(className)
+                                  .Add(Attributes)
+                                  .Add(alignClassName, TextAlign != TextAlign.Left)
+                                  .ToString();
 
             if (Visible)
             {
                 builder.OpenElement(0, tagName);
                 builder.AddAttribute(1, "style", Style);
                 builder.AddMultipleAttributes(2, Attributes);
-                builder.AddAttribute(3, "class", classList.ToString());
+                builder.AddAttribute(3, "class", @class);
                 builder.AddAttribute(4, "id", GetId());
 
                 if (!string.IsNullOrEmpty(Text))

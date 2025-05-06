@@ -3,8 +3,8 @@
 @using System.ComponentModel
 @inject IJSRuntime JSRuntime
 @implements IDisposable
-<div class="@WrapperCssClass">
-    <div @ref="dialog" class="@CssClass" role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
+<div class=@WrapperClass>
+    <div @ref="dialog" class=@Class role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
         @if (Dialog.Options.ShowTitle)
         {
             <div class="rz-dialog-titlebar">
@@ -26,7 +26,7 @@
                 }
             </div>
         }
-        <div class="@ContentCssClass">
+        <div class=@ContentClass>
             @if (Dialog.Options.ChildContent != null)
             {
                 @Dialog.Options.ChildContent(Service)
@@ -49,7 +49,6 @@
             <div class="rz-dialog-mask" style="pointer-events: none;"></div>
         }
     }
-
 </div>
 
 @code {
@@ -158,34 +157,17 @@
         Service.Close();
     }
 
-    string CssClass
-    {
-        get
-        {
-            var classList = ClassList.Create("rz-dialog rz-open")
-                .Add(Dialog.Options.CssClass);
-            
-            return classList.ToString();
-        }
-    }
+    string Class => ClassList.Create("rz-dialog rz-open")
+                             .Add(Dialog.Options.CssClass)
+                             .ToString();
 
-    string WrapperCssClass
-    {
-        get
-        {
-            var baseCss = "rz-dialog-wrapper";
-            return string.IsNullOrWhiteSpace(Dialog.Options.WrapperCssClass) ? baseCss : $"{baseCss} {Dialog.Options.WrapperCssClass}";
-        }
-    }
+    string WrapperClass => ClassList.Create("rz-dialog-wrapper")
+                                    .Add(Dialog.Options.WrapperCssClass)
+                                    .ToString();
 
-    string ContentCssClass
-    {
-        get
-        {
-            var baseCss = "rz-dialog-content";
-            return string.IsNullOrEmpty(Dialog.Options.ContentCssClass) ? baseCss : $"{baseCss} {Dialog.Options.ContentCssClass}";
-        }
-    }
+    string ContentClass => ClassList.Create("rz-dialog-content")
+                                    .Add(Dialog.Options.ContentCssClass)
+                                    .ToString();
 
     string Style
     {
