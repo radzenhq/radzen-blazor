@@ -141,7 +141,6 @@ public readonly struct ClassList
     /// Adds the specified shade as a CSS class.
     /// </summary>
     /// <param name="shade"></param>
-    /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public ClassList AddShade(Shade shade) => shade switch {
         Shade.Default => Add("rz-shade-default"),
@@ -150,6 +149,18 @@ public readonly struct ClassList
         Shade.Lighter => Add("rz-shade-lighter"),
         Shade.Darker => Add("rz-shade-darker"),
         _ => throw new ArgumentOutOfRangeException(nameof(shade), shade, null)
+    };
+
+    /// <summary>
+    /// Adds the specified horizontal alignment as a CSS class.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
+    public ClassList AddHorizontalAlign(HorizontalAlign alignment) => alignment switch {
+        HorizontalAlign.Center => Add("rz-align-center"),
+        HorizontalAlign.Left => Add("rz-align-left"),
+        HorizontalAlign.Right => Add("rz-align-right"),
+        HorizontalAlign.Justify => Add("rz-align-justify"),
+        _ => throw new ArgumentOutOfRangeException(nameof(alignment), alignment, null)
     };
 
     /// <summary>
