@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -14,48 +14,21 @@ namespace Radzen.Blazor
     public partial class RadzenProgressBarCircular : RadzenProgressBar
     {
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
+        protected override string GetComponentCssClass() => ClassList.Create("rz-progressbar-circular")
+                                                                     .Add("rz-progressbar-determinate", Mode == ProgressBarMode.Determinate)
+                                                                     .Add("rz-progressbar-indeterminate", Mode == ProgressBarMode.Indeterminate)
+                                                                     .Add($"rz-progressbar-{ProgressBarStyle.ToString().ToLowerInvariant()}")
+                                                                     .Add($"rz-progressbar-circular-{CircleSize}")
+                                                                     .ToString();
+
+        string CircleSize => Size switch
         {
-            var classList=new List<string>()
-            {
-                "rz-progressbar-circular"
-            };
-
-            switch (Mode)
-            {
-                case ProgressBarMode.Determinate:
-                    classList.Add("rz-progressbar-determinate");
-                    break;
-                case ProgressBarMode.Indeterminate:
-                    classList.Add("rz-progressbar-indeterminate");
-                    break;
-            }
-
-            classList.Add($"rz-progressbar-{ProgressBarStyle.ToString().ToLowerInvariant()}");
-            classList.Add($"rz-progressbar-circular-{GetCircleSize()}");
-
-            return string.Join(" ", classList);
-        }
-
-        /// <summary>
-        /// Gets the circle size.
-        /// </summary>
-        protected string GetCircleSize()
-        {
-            switch (Size)
-            {
-                case ProgressBarCircularSize.Medium:
-                    return "md";
-                case ProgressBarCircularSize.Large:
-                    return "lg";
-                case ProgressBarCircularSize.Small:
-                    return "sm";
-                case ProgressBarCircularSize.ExtraSmall:
-                    return "xs";
-                default:
-                    return string.Empty;
-            }
-        }
+            ProgressBarCircularSize.Medium => "md",
+            ProgressBarCircularSize.Large => "lg",
+            ProgressBarCircularSize.Small => "sm",
+            ProgressBarCircularSize.ExtraSmall => "xs",
+            _ => string.Empty,
+        };
 
         /// <summary>
         /// Gets or sets the size.

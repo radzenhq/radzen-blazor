@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -19,17 +16,8 @@ namespace Radzen.Blazor
         public bool Responsive { get; set; } = true;
         
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var classList = new List<string>();
-            classList.Add("rz-card-group");
-
-            if (Responsive)
-            {
-                classList.Add("rz-card-group-responsive");
-            }
-
-            return string.Join(" ", classList);
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-card-group")
+                                                                      .Add("rz-card-group-responsive", Responsive)
+                                                                      .ToString();
     }
 }
