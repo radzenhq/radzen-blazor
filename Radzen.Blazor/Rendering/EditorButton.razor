@@ -52,20 +52,9 @@ else
 
     string GetTitle() => !string.IsNullOrEmpty(Shortcut) ? $"{Title} ({Shortcut})" : Title;
 
-    string Class
-    {
-        get
-        {
-            var classList = new List<string>() { "rz-html-editor-button" };
-
-            if (Selected && !Editor.Disabled && EnabledModes.HasFlag(Editor.GetMode()))
-            {
-                classList.Add("rz-selected");
-            }
-
-            return string.Join(" ", classList);
-        }
-    }
+    string Class => ClassList.Create("rz-html-editor-button")
+        .Add("rz-selected", Selected && !Editor.Disabled && EnabledModes.HasFlag(Editor.GetMode()))
+        .ToString();
 
     void Empty()
     {

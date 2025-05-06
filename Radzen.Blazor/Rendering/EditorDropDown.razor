@@ -75,18 +75,7 @@
         }
     }
 
-    string Class
-    {
-        get
-        {
-            var classList = new List<string>() { "rz-html-editor-dropdown" };
-
-            if (Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))
-            {
-                classList.Add("rz-disabled");
-            }
-
-            return string.Join(" ", classList);
-        }
-    }
+    string Class => ClassList.Create("rz-html-editor-dropdown")
+        .Add("rz-disabled", Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))
+        .ToString();
 }
