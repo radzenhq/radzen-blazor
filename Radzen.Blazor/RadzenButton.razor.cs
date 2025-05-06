@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Threading.Tasks;
 
@@ -15,11 +16,6 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenButton : RadzenComponent
     {
-        internal string getButtonSize()
-        {
-            return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : Size == ButtonSize.Small ? "sm" : "xs";
-        }
-
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
@@ -164,9 +160,13 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            return $"rz-button rz-button-{getButtonSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-button")
+                                                                     .AddButtonSize(Size)
+                                                                     .AddVariant(Variant)
+                                                                     .AddButtonStyle(ButtonStyle)
+                                                                     .AddDisabled(IsDisabled)
+                                                                     .AddShade(Shade)
+                                                                     .Add($"rz-button-icon-only", string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon))
+                                                                     .ToString();
     }
 }
