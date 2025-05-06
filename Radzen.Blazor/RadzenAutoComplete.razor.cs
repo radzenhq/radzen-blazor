@@ -279,8 +279,9 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
-        ClassList InputClassList => ClassList.Create("rz-inputtext rz-autocomplete-input")
-                                             .AddDisabled(Disabled);
+        string InputClass => ClassList.Create("rz-inputtext rz-autocomplete-input")
+                                      .AddDisabled(Disabled)
+                                      .ToString();
 
         private string OpenScript()
         {
@@ -293,10 +294,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            return GetClassList("rz-autocomplete").ToString();
-        }
+        protected override string GetComponentCssClass() => GetClassList("rz-autocomplete").ToString();
 
         /// <inheritdoc />
         public override void Dispose()

@@ -231,15 +231,6 @@ namespace Radzen.Blazor
             return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Gets the class list.
-        /// </summary>
-        /// <param name="className">Name of the class.</param>
-        /// <returns>ClassList.</returns>
-        protected ClassList GetClassList(string className) => ClassList.Create(className)
-                                                                       .AddDisabled(Disabled)
-                                                                       .Add(FieldIdentifier, EditContext);
-
         /// <summary> Provides support for RadzenFormField integration. </summary>
         [CascadingParameter]
         public IFormFieldContext FormFieldContext { get; set; }
@@ -279,22 +270,19 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var classes = GetClassList("rz-toggle-button");
+        protected override string GetComponentCssClass() => ClassList.Create("rz-button rz-toggle-button")
+                .Add("rz-button-icon-only", string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon))
+                .Add($"rz-button-{getButtonSize()}")
+                .Add($"rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()}")
+                .Add($"rz-{Enum.GetName(typeof(ButtonStyle), CurrentButtonStyle).ToLowerInvariant()}")
+                .Add($"rz-shade-{Enum.GetName(typeof(Shade), CurrentShade).ToLowerInvariant()}")
+                .AddDisabled(IsDisabled)
+                .Add(FieldIdentifier, EditContext)
+                .Add("rz-state-active", HasValue)
+                .ToString();
 
-            if (HasValue)
-            {
-                classes.Add("rz-state-active", Value);
-            }
-
-            var baseClasses = HasValue ?
-                $"rz-button rz-button-{getButtonSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(ButtonStyle), ToggleButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), ToggleShade).ToLowerInvariant()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}" :
-            $"rz-button rz-button-{getButtonSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(ButtonStyle), ButtonStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}{(IsDisabled ? " rz-state-disabled" : "")}{(string.IsNullOrEmpty(Text) && !string.IsNullOrEmpty(Icon) ? " rz-button-icon-only" : "")}";
-
-
-            return $"{baseClasses} {classes.ToString()}";
-        }
+        private Shade CurrentShade => HasValue ? ToggleShade : Shade;
+        private ButtonStyle CurrentButtonStyle => HasValue ? ToggleButtonStyle : ButtonStyle;
 
         /// <summary>
         /// Gets or sets the ToggleButton style.

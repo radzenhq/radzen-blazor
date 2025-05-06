@@ -25,8 +25,8 @@
                     <div class="rz-helper-hidden-accessible">
                         <input type="radio" disabled="@Disabled" name="@Name" value="@item.Value" tabindex="-1" aria-label="@(item.Text + " " + item.Value)" @attributes="item.InputAttributes">
                     </div>
-                    <div class=@ItemClassList(item)>
-                        <span class=@IconClassList(item)></span>
+                    <div class=@ItemClass(item)>
+                        <span class=@IconClass(item)></span>
                     </div>
                 </div>
                 @if (item.Template != null)

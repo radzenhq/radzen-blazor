@@ -25,13 +25,15 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>
     {
-        ClassList ItemClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
+        string ItemClass(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-box")
                                                                             .Add("rz-state-active", IsSelected(item))
                                                                             .Add("rz-state-focused", IsFocused(item) && focused)
-                                                                            .AddDisabled(Disabled || item.Disabled);
+                                                                            .AddDisabled(Disabled || item.Disabled)
+                                                                            .ToString();
 
-        ClassList IconClassList(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
-                                                                            .Add("notranslate rzi rzi-circle-on", IsSelected(item));
+        string IconClass(RadzenRadioButtonListItem<TValue> item) => ClassList.Create("rz-radiobutton-icon")
+                                                                             .Add("notranslate rzi rzi-circle-on", IsSelected(item))
+                                                                             .ToString();
         /// <summary>
         /// Gets or sets the value property.
         /// </summary>

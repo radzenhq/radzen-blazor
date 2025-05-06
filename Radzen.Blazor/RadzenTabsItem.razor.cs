@@ -79,11 +79,12 @@ namespace Radzen.Blazor
         /// Gets the class list.
         /// </summary>
         /// <value>The class list.</value>
-        ClassList ClassList => ClassList.Create()
-                                        .Add("rz-tabview-selected", IsSelected)
-                                        .Add("rz-state-focused", Tabs.IsFocused(this))
-                                        .AddDisabled(Disabled)
-                                        .Add(Attributes);
+        string Class => ClassList.Create()
+                                 .Add("rz-tabview-selected", IsSelected)
+                                 .Add("rz-state-focused", Tabs.IsFocused(this))
+                                 .AddDisabled(Disabled)
+                                 .Add(Attributes)
+                                 .ToString();
 
         /// <summary>
         /// Gets the index.

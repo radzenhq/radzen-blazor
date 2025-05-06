@@ -25,13 +25,15 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>
     {
-        ClassList ItemClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
-                                                                            .Add("rz-state-active", IsSelected(item))
-                                                                            .Add("rz-state-focused", IsFocused(item) && focused)
-                                                                            .AddDisabled(Disabled || item.Disabled);
+        string ItemClass(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
+                                                                          .Add("rz-state-active", IsSelected(item))
+                                                                          .Add("rz-state-focused", IsFocused(item) && focused)
+                                                                          .AddDisabled(Disabled || item.Disabled)
+                                                                          .ToString();
 
-        ClassList IconClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
-                                                                            .Add("notranslate rzi rzi-check", IsSelected(item));
+        string IconClass(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
+                                                                          .Add("notranslate rzi rzi-check", IsSelected(item))
+                                                                          .ToString();
 
         /// <summary>
         /// Gets or sets the value property.

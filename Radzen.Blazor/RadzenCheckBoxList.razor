@@ -33,8 +33,8 @@
                     <div class="rz-helper-hidden-accessible">
                         <input type="checkbox" name="@Name" value="@item.Value" disabled="@Disabled" readonly="@ReadOnly" tabindex="-1" aria-label="@(item.Text + " " + item.Value)" aria-checked="@(IsSelected(item).ToString().ToLowerInvariant())">
                     </div>
-                    <div class=@ItemClassList(item)>
-                        <span class=@IconClassList(item)></span>
+                    <div class=@ItemClass(item)>
+                        <span class=@IconClass(item)></span>
                     </div>
                 </div>
                 @if (item.Template != null)

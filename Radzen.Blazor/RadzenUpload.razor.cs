@@ -141,15 +141,17 @@ namespace Radzen.Blazor
         /// Gets the choose class list.
         /// </summary>
         /// <value>The choose class list.</value>
-        ClassList ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button")
-                                              .AddDisabled(Disabled);
+        string ChooseClassList => ClassList.Create("rz-fileupload-choose rz-button")
+                                           .AddDisabled(Disabled)
+                                           .ToString();
 
         /// <summary>
         /// Gets the button class list.
         /// </summary>
         /// <value>The button class list.</value>
-        ClassList ButtonClassList => ClassList.Create("rz-button rz-button-icon-only rz-base rz-shade-default")
-                                              .AddDisabled(Disabled);
+        string ButtonClassList => ClassList.Create("rz-button rz-button-icon-only rz-base rz-shade-default")
+                                            .AddDisabled(Disabled)
+                                            .ToString();
 
         /// <summary>
         /// Gets or sets the child content.

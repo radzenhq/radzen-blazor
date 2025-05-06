@@ -46,11 +46,11 @@ namespace Radzen.Blazor
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
 
-        ClassList ButtonClassList(RadzenSelectBarItem item)
-            => ClassList.Create($"rz-button rz-button-{getButtonSize()} rz-button-text-only")
-                        .Add("rz-state-active", IsSelected(item))
-                        .Add("rz-state-focused", IsFocused(item) && focused)
-                        .AddDisabled(Disabled || item.Disabled);
+        string ButtonClass(RadzenSelectBarItem item) => ClassList.Create($"rz-button rz-button-{getButtonSize()} rz-button-text-only")
+                                                                 .Add("rz-state-active", IsSelected(item))
+                                                                 .Add("rz-state-focused", IsFocused(item) && focused)
+                                                                 .AddDisabled(Disabled || item.Disabled)
+                                                                 .ToString();
 
         /// <summary>
         /// Gets or sets the value property.
@@ -111,11 +111,10 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-            => GetClassList("rz-selectbar rz-buttonset")
-                .Add($"rz-selectbar-{(Orientation == Orientation.Vertical ? "vertical" : "horizontal")}")
-                .Add($"rz-buttonset-{allItems.Count}")
-                .ToString();
+        protected override string GetComponentCssClass() => GetClassList("rz-selectbar rz-buttonset")
+                                                            .Add($"rz-selectbar-{(Orientation == Orientation.Vertical ? "vertical" : "horizontal")}")
+                                                            .Add($"rz-buttonset-{allItems.Count}")
+                                                            .ToString();
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenSelectBar{TValue}"/> is multiple.

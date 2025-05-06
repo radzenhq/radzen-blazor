@@ -31,23 +31,22 @@ namespace Radzen.Blazor
         [Parameter]
         public bool TriState { get; set; } = false;
 
-        ClassList BoxClassList => ClassList.Create("rz-chkbox-box")
-                                           .Add("rz-state-active", !object.Equals(Value, false))
-                                           .AddDisabled(Disabled);
+        string BoxClass => ClassList.Create("rz-chkbox-box")
+                                    .Add("rz-state-active", !object.Equals(Value, false))
+                                    .AddDisabled(Disabled)
+                                    .ToString();
 
-        ClassList IconClassList => ClassList.Create("notranslate rz-chkbox-icon")
-                                            .Add("rzi rzi-check", object.Equals(Value, true))
-                                            .Add("rzi rzi-times", object.Equals(Value, null));
+        string IconClass => ClassList.Create("notranslate rz-chkbox-icon")
+                                     .Add("rzi rzi-check", object.Equals(Value, true))
+                                     .Add("rzi rzi-times", object.Equals(Value, null))
+                                     .ToString();
 
         string CheckBoxValue => CheckBoxChecked ? "true" : "false";
 
         bool CheckBoxChecked => object.Equals(Value, true);
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            return GetClassList("rz-chkbox").ToString();
-        }
+        protected override string GetComponentCssClass() => GetClassList("rz-chkbox").ToString();
 
         async Task OnKeyPress(KeyboardEventArgs args)
         {

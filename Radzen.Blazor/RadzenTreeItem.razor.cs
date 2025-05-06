@@ -21,19 +21,22 @@ namespace Radzen.Blazor
         [Parameter(CaptureUnmatchedValues = true)]
         public IReadOnlyDictionary<string, object> Attributes { get; set; }
 
-        ClassList ContentClassList => ClassList.Create("rz-treenode-content")
-                                               .Add("rz-treenode-content-selected", selected)
-                                               .Add("rz-state-focused", Tree.IsFocused(this))
-                                               .Add(Tree.ItemContentCssClass)
-                                               .Add(ContentCssClass);
-        ClassList IconClassList => ClassList.Create("notranslate rz-tree-toggler rzi")
-                                               .Add("rzi-caret-down", clientExpanded)
-                                               .Add("rzi-caret-right", !clientExpanded)
-                                               .Add(Tree.ItemIconCssClass)
-                                               .Add(IconCssClass);
-        private ClassList LabelClassList => ClassList.Create("rz-treenode-label")
-                                               .Add(Tree.ItemLabelCssClass)
-                                               .Add(LabelCssClass);
+        string ContentClass => ClassList.Create("rz-treenode-content")
+                                        .Add("rz-treenode-content-selected", selected)
+                                        .Add("rz-state-focused", Tree.IsFocused(this))
+                                        .Add(Tree.ItemContentCssClass)
+                                        .Add(ContentCssClass)
+                                        .ToString();
+        string IconClass => ClassList.Create("notranslate rz-tree-toggler rzi")
+                                     .Add("rzi-caret-down", clientExpanded)
+                                     .Add("rzi-caret-right", !clientExpanded)
+                                     .Add(Tree.ItemIconCssClass)
+                                     .Add(IconCssClass)
+                                     .ToString();
+        string LabelClass => ClassList.Create("rz-treenode-label")
+                                      .Add(Tree.ItemLabelCssClass)
+                                      .Add(LabelCssClass)
+                                      .ToString();
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>

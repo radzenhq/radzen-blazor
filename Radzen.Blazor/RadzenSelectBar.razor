@@ -20,7 +20,7 @@
         {
             <div @ref="@item.Element" id="@item.GetItemId()"
                 @onclick="@(args => SelectItem(item))"
-                 @attributes="item.Attributes" style="@item.Style" class=@ButtonClassList(item) aria-label="@item.Text" aria-selected=@(IsSelected(item)? "true" : "false")>
+                 @attributes="item.Attributes" style="@item.Style" class=@ButtonClass(item) aria-label="@item.Text" aria-selected=@(IsSelected(item)? "true" : "false")>
                 @if (item.Template != null)
                 {
                     @item.Template(item)
