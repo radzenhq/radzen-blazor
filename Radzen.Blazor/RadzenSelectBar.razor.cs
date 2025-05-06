@@ -26,11 +26,6 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
-        private string getButtonSize()
-        {
-            return Size == ButtonSize.Medium ? "md" : Size == ButtonSize.Large ? "lg" : Size == ButtonSize.Small ? "sm" : "xs";
-        }
-
         /// <summary>
         /// Gets or sets the size. Set to <c>ButtonSize.Medium</c> by default.
         /// </summary>
@@ -46,7 +41,8 @@ namespace Radzen.Blazor
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 
 
-        string ButtonClass(RadzenSelectBarItem item) => ClassList.Create($"rz-button rz-button-{getButtonSize()} rz-button-text-only")
+        string ButtonClass(RadzenSelectBarItem item) => ClassList.Create($"rz-button rz-button-text-only")
+                                                                 .AddButtonSize(Size)
                                                                  .Add("rz-state-active", IsSelected(item))
                                                                  .Add("rz-state-focused", IsFocused(item) && focused)
                                                                  .AddDisabled(Disabled || item.Disabled)
