@@ -1,10 +1,46 @@
 ﻿@page "/changelog"
 
 <div class="changelog">
-<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
-    Radzen Blazor Components v6 Changelog
+<RadzenText Anchor="changelog#v7" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v7 Changelog
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Track and review changes to Radzen Blazor Components v7
+</RadzenText>
+<RadzenText Anchor="changelog#v7-dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2">
+    Dependencies
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" />
+    Starting from Radzen Blazor v7.0.0 we have dropped the dependency on Roslyn (Microsoft.CodeAnalysis.*) packages. 
+    Expression parsing now relies on a home-grown implementation. Some expressions may no longer work.
+</RadzenText>
+<RadzenText Anchor="changelog#v7-animations" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Animations
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" />
+    Added animations to Popup, Dialog, SideDialog, DropDown, DropDownDataGrid, Notification, Tooltip, Tree, Panel, Fieldest, PanelMenu, Menu, ContextMenu, SplitButton and Accordion.
+
+    Some of the components used inline style to hide certain content which makes it impossible to animate. 
+    We have updated those components to use CSS class based hiding. As a result theme CSS files need to be updated. 
+    The free themes should work out of the box as long as they are not cached by the browser (RadzenTheme takes care of cache busting). 
+    Premium themes should be updated from Radzen Blazor Studio and Radzen Blazor for Visual Studio.
+    The latest versions of both products would display a warning that the premium theme is outdated and update it automatically without losing any customizations.
+</RadzenText>
+<RadzenText Anchor="changelog#v7-scheduler" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    RadzenScheduler month view
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" />
+    We have redone rendering implementation of the month view in RadzenScheduler. The old implementation didn't handle some cases and relied on odd sorting rules.
+    The new implementation is much more robust and should handle a lot more scenarios. The Breaking change is that appointments may not appear in the same
+    order as before.
+</RadzenText>
+<RadzenText Anchor="changelog#v6" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v6 Changelog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">
     Track and review changes to Radzen Blazor Components v6
 </RadzenText>
 <RadzenText Anchor="changelog#v6-dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
