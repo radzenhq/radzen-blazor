@@ -1,13 +1,46 @@
-﻿<div class="rz-p-12 rz-text-align-center">
-    <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical">
+﻿<RadzenStack class="rz-p-0 rz-p-md-12" Gap="2rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Orientation
+                <RadzenDropDown @bind-Value="@orientation" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "orientation" }})"
+                            Data="@(Enum.GetValues(typeof(Orientation)).Cast<Orientation>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                AlignItems
+                <RadzenDropDown @bind-Value="@alignItems" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "align items" }})"
+                            Data="@(Enum.GetValues(typeof(AlignItems)).Cast<AlignItems>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                JustifyContent
+                <RadzenDropDown @bind-Value="@justifyContent" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "justify content" }})"
+                            Data="@(Enum.GetValues(typeof(JustifyContent)).Cast<JustifyContent>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Wrap
+                <RadzenDropDown @bind-Value="@wrap" TextProperty="Text" ValueProperty="Value" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "wrap" }})"
+                            Data="@(Enum.GetValues(typeof(FlexWrap)).Cast<FlexWrap>().Select(t => new { Text = $"{t}", Value = t }))" Size="ButtonSize.Small" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Gap
+                <RadzenTextBox @bind-Value="@gap" aria-label="gap" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="@orientation" Gap="@gap" JustifyContent="@justifyContent" AlignItems="@alignItems" Wrap="@wrap">
         <Items>
             <RadzenRadioButtonListItem Text="Orders" Value="1" />
             <RadzenRadioButtonListItem Text="Employees" Value="2" />
             <RadzenRadioButtonListItem Text="Customers" Value="3" />
         </Items>
     </RadzenRadioButtonList>
-</div>
+</RadzenStack>
 
 @code {
     int value = 1;
+    Orientation orientation = Orientation.Horizontal;
+    AlignItems alignItems = AlignItems.Start;
+    JustifyContent justifyContent = JustifyContent.Start;
+    FlexWrap wrap = FlexWrap.Wrap;
+    string gap = "0";
 }

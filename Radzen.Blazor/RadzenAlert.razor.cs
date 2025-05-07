@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Threading.Tasks;
 
@@ -161,32 +162,23 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            return $"rz-alert rz-alert-{GetAlertSize()} rz-variant-{Enum.GetName(typeof(Variant), Variant).ToLowerInvariant()} rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()} rz-shade-{Enum.GetName(typeof(Shade), Shade).ToLowerInvariant()}";
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-alert")
+                                                                     .Add($"rz-alert-{GetAlertSize()}")
+                                                                     .AddVariant(Variant)
+                                                                     .Add($"rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()}")
+                                                                     .AddShade(Shade)
+                                                                     .ToString();
 
-        string GetIcon()
-        {
-            if (!string.IsNullOrEmpty(Icon))
-            {
-                return Icon;
-            }
-
-            switch (AlertStyle)
-            {
-                case AlertStyle.Success:
-                    return "check_circle";
-                case AlertStyle.Danger:
-                    return "error";
-                case AlertStyle.Warning:
-                    return "warning_amber";
-                case AlertStyle.Info:
-                    return "info";
-                default:
-                    return "lightbulb";
-            }
-        }
+        string GetIcon() => !string.IsNullOrEmpty(Icon)
+                ? Icon
+                : AlertStyle switch
+                {
+                    AlertStyle.Success => "check_circle",
+                    AlertStyle.Danger => "error",
+                    AlertStyle.Warning => "warning_amber",
+                    AlertStyle.Info => "info",
+                    _ => "lightbulb",
+                };
 
         async Task OnClose()
         {

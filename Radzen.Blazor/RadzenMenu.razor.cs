@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,26 +40,10 @@ namespace Radzen.Blazor
         private bool IsOpen { get; set; } = false;
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var classList = new List<string>();
-
-            classList.Add("rz-menu");
-
-            if (Responsive)
-            {
-                if (IsOpen)
-                {
-                    classList.Add("rz-menu-open");
-                }
-                else
-                {
-                    classList.Add("rz-menu-closed");
-                }
-            }
-
-            return string.Join(" ", classList);
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-menu")
+                                                                     .Add("rz-menu-open", Responsive && IsOpen)
+                                                                     .Add("rz-menu-closed", Responsive && !IsOpen)
+                                                                     .ToString();
 
         void OnToggle()
         {
@@ -72,7 +56,6 @@ namespace Radzen.Blazor
         /// <value>The click callback.</value>
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
-
 
         [Inject]
         NavigationManager NavigationManager { get; set; }
@@ -243,6 +226,11 @@ namespace Radzen.Blazor
         {
             base.Dispose();
             NavigationManager.LocationChanged -= OnLocationChanged;
+        }
+
+        void OnFocus()
+        {
+            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
         }
     }
 }

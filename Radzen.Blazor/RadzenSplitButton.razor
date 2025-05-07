@@ -5,7 +5,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
          tabindex="@(Disabled ? -1 : TabIndex)" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
-        <button aria-label="@(ButtonAriaLabel ?? Text)" tabindex="-1" disabled="@IsDisabled" class="@getButtonCss()" type="@Enum.GetName(typeof(ButtonType), ButtonType).ToLower()" @onclick="@OnClick">
+        <button aria-label="@(ButtonAriaLabel ?? Text)" tabindex="-1" disabled="@IsDisabled" class=@ButtonClass type="@Enum.GetName(typeof(ButtonType), ButtonType).ToLower()" @onclick="@OnClick">
             <span class="rz-button-box">
             @if (ButtonContent != null)
             {
@@ -43,7 +43,7 @@
             }
             </span>
         </button>
-        <button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class="@getPopupButtonCss()" type="button" aria-label="@OpenAriaLabel">
+        <button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class=@PopupButtonClass type="button" aria-label="@OpenAriaLabel">
             <RadzenIcon Icon="@DropDownIcon" />
         </button>
         <div id="@PopupID" class="rz-splitbutton-menu">

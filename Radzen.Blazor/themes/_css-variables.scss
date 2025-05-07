@@ -65,6 +65,7 @@
   /* Transition */
   --rz-transition: #{$rz-transition};
   --rz-transition-all: #{$rz-transition-all};
+  --rz-expander-transition: #{$rz-expander-transition};
 
   /* Layout Body */
   --rz-layout-body-margin: #{$layout-body-margin};
@@ -356,6 +357,7 @@
   --rz-dialog-border-radius: #{$dialog-border-radius};
   --rz-dialog-mask-zindex: #{$dialog-mask-zindex};
   --rz-dialog-zindex: #{$dialog-zindex};
+  --rz-dialog-transition: #{$dialog-transition};
 
   /* DropDown */
   --rz-dropdown-trigger-icon-width: #{$dropdown-trigger-icon-width};
@@ -624,15 +626,21 @@
   --rz-input-placeholder-color: #{$input-placeholder-color};
   --rz-input-background-color: #{$input-background-color};
   --rz-input-border: #{$input-border};
+  --rz-input-border-block-end: #{$input-border-block-end};
   --rz-input-border-radius: #{$input-border-radius};
   --rz-input-shadow: #{$input-shadow};
   --rz-input-hover-shadow: #{$input-hover-shadow};
+  --rz-input-hover-background-color: #{$input-hover-background-color};
   --rz-input-hover-border: #{$input-hover-border};
+  --rz-input-hover-border-block-end: #{$input-hover-border-block-end};
   --rz-input-focus-shadow: #{$input-focus-shadow};
+  --rz-input-focus-background-color: #{$input-focus-background-color};
   --rz-input-focus-border: #{$input-focus-border};
+  --rz-input-focus-border-block-end: #{$input-focus-border-block-end};
   --rz-input-focus-outline: #{$input-focus-outline};
   --rz-input-focus-outline-offset: #{$input-focus-outline-offset};
   --rz-input-disabled-border: #{$input-disabled-border};
+  --rz-input-disabled-border-block-end: #{$input-disabled-border-block-end};
   --rz-input-disabled-shadow: #{$input-disabled-shadow};
   --rz-input-disabled-background-color: #{$input-disabled-background-color};
   --rz-input-disabled-color: #{$input-disabled-color};
@@ -1002,6 +1010,10 @@
   --rz-selectbar-selected-color: #{$selectbar-selected-color};
   --rz-selectbar-selected-border: #{$selectbar-selected-border};
   --rz-selectbar-border-radius: #{$selectbar-border-radius};
+  --rz-selectbar-focus-outline: #{$selectbar-focus-outline};
+  --rz-selectbar-focus-outline-offset: #{$selectbar-focus-outline-offset};
+  --rz-selectbar-button-focus-outline: #{$selectbar-button-focus-outline};
+  --rz-selectbar-button-focus-outline-offset: #{$selectbar-button-focus-outline-offset};
 
   /* SidebarToggle */
   --rz-sidebar-toggle-icon-width: #{$sidebar-toggle-icon-width};

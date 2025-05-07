@@ -1,264 +1,903 @@
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
-using System.Linq;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Reflection.Emit;
+using System.Text;
+using System.Linq;
 
 namespace Radzen;
 
-static class DynamicTypeFactory
+#nullable enable
+
+/// <summary>
+/// Parse lambda expressions from strings.
+/// </summary>
+public class ExpressionParser
 {
-    public static Type CreateType(string typeName, string[] propertyNames, Type[] propertyTypes)
+    /// <summary>
+    /// Parses a lambda expression that returns a boolean value.
+    /// </summary>
+    public static Expression<Func<T, bool>> ParsePredicate<T>(string expression, Func<string, Type?>? typeResolver = null)
     {
-        if (propertyNames.Length != propertyTypes.Length)
+        return ParseLambda<T, bool>(expression, typeResolver);
+    }
+
+    /// <summary>
+    /// Parses a lambda expression that returns a typed result.
+    /// </summary>
+    public static Expression<Func<T, TResult>> ParseLambda<T, TResult>(string expression, Func<string, Type?>? typeResolver = null)
+    {
+        var lambda = ParseLambda(expression, typeof(T), typeResolver);
+
+        return Expression.Lambda<Func<T, TResult>>(lambda.Body, lambda.Parameters[0]);
+    }
+
+    /// <summary>
+    /// Parses a lambda expression that returns untyped result.
+    /// </summary>
+    public static LambdaExpression ParseLambda<T>(string expression, Func<string, Type?>? typeLocator = null)
+    {
+        return ParseLambda(expression, typeof(T), typeLocator);
+    }
+
+    /// <summary>
+    /// Parses a lambda expression that returns untyped result.
+    /// </summary>
+    public static LambdaExpression ParseLambda(string expression, Type type, Func<string, Type?>? typeResolver = null)
+    {
+        var parser = new ExpressionParser(expression, typeResolver);
+
+        return parser.ParseLambda(type);
+    }
+
+    private readonly List<Token> tokens;
+    private int position = 0;
+    private readonly Func<string, Type?>? typeResolver;
+    private readonly Stack<ParameterExpression> parameterStack = new();
+
+    private ExpressionParser(string expression, Func<string, Type?>? typeResolver = null)
+    {
+        this.typeResolver = typeResolver;
+        tokens = ExpressionLexer.Scan(expression);
+    }
+
+    Token Expect(TokenType type)
+    {
+        if (position >= tokens.Count)
         {
-            throw new ArgumentException("Property names and types count mismatch.");
+            throw new InvalidOperationException($"Unexpected end of expression. Expected token: {type}");
         }
 
-        var assemblyName = new AssemblyName("DynamicTypesAssembly");
-        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule("DynamicTypesModule");
+        var token = tokens[position];
 
-        var typeBuilder = moduleBuilder.DefineType(typeName, TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Sealed);
-
-        for (int i = 0; i < propertyNames.Length; i++)
+        if (token.Type != type)
         {
-            var fieldBuilder = typeBuilder.DefineField("_" + propertyNames[i], propertyTypes[i], FieldAttributes.Private);
-            var propertyBuilder = typeBuilder.DefineProperty(propertyNames[i], PropertyAttributes.None, propertyTypes[i], null);
-
-            var getterMethod = typeBuilder.DefineMethod(
-                "get_" + propertyNames[i],
-                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                propertyTypes[i],
-                Type.EmptyTypes);
-
-            var getterIl = getterMethod.GetILGenerator();
-            getterIl.Emit(OpCodes.Ldarg_0);
-            getterIl.Emit(OpCodes.Ldfld, fieldBuilder);
-            getterIl.Emit(OpCodes.Ret);
-
-            propertyBuilder.SetGetMethod(getterMethod);
-
-            var setterMethod = typeBuilder.DefineMethod(
-                      "set_" + propertyNames[i],
-                      MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
-                      null,
-                      [propertyTypes[i]]);
-
-            var setterIl = setterMethod.GetILGenerator();
-            setterIl.Emit(OpCodes.Ldarg_0);
-            setterIl.Emit(OpCodes.Ldarg_1);
-            setterIl.Emit(OpCodes.Stfld, fieldBuilder);
-            setterIl.Emit(OpCodes.Ret);
-
-            propertyBuilder.SetSetMethod(setterMethod);
+            throw new InvalidOperationException($"Unexpected token: {token.Type}. Expected: {type}");
         }
 
-        var dynamicType = typeBuilder.CreateType();
-        return dynamicType;
-    }
-}
+        position++;
 
-class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
-{
-    private readonly ParameterExpression parameter;
-    private readonly Func<string, Type> typeLocator;
-
-    public ExpressionSyntaxVisitor(ParameterExpression parameter, Func<string, Type> typeLocator)
-    {
-        this.parameter = parameter;
-        this.typeLocator = typeLocator;
+        return token;
     }
 
-    public override Expression VisitBinaryExpression(BinaryExpressionSyntax node)
+    void Advance(int count)
     {
-        var left = Visit(node.Left);
-
-        var right = ConvertIfNeeded(Visit(node.Right), left.Type);
-
-        return Expression.MakeBinary(ParseBinaryOperator(node.OperatorToken), left, right);
+        position += count;
     }
 
-
-    public override Expression VisitMemberAccessExpression(MemberAccessExpressionSyntax node)
+    Token Peek(int offset = 0)
     {
-        var expression = Visit(node.Expression) ?? parameter;
-        return Expression.PropertyOrField(expression, node.Name.Identifier.Text);
-    }
-
-    public override Expression VisitLiteralExpression(LiteralExpressionSyntax node)
-    {
-        return Expression.Constant(ParseLiteral(node));
-    }
-
-    public override Expression VisitIdentifierName(IdentifierNameSyntax node)
-    {
-        if (node.Identifier.Text == parameter.Name)
+        if (position + offset >= tokens.Count)
         {
-            return parameter;
+            return new Token(TokenType.None, string.Empty);
         }
 
-        var type = GetType(node.Identifier.Text);
-
-        if (type != null)
-        {
-            return Expression.Constant(type);
-        }
-
-        throw new NotSupportedException("Unsupported identifier: " + node.Identifier.Text);
+        return tokens[position + offset];
     }
 
-    public override Expression VisitConditionalExpression(ConditionalExpressionSyntax node)
+    private LambdaExpression ParseLambda(Type paramType)
     {
-        var condition = Visit(node.Condition);
+        var parameterIdentifier = Expect(TokenType.Identifier);
 
-        var whenTrue = Visit(node.WhenTrue);
+        var parameter = Expression.Parameter(paramType, parameterIdentifier.Value);
 
-        var whenFalse = Visit(node.WhenFalse);
+        parameterStack.Push(parameter);
 
-        if (whenTrue.Type != whenFalse.Type)
-        {
-            if (whenTrue.Type == typeof(object))
-            {
-                whenTrue = Expression.Convert(whenTrue, whenFalse.Type);
-            }
-            else if (whenFalse.Type == typeof(object))
-            {
-                whenFalse = Expression.Convert(whenFalse, whenTrue.Type);
-            }
-            else
-            {
-                throw new NotSupportedException("Conditional expression types mismatch: " + whenTrue.Type + " and " + whenFalse.Type);
-            }
-        }
+        Expect(TokenType.EqualsGreaterThan);
 
-        return Expression.Condition(condition, whenTrue, whenFalse);
-    }
+        var body = ParseExpression(parameter);
 
-    public override Expression VisitParenthesizedExpression(ParenthesizedExpressionSyntax node)
-    {
-        return Visit(node.Expression);
-    }
-
-    private Type GetType(string typeName)
-    {
-        var nullable = typeName.EndsWith('?');
-
-        if (nullable)
-        {
-            typeName = typeName[..^1];
-        }
-
-        var type = typeName switch
-        {
-            nameof(Int32) => typeof(int),
-            nameof(Int64) => typeof(long),
-            nameof(Double) => typeof(double),
-            nameof(Single) => typeof(float),
-            nameof(Decimal) => typeof(decimal),
-            nameof(String) => typeof(string),
-            nameof(Boolean) => typeof(bool),
-            nameof(DateTime) => typeof(DateTime),
-            nameof(DateOnly) => typeof(DateOnly),
-            nameof(DateTimeOffset) => typeof(DateTimeOffset),
-            nameof(TimeOnly) => typeof(TimeOnly),
-            nameof(Guid) => typeof(Guid),
-            nameof(Char) => typeof(char),
-            "int" => typeof(int),
-            "long" => typeof(long),
-            "double" => typeof(double),
-            "float" => typeof(float),
-            "decimal" => typeof(decimal),
-            "string" => typeof(string),
-            "char" => typeof(char),
-            "bool" => typeof(bool),
-            _ => typeLocator?.Invoke(typeName)
-        };
-
-        if (nullable && type != null)
-        {
-            type = typeof(Nullable<>).MakeGenericType(type);
-        }
-
-        return type;
-    }
-
-    public override Expression VisitCastExpression(CastExpressionSyntax node)
-    {
-        var typeName = node.Type.ToString();
-
-        var targetType = GetType(typeName);
-
-        if (targetType == null)
-        {
-            throw new NotSupportedException("Unsupported cast type: " + node.Type);
-        }
-
-        var operand = Visit(node.Expression);
-
-        return Expression.Convert(operand, targetType);
-    }
-
-    public override Expression VisitImplicitArrayCreationExpression(ImplicitArrayCreationExpressionSyntax node)
-    {
-        var expressions = node.Initializer.Expressions.Select(Visit).ToArray();
-        var elementType = expressions.Length > 0 ? expressions[0].Type : typeof(object);
-        return Expression.NewArrayInit(elementType, expressions);
-    }
-
-    public override Expression VisitArrayCreationExpression(ArrayCreationExpressionSyntax node)
-    {
-        var elementType = GetType(node.Type.ElementType.ToString());
-
-        if (elementType == null)
-        {
-            throw new NotSupportedException("Unsupported array element type: " + node.Type.ElementType);
-        }
-
-        var expressions = node.Initializer.Expressions.Select(e => ConvertIfNeeded(Visit(e), elementType));
-
-        return Expression.NewArrayInit(elementType, expressions);
-    }
-
-    private static MethodCallExpression CallStaticMethod(Type type, string methodName, Expression[] arguments, Type[] argumentTypes)
-    {
-        var methodInfo = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static, argumentTypes);
-
-        if (methodInfo != null)
-        {
-            return Expression.Call(methodInfo, arguments);
-        }
-
-        throw new NotSupportedException("Method not found: " + methodName);
-    }
-
-    public override Expression DefaultVisit(SyntaxNode node)
-    {
-        throw new NotSupportedException("Unsupported syntax: " + node.GetType().Name);
-    }
-
-    public override Expression VisitSimpleLambdaExpression(SimpleLambdaExpressionSyntax node)
-    {
-        var body = Visit(node.Body);
+        parameterStack.Pop();
 
         return Expression.Lambda(body, parameter);
     }
 
-    private Expression VisitArgument(Expression instance, ArgumentSyntax argument)
+    private Expression ParseExpression(ParameterExpression parameter)
     {
-        if (argument.Expression is SimpleLambdaExpressionSyntax lambda)
+        var left = ParseBinary(parameter);
+        var token = Peek();
+
+        if (token.Type is TokenType.AmpersandAmpersand)
         {
-            var itemType = GetItemType(instance.Type);
+            Advance(1);
 
-            var visitor = new ExpressionSyntaxVisitor(Expression.Parameter(itemType, lambda.Parameter.Identifier.Text), typeLocator);
+            var right = ParseExpression(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
 
-            return visitor.Visit(lambda);
+            left = Expression.AndAlso(left, right);
+        }
+        else if (token.Type is TokenType.BarBar)
+        {
+            Advance(1);
+
+            var right = ParseExpression(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+
+            left = Expression.OrElse(left, right);
         }
 
-        return Visit(argument.Expression);
+        return left;
+    }
+
+    private Expression ParseBinary(ParameterExpression parameter)
+    {
+        var left = ParseNullCoalescing(parameter);
+        var token = Peek();
+
+        if (token.Type is TokenType.EqualsEquals or TokenType.NotEquals or TokenType.GreaterThan or TokenType.LessThan or TokenType.LessThanOrEqual or TokenType.GreaterThanOrEqual)
+        {
+            Advance(1);
+            var right = ParseBinary(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
+        }
+
+        return left;
+    }
+
+    private Expression ParseNullCoalescing(ParameterExpression parameter)
+    {
+        var left = ParseTernary(parameter);
+        var token = Peek();
+
+        while (token.Type == TokenType.QuestionMarkQuestionMark)
+        {
+            Advance(1);
+
+            var right = ParseTernary(parameter) ?? throw new InvalidOperationException($"Expected expression after ?? at position {position}");
+
+            left = Expression.Coalesce(left, right);
+
+            token = Peek();
+        }
+
+        return left;
+    }
+
+    private Expression ParseTernary(ParameterExpression parameter)
+    {
+        var condition = ParseOr(parameter);
+
+        if (Peek().Type == TokenType.QuestionMark)
+        {
+            Advance(1);
+
+            var trueExpression = ParseOr(parameter);
+
+            Expect(TokenType.Colon);
+
+            var falseExpression = ParseOr(parameter);
+
+            if (trueExpression is ConstantExpression trueConst && trueConst.Value == null && falseExpression is not ConstantExpression)
+            {
+                trueExpression = Expression.Constant(null, falseExpression.Type);
+            }
+            else if (falseExpression is ConstantExpression falseConst && falseConst.Value == null && trueExpression is not ConstantExpression)
+            {
+                falseExpression = Expression.Constant(null, trueExpression.Type);
+            }
+
+            var ternary = Expression.Condition(condition, trueExpression, falseExpression);
+
+            return ParseMemberAccess(ternary, parameter);
+        }
+
+        return ParseMemberAccess(condition, parameter);
+    }
+
+    private Expression ParseMemberAccess(Expression expression, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type is TokenType.Dot or TokenType.QuestionDot or TokenType.OpenBracket)
+        {
+            if (token.Type == TokenType.Dot)
+            {
+                Advance(1);
+                token = Expect(TokenType.Identifier);
+                if (Peek().Type == TokenType.OpenParen)
+                {
+                    expression = ParseInvocation(expression, token.Value, parameter);
+                }
+                else
+                {
+                    expression = Expression.PropertyOrField(expression, token.Value);
+                }
+            }
+            else if (token.Type == TokenType.QuestionDot)
+            {
+                Advance(1);
+                token = Expect(TokenType.Identifier);
+
+                var check = Expression.Equal(expression, Expression.Constant(null));
+
+                if (Peek().Type == TokenType.OpenParen)
+                {
+                    var call = ParseInvocation(expression, token.Value, parameter);
+                    expression = Expression.Condition(check, Expression.Constant(null, call.Type), call);
+                }
+                else
+                {
+                    var access = Expression.PropertyOrField(expression, token.Value);
+
+                    expression = Expression.Condition(check, Expression.Default(access.Type), access);
+
+                    var nextToken = Peek();
+
+                    if (nextToken.Type == TokenType.Dot || nextToken.Type == TokenType.QuestionDot)
+                    {
+                        var nextAccess = ParseMemberAccess(access, parameter);
+
+                        expression = Expression.Condition(check, Expression.Default(nextAccess.Type), nextAccess);
+                    }
+                }
+            }
+            else if (token.Type == TokenType.OpenBracket)
+            {
+                Advance(1);
+                var index = ParseExpression(parameter);
+                Expect(TokenType.CloseBracket);
+
+                if (expression.Type.IsArray)
+                {
+                    expression = Expression.ArrayIndex(expression, index);
+                }
+                else
+                {
+                    var indexer = expression.Type.GetProperty("Item") ?? throw new InvalidOperationException($"Type {expression.Type} does not have an indexer property");
+
+                    expression = Expression.Property(expression, indexer, index);
+                }
+            }
+
+            token = Peek();
+        }
+
+        return expression;
+    }
+
+    private MethodCallExpression ParseInvocation(Expression expression, string methodName, ParameterExpression parameter)
+    {
+        Advance(1);
+
+        var arguments = new List<Expression>();
+
+        if (Peek().Type != TokenType.CloseParen)
+        {
+            while (Peek().Type != TokenType.CloseParen)
+            {
+                var token = Peek();
+
+                if (token.Type == TokenType.Identifier && Peek(1).Type == TokenType.EqualsGreaterThan)
+                {
+                    var lambdaParameterName = token.Value;
+
+                    Advance(2);
+
+                    Type? lambdaParameterType = null;
+
+                    var extensionMethod = typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                        .FirstOrDefault(m => m.Name == methodName && m.GetParameters().Length == 2);
+
+                    if (extensionMethod != null)
+                    {
+                        lambdaParameterType = GetItemType(expression.Type);
+                    }
+
+                    if (lambdaParameterType == null)
+                    {
+                        throw new InvalidOperationException($"Could not infer type for lambda parameter {lambdaParameterName}");
+                    }
+
+                    var lambdaParameter = Expression.Parameter(lambdaParameterType, lambdaParameterName);
+                    parameterStack.Push(lambdaParameter);
+                    var lambdaBody = ParseExpression(lambdaParameter);
+                    parameterStack.Pop();
+                    arguments.Add(Expression.Lambda(lambdaBody, lambdaParameter));
+                }
+                else
+                {
+                    arguments.Add(ParseExpression(parameter));
+                }
+
+                if (Peek().Type == TokenType.Comma)
+                {
+                    Advance(1);
+                }
+            }
+        }
+
+        Expect(TokenType.CloseParen);
+
+        var argumentTypes = arguments.Select(a => a.Type).ToArray();
+
+        var method = expression.Type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance, null, argumentTypes, null);
+
+        if (method != null)
+        {
+            return Expression.Call(expression, method, arguments);
+        }
+
+        method = typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                                   .FirstOrDefault(m => m.Name == methodName && m.GetParameters().Length == arguments.Count + 1);
+
+        if (method != null)
+        {
+            var argumentType = GetItemType(expression.Type);
+
+            if (argumentType == null)
+            {
+                throw new InvalidOperationException($"Cannot determine item type for {expression.Type}");
+            }
+
+            if (method.IsGenericMethodDefinition)
+            {
+                method = method.MakeGenericMethod(argumentType);
+            }
+
+            var parameters = method.GetParameters();
+
+            var argumentsWithInstance = new[] { expression }.Concat(arguments).ToArray();
+
+            return Expression.Call(method, argumentsWithInstance.Select((a, index) => ConvertIfNeeded(a, parameters[index].ParameterType)));
+        }
+
+        throw new InvalidOperationException($"No suitable method '{methodName}' found for type '{expression.Type}'");
+    }
+
+    private static Type? GetItemType(Type enumerableOrArray)
+    {
+        return enumerableOrArray.IsArray ? enumerableOrArray.GetElementType() : enumerableOrArray.GetGenericArguments()[0];
+    }
+
+    private Expression? ParseTerm(ParameterExpression parameter)
+    {
+        var token = Peek();
+
+        if (token.Type == TokenType.None)
+        {
+            return null;
+        }
+
+        if (token.Type == TokenType.OpenParen)
+        {
+            Advance(1);
+
+            if (TryParseCastExpression(parameter, out var expression))
+            {
+                return expression;
+            }
+
+            expression = ParseExpression(parameter);
+
+            Expect(TokenType.CloseParen);
+
+            return expression;
+        }
+
+        if (token.Type == TokenType.Identifier)
+        {
+            var matchingParameter = parameterStack.FirstOrDefault(p => p.Name == token.Value);
+            if (matchingParameter != null)
+            {
+                Advance(1);
+                return ParseMemberAccess(matchingParameter, parameter);
+            }
+
+            var type = GetWellKnownType(token.Value);
+
+            if (type != null)
+            {
+                Advance(1);
+                return ParseStaticMemberAccess(type, parameter);
+            }
+
+            if (Peek(1).Type == TokenType.OpenParen)
+            {
+                Advance(1);
+                return ParseInvocation(parameter, token.Value, parameter);
+            }
+
+            throw new InvalidOperationException($"Unexpected identifier: {token.Value}");
+        }
+
+        if (token.Type == TokenType.ExclamationMark)
+        {
+            Advance(1);
+
+            var operand = ParseTerm(parameter) ?? throw new InvalidOperationException($"Expected expression after ! at position {position}");
+
+            operand = ConvertIfNeeded(operand, typeof(bool));
+
+            return Expression.Not(operand);
+        }
+
+        if (token.Type == TokenType.Minus)
+        {
+            Advance(1);
+
+            var operand = ParseTerm(parameter) ?? throw new InvalidOperationException($"Expected expression after - at position {position}");
+
+            return Expression.Negate(operand);
+        }
+
+        if (token.Type == TokenType.Plus)
+        {
+            Advance(1);
+
+            var operand = ParseTerm(parameter) ?? throw new InvalidOperationException($"Expected expression after + at position {position}");
+
+            return operand;
+        }
+
+        switch (token.Type)
+        {
+            case TokenType.CharacterLiteral:
+            case TokenType.StringLiteral:
+            case TokenType.NullLiteral:
+            case TokenType.NumericLiteral:
+            case TokenType.TrueLiteral:
+            case TokenType.FalseLiteral:
+                Advance(1);
+                return token.ToConstantExpression();
+            case TokenType.New:
+                Advance(1);
+
+                token = Peek();
+
+                if (token.Type == TokenType.OpenBrace)
+                {
+                    Advance(1);
+
+                    var properties = new List<(string Name, Expression Expression)>();
+
+                    if (Peek().Type != TokenType.CloseBrace)
+                    {
+                        do
+                        {
+                            token = Peek();
+                            string propertyName;
+                            Expression propertyExpression;
+
+                            if (token.Type == TokenType.Identifier)
+                            {
+                                propertyName = token.Value;
+                                Advance(1);
+                                if (Peek().Type == TokenType.Dot || Peek().Type == TokenType.QuestionDot)
+                                {
+                                    // Handle nested property access
+                                    Expression expr = propertyName == parameter.Name ? (Expression)parameter : Expression.Property(parameter, propertyName);
+                                    propertyExpression = ParseMemberAccess(expr, parameter);
+
+                                    // Get the last identifier token's value
+                                    var lastToken = tokens[position - 1];
+                                    if (lastToken.Type == TokenType.Identifier)
+                                    {
+                                        propertyName = lastToken.Value;
+                                    }
+                                }
+                                else
+                                {
+                                    Expect(TokenType.Equals);
+                                    propertyExpression = ParseExpression(parameter);
+                                }
+                            }
+                            else
+                            {
+                                propertyExpression = ParseExpression(parameter);
+
+                                if (propertyExpression is MemberExpression memberExpression)
+                                {
+                                    propertyName = memberExpression.Member.Name;
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException($"Invalid anonymous type member expression at position {position}");
+                                }
+                            }
+
+                            properties.Add((propertyName, propertyExpression));
+
+                            if (Peek().Type == TokenType.Comma)
+                            {
+                                Advance(1);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        } while (Peek().Type != TokenType.CloseBrace);
+                    }
+
+                    Expect(TokenType.CloseBrace);
+
+                    var propertyTypes = properties.Select(p => p.Expression.Type).ToArray();
+                    var propertyNames = properties.Select(p => p.Name).ToArray();
+                    var dynamicType = DynamicTypeFactory.CreateType(parameter.Type.Name, propertyNames, propertyTypes);
+                    var bindings = properties.Select(p => Expression.Bind(dynamicType.GetProperty(p.Name)!, p.Expression));
+                    return Expression.MemberInit(Expression.New(dynamicType), bindings);
+                }
+                else
+                {
+                    Type? elementType = null;
+                    var nullable = false;
+
+                    if (token.Type == TokenType.Identifier)
+                    {
+                        var typeName = token.Value;
+                        elementType = GetWellKnownType(typeName);
+                        Advance(1);
+
+                        if (Peek().Type == TokenType.QuestionMark)
+                        {
+                            nullable = true;
+                            Advance(1);
+                        }
+                    }
+
+                    Expect(TokenType.OpenBracket);
+                    Expect(TokenType.CloseBracket);
+                    Expect(TokenType.OpenBrace);
+
+                    var elements = new List<Expression>();
+                    if (Peek().Type != TokenType.CloseBrace)
+                    {
+                        do
+                        {
+                            elements.Add(ParseExpression(parameter));
+                            if (Peek().Type == TokenType.Comma)
+                            {
+                                Advance(1);
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        } while (Peek().Type != TokenType.CloseBrace);
+                    }
+
+                    Expect(TokenType.CloseBrace);
+
+                    if (elementType == null)
+                    {
+                        elementType = elements.Count > 0 ? elements[0].Type : typeof(object);
+                    }
+
+                    if (nullable)
+                    {
+                        elementType = typeof(Nullable<>).MakeGenericType(elementType);
+                    }
+
+                    return Expression.NewArrayInit(elementType, elements.Select(e => ConvertIfNeeded(e, elementType)));
+                }
+            default:
+                throw new InvalidOperationException($"Unexpected token: {token.Type} at position {position}");
+        }
+    }
+
+    private bool TryParseCastExpression(ParameterExpression parameter, out Expression expression)
+    {
+        expression = null!;
+
+        var token = Peek();
+
+        if (token.Type != TokenType.Identifier)
+        {
+            return false;
+        }
+
+        var typeName = new StringBuilder(token.Value);
+        var index = position + 1;
+        var typeCast = true;
+        var nullable = false;
+
+        while (index < tokens.Count)
+        {
+            token = tokens[index];
+
+            if (token.Type == TokenType.Dot)
+            {
+                index++;
+                if (index >= tokens.Count || tokens[index].Type != TokenType.Identifier)
+                {
+                    typeCast = false;
+                    break;
+                }
+                typeName.Append('.').Append(tokens[index].Value);
+                index++;
+            }
+            else if (token.Type == TokenType.QuestionMark)
+            {
+                nullable = true;
+                index++;
+                if (index >= tokens.Count || tokens[index].Type != TokenType.CloseParen)
+                {
+                    typeCast = false;
+                    break;
+                }
+            }
+            else if (token.Type == TokenType.CloseParen)
+            {
+                break;
+            }
+            else
+            {
+                typeCast = false;
+                break;
+            }
+        }
+
+        if (typeCast && index < tokens.Count && tokens[index].Type == TokenType.CloseParen)
+        {
+            var name = typeName.ToString();
+
+            var type = GetWellKnownType(name) ?? typeResolver?.Invoke(name) ?? throw new InvalidOperationException($"Could not resolve type: {typeName}");
+
+            if (nullable && type.IsValueType)
+            {
+                type = typeof(Nullable<>).MakeGenericType(type);
+            }
+
+            position = index;
+
+            Advance(1);
+
+            if (Peek().Type == TokenType.OpenParen && TryParseCastExpression(parameter, out var innerExpression))
+            {
+                expression = Expression.Convert(innerExpression, type);
+            }
+            else
+            {
+                var source = ParseTerm(parameter) ?? throw new InvalidOperationException($"Expected expression to cast at position {position}");
+                expression = Expression.Convert(source, type);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private Expression ParseStaticMemberAccess(Type type, ParameterExpression parameter)
+    {
+        Expect(TokenType.Dot);
+
+        var token = Expect(TokenType.Identifier);
+
+        if (Peek().Type == TokenType.OpenParen)
+        {
+            return ParseStaticInvocation(type, token.Value, parameter);
+        }
+        else
+        {
+            var member = (MemberInfo?)type.GetProperty(token.Value) ?? type.GetField(token.Value);
+
+            if (member == null)
+            {
+                throw new InvalidOperationException($"Member {token.Value} not found on type {type.Name}");
+            }
+
+            return Expression.MakeMemberAccess(null, member);
+        }
+
+        throw new InvalidOperationException($"Expected method invocation after {token.Value} at position {position}");
+    }
+
+    private Expression ParseStaticInvocation(Type type, string methodName, ParameterExpression parameter)
+    {
+        Advance(1);
+
+        var arguments = new List<Expression>();
+
+        if (Peek().Type != TokenType.CloseParen)
+        {
+            arguments.Add(ParseExpression(parameter));
+
+            while (Peek().Type == TokenType.Comma)
+            {
+                Advance(1);
+                arguments.Add(ParseExpression(parameter));
+            }
+        }
+
+        Expect(TokenType.CloseParen);
+
+        var method = type.GetMethod(methodName, [.. arguments.Select(a => a.Type)]) ?? throw new InvalidOperationException($"Method {methodName} not found on type {type.Name}");
+
+        return Expression.Call(null, method, arguments);
+    }
+
+    private static Type? GetWellKnownType(string typeName)
+    {
+        return typeName switch
+        {
+            nameof(DateTime) => typeof(DateTime),
+            nameof(DateOnly) => typeof(DateOnly),
+            nameof(TimeOnly) => typeof(TimeOnly),
+            nameof(DateTimeOffset) => typeof(DateTimeOffset),
+            nameof(Guid) => typeof(Guid),
+            nameof(CultureInfo) => typeof(CultureInfo),
+            nameof(Double) or "double" => typeof(double),
+            nameof(Single) or "float" => typeof(float),
+            nameof(Int32) or "int" => typeof(int),
+            nameof(Int64) or "long" => typeof(long),
+            nameof(Int16) or "short" => typeof(short),
+            nameof(Byte) or "byte" => typeof(byte),
+            nameof(SByte) or "sbyte" => typeof(sbyte),
+            nameof(UInt32) or "uint" => typeof(uint),
+            nameof(UInt64) or "ulong" => typeof(ulong),
+            nameof(UInt16) or "ushort" => typeof(ushort),
+            nameof(Boolean) or "bool" => typeof(bool),
+            nameof(Char) or "char" => typeof(char),
+            nameof(Decimal) or "decimal" => typeof(decimal),
+            nameof(String) or "string" => typeof(string),
+            nameof(Math) => typeof(Math),
+            nameof(Convert) => typeof(Convert),
+            _ => null
+        };
+    }
+
+    private Expression ParseOr(ParameterExpression parameter)
+    {
+        var left = ParseAnd(parameter);
+
+        var token = Peek();
+        while (token.Type == TokenType.BarBar)
+        {
+            Advance(1);
+            var right = ParseAnd(parameter) ?? throw new InvalidOperationException($"Expected expression after || at position {position}");
+            left = Expression.OrElse(left, right);
+            token = Peek();
+        }
+
+        return left;
+    }
+
+    private Expression ParseAnd(ParameterExpression parameter)
+    {
+        var left = ParseComparison(parameter);
+
+        var token = Peek();
+        while (token.Type == TokenType.AmpersandAmpersand)
+        {
+            Advance(1);
+            var right = ParseComparison(parameter) ?? throw new InvalidOperationException($"Expected expression after && at position {position}");
+            left = Expression.AndAlso(left, right);
+            token = Peek();
+        }
+
+        return left;
+    }
+
+    private Expression ParseComparison(ParameterExpression parameter)
+    {
+        var left = ParseShift(parameter);
+
+        var token = Peek();
+        if (token.Type is TokenType.EqualsEquals or TokenType.NotEquals or TokenType.GreaterThan or TokenType.LessThan or TokenType.LessThanOrEqual or TokenType.GreaterThanOrEqual)
+        {
+            Advance(1);
+            var right = ParseShift(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
+        }
+
+        return ParseBinaryAnd(left, parameter);
+    }
+
+    private Expression ParseBinaryAnd(Expression left, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type == TokenType.Ampersand)
+        {
+            Advance(1);
+            var right = ParseShift(parameter) ?? throw new InvalidOperationException($"Expected expression after & at position {position}");
+            left = Expression.MakeBinary(ExpressionType.And, left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
+        return ParseBinaryXor(left, parameter);
+    }
+
+    private Expression ParseBinaryXor(Expression left, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type == TokenType.Caret)
+        {
+            Advance(1);
+            var right = ParseBinaryAnd(ParseShift(parameter), parameter) ?? throw new InvalidOperationException($"Expected expression after ^ at position {position}");
+            left = Expression.MakeBinary(ExpressionType.ExclusiveOr, left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
+        return ParseBinaryOr(left, parameter);
+    }
+
+    private Expression ParseBinaryOr(Expression left, ParameterExpression parameter)
+    {
+        var token = Peek();
+        while (token.Type == TokenType.Bar)
+        {
+            Advance(1);
+            var right = ParseBinaryXor(ParseShift(parameter), parameter) ?? throw new InvalidOperationException($"Expected expression after | at position {position}");
+            left = Expression.MakeBinary(ExpressionType.Or, left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
+        return left;
+    }
+
+    private Expression ParseShift(ParameterExpression parameter)
+    {
+        var left = ParseAdditive(parameter);
+
+        var token = Peek();
+        while (token.Type is TokenType.LessThanLessThan or TokenType.GreaterThanGreaterThan)
+        {
+            Advance(1);
+            var right = ParseAdditive(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
+        return left;
+    }
+
+    private Expression ParseAdditive(ParameterExpression parameter)
+    {
+        var left = ParseMultiplicative(parameter);
+
+        var token = Peek();
+        while (token.Type is TokenType.Plus or TokenType.Minus)
+        {
+            Advance(1);
+            var right = ParseMultiplicative(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+
+            if (token.Type == TokenType.Plus && left.Type == typeof(string))
+            {
+                left = Expression.Call(null, typeof(string).GetMethod(nameof(string.Concat), [typeof(string), typeof(string)])!, left, ConvertIfNeeded(right, typeof(string)));
+            }
+            else
+            {
+                left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
+            }
+
+            token = Peek();
+        }
+
+        return left;
+    }
+
+    private Expression ParseMultiplicative(ParameterExpression parameter)
+    {
+        var left = ParseTerm(parameter) ?? throw new InvalidOperationException($"Expected expression at position {position}");
+
+        var token = Peek();
+        while (token.Type is TokenType.Star or TokenType.Slash)
+        {
+            Advance(1);
+            var right = ParseTerm(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
+            token = Peek();
+        }
+
+        return left;
     }
 
     private static Expression ConvertIfNeeded(Expression expression, Type targetType)
@@ -269,280 +908,5 @@ class ExpressionSyntaxVisitor : CSharpSyntaxVisitor<Expression>
         }
 
         return expression;
-    }
-
-    public override Expression VisitInvocationExpression(InvocationExpressionSyntax node)
-    {
-        if (node.Expression is MemberAccessExpressionSyntax methodCall)
-        {
-            var instance = Visit(methodCall.Expression);
-            var arguments = node.ArgumentList.Arguments.Select(a => VisitArgument(instance, a)).ToArray();
-            var argumentTypes = arguments.Select(a => a.Type).ToArray();
-
-            if (instance is ConstantExpression constant && constant.Value is Type type)
-            {
-                return CallStaticMethod(type, methodCall.Name.Identifier.Text, arguments, argumentTypes);
-            }
-
-            var instanceType = instance.Type;
-            var methodInfo = instanceType.GetMethod(methodCall.Name.Identifier.Text, BindingFlags.Public | BindingFlags.Instance | BindingFlags.Static, argumentTypes);
-
-            if (methodInfo == null)
-            {
-                methodInfo = typeof(Enumerable)
-                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    .FirstOrDefault(m => m.Name == methodCall.Name.Identifier.Text && m.GetParameters().Length == arguments.Length + 1);
-
-                if (methodInfo != null)
-                {
-                    var argumentType = GetItemType(instanceType);
-                    var genericMethod = methodInfo.MakeGenericMethod(argumentType);
-                    var parameters = genericMethod.GetParameters();
-                    var argumentsWithInstance = new[] { instance }.Concat(arguments).ToArray();
-
-                    if (parameters.Length != argumentsWithInstance.Length)
-                    {
-                        throw new NotSupportedException("Unsupported method call: " + methodCall.Name.Identifier.Text);
-                    }
-                    
-                    return Expression.Call(genericMethod, argumentsWithInstance.Select((a, index) => ConvertIfNeeded(a, parameters[index].ParameterType)));
-                }
-            }
-
-            if (methodInfo == null)
-            {
-                throw new NotSupportedException("Unsupported method call: " + methodCall.Name.Identifier.Text);
-            }
-
-            return Expression.Call(instance, methodInfo, arguments);
-        }
-
-        throw new NotSupportedException("Unsupported invocation expression: " + node.ToString());
-    }
-
-    private static Type GetItemType(Type enumerableOrArray)
-    {
-        return enumerableOrArray.IsArray ? enumerableOrArray.GetElementType() : enumerableOrArray.GetGenericArguments()[0];
-    }
-
-
-    private static object ParseLiteral(LiteralExpressionSyntax literal)
-    {
-        return literal.Kind() switch
-        {
-            SyntaxKind.StringLiteralExpression => literal.Token.ValueText,
-            SyntaxKind.NumericLiteralExpression => literal.Token.Value,
-            SyntaxKind.TrueLiteralExpression => true,
-            SyntaxKind.FalseLiteralExpression => false,
-            SyntaxKind.NullLiteralExpression => null,
-            _ => throw new NotSupportedException("Unsupported literal: " + literal),
-        };
-    }
-
-    private static ExpressionType ParseBinaryOperator(SyntaxToken token)
-    {
-        return token.Kind() switch
-        {
-            SyntaxKind.EqualsEqualsToken => ExpressionType.Equal,
-            SyntaxKind.LessThanToken => ExpressionType.LessThan,
-            SyntaxKind.GreaterThanToken => ExpressionType.GreaterThan,
-            SyntaxKind.LessThanEqualsToken => ExpressionType.LessThanOrEqual,
-            SyntaxKind.GreaterThanEqualsToken => ExpressionType.GreaterThanOrEqual,
-            SyntaxKind.ExclamationEqualsToken => ExpressionType.NotEqual,
-            SyntaxKind.AmpersandAmpersandToken => ExpressionType.AndAlso,
-            SyntaxKind.BarBarToken => ExpressionType.OrElse,
-            SyntaxKind.QuestionQuestionToken => ExpressionType.Coalesce,
-            _ => throw new NotSupportedException("Unsupported operator: " + token.Text),
-        };
-    }
-
-    private static string GetPropertyNameFromInitializer(AnonymousObjectMemberDeclaratorSyntax initializer)
-    {
-        if (initializer.NameEquals != null)
-        {
-            return initializer.NameEquals.Name.Identifier.Text;
-        }
-
-        var expression = initializer.Expression;
-
-        if (expression is MemberAccessExpressionSyntax memberAccess)
-        {
-            expression = memberAccess.Name;
-        }
-
-        while (expression is ConditionalAccessExpressionSyntax conditionalAccess)
-        {
-            expression = conditionalAccess.WhenNotNull;
-        }
-
-        if (expression is MemberBindingExpressionSyntax memberBinding)
-        {
-            expression = memberBinding.Name;
-        }
-
-        if (expression is IdentifierNameSyntax identifier)
-        {
-            return identifier.Identifier.Text;
-        }
-
-        throw new NotSupportedException("Unsupported initializer: " + initializer.ToString());
-    }
-
-    public override Expression VisitAnonymousObjectCreationExpression(AnonymousObjectCreationExpressionSyntax node)
-    {
-        var properties = node.Initializers.Select(init =>
-        {
-            var name = GetPropertyNameFromInitializer(init);
-            var value = Visit(init.Expression);
-            return new { Name = name, Value = value };
-        }).ToList();
-
-        var propertyNames = properties.Select(p => p.Name).ToArray();
-        var propertyTypes = properties.Select(p => p.Value.Type).ToArray();
-        var dynamicType = DynamicTypeFactory.CreateType(parameter.Type.Name, propertyNames, propertyTypes);
-
-        var bindings = properties.Select(p => Expression.Bind(dynamicType.GetProperty(p.Name), p.Value));
-        return Expression.MemberInit(Expression.New(dynamicType), bindings);
-    }
-
-    private Expression instance;
-
-    public override Expression VisitConditionalAccessExpression(ConditionalAccessExpressionSyntax node)
-    {
-        var expression = Visit(node.Expression);
-
-        instance = expression;
-
-        var whenNotNull = Visit(node.WhenNotNull);
-
-        instance = null;
-
-        if (expression.Type.IsValueType && Nullable.GetUnderlyingType(expression.Type) == null)
-        {
-            throw new NotSupportedException("Conditional access is not supported on non-nullable value types: " + expression.Type);
-        }
-
-        if (!expression.Type.IsValueType || Nullable.GetUnderlyingType(expression.Type) != null)
-        {
-            return Expression.Condition(Expression.NotEqual(expression, Expression.Constant(null, expression.Type)),
-                whenNotNull, Expression.Default(whenNotNull.Type)
-            );
-        }
-
-        return whenNotNull;
-    }
-
-    public override Expression VisitMemberBindingExpression(MemberBindingExpressionSyntax node)
-    {
-        if (instance is Expression expression)
-        {
-            return Expression.PropertyOrField(expression, node.Name.Identifier.Text);
-        }
-
-        throw new NotSupportedException("Unsupported member binding: " + node.ToString());
-    }
-
-    public override Expression VisitElementAccessExpression(ElementAccessExpressionSyntax node)
-    {
-        var expression = Visit(node.Expression);
-        var arguments = node.ArgumentList.Arguments.Select(arg => Visit(arg.Expression)).ToArray();
-
-        if (expression.Type.IsArray)
-        {
-            return Expression.ArrayIndex(expression, arguments);
-        }
-
-        var indexer = expression.Type.GetProperties()
-            .FirstOrDefault(p => p.GetIndexParameters().Length == arguments.Length);
-
-        if (indexer != null)
-        {
-            return Expression.MakeIndex(expression, indexer, arguments);
-        }
-
-        throw new NotSupportedException("Unsupported element access: " + node.ToString());
-    }
-
-    public override Expression VisitPrefixUnaryExpression(PrefixUnaryExpressionSyntax node)
-    {
-        var operand = Visit(node.Operand);
-
-        return node.OperatorToken.Kind() switch
-        {
-            SyntaxKind.MinusToken => Expression.Negate(operand),
-            SyntaxKind.ExclamationToken => Expression.Not(operand),
-            _ => throw new NotSupportedException("Unsupported unary operator: " + node.OperatorToken.Text),
-        };
-    }
-}
-
-/// <summary>
-/// Parse lambda expressions from strings.
-/// </summary>
-public static class ExpressionParser
-{
-    /// <summary>
-    /// Parses a lambda expression that returns a boolean value.
-    /// </summary>
-    public static Expression<Func<T, bool>> ParsePredicate<T>(string expression, Func<string, Type> typeLocator = null)
-    {
-        return ParseLambda<T, bool>(expression, typeLocator);
-    }
-
-    /// <summary>
-    /// Parses a lambda expression that returns a typed result.
-    /// </summary>
-    public static Expression<Func<T, TResult>> ParseLambda<T, TResult>(string expression, Func<string, Type> typeLocator = null)
-    {
-        var (parameter, body) = Parse<T>(expression, typeLocator);
-
-        return Expression.Lambda<Func<T, TResult>>(body, parameter);
-    }
-
-
-    private static (ParameterExpression, Expression) Parse<T>(string expression, Func<string, Type> typeLocator)
-    {
-        var syntaxTree = CSharpSyntaxTree.ParseText(expression);
-        var root = syntaxTree.GetRoot();
-        var lambdaExpression = root.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().FirstOrDefault();
-        if (lambdaExpression == null)
-        {
-            throw new ArgumentException("Invalid lambda expression.");
-        }
-        var parameter = Expression.Parameter(typeof(T), lambdaExpression.Parameter.Identifier.Text);
-        var visitor = new ExpressionSyntaxVisitor(parameter, typeLocator);
-        var body = visitor.Visit(lambdaExpression.Body);
-        return (parameter, body);
-    }
-
-    /// <summary>
-    /// Parses a lambda expression that returns untyped result.
-    /// </summary>
-    public static LambdaExpression ParseLambda<T>(string expression, Func<string, Type> typeLocator = null)
-    {
-        var (parameter, body) = Parse<T>(expression, typeLocator);
-
-        return Expression.Lambda(body, parameter);
-    }
-
-    /// <summary>
-    /// Parses a lambda expression that returns untyped result.
-    /// </summary>
-    public static LambdaExpression ParseLambda(string expression, Type type, Func<string, Type> typeLocator = null)
-    {
-        var syntaxTree = CSharpSyntaxTree.ParseText(expression);
-        var root = syntaxTree.GetRoot();
-        var lambdaExpression = root.DescendantNodes().OfType<SimpleLambdaExpressionSyntax>().FirstOrDefault();
-
-        if (lambdaExpression == null)
-        {
-            throw new ArgumentException("Invalid lambda expression.");
-        }
-
-        var parameter = Expression.Parameter(type, lambdaExpression.Parameter.Identifier.Text);
-        var visitor = new ExpressionSyntaxVisitor(parameter, typeLocator);
-        var body = visitor.Visit(lambdaExpression.Body);
-
-        return Expression.Lambda(body, parameter);
     }
 }

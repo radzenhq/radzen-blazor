@@ -1,0 +1,25 @@
+@keyframes rz-open {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rz-close {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.rz-open {
+  animation: var(--rz-expander-transition) rz-open;
+}
+
+.rz-close {
+  animation: var(--rz-expander-transition) rz-close;
+}

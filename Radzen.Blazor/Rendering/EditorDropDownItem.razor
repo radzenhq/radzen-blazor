@@ -37,16 +37,7 @@
         }
     }
 
-    string Class
-    {
-        get
-        {
-            var classList = new List<string>() { "rz-html-editor-dropdown-item" };
-            if (DropDown.Value == Value)
-            {
-                classList.Add("rz-selected");
-            }
-            return string.Join(" ", classList);
-        }
-    }
+    string Class => ClassList.Create("rz-html-editor-dropdown-item")
+        .Add("rz-selected", DropDown.Value == Value)
+        .ToString();
 }

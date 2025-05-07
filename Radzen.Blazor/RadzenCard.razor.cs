@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using System;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -12,14 +9,9 @@ namespace Radzen.Blazor
     public partial class RadzenCard : RadzenComponentWithChildren
     {
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var classList = new List<string>();
-            classList.Add("rz-card");
-            classList.Add($"rz-variant-{Variant.ToString().ToLowerInvariant()}");
-
-            return string.Join(" ", classList);
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-card")
+                                                                     .AddVariant(Variant)
+                                                                     .ToString();
 
         /// <summary>
         /// Gets or sets the card variant.

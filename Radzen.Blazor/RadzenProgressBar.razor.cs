@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using System;
-using System.Collections.Generic;
 
 namespace Radzen.Blazor
 {
@@ -15,28 +15,11 @@ namespace Radzen.Blazor
     public partial class RadzenProgressBar
     {
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var classList = new List<string>()
-            {
-                "rz-progressbar"
-            };
-
-            switch (Mode)
-            {
-                case ProgressBarMode.Determinate:
-                    classList.Add("rz-progressbar-determinate");
-                    break;
-                case ProgressBarMode.Indeterminate:
-                    classList.Add("rz-progressbar-indeterminate");
-                    break;
-            }
-            
-            classList.Add($"rz-progressbar-{ProgressBarStyle.ToString().ToLowerInvariant()}");
-
-            return string.Join(" ", classList);
-        }
-
+        protected override string GetComponentCssClass() => ClassList.Create("rz-progressbar")
+                                                                      .Add("rz-progressbar-determinate", Mode == ProgressBarMode.Determinate)
+                                                                      .Add("rz-progressbar-indeterminate", Mode == ProgressBarMode.Indeterminate)
+                                                                      .Add($"rz-progressbar-{ProgressBarStyle.ToString().ToLowerInvariant()}")
+                                                                      .ToString();
         /// <summary>
         /// Gets or sets the template.
         /// </summary>

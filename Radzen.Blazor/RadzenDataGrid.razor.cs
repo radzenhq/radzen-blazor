@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -3303,32 +3304,12 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var additionalClasses = new List<string>();
-
-            if (CurrentStyle.ContainsKey("height"))
-            {
-                additionalClasses.Add("rz-has-height");
-            }
-
-            if (RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple)
-            {
-                additionalClasses.Add("rz-selectable");
-            }
-
-            if (Responsive)
-            {
-                additionalClasses.Add("rz-datatable-reflow");
-            }
-
-            if (Density == Density.Compact)
-            {
-                additionalClasses.Add("rz-density-compact");
-            }
-
-            return $"rz-has-pager rz-datatable  rz-datatable-scrollable {String.Join(" ", additionalClasses)}";
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-has-pager rz-datatable rz-datatable-scrollable")
+            .Add("rz-has-height", CurrentStyle.ContainsKey("height"))
+            .Add("rz-datatable-reflow", Responsive)
+            .Add("rz-density-compact", Density == Density.Compact)
+            .Add("rz-selectable", RowSelect.HasDelegate || ValueChanged.HasDelegate || SelectionMode == DataGridSelectionMode.Multiple)
+            .ToString();
 
         internal string getHeaderStyle()
         {
@@ -3364,7 +3345,7 @@ namespace Radzen.Blazor
             {
                 foreach (var column in allColumns.ToList().Where(c => c.GetVisible()))
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
+                    JSRuntime.InvokeVoid("Radzen.destroyPopup", $"{PopupID}{column.GetFilterProperty()}");
                 }
             }
         }

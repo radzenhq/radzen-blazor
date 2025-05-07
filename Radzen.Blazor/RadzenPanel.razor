@@ -1,4 +1,5 @@
-﻿@inherits RadzenComponentWithChildren
+﻿@using Radzen.Blazor.Rendering
+@inherits RadzenComponentWithChildren
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
@@ -27,7 +28,7 @@
                 </a>
             }
         </div>
-        <div class="rz-panel-content-wrapper" role="region" aria-hidden="false" style="@contentStyle">
+        <Expander Expanded=@(!collapsed) CssClass="rz-panel-content-wrapper">
             <div class="rz-panel-content">
                 @ChildContent
             </div>
@@ -37,14 +38,14 @@
                     @FooterTemplate
                 </div>
             }
-        </div>
+        </Expander>
         @if (SummaryTemplate != null)
         {
-            <div class="rz-panel-content-wrapper" role="region" aria-hidden="false" style="@summaryContentStyle">
+            <Expander Expanded=@collapsed>
                 <div class="rz-panel-content rz-panel-content-summary">
                     @SummaryTemplate
                 </div>
-            </div>
+            </Expander>
         }
     </div>
 }

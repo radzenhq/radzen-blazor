@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -18,26 +19,11 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenPager : RadzenComponent
     {
-        static readonly IDictionary<HorizontalAlign, string> HorizontalAlignCssClasses = new Dictionary<HorizontalAlign, string>
-        {
-            {HorizontalAlign.Center, "rz-align-center"},
-            {HorizontalAlign.Left, "rz-align-left"},
-            {HorizontalAlign.Right, "rz-align-right"},
-            {HorizontalAlign.Justify, "rz-align-justify"}
-        };
-
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var additionalClasses = new List<string>();
-
-            if (Density == Density.Compact)
-            {
-                additionalClasses.Add("rz-density-compact");
-            }
-
-            return $"rz-pager rz-unselectable-text rz-helper-clearfix {HorizontalAlignCssClasses[HorizontalAlign]} {String.Join(" ", additionalClasses)}";
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-pager rz-unselectable-text rz-helper-clearfix")
+                                                                     .Add("rz-density-compact", Density == Density.Compact)
+                                                                     .AddHorizontalAlign(HorizontalAlign)
+                                                                     .ToString();
 
         /// <summary>
         /// Gets or sets the pager's first page button's title attribute.
@@ -550,7 +536,7 @@ namespace Radzen.Blazor
 
         bool shouldFocus;
 
-        void OnFocus(FocusEventArgs args)
+        void OnFocus()
         {
             focusedIndex = focusedIndex == -3 ? 0 : focusedIndex;
 

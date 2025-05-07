@@ -9,7 +9,7 @@
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-fileupload-buttonbar">
-        <span class="@ChooseClassList" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
+        <span class=@ChooseClass tabindex="@(Disabled ? "-1" : $"{TabIndex}")" onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
             <input id="@(Name ?? GetId())" @attributes="InputAttributes" tabindex="-1" disabled="@Disabled" @ref="@fileUpload" name="@Name" type="file" accept="@Accept" onkeydown="event.stopPropagation()"
                 onchange="Radzen.uploadInputChange(event, null, false, false, true)" />
             <span class="rz-button-text">@ChooseText</span>
@@ -43,7 +43,7 @@
                             }
                         </div>
                         <div>
-                            <button disabled="@Disabled" type="button" class="@ButtonClassList" @onclick="@Remove" title="@DeleteText" tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
+                            <button disabled="@Disabled" type="button" class=@ButtonClass @onclick="@Remove" title="@DeleteText" tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
                                 <span class="rz-button-icon-left rz-icon-trash" style="display:block"></span>
                             </button>
                         </div>

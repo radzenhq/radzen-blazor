@@ -1,0 +1,18 @@
+$rz-expander-transition: .2s ease-in-out !default;
+
+.rz-expander {
+    display: grid;
+    transition: grid-template-rows var(--rz-expander-transition);
+
+    .rz-expander-content {
+        overflow: hidden;
+    }
+
+    &.rz-state-expanded {
+        grid-template-rows: 1fr;
+    }
+
+    &.rz-state-collapsed {
+        grid-template-rows: 0fr;
+    }
+}

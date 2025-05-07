@@ -432,7 +432,7 @@ namespace Radzen.Blazor
 
             if (Visible && IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyEditor", ContentEditable);
+                JSRuntime.InvokeVoid("Radzen.destroyEditor", ContentEditable);
             }
         }
 

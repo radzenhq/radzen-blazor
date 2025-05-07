@@ -1,0 +1,52 @@
+@inject ExampleService ExampleService
+
+<div style="padding: 1rem">
+    <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
+</div>
+<div style="flex: 1; overflow: auto">
+    <RadzenPanelMenu Match="NavLinkMatch.Prefix">
+        @foreach (var category in examples)
+        {
+            @if (category.Children != null)
+            {
+            <NavigationItem @key=category Example=@category>
+            @foreach (var example in category.Children)
+            {
+                if (example.Children != null)
+                {
+                    <NavigationItem @key=example Example=@example>
+                    @foreach (var child in example.Children)
+                    {
+                        <NavigationItem @key=child Example=@child />
+                    }
+                    </NavigationItem>
+                }
+                else
+                {
+                    <NavigationItem @key=example Example=@example />
+                }
+            }
+            </NavigationItem>
+            }
+            else
+            {
+                <NavigationItem @key=category Example=@category />
+            }
+        }
+    </RadzenPanelMenu>
+</div>
+@code {
+    IEnumerable<Example> examples;
+
+    protected override void OnInitialized()
+    {
+        examples = ExampleService.Examples;
+    }
+
+    void FilterPanelMenu(ChangeEventArgs args)
+    {
+        var term = args.Value.ToString();
+
+        examples = string.IsNullOrEmpty(term) ? ExampleService.Examples : ExampleService.Filter(term);
+    }
+}

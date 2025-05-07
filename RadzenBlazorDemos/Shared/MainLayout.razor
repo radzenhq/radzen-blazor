@@ -120,37 +120,7 @@
     </ChildContent>
 </RadzenBody>
 <RadzenSidebar @ref="sidebar0" @bind-Expanded="@sidebarExpanded" class="demos-sidebar" style="display: flex; flex-direction: column">
-    <div style="padding: 1rem">
-        <RadzenTextBox id="find" Placeholder="Find component ..." type="search" @oninput="@FilterPanelMenu" style="width: 100%" class="rz-search-input" aria-label="find" />
-    </div>
-    <div style="flex: 1; overflow: auto">
-    <RadzenPanelMenu Match="NavLinkMatch.Prefix">
-        @foreach (var category in examples)
-        {
-            <NavigationItem @key=category @bind-Expanded=@category.Expanded Example=@category>
-                @if (category.Children != null)
-                {
-                    @foreach (var example in category.Children)
-                    {
-                        if (example.Children != null)
-                        {
-                            <NavigationItem @key=example @bind-Expanded=@example.Expanded Example=@example>
-                            @foreach (var child in example.Children)
-                            {
-                                <NavigationItem @key=child @bind-Expanded=@child.Expanded Example=@child />
-                            }
-                            </NavigationItem>
-                        }
-                        else
-                        {
-                            <NavigationItem @key=example @bind-Expanded=@example.Expanded Example=@example />
-                        }
-                    }
-                }
-            </NavigationItem>
-        }
-    </RadzenPanelMenu>
-    </div>
+    <PanelMenu />
 </RadzenSidebar>
 <RadzenSidebar Responsive="false" @bind-Expanded="@configSidebarExpanded" class="rz-sidebar-second" Style="--rz-sidebar-width: 370px; grid-area: rz-config-sidebar; background-color: var(--rz-body-background-color); color: var(--rz-text-color);">
     <RadzenStack class="rz-p-4" Gap="0">
@@ -216,14 +186,10 @@
     bool configSidebarExpanded = false;
     bool rendered;
 
-    IEnumerable<Example> examples;
-
     Example example;
 
     protected override void OnInitialized()
     {
-        examples = ExampleService.Examples;
-
         UriHelper.LocationChanged += OnLocationChanged;
 
         example = ExampleService.FindCurrent(new Uri(UriHelper.Uri));
@@ -249,13 +215,6 @@
         {
             rendered = true;
         }
-    }
-
-    void FilterPanelMenu(ChangeEventArgs args)
-    {
-        var term = args.Value.ToString();
-
-        examples = string.IsNullOrEmpty(term) ? ExampleService.Examples : ExampleService.Filter(term);
     }
 
     void ChangeTheme(object value)

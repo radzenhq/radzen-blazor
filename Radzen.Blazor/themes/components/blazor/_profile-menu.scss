@@ -47,6 +47,16 @@ ul.rz-profile-menu {
 
   .rz-navigation-item-icon-children {
     color: var(--rz-profile-menu-toggle-button-color);
+
+    &.rz-state-expanded {
+      transform: rotate(180deg);
+      transition: transform var(--rz-expander-transition);
+    }
+
+    &.rz-state-collapsed {
+      transform: rotate(0);
+      transition: transform var(--rz-expander-transition);
+    }
   }
 
   .rz-navigation-menu {

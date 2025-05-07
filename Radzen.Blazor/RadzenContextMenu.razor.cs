@@ -174,7 +174,7 @@ namespace Radzen.Blazor
 
         void OnNavigate()
         {
-            JSRuntime.InvokeVoidAsync("Radzen.closePopup", UniqueID);
+            JSRuntime.InvokeVoid("Radzen.closePopup", UniqueID);
         }
     }
 }

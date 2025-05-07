@@ -1,12 +1,80 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 
 namespace Radzen.Blazor
 {
+    static class ClassListExtensions
+    {
+        private static int GetSize(string name, int value)
+        {
+            if (value < 0 || value > 12)
+            {
+                throw new ArgumentOutOfRangeException($"Property {name} value should be between 0 and 12.");
+            }
+
+            return value;
+        }
+
+        private static string GetOrder(string name, string value)
+        {
+            if (int.TryParse(value, out int result))
+            {
+                if (result >= 0 && result <= 12)
+                {
+                    return value;
+                }
+            }
+
+            if (value == "first" || value == "last")
+            {
+                return value;
+            }
+
+            throw new ArgumentOutOfRangeException($"Property {name} value should be between 0 and 12 or first/last.");
+        }
+
+        public static ClassList AddSize(this ClassList classList, string prefix, string name, string size, int? value)
+        {
+            if (value.HasValue)
+            {
+                classList.Add($"rz-{prefix}-{size}-{GetSize(name, value.Value)}");
+            }
+
+            return classList;
+        }
+
+        public static ClassList AddSize(this ClassList classList, string prefix, string name, int? value)
+        {
+            if (value.HasValue)
+            {
+                classList.Add($"rz-{prefix}-{GetSize(name, value.Value)}");
+            }
+
+            return classList;
+        }
+
+        public static ClassList AddOrder(this ClassList classList, string prefix, string name, string size, string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                classList.Add($"rz-{prefix}-{size}-{GetOrder(name, value)}");
+            }
+
+            return classList;
+        }
+
+        public static ClassList AddOrder(this ClassList classList, string prefix, string name, string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                classList.Add($"rz-{prefix}-{GetOrder(name, value)}");
+            }
+
+            return classList;
+        }
+    }
+
     /// <summary>
     /// RadzenColumn component.
     /// </summary>
@@ -181,65 +249,29 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var list = new List<string>
-            {
-                Size != null ? $"rz-col-{GetColumnValue("Size", Size)}" : "rz-col"
-            };
-
-            if (Offset != null)
-            {
-                list.Add($"rz-offset-{GetColumnValue("Offset", Offset)}");
-            }
-
-            if (!string.IsNullOrEmpty(Order))
-            {
-                list.Add($"rz-order-{GetOrderValue("Order", Order)}");
-            }
-
-            var breakPoints = new string[] { "xs", "sm", "md", "lg", "xl", "xx" };
-
-            var properties = GetType().GetProperties()
-                .Where(p => breakPoints.Any(bp => p.Name.ToLower().EndsWith(bp)))
-                .Select(p => new { p.Name, BreakPoint = string.Concat(p.Name.ToLower().TakeLast(2)), Value = p.GetValue(this) });
-
-            foreach (var p in properties) 
-            {
-                if (p.Value != null)
-                {
-                    list.Add($"rz-{(!p.Name.StartsWith("Size") ? p.Name.ToLower().Replace(p.BreakPoint, "") + "-" : "col-")}{p.BreakPoint}-{GetColumnValue(p.Name, p.Value)}");
-                }
-            }
-
-            return string.Join(" ", list);
-        }
-
-        string GetColumnValue(string name, object value)
-        {
-            if (name.StartsWith("Order"))
-            {
-                return GetOrderValue(name, value.ToString());
-            }
-
-            if ((int)value < 0 || (int)value > 12)
-            {
-                throw new Exception($"Property {name} value should be between 0 and 12.");
-            }
-
-            return $"{value}";
-        }
-
-        string GetOrderValue(string name, string value)
-        {
-            var orders = Enumerable.Range(0, 12).Select(i => $"{i}").ToArray().Concat(new string[] { "first", "last" }); 
-
-            if (!orders.Contains(value))
-            {
-                throw new Exception($"Property {name} value should be between 0 and 12 or first/last.");
-            }
-
-            return value;
-        }
+        protected override string GetComponentCssClass() => ClassList.Create()
+                .Add("rz-col", Size == null)
+                .AddSize("col", nameof(Size), Size)
+                .AddSize("col", nameof(SizeXS), "xs", SizeXS)
+                .AddSize("col", nameof(SizeSM), "sm", SizeSM)
+                .AddSize("col", nameof(SizeMD), "md", SizeMD)
+                .AddSize("col", nameof(SizeLG), "lg", SizeLG)
+                .AddSize("col", nameof(SizeXL), "xl", SizeXL)
+                .AddSize("col", nameof(SizeXX), "xx", SizeXX)
+                .AddSize("offset", nameof(Offset), Offset)
+                .AddSize("offset", nameof(OffsetXS), "xs", OffsetXS)
+                .AddSize("offset", nameof(OffsetSM), "sm", OffsetSM)
+                .AddSize("offset", nameof(OffsetMD), "md", OffsetMD)
+                .AddSize("offset", nameof(OffsetLG), "lg", OffsetLG)
+                .AddSize("offset", nameof(OffsetXL), "xl", OffsetXL)
+                .AddSize("offset", nameof(OffsetXX), "xx", OffsetXX)
+                .AddOrder("order", nameof(Order), Order)
+                .AddOrder("order", nameof(OrderXS), "xs", OrderXS)
+                .AddOrder("order", nameof(OrderSM), "sm", OrderSM)
+                .AddOrder("order", nameof(OrderMD), "md", OrderMD)
+                .AddOrder("order", nameof(OrderLG), "lg", OrderLG)
+                .AddOrder("order", nameof(OrderXL), "xl", OrderXL)
+                .AddOrder("order", nameof(OrderXX), "xx", OrderXX)
+                .ToString();
     }
 }

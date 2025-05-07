@@ -33,12 +33,6 @@ $panel-shadow: none !default;
   margin: var(--rz-panel-content-margin);
 }
 
-.rz-panel-content-wrapper {
-  &[aria-hidden='true'] {
-    display: none;
-  }
-}
-
 .rz-panel-title {
   line-height: var(--rz-panel-title-line-height);
   font-weight: var(--rz-panel-title-font-weight);

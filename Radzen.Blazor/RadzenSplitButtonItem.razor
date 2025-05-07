@@ -1,7 +1,7 @@
 ﻿@inherits RadzenComponent
 @if (Visible)
 {
-    <li class=@ItemClassList role="menuitem" @onclick="@OnClick" @attributes="Attributes" style="@Style">
+    <li class=@ItemClass role="menuitem" @onclick="@OnClick" @attributes="Attributes" style="@Style">
         <a id="@(SplitButton.SplitButtonId() + GetHashCode())" class="rz-menuitem-link">
             @if (!string.IsNullOrEmpty(Icon))
             {

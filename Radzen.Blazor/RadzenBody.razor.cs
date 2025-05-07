@@ -24,13 +24,9 @@ namespace Radzen.Blazor
         public override string Style { get; set; } = DefaultStyle;
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var classList = ClassList.Create("rz-body")
-                                     .Add("rz-body-expanded", Expanded);
-
-            return classList.ToString();
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-body")
+                                                                     .Add("rz-body-expanded", Expanded)
+                                                                     .ToString();
 
         /// <summary>
         /// Toggles this instance width and left margin.

@@ -17,16 +17,7 @@
     [CascadingParameter]
     public RadzenChart Chart { get; set; }
 
-    string Class
-    {
-        get
-        {
-            var classList = new List<string>();
-
-            classList.Add("rz-legend");
-            classList.Add($"rz-legend-{Chart.Legend.Position}".ToLowerInvariant());
-
-            return String.Join(" ", classList);
-        }
-    }
+    string Class => ClassList.Create("rz-legend")
+        .Add($"rz-legend-{Chart.Legend.Position}".ToLowerInvariant())
+        .ToString();
 }

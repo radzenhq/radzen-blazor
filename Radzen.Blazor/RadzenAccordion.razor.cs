@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -109,6 +110,11 @@ namespace Radzen.Blazor
                 }
             }
         }
+
+        string ToggleIconClass(RadzenAccordionItem item) => ClassList.Create("notranslate rz-accordion-toggle-icon rzi")
+                                               .Add("rz-state-expanded", item.GetSelected())
+                                               .Add("rz-state-collapsed", !item.GetSelected())
+                                               .ToString();
 
         /// <summary>
         /// Refreshes this instance.

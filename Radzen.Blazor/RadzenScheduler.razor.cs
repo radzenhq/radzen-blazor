@@ -705,7 +705,7 @@ namespace Radzen.Blazor
 
             if (IsJSRuntimeAvailable)
             {
-                JSRuntime.InvokeVoidAsync("Radzen.destroyScheduler", Element);
+                JSRuntime.InvokeVoid("Radzen.destroyScheduler", Element);
             }
         }
 

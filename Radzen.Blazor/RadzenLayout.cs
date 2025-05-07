@@ -34,16 +34,8 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var classList = ClassList.Create("rz-layout");
-
-            if (themeService != null)
-            {
-                classList.Add($"rz-{themeService.Theme}");
-            }
-
-            return classList.ToString();
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-layout")
+            .Add($"rz-{themeService.Theme}", themeService != null)
+            .ToString();
     }
 }

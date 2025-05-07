@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System.Collections.Generic;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -14,22 +14,12 @@ namespace Radzen.Blazor
     public partial class RadzenBadge : RadzenComponent
     {
         /// <inheritdoc />
-        protected override string GetComponentCssClass()
-        {
-            var classList = new List<string>();
-
-            classList.Add("rz-badge");
-            classList.Add($"rz-badge-{BadgeStyle.ToString().ToLowerInvariant()}");
-            classList.Add($"rz-variant-{Variant.ToString().ToLowerInvariant()}");
-            classList.Add($"rz-shade-{Shade.ToString().ToLowerInvariant()}");
-
-            if (IsPill)
-            {
-                classList.Add("rz-badge-pill");
-            }
-
-            return string.Join(" ", classList);
-        }
+        protected override string GetComponentCssClass() => ClassList.Create("rz-badge")
+                                                                     .Add($"rz-badge-{BadgeStyle.ToString().ToLowerInvariant()}")
+                                                                     .AddVariant(Variant)
+                                                                     .AddShade(Shade)
+                                                                     .Add("rz-badge-pill", IsPill)
+                                                                     .ToString();
 
         /// <summary>
         /// Gets or sets the child content.

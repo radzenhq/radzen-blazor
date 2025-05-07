@@ -198,14 +198,10 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("SummaryContent", component.Markup);
-            Assert.Equal(
-                "display: block",
-                component.Find(".rz-panel-content-summary").ParentElement.Attributes.First(attr => attr.Name == "style").Value
-            );
         }
 
         [Fact]
-        public void Panel_DontRenders_SummaryWhenOpen()
+        public void Panel_DoesNotRender_SummaryWhenOpen()
         {
             using var ctx = new TestContext();
             var component = ctx.RenderComponent<RadzenPanel>();
@@ -225,8 +221,8 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("SummaryContent", component.Markup);
             Assert.Equal(
-                "display: none",
-                component.Find(".rz-panel-content-summary").ParentElement.Attributes.First(attr => attr.Name == "style").Value
+                "true",
+                component.Find(".rz-panel-content-summary").ParentElement.ParentElement.Attributes.First(attr => attr.Name == "aria-hidden").Value
             );
         }
     }

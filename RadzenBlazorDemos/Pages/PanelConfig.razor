@@ -28,7 +28,7 @@
         </RadzenText>
     </HeaderTemplate>
     <ChildContent>
-        <RadzenCard  class="rz-mt-4">
+        <RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
             <RadzenDataList PageSize="4" WrapItems="true" AllowPaging="true" 
                             Data="@orders" TItem="Order">
                 <Template Context="order">
@@ -57,7 +57,7 @@
         </RadzenCard>
     </ChildContent>
     <SummaryTemplate>
-        <RadzenCard class="rz-mt-4">
+        <RadzenCard Variant="Variant.Outlined" class="rz-mt-4">
             <b>@orders.Count() Orders</b>
         </RadzenCard>
     </SummaryTemplate>

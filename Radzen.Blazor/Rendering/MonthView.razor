@@ -16,84 +16,171 @@
     </div>
     @{
         var days = 0;
-        var points = new Dictionary<AppointmentData, double>();
     }
     <div @ref=contentView class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
-         @onfocus=@(args => {if(CurrentDate == default(DateTime)) { CurrentDate = StartDate; }})>
-    @for (var date = StartDate; date < EndDate; date = date.AddDays(7))
-    {
-        <div class="rz-week">
-            <div class="rz-events">
-                @for (var start = date; start < date.AddDays(7); start = start.AddDays(1))
-                {
-                    var end = start.AddDays(1);
-                    var appointments = AppointmentsInSlot(start, end);
-                    var excessCount = appointments.Count() - MaxAppointmentsInSlot;
-                    var existingTops = ExistingTops(points, appointments.Take(MaxAppointmentsInSlot));
-                    var appointmentsToRender = appointments.Take(MaxAppointmentsInSlot).ToList();
-
-                    @foreach(var item in appointmentsToRender)
+         @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
+         @foreach (var week in weeks)
+         {
+            <div class="rz-week">
+                <div class="rz-events">
+                    @for (var bandIndex = 0; bandIndex < week.Bands.Length; bandIndex++)
                     {
-                        var slotIndex = item.Start.Date.Subtract(date).Days;
-                        var slotWidth = 100 / 7.0;
-                        var left = slotIndex * slotWidth;
-                        var length = Math.Max(1, Math.Ceiling(item.End.Subtract(date).TotalDays) - slotIndex);
-                        var width = item.End <= date.AddDays(7) ? (length) * slotWidth : (7 - slotIndex) * slotWidth;
-                        if (!points.TryGetValue(item, out var top))
-                        {
-                            top = DetermineTop(existingTops);
-                            points.Add(item, top);
-                            existingTops.Add(top);
-                        }
-                        var height = 1.5;
-                        var data = item;
+                        var band = week.Bands[bandIndex];
 
-                        @if (item.Start >= start && item.Start <= end)
+                        foreach (var info in band)
                         {
-                            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
-                                CssClass="@(CurrentDate >= start && CurrentDate <= end && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")"
-                                DragStart=@OnAppointmentDragStart />
-                        }
-                        else if (start == date)
-                        {
-                            left = 0;
-                            length = Math.Max(1, Math.Min(7, Math.Ceiling(item.End.Subtract(date).TotalDays)));
-                            width = length * slotWidth;
+                            var dayIndex = info.DayIndex;
+                            var day = week.Days[dayIndex];
+                            var slotWidth = 100 / 7.0;
+                            var left = dayIndex * slotWidth;
+                            var length = Math.Max(1, Math.Ceiling(info.Data.End.Subtract(week.Start).TotalDays) - dayIndex);
+                            var width = info.Data.End <= week.End ? (length) * slotWidth : (7 - dayIndex) * slotWidth;
+                            var top = (bandIndex + 1) * 1.5;
+                            var height = 1.5;
 
-                            <Appointment Data=@item Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
-                                CssClass="@(CurrentDate == date && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment),item) ? "rz-state-focused" : "")"
+                            <Appointment Data=@info.Data Top=@top Left=@left Width=@width Height=@height Click=@OnAppointmentClick
+                                CssClass="@(CurrentDate >= day.Start && CurrentDate <= day.Start.AddDays(1) && object.Equals(currentAppointments?.ElementAtOrDefault(currentAppointment), info.Data) ? "rz-state-focused" : "")"
                                 DragStart=@OnAppointmentDragStart />
                         }
                     }
-
-                    @if (excessCount > 0)
+                    @for (var dayIndex = 0; dayIndex < week.Days.Length; dayIndex++)
                     {
-                        var slotIndex = start.Subtract(date).Days;
-                        var slotWidth = 100 / 7.0;
-                        var left = slotIndex * slotWidth;
-                        var top = 1.5 * (MaxAppointmentsInSlot + 1);
-                        var listDate = start;
-                        <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
+                        var slot = week.Days[dayIndex];
+                        if (slot.Hidden > 0)
+                        {
+                            var slotWidth = 100 / 7.0;
+                            var left = dayIndex * slotWidth;
+                            var top = 1.5 * (MaxAppointmentsInSlot + 1);
+                            <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(slot.Start, slot.Appointments))>@String.Format(MoreText, slot.Hidden)</a>
+                        }
                     }
-                }
-            </div>
-            <div class="rz-slots">
-            @for (var day = 0; day < 7; day ++)
-            {
-                var dayOfWeek = StartDate.AddDays(days++);
-                <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
-                    <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation>
-                        @dayOfWeek.Day
-                    </div>
                 </div>
-            }
+                <div class="rz-slots">
+                @for (var day = 0; day < 7; day ++)
+                {
+                    var dayOfWeek = StartDate.AddDays(days++);
+                    <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
+                        <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation>
+                            @dayOfWeek.Day
+                        </div>
+                    </div>
+                }
+                </div>
             </div>
-        </div>
-    }
+         }
     </div>
 </div>
 
 @code {
+    class Day
+    {
+        public AppointmentData[] Appointments { get; set; }
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public int Hidden { get; set; }
+    }
+
+    class AppointmentRenderInfo
+    {
+        public AppointmentData Data { get; set; }
+        public int DayIndex { get; set; }
+    }
+
+    class Week
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public IList<AppointmentRenderInfo>[] Bands { get; set; }
+        public Day[] Days { get; set; }
+    }
+
+    Week CreateWeek(DateTime weekStart, DateTime weekEnd)
+    {
+        var bands = Enumerable.Range(0, MaxAppointmentsInSlot).Select(_ => new List<AppointmentRenderInfo>()).ToArray();
+
+        var days = new List<Day>();
+        var start = weekStart;
+        var dayIndex = 0;
+
+        while (start < weekEnd)
+        {
+            var end = start.AddDays(1);
+
+            var appointments = AppointmentsInSlot(start, end);
+
+            var slot = new Day { Start = start, End = end, Appointments = appointments };
+            dayIndex = days.Count;
+            days.Add(slot);
+
+            foreach (var appointment in appointments)
+            {
+                var placed = bands.Any(b => b.Any(a => a.Data.Equals(appointment)));
+
+                if (placed)
+                {
+                    continue;
+                }
+
+                foreach (var band in bands)
+                {
+                    if (band.Count == 0)
+                    {
+                        band.Add(new AppointmentRenderInfo { Data = appointment, DayIndex = dayIndex });
+
+                        placed = true;
+
+                        break;
+                    }
+
+                    var lastAppointmentInBand = band[^1];
+                    var lastStart = days[lastAppointmentInBand.DayIndex].Start;
+                    var lastEnd = lastAppointmentInBand.Data.End;
+
+                    // Check if the appointment overlaps with the last appointment in the band
+                    if (lastStart < appointment.End && lastEnd > slot.Start)
+                    {
+                        // Overlap, we cannot place the appointment in this band
+                        continue;
+                    }
+
+                    // No overlap, we can add the appointment to this band if there is space for it. A band can contain appointments whose total duration is less than one week.
+                    var bandDuration = band.Sum(a => a.Data.End.Subtract(days[a.DayIndex].Start).TotalDays);
+
+                    if (bandDuration < 7)
+                    {
+                        band.Add(new AppointmentRenderInfo { Data = appointment, DayIndex = dayIndex });
+
+                        placed = true;
+
+                        break;
+                    }
+                    else
+                    {
+                        // No space in this band, try the next one
+                        continue;
+                    }
+                }
+
+                if (!placed)
+                {
+                    slot.Hidden++;
+                }
+            }
+
+            start = end;
+        }
+
+        return new Week { Start = weekStart, End = weekEnd, Bands = bands.ToArray(), Days = days.ToArray() };
+    }
+
+    void OnFocus()
+    {
+        if (CurrentDate == default(DateTime)) 
+        { 
+            CurrentDate = StartDate; 
+        }
+    }
+
     [Parameter]
     public DateTime StartDate { get; set; }
 
@@ -130,33 +217,6 @@
         await Scheduler.SelectDay(day, AppointmentsInSlot(day, day.AddDays(1)));
     }
 
-    double DetermineTop(HashSet<double> existingTops)
-    {
-        var top = 1.5;
-
-        while (existingTops.Contains(top))
-        {
-            top += 1.5;
-        }
-
-        return top;
-    }
-
-    HashSet<double> ExistingTops(IDictionary<AppointmentData, double> tops, IEnumerable<AppointmentData> appointments)
-    {
-        var existingTops = new HashSet<double>();
-
-        foreach (var appointment in appointments)
-        {
-            if (tops.TryGetValue(appointment, out var existingTop))
-            {
-                existingTops.Add(existingTop);
-            }
-        }
-
-        return existingTops;
-    }
-
     ElementReference contentView;
 
     async Task OnAppointmentClick(AppointmentData data)
@@ -173,10 +233,9 @@
         }
 
         return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end))
-                   .OrderByDescending(item => item.End.Subtract(item.Start).TotalDays > 1)
-                   .ThenBy(item => item.Start)
-                   .ThenByDescending(item => item.End)
-                   .ToArray();
+                .OrderBy(item => item.Start)
+                .ThenBy(item => item.End)
+                .ToArray();
     }
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
@@ -195,6 +254,30 @@
                     </CascadingValue>
                 </div>
             );
+        }
+    }
+
+    private List<Week> weeks;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        var didAppointmentsChange = parameters.DidParameterChange(nameof(Appointments), Appointments);
+        var didStartDateChange = parameters.DidParameterChange(nameof(StartDate), StartDate);
+        var didEndDateChange = parameters.DidParameterChange(nameof(EndDate), EndDate);
+        var didMaxAppointmentsInSlotChange = parameters.DidParameterChange(nameof(MaxAppointmentsInSlot), MaxAppointmentsInSlot);
+
+        await base.SetParametersAsync(parameters);
+
+        if (didAppointmentsChange || didStartDateChange || didEndDateChange || didMaxAppointmentsInSlotChange)
+        {
+            weeks = new List<Week>();
+
+            for (var date = StartDate; date < EndDate; date = date.AddDays(7))
+            {
+                var week = CreateWeek(date, date.AddDays(7));
+
+                weeks.Add(week);
+            }
         }
     }
 

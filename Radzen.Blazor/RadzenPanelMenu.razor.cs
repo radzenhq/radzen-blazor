@@ -56,7 +56,6 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowArrow { get; set; } = true;
 
-
         internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
         /// <summary>
@@ -65,34 +64,10 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void AddItem(RadzenPanelMenuItem item)
         {
-            if (items.IndexOf(item) == -1)
+            if (!items.Contains(item))
             {
                 items.Add(item);
-                SelectItem(item);
-                StateHasChanged();
             }
-        }
-
-        /// <inheritdoc />
-        protected override void OnInitialized()
-        {
-            UriHelper.LocationChanged += UriHelper_OnLocationChanged;
-        }
-
-        private void UriHelper_OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
-        {
-            var allExpandedItems = items.Concat(items.SelectManyRecursive(i => i.ExpandedInternal ? i.items : Enumerable.Empty<RadzenPanelMenuItem>()));
-            foreach (var item in allExpandedItems)
-            {
-                SelectItem(item);
-            }
-        }
-
-        /// <inheritdoc />
-        public override void Dispose()
-        {
-            base.Dispose();
-            UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
         }
 
         internal void CollapseAll(IEnumerable<RadzenPanelMenuItem> itemsToSkip)
@@ -112,85 +87,6 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        bool ShouldMatch(RadzenPanelMenuItem item)
-        {
-            if (string.IsNullOrEmpty(item.Path))
-            {
-                return false;
-            }
-
-
-            var currentAbsoluteUrl = UriHelper.ToAbsoluteUri(UriHelper.Uri).AbsoluteUri;
-            var absoluteUrl = UriHelper.ToAbsoluteUri(item.Path).AbsoluteUri;
-
-            if (EqualsHrefExactlyOrIfTrailingSlashAdded(absoluteUrl, currentAbsoluteUrl))
-            {
-                return true;
-            }
-
-            if (item.Path == "/")
-            {
-                return false;
-            }
-
-            var match = item.Match != NavLinkMatch.Prefix ? item.Match : Match;
-
-            if (match == NavLinkMatch.Prefix && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        private static bool EqualsHrefExactlyOrIfTrailingSlashAdded(string absoluteUrl, string currentAbsoluteUrl)
-        {
-            if (string.Equals(currentAbsoluteUrl, absoluteUrl, StringComparison.OrdinalIgnoreCase))
-            {
-                return true;
-            }
-
-            if (currentAbsoluteUrl.Length == absoluteUrl.Length - 1)
-            {
-                if (absoluteUrl[absoluteUrl.Length - 1] == '/'
-                    && absoluteUrl.StartsWith(currentAbsoluteUrl, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsSeparator(char c)
-        {
-            return c == '?' || c == '/' || c == '#';
-        }
-
-        private static bool IsStrictlyPrefixWithSeparator(string value, string prefix)
-        {
-            var prefixLength = prefix.Length;
-            if (value.Length > prefixLength)
-            {
-                return value.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-                    && (
-                        prefixLength == 0
-                        || IsSeparator(prefix[prefixLength - 1])
-                        || IsSeparator(value[prefixLength])
-                    );
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        internal void SelectItem(RadzenPanelMenuItem item)
-        {
-            var selected = ShouldMatch(item);
-            item.Select(selected);
-        }
-
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
@@ -204,14 +100,12 @@ namespace Radzen.Blazor
         List<RadzenPanelMenuItem> currentItems;
 
         bool preventKeyPress = false;
+
         async Task OnKeyPress(KeyboardEventArgs args)
         {
-            var key = args.Code != null ? args.Code : args.Key;
+            var key = args.Code ?? args.Key;
 
-            if (currentItems == null)
-            {
-                currentItems = items.Where(i => i.Visible).ToList();
-            }
+            currentItems ??= [.. items.Where(i => i.Visible)];
 
             if (key == "ArrowUp" || key == "ArrowDown")
             {
@@ -223,8 +117,8 @@ namespace Radzen.Blazor
                     currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent.items).ToList();
                     focusedIndex = currentItems.IndexOf(parentItem);
                 }
-                else if (key == "ArrowDown" && currentItems.ElementAtOrDefault(focusedIndex) != null && 
-                    currentItems.ElementAtOrDefault(focusedIndex).ExpandedInternal && currentItems.ElementAtOrDefault(focusedIndex).items.Any())
+                else if (key == "ArrowDown" && currentItems.ElementAtOrDefault(focusedIndex) != null &&
+                    currentItems.ElementAtOrDefault(focusedIndex).IsExpanded && currentItems.ElementAtOrDefault(focusedIndex).items.Any())
                 {
                     currentItems = currentItems.ElementAtOrDefault(focusedIndex).items.Where(i => i.Visible).ToList();
                     focusedIndex = 0;
@@ -236,7 +130,7 @@ namespace Radzen.Blazor
                     focusedIndex = parentItem != null ? currentItems.IndexOf(parentItem) + 1 : focusedIndex;
                 }
                 else if (key == "ArrowUp" && currentItems.ElementAtOrDefault(focusedIndex - 1) != null &&
-                    currentItems.ElementAtOrDefault(focusedIndex - 1).ExpandedInternal && currentItems.ElementAtOrDefault(focusedIndex - 1).items.Any())
+                    currentItems.ElementAtOrDefault(focusedIndex - 1).IsExpanded && currentItems.ElementAtOrDefault(focusedIndex - 1).items.Any())
                 {
                     currentItems = currentItems.ElementAtOrDefault(focusedIndex - 1).items.Where(i => i.Visible).ToList();
                     focusedIndex = currentItems.Count - 1;
@@ -261,15 +155,15 @@ namespace Radzen.Blazor
                 {
                     var item = currentItems[focusedIndex];
 
-                    if (item.items.Any())
+                    if (item.items.Count > 0)
                     {
                         await item.Toggle();
 
-                        currentItems = (item.ExpandedInternal ?
+                        currentItems = (item.IsExpanded ?
                                 item.items :
                                 item.ParentItem != null ? item.ParentItem.items : item.Parent.items).Where(i => i.Visible).ToList();
 
-                        focusedIndex = item.ExpandedInternal ? 0 : currentItems.IndexOf(item);
+                        focusedIndex = item.IsExpanded ? 0 : currentItems.IndexOf(item);
                     }
                     else
                     {
@@ -288,6 +182,11 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = false;
             }
+
+            if (preventKeyPress)
+            {
+                StateHasChanged();
+            }
         }
 
         internal bool IsFocused(RadzenPanelMenuItem item)
@@ -301,6 +200,19 @@ namespace Radzen.Blazor
 
             focusedIndex = -1;
             currentItems = null;
+        }
+
+        void OnFocus()
+        {
+            currentItems ??= [.. items.Where(i => i.Visible)];
+
+            if (focusedIndex == -1)
+            {
+                Console.WriteLine("OnFocus");
+                focusedIndex = 0;
+
+                StateHasChanged();
+            }
         }
     }
 }

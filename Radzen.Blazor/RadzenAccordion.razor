@@ -1,4 +1,5 @@
 ﻿@using System.Linq
+@using Radzen.Blazor.Rendering
 
 @inherits RadzenComponent
 
@@ -21,14 +22,7 @@
         <div @ref="@item.Element" id="@item.GetItemId()" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" @onkeydown:stopPropagation>
             <a @onclick="@((args) => SelectItem(item))" aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)" @onclick:preventDefault="true" role="tab" 
                id="@($"rz-accordiontab-{items.IndexOf(item)}")" aria-controls="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-expanded="true">
-                @if (IsSelected(i, item))
-                {
-                    <span class="notranslate rz-accordion-toggle-icon rzi rzi-chevron-down"></span>
-                }
-                else
-                {
-                    <span class="notranslate rz-accordion-toggle-icon rzi rzi-chevron-right"></span>
-                }
+                <span class="@ToggleIconClass(item)">keyboard_arrow_down</span>
                 @if (!string.IsNullOrEmpty(item.Icon))
                 {
             <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(item.IconColor) ? $"color:{item.IconColor}" : null)">@item.Icon</i>
@@ -43,15 +37,12 @@
                 }
             </a>
         </div>
-        @if (IsSelected(i, item))
-        {
-            <div class="rz-accordion-content-wrapper" role="tabpanel"
-                 id="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-hidden="false" aria-labelledby="@($"rz-accordiontab-{items.IndexOf(item)}")">
-                <div class="rz-accordion-content" @onkeydown:stopPropagation>
-                    @item.ChildContent
-                </div>
+        <Expander Expanded=@item.GetSelected() role="tabpanel"
+                id="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-labelledby="@($"rz-accordiontab-{items.IndexOf(item)}")">
+            <div class="rz-accordion-content" @onkeydown:stopPropagation>
+                @item.ChildContent
             </div>
-        }
+        </Expander>
     }
 </div>
 }

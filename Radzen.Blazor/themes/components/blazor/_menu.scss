@@ -117,6 +117,19 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
     .rzi:not(.rz-navigation-item-icon-children) {
       color: var(--rz-menu-top-item-icon-color);
     }
+
+    .rz-navigation-item-icon-children {
+  
+      &.rz-state-expanded {
+        transform: rotate(180deg);
+        transition: transform var(--rz-expander-transition);
+      }
+  
+      &.rz-state-collapsed {
+        transform: rotate(0);
+        transition: transform var(--rz-expander-transition);
+      }
+    }
   }
 
   .rz-navigation-item-wrapper {
@@ -162,22 +175,6 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
           outline: var(--rz-menu-item-focus-outline);
           outline-offset: var(--rz-menu-item-focus-outline-offset);
         }
-      }
-    }
-  }
-
-  > .rz-navigation-item {
-    > .rz-navigation-item-wrapper-active {
-      &:before {
-        position: absolute;
-        content: '';
-        inset-block-end: -2px;
-        height: 1px;
-        inset-inline-start: 0;
-        inset-inline-end: 0;
-        background-color: var(--rz-menu-top-item-selected-color);
-        margin-inline-start: 0.5rem;
-        margin-inline-end: 0.5rem;
       }
     }
   }

@@ -25,12 +25,15 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>
     {
-        ClassList ItemClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
-                                                                            .Add("rz-state-active", IsSelected(item))
-                                                                            .AddDisabled(Disabled || item.Disabled);
+        string ItemClass(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-box")
+                                                                          .Add("rz-state-active", IsSelected(item))
+                                                                          .Add("rz-state-focused", IsFocused(item) && focused)
+                                                                          .AddDisabled(Disabled || item.Disabled)
+                                                                          .ToString();
 
-        ClassList IconClassList(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
-                                                                            .Add("notranslate rzi rzi-check", IsSelected(item));
+        string IconClass(RadzenCheckBoxListItem<TValue> item) => ClassList.Create("rz-chkbox-icon")
+                                                                          .Add("notranslate rzi rzi-check", IsSelected(item))
+                                                                          .ToString();
 
         /// <summary>
         /// Gets or sets the value property.
@@ -47,6 +50,34 @@ namespace Radzen.Blazor
         public string TextProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets the content justify.
+        /// </summary>
+        /// <value>The content justify.</value>
+        [Parameter]
+        public JustifyContent JustifyContent { get; set; } = JustifyContent.Start;
+
+        /// <summary>
+        /// Gets or sets the items alignment.
+        /// </summary>
+        /// <value>The items alignment.</value>
+        [Parameter]
+        public AlignItems AlignItems { get; set; } = AlignItems.Start;
+
+        /// <summary>
+        /// Gets or sets the spacing between items
+        /// </summary>
+        /// <value>The spacing between items.</value>
+        [Parameter]
+        public string Gap { get; set; }
+
+        /// <summary>
+        /// Gets or sets the wrap.
+        /// </summary>
+        /// <value>The wrap.</value>
+        [Parameter]
+        public FlexWrap Wrap { get; set; } = FlexWrap.Wrap;
+
+        /// <summary>
         /// Gets or sets the disabled property.
         /// </summary>
         /// <value>The disabled property.</value>
@@ -60,31 +91,37 @@ namespace Radzen.Blazor
         [Parameter]
         public string ReadOnlyProperty { get; set; }
 
-        IEnumerable<RadzenCheckBoxListItem<TValue>> allItems
+        void UpdateAllItems()
         {
-            get
+            allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
             {
-                return items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
+                var item = new RadzenCheckBoxListItem<TValue>();
+                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
+                item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+
+                if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
                 {
-                    var item = new RadzenCheckBoxListItem<TValue>();
-                    item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
-                    item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+                    item.SetDisabled(disabledResult);
+                }
 
-                    if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
-                    {
-                        item.SetDisabled(disabledResult);
-                    }
+                if (ReadOnlyProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, ReadOnlyProperty, out var readOnlyResult))
+                {
+                    item.SetReadOnly(readOnlyResult);
+                }
 
-                    if (ReadOnlyProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, ReadOnlyProperty, out var readOnlyResult))
-                    {
-                        item.SetReadOnly(readOnlyResult);
-                    }
-
-                    return item;
-                }));
-            }
+                return item;
+            })).ToList();
         }
 
+        /// <inheritdoc />
+        protected override void OnParametersSet()
+        {
+            base.OnParametersSet();
+
+            UpdateAllItems();
+        }
+
+        List<RadzenCheckBoxListItem<TValue>> allItems;
         /// <summary>
         /// Gets or sets a value indicating whether the user can select all values. Set to <c>false</c> by default.
         /// </summary>
@@ -171,7 +208,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return GetClassList(Orientation == Orientation.Horizontal ? "rz-checkbox-list-horizontal" : "rz-checkbox-list-vertical").ToString();
+            return GetClassList("rz-checkbox-list").Add(Orientation == Orientation.Horizontal ? "rz-checkbox-list-horizontal" : "rz-checkbox-list-vertical").ToString();
         }
 
         /// <summary>
@@ -211,6 +248,7 @@ namespace Radzen.Blazor
             if (items.IndexOf(item) == -1)
             {
                 items.Add(item);
+                UpdateAllItems();
                 StateHasChanged();
             }
         }
@@ -224,6 +262,7 @@ namespace Radzen.Blazor
             if (items.Contains(item))
             {
                 items.Remove(item);
+                UpdateAllItems();
                 if (!disposed)
                 {
                     try { InvokeAsync(StateHasChanged); } catch { }
@@ -250,6 +289,8 @@ namespace Radzen.Blazor
             if (Disabled || item.Disabled || ReadOnly || item.ReadOnly)
                 return;
 
+            focusedIndex = allItems.IndexOf(item);
+
             List<TValue> selectedValues = new List<TValue>(Value != null ? Value : Enumerable.Empty<TValue>());
 
             if (!selectedValues.Contains(item.Value))
@@ -270,21 +311,68 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        bool focused;
+        int focusedIndex = -1;
         bool preventKeyPress = true;
-        async Task OnKeyPress(KeyboardEventArgs args, Task task)
+        async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (key == "Space" || key == "Enter")
+            var item = allItems.ElementAtOrDefault(focusedIndex) ?? allItems.FirstOrDefault();
+
+            if (item == null) return;
+
+            if ((Orientation == Orientation.Horizontal && (key == "ArrowLeft" || key == "ArrowRight")) ||
+                (Orientation == Orientation.Vertical && (key == "ArrowUp" || key == "ArrowDown")))
+            {
+                preventKeyPress = true;
+                var direction = key == "ArrowLeft" || key == "ArrowUp" ? -1 : 1;
+
+                focusedIndex = Math.Clamp(focusedIndex + direction, 0, allItems.FindLastIndex(t => t.Visible && !t.Disabled));
+
+                while (allItems.ElementAtOrDefault(focusedIndex)?.Disabled == true)
+                {
+                    focusedIndex = focusedIndex + direction;
+                }
+            }
+            else if (key == "Home" || key == "End")
             {
                 preventKeyPress = true;
 
-                await task;
+                focusedIndex = key == "Home" ? 0 : allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count() - 1;
+            }
+            else if (key == "Space" || key == "Enter")
+            {
+                preventKeyPress = true;
+
+                if (focusedIndex >= 0 && focusedIndex < allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).Count())
+                {
+                    await SelectItem(allItems.Where(t => HasInvisibleBefore(item) ? true : t.Visible).ToList()[focusedIndex]);
+                }
             }
             else
             {
                 preventKeyPress = false;
             }
+        }
+
+        bool HasInvisibleBefore(RadzenCheckBoxListItem<TValue> item)
+        {
+            return allItems.Take(allItems.IndexOf(item)).Any(t => !t.Visible && !t.Disabled);
+        }
+
+        bool IsFocused(RadzenCheckBoxListItem<TValue> item)
+        {
+            return allItems.IndexOf(item) == focusedIndex;
+        }
+        void OnFocus()
+        {
+            focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
+            focused = true;
+        }
+        void OnBlur()
+        {
+            focused = false;
         }
     }
 }

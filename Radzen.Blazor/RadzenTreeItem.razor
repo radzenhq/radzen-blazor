@@ -4,10 +4,10 @@
 @{var itemArgs = Tree?.ItemAttributes(this); }
 <li class="rz-treenode" @attributes="@(itemArgs.Item1.Attributes.Any() ? itemArgs.Item1.Attributes : Attributes)" 
     @oncontextmenu="OnContextMenu" @oncontextmenu:preventDefault="@Tree.ItemContextMenu.HasDelegate" @oncontextmenu:stopPropagation>
-    <div class=@ContentClassList @onclick="@Select">
+    <div class=@ContentClass @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {
-            <span class=@IconClassList @onclick="@Toggle" @onclick:stopPropagation></span>
+            <span class=@IconClass @onclick="@Toggle" @onclick:stopPropagation></span>
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
@@ -15,18 +15,20 @@
         }
         @if (Template != null)
         {
-            <div class="@LabelClassList" @onkeydown:stopPropagation>@Template(this)</div>
+            <div class=@LabelClass @onkeydown:stopPropagation>@Template(this)</div>
         } else
         {
-            <label for="@(GetHashCode())" class="@LabelClassList">@Text</label>
+            <label for="@(GetHashCode())" class=@LabelClass>@Text</label>
         }
     </div>
     @if (ChildContent != null && expanded)
     {
     <CascadingValue Value=this>
-    <ul class="rz-treenode-children" style=@(clientExpanded ? "" : "display:none;") @onkeydown:stopPropagation>
+    <Expander Expanded=@clientExpanded>
+    <ul class="rz-treenode-children" @onkeydown:stopPropagation>
         @ChildContent
     </ul>
+    </Expander>
     </CascadingValue>
     }
 </li>
