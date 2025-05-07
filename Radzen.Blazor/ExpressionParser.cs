@@ -164,6 +164,11 @@ public class ExpressionParser
 
             var right = ParseTernary(parameter) ?? throw new InvalidOperationException($"Expected expression after ?? at position {position}");
 
+            if (right.Type == typeof(object))
+            {
+                right = ConvertIfNeeded(right, left.Type);
+            }
+
             left = Expression.Coalesce(left, right);
 
             token = Peek();

@@ -1072,6 +1072,17 @@ public class ExpressionParserTests
     }
 
     [Fact]
+    public void Should_SupportTernaryWithNullCoalescing()
+    {
+        var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<Int16?>>("x => ((((x == null) ? null : x.Value) ?? null) == 4)");
+
+        var func = expression.Compile();
+
+        Assert.False(func(new ItemWithGenericProperty<Int16?> { Value = null }));
+        Assert.True(func(new ItemWithGenericProperty<Int16?> { Value = 4 }));
+    }
+
+    [Fact]
     public void Should_SupportNullCoalescing()
     {
         var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<double?>>("it => (it.Value ?? 0) == 0");
@@ -1414,7 +1425,6 @@ public class ExpressionParserTests
         Assert.True(func(new Person { Age = 15 }));
         Assert.False(func(new Person { Age = 5 }));
     }
-
 
     [Fact]
     public void Should_SupportComplexTypeConversions()
