@@ -8,14 +8,14 @@
 @code {
     async Task ShowBusyDialog(bool withMessageAsString)
     {
-        InvokeAsync(async () =>
-    {
-        // Simulate background task
-        await Task.Delay(2000);
+        _ = InvokeAsync(async () =>
+        {
+            // Simulate background task
+            await Task.Delay(2000);
 
-        // Close the dialog
-        DialogService.Close();
-    });
+            // Close the dialog
+            DialogService.Close();
+        });
 
         if (withMessageAsString)
         {
@@ -42,17 +42,21 @@
     {
         await DialogService.OpenAsync("", ds =>
         {
-            RenderFragment content = b =>
+            RenderFragment content = dialogContent =>
             {
-                b.OpenElement(0, "RadzenRow");
+                dialogContent.OpenComponent<RadzenRow>(0);
+                dialogContent.AddComponentParameter(1, nameof(RadzenRow.ChildContent), (RenderFragment)(rowContent => 
+                {
+                    rowContent.OpenComponent<RadzenColumn>(0);
+                    rowContent.AddComponentParameter(1, nameof(RadzenColumn.Size), 12);
+                    rowContent.AddComponentParameter(2, nameof(RadzenRow.ChildContent), (RenderFragment)(columnContent => 
+                    {
+                        columnContent.AddContent(0, message);
+                    }));
+                    rowContent.CloseComponent();
+                }));
 
-                b.OpenElement(1, "RadzenColumn");
-                b.AddAttribute(2, "Size", "12");
-
-                b.AddContent(3, message);
-
-                b.CloseElement();
-                b.CloseElement();
+                dialogContent.CloseComponent();
             };
             return content;
         }, new DialogOptions() { ShowTitle = false, Style = "min-height:auto;min-width:auto;width:auto", CloseDialogOnEsc = false });
