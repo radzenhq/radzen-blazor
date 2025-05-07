@@ -66,7 +66,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "ThemeService",
                     Path = "theme-service",
-                    New = true,
                     Title = "ThemeService",
                     Description = "The ThemeService allows to change the theme of the application at runtime.",
                     Icon = "\ue3ae",
@@ -77,7 +76,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Switch between light and dark mode", Anchor = "#light-dark-mode" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "AppearanceToggle",
                     Path = "appearance-toggle",
-                    New = true,
                     Title = "Blazor Themes | Free UI Components by Radzen",
                     Description = "The AppearanceToggle button allows you to switch between two predefined themes, most commonly light and dark.",
                     Icon = "\ueb37",
@@ -88,7 +86,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Theme Colors", Anchor = "#theme-colors" }, new () { Text = "Utility CSS Classes", Anchor = "#utility-css-classes" } ],
                     Name = "Colors",
                     Path = "colors",
-                    Updated = true,
                     Title = "Blazor Color Utilities | Free UI Components by Radzen",
                     Description = "List of colors and utility CSS classes available in Radzen Blazor Components library.",
                     Icon = "\ue997",
@@ -120,7 +117,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Border radius", Anchor = "#border-radius" }, new () { Text = "Add or remove borders arbitrarily", Anchor = "#add-remove-css-classes" }, new () { Text = "Border color utility CSS classes", Anchor = "#color-css-classes" }, new () { Text = "Border with color utility CSS classes", Anchor = "#utility-css-classes" }, new () { Text = "Set border width via CSS variable", Anchor = "#border-width" }, new () { Text = "Borders with CSS variables", Anchor = "#css-variables" } ],
                     Name = "Borders",
                     Path = "borders",
-                    Updated = true,
                     Title = "Blazor Border Utilities | Free UI Components by Radzen",
                     Description = "Border styles and utility CSS classes for borders available in Radzen Blazor Components library.",
                     Icon = "\ue3c6",
@@ -141,7 +137,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Responsive display", Anchor = "#responsive-spacing" } ],
                     Name = "Display",
                     Title = "Blazor Display Utilities | Free UI Components by Radzen",
-                    New = true,
                     Description = "Display styles and utility CSS classes available in Radzen Blazor Components library.",
                     Path = "display",
                     Icon = "\uf023",
@@ -152,7 +147,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Responsive overflow", Anchor = "#responsive-spacing" } ],
                     Name = "Overflow",
                     Title = "Blazor Content Overflow Utilities | Free UI Components by Radzen",
-                    New = true,
                     Description = "Overflow styles and utility CSS classes available in Radzen Blazor Components library.",
                     Path = "overflow",
                     Icon = "\uf829",
@@ -183,7 +177,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Width percentage CSS classes", Anchor = "#width-percentage-css-classes" }, new () { Text = "Width keyword CSS classes", Anchor = "#width-keyword-css-classes" }, new () { Text = "Width viewport CSS classes", Anchor = "#width-viewport-css-classes" }, new () { Text = "Max-width and min-width CSS classes", Anchor = "#border-radius" }, new () { Text = "Height percentage CSS classes", Anchor = "#height-percentage-css-classes" }, new () { Text = "Height viewport CSS classes", Anchor = "#height-viewport-css-classes" }, new () { Text = "Max-height and min-height CSS classes", Anchor = "#border-radius" }, new () { Text = "Responsive sizing", Anchor = "#responsive-spacing" } ],
                     Name = "Sizing",
                     Title = "Blazor Sizing Utilities | Free UI Components by Radzen",
-                    New = true,
                     Description = "Sizing styles and utility CSS classes for width and height available in Radzen Blazor Components library.",
                     Path = "sizing",
                     Icon = "\uf730",
@@ -1263,7 +1256,6 @@ namespace RadzenBlazorDemos
                     Description = "Use the Blazor RadzenCardGroup component to visually stick RadzenCards next to each other.",
                     Path = "card-group",
                     Icon = "\ue8f3",
-                    New = true,
                     Tags = new [] { "card", "group", "deck", "container" }
                 },
                 new Example
@@ -1278,7 +1270,6 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Toc = [ new () { Text = "Define can-drop and no-drop styles", Anchor = "#can-drop-no-drop-styles" }, new () { Text = "Define a Footer Template per Drop Zone", Anchor = "#footer-template" } ],
-                    New = true,
                     Name = "DropZone",
                     Description = "Demonstration and configuration of the Radzen Blazor DropZone component.",
                     Path = "dropzone",
@@ -1296,7 +1287,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    New = true,
                     Name = "Popup",
                     Description = "Demonstration and configuration of the Radzen Blazor Popup component.",
                     Path = "popup",
@@ -1343,7 +1333,6 @@ namespace RadzenBlazorDemos
                     Description = "Demonstration and configuration of the Radzen Blazor Carousel component.",
                     Path = "carousel",
                     Icon = "\ue8eb",
-                    New = true,
                     Tags = new [] { "carousel", "gallery", "slide", "deck", "container" }
                 },
                 new Example
@@ -1677,7 +1666,6 @@ namespace RadzenBlazorDemos
                     Path = "security-code",
                     Description = "Demonstration and configuration of the Radzen Blazor SecurityCode component.",
                     Icon = "\uf045",
-                    New = true,
                     Tags = new [] { "security", "code", "input" }
                 },
                 new Example
@@ -1695,7 +1683,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Get and Set the value of Slider", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Slider using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Slider from -100 to 100", Anchor = "#min-max-value" }, new () { Text = "Slider with Step=10", Anchor = "#step" }, new () { Text = "Range Slider", Anchor = "#range-slider" }, new () { Text = "Disabled Slider", Anchor = "#disabled-slider" }, new () { Text = "Vertical Slider", Anchor = "#vertical-slider" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Slider",
                     Path = "slider",
-                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor Slider component.",
                     Icon = "\ue429",
                     Tags = new [] { "form", "slider" }
@@ -1833,7 +1820,6 @@ namespace RadzenBlazorDemos
                         {
                             Name = "Line Chart",
                             Path = "line-chart",
-                            Updated = true,
                             Description = "Radzen Blazor Chart with line series.",
                             Tags = new [] { "chart", "graph", "line" }
                         },
@@ -1940,7 +1926,6 @@ namespace RadzenBlazorDemos
                 {
                     Name = "Sparkline",
                     Path = "sparkline",
-                    New = true,
                     Description = "Demonstration and configuration of RadzenSparkline component.",
                     Icon = "\uf64f",
                     Tags = new [] { "chart", "sparkline" }
@@ -2041,7 +2026,6 @@ namespace RadzenBlazorDemos
                     Toc = [ new () { Text = "Severity", Anchor = "#severity" }, new () { Text = "Position", Anchor = "#position" }, new () { Text = "Custom click handler", Anchor = "#click-handler" }, new () { Text = "Custom content", Anchor = "#custom-content" }, new () { Text = "Duration progress", Anchor = "#duration-progress" } ],
                     Name = "Notification",
                     Path = "notification",
-                    Updated = true,
                     Description = "Demonstration and configuration of the Radzen Blazor Notification component.",
                     Icon = "\ue87f",
                     Tags = new [] { "message", "notification" }
