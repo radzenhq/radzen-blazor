@@ -82,7 +82,7 @@ namespace Radzen.Blazor
 
         string ItemClass => ClassList.Create("rz-menuitem")
                                      .AddDisabled(Disabled)
-                                     .Add("rz-state-focused", SplitButton.IsFocused(this))
+                                     .Add("rz-state-highlight", SplitButton.IsFocused(this))
                                      .ToString();
 
         /// <inheritdoc />
