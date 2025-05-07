@@ -28,6 +28,13 @@
     Premium themes should be updated from Radzen Blazor Studio and Radzen Blazor for Visual Studio.
     The latest versions of both products would display a warning that the premium theme is outdated and update it automatically without losing any customizations.
 </RadzenText>
+<RadzenText Anchor="changelog#v7-accordion" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Accordion changes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" />
+    RadzenAccordion now hides its child content using CSS class in order to support animations. The older behavior was to remove the child content entirely.
+</RadzenText>
 <RadzenText Anchor="changelog#v7-scheduler" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     RadzenScheduler month view
 </RadzenText>
@@ -69,14 +76,14 @@
 &lt;/PagingSummaryTemplate&gt;
 </code></pre>
 
-<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+<RadzenText TextStyle="TextStyle.H2" Anchor="changelog#v5" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Components v5 Changelog
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     Track and review changes to Radzen Blazor Components v5.
 </RadzenText>
 
-<RadzenText Anchor="changelog#dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+<RadzenText Anchor="changelog#v5-dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Dependencies
 </RadzenText>
 <ul>
@@ -85,7 +92,7 @@
     <li>Dropped support for .NET Core 3.x and .NET 5.</li>
 </ul>
 
-<RadzenText Anchor="changelog#dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+<RadzenText Anchor="changelog#v5-common" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     Common
 </RadzenText>
 <ul>
@@ -93,7 +100,7 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> All components now render with <code>box-sizing: border-box;</code>.</li>
 </ul>
 
-<RadzenText Anchor="changelog#dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+<RadzenText Anchor="changelog#v5-new-components" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     New Components
 </RadzenText>
 <ul>
@@ -101,7 +108,7 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <code>RadzenTheme</code>  - Use it to load themes to your app.</li>
 </ul>
 
-<RadzenText Anchor="changelog#themes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+<RadzenText Anchor="changelog#v5-themes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     Themes
 </RadzenText>
 <ul>
@@ -111,14 +118,14 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> Added Software Dark free theme.</li>
 </ul>
 
-<RadzenText Anchor="changelog#colors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+<RadzenText Anchor="changelog#v5-colors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     Colors
 </RadzenText>
 <ul>
     <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> Added <strong>--rz-base</strong> color variable and shades.</li>
 </ul>
 
-<RadzenText Anchor="changelog#typography" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+<RadzenText Anchor="changelog#v5-typography" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     Typography
 </RadzenText>
 <ul>
@@ -156,7 +163,7 @@
     </li>
 </ul>
 
-<RadzenText Anchor="changelog#icons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+<RadzenText Anchor="changelog#v5-icons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     Icons
 </RadzenText>
 <ul>
@@ -169,7 +176,7 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Removed <code>direction: ltr;</code> rule from <code>.rzi</code> CSS class.</li>
 </ul>
 
-<RadzenText Anchor="changelog#datagrid" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+<RadzenText Anchor="changelog#v5-datagrid" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     DataGrid
 </RadzenText>
 <ul>
@@ -237,7 +244,7 @@
     <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Deleted" /> <code>--rz-paginator-next-button-hover-background-color</code></li>
 </ul>
 
-<RadzenText Anchor="changelog#scheduler" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+<RadzenText Anchor="changelog#v5-scheduler" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
     Scheduler
 </RadzenText>
 <ul>
