@@ -53,9 +53,9 @@ public readonly struct ClassList
     /// <param name="attributes">The attributes.</param>
     public ClassList Add(IDictionary<string, object> attributes)
     {
-        if (attributes != null && attributes.TryGetValue("class", out var className) && className != null)
+        if (attributes != null && attributes.TryGetValue("class", out var value) && value is string @class)
         {
-            return Add(className.ToString());
+            return Add(@class);
         }
 
         return this;
@@ -67,9 +67,9 @@ public readonly struct ClassList
     /// <param name="attributes">The attributes.</param>
     public ClassList Add(IReadOnlyDictionary<string, object> attributes)
     {
-        if (attributes != null && attributes.TryGetValue("class", out var className) && className != null)
+        if (attributes != null && attributes.TryGetValue("class", out var value) && value is string @class)
         {
-            return Add(className.ToString());
+            return Add(@class);
         }
 
         return this;
