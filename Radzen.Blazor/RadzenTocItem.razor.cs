@@ -24,6 +24,12 @@ public partial class RadzenTocItem : ComponentBase, IAsyncDisposable
     public string? Text { get; set; }
 
     /// <summary>
+    /// Gets or sets the custom content of the item.
+    /// </summary>
+    [Parameter]
+    public RenderFragment? Template { get; set; }
+
+    /// <summary>
     /// Gets or sets the CSS selector of the element to scroll to.
     /// </summary>
     [Parameter]
