@@ -103,7 +103,7 @@
       </RadzenColumn>
     </RadzenRow>
 
-    <RadzenRow ID="components" Gap="1rem">
+      <RadzenRow ID="components" Gap="1rem">
       <RadzenColumn Size="12">
             <RadzenAlert AlertStyle="AlertStyle.Dark" Icon="mode_heat" Size="AlertSize.Large" Variant="Variant.Flat" class="rz-my-lg-12 promo-alert">
               <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-3 rz-color-on-base-darker"><strong>NEW: Radzen Blazor for Visual Studio</strong></RadzenText>
@@ -112,7 +112,13 @@
                 <RadzenButton Text="See in Action" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Medium" Click=@(args => ShowVideoDialog("https://www.youtube.com/embed/VUwy-BX3eCM?&rel=0")) />
               </RadzenStack>
             </RadzenAlert>
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
+
+            <RadzenToc Orientation="Orientation.Horizontal" Selector=".radzen-blazor" Style="position: sticky; top: 2rem; z-index: 1;" class="rz-display-none rz-display-md-flex">
+                <RadzenTocItem Text="UI Components" Selector="#get-started"></RadzenTocItem>
+                <RadzenTocItem Text="UI Blocks" Selector="#blocks"></RadzenTocItem>
+                <RadzenTocItem Text="App Templates" Selector="#templates"></RadzenTocItem>
+            </RadzenToc>
+            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12" ID="get-started">
               <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
                 <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Get Started</RadzenText>
               </RadzenColumn>
@@ -175,26 +181,6 @@
                   <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/shadows"><RadzenIcon aria-hidden="true" Icon="@("\ue9df")" /><span>Shadows</span></RadzenLink></RadzenColumn>
                   <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/sizing"><RadzenIcon aria-hidden="true" Icon="@("\uf730")" /><span>Sizing</span></RadzenLink></RadzenColumn>
                   <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/spacing"><RadzenIcon aria-hidden="true" Icon="@("\uf773")" /><span>Spacing</span></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">UI Blocks <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Pro" Title="Pro" Style="vertical-align: top;" /></RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow RowGap="1.5rem">
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-cta"><RadzenIcon aria-hidden="true" Icon="@("\ue06c")" /><span>Call-to-Action</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-cards"><RadzenIcon aria-hidden="true" Icon="@("\ue991")" /><span>Cards</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-faq"><RadzenIcon aria-hidden="true" Icon="@("\uf04c")" /><span>FAQ</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-features"><RadzenIcon aria-hidden="true" Icon="@("\ue031")" /><span>Features</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-footers"><RadzenIcon aria-hidden="true" Icon="@("\uf7e6")" /><span>Footers</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-logos"><RadzenIcon aria-hidden="true" Icon="@("\ue574")" /><span>Logo Clouds</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-newsletter"><RadzenIcon aria-hidden="true" Icon="@("\uf18c")" /><span>Newsletter</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-page-headings"><RadzenIcon aria-hidden="true" Icon="@("\ue9ea")" /><span>Page Headings</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-pricing"><RadzenIcon aria-hidden="true" Icon="@("\uf05b")" /><span>Pricing</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-testimonials"><RadzenIcon aria-hidden="true" Icon="@("\uf054")" /><span>Testimonials</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
                 </RadzenRow>
               </RadzenColumn>
             </RadzenRow>
@@ -348,6 +334,40 @@
                   <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/regexvalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue53f")" /><span>RegexValidator</span></RadzenLink></RadzenColumn>
                   <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/requiredvalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue578")" /><span>RequiredValidator</span></RadzenLink></RadzenColumn>
                   <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/customvalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue7d8")" /><span>CustomValidator</span></RadzenLink></RadzenColumn>
+                </RadzenRow>
+              </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12" ID="blocks">
+              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">UI Blocks <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Pro" Title="Pro" Style="vertical-align: top;" /></RadzenText>
+              </RadzenColumn>
+              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
+                <RadzenRow RowGap="1.5rem">
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-cta"><RadzenIcon aria-hidden="true" Icon="@("\ue06c")" /><span>Call-to-Action</span></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-cards"><RadzenIcon aria-hidden="true" Icon="@("\ue991")" /><span>Cards</span></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-faq"><RadzenIcon aria-hidden="true" Icon="@("\uf04c")" /><span>FAQ</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-features"><RadzenIcon aria-hidden="true" Icon="@("\ue031")" /><span>Features</span></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-footers"><RadzenIcon aria-hidden="true" Icon="@("\uf7e6")" /><span>Footers</span></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-logos"><RadzenIcon aria-hidden="true" Icon="@("\ue574")" /><span>Logo Clouds</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-newsletter"><RadzenIcon aria-hidden="true" Icon="@("\uf18c")" /><span>Newsletter</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-page-headings"><RadzenIcon aria-hidden="true" Icon="@("\ue9ea")" /><span>Page Headings</span></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-pricing"><RadzenIcon aria-hidden="true" Icon="@("\uf05b")" /><span>Pricing</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-testimonials"><RadzenIcon aria-hidden="true" Icon="@("\uf054")" /><span>Testimonials</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
+                </RadzenRow>
+              </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12" ID="templates">
+              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
+                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">App Templates <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Pro" Title="Pro" Style="vertical-align: top;" /></RadzenText>
+              </RadzenColumn>
+              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
+                <RadzenRow RowGap="1.5rem">
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/dashboard"><RadzenIcon aria-hidden="true" Icon="@("\ue868")" /><span>Issues Dashboard</span></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/templates-healthcare"><RadzenIcon aria-hidden="true" Icon="@("\ueb4c")" /><span>Healthcare</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/templates-realestate"><RadzenIcon aria-hidden="true" Icon="@("\ue73a")" /><span>Real Estate</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
+                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/templates-repairshop"><RadzenIcon aria-hidden="true" Icon="@("\uf56c")" /><span>Repair Workshop</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
                 </RadzenRow>
               </RadzenColumn>
             </RadzenRow>
