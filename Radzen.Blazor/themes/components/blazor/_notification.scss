@@ -26,7 +26,7 @@ $notification-info-icon-color: $notification-info-color !default;
 }
 
 .rz-notification-item-wrapper {
-  position: static;
+  position: relative;
   width: 250px;
   min-width: 20rem;
   background-color: var(--rz-notification-container-background-color);
@@ -34,7 +34,7 @@ $notification-info-icon-color: $notification-info-color !default;
   
   & > .rz-progressbar {
     position: absolute;
-    inset-block-end: calc(1rem + var(--rz-notification-border-radius));
+    inset-block-end: var(--rz-notification-border-radius);
     inset-inline: var(--rz-notification-border-radius); 
     --rz-progressbar-height: 0.25rem;
     --rz-progressbar-border-radius: var(--rz-notification-border-radius); 
