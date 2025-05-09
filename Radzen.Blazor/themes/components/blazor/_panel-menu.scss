@@ -90,6 +90,11 @@ $panel-menu-toggle-icon-opacity: 1 !default;
     border-block-end: var(--rz-panel-menu-item-border);
     border-radius: var(--rz-panel-menu-item-border-radius);
     overflow: hidden;
+
+    /* Do not show expand arrow if there are no child items */
+    &:not(:has(> .rz-expander .rz-navigation-item)) > .rz-navigation-item-wrapper .rz-navigation-item-icon-children {
+      display: none;
+    } 
   }
 
   .rz-navigation-item-wrapper {
