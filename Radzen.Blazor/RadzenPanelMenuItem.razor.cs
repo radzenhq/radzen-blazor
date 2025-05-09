@@ -125,14 +125,17 @@ namespace Radzen.Blazor
             if (!expanded && !Parent.Multiple)
             {
                 var itemsToSkip = new List<RadzenPanelMenuItem>();
+
                 var p = ParentItem;
+
                 while (p != null)
                 {
                     itemsToSkip.Add(p);
+
                     p = p.ParentItem;
                 }
 
-                Parent.CollapseAll(itemsToSkip);
+                await Parent.CollapseAllAsync(itemsToSkip);
             }
 
             expanded = !expanded;
@@ -140,7 +143,7 @@ namespace Radzen.Blazor
             await ExpandedChanged.InvokeAsync(expanded);
         }
 
-        internal async Task Collapse()
+        internal async Task CollapseAsync()
         {
             if (expanded)
             {

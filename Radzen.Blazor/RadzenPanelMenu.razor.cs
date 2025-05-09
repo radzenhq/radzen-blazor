@@ -70,10 +70,16 @@ namespace Radzen.Blazor
             }
         }
 
-        internal void CollapseAll(IEnumerable<RadzenPanelMenuItem> itemsToSkip)
+        internal async Task CollapseAllAsync(IEnumerable<RadzenPanelMenuItem> itemsToSkip)
         {
-            items.Concat(items.SelectManyRecursive(i => i.items))
-                .Where(i => !itemsToSkip.Contains(i)).ToList().ForEach(i => InvokeAsync(i.Collapse));
+            var itemsToCollapse = items.Concat(items.SelectManyRecursive(i => i.items)).Except(itemsToSkip);
+
+            foreach (var item in itemsToCollapse)
+            {
+                await item.CollapseAsync();
+            }
+
+            StateHasChanged();
         }
 
         /// <inheritdoc />
@@ -81,7 +87,7 @@ namespace Radzen.Blazor
         {
             if (parameters.DidParameterChange(nameof(Multiple), Multiple))
             {
-                CollapseAll(Enumerable.Empty<RadzenPanelMenuItem>());
+                await CollapseAllAsync([]);
             }
 
             await base.SetParametersAsync(parameters);
@@ -208,7 +214,6 @@ namespace Radzen.Blazor
 
             if (focusedIndex == -1)
             {
-                Console.WriteLine("OnFocus");
                 focusedIndex = 0;
 
                 StateHasChanged();
