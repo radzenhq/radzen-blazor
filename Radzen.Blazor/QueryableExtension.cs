@@ -269,7 +269,7 @@ namespace Radzen
             string currentPart = parts[0];
             Expression member;
 
-            if (typeof(IDictionary<string, object>).IsAssignableFrom(expression.Type))
+            if (typeof(IDictionary<string, object>).IsAssignableFrom(expression.Type) || typeof(IDictionary<string, string>).IsAssignableFrom(expression.Type))
             {
                 var key = currentPart.Split('"')[1];
                 var typeString = currentPart.Split('(')[0];
