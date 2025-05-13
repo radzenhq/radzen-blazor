@@ -761,13 +761,13 @@ public class ExpressionParser
 
     private Expression ParseOr(ParameterExpression parameter)
     {
-        var left = ParseAnd(parameter);
+        var left = ParseMemberAccess(ParseAnd(parameter), parameter);
 
         var token = Peek();
         while (token.Type == TokenType.BarBar)
         {
             Advance(1);
-            var right = ParseAnd(parameter) ?? throw new InvalidOperationException($"Expected expression after || at position {position}");
+            var right = ParseMemberAccess(ParseAnd(parameter) ?? throw new InvalidOperationException($"Expected expression after || at position {position}"), parameter);
             left = Expression.OrElse(left, right);
             token = Peek();
         }
@@ -777,13 +777,13 @@ public class ExpressionParser
 
     private Expression ParseAnd(ParameterExpression parameter)
     {
-        var left = ParseComparison(parameter);
+        var left = ParseMemberAccess(ParseComparison(parameter), parameter);
 
         var token = Peek();
         while (token.Type == TokenType.AmpersandAmpersand)
         {
             Advance(1);
-            var right = ParseComparison(parameter) ?? throw new InvalidOperationException($"Expected expression after && at position {position}");
+            var right = ParseMemberAccess(ParseComparison(parameter) ?? throw new InvalidOperationException($"Expected expression after && at position {position}"), parameter);
             left = Expression.AndAlso(left, right);
             token = Peek();
         }

@@ -1464,6 +1464,15 @@ public class ExpressionParserTests
     }
 
     [Fact]
+    public void Should_SupportConditionalsOfMixedType()
+    {
+        var expression = ExpressionParser.ParsePredicate<Person>("x => ((x.Age == 1) && (((x == null) ? null : x.Name) ?? \"\").Contains(\"D\"))");
+        var func = expression.Compile();
+
+        Assert.True(func(new Person { Age = 1, Name = "Dali" }));
+    }
+
+    [Fact]
     public void Should_SupportConvertMethods()
     {
         var expression = ExpressionParser.ParsePredicate<ItemWithGenericProperty<object>>("it => Convert.ToInt32(it.Value) == 42");
