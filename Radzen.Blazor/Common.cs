@@ -1116,9 +1116,21 @@ namespace Radzen
     /// </summary>
     public class Query
     {
-        string _filter;
-        internal Func<string> GetFilter { get; set; }
+        Func<string> _getFilter;
+        internal Func<string> GetFilter 
+        {
+            get
+            { 
+                return _getFilter;
+            }
+            set
+            {
+                _filter = null;
+                _getFilter = value;
+            }
+        }
 
+        string _filter;
         /// <summary>
         /// Gets the filter expression as a string.
         /// </summary>
@@ -2580,8 +2592,21 @@ namespace Radzen
         /// </summary>
         public string OrderBy { get; set; }
 
+        Func<string> _getFilter;
+        internal Func<string> GetFilter
+        {
+            get
+            {
+                return _getFilter;
+            }
+            set
+            {
+                _filter = null;
+                _getFilter = value;
+            }
+        }
+
         string _filter;
-        internal Func<string> GetFilter { get; set; }
 
         /// <summary>
         /// Gets the filter expression as a string.
