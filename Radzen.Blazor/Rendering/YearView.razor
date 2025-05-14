@@ -59,8 +59,8 @@
                                 var excessCount = appointments.Count();
                                 string classname = $"rz-slot-title {(day.Month != offSetMonth ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")} {(day == CurrentDate && month == CurrentMonth ? " rz-state-focused" : "")}".Trim();
 
-                                    <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
-                                        <div class="@classname">
+                                    <div class="rz-slot" @onclick=@(args => OnListClick(day, appointments))>
+                                        <div @attributes=@Attributes(day, classname, day.Month == offSetMonth)>
                                             @day.Day
                                         </div>
                                     </div>
@@ -99,9 +99,9 @@
     [Parameter]
     public IEnumerable<AppointmentData> Appointments { get; set; }
 
-    IDictionary<string, object> Attributes(DateTime start, string className)
+    IDictionary<string, object> Attributes(DateTime start, string className, bool slotInMonth)
     {
-        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1));
+        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), AppointmentsInRange(start, start.AddDays(1)));
         attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
         return attributes;
     }

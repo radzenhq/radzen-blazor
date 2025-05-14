@@ -370,9 +370,9 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end)
+        public IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments)
         {
-            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, View = SelectedView };
+            var args = new SchedulerSlotRenderEventArgs { Start = start, End = end, Appointments = appointments, View = SelectedView };
 
             SlotRender?.Invoke(args);
 

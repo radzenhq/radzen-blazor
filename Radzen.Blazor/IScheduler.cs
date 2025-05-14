@@ -100,8 +100,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="start">The start of the slot.</param>
         /// <param name="end">The end of the slot.</param>
+        /// <param name="appointments">The appointments for this range.</param>
         /// <returns>A dictionary containing the HTML attributes for the specified slot.</returns>
-        IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end);
+        IDictionary<string, object> GetSlotAttributes(DateTime start, DateTime end, IEnumerable<AppointmentData> appointments);
         /// <summary>
         /// Renders the appointment.
         /// </summary>
