@@ -168,7 +168,7 @@
 
     IDictionary<string, object> Attributes(DateTime start, string className, bool slotInMonth)
     {
-        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), AppointmentsInRange(start, start.AddDays(1)));
+        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInRange(start, start.AddDays(1)));
         attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
         attributes["dropzone"] = "move";
         if (!slotInMonth)
