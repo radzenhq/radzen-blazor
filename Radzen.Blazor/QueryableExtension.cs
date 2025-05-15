@@ -269,7 +269,7 @@ namespace Radzen
             string currentPart = parts[0];
             Expression member;
 
-            if (expression.Type.GetProperty("Item") != null)
+            if (expression.Type.IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(expression.Type.GetGenericTypeDefinition()))
             {
                 var key = currentPart.Split('"')[1];
                 var typeString = currentPart.Split('(')[0];
