@@ -182,20 +182,31 @@ $dialog-transition: .1s ease-in-out !default;
 
 // Dialog Animations
 
-@keyframes rz-dialog-open {
+@keyframes rz-dialog-open-scale {
   from {
-    transform: scale(0.5);
+    scale: 0.5;
+  }
+  to {
+    scale: 1;
+  }
+}
+
+@keyframes rz-dialog-open-opacity {
+  from {
     opacity: 0;
   }
   to {
-    transform: scale(1);
     opacity: 1;
   }
 }
 
 .rz-dialog {
   &.rz-open {
-    animation: var(--rz-dialog-transition) rz-dialog-open;
+    animation: var(--rz-dialog-transition) rz-dialog-open-opacity, var(--rz-dialog-transition) rz-dialog-open-scale;
+  }
+
+  &:has(.rz-chart).rz-open {
+    animation: var(--rz-dialog-transition) rz-dialog-open-opacity;
   }
 }
 
