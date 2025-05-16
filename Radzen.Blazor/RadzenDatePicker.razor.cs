@@ -74,9 +74,15 @@ namespace Radzen.Blazor
         public string ToggleAmPmAriaLabel { get; set; } = "Toggle Am/Pm";
 
         /// <summary>
+        /// Gets or sets whether to disable the automatic display of the virtual keyboard on keyboardless devices
+        /// </summary>
+        /// <value></value>
+        [Parameter]
+        public bool DisableAutoVirtualKeyboard { get; set; }
+        /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
-        /// <value>The attributes.</value>
+        /// <value><c>true</c> to disable the automatic display of the vrtual keyboard; otherwise, <c>false</c>.</value>
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 

@@ -1,0 +1,14 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Enable / Disable automatic virtual keyboard when date selected" />
+    <RadzenSwitch @bind-Value=@toggle InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "Switch value" } })" />
+</RadzenStack>
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Date" Component="RadzenDatePickerBindValue" />
+    <RadzenDatePicker @bind-Value=@value Name="RadzenDatePickerBindValue" ShowCalendarWeek DisableAutoVirtualKeyboard=@toggle />
+</RadzenStack>
+
+@code {
+    bool toggle;
+    DateTime? value;
+}
