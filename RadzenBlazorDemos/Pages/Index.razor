@@ -115,8 +115,20 @@
 
             <RadzenToc Orientation="Orientation.Horizontal" Selector=".radzen-blazor" Style="position: sticky; top: 2rem; z-index: 1;" class="rz-display-none rz-display-md-flex">
                 <RadzenTocItem Text="UI Components" Selector="#get-started"></RadzenTocItem>
-                <RadzenTocItem Text="UI Blocks" Selector="#blocks"></RadzenTocItem>
-                <RadzenTocItem Text="App Templates" Selector="#templates"></RadzenTocItem>
+                <RadzenTocItem Selector="#blocks">
+                  <Template>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                      <RadzenText Text="UI Blocks" /> <RadzenBadge Text="Pro" BadgeStyle="BadgeStyle.Danger" />
+                    </RadzenStack>
+                  </Template>
+                </RadzenTocItem>
+                <RadzenTocItem Selector="#templates">
+                  <Template>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                      <RadzenText Text="App Templates" /> <RadzenBadge Text="Pro" BadgeStyle="BadgeStyle.Danger" />
+                    </RadzenStack>
+                  </Template>
+                </RadzenTocItem>
             </RadzenToc>
             <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12" ID="get-started">
               <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">

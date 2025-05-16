@@ -615,7 +615,7 @@ $steps-number-background-color: var(--rz-base-600) !default;
 $steps-number-color: var(--rz-text-secondary-color) !default;
 
 .rz-steps {
-  [role='tablist'] {
+  > ul {
     display: flex;
   }
   .rz-steps-item {

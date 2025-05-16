@@ -271,7 +271,7 @@ else
                 query = query.Cast<object>().Take(loadDataArgs.Top.Value);
             }
 
-            filterValues = query.Cast(propertyType);
+            filterValues = await Task.FromResult(query.Cast(propertyType));
 
             if (!Column.AllowCheckBoxListVirtualization)
             {
