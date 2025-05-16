@@ -116,6 +116,19 @@ Radzen.Blazor provides appropriate labels, roles, and descriptions to enable scr
 
 <KeyboardNavigationDataGrid Data="@shortcuts" />
 
+<RadzenText Anchor="accessibility#acr" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Accessibility Conformance Report (ACR)
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    Radzen Blazor Components ACR is based on an ITI VPAT® format covering Section 508 (U.S.), EN 301 549 (EU), and W3C/WAI WCAG.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    The use of Radzen Blazor Components does not constitute and guarantee that the end-user software will be compliant with accessibility standards and guidelines. The components provide means to developers to cover the required accessibility criteria and functionalities.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">
+    <RadzenLink Path="https://cdn.radzen.com/VPAT2.5Rev-INT-May2025-Radzen-Blazor-Components.pdf" target="_blank" Title="Download Radzen Blazor Components Accessibility Conformance Report">Download Radzen Blazor Components VPAT</RadzenLink>
+</RadzenText>
+
 @code {
     public List<KeyboardShortcut> shortcuts = new()
     {

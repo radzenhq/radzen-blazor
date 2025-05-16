@@ -36,7 +36,7 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
-            Toc = [ new () { Text = "Applying guidelines", Anchor = "#applying-guidelines" }, new () { Text = "WCAG 2.2", Anchor = "#wcag" }, new () { Text = "WCAG compliant theme colors (AA level of conformance)", Anchor = "#wcag-colors" }, new () { Text = "ARIA attributes", Anchor = "#wai-aria" }, new () { Text = "Semantic HTML", Anchor = "#semantic-html" }, new () { Text = "Screen reader compatibility", Anchor = "#screen-readers" }, new () { Text = "Responsive design", Anchor = "#responsive-design" }, new () { Text = "Keyboard compatibility", Anchor = "#keyboard-compatibility" } ],
+            Toc = [ new () { Text = "Applying guidelines", Anchor = "#applying-guidelines" }, new () { Text = "WCAG 2.2", Anchor = "#wcag" }, new () { Text = "WCAG compliant theme colors (AA level of conformance)", Anchor = "#wcag-colors" }, new () { Text = "ARIA attributes", Anchor = "#wai-aria" }, new () { Text = "Semantic HTML", Anchor = "#semantic-html" }, new () { Text = "Screen reader compatibility", Anchor = "#screen-readers" }, new () { Text = "Responsive design", Anchor = "#responsive-design" }, new () { Text = "Keyboard compatibility", Anchor = "#keyboard-compatibility" }, new () { Text = "Accessibility Conformance Report", Anchor = "#acr" } ],
             Name = "Accessibility",
             Path = "/accessibility",
             Title = "Blazor Accessibility | Free UI Components by Radzen",
