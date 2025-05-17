@@ -13,7 +13,7 @@
             {
                 <input @ref="@input" @attributes="InputAttributes" disabled="@Disabled" readonly="@IsReadonly" value="@FormattedValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
                         @onchange="@ParseDate" autocomplete="off" type="text" name="@Name" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
-                       class="rz-inputtext @InputClass @(ReadOnly ? "rz-readonly" : "") @(!ShowButton ? "rz-input-trigger" : "")" id="@Name" placeholder="@CurrentPlaceholder" />
+                       class="rz-inputtext @InputClass @(ReadOnly ? "rz-readonly" : "") @(!ShowButton ? "rz-input-trigger" : "")" id="@Name" placeholder="@CurrentPlaceholder" virtualkeyboardpolicy="@(DisableAutoVirtualKeyboard ? "manual" : "auto")" />
             }
             @if (ShowButton)
             {
