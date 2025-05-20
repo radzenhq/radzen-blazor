@@ -498,7 +498,7 @@ namespace Radzen
             {FilterOperator.StartsWith, "startswith"},
             {FilterOperator.EndsWith, "endswith"},
             {FilterOperator.Contains, "contains"},
-            {FilterOperator.DoesNotContain, "DoesNotContain"},
+            {FilterOperator.DoesNotContain, "contains"},
             {FilterOperator.IsNull, "eq"},
             {FilterOperator.IsEmpty, "eq"},
             {FilterOperator.IsNotNull, "ne"},
@@ -636,6 +636,57 @@ namespace Radzen
                     combinedExpression = combinedExpression == null
                         ? expression
                         : dataFilter.LogicalFilterOperator == LogicalFilterOperator.And ?
+                            Expression.AndAlso(combinedExpression, expression) :
+                                Expression.OrElse(combinedExpression, expression);
+                }
+
+                if (combinedExpression != null)
+                {
+                    return serializer.Serialize(Expression.Lambda<Func<T, bool>>(combinedExpression, parameter));
+                }
+            }
+
+            return "";
+        }
+
+        /// <summary>
+        /// Converts a enumerable of CompositeFilterDescriptor to a Linq-compatibly filter string
+        /// </summary>
+        /// <typeparam name="T">The type that is being filtered</typeparam>
+        /// <param name="filters">The enumerable of CompositeFilterDescriptor </param>
+        /// <param name="logicalFilterOperator">The LogicalFilterOperator</param>
+        /// <param name="filterCaseSensitivity">The FilterCaseSensitivity</param>
+        /// <returns>A Linq-compatible filter string</returns>
+        public static string ToFilterString<T>(this IEnumerable<CompositeFilterDescriptor> filters, 
+            LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And,
+            FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)
+        {
+            Func<CompositeFilterDescriptor, bool> canFilter = (c) => 
+                           (!(c.FilterValue == null || c.FilterValue as string == string.Empty)
+                            || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
+                            || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
+                           && c.Property != null;
+
+            if (filters.Concat(filters.SelectManyRecursive(i => i.Filters ?? Enumerable.Empty<CompositeFilterDescriptor>())).Where(canFilter).Any())
+            {
+                var serializer = new ExpressionSerializer();
+
+                var filterExpressions = new List<Expression>();
+
+                var parameter = Expression.Parameter(typeof(T), "x");
+
+                foreach (var filter in filters)
+                {
+                    AddWhereExpression<T>(parameter, filter, ref filterExpressions, filterCaseSensitivity);
+                }
+
+                Expression combinedExpression = null;
+
+                foreach (var expression in filterExpressions)
+                {
+                    combinedExpression = combinedExpression == null
+                        ? expression
+                        : logicalFilterOperator == LogicalFilterOperator.And ?
                             Expression.AndAlso(combinedExpression, expression) :
                                 Expression.OrElse(combinedExpression, expression);
                 }
@@ -1167,7 +1218,13 @@ namespace Radzen
 
                 foreach (var filter in dataFilter.Filters)
                 {
-                    AddODataExpression(canFilter, filter, ref filterExpressions, dataFilter);
+                    var ft = dataFilter.properties.Where(col => col.Property == filter.Property).FirstOrDefault()?.FilterPropertyType;
+                    if (ft != null && ft != filter.Type)
+                    {
+                        filter.Type = ft;
+                    }
+
+                    AddODataExpression<T>(canFilter, filter, ref filterExpressions, dataFilter.LogicalFilterOperator, dataFilter.FilterCaseSensitivity);
                 }
 
                 return filterExpressions.Any() ?
@@ -1177,7 +1234,43 @@ namespace Radzen
             return "";
         }
 
-        private static void AddODataExpression<T>(Func<CompositeFilterDescriptor, bool> canFilter, CompositeFilterDescriptor filter, ref List<string> filterExpressions, RadzenDataFilter<T> dataFilter)
+        /// <summary>
+        /// Converts a enumerable of CompositeFilterDescriptor to a OData-compatibly filter string
+        /// </summary>
+        /// <param name="filters">The enumerable of CompositeFilterDescriptor </param>
+        /// <param name="logicalFilterOperator">The LogicalFilterOperator</param>
+        /// <param name="filterCaseSensitivity">The FilterCaseSensitivity</param>
+        /// <returns>A OData-compatible filter string</returns>
+        public static string ToODataFilterString<T>(this IEnumerable<CompositeFilterDescriptor> filters,
+            LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And,
+            FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)
+        {
+            Func<CompositeFilterDescriptor, bool> canFilter = (c) => 
+               (!(c.FilterValue == null || c.FilterValue as string == string.Empty)
+                || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
+                || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
+               && c.Property != null;
+
+            if (filters.Concat(filters.SelectManyRecursive(i => i.Filters ?? Enumerable.Empty<CompositeFilterDescriptor>())).Where(canFilter).Any())
+            {
+                var filterExpressions = new List<string>();
+
+                foreach (var filter in filters)
+                {
+                    AddODataExpression<T>(canFilter, filter, ref filterExpressions, logicalFilterOperator, filterCaseSensitivity);
+                }
+
+                return filterExpressions.Any() ?
+                    string.Join($" {logicalFilterOperator.ToString().ToLower()} ", filterExpressions)
+                    : "";
+            }
+            return "";
+        }
+
+        private static void AddODataExpression<T>(Func<CompositeFilterDescriptor, bool> canFilter, 
+            CompositeFilterDescriptor filter, ref List<string> filterExpressions, 
+            LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And,
+            FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)
         {
             if (filter.Filters != null)
             {
@@ -1185,7 +1278,7 @@ namespace Radzen
 
                 foreach (var f in filter.Filters)
                 {
-                    AddODataExpression(canFilter, f, ref innerFilterExpressions, dataFilter);
+                    AddODataExpression<T>(canFilter, f, ref innerFilterExpressions, logicalFilterOperator, filterCaseSensitivity);
                 }
 
                 if (innerFilterExpressions.Any())
@@ -1203,10 +1296,15 @@ namespace Radzen
 
                 var property = filter.Property.Replace('.', '/');
 
-                var column = dataFilter.properties.Where(c => c.Property == filter.Property).FirstOrDefault();
-                if (column == null) return;
+                var parameter = Expression.Parameter(typeof(T), "x");
 
-                if (dataFilter.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && column.FilterPropertyType == typeof(string))
+                var propertyExpression = GetNestedPropertyExpression(parameter, filter.Property);
+
+                if (propertyExpression == null) return;
+
+                var filterPropertyType = filter.Type ?? propertyExpression.Type;
+
+                if (filterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && filterPropertyType == typeof(string))
                 {
                     property = $"tolower({property})";
                 }
@@ -1214,7 +1312,7 @@ namespace Radzen
                 if (filter.FilterOperator == FilterOperator.StartsWith || filter.FilterOperator == FilterOperator.EndsWith
                     || filter.FilterOperator == FilterOperator.Contains || filter.FilterOperator == FilterOperator.DoesNotContain)
                 {
-                    if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string) &&
+                    if (IsEnumerable(filterPropertyType) && filterPropertyType != typeof(string) &&
                         (filter.FilterOperator == FilterOperator.Contains || filter.FilterOperator == FilterOperator.DoesNotContain))
                     {
                         var enumerableValue = ((IEnumerable)(filter.FilterValue != null ? filter.FilterValue : Enumerable.Empty<object>())).AsQueryable();
@@ -1234,7 +1332,7 @@ namespace Radzen
                     }
                     else
                     {
-                        var expression = dataFilter.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
+                        var expression = filterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive ?
                             $"{ODataFilterOperators[filter.FilterOperator.Value]}({property}, tolower('{filter.FilterValue}'))" :
                             $"{ODataFilterOperators[filter.FilterOperator.Value]}({property}, '{filter.FilterValue}')";
 
@@ -1248,7 +1346,7 @@ namespace Radzen
                 }
                 else
                 {
-                    if (IsEnumerable(column.FilterPropertyType) && column.FilterPropertyType != typeof(string))
+                    if (IsEnumerable(filterPropertyType) && filterPropertyType != typeof(string))
                         return;
 
                     var value = $"{filter.FilterValue}";
@@ -1261,11 +1359,11 @@ namespace Radzen
                     {
                         value = $"''";
                     }
-                    else if (column.FilterPropertyType == typeof(string) || PropertyAccess.IsEnum(column.FilterPropertyType) || PropertyAccess.IsNullableEnum(column.FilterPropertyType))
+                    else if (filterPropertyType == typeof(string) || PropertyAccess.IsEnum(filterPropertyType) || PropertyAccess.IsNullableEnum(filterPropertyType))
                     {
                         value = $"'{value}'";
                     }
-                    else if (column.FilterPropertyType == typeof(DateTime) || column.FilterPropertyType == typeof(DateTime?))
+                    else if (filterPropertyType == typeof(DateTime) || filterPropertyType == typeof(DateTime?))
                     {
                         try
                         {
@@ -1278,7 +1376,7 @@ namespace Radzen
 
                         value = $"{DateTime.Parse(value, CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind).ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)}";
                     }
-                    else if (column.FilterPropertyType == typeof(bool) || column.FilterPropertyType == typeof(bool?))
+                    else if (filterPropertyType == typeof(bool) || filterPropertyType == typeof(bool?))
                     {
                         value = $"{value?.ToLower()}";
                     }
