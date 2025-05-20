@@ -5,8 +5,14 @@
 </p>
 
 <RadzenButton Size="ButtonSize.ExtraSmall" Text="Close Side Dialog" Click="@(_ => Service.CloseSide())" />
+<RadzenButton Size="ButtonSize.ExtraSmall" Text="Open Side Dialog" Click="@OnClick" />
 
 @code {
     [Inject] DialogService Service { get; set; }
 
+    async Task OnClick()
+    {
+        await Service.CloseSideAsync();
+        await Service.OpenSideAsync<DialogSideContent>("Side Dialog");
+    }
 }
