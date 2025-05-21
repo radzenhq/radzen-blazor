@@ -51,13 +51,13 @@ namespace Radzen.Blazor
             }
         }
         /// <summary>
-        /// Specifies the minimum time stamp allowed.
+        /// Specifies the minimum time span allowed.
         /// </summary>
         [Parameter]
         public TimeSpan Min { get; set; } = TimeSpan.MinValue;
 
         /// <summary>
-        /// Specifies the maximum time stamp allowed.
+        /// Specifies the maximum time span allowed.
         /// </summary>
         [Parameter]
         public TimeSpan Max { get; set; } = TimeSpan.MaxValue;
@@ -490,8 +490,8 @@ namespace Radzen.Blazor
         {
             if (parameters.DidParameterChange(nameof(Min), Min) || parameters.DidParameterChange(nameof(Max), Max))
             {
-                var min = parameters.GetValueOrDefault<TimeSpan>(nameof(Min));
-                var max = parameters.GetValueOrDefault<TimeSpan>(nameof(Max));
+                var min = parameters.GetValueOrDefault(nameof(Min), Min);
+                var max = parameters.GetValueOrDefault(nameof(Max), Max);
 
                 SetPanelFieldsSetup(min, max);
             }
