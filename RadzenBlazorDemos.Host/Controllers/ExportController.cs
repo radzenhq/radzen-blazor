@@ -77,7 +77,14 @@ namespace RadzenBlazorDemos
 
                 foreach (var column in columns)
                 {
-                    row.Add($"{GetValue(item, column.Key)}".Trim());
+                    var rawValue = $"{GetValue(item, column.Key)}".Trim();
+
+                    if (rawValue.Contains(",") || rawValue.Contains("\"") || rawValue.Contains("\n"))
+                    {
+                        rawValue = $"\"{rawValue.Replace("\"", "\"\"")}\"";
+                    }
+
+                    row.Add(rawValue);
                 }
 
                 sb.AppendLine(string.Join(",", row.ToArray()));
