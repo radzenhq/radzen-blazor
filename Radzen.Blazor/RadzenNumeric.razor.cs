@@ -349,7 +349,7 @@ namespace Radzen.Blazor
             string valueStr = value as string;
             if (valueStr == null)
             {
-                valueStr = value.ToString();
+                valueStr = $"{value}";
             }
 
             if (!string.IsNullOrEmpty(Format))
