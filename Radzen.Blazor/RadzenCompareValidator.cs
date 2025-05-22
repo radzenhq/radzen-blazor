@@ -85,27 +85,22 @@ namespace Radzen.Blazor
         [Parameter]
         public virtual bool ValidateOnComponentValueChange { get; set; } = true;
 
-        private int Compare(object componentValue)
+        private int Compare(object componentValue) => componentValue switch
         {
-            switch (componentValue)
-            {
-                case String stringValue:
-                    return String.Compare(stringValue, (string)Value, false, Culture);
-                case IComparable comparable:
-                    return comparable.CompareTo(Value);
-                default:
-                    return 0;
-            }
-        }
+            string stringValue => string.Compare(stringValue, (string)Value, false, Culture),
+            IComparable comparable => comparable.CompareTo(Value),
+            _ => 0,
+        };
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
             var valueChanged = parameters.DidParameterChange(nameof(Value), Value);
+            var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
 
             await base.SetParametersAsync(parameters);
 
-            if (ValidateOnComponentValueChange && valueChanged && !firstRender && Visible)
+            if (ValidateOnComponentValueChange && (valueChanged || visibleChanged) && !firstRender && Visible)
             {
                 var component = Form.FindComponent(Component);
                 if (component != null && component.FieldIdentifier.FieldName != null)
@@ -137,23 +132,17 @@ namespace Radzen.Blazor
         {
             var compareResult = Compare(component.GetValue());
 
-            switch (Operator)
+            return Operator switch
             {
-                case CompareOperator.Equal:
-                    return compareResult == 0;
-                case CompareOperator.NotEqual:
-                    return compareResult != 0;
-                case CompareOperator.GreaterThan:
-                    return compareResult > 0;
-                case CompareOperator.GreaterThanEqual:
-                    return compareResult >= 0;
-                case CompareOperator.LessThan:
-                    return compareResult < 0;
-                case CompareOperator.LessThanEqual:
-                    return compareResult <= 0;
-                default:
-                    return true;
-            }
+                CompareOperator.Equal => compareResult == 0,
+                CompareOperator.NotEqual => compareResult != 0,
+                CompareOperator.GreaterThan => compareResult > 0,
+                CompareOperator.GreaterThanEqual => compareResult >= 0,
+                CompareOperator.LessThan => compareResult < 0,
+                CompareOperator.LessThanEqual => compareResult <= 0,
+                _ => true,
+            };
+
         }
     }
 }
