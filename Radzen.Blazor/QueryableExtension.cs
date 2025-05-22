@@ -1155,7 +1155,7 @@ namespace Radzen
                 if (string.IsNullOrEmpty(property) && inMemory || 
                     propertyExpression != null && propertyExpression.Type != typeof(string))
                 {
-                    propertyExpression = Expression.Call(notNullCheck(parameter), "ToString", Type.EmptyTypes);
+                    propertyExpression = Expression.Call(string.IsNullOrEmpty(property) && inMemory ? notNullCheck(parameter) : notNullCheck(propertyExpression), "ToString", Type.EmptyTypes);
                 }
 
                 if (ignoreCase)
