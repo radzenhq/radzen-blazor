@@ -9,6 +9,12 @@
         {
             <div class="rz-dialog-titlebar">
                 <div class="rz-dialog-title" id="rz-dialog-0-label">
+                    @if (!string.IsNullOrEmpty(Dialog.Options.Icon))
+                    {
+                        <RadzenIcon Icon="@Dialog.Options.Icon" 
+                                    IconColor="@(string.IsNullOrEmpty(Dialog.Options.IconColor) ? null : Dialog.Options.IconColor)" 
+                                    Style="@Dialog.Options.IconStyle" />
+                    }
                     @if (Dialog.Options.TitleContent != null)
                     {
                         @Dialog.Options.TitleContent(Service)
