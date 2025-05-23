@@ -589,7 +589,7 @@ namespace Radzen
 
             var customFilterExpression = "";
 
-            if (columnsToFilter.Any())
+            if (columnsWithCustomFilter.Any())
             {
                 var expressions = columnsWithCustomFilter.Select(c => (c.GetCustomFilterExpression() ?? "").Replace(" or ", " || ").Replace(" and ", " && ")).Where(e => !string.IsNullOrEmpty(e)).ToList();
                 customFilterExpression = string.Join($"{(gridLogicalFilterOperator == LogicalFilterOperator.And ? " && " : " || ")}", expressions);
