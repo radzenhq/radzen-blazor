@@ -189,7 +189,7 @@ public class ExpressionSerializer : ExpressionVisitor
             string str => $"\"{str}\"",
             char c => $"'{c}'",
             bool b => b.ToString().ToLowerInvariant(),
-            DateTime dt => $"DateTime.Parse(\"{dt.ToString("yyyy-MM-ddTHH:mm:ss.fffZ", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
+            DateTime dt => FormatDateTime(dt),
             DateOnly dateOnly => $"DateOnly.Parse(\"{dateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
             TimeOnly timeOnly => $"TimeOnly.Parse(\"{timeOnly.ToString("HH:mm:ss", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
             Guid guid => $"Guid.Parse(\"{guid.ToString("D", CultureInfo.InvariantCulture)}\")",
@@ -198,6 +198,14 @@ public class ExpressionSerializer : ExpressionVisitor
                 ? $"({value.GetType().FullName.Replace("+", ".")})" + Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()), CultureInfo.InvariantCulture).ToString()
                 : Convert.ToString(value, CultureInfo.InvariantCulture)
         };
+    }
+
+    private string FormatDateTime(DateTime dateTime)
+    {
+        var finalDate = dateTime.TimeOfDay == TimeSpan.Zero ? dateTime.Date : dateTime;
+        var dateFormat = dateTime.TimeOfDay == TimeSpan.Zero ? "yyyy-MM-dd" : "yyyy-MM-ddTHH:mm:ss.fffZ";
+
+        return $"DateTime.Parse(\"{finalDate.ToString(dateFormat, CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)";
     }
 
     private string FormatEnumerable(IEnumerable enumerable)
