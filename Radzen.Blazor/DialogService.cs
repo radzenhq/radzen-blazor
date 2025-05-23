@@ -54,24 +54,6 @@ namespace Radzen
                 return reference;
             }
         }
-        /// <summary>
-        /// Gets or sets the icon in Title.
-        /// </summary>
-        /// <value>The icon.</value>
-
-        public string Icon { get; set; }
-        /// <summary>
-        /// Gets or sets the icon color in Title.
-        /// </summary>
-        /// <value>The icon color.</value>
-
-        public string IconColor { get; set; }
-
-        /// <summary>
-        /// Gets or sets the CSS style of the Icon in Title.
-
-        /// </summary>
-        public string IconStyle { get; set; } = "margin-right: 0.75rem";
         
         /// <summary>
         /// Gets or sets the URI helper.
@@ -973,7 +955,26 @@ namespace Radzen
 	/// </summary>
 	public class DialogOptions : DialogOptionsBase
 	{
-		private bool resizable;
+        /// <summary>
+        /// Gets or sets the icon in Title.
+        /// </summary>
+        /// <value>The icon.</value>
+
+        public string Icon { get; set; }
+        /// <summary>
+        /// Gets or sets the icon color in Title.
+        /// </summary>
+        /// <value>The icon color.</value>
+
+        public string IconColor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the CSS style of the Icon in Title.
+        /// </summary>
+        public string IconStyle { get; set; } = "margin-right: 0.75rem";
+
+        
+        private bool resizable;
 		/// <summary>
 		/// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
 		/// </summary>
