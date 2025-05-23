@@ -268,8 +268,8 @@ namespace Radzen
             var parts = property.Split(new char[] { '.' }, 2);
             string currentPart = parts[0];
             Expression member;
-
-            if (expression.Type.IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(expression.Type.GetGenericTypeDefinition()))
+                
+            if (typeof(IDictionary).IsAssignableFrom(expression.Type))
             {
                 var key = currentPart.Split('"')[1];
                 var typeString = currentPart.Split('(')[0];
