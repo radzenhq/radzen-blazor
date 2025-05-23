@@ -207,7 +207,7 @@
 
     IDictionary<string, object> Attributes(DateTime start)
     {
-        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1));
+        var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInSlot(start, start.AddDays(1)));
         attributes["class"] = ClassList.Create("rz-slot").Add(attributes).ToString();
         attributes["dropzone"] = "move";
         return attributes;
