@@ -71,7 +71,7 @@ namespace Radzen
         /// Gets or sets the CSS style of the Icon in Title.
 
         /// </summary>
-        public string IconStyle { get; set; } = "margin-right: 0.75rem"
+        public string IconStyle { get; set; } = "margin-right: 0.75rem";
         
         /// <summary>
         /// Gets or sets the URI helper.
