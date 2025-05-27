@@ -23,7 +23,7 @@ namespace Radzen
         /// <summary>
         /// List of appointments.
         /// </summary>
-        public IEnumerable<AppointmentData> Appointments => appointments ?? (appointments = getAppointments());
+        public IEnumerable<AppointmentData> Appointments => appointments ??= getAppointments();
         /// <summary>
         /// HTML attributes to apply to the slot element.
         /// </summary>
