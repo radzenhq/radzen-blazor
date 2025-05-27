@@ -17,6 +17,13 @@ namespace Radzen
         /// The end of the slot.
         /// </summary>
         public DateTime End { get; set; }
+        // used to pass a function to get appointments on demand.
+        internal Func<IEnumerable<AppointmentData>> getAppointments;
+        private IEnumerable<AppointmentData> appointments;
+        /// <summary>
+        /// List of appointments.
+        /// </summary>
+        public IEnumerable<AppointmentData> Appointments => appointments ??= getAppointments();
         /// <summary>
         /// HTML attributes to apply to the slot element.
         /// </summary>
@@ -25,5 +32,6 @@ namespace Radzen
         /// The current view.
         /// </summary>
         public ISchedulerView View { get; set;}
+
     }
 }

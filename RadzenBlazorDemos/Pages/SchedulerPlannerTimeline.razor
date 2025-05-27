@@ -6,8 +6,8 @@
 </RadzenStack>
 
 <RadzenScheduler @ref=@scheduler SlotRender=@OnSlotRender style="height: 768px;" TItem="Appointment" Data=@appointments StartProperty="Start" EndProperty="End"
-    TextProperty="Text" SelectedIndex="1"
-    SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender MonthSelect=@OnMonthSelect>
+TextProperty="Text" SelectedIndex="1"
+SlotSelect=@OnSlotSelect AppointmentSelect=@OnAppointmentSelect AppointmentRender=@OnAppointmentRender MonthSelect=@OnMonthSelect>
     <RadzenMonthView />
     <RadzenYearPlannerView StartMonth="@startMonth" />
     <RadzenYearTimelineView StartMonth="@startMonth" />
@@ -30,7 +30,33 @@
         new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
         new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
         new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
-        new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
+        new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(7), Text = "Vacation" },
+        new Appointment { Start = DateTime.Today.AddDays(21).AddHours(10), End = DateTime.Today.AddDays(21).AddHours(11), Text = "Client #1" },
+        new Appointment { Start = DateTime.Today.AddDays(21).AddHours(11), End = DateTime.Today.AddDays(21).AddHours(12), Text = "Client #2" },
+        new Appointment { Start = DateTime.Today.AddDays(21).AddHours(12), End = DateTime.Today.AddDays(21).AddHours(13), Text = "Client #3" },
+        new Appointment { Start = DateTime.Today.AddDays(21).AddHours(13), End = DateTime.Today.AddDays(21).AddHours(14), Text = "Client #4" },
+        new Appointment { Start = DateTime.Today.AddDays(17).AddHours(10), End = DateTime.Today.AddDays(17).AddHours(11), Text = "Client #1" },
+        new Appointment { Start = DateTime.Today.AddDays(17).AddHours(11), End = DateTime.Today.AddDays(17).AddHours(12), Text = "Client #2" },
+        new Appointment { Start = DateTime.Today.AddDays(18).AddHours(10), End = DateTime.Today.AddDays(18).AddHours(11), Text = "Client #1" },
+        new Appointment { Start = DateTime.Today.AddDays(18).AddHours(11), End = DateTime.Today.AddDays(18).AddHours(12), Text = "Client #2" },
+        new Appointment { Start = DateTime.Today.AddDays(18).AddHours(12), End = DateTime.Today.AddDays(18).AddHours(13), Text = "Client #3" },
+        new Appointment { Start = DateTime.Today.AddDays(18).AddHours(13), End = DateTime.Today.AddDays(18).AddHours(14), Text = "Client #4" },
+        new Appointment { Start = DateTime.Today.AddDays(18).AddHours(14), End = DateTime.Today.AddDays(23).AddHours(15), Text = "Client #5" },
+        new Appointment { Start = DateTime.Today.AddDays(6).AddHours(10), End = DateTime.Today.AddDays(6).AddHours(11), Text = "Client #1" },
+        new Appointment { Start = DateTime.Today.AddDays(6).AddHours(11), End = DateTime.Today.AddDays(6).AddHours(12), Text = "Client #2" },
+        new Appointment { Start = DateTime.Today.AddDays(6).AddHours(12), End = DateTime.Today.AddDays(6).AddHours(13), Text = "Client #3" },
+        new Appointment { Start = DateTime.Today.AddDays(6).AddHours(13), End = DateTime.Today.AddDays(6).AddHours(14), Text = "Client #4" },
+        new Appointment { Start = DateTime.Today.AddDays(7).AddHours(10), End = DateTime.Today.AddDays(7).AddHours(11), Text = "Client #1" },
+        new Appointment { Start = DateTime.Today.AddDays(7).AddHours(11), End = DateTime.Today.AddDays(7).AddHours(12), Text = "Client #2" },
+        new Appointment { Start = DateTime.Today.AddDays(8).AddHours(10), End = DateTime.Today.AddDays(8).AddHours(11), Text = "Client #1" },
+        new Appointment { Start = DateTime.Today.AddDays(8).AddHours(11), End = DateTime.Today.AddDays(8).AddHours(12), Text = "Client #2" },
+        new Appointment { Start = DateTime.Today.AddDays(9).AddHours(10), End = DateTime.Today.AddDays(9).AddHours(11), Text = "Client #1" },
+        new Appointment { Start = DateTime.Today.AddDays(9).AddHours(11), End = DateTime.Today.AddDays(9).AddHours(12), Text = "Client #2" },
+        new Appointment { Start = DateTime.Today.AddDays(13).AddHours(10), End = DateTime.Today.AddDays(16).AddHours(11), Text = "Client #1" },
+        new Appointment { Start = DateTime.Today.AddDays(13).AddHours(11), End = DateTime.Today.AddDays(16).AddHours(12), Text = "Client #2" },
+        new Appointment { Start = DateTime.Today.AddDays(13).AddHours(12), End = DateTime.Today.AddDays(13).AddHours(13), Text = "Client #3" },
+        new Appointment { Start = DateTime.Today.AddDays(13).AddHours(13), End = DateTime.Today.AddDays(16).AddHours(14), Text = "Client #4" },
+        new Appointment { Start = DateTime.Today.AddDays(13).AddHours(14), End = DateTime.Today.AddDays(16).AddHours(15), Text = "Client #5" },
     };
 
     void OnSlotRender(SchedulerSlotRenderEventArgs args)
@@ -45,6 +71,20 @@
         if ((args.View.Text == "Planner" || args.View.Text == "Timeline") && args.Start.Month == 12 && startMonth != Month.January)
         {
             args.Attributes["style"] = "border-bottom: thick double var(--rz-base-600);";
+        }
+
+        // Color the slot depending on number of appointments for that day
+        if (args.Appointments.Count() > 4)
+        {
+            args.Attributes["style"] = "background: #ffabab;";
+        }
+        else if (args.Appointments.Count() > 2)
+        {
+            args.Attributes["style"] = "background: #ffc988;";
+        }
+        else if (args.Appointments.Count() > 0)
+        {
+            args.Attributes["style"] = "background: #c3ffc3;";
         }
     }
 
