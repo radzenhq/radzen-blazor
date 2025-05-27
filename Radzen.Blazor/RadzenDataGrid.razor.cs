@@ -1719,7 +1719,7 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<DataGridColumnReorderedEventArgs<TItem>> ColumnReordered { get; set; }
 
-        IQueryable<TItem> GetSelfRefView(IQueryable<TItem> view, string orderBy)
+        internal IQueryable<TItem> GetSelfRefView(IQueryable<TItem> view, string orderBy)
         {
             if (!string.IsNullOrEmpty(orderBy))
             {

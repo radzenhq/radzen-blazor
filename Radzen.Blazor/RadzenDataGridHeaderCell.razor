@@ -241,12 +241,14 @@ else
 
             if(!string.IsNullOrEmpty(loadDataArgs.Filter))
             {
-                query = Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column))
+                query = (Column.Grid.childData.Any() ? Column.Grid.GetSelfRefView(Column.Grid.Data.AsQueryable(), "") :
+                    Column.Grid.Data.AsQueryable()).Where<TItem>(Column.Grid.allColumns.Where(c => c != Column))
                     .Where(property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive);
             }
             else
             {
-                query = Column.Grid.Data.AsQueryable().Where<TItem>(Column.Grid.allColumns.Where(c => c != Column));
+                query = (Column.Grid.childData.Any() ? Column.Grid.GetSelfRefView(Column.Grid.Data.AsQueryable(), "") :
+                    Column.Grid.Data.AsQueryable()).Where<TItem>(Column.Grid.allColumns.Where(c => c != Column));
             }
 
             if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
@@ -271,7 +273,8 @@ else
                 query = query.Cast<object>().Take(loadDataArgs.Top.Value);
             }
 
-            filterValues = await Task.FromResult(query.Cast(propertyType));
+            filterValues = await Task.FromResult(Column.Grid.childData.Any() ?
+                query.Cast<object>().ToList().AsQueryable().Cast(propertyType) : query.Cast(propertyType));
 
             if (!Column.AllowCheckBoxListVirtualization)
             {
