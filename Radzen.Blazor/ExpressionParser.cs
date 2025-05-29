@@ -739,6 +739,7 @@ public class ExpressionParser
             nameof(DateTimeOffset) => typeof(DateTimeOffset),
             nameof(Guid) => typeof(Guid),
             nameof(CultureInfo) => typeof(CultureInfo),
+            nameof(DateTimeStyles) => typeof(DateTimeStyles),
             nameof(Double) or "double" => typeof(double),
             nameof(Single) or "float" => typeof(float),
             nameof(Int32) or "int" => typeof(int),
