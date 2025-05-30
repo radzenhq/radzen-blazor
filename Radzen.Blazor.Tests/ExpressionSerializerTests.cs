@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using Xunit;
@@ -236,6 +237,17 @@ namespace Radzen.Blazor.Tests
         {
             Expression<Func<TestEntity, bool>> expr = e => new[] { DateTimeOffset.Parse("2023-01-01T10:30:00.000+00:00") }.Intersect(e.UpdatedDates).Any();
             Assert.Equal("e => (new [] { DateTimeOffset.Parse(\"2023-01-01T10:30:00.000+00:00\") }).Intersect(e.UpdatedDates).Any()", _serializer.Serialize(expr));
+        }
+
+        [Fact]
+        public void Serializes_DateTimeWithRoundtripKind()
+        {
+            Expression<Func<TestEntity, bool>> expr = e =>
+                DateTime.Parse("2023-01-01T00:00:00.000Z", null, DateTimeStyles.RoundtripKind) > e.CreatedAt;
+
+            Assert.Equal(
+                "e => (DateTime.Parse(\"2023-01-01T00:00:00.000Z\", null, (System.Globalization.DateTimeStyles)128) > e.CreatedAt)",
+                _serializer.Serialize(expr));
         }
 
         [Fact]
