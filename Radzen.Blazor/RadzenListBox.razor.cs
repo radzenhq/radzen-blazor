@@ -86,8 +86,8 @@ namespace Radzen.Blazor
 
             if (AllowFiltering && key.Length == 1)
             {
-                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, key);
                 await JSRuntime.InvokeVoidAsync("Radzen.focusElement", SearchID);
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, key);
             }
 
             await OnKeyPress(args, false);
