@@ -213,6 +213,13 @@ namespace Radzen
         public bool Multiple { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating the selected index should reset to the top item when filtering, resulting in a down arrow action will start moving from the top.
+        /// </summary>
+        /// <value><c>true</c> to reset selected index to -1 when filtering; otherwist, <c>false</c>.</value>
+        [Parameter]
+        public bool ResetSelectedIndexOnFilter { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the user can select all values in multiple selection. Set to <c>true</c> by default.
         /// </summary>
         /// <value><c>true</c> if select all values is allowed; otherwise, <c>false</c>.</value>
@@ -725,7 +732,7 @@ namespace Radzen
                 await ClosePopup(key);
             }
             else if (key == "Delete" && AllowClear)
-            {
+            {                
                 preventKeydown = true;
 
                 if (!Multiple && selectedItem != null)
@@ -741,6 +748,10 @@ namespace Radzen
             }
             else if (AllowFiltering && isFilter && FilterAsYouType)
             {
+                if (ResetSelectedIndexOnFilter)
+                {
+                    selectedIndex = -1;
+                }                
                 preventKeydown = true;
 
                 Debounce(DebounceFilter, FilterDelay);
