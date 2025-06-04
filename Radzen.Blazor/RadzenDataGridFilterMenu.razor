@@ -116,6 +116,18 @@
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotNull)</span><span>@Grid.IsNotNullText</span>
             </li>
                 }
+            @if (Column.GetFilterOperators().Contains(FilterOperator.IsEmpty) && Column.FilterPropertyType == typeof(string))
+            {
+                <li class="@(FilterOperatorStyle(Column, FilterOperator.IsEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsEmpty))" style="display: block;">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsEmpty)</span><span>@Grid.IsEmptyText</span>
+                </li>
+            }
+            @if (Column.GetFilterOperators().Contains(FilterOperator.IsNotEmpty) && Column.FilterPropertyType == typeof(string))
+            {
+                <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotEmpty))" style="display: block;">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotEmpty)</span><span>@Grid.IsNotEmptyText</span>
+                </li>
+            }
             <li class="rz-multiselect-item" @onclick="@(args => ClearFilter())" style="display:block;">
                 <span class="rz-filter-menu-symbol">x</span><span>@Grid.ClearFilterText</span>
             </li>
