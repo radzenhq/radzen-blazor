@@ -486,8 +486,7 @@ namespace Radzen.Blazor
                     {
                         if (AllowFilteringByWord)
                         {
-                            var words = AllowFilteringByWordCount != null ? 
-                                searchText.Split(' ').Take(AllowFilteringByWordCount.Value) : searchText.Split(' ');
+                            var words = searchText.Split(' ').Take(AllowFilteringByWordCount);
 
                             foreach (string word in words)
                             {
@@ -507,7 +506,7 @@ namespace Radzen.Blazor
                     {
                         if (AllowFilteringByWord)
                         {
-                            string[] words = searchText.Split(' ');
+                            var words = searchText.Split(' ').Take(AllowFilteringByWordCount);
 
                             foreach (string word in words)
                             {
@@ -940,7 +939,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The AllowFilteringByWord max count.</value>
         [Parameter]
-        public int? AllowFilteringByWordCount { get; set; }
+        public int AllowFilteringByWordCount { get; set; } = 10;
 
         /// <summary>
         /// Gets or sets a value indicating whether DataGrid row can be selected on row click.
