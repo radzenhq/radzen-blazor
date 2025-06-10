@@ -215,7 +215,7 @@ namespace Radzen
         /// <summary>
         /// Gets or sets a value indicating the selected index should reset to the top item when filtering, resulting in a down arrow action will start moving from the top.
         /// </summary>
-        /// <value><c>true</c> to reset selected index to -1 when filtering; otherwist, <c>false</c>.</value>
+        /// <value><c>true</c> to reset selected index to -1 when filtering; otherwise, <c>false</c>.</value>
         [Parameter]
         public bool ResetSelectedIndexOnFilter { get; set; }
 
@@ -748,11 +748,12 @@ namespace Radzen
             }
             else if (AllowFiltering && isFilter && FilterAsYouType)
             {
+                preventKeydown = true;
+
                 if (ResetSelectedIndexOnFilter)
                 {
                     selectedIndex = -1;
-                }                
-                preventKeydown = true;
+                }                                
 
                 Debounce(DebounceFilter, FilterDelay);
             }
