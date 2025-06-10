@@ -732,7 +732,7 @@ namespace Radzen
                 await ClosePopup(key);
             }
             else if (key == "Delete" && AllowClear)
-            {                
+            {
                 preventKeydown = true;
 
                 if (!Multiple && selectedItem != null)
