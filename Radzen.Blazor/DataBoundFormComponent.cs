@@ -103,13 +103,13 @@ namespace Radzen
         /// <summary>
         /// The value
         /// </summary>
-        object _value;
+        private T _value = default;
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
         [Parameter]
-        public object Value
+        public T Value
         {
             get
             {
@@ -117,10 +117,14 @@ namespace Radzen
             }
             set
             {
-                if (_value != value)
+                if (value == null || value.Equals("null"))
                 {
-                    _value = object.Equals(value, "null") ? null : value;
+                    _value = default;
+                    return;
                 }
+
+                if (!value.Equals(_value))
+                    _value = value;
             }
         }
 
@@ -185,7 +189,7 @@ namespace Radzen
                 if (_data != value)
                 {
                     _view = null;
-                    _value = null;
+                    _value = default;
                     _data = value;
                     StateHasChanged();
                 }

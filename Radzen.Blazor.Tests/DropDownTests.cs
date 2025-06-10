@@ -1,10 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AngleSharp.Dom;
 using Bunit;
 using Microsoft.AspNetCore.Components;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -15,7 +14,7 @@ namespace Radzen.Blazor.Tests
         {
             public string Text { get; set; }
             public int Id { get; set; }
-            public bool Disabled { get; set; } = false;
+            public bool Disabled { get; set; }
         }
 
         private static IRenderedComponent<RadzenDropDown<T>> DropDown<T>(TestContext ctx, Action<ComponentParameterCollectionBuilder<RadzenDropDown<T>>> configure = null)
@@ -127,7 +126,7 @@ namespace Radzen.Blazor.Tests
 
             List<DataItem> boundCollection = [new() { Text = "Item 2" }];
 
-            var component = DropDown<string>(ctx, parameters =>
+            var component = DropDown<List<DataItem>>(ctx, parameters =>
             {
                 parameters.Add(p => p.ItemComparer, new DataItemComparer());
                 parameters.Add(p => p.Multiple, true);
@@ -307,7 +306,7 @@ namespace Radzen.Blazor.Tests
                 selectedValues.Add(data[1].Id);
             }
 
-            var component = ctx.RenderComponent<RadzenDropDown<DataItem>>(parameters => parameters
+            var component = ctx.RenderComponent<RadzenDropDown<List<int>>>(parameters => parameters
                .Add(p => p.Data, data)
                .Add(p => p.Value, selectedValues)
                .Add(p => p.Multiple, true)
