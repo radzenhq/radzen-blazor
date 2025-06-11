@@ -155,7 +155,7 @@
                                     {
                                         <RadzenProgressBarCircular Style="position:absolute;width:100%;" Visible="@isLoading" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
                                         <RadzenListBox AllowVirtualization="@Column.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
-                                        TValue="IEnumerable<object>" Value=@Column.GetFilterValue() Change="@ListBoxChange" 
+                                        TValue="IEnumerable" Value=@(Column.GetFilterValue() as IEnumerable) Change="@ListBoxChange" 
                                         Data=@filterValues Count=@filterValuesCount LoadData="@LoadFilterValues" 
                                         AllowFiltering="@(!string.IsNullOrEmpty(Column.GetFilterProperty()) && (PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty()) == typeof(string) || Column.FilterPropertyType == typeof(string)))"
                                         Disabled="@(!Column.CanSetFilterValue())" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
