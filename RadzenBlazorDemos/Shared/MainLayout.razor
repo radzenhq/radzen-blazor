@@ -13,9 +13,10 @@
 <RadzenComponents />
 
 <RadzenLayout Style="grid-template-columns: auto 1fr auto; grid-template-areas: 'rz-header rz-header rz-header' 'rz-sidebar rz-body rz-config-sidebar'">
-<RadzenHeader>
+<RadzenHeader class="rz-p-0">
     <ChildContent>
-        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px">
+        <MainTopNav />
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav">
             <RadzenColumn Size="5">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
@@ -26,7 +27,6 @@
                 <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
                     <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
                         <RadzenLink Path="/docs/api/" Text="API Reference" title="Radzen Blazor Components API Reference" class="rz-mx-2 rz-mx-lg-4" target="_blank" />
-                        <RadzenLink Path="https://www.radzen.com/" Text="About Radzen" title="Create .NET Core web applications fast & easy" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
                         <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" Text="GitHub" title="Star Radzen Blazor Components on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
                     </div>
                     <RadzenAppearanceToggle class="rz-mx-2" />

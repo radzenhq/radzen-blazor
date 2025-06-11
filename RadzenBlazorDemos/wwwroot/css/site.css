@@ -303,7 +303,28 @@ video {
     }
 }
 
+/* Main Site Navigation on Product pages */
 
+.site-main-top-nav {
+    --rz-menu-item-icon-margin-inline: 0;
+    --rz-menu-item-icon-color: var(--rz-on-primary-darker);
+    --rz-menu-item-icon-hover-color: var(--rz-white);
+    --rz-menu-background-color: var(--rz-base-darker);
+    --rz-menu-top-item-color: var(--rz-on-base-darker);
+    --rz-menu-top-item-background-color: var(--rz-base-darker);
+    --rz-menu-top-item-hover-color: var(--rz-on-base-darker);
+    --rz-menu-top-item-selected-color: var(--rz-on-base-darker);
+    --rz-menu-item-color: var(--rz-on-base-darker);
+    --rz-menu-item-background-color: var(--rz-base-darker);
+    --rz-menu-item-hover-color: var(--rz-on-base-dark);
+    --rz-menu-item-hover-background-color: var(--rz-base-dark);
+    --rz-menu-item-selected-color: var(--rz-on-base-darker);  
+}
+
+.rz-material3 .demos-nav,
+.rz-material3-dark .demos-nav  {
+    padding: 0.5rem;
+}
 
 /* Footer */
 
