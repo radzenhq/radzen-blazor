@@ -9,7 +9,8 @@ $menu-item-hover-color: var(--rz-on-secondary-light) !default;
 $menu-item-hover-background-color: var(--rz-secondary-light) !default;
 $menu-item-focus-outline: var(--rz-outline-focus) !default;
 $menu-item-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
-$menu-item-selected-color: var(--rz-text-color) !default;
+$menu-item-selected-color: var(--rz-secondary) !default;
+$menu-item-selected-background-color: transparent !default;
 $menu-item-icon-margin-inline: 0 0.5rem !default;
 $menu-item-icon-color: $menu-item-color !default;
 $menu-item-icon-hover-color: $menu-item-hover-color !default;
@@ -24,7 +25,8 @@ $menu-top-item-background-color: $menu-background-color !default;
 $menu-top-item-hover-color: var(--rz-secondary) !default;
 $menu-top-item-hover-background-color: transparent !default;
 $menu-top-item-selected-color: var(--rz-secondary) !default;
-$menu-top-item-icon-color: $menu-item-selected-color !default;
+$menu-top-item-selected-background-color: transparent !default;
+$menu-top-item-icon-color: $menu-top-item-color !default;
 $menu-top-item-icon-hover-color: $menu-top-item-hover-color !default;
 $context-menu-padding-block: 0 !default;
 $context-menu-padding-inline: 0 !default;
@@ -78,6 +80,8 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
   }
 
   .rz-navigation-item-wrapper-active {
+    background-color: var(--rz-menu-item-selected-background-color);
+
     .rz-navigation-item-link {
       color: var(--rz-menu-item-selected-color);
 
@@ -110,7 +114,10 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
     padding-inline: var(--rz-context-menu-padding-inline);
   }
 
+  // Top menu items
   .rz-navigation-item-link {
+    padding-block: var(--rz-menu-top-item-padding-block);
+    padding-inline: var(--rz-menu-top-item-padding-inline);
     color: var(--rz-menu-top-item-color);
     white-space: nowrap;
 
@@ -118,6 +125,15 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
       color: var(--rz-menu-top-item-icon-color);
     }
 
+    &.active {
+      color: var(--rz-menu-top-item-selected-color);
+
+      .rzi:not(.rz-navigation-item-icon-children) {
+        color: var(--rz-menu-top-item-selected-color);
+      }
+    }
+
+    // Expand-collapse top item icon
     .rz-navigation-item-icon-children {
   
       &.rz-state-expanded {
@@ -133,14 +149,14 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
   }
 
   .rz-navigation-item-wrapper {
-    border-radius: var(--rz-menu-top-item-border-radius);;
+    border-radius: var(--rz-menu-top-item-border-radius);
 
-    .rz-navigation-item-link {
-      padding-block: var(--rz-menu-top-item-padding-block);
-      padding-inline: var(--rz-menu-top-item-padding-inline);
+    &:has(>.active) {
+      background-color: var(--rz-menu-top-item-selected-background-color);
     }
 
-    &:hover {
+    &:hover,
+    &:has(>.active):hover {
       background-color: var(--rz-menu-top-item-hover-background-color);
 
       .rz-navigation-item-link {
@@ -154,6 +170,8 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
   }
 
   .rz-navigation-item-wrapper-active {
+    background-color: var(--rz-menu-top-item-selected-background-color);
+
     .rz-navigation-item-link {
       color: var(--rz-menu-top-item-selected-color);
 
@@ -199,12 +217,12 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
     .rz-navigation-item-wrapper {
       border-radius: var(--rz-menu-item-border-radius);
 
-      .rz-navigation-item-link {
-        padding-block: var(--rz-menu-item-padding-block);
-        padding-inline: var(--rz-menu-item-padding-inline);
+      &:has(>.active) {
+        background-color: var(--rz-menu-item-selected-background-color);
       }
 
-      &:hover {
+      &:hover,
+      &:has(>.active):hover {
         background-color: var(--rz-menu-item-hover-background-color);
 
         .rz-navigation-item-link {
@@ -217,12 +235,34 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
       }
     }
 
+    .rz-navigation-item-wrapper-active {
+      background-color: var(--rz-menu-item-selected-background-color);
+
+      .rz-navigation-item-link {
+        color: var(--rz-menu-item-selected-color);
+
+        .rzi:not(.rz-navigation-item-icon-children) {
+          color: var(--rz-menu-item-selected-color);
+        }
+      }
+    }
+
     .rz-navigation-item-link {
+      padding-block: var(--rz-menu-item-padding-block);
+      padding-inline: var(--rz-menu-item-padding-inline);
       color: var(--rz-menu-item-color);
       white-space: nowrap;
 
       .rzi:not(.rz-navigation-item-icon-children) {
         color: var(--rz-menu-item-icon-color);
+      }
+
+        &.active {
+        color: var(--rz-menu-item-selected-color);
+
+        .rzi:not(.rz-navigation-item-icon-children) {
+          color: var(--rz-menu-item-selected-color);
+        }
       }
     }
 
@@ -231,7 +271,6 @@ $context-menu-box-shadow: $rz-shadow-3 !default;
       box-shadow: none;
 
       .rz-navigation-item-link {
-        color: var(--rz-menu-item-color);
         margin-inline-start: var(--rz-menu-item-offset);
       }
 
