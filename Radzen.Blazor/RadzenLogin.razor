@@ -78,7 +78,10 @@
             <div class="rz-form-row">
                 <label class="rz-label"></label>
                 <div class="rz-form-input-wrapper rz-login-buttons">
+                    @if (ShowLoginButton)
+                    {
                     <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text=@LoginText Click=@OnLogin />
+                    }
                     @if (AllowResetPassword)
                     {
                         <a tabindex="0" class="rz-link" @onclick=@OnReset>@ResetPasswordText</a>
