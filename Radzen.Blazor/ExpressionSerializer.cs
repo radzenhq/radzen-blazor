@@ -205,7 +205,7 @@ public class ExpressionSerializer : ExpressionVisitor
         var finalDate = dateTime.TimeOfDay == TimeSpan.Zero ? dateTime.Date : dateTime;
         var dateFormat = dateTime.TimeOfDay == TimeSpan.Zero ? "yyyy-MM-dd" : "yyyy-MM-ddTHH:mm:ss.fffZ";
 
-        return $"DateTime.Parse(\"{finalDate.ToString(dateFormat, CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)";
+        return $"DateTime.SpecifyKind(DateTime.Parse(\"{finalDate.ToString(dateFormat, CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind), DateTimeKind.{Enum.GetName(finalDate.Kind)})";
     }
 
     private string FormatEnumerable(IEnumerable enumerable)
