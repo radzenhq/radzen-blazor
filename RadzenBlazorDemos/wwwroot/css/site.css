@@ -318,7 +318,8 @@ video {
     --rz-menu-item-background-color: var(--rz-base-darker);
     --rz-menu-item-hover-color: var(--rz-on-base-dark);
     --rz-menu-item-hover-background-color: var(--rz-base-dark);
-    --rz-menu-item-selected-color: var(--rz-on-base-darker);  
+    --rz-menu-item-selected-color: var(--rz-on-base-darker); 
+    --rz-menu-item-selected-background-color: var(--rz-base-dark);
 }
 
 .rz-material3 .demos-nav,
