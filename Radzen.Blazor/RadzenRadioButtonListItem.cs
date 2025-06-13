@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Radzen.Blazor.Rendering;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor
@@ -121,7 +122,9 @@ namespace Radzen.Blazor
 
         internal string GetItemCssClass()
         {
-            return GetCssClass();
+            return ClassList.Create(GetCssClass())
+                .AddDisabled(Disabled)
+                .ToString();
         }
 
         /// <inheritdoc />
