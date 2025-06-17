@@ -2174,7 +2174,8 @@ namespace Radzen.Blazor
                     || c.GetFilterOperator() == FilterOperator.IsEmpty | c.GetFilterOperator() == FilterOperator.IsNotEmpty))
                 .Select(c => new FilterDescriptor()
                 {
-                    Property = c.GetFilterProperty(),
+                    Property = !string.IsNullOrEmpty(c.FilterProperty) && c.FilterProperty != c.Property ? c.Property : c.GetFilterProperty(),
+                    FilterProperty = !string.IsNullOrEmpty(c.FilterProperty) && c.FilterProperty != c.Property ? c.FilterProperty : null,
                     FilterValue = c.GetFilterValue(),
                     FilterOperator = c.GetFilterOperator(),
                     SecondFilterValue = c.GetSecondFilterValue(),
