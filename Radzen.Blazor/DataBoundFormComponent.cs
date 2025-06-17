@@ -301,22 +301,23 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            // process all parameters first to prevent stale parameters
             var searchTextChanged = parameters.DidParameterChange(nameof(SearchText), SearchText);
+            var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
+            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
+            var result = base.SetParametersAsync(parameters);
+
             if (searchTextChanged)
             {
                 searchText = parameters.GetValueOrDefault<string>(SearchText);
             }
 
-            var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
-
+            // only call async code after all parameters have been processed
+            // and do not access any parameters afterwards as they may be stale
             if (dataChanged)
             {
                 await OnDataChanged();
             }
-
-            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
-
-            var result = base.SetParametersAsync(parameters);
 
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
             {

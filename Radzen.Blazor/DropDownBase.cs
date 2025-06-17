@@ -938,32 +938,38 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            // process all parameters first to prevent stale parameters
             var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
+            var selectedItemChanged = parameters.DidParameterChange(nameof(SelectedItem), SelectedItem);
+            var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+            var valueChanged = parameters.DidParameterChange(nameof(Value), Value);
+
             if (pageSize != default(int))
             {
                 PageSize = pageSize;
             }
 
-            var selectedItemChanged = parameters.DidParameterChange(nameof(SelectedItem), SelectedItem);
-            if (selectedItemChanged)
-            {
-                await SelectItem(selectedItem, false);
-            }
-
             var shouldClose = false;
 
-            if (parameters.DidParameterChange(nameof(Visible), Visible))
+            if (visibleChanged)
             {
                 var visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
                 shouldClose = !visible;
             }
 
-            if (parameters.DidParameterChange(nameof(Value), Value))
+            if (valueChanged)
             {
                 internalValue = parameters.GetValueOrDefault<object>(nameof(Value));
             }
 
             await base.SetParametersAsync(parameters);
+
+            // only call async code after all parameters have been processed
+            // and do not access any parameters afterwards as they may be stale
+            if (selectedItemChanged)
+            {
+                await SelectItem(selectedItem, false);
+            }
 
             if (shouldClose && !firstRender)
             {
