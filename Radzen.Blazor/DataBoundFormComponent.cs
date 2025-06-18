@@ -301,22 +301,19 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            var searchTextChanged = parameters.DidParameterChange(nameof(SearchText), SearchText);
-            if (searchTextChanged)
-            {
-                searchText = parameters.GetValueOrDefault<string>(SearchText);
-            }
-
+            // check for changes before setting the properties through the base call
             var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
+            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
+            
+            // allow the base class to process parameters and set the properties
+            // after this call the parameters object should be considered stale
+            await base.SetParametersAsync(parameters);
 
+            // handle changes
             if (dataChanged)
             {
                 await OnDataChanged();
             }
-
-            var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
-
-            var result = base.SetParametersAsync(parameters);
 
             if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
             {
@@ -329,8 +326,6 @@ namespace Radzen
             {
                 FormFieldContext?.DisabledChanged(Disabled);
             }
-
-            await result;
         }
 
         /// <summary>
