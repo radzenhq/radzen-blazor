@@ -147,7 +147,7 @@
     {
         await base.OnInitializedAsync();
 
-        filterId = $"{Grid.PopupID}{Column.GetFilterProperty()}fm";
+        filterId = $"{Grid.PopupID}{Column.GetFilterProperty()}{Column.UniqueID}fm";
     }
 
     protected string FilterOperatorStyle(RadzenDataGridColumn<TItem> column, FilterOperator value)
