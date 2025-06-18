@@ -938,39 +938,34 @@ namespace Radzen
         /// <returns>A Task representing the asynchronous operation.</returns>
         public override async Task SetParametersAsync(ParameterView parameters)
         {
-            // process all parameters first to prevent stale parameters
-            var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
+            // check for changes before setting the properties through the base call
             var selectedItemChanged = parameters.DidParameterChange(nameof(SelectedItem), SelectedItem);
             var visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
             var valueChanged = parameters.DidParameterChange(nameof(Value), Value);
 
-            if (pageSize != default(int))
-            {
-                PageSize = pageSize;
-            }
-
-            var shouldClose = false;
-
-            if (visibleChanged)
-            {
-                var visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
-                shouldClose = !visible;
-            }
-
+            // manually set properties that are not set through the base call
             if (valueChanged)
             {
                 internalValue = parameters.GetValueOrDefault<object>(nameof(Value));
             }
-
+            
+            var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
+            if (pageSize != default(int))
+            {
+                PageSize = pageSize;
+            }
+            
+            // allow the base class to process parameters and set the properties
+            // after this call the parameters object should be considered stale
             await base.SetParametersAsync(parameters);
 
-            // only call async code after all parameters have been processed
-            // and do not access any parameters afterwards as they may be stale
+            // handle changes
             if (selectedItemChanged)
             {
                 await SelectItem(selectedItem, false);
             }
 
+            var shouldClose = visibleChanged && !Visible;
             if (shouldClose && !firstRender)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
