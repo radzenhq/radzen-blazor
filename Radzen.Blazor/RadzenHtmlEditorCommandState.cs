@@ -1,6 +1,10 @@
 namespace Radzen.Blazor
 {
-    internal class RadzenHtmlEditorCommandState
+    /// <summary>
+    /// Represents the state of various commands available in the Radzen HTML editor.
+    /// Used to track the status of editor commands such as formatting, undo/redo, and text alignment.
+    /// </summary>
+    public class RadzenHtmlEditorCommandState
     {
         public bool Undo { get; set; }
         public bool Redo { get; set; }

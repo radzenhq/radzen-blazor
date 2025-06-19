@@ -136,7 +136,11 @@ namespace Radzen.Blazor
             }
         }
 
-        internal RadzenHtmlEditorCommandState State { get; set; } = new RadzenHtmlEditorCommandState();
+        /// <summary>
+        /// Represents the current state of the toolbar commands and other functionalities within the RadzenHtmlEditor component.
+        /// Updated dynamically based on user actions or programmatically invoked commands.
+        /// </summary>
+        public RadzenHtmlEditorCommandState State { get; set; } = new();
 
         async Task OnFocus()
         {
@@ -217,6 +221,11 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Handles changes to the editor's source content.
+        /// </summary>
+        /// <param name="html">The updated HTML content.</param>
+        /// <returns>A task that represents the asynchronous operation.</returns>
         private async Task SourceChanged(string html)
         {
             if (Html != html)
@@ -289,7 +298,14 @@ namespace Radzen.Blazor
         bool visibleChanged = false;
         bool firstRender = true;
 
-        internal ValueTask<T> GetSelectionAttributes<T>(string selector, string[] attributes)
+        /// <summary>
+        /// Retrieves the specified attributes of a selection within the content editable area.
+        /// </summary>
+        /// <typeparam name="T">The type of attributes to retrieve.</typeparam>
+        /// <param name="selector">The CSS selector used to target the element.</param>
+        /// <param name="attributes">An array of attribute names to retrieve.</param>
+        /// <returns>A task that represents the asynchronous operation, returning the attributes as an object of type T.</returns>
+        public ValueTask<T> GetSelectionAttributes<T>(string selector, string[] attributes)
         {
             return JSRuntime.InvokeAsync<T>("Radzen.selectionAttributes", selector, attributes, ContentEditable);
         }
