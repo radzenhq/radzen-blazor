@@ -226,7 +226,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="html">The updated HTML content.</param>
         /// <returns>A task that represents the asynchronous operation.</returns>
-        public async Task SourceChanged(string html)
+        private async Task SourceChanged(string html)
         {
             if (Html != html)
             {
