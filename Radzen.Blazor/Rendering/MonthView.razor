@@ -136,6 +136,11 @@
                     var lastStart = days[lastAppointmentInBand.DayIndex].Start;
                     var lastEnd = lastAppointmentInBand.Data.End;
 
+                    if (lastStart == lastEnd && lastEnd == slot.Start)
+                    {
+                        continue;
+                    }
+
                     // Check if the appointment overlaps with the last appointment in the band
                     if (lastStart < appointment.End && lastEnd > slot.Start)
                     {
