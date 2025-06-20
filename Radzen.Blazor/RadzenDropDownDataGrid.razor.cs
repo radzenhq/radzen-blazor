@@ -57,6 +57,13 @@ namespace Radzen.Blazor
         public bool Chips { get; set; }
 
         /// <summary>
+        /// Gets or sets the grid lines.
+        /// </summary>
+        /// <value>The grid lines.</value>
+        [Parameter]
+        public DataGridGridLines GridLines { get; set; } = DataGridGridLines.Default;
+
+        /// <summary>
         /// Gets or sets the Popup style.
         /// </summary>
         /// <value>The number Popup style.</value>

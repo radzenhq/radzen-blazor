@@ -4,7 +4,7 @@
 
 @foreach (var menu in menus)
 {
-    <div id="@UniqueID" class="rz-tooltip" style="display: none; top: 0px; left: 0px; z-index: 1001; position: absolute;">
+    <div id="@UniqueID" oncontextmenu="event.preventDefault()" class="rz-tooltip" style="display: none; top: 0px; left: 0px; z-index: 1001; position: absolute;">
         @if (menu.Options.ChildContent != null)
         {
             <div class="rz-context-menu">
