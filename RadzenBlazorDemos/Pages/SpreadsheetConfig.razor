@@ -22,8 +22,6 @@
     <button @onclick=@(Filter)>Filter</button>
 </div>
 
-<InputFile OnChange=@OnUploadAsync />
-
 <RadzenSpreadsheet Workbook=@workbook style="height: 500px" />
 
 @code {
@@ -85,23 +83,6 @@
     void SetColor(string color)
     {
         sheet.Cells["A5"].Format.Color = color;
-    }
-
-    async Task OnUploadAsync(InputFileChangeEventArgs args)
-    {
-        var file = args.File;
-        if (file != null)
-        {
-            using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10); // 10 MB max size
-            using var memoryStream = new MemoryStream();
-
-            await stream.CopyToAsync(memoryStream);
-            memoryStream.Position = 0;
-    
-            workbook = Workbook.LoadFromStream(memoryStream);
-
-            StateHasChanged();
-        }
     }
 
     async Task SaveAsync()
