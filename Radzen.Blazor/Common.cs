@@ -3972,4 +3972,46 @@ namespace Radzen
         /// </summary>
         Right
     }
+
+    /// <summary>
+    /// Supplies information about an image resize event in the RadzenHtmlEditor.
+    /// </summary>
+    public class ImageResizeEventArgs
+    {
+        /// <summary>
+        /// Gets or sets the source URL of the resized image.
+        /// </summary>
+        public string Src { get; set; }
+
+        /// <summary>
+        /// Gets or sets the new width of the image.
+        /// </summary>
+        public string Width { get; set; }
+
+        /// <summary>
+        /// Gets or sets the new height of the image.
+        /// </summary>
+        public string Height { get; set; }
+    }
+
+    /// <summary>
+    /// Data structure for image resize information passed from JavaScript.
+    /// </summary>
+    public class ImageResizeData
+    {
+        /// <summary>
+        /// Gets or sets the source URL of the resized image.
+        /// </summary>
+        public string Src { get; set; }
+
+        /// <summary>
+        /// Gets or sets the new width of the image.
+        /// </summary>
+        public string Width { get; set; }
+
+        /// <summary>
+        /// Gets or sets the new height of the image.
+        /// </summary>
+        public string Height { get; set; }
+    }
 }

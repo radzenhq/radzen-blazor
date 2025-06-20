@@ -33,6 +33,54 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   padding: 0.5rem;
   outline: none;
   background-color: var(--rz-editor-content-background-color);
+
+  img.rz-state-selected {
+    position: relative;
+    outline: 2px solid var(--rz-primary);
+    outline-offset: 2px;
+  }
+
+  .rz-image-resize-handle {
+    position: absolute !important;
+    width: 12px !important;
+    height: 12px !important;
+    background-color: var(--rz-primary) !important;
+    border: 2px solid var(--rz-on-primary) !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    z-index: 1000 !important;
+    pointer-events: all !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+
+    &.rz-resize-nw {
+      top: -6px !important;
+      left: -6px !important;
+      cursor: nw-resize !important;
+    }
+
+    &.rz-resize-ne {
+      top: -6px !important;
+      right: -6px !important;
+      cursor: ne-resize !important;
+    }
+
+    &.rz-resize-sw {
+      bottom: -6px !important;
+      left: -6px !important;
+      cursor: sw-resize !important;
+    }
+
+    &.rz-resize-se {
+      bottom: -6px !important;
+      right: -6px !important;
+      cursor: se-resize !important;
+    }
+  }
+
+  .rz-image-resize-container {
+    position: relative !important;
+    display: inline-block !important;
+  }
 }
 
 .rz-html-editor-source.rz-textarea {
@@ -61,6 +109,21 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
   > * {
     margin: var(--rz-editor-toolbar-item-margin);
+  }
+
+  .rz-html-editor-colorpicker {
+    .rz-colorpicker {
+      &:not(:disabled):not(.rz-state-disabled):hover {
+        border: none;
+      }
+    }
+
+    .rz-colorpicker-trigger {
+      .rzi {
+        font-size: 1.25rem;
+        height: 1rem;
+      }
+    }
   }
 }
 
@@ -209,22 +272,4 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 .rz-html-editor-separator {
   width: 1px;
   background-color: var(--rz-editor-separator-background-color);
-}
-
-.rz-html-editor-toolbar {
-
-  .rz-html-editor-colorpicker {
-    .rz-colorpicker {
-      &:not(:disabled):not(.rz-state-disabled):hover {
-        border: none;
-      }
-    }
-
-    .rz-colorpicker-trigger {
-      .rzi {
-        font-size: 1.25rem;
-        height: 1rem;
-      }
-    }
-  }
 }

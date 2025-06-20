@@ -459,6 +459,12 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<UploadCompleteEventArgs> UploadComplete { get; set; }
 
+        /// <summary>
+        /// Gets or sets the callback which is invoked when an image is resized.
+        /// </summary>
+        /// <value>The image resize callback.</value>
+        [Parameter]
+        public EventCallback<ImageResizeEventArgs> ImageResize { get; set; }
 
         internal async Task RaiseUploadComplete(UploadCompleteEventArgs args)
         {
@@ -486,6 +492,20 @@ namespace Radzen.Blazor
             }
 
             await UploadComplete.InvokeAsync(new UploadCompleteEventArgs() { RawResponse = response, JsonResponse = doc });
+        }
+
+        /// <summary>
+        /// Invoked by interop when an image is resized.
+        /// </summary>
+        [JSInvokable("OnImageResize")]
+        public async Task OnImageResize(ImageResizeData data)
+        {
+            await ImageResize.InvokeAsync(new ImageResizeEventArgs 
+            { 
+                Src = data.Src, 
+                Width = data.Width, 
+                Height = data.Height 
+            });
         }
     }
 }

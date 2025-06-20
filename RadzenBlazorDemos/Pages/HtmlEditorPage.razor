@@ -79,6 +79,18 @@ The Radzen HtmlEditor supports the following tools:
 <RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorUploadUrl" AdditionalSourceCodePages="@(new [] { "../../RadzenBlazorDemos.Host/Controllers/UploadController.cs"})" >
     <HtmlEditorUploadUrl />
 </RadzenExample>
+
+<RadzenText Anchor="html-editor#image-resize" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Image resize functionality
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The HtmlEditor now supports image resizing. Click on any image in the editor to see resize handles appear on the corners. 
+    Drag the handles to resize the image while maintaining aspect ratio. You can listen to resize events using the <code>ImageResize</code> event.
+</RadzenText>
+<RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorImageResize">
+    <HtmlEditorImageResize />
+</RadzenExample>
+
 <RadzenText Anchor="html-editor#focus" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
     Focus
 </RadzenText>

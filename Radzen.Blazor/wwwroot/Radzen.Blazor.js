@@ -1819,19 +1819,38 @@ window.Radzen = {
         inside = false;
         instance.invokeMethodAsync('MouseMove', -1, -1);
     };
-    ref.clickHandler = function (e) {
-      var rect = ref.getBoundingClientRect();
-      var x = e.clientX - rect.left;
-      var y = e.clientY - rect.top;
-      if (!e.target.closest('.rz-marker')) {
-        instance.invokeMethodAsync('Click', x, y);
+    ref.clickListener = function (e) {
+      console.log('Editor click event on:', e.target);
+      console.log('Target matches img:', e.target.matches('img'));
+      
+      if (e.target) {
+        if (e.target.matches('a,button')) {
+          e.preventDefault();
+        }
+
+        // Remove resize handles from all images
+        Radzen.removeImageResizeHandles(ref);
+
+        for (var img of ref.querySelectorAll('img.rz-state-selected')) {
+          img.classList.remove('rz-state-selected');
+        }
+
+        if (e.target.matches('img')) {
+          console.log('Image clicked:', e.target);
+          e.target.classList.add('rz-state-selected');
+          Radzen.addImageResizeHandles(e.target, ref, instance);
+          var range = document.createRange();
+          range.selectNode(e.target);
+          getSelection().removeAllRanges();
+          getSelection().addRange(range);
+        }
       }
     };
 
     ref.addEventListener('mouseenter', ref.mouseEnterHandler);
     ref.addEventListener('mouseleave', ref.mouseLeaveHandler);
     ref.addEventListener('mousemove', ref.mouseMoveHandler);
-    ref.addEventListener('click', ref.clickHandler);
+    ref.addEventListener('click', ref.clickListener);
 
     return this.createResizable(ref, instance);
   },
@@ -1937,17 +1956,24 @@ window.Radzen = {
     };
 
     ref.clickListener = function (e) {
+      console.log('Editor click event on:', e.target);
+      console.log('Target matches img:', e.target.matches('img'));
+      
       if (e.target) {
         if (e.target.matches('a,button')) {
           e.preventDefault();
         }
 
+        // Remove resize handles from all images
+        Radzen.removeImageResizeHandles(ref);
+
         for (var img of ref.querySelectorAll('img.rz-state-selected')) {
           img.classList.remove('rz-state-selected');
         }
-
         if (e.target.matches('img')) {
+          console.log('Image clicked:', e.target);
           e.target.classList.add('rz-state-selected');
+          Radzen.addImageResizeHandles(e.target, ref, instance);
           var range = document.createRange();
           range.selectNode(e.target);
           getSelection().removeAllRanges();
@@ -2101,6 +2127,9 @@ window.Radzen = {
       ref.removeEventListener('keydown', ref.keydownListener);
       ref.removeEventListener('click', ref.clickListener);
       document.removeEventListener('selectionchange', ref.selectionChangeListener);
+      
+      // Remove image resize handles
+      Radzen.removeImageResizeHandles(ref);
     }
   },
   startDrag: function (ref, instance, handler) {
@@ -2583,5 +2612,215 @@ window.Radzen = {
     unregisterScrollListener: function (element) {
       document.removeEventListener('scroll', element.scrollHandler, true);
       window.removeEventListener('resize', element.scrollHandler, true);
+    },
+    addImageResizeHandles: function (img, container, instance) {
+      // Remove existing handles first
+      Radzen.removeImageResizeHandles(container);
+      
+      // Create container for the image and handles
+      var wrapper = document.createElement('div');
+      wrapper.className = 'rz-image-resize-container';
+      wrapper.style.position = 'relative';
+      wrapper.style.display = 'inline-block';
+      
+      // Insert wrapper before the image
+      img.parentNode.insertBefore(wrapper, img);
+      wrapper.appendChild(img);
+      
+      // Create resize handles
+      var handles = ['nw', 'ne', 'sw', 'se'];
+      var resizeData = {
+        img: img,
+        wrapper: wrapper,
+        editorContainer: container, // Store reference to the editor container
+        startX: 0,
+        startY: 0,
+        startWidth: 0,
+        startHeight: 0,
+        aspectRatio: 0
+      };
+      
+      handles.forEach(function(position) {
+        var handle = document.createElement('div');
+        handle.className = 'rz-image-resize-handle rz-resize-' + position;
+        handle.setAttribute('data-position', position);
+        
+        // Add inline styles to ensure visibility
+        handle.style.position = 'absolute';
+        handle.style.width = '12px';
+        handle.style.height = '12px';
+        handle.style.backgroundColor = '#007bff';
+        handle.style.border = '2px solid #ffffff';
+        handle.style.borderRadius = '50%';
+        handle.style.cursor = 'pointer';
+        handle.style.zIndex = '1000';
+        handle.style.pointerEvents = 'all';
+        handle.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        
+        // Position the handle
+        if (position === 'nw') {
+          handle.style.top = '-6px';
+          handle.style.left = '-6px';
+          handle.style.cursor = 'nw-resize';
+        } else if (position === 'ne') {
+          handle.style.top = '-6px';
+          handle.style.right = '-6px';
+          handle.style.cursor = 'ne-resize';
+        } else if (position === 'sw') {
+          handle.style.bottom = '-6px';
+          handle.style.left = '-6px';
+          handle.style.cursor = 'sw-resize';
+        } else if (position === 'se') {
+          handle.style.bottom = '-6px';
+          handle.style.right = '-6px';
+          handle.style.cursor = 'se-resize';
+        }
+        
+        wrapper.appendChild(handle);
+        
+        handle.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          Radzen.startImageResize(e, resizeData, instance);
+        });
+        
+        handle.addEventListener('touchstart', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.touches.length === 1) {
+            Radzen.startImageResize(e.touches[0], resizeData, instance);
+          }
+        });
+      });
+    },
+    removeImageResizeHandles: function (container) {
+      var wrappers = container.querySelectorAll('.rz-image-resize-container');
+      wrappers.forEach(function(wrapper) {
+        var img = wrapper.querySelector('img');
+        if (img) {
+          wrapper.parentNode.insertBefore(img, wrapper);
+          wrapper.parentNode.removeChild(wrapper);
+        }
+      });
+    },
+    startImageResize: function (e, data, instance) {
+      var rect = data.img.getBoundingClientRect();
+      data.startX = e.clientX;
+      data.startY = e.clientY;
+      data.startWidth = rect.width;
+      data.startHeight = rect.height;
+      data.aspectRatio = rect.width / rect.height;
+      
+      // Store references to the event handlers so we can remove them later
+      data.mouseMoveHandler = function(e) {
+        Radzen.resizeImage(e, data, instance);
+      };
+      
+      data.mouseUpHandler = function() {
+        document.removeEventListener('mousemove', data.mouseMoveHandler);
+        document.removeEventListener('mouseup', data.mouseUpHandler);
+        document.removeEventListener('touchmove', data.touchMoveHandler);
+        document.removeEventListener('touchend', data.touchEndHandler);
+        Radzen.finishImageResize(data, instance);
+      };
+      
+      data.touchMoveHandler = function(e) {
+        e.preventDefault();
+        if (e.touches.length === 1) {
+          Radzen.resizeImage(e.touches[0], data, instance);
+        }
+      };
+      
+      data.touchEndHandler = function() {
+        document.removeEventListener('mousemove', data.mouseMoveHandler);
+        document.removeEventListener('mouseup', data.mouseUpHandler);
+        document.removeEventListener('touchmove', data.touchMoveHandler);
+        document.removeEventListener('touchend', data.touchEndHandler);
+        Radzen.finishImageResize(data, instance);
+      };
+      
+      // Add event listeners
+      document.addEventListener('mousemove', data.mouseMoveHandler);
+      document.addEventListener('mouseup', data.mouseUpHandler);
+      document.addEventListener('touchmove', data.touchMoveHandler, { passive: false });
+      document.addEventListener('touchend', data.touchEndHandler);
+    },
+    resizeImage: function (e, data, instance) {
+      var deltaX = e.clientX - data.startX;
+      var deltaY = e.clientY - data.startY;
+      
+      // Calculate new dimensions based on the resize handle position
+      var newWidth = data.startWidth + deltaX;
+      var newHeight = data.startHeight + deltaY;
+      
+      // Maintain aspect ratio
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        newHeight = newWidth / data.aspectRatio;
+      } else {
+        newWidth = newHeight * data.aspectRatio;
+      }
+      
+      // Apply minimum size constraints
+      newWidth = Math.max(20, newWidth);
+      newHeight = Math.max(20, newHeight);
+      
+      // Update image dimensions
+      data.img.style.width = newWidth + 'px';
+      data.img.style.height = newHeight + 'px';
+    },
+    finishImageResize: function (data, instance) {
+      // Get the computed dimensions
+      var computedWidth = data.img.style.width;
+      var computedHeight = data.img.style.height;
+      
+      // Extract numeric values (remove 'px')
+      var widthValue = computedWidth.replace('px', '');
+      var heightValue = computedHeight.replace('px', '');
+      
+      // Update the image attributes to match the style
+      data.img.setAttribute('width', widthValue);
+      data.img.setAttribute('height', heightValue);
+      
+      // Keep the style attributes for visual consistency
+      data.img.style.width = computedWidth;
+      data.img.style.height = computedHeight;
+      
+      // Use the stored editor container reference
+      var editorContainer = data.editorContainer;
+      
+      // Notify Blazor immediately about the HTML change
+      if (editorContainer && editorContainer.inputListener) {
+        editorContainer.inputListener();
+      } else if (instance && editorContainer) {
+        var updatedHtml = editorContainer.innerHTML;
+        instance.invokeMethodAsync('OnChange', updatedHtml);
+      }
+      
+      // Also try the setTimeout approach as backup
+      setTimeout(function() {
+        // Use the stored editor container reference again
+        var editorContainer = data.editorContainer;
+        
+        // Use the existing inputListener to notify Blazor about the HTML change
+        if (editorContainer && editorContainer.inputListener) {
+          editorContainer.inputListener();
+        } else {
+          // Fallback: directly call OnChange with the updated HTML
+          if (instance && editorContainer) {
+            var updatedHtml = editorContainer.innerHTML;
+            instance.invokeMethodAsync('OnChange', updatedHtml);
+          }
+        }
+      }, 10);
+      
+      // Notify the Blazor component about the image resize event
+      if (instance) {
+        instance.invokeMethodAsync('OnImageResize', {
+          src: data.img.src,
+          width: computedWidth,
+          height: computedHeight
+        });
+      }
     }
 };
+
