@@ -1,0 +1,9 @@
+@if (Sheet.Selection.Cell != CellRef.Invalid)
+{
+    <CellSelection Context=@Context Cell=@Sheet.Selection.Cell Sheet=@Sheet />
+}
+@foreach (var range in Sheet.GetRanges(Sheet.Selection.Range))
+{
+    <RangeSelectionItem Context=@Context Range=@range.Range Sheet=@Sheet Cell=@Sheet.Selection.Cell FrozenRow=@range.FrozenRow 
+                        FrozenColumn=@range.FrozenColumn Top=@range.Top Left=@range.Left Bottom=@range.Bottom Right=@range.Right />
+}

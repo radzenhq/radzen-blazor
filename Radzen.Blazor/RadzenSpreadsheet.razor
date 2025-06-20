@@ -1,0 +1,45 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor.Spreadsheet
+@inherits RadzenComponent
+
+<div @ref=@Element class=@GetCssClass() style=@Style @attributes=@Attributes tabindex="0">
+    <CascadingValue TValue="ISpreadsheet" Value=this IsFixed="true">
+@if (Sheet != null)
+{
+        <FormulaEditor Sheet=@Sheet />
+        <VirtualGrid @ref=@grid style="flex: 1" Rows=@Sheet.Rows Columns=@Sheet.Columns MergedCells=@Sheet.MergedCells>
+            <Template>
+                @switch (context)
+                {
+                    case VirtualCorner corner:
+                        <CornerHeaderCell Rect=@context.Rect />
+                        break;
+                    case VirtualColumnHeader column:
+                        <ColumnHeader Sheet=@Sheet FrozenState=@column.FrozenState Column=@column.Column Rect=@context.Rect />
+                        break;
+                    case VirtualRowHeader row:
+                        <RowHeader Sheet=@Sheet FrozenState=@row.FrozenState Row=@row.Row Rect=@context.Rect />
+                        break;
+                    case VirtualDataItem item:
+                        <CellView Sheet=@Sheet Column=@item.Column Row=@item.Row FrozenState=@item.FrozenState Rect=@context.Rect />
+                        break;
+                    case VirtualHorizontalSplitter horizontalSplitter:
+                        <Splitter class="rz-spreadsheet-horizontal-splitter" Rect=@horizontalSplitter.Rect />
+                        break;
+                    case VirtualVerticalSplitter verticalSplitter:
+                        <Splitter class="rz-spreadsheet-vertical-splitter" Rect=@verticalSplitter.Rect />
+                        break;
+                }
+            </Template>
+            <ChildContent>
+                <SelectionOverlay Sheet=@Sheet Context=@context />
+                <CellEditor Sheet=@Sheet Context=@context />
+                @foreach (var dataTable in Sheet.DataTables)
+                {
+                    <DataTableFrame Sheet=@Sheet DataTable=@dataTable Context=@context />
+                }
+            </ChildContent>
+        </VirtualGrid>
+}
+    </CascadingValue>
+</div>
