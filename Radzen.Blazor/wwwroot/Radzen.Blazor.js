@@ -2855,4 +2855,342 @@ Radzen.unregisterFabMenu = function(element){
     document.removeEventListener('click', handler);
     delete element.__rzOutsideClickHandler;
   }
-};
+};class Spreadsheet {
+  constructor(options) {
+    this.element = options.element;
+    this.dotNetRef = options.dotNetRef;
+    this.shortcuts = options.shortcuts;
+    this.element.addEventListener('keydown', this.onKeyDown);
+    this.element.addEventListener('pointerdown', this.onPointerDown);
+    this.element.addEventListener('dblclick', this.onDoubleClick);
+    addEventListener('paste', this.onPaste);
+    addEventListener('copy', this.onCopy);
+  }
+
+  onPaste = (e) => {
+    if (this.isActive(e.target)) {
+      var text = e.clipboardData.getData('text/plain');
+      this.dotNetRef.invokeMethodAsync('OnPasteAsync', text);
+    }
+  }
+
+  onCopy = async (e) => {
+    if (this.isActive(e.target)) {
+      this.dotNetRef.invokeMethodAsync('OnCopyAsync');
+    }
+  }
+
+  isActive = (target) => {
+    return target == this.element || this.element.contains(target);
+  }
+
+  copyToClipboard = async (text) => {
+    if (window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (err) {
+        console.error('Failed to copy text to clipboard:', err);
+      }
+    }
+  }
+
+  onPointerDown = async (e) => {
+    if (e.button != 0) return;
+
+    if (e.target.matches('.rz-spreadsheet-cell')) {
+      const cell = e.target;
+      const row = +cell.dataset.row;
+      const column = +cell.dataset.column;
+      addEventListener('pointerup', this.onCellPointerUp);
+      addEventListener('pointermove', this.onCellPointerMove);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnCellPointerDownAsync', { row, column, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onCellPointerMove);
+      }
+    } else if (e.target.matches('.rz-spreadsheet-row-header')) {
+      const row = +e.target.dataset.row;
+      addEventListener('pointerup', this.onRowPointerUp);
+      addEventListener('pointermove', this.onRowPointerMove);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnRowPointerDownAsync', { row, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onRowPointerMove);
+      }
+    } else if (e.target.matches('.rz-spreadsheet-column-header')) {
+      const column = +e.target.dataset.column;
+      addEventListener('pointerup', this.onColumnPointerUp);
+      addEventListener('pointermove', this.onColumnPointerMove);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnColumnPointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onColumnPointerMove);
+      }
+    } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
+      const column = +e.target.dataset.column;
+        addEventListener('pointermove', this.onColumnResizeMove);
+        addEventListener('pointerup', this.onColumnResizeUp);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnColumnResizePointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onColumnResizeMove);
+        removeEventListener('pointerup', this.onColumnResizeUp);
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    } else if (e.target.matches('.rz-spreadsheet-row-resize-handle')) {
+      const row = +e.target.dataset.row;
+      addEventListener('pointermove', this.onRowResizeMove);
+      addEventListener('pointerup', this.onRowResizeUp);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnRowResizePointerDownAsync', { row, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onRowResizeMove);
+        removeEventListener('pointerup', this.onRowResizeUp);
+      }
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+
+  onDoubleClick = (e) => {
+    if (e.target.matches('.rz-spreadsheet-cell')) {
+      const cell = e.target;
+      const row = +cell.dataset.row;
+      const column = +cell.dataset.column;
+      this.dotNetRef.invokeMethodAsync('OnCellDoubleClickAsync', { row, column, pointer: this.toEventArgs(e) });
+    }
+  }
+
+  onColumnPointerUp = (e) => {
+    removeEventListener('pointermove', this.onColumnPointerMove);
+    removeEventListener('pointerup', this.onColumnPointerUp);
+  }
+
+  onColumnPointerMove = (e) => {
+    this.invokeAsync('OnColumnPointerMoveAsync', e);
+  }
+
+  onRowPointerMove = (e) => {
+    this.invokeAsync('OnRowPointerMoveAsync', e);
+  }
+
+  onRowPointerUp = (e) => {
+    removeEventListener('pointermove', this.onRowPointerMove);
+    removeEventListener('pointerup', this.onRowPointerUp);
+  }
+
+  onCellPointerMove = (e) => {
+    this.invokeAsync('OnCellPointerMoveAsync', e);
+  }
+
+  onCellPointerUp = (e) => {
+    removeEventListener('pointermove', this.onCellPointerMove);
+    removeEventListener('pointerup', this.onCellPointerUp);
+  }
+
+  onKeyDown = (e) => {
+    let key = '';
+
+    if (e.ctrlKey || e.metaKey) {
+      key += 'Ctrl+';
+    }
+
+    if (e.altKey) {
+      key += 'Alt+';
+    }
+
+    if (e.shiftKey) {
+      key += 'Shift+';
+    }
+
+    key += e.code.replace('Key', '').replace('Digit', '').replace('Numpad', '');
+
+    if (this.shortcuts.includes(key)) {
+      e.preventDefault();
+    }
+
+    this.invokeAsync('OnKeyDownAsync', e);
+  }
+
+  invokeAsync(name, e) {
+    this.dotNetRef.invokeMethodAsync(name, this.toEventArgs(e));
+  }
+
+  toEventArgs(e) {
+    return {
+      key: e.key,
+      code: e.code,
+      location: e.location,
+      repeat: e.repeat,
+      ctrlKey: e.ctrlKey,
+      shiftKey: e.shiftKey,
+      altKey: e.altKey,
+      metaKey: e.metaKey,
+      type: e.type,
+      button: e.button,
+      buttons: e.buttons,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      offsetX: e.offsetX,
+      offsetY: e.offsetY,
+      pageX: e.pageX,
+      pageY: e.pageY,
+      screenX: e.screenX,
+      screenY: e.screenY
+    };
+  }
+
+  dispose() {
+    this.element.removeEventListener('keydown', this.onKeyDown);
+    this.element.removeEventListener('pointerdown', this.onPointerDown);
+    this.element.removeEventListener('dblclick', this.onDoubleClick);
+    removeEventListener('paste', this.onPaste);
+    removeEventListener('copy', this.onCopy);
+  }
+
+  onColumnResizeMove = (e) => {
+    this.invokeAsync('OnColumnResizePointerMoveAsync', e);
+  }
+
+  onColumnResizeUp = (e) => {
+    this.invokeAsync('OnColumnResizePointerUpAsync', e);
+    removeEventListener('pointermove', this.onColumnResizeMove);
+    removeEventListener('pointerup', this.onColumnResizeUp);
+  }
+
+  onRowResizeMove = (e) => {
+    this.invokeAsync('OnRowResizePointerMoveAsync', e);
+  }
+
+  onRowResizeUp = (e) => {
+    this.invokeAsync('OnRowResizePointerUpAsync', e);
+    removeEventListener('pointermove', this.onRowResizeMove);
+    removeEventListener('pointerup', this.onRowResizeUp);
+  }
+}
+
+class SheetEditor {
+  constructor(options) {
+    this.element = options.element;
+    this.element.innerText = options.value;
+    this.dotNetRef = options.dotNetRef;
+    this.element.addEventListener('input', this.onInput);
+    this.element.addEventListener('keydown', this.onKeyDown);
+    this.element.addEventListener('blur', this.onBlur);
+    this.element.addEventListener('focus', this.onFocus);
+    this.element.addEventListener('paste', this.onPaste);
+    document.addEventListener('selectionchange', this.onSelectionChange);
+    if (options.autoFocus) {
+      this.focus();
+    }
+  }
+
+  onPaste = (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    const selection = getSelection();
+    if (!selection.rangeCount) return;
+    selection.deleteFromDocument();
+    selection.getRangeAt(0).insertNode(document.createTextNode(text));
+    selection.collapseToEnd();
+    this.onInput();
+  };
+
+  onSelectionChange = (e) => {
+    const selection = getSelection();
+    const inside = selection.focusNode.parentElement == this.element || selection.focusNode == this.element;
+    let caretPosition = -1;
+
+    if (inside && selection.isCollapsed)
+    {
+      caretPosition = selection.focusOffset;
+    }
+
+    this.dotNetRef.invokeMethodAsync('OnSelectionChangeAsync', caretPosition);
+  };
+
+  onInput = () => {
+    this.dotNetRef.invokeMethodAsync('OnInputAsync', this.element.innerText);
+  };
+
+  setValue = (value, moveCaretTo) => {
+    this.element.innerText = value;
+    if (moveCaretTo != null) {
+      const range = document.createRange();
+      const el = this.element.childNodes[0];
+      range.selectNodeContents(el)
+      range.setStart(el, 0);
+      range.setEnd(el, moveCaretTo);
+      range.collapse(false);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  };
+
+  onKeyDown = (e) => {
+    if (e.key == 'Enter' && e.altKey) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const range = document.createRange();
+      range.selectNodeContents(this.element);
+      range.collapse(false);
+      range.deleteContents();
+
+
+      let br = document.createElement("br");
+      range.insertNode(br);
+
+      if (!br.previousSibling || br.previousSibling.nodeName != 'BR') {
+        br = br.cloneNode();
+        range.insertNode(br);
+      }
+
+      range.setStartAfter(br);
+      range.setEndAfter(br);
+
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    } else {
+       const popup = document.querySelector('.rz-spreadsheet-highlight-popup .rz-state-highlight') != null;
+       if (popup && (e.key == 'Tab' || e.key == 'ArrowUp' || e.key == 'ArrowDown')) {
+         e.stopPropagation();
+         e.preventDefault();
+         this.dotNetRef.invokeMethodAsync('OnKeyDownAsync', { key: e.key });
+       } else if (e.key != 'Enter' && e.key != 'Escape' && e.key != 'Tab') {
+         e.stopPropagation();
+       }
+    }
+  };
+
+  onBlur = (e) => {
+    if (e.relatedTarget && e.relatedTarget.matches('.rz-spreadsheet-editor-input') && e.relatedTarget.closest('.rz-spreadsheet') == this.element.closest('.rz-spreadsheet')) {
+      return;
+    }
+
+    this.dotNetRef.invokeMethodAsync('OnBlurAsync');
+  }
+
+  onFocus = () => {
+    this.dotNetRef.invokeMethodAsync('OnFocusAsync');
+  }
+
+  focus() {
+    this.element.focus();
+    const range = document.createRange();
+    range.selectNodeContents(this.element);
+    range.collapse(false);
+
+    const selection = getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  dispose() {
+    this.element.removeEventListener('input', this.onInput);
+    this.element.removeEventListener('keydown', this.onKeyDown);
+    this.element.removeEventListener('blur', this.onBlur);
+    this.element.removeEventListener('focus', this.onFocus);
+    this.element.removeEventListener('paste', this.onPaste);
+    document.removeEventListener('selectionchange', this.onSelectionChange);
+  }
+}
+
+
+
+
+Radzen.createSheetEditor = (options) => new SheetEditor(options);
+Radzen.createSpreadsheet = (options) => new Spreadsheet(options);
