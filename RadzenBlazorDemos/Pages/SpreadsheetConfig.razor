@@ -1,0 +1,117 @@
+@using Radzen.Blazor.Spreadsheet;
+@using System.IO
+@inject IJSRuntime JSRuntime
+
+<button @onclick="() => sheet.Selection.Clear()">Clear Selection</button>
+<button @onclick="() => sheet.Commands.Undo()">Undo</button>
+<button @onclick="() => sheet.Commands.Redo()">Redo</button>
+<button @onclick="() => sheet.Rows[2] = 100">Set third row height</button>
+<button @onclick="() => sheet.Columns[2] = 250">Set third column width</button>
+<button @onclick="@(() => SetColor("#FF0000"))">Set cell color</button>
+<button @onclick="@(() => SetBackgroundColor("#00FF00"))">Set cell background color</button>
+<button @onclick="() => sheet.Rows.Hide(4)">Hide row 5</button>
+<button @onclick="() => sheet.Rows.Show(4)">Show row 5</button>
+<button @onclick="() => sheet.Columns.Hide(3)">Hide column D</button>
+<button @onclick="() => sheet.Columns.Show(3)">Show column D</button>
+<button @onclick=@(SortAscending)>Sort Ascending</button>
+<button @onclick=@(SortDescending)>Sort Descending</button>
+<button @onclick=@(SaveAsync)>Save</button>
+
+<div>
+    <input type="text" @bind="filter" placeholder="Filter..." />
+    <button @onclick=@(Filter)>Filter</button>
+</div>
+
+<InputFile OnChange=@OnUploadAsync />
+
+<RadzenSpreadsheet Workbook=@workbook style="height: 500px" />
+
+@code {
+    Sheet sheet = new Sheet(40, 40);
+
+    Workbook workbook = new Workbook();
+
+    protected override void OnInitialized()
+    {
+        workbook.AddSheet(sheet);
+
+        sheet.BeginUpdate();
+        sheet.AddDataTable(RangeRef.Parse("A1:F10"));
+        sheet.Rows.Frozen = 3;
+        sheet.Columns.Frozen = 2;
+        sheet.MergedCells.Add(RangeRef.Parse("A1:D1"));
+        sheet.MergedCells.Add(RangeRef.Parse("C3:D3"));
+        sheet.Cells["A1"].Value = "Hello";
+        sheet.Cells["B2"].Formula = "=A1";
+        sheet.Cells["C3"].Value = 42;
+        sheet.Cells["D3"].Value = "world";
+        sheet.Cells["A5"].Value = "world";
+        sheet.Cells["F1"].Value = 3;
+        sheet.Cells["F2"].Value = 4;
+        //sheet.Cells["F3"].Value = 2;
+        sheet.Cells["F4"].Value = 5;
+        sheet.Selection.Select(RangeRef.Parse("A1:B2"));
+        sheet.Validation.Add(RangeRef.Parse("E1:E10"), new NumberValidator());
+        sheet.EndUpdate();
+    }
+    private string? filter;
+
+    void Filter()
+    {
+        if (!string.IsNullOrEmpty(filter))
+        {
+            sheet.Filter(sheet.Selection.Range, new EqualsCriterion
+            {
+                ColumnIndex = sheet.Selection.Cell.Column,
+                Value = filter,
+            });
+        }
+    }
+
+    void SortAscending()
+    {
+        sheet.Sort(sheet.Selection.Range, SortOrder.Ascending, sheet.Selection.Cell.Column);
+    }
+    void SortDescending()
+    {
+        sheet.Sort(sheet.Selection.Range, SortOrder.Descending, sheet.Selection.Cell.Column);
+    }
+
+    void SetBackgroundColor(string color)
+    {
+        sheet.Cells["A5"].Format.BackgroundColor = color;
+    }
+
+    void SetColor(string color)
+    {
+        sheet.Cells["A5"].Format.Color = color;
+    }
+
+    async Task OnUploadAsync(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+        if (file != null)
+        {
+            using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10); // 10 MB max size
+            using var memoryStream = new MemoryStream();
+
+            await stream.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+    
+            workbook = Workbook.LoadFromStream(memoryStream);
+
+            StateHasChanged();
+        }
+    }
+
+    async Task SaveAsync()
+    {
+        var stream = new MemoryStream();
+        workbook.SaveToStream(stream);
+        stream.Position = 0;
+
+         using var streamRef = new DotNetStreamReference(stream);
+
+        await JSRuntime.InvokeVoidAsync("downloadFile", "export.xlsx", streamRef);
+    }
+}

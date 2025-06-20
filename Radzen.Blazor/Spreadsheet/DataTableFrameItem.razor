@@ -1,0 +1,14 @@
+@using Radzen.Blazor.Rendering
+@inherits FrameItemBase
+<div class=@Class style=@Style></div>
+
+@code {
+    protected override string Class => ClassList.Create("rz-spreadsheet-datatable-frame")
+                                                .Add("rz-spreadsheet-frozen-column", FrozenColumn)
+                                                .Add("rz-spreadsheet-frozen-row", FrozenRow)
+                                                .Add("rz-spreadsheet-datatable-frame-top", Top)
+                                                .Add("rz-spreadsheet-datatable-frame-left", Left)
+                                                .Add("rz-spreadsheet-datatable-frame-bottom", Bottom)
+                                                .Add("rz-spreadsheet-datatable-frame-right", Right)
+                                                .ToString();
+}
