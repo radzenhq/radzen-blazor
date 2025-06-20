@@ -1,0 +1,14 @@
+@using Radzen.Blazor.Rendering
+@inherits FrameItemBase
+<div class=@Class style=@Style></div>
+
+@code {
+    protected override string Class => ClassList.Create("rz-spreadsheet-selection-cell")
+                                                .Add("rz-spreadsheet-frozen-column", FrozenColumn)
+                                                .Add("rz-spreadsheet-frozen-row", FrozenRow)
+                                                .Add("rz-spreadsheet-selection-cell-top", Top)
+                                                .Add("rz-spreadsheet-selection-cell-left", Left)
+                                                .Add("rz-spreadsheet-selection-cell-bottom", Bottom)
+                                                .Add("rz-spreadsheet-selection-cell-right", Right)
+                                                .ToString();
+}

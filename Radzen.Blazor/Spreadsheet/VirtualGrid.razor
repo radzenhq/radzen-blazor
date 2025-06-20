@@ -1,0 +1,18 @@
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div class="rz-virtual-grid" @attributes=@AdditionalAttributes>
+    <div @ref=@content class="rz-virtual-grid-content" style=@ContentStyle>
+    @ChildContent?.Invoke(this)
+@if (items != null)
+{
+    @foreach (var item in items)
+    {
+        @Template?.Invoke(item)
+    }
+}
+    </div>
+    <div class="rz-virtual-grid-scroller" @ref=@scrollable>
+        <div class="rz-virtual-grid-spacer" style=@SpacerStyle></div>
+    </div>
+</div>
