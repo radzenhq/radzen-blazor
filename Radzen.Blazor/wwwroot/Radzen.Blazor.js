@@ -2673,18 +2673,10 @@ window.Radzen = {
         
         wrapper.appendChild(handle);
         
-        handle.addEventListener('mousedown', function(e) {
+        handle.addEventListener('pointerdown', function(e) {
           e.preventDefault();
           e.stopPropagation();
           Radzen.startImageResize(e, resizeData, instance);
-        });
-        
-        handle.addEventListener('touchstart', function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          if (e.touches.length === 1) {
-            Radzen.startImageResize(e.touches[0], resizeData, instance);
-          }
         });
       });
     },
@@ -2707,38 +2699,19 @@ window.Radzen = {
       data.aspectRatio = rect.width / rect.height;
       
       // Store references to the event handlers so we can remove them later
-      data.mouseMoveHandler = function(e) {
+      data.pointerMoveHandler = function(e) {
         Radzen.resizeImage(e, data, instance);
       };
       
-      data.mouseUpHandler = function() {
-        document.removeEventListener('mousemove', data.mouseMoveHandler);
-        document.removeEventListener('mouseup', data.mouseUpHandler);
-        document.removeEventListener('touchmove', data.touchMoveHandler);
-        document.removeEventListener('touchend', data.touchEndHandler);
-        Radzen.finishImageResize(data, instance);
-      };
-      
-      data.touchMoveHandler = function(e) {
-        e.preventDefault();
-        if (e.touches.length === 1) {
-          Radzen.resizeImage(e.touches[0], data, instance);
-        }
-      };
-      
-      data.touchEndHandler = function() {
-        document.removeEventListener('mousemove', data.mouseMoveHandler);
-        document.removeEventListener('mouseup', data.mouseUpHandler);
-        document.removeEventListener('touchmove', data.touchMoveHandler);
-        document.removeEventListener('touchend', data.touchEndHandler);
+      data.pointerUpHandler = function() {
+        document.removeEventListener('pointermove', data.pointerMoveHandler);
+        document.removeEventListener('pointerup', data.pointerUpHandler);
         Radzen.finishImageResize(data, instance);
       };
       
       // Add event listeners
-      document.addEventListener('mousemove', data.mouseMoveHandler);
-      document.addEventListener('mouseup', data.mouseUpHandler);
-      document.addEventListener('touchmove', data.touchMoveHandler, { passive: false });
-      document.addEventListener('touchend', data.touchEndHandler);
+      document.addEventListener('pointermove', data.pointerMoveHandler);
+      document.addEventListener('pointerup', data.pointerUpHandler);
     },
     resizeImage: function (e, data, instance) {
       var deltaX = e.clientX - data.startX;
