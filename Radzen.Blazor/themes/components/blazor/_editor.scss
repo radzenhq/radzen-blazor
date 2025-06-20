@@ -43,45 +43,45 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
 .rz-html-editor .rz-html-editor-content {
   .rz-image-resize-handle {
-    position: absolute !important;
-    width: 12px !important;
-    height: 12px !important;
-    background-color: var(--rz-primary) !important;
-    border: 2px solid var(--rz-on-primary) !important;
-    border-radius: 50% !important;
-    cursor: pointer !important;
-    z-index: 1000 !important;
-    pointer-events: all !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: var(--rz-primary);
+    border: 2px solid var(--rz-on-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+    pointer-events: all;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 
     &.rz-resize-nw {
-      top: -6px !important;
-      left: -6px !important;
-      cursor: nw-resize !important;
+      top: -6px;
+      left: -6px;
+      cursor: nw-resize;
     }
 
     &.rz-resize-ne {
-      top: -6px !important;
-      right: -6px !important;
-      cursor: ne-resize !important;
+      top: -6px;
+      right: -6px;
+      cursor: ne-resize;
     }
 
     &.rz-resize-sw {
-      bottom: -6px !important;
-      left: -6px !important;
-      cursor: sw-resize !important;
+      bottom: -6px;
+      left: -6px;
+      cursor: sw-resize;
     }
 
     &.rz-resize-se {
-      bottom: -6px !important;
-      right: -6px !important;
-      cursor: se-resize !important;
+      bottom: -6px;
+      right: -6px;
+      cursor: se-resize;
     }
   }
 
   .rz-image-resize-container {
-    position: relative !important;
-    display: inline-block !important;
+    position: relative;
+    display: inline-block;
   }
 }
 

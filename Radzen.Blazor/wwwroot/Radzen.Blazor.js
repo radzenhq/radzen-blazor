@@ -1820,9 +1820,6 @@ window.Radzen = {
         instance.invokeMethodAsync('MouseMove', -1, -1);
     };
     ref.clickListener = function (e) {
-      console.log('Editor click event on:', e.target);
-      console.log('Target matches img:', e.target.matches('img'));
-      
       if (e.target) {
         if (e.target.matches('a,button')) {
           e.preventDefault();
@@ -1834,9 +1831,7 @@ window.Radzen = {
         for (var img of ref.querySelectorAll('img.rz-state-selected')) {
           img.classList.remove('rz-state-selected');
         }
-
         if (e.target.matches('img')) {
-          console.log('Image clicked:', e.target);
           e.target.classList.add('rz-state-selected');
           Radzen.addImageResizeHandles(e.target, ref, instance);
           var range = document.createRange();
