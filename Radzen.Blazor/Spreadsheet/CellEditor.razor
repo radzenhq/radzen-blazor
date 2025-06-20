@@ -1,0 +1,14 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@inject Microsoft.JSInterop.IJSRuntime JSRuntime
+
+@if (Sheet.Editor.Mode != EditMode.None)
+{
+<div class=@className style=@cellStyle>
+    <ContentEditable class="rz-spreadsheet-cell-editor-input" 
+            @bind-Value=@Sheet.Editor.Value 
+            AutoFocus=@(Sheet.Editor.Mode == EditMode.Cell)
+            Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
+     />
+</div>
+}
