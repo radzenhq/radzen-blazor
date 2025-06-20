@@ -1,0 +1,31 @@
+@using Microsoft.AspNetCore.Components.Forms
+@using System.IO
+
+<RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-fileupload-choose rz-button-icon-only" ButtonType="ButtonType.Button">
+    <InputFile OnChange=@OnUploadAsync accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+    <i class="notranslate rzi">folder_open</i>
+</RadzenButton>
+@code {
+    #nullable enable
+
+    [Parameter]
+    public EventCallback<Workbook> WorkbookChanged { get; set; }
+
+    async Task OnUploadAsync(InputFileChangeEventArgs args)
+    {
+        var file = args.File;
+
+        if (file != null)
+        {
+            using var stream = file.OpenReadStream(maxAllowedSize: 1024 * 1024 * 10); // 10 MB max size
+            using var memoryStream = new MemoryStream();
+
+            await stream.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+    
+            var workbook = Workbook.LoadFromStream(memoryStream);
+
+            await WorkbookChanged.InvokeAsync(workbook);
+        }
+    }
+}
