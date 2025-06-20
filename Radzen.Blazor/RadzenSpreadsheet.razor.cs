@@ -31,6 +31,8 @@ public interface ISpreadsheet
 /// </summary>
 public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpreadsheet
 {
+    private Workbook? workbook;
+
     /// <summary>
     /// The workbook to display in the spreadsheet.
     /// </summary>
@@ -45,13 +47,24 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
     {
+        var didWorkbookChange = parameters.DidParameterChange(nameof(Workbook), Workbook);
+
         await base.SetParametersAsync(parameters);
+
+        if (didWorkbookChange)
+        {
+            workbook = Workbook;
+        }
     }
 
     private readonly int sheetIndex = 0;
 
-    private Sheet? Sheet => Workbook?.Sheets[sheetIndex];
+    private Sheet? Sheet => workbook?.Sheets[sheetIndex];
 
+    private void OnWorkbookChanged(Workbook? value)
+    {
+        workbook = value;
+    }
     private async Task MoveSelectionAsync(int rowOffset, int columnOffset)
     {
         if (Sheet is not null)
@@ -145,6 +158,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// <inheritdoc/>
     protected override void OnInitialized()
     {
+        workbook = Workbook;
         shortcuts.Add("Enter", _ => CycleSelectionAsync(1, 0));
         shortcuts.Add("Escape", _ => CancelEditAsync());
         shortcuts.Add("Tab", _ => CycleSelectionAsync(0, 1));
