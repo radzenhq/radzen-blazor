@@ -206,6 +206,15 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
+            Name = "Spreadsheet",
+            Icon = "\ue3ec",
+            Path = "spreadsheet",
+            Title = "Blazor Spreadsheet Component | Free UI Components by Radzen",
+            Description = "The Radzen Blazor Spreadsheet component allows you to create and edit spreadsheets in your Blazor applications.",
+            Tags = new [] { "spreadsheet", "excel", "xls", "xlsx", "csv", "ods" }
+        },
+        new Example
+        {
             Toc = [ new () { Text = "Centered CTA", Anchor = "#centered-cta" }, new () { Text = "Left-aligned CTA", Anchor = "#left-aligned-cta" }, new () { Text = "Justified CTA", Anchor = "#left-aligned-cta" }, new () { Text = "Image to the left", Anchor = "#image-to-the-left" }, new () { Text = "Image to the right", Anchor = "#image-to-the-right" } ],
             Name = "UI Blocks",
             Pro = true,
