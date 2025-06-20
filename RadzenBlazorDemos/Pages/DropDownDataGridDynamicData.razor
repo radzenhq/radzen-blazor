@@ -2,7 +2,7 @@
 
 <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
     <RadzenLabel Text="Select Value" Component="DropDownDataGridBindValue" />
-    <RadzenDropDownDataGrid @ref=grid Data="@data" ColumnWidth="200px" TValue="IDictionary<string, object>" 
+    <RadzenDropDownDataGrid GridLines="Radzen.DataGridGridLines.Both" @ref=grid Data="@data" ColumnWidth="200px" TValue="IDictionary<string, object>" 
                             AllowFiltering="true" AllowSorting="true" Value="@selectedItem" Change="@OnChange"
                             TextProperty="@(PropertyAccess.GetDynamicPropertyExpression("LastName", typeof(string)))">
         <ValueTemplate>

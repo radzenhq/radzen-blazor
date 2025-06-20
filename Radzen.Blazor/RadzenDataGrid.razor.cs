@@ -3602,6 +3602,18 @@ namespace Radzen.Blazor
                 {
                     return element.GetInt64();
                 }
+                else if (type == typeof(UInt16) || type == typeof(UInt16?))
+                {
+                    return element.GetUInt16();
+                }
+                else if (type == typeof(UInt32) || type == typeof(UInt32?))
+                {
+                    return element.GetUInt32();
+                }
+                else if (type == typeof(UInt64) || type == typeof(UInt64?))
+                {
+                    return element.GetUInt64();
+                }
                 else if (type == typeof(double) || type == typeof(double?))
                 {
                     return element.GetDouble();
