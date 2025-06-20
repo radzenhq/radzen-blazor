@@ -498,14 +498,9 @@ namespace Radzen.Blazor
         /// Invoked by interop when an image is resized.
         /// </summary>
         [JSInvokable("OnImageResize")]
-        public async Task OnImageResize(ImageResizeData data)
+        public async Task OnImageResize(ImageResizeEventArgs data)
         {
-            await ImageResize.InvokeAsync(new ImageResizeEventArgs 
-            { 
-                Src = data.Src, 
-                Width = data.Width, 
-                Height = data.Height 
-            });
+            await ImageResize.InvokeAsync(data);
         }
     }
 }

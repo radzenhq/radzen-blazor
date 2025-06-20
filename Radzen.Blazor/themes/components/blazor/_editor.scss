@@ -33,13 +33,15 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   padding: 0.5rem;
   outline: none;
   background-color: var(--rz-editor-content-background-color);
+}
 
-  img.rz-state-selected {
-    position: relative;
-    outline: 2px solid var(--rz-primary);
-    outline-offset: 2px;
-  }
+.rz-html-editor .rz-html-editor-content img.rz-state-selected {
+  position: relative;
+  outline: 2px solid var(--rz-primary);
+  outline-offset: 2px;
+}
 
+.rz-html-editor .rz-html-editor-content {
   .rz-image-resize-handle {
     position: absolute !important;
     width: 12px !important;
