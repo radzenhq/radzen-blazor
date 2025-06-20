@@ -1764,8 +1764,8 @@ window.Radzen = {
     delete ref.mouseEnterHandler;
     ref.removeEventListener('mousemove', ref.mouseMoveHandler);
     delete ref.mouseMoveHandler;
-    ref.removeEventListener('click', ref.clickHandler);
-    delete ref.clickHandler;
+    ref.removeEventListener('click', ref.clickListener);
+    delete ref.clickListener;
     this.destroyResizable(ref);
   },
   destroyGauge: function (ref) {
