@@ -2737,21 +2737,17 @@ window.Radzen = {
       data.img.style.height = newHeight + 'px';
     },
     finishImageResize: function (data, instance) {
-      // Get the computed dimensions
-      var computedWidth = data.img.style.width;
-      var computedHeight = data.img.style.height;
+      // Get the computed dimensions in pixels
+      var computedWidth = data.img.clientWidth;
+      var computedHeight = data.img.clientHeight;
       
-      // Extract numeric values (remove 'px')
-      var widthValue = computedWidth.replace('px', '');
-      var heightValue = computedHeight.replace('px', '');
-      
-      // Update the image attributes to match the style
-      data.img.setAttribute('width', widthValue);
-      data.img.setAttribute('height', heightValue);
+      // Update the image attributes to match the computed dimensions
+      data.img.setAttribute('width', computedWidth);
+      data.img.setAttribute('height', computedHeight);
       
       // Keep the style attributes for visual consistency
-      data.img.style.width = computedWidth;
-      data.img.style.height = computedHeight;
+      data.img.style.width = computedWidth + 'px';
+      data.img.style.height = computedHeight + 'px';
       
       // Use the stored editor container reference
       var editorContainer = data.editorContainer;
