@@ -10,17 +10,20 @@
             <Tabs>
                 <RadzenTabsItem Text="File">
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <UploadButton WorkbookChanged=@OnWorkbookChangedAsync />
-                        <SaveButton Workbook=@workbook FileName=@ExportFileName />
+                        <Open WorkbookChanged=@OnWorkbookChangedAsync />
+                        <Save Workbook=@workbook FileName=@ExportFileName />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Home">
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <RadzenStack Orientation="Orientation.Horizontal">
-                            <UndoButton Commands=@Sheet?.Commands />
-                            <RedoButton Commands=@Sheet?.Commands />
+                            <Undo Commands=@Sheet?.Commands />
+                            <Redo Commands=@Sheet?.Commands />
                         </RadzenStack>
                         <RadzenStack Orientation="Orientation.Horizontal">
+                            <Bold Sheet=@Sheet />
+                            <Italic Sheet=@Sheet />
+                            <Underline Sheet=@Sheet />
                             <Color Sheet=@Sheet />
                             <BackgroundColor Sheet=@Sheet />
                         </RadzenStack>
