@@ -1,9 +1,16 @@
+using Radzen.Blazor.Rendering;
 using System;
 using System.Text;
 
 namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
+
+internal static class FormatColorExtensions
+{
+    public static string ToXLSXColor(this string color) => $"FF{RGB.Parse(color).ToHex()}";
+}
+
 /// <summary>
 /// Represents a format that can be applied to cells in a spreadsheet.
 /// </summary>
