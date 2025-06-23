@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor.Spreadsheet;
 
+#nullable enable
 /// <summary>
 /// Represents a command that can be executed, undone, and redone.
 /// </summary>
@@ -28,6 +30,21 @@ public class UndoRedoStack
     private readonly Stack<ICommand> redoStack = new();
 
     /// <summary>
+    /// Event raised when the undo or redo stacks change.
+    /// </summary>
+    public event Action? Changed;
+
+    /// <summary>
+    /// Gets a value indicating whether the undo stack is empty.
+    /// </summary>
+    public bool CanUndo => undoStack.Count > 0;
+
+    /// <summary>
+    /// Gets a value indicating whether the redo stack is empty.
+    /// </summary>
+    public bool CanRedo => redoStack.Count > 0;
+
+    /// <summary>
     /// Executes a command and adds it to the undo stack if successful.
     /// </summary>
     public bool Execute(ICommand command)
@@ -40,6 +57,7 @@ public class UndoRedoStack
             redoStack.Clear();
         }
 
+        Changed?.Invoke();
         return result;
     }
 
@@ -54,6 +72,7 @@ public class UndoRedoStack
             var command = undoStack.Pop();
             command.Unexecute();
             redoStack.Push(command);
+            Changed?.Invoke();
         }
     }
 
