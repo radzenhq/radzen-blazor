@@ -1,0 +1,65 @@
+@using Radzen.Blazor.Spreadsheet
+@implements IDisposable
+
+<RadzenToggleButton @bind-Value=@IsUnderline Icon="format_underlined" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsUnderline
+    {
+        get
+        {
+            if (Sheet?.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.Underline;
+            }
+            return false;
+        }
+        set
+        {
+            if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+            {
+                if (Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+                {
+                    var newFormat = cell.Format.WithUnderline(value);
+                    var command = new FormatCommand(Sheet, Sheet.Selection.Range, newFormat);
+                    Sheet.Commands.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+} 
