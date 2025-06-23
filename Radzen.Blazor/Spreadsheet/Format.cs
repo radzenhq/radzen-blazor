@@ -10,6 +10,22 @@ namespace Radzen.Blazor.Spreadsheet;
 public class Format
 {
     private string? color;
+    private string? background;
+
+    /// <summary>
+    /// Gets or sets whether the text in the format should be bold.
+    /// </summary>
+    public bool Bold { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the text in the format should be italicized.
+    /// </summary>
+    public bool Italic { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the text in the format should be underlined.
+    /// </summary>
+    public bool Underline { get; set; }
 
     /// <summary>
     /// Gets or sets the color of the text in the format.
@@ -26,8 +42,6 @@ public class Format
             }
         }
     }
-
-    private string? background;
 
     /// <summary>
     /// Gets or sets the background color of the format.
@@ -73,6 +87,18 @@ public class Format
             sb.Append(BackgroundColor);
             sb.Append(';');
         }
+        if (Bold)
+        {
+            sb.Append("font-weight: bold;");
+        }
+        if (Italic)
+        {
+            sb.Append("font-style: italic;");
+        }
+        if (Underline)
+        {
+            sb.Append("text-decoration: underline;");
+        }
     }
 
     /// <summary>
@@ -81,9 +107,7 @@ public class Format
     public Format WithColor(string? color)
     {
         var clone = Clone();
-
         clone.Color = color;
-
         return clone;
     }
 
@@ -98,6 +122,36 @@ public class Format
     }
 
     /// <summary>
+    /// This method is used to create a copy of the current format with a new bold setting.
+    /// </summary>
+    public Format WithBold(bool bold)
+    {
+        var clone = Clone();
+        clone.Bold = bold;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new italic setting.
+    /// </summary>
+    public Format WithItalic(bool italic)
+    {
+        var clone = Clone();
+        clone.Italic = italic;
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new underline setting.
+    /// </summary>
+    public Format WithUnderline(bool underline)
+    {
+        var clone = Clone();
+        clone.Underline = underline;
+        return clone;
+    }
+
+    /// <summary>
     /// Creates a new instance of the Format class that is a copy of the current instance.
     /// </summary>
     public Format Clone()
@@ -105,7 +159,10 @@ public class Format
         return new Format
         {
             Color = Color,
-            BackgroundColor = BackgroundColor
+            BackgroundColor = BackgroundColor,
+            Bold = Bold,
+            Italic = Italic,
+            Underline = Underline
         };
     }
 }
