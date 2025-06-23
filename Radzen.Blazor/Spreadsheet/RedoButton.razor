@@ -1,0 +1,46 @@
+@using Radzen.Blazor.Spreadsheet
+@implements IDisposable
+
+<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnRedoAsync Icon="redo" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public UndoRedoStack? Commands { get; set; }
+
+    private bool IsDisabled => Commands == null || !Commands.CanRedo;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Commands != null)
+        {
+            Commands.Changed -= OnCommandsChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Commands != null)
+        {
+            Commands.Changed += OnCommandsChanged;
+        }
+    }
+
+    private void OnCommandsChanged()
+    {
+        StateHasChanged();
+    }
+
+    private void OnRedoAsync()
+    {
+        Commands?.Redo();
+    }
+
+    public void Dispose()
+    {
+        if (Commands != null)
+        {
+            Commands.Changed -= OnCommandsChanged;
+        }
+    }
+} 
