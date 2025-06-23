@@ -13,7 +13,11 @@
                         <SaveButton Workbook=@workbook FileName=@ExportFileName />
                     </RadzenStack>
                 </RadzenTabsItem>
-                <RadzenTabsItem Text="Home" />
+                <RadzenTabsItem Text="Home">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <UndoButton Commands=@Sheet?.Commands />
+                    </RadzenStack>
+                </RadzenTabsItem>
             </Tabs>
         </RadzenTabs>
 @if (Sheet != null)
