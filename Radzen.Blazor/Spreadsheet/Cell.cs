@@ -44,7 +44,7 @@ public class Cell
     private Format? format;
 
     /// <summary>
-    /// Gets the format of the cell.
+    /// Gets or sets the format of the cell.
     /// </summary>
     public Format Format
     {
@@ -55,8 +55,24 @@ public class Cell
                 format = new Format();
                 format.Changed += OnFormatChanged;
             }
-
             return format;
+        }
+
+        set
+        {
+            if (format != null)
+            {
+                format.Changed -= OnFormatChanged;
+            }
+
+            format = value;
+
+            if (format != null)
+            {
+                format.Changed += OnFormatChanged;
+            }
+
+            OnFormatChanged();
         }
     }
 
