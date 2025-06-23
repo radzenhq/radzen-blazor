@@ -74,4 +74,38 @@ public class Format
             sb.Append(';');
         }
     }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new color.
+    /// </summary>
+    public Format WithColor(string? color)
+    {
+        var clone = Clone();
+
+        clone.Color = color;
+
+        return clone;
+    }
+
+    /// <summary>
+    /// This method is used to create a copy of the current format with a new background color.
+    /// </summary>
+    public Format WithBackgroundColor(string? backgroundColor)
+    {
+        var clone = Clone();
+        clone.BackgroundColor = backgroundColor;
+        return clone;
+    }
+
+    /// <summary>
+    /// Creates a new instance of the Format class that is a copy of the current instance.
+    /// </summary>
+    public Format Clone()
+    {
+        return new Format
+        {
+            Color = Color,
+            BackgroundColor = BackgroundColor
+        };
+    }
 }
