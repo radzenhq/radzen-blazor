@@ -64,7 +64,7 @@ public class Workbook
         using var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true);
 
         // Track unique styles
-        var fontStyles = new Dictionary<string, int>();
+        var fontStyles = new Dictionary<(string? Color, bool Bold, bool Italic, bool Underline), int>();
         var fillStyles = new Dictionary<string, int>();
         var cellStyles = new Dictionary<(int FontId, int FillId), int>();
 
@@ -253,26 +253,38 @@ public class Workbook
                         new XAttribute("r", new CellRef(row, col).ToString()));
 
                     // Add style reference if cell has formatting
-                    if (cell.Format.Color != null || cell.Format.BackgroundColor != null)
+                    if (cell.Format.Color != null || cell.Format.BackgroundColor != null || cell.Format.Bold || cell.Format.Italic || cell.Format.Underline)
                     {
+                        var fontKey = (cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline);
                         var fontId = 0;
-                        if (cell.Format.Color != null)
+                        if (!fontStyles.TryGetValue(fontKey, out fontId))
                         {
-                            if (!fontStyles.TryGetValue(cell.Format.Color, out fontId))
+                            fontId = fontStyles.Count + 1;
+                            fontStyles[fontKey] = fontId;
+                            var fontElement = new XElement(XName.Get("font", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                                new XElement(XName.Get("sz", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                                    new XAttribute("val", "11")),
+                                new XElement(XName.Get("name", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                                    new XAttribute("val", "Aptos Narrow")));
+                            if (cell.Format.Color != null)
                             {
-                                fontId = fontStyles.Count + 1;
-                                fontStyles[cell.Format.Color] = fontId;
-                                var fontElement = new XElement(XName.Get("font", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                    new XElement(XName.Get("sz", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                        new XAttribute("val", "11")),
-                                    new XElement(XName.Get("name", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                        new XAttribute("val", "Aptos Narrow")),
-                                    new XElement(XName.Get("color", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                        new XAttribute("rgb", cell.Format.Color.Replace("#", "FF"))));
-
-                                stylesDoc.Root!.Element(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!.Add(fontElement);
-                                stylesDoc.Root!.Element(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!.Attribute("count")!.Value = (fontStyles.Count + 1).ToString();
+                                fontElement.Add(new XElement(XName.Get("color", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                                    new XAttribute("rgb", cell.Format.Color.ToXLSXColor())));
                             }
+                            if (cell.Format.Bold)
+                            {
+                                fontElement.Add(new XElement(XName.Get("b", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
+                            }
+                            if (cell.Format.Italic)
+                            {
+                                fontElement.Add(new XElement(XName.Get("i", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
+                            }
+                            if (cell.Format.Underline)
+                            {
+                                fontElement.Add(new XElement(XName.Get("u", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
+                            }
+                            stylesDoc.Root!.Element(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!.Add(fontElement);
+                            stylesDoc.Root!.Element(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!.Attribute("count")!.Value = (fontStyles.Count + 1).ToString();
                         }
 
                         var fillId = 0;
@@ -286,7 +298,7 @@ public class Workbook
                                     new XElement(XName.Get("patternFill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                                         new XAttribute("patternType", "solid"),
                                         new XElement(XName.Get("fgColor", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                            new XAttribute("rgb", cell.Format.BackgroundColor.Replace("#", "FF"))),
+                                            new XAttribute("rgb", cell.Format.BackgroundColor.ToXLSXColor())),
                                         new XElement(XName.Get("bgColor", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                                             new XAttribute("indexed", "64")))));
                                 fillsElement.Attribute("count")!.Value = (fillStyles.Count + 2).ToString();
@@ -422,7 +434,7 @@ public class Workbook
         using var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
 
         // Parse styles
-        var fontColors = new Dictionary<int, string>();
+        var fontStyles = new Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)>();
         var fillColors = new Dictionary<int, string>();
         var cellStyles = new Dictionary<int, (int FontId, int FillId)>();
 
@@ -438,10 +450,15 @@ public class Workbook
             for (var i = 0; i < fonts.Count; i++)
             {
                 var color = fonts[i].Element(stylesNs + "color")?.Attribute("rgb")?.Value;
+                string? colorValue = null;
                 if (color != null)
                 {
-                    fontColors[i] = "#" + color[2..]; // Convert from "FFFF0000" to "#FF0000"
+                    colorValue = "#" + color[2..]; // Convert from "FFFF0000" to "#FF0000"
                 }
+                bool bold = fonts[i].Element(stylesNs + "b") != null;
+                bool italic = fonts[i].Element(stylesNs + "i") != null;
+                bool underline = fonts[i].Element(stylesNs + "u") != null;
+                fontStyles[i] = (colorValue, bold, italic, underline);
             }
 
             // Parse fills
@@ -470,7 +487,7 @@ public class Workbook
                     var fontIdValue = int.Parse(fontId);
                     var fillIdValue = int.Parse(fillId);
 
-                    if (applyFont == "1" && fontColors.ContainsKey(fontIdValue) ||
+                    if (applyFont == "1" && fontStyles.ContainsKey(fontIdValue) ||
                         applyFill == "1" && fillColors.ContainsKey(fillIdValue))
                     {
                         cellStyles[i] = (fontIdValue, fillIdValue);
@@ -569,11 +586,16 @@ public class Workbook
                     var styleId = cellElem.Attribute("s")?.Value;
                     if (styleId != null && cellStyles.TryGetValue(int.Parse(styleId), out var style))
                     {
-                        if (fontColors.TryGetValue(style.FontId, out var fontColor))
+                        if (fontStyles.TryGetValue(style.FontId, out var fontStyle))
                         {
-                            sheet.Cells[address.Row, address.Column].Format.Color = fontColor;
+                            if (fontStyle.Color != null)
+                            {
+                                sheet.Cells[address.Row, address.Column].Format.Color = fontStyle.Color;
+                            }
+                            sheet.Cells[address.Row, address.Column].Format.Bold = fontStyle.Bold;
+                            sheet.Cells[address.Row, address.Column].Format.Italic = fontStyle.Italic;
+                            sheet.Cells[address.Row, address.Column].Format.Underline = fontStyle.Underline;
                         }
-
                         if (fillColors.TryGetValue(style.FillId, out var fillColor))
                         {
                             sheet.Cells[address.Row, address.Column].Format.BackgroundColor = fillColor;

@@ -3,19 +3,14 @@
 @inject IJSRuntime JSRuntime
 
 <button @onclick="() => sheet.Selection.Clear()">Clear Selection</button>
-<button @onclick="() => sheet.Commands.Undo()">Undo</button>
-<button @onclick="() => sheet.Commands.Redo()">Redo</button>
 <button @onclick="() => sheet.Rows[2] = 100">Set third row height</button>
 <button @onclick="() => sheet.Columns[2] = 250">Set third column width</button>
-<button @onclick="@(() => SetColor("#FF0000"))">Set cell color</button>
-<button @onclick="@(() => SetBackgroundColor("#00FF00"))">Set cell background color</button>
 <button @onclick="() => sheet.Rows.Hide(4)">Hide row 5</button>
 <button @onclick="() => sheet.Rows.Show(4)">Show row 5</button>
 <button @onclick="() => sheet.Columns.Hide(3)">Hide column D</button>
 <button @onclick="() => sheet.Columns.Show(3)">Show column D</button>
 <button @onclick=@(SortAscending)>Sort Ascending</button>
 <button @onclick=@(SortDescending)>Sort Descending</button>
-<button @onclick=@(SaveAsync)>Save</button>
 
 <div>
     <input type="text" @bind="filter" placeholder="Filter..." />
@@ -52,7 +47,7 @@
         sheet.Validation.Add(RangeRef.Parse("E1:E10"), new NumberValidator());
         sheet.EndUpdate();
     }
-    private string? filter;
+    private string filter;
 
     void Filter()
     {
@@ -78,21 +73,5 @@
     void SetBackgroundColor(string color)
     {
         sheet.Cells["A5"].Format.BackgroundColor = color;
-    }
-
-    void SetColor(string color)
-    {
-        sheet.Cells["A5"].Format.Color = color;
-    }
-
-    async Task SaveAsync()
-    {
-        var stream = new MemoryStream();
-        workbook.SaveToStream(stream);
-        stream.Position = 0;
-
-         using var streamRef = new DotNetStreamReference(stream);
-
-        await JSRuntime.InvokeVoidAsync("downloadFile", "export.xlsx", streamRef);
     }
 }
