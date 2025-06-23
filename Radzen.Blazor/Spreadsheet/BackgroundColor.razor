@@ -1,7 +1,7 @@
 @using Radzen.Blazor.Spreadsheet
 @implements IDisposable
 
-<RadzenColorPicker @bind-Value=@CurrentColor Disabled=@IsDisabled />
+<RadzenColorPicker @bind-Value=@CurrentColor Icon="opacity" Disabled=@IsDisabled />
 
 @code {
 #nullable enable
@@ -21,9 +21,13 @@
         }
         set
         {
-            if (Sheet?.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell) == true)
+            if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
             {
-                cell.Format.BackgroundColor = value;
+                if (Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+                {
+                    var command = new FormatCommand(Sheet, Sheet.Selection.Range, cell.Format.WithBackgroundColor(value));
+                    Sheet.Commands.Execute(command);
+                }
             }
         }
     }
