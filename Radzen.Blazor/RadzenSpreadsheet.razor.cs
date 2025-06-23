@@ -39,6 +39,18 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [Parameter]
     public Workbook? Workbook { get; set; }
 
+    /// <summary>
+    /// The name of the file to export the workbook to when using the export functionality.
+    /// </summary>
+    [Parameter]
+    public string ExportFileName { get; set; } = "sheet.xlsx";
+
+    /// <summary>
+    /// Event callback that is invoked when the workbook changes.
+    /// </summary>
+    [Parameter]
+    public EventCallback<Workbook?> WorkbookChanged { get; set; }
+
     /// <inheritdoc/>
     protected override string GetComponentCssClass() => "rz-spreadsheet";
 
@@ -61,10 +73,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private Sheet? Sheet => workbook?.Sheets[sheetIndex];
 
-    private void OnWorkbookChanged(Workbook? value)
+    private async Task OnWorkbookChangedAsync(Workbook? value)
     {
         workbook = value;
+
+        await WorkbookChanged.InvokeAsync(value);
     }
+
     private async Task MoveSelectionAsync(int rowOffset, int columnOffset)
     {
         if (Sheet is not null)

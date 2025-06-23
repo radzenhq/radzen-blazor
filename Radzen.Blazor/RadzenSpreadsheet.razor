@@ -9,7 +9,8 @@
             <Tabs>
                 <RadzenTabsItem Text="File">
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <UploadButton WorkbookChanged=@OnWorkbookChanged />
+                        <UploadButton WorkbookChanged=@OnWorkbookChangedAsync />
+                        <SaveButton Workbook=@workbook FileName=@ExportFileName />
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Home" />

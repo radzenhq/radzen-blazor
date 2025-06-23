@@ -1,0 +1,27 @@
+@using Microsoft.JSInterop
+@using System.IO
+@inject IJSRuntime JSRuntime
+<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnSaveAsync Icon="download" ButtonType="ButtonType.Button" Disabled=@(Workbook == null) />
+@code {
+#nullable enable
+
+    [Parameter]
+    public Workbook? Workbook { get; set; }
+
+    [Parameter]
+    public string FileName { get; set; } = default!;
+
+    private async Task OnSaveAsync()
+    {
+        if (Workbook != null)
+        {
+            var stream = new MemoryStream();
+            Workbook.SaveToStream(stream);
+            stream.Position = 0;
+
+            using var streamRef = new DotNetStreamReference(stream);
+
+            await JSRuntime.InvokeVoidAsync("Radzen.downloadFile", FileName, streamRef);
+        }
+    }
+}
