@@ -15,8 +15,13 @@
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Home">
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <UndoButton Commands=@Sheet?.Commands />
-                        <RedoButton Commands=@Sheet?.Commands />
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <UndoButton Commands=@Sheet?.Commands />
+                            <RedoButton Commands=@Sheet?.Commands />
+                        </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <Color Sheet=@Sheet />
+                        </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
             </Tabs>
