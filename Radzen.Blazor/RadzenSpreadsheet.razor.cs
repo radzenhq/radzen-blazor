@@ -535,6 +535,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     private Func<MouseEventArgs, Task>? onColumnResizeMouseMoveAsync;
+    private Func<MouseEventArgs, Task>? onRowResizeMouseMoveAsync;
 
     /// <summary>
     /// Invoked by JS interop when the column resize handle is pressed.
@@ -565,6 +566,34 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     /// <summary>
+    /// Invoked by JS interop when the row resize handle is pressed.
+    /// </summary>
+    [JSInvokable]
+    public async Task<bool> OnRowResizeMouseDownAsync(CellEventArgs args)
+    {
+        var result = await AcceptAsync();
+
+        if (result)
+        {
+            if (grid is not null)
+            {
+                var capture = new RowResizeCapture
+                {
+                    ScrollTop = grid.ScrollTop,
+                    ScrollLeft = grid.ScrollLeft,
+                    Row = args.Row,
+                    StartY = args.Mouse.ClientY,
+                    StartHeight = Sheet?.Rows[args.Row] ?? 20
+                };
+
+                onRowResizeMouseMoveAsync = mouse => OnRowResizeMouseMoveAsync(capture, mouse);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Invoked by JS interop when the mouse moves while resizing a column.
     /// </summary>
     [JSInvokable]
@@ -573,6 +602,18 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (onColumnResizeMouseMoveAsync is not null)
         {
             await onColumnResizeMouseMoveAsync(args);
+        }
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the mouse moves while resizing a row.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnRowResizeMouseMoveAsync(MouseEventArgs args)
+    {
+        if (onRowResizeMouseMoveAsync is not null)
+        {
+            await onRowResizeMouseMoveAsync(args);
         }
     }
 
@@ -589,6 +630,18 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         return Task.CompletedTask;
     }
 
+    private Task OnRowResizeMouseMoveAsync(RowResizeCapture capture, MouseEventArgs mouse)
+    {
+        if (Sheet != null && capture.Row >= 0 && capture.Row < Sheet.Rows.Count)
+        {
+            var delta = mouse.ClientY - capture.StartY;
+            var newHeight = Math.Max(16, capture.StartHeight + delta);
+            Sheet.Rows[capture.Row] = newHeight;
+            StateHasChanged();
+        }
+
+        return Task.CompletedTask;
+    }
 
     class ColumnResizeCapture
     {
@@ -597,6 +650,15 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         public int Column { get; set; }
         public double StartX { get; set; }
         public double StartWidth { get; set; }
+    }
+
+    class RowResizeCapture
+    {
+        public double ScrollTop { get; set; }
+        public double ScrollLeft { get; set; }
+        public int Row { get; set; }
+        public double StartY { get; set; }
+        public double StartHeight { get; set; }
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
