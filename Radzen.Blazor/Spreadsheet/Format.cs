@@ -35,6 +35,11 @@ public class Format
     public bool Underline { get; set; }
 
     /// <summary>
+    /// Gets or sets the text alignment in the format.
+    /// </summary>
+    public TextAlign TextAlign { get; set; } = TextAlign.Left;
+
+    /// <summary>
     /// Gets or sets the color of the text in the format.
     /// </summary>
     public string? Color
@@ -106,6 +111,12 @@ public class Format
         {
             sb.Append("text-decoration: underline;");
         }
+        if (TextAlign != TextAlign.Left)
+        {
+            sb.Append("text-align: ");
+            sb.Append(TextAlign.ToString().ToLowerInvariant());
+            sb.Append(';');
+        }
     }
 
     /// <summary>
@@ -159,6 +170,16 @@ public class Format
     }
 
     /// <summary>
+    /// This method is used to create a copy of the current format with a new text alignment setting.
+    /// </summary>
+    public Format WithTextAlign(TextAlign textAlign)
+    {
+        var clone = Clone();
+        clone.TextAlign = textAlign;
+        return clone;
+    }
+
+    /// <summary>
     /// Creates a new instance of the Format class that is a copy of the current instance.
     /// </summary>
     public Format Clone()
@@ -169,7 +190,8 @@ public class Format
             BackgroundColor = BackgroundColor,
             Bold = Bold,
             Italic = Italic,
-            Underline = Underline
+            Underline = Underline,
+            TextAlign = TextAlign
         };
     }
 }
