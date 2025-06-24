@@ -534,6 +534,71 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
+    private Func<MouseEventArgs, Task>? onColumnResizeMouseMoveAsync;
+
+    /// <summary>
+    /// Invoked by JS interop when the column resize handle is pressed.
+    /// </summary>
+    [JSInvokable]
+    public async Task<bool> OnColumnResizeMouseDownAsync(CellEventArgs args)
+    {
+        var result = await AcceptAsync();
+
+        if (result)
+        {
+            if (grid is not null)
+            {
+                var capture = new ColumnResizeCapture
+                {
+                    ScrollTop = grid.ScrollTop,
+                    ScrollLeft = grid.ScrollLeft,
+                    Column = args.Column,
+                    StartX = args.Mouse.ClientX,
+                    StartWidth = Sheet?.Columns[args.Column] ?? 100
+                };
+
+                onColumnResizeMouseMoveAsync = mouse => OnColumnResizeMouseMoveAsync(capture, mouse);
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Invoked by JS interop when the mouse moves while resizing a column.
+    /// </summary>
+    [JSInvokable]
+    public async Task OnColumnResizeMouseMoveAsync(MouseEventArgs args)
+    {
+        if (onColumnResizeMouseMoveAsync is not null)
+        {
+            await onColumnResizeMouseMoveAsync(args);
+        }
+    }
+
+    private Task OnColumnResizeMouseMoveAsync(ColumnResizeCapture capture, MouseEventArgs mouse)
+    {
+        if (Sheet != null && capture.Column >= 0 && capture.Column < Sheet.Columns.Count)
+        {
+            var delta = mouse.ClientX - capture.StartX;
+            var newWidth = Math.Max(24, capture.StartWidth + delta);
+            Sheet.Columns[capture.Column] = newWidth;
+            StateHasChanged();
+        }
+
+        return Task.CompletedTask;
+    }
+
+
+    class ColumnResizeCapture
+    {
+        public double ScrollTop { get; set; }
+        public double ScrollLeft { get; set; }
+        public int Column { get; set; }
+        public double StartX { get; set; }
+        public double StartWidth { get; set; }
+    }
+
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         if (jsRef is not null)

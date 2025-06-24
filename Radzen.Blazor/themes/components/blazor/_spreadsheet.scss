@@ -266,3 +266,14 @@
     z-index: 4;
     z-index: 4;
 }
+
+.rz-spreadsheet-column-resize-handle {
+    position: absolute;
+    width: 5px;
+    cursor: ew-resize;
+    z-index: 5;
+    transform: translateX(-50%);
+    &:hover {
+        background-color: #258cfb;
+    }
+}
