@@ -40,6 +40,11 @@ public class Format
     public TextAlign TextAlign { get; set; } = TextAlign.Left;
 
     /// <summary>
+    /// Gets or sets the vertical alignment in the format.
+    /// </summary>
+    public VerticalAlign VerticalAlign { get; set; } = VerticalAlign.Top;
+
+    /// <summary>
     /// Gets or sets the color of the text in the format.
     /// </summary>
     public string? Color
@@ -91,31 +96,57 @@ public class Format
 
         if (BackgroundColor != null)
         {
-            if (sb.Length > 0)
-            {
-                sb.Append(' ');
-            }
             sb.Append("background-color: ");
             sb.Append(BackgroundColor);
             sb.Append(';');
         }
+
         if (Bold)
         {
             sb.Append("font-weight: bold;");
         }
+
         if (Italic)
         {
             sb.Append("font-style: italic;");
         }
+
         if (Underline)
         {
             sb.Append("text-decoration: underline;");
         }
-        if (TextAlign != TextAlign.Left)
+
+        if (VerticalAlign != VerticalAlign.Top || TextAlign != TextAlign.Left)
         {
-            sb.Append("text-align: ");
-            sb.Append(TextAlign.ToString().ToLowerInvariant());
-            sb.Append(';');
+            sb.Append("display: flex;");
+            
+            // Handle vertical alignment with align-items
+            if (VerticalAlign != VerticalAlign.Top)
+            {
+                sb.Append("align-items: ");
+                sb.Append(VerticalAlign switch
+                {
+                    VerticalAlign.Top => "flex-start",
+                    VerticalAlign.Middle => "center",
+                    VerticalAlign.Bottom => "flex-end",
+                    _ => "flex-start"
+                });
+                sb.Append(';');
+            }
+            
+            // Handle horizontal alignment with justify-content
+            if (TextAlign != TextAlign.Left)
+            {
+                sb.Append("justify-content: ");
+                sb.Append(TextAlign switch
+                {
+                    TextAlign.Center => "center",
+                    TextAlign.Right => "flex-end",
+                    TextAlign.Justify => "space-between",
+                    _ => "flex-start"
+                });
+                sb.Append(';');
+            }
         }
     }
 
@@ -180,6 +211,16 @@ public class Format
     }
 
     /// <summary>
+    /// This method is used to create a copy of the current format with a new vertical alignment setting.
+    /// </summary>
+    public Format WithVerticalAlign(VerticalAlign verticalAlign)
+    {
+        var clone = Clone();
+        clone.VerticalAlign = verticalAlign;
+        return clone;
+    }
+
+    /// <summary>
     /// Creates a new instance of the Format class that is a copy of the current instance.
     /// </summary>
     public Format Clone()
@@ -191,7 +232,8 @@ public class Format
             Bold = Bold,
             Italic = Italic,
             Underline = Underline,
-            TextAlign = TextAlign
+            TextAlign = TextAlign,
+            VerticalAlign = VerticalAlign
         };
     }
 }
