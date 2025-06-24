@@ -86,6 +86,14 @@ class Spreadsheet {
       }
       e.preventDefault();
       e.stopPropagation();
+    } else if (e.target.matches('.rz-spreadsheet-row-resize-handle')) {
+      const row = +e.target.dataset.row;
+      if (await this.dotNetRef.invokeMethodAsync('OnRowResizeMouseDownAsync', { row, mouse: this.toEventArgs(e) })) {
+        addEventListener('mousemove', this.onRowResizeMove);
+        addEventListener('mouseup', this.onRowResizeUp);
+      }
+      e.preventDefault();
+      e.stopPropagation();
     }
   }
 
@@ -193,6 +201,16 @@ class Spreadsheet {
     this.invokeAsync('OnColumnResizeMouseUpAsync', e);
     removeEventListener('mousemove', this.onColumnResizeMove);
     removeEventListener('mouseup', this.onColumnResizeUp);
+  }
+
+  onRowResizeMove = (e) => {
+    this.invokeAsync('OnRowResizeMouseMoveAsync', e);
+  }
+
+  onRowResizeUp = (e) => {
+    this.invokeAsync('OnRowResizeMouseUpAsync', e);
+    removeEventListener('mousemove', this.onRowResizeMove);
+    removeEventListener('mouseup', this.onRowResizeUp);
   }
 }
 
