@@ -19,6 +19,12 @@ namespace Radzen.Blazor
         public string? Theme { get; set; }
 
         /// <summary>
+        /// When set to true the icon font will be preloadd.
+        /// </summary>
+        [Parameter]
+        public bool PreloadIconFont { get; set; } = true;
+
+        /// <summary>
         /// Enables WCAG contrast requirements. If set to true additional CSS file will be loaded.
         /// </summary>
         [Parameter]
@@ -37,6 +43,10 @@ namespace Radzen.Blazor
         private string WcagHref => $"{Path}/{theme}-wcag.css?v={Version}";
 
         private string Path => Embedded ? $"_content/Radzen.Blazor/css" : "css";
+
+        private string IconFontPath => Embedded ? $"_content/Radzen.Blazor/fonts" : "fonts";
+
+        private string IconFontHref => $"{IconFontPath}/MaterialSymbolsOutlined.woff2";
 
         private bool Embedded => theme switch
         {
