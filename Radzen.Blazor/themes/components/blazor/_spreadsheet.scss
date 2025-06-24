@@ -277,3 +277,14 @@
         background-color: #258cfb;
     }
 }
+
+.rz-spreadsheet-row-resize-handle {
+    position: absolute;
+    height: 5px;
+    cursor: ns-resize;
+    z-index: 5;
+    transform: translateY(-50%);
+    &:hover {
+        background-color: #258cfb;
+    }
+}

@@ -34,6 +34,8 @@ public partial class RowHeader : CellBase, IDisposable
                                      .Add("rz-spreadsheet-header-selected", selected)
                                      .ToString();
 
+    private string ResizeHandleStyle => $"top: {Rect.Bottom.ToPx()}; left: {Rect.Left.ToPx()}; width: {Rect.Width.ToPx()};";
+
     /// <inheritdoc/>
     protected override void OnInitialized()
     {
