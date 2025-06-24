@@ -17,7 +17,7 @@
         style="display:none;" tabindex="0">
     <div class="rz-overlaypanel-content">
         <ul class="rz-listbox-list">
-            @if (QueryableExtension.IsEnumerable(Column.FilterPropertyType))
+            @if (QueryableExtension.IsEnumerable(Column.FilterPropertyType) || Column.FilterPropertyType == typeof(string))
             {
                 @if (Column.GetFilterOperators().Contains(FilterOperator.Contains))
                 {
