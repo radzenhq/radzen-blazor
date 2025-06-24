@@ -78,6 +78,14 @@ class Spreadsheet {
       if (await this.dotNetRef.invokeMethodAsync('OnColumnMouseDownAsync', { column, mouse: this.toEventArgs(e) })) {
         addEventListener('mousemove', this.onColumnMouseMove);
       }
+    } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
+      const column = +e.target.dataset.column;
+      if (await this.dotNetRef.invokeMethodAsync('OnColumnResizeMouseDownAsync', { column, mouse: this.toEventArgs(e) })) {
+        addEventListener('mousemove', this.onColumnResizeMove);
+        addEventListener('mouseup', this.onColumnResizeUp);
+      }
+      e.preventDefault();
+      e.stopPropagation();
     }
   }
 
@@ -175,6 +183,16 @@ class Spreadsheet {
     this.element.removeEventListener('dblclick', this.onDoubleClick);
     removeEventListener('paste', this.onPaste);
     removeEventListener('copy', this.onCopy);
+  }
+
+  onColumnResizeMove = (e) => {
+    this.invokeAsync('OnColumnResizeMouseMoveAsync', e);
+  }
+
+  onColumnResizeUp = (e) => {
+    this.invokeAsync('OnColumnResizeMouseUpAsync', e);
+    removeEventListener('mousemove', this.onColumnResizeMove);
+    removeEventListener('mouseup', this.onColumnResizeUp);
   }
 }
 
