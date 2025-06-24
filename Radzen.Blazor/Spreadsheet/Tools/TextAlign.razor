@@ -1,0 +1,71 @@
+@using Radzen.Blazor.Spreadsheet
+@implements IDisposable
+
+<RadzenSelectBar @bind-Value=@CurrentTextAlign Disabled=@IsDisabled>
+    <Items>
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Left Icon="format_align_left" />
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Center Icon="format_align_center" />
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Right Icon="format_align_right" />
+        <RadzenSelectBarItem Value=@Radzen.TextAlign.Justify Icon="format_align_justify" />
+    </Items>
+</RadzenSelectBar>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private Radzen.TextAlign CurrentTextAlign
+    {
+        get
+        {
+            if (Sheet?.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.TextAlign;
+            }
+            return Radzen.TextAlign.Left;
+        }
+        set
+        {
+            if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+            {
+                if (Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+                {
+                    var command = new FormatCommand(Sheet, Sheet.Selection.Range, cell.Format.WithTextAlign(value));
+                    Sheet.Commands.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+} 
