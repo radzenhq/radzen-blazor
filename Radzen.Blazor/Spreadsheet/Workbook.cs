@@ -66,7 +66,7 @@ public class Workbook
         // Track unique styles
         var fontStyles = new Dictionary<(string? Color, bool Bold, bool Italic, bool Underline), int>();
         var fillStyles = new Dictionary<string, int>();
-        var cellStyles = new Dictionary<(int FontId, int FillId, TextAlign TextAlign), int>();
+        var cellStyles = new Dictionary<(int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign), int>();
 
         // Create styles.xml
         var stylesDoc = new XDocument(
@@ -253,7 +253,7 @@ public class Workbook
                         new XAttribute("r", new CellRef(row, col).ToString()));
 
                     // Add style reference if cell has formatting
-                    if (cell.Format.Color != null || cell.Format.BackgroundColor != null || cell.Format.Bold || cell.Format.Italic || cell.Format.Underline || cell.Format.TextAlign != TextAlign.Left)
+                    if (cell.Format.Color != null || cell.Format.BackgroundColor != null || cell.Format.Bold || cell.Format.Italic || cell.Format.Underline || cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top)
                     {
                         var fontKey = (cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline);
                         var fontId = 0;
@@ -305,7 +305,7 @@ public class Workbook
                             }
                         }
 
-                        var styleKey = (fontId, fillId, cell.Format.TextAlign);
+                        var styleKey = (fontId, fillId, cell.Format.TextAlign, cell.Format.VerticalAlign);
                         if (!cellStyles.TryGetValue(styleKey, out int styleId))
                         {
                             styleId = cellStyles.Count + 1;
@@ -319,8 +319,8 @@ public class Workbook
                                 new XAttribute("applyFont", fontId > 0 ? "1" : "0"),
                                 new XAttribute("applyFill", fillId > 0 ? "1" : "0"));
 
-                            // Add alignment if not left-aligned
-                            if (cell.Format.TextAlign != TextAlign.Left)
+                            // Add alignment if not default (left-aligned and top-aligned)
+                            if (cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top)
                             {
                                 var horizontalAlign = cell.Format.TextAlign switch
                                 {
@@ -329,9 +329,23 @@ public class Workbook
                                     TextAlign.Justify => "justify",
                                     _ => "left"
                                 };
-
-                                xfElement.Add(new XElement(XName.Get("alignment", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                    new XAttribute("horizontal", horizontalAlign)));
+                                var verticalAlign = cell.Format.VerticalAlign switch
+                                {
+                                    VerticalAlign.Middle => "center",
+                                    VerticalAlign.Bottom => "bottom",
+                                    _ => "top"
+                                };
+                                
+                                var alignmentElement = new XElement(XName.Get("alignment", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"));
+                                if (cell.Format.TextAlign != TextAlign.Left)
+                                {
+                                    alignmentElement.Add(new XAttribute("horizontal", horizontalAlign));
+                                }
+                                if (cell.Format.VerticalAlign != VerticalAlign.Top)
+                                {
+                                    alignmentElement.Add(new XAttribute("vertical", verticalAlign));
+                                }
+                                xfElement.Add(alignmentElement);
                                 xfElement.Add(new XAttribute("applyAlignment", "1"));
                             }
 
@@ -454,7 +468,7 @@ public class Workbook
         // Parse styles
         var fontStyles = new Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)>();
         var fillColors = new Dictionary<int, string>();
-        var cellStyles = new Dictionary<int, (int FontId, int FillId, TextAlign TextAlign)>(0);
+        var cellStyles = new Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)>(0);
 
         var stylesEntry = archive.GetEntry("xl/styles.xml");
         if (stylesEntry != null)
@@ -507,6 +521,7 @@ public class Workbook
                     var fillIdValue = int.Parse(fillId);
 
                     var textAlign = TextAlign.Left;
+                    var verticalAlign = VerticalAlign.Top;
                     if (applyAlignment == "1")
                     {
                         var alignment = cellXfs[i].Element(stylesNs + "alignment");
@@ -520,13 +535,20 @@ public class Workbook
                                 "justify" => TextAlign.Justify,
                                 _ => TextAlign.Left
                             };
+                            var vertical = alignment.Attribute("vertical")?.Value;
+                            verticalAlign = vertical switch
+                            {
+                                "center" => VerticalAlign.Middle,
+                                "bottom" => VerticalAlign.Bottom,
+                                _ => VerticalAlign.Top
+                            };
                         }
                     }
 
                     if (applyFont == "1" && fontStyles.ContainsKey(fontIdValue) ||
                         applyFill == "1" && fillColors.ContainsKey(fillIdValue))
                     {
-                        cellStyles[i] = (fontIdValue, fillIdValue, textAlign);
+                        cellStyles[i] = (fontIdValue, fillIdValue, textAlign, verticalAlign);
                     }
                 }
             }
@@ -633,6 +655,7 @@ public class Workbook
                             sheet.Cells[address.Row, address.Column].Format.Underline = fontStyle.Underline;
                         }
                         sheet.Cells[address.Row, address.Column].Format.TextAlign = style.TextAlign;
+                        sheet.Cells[address.Row, address.Column].Format.VerticalAlign = style.VerticalAlign;
                         if (fillColors.TryGetValue(style.FillId, out var fillColor))
                         {
                             sheet.Cells[address.Row, address.Column].Format.BackgroundColor = fillColor;

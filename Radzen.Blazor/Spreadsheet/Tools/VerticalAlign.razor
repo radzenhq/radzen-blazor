@@ -1,0 +1,70 @@
+@using Radzen.Blazor.Spreadsheet
+@implements IDisposable
+
+<RadzenSelectBar @bind-Value=@CurrentVerticalAlign Disabled=@IsDisabled>
+    <Items>
+        <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Top Icon="align_vertical_top" />
+        <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Middle Icon="align_vertical_center" />
+        <RadzenSelectBarItem Value=@Radzen.VerticalAlign.Bottom Icon="align_vertical_bottom" />
+    </Items>
+</RadzenSelectBar>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private Radzen.VerticalAlign CurrentVerticalAlign
+    {
+        get
+        {
+            if (Sheet?.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell) == true)
+            {
+                return cell.Format.VerticalAlign;
+            }
+            return Radzen.VerticalAlign.Top;
+        }
+        set
+        {
+            if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+            {
+                if (Sheet.Cells.TryGet(Sheet.Selection.Cell.Row, Sheet.Selection.Cell.Column, out var cell))
+                {
+                    var command = new FormatCommand(Sheet, Sheet.Selection.Range, cell.Format.WithVerticalAlign(value));
+                    Sheet.Commands.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+} 
