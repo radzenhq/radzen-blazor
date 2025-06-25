@@ -86,7 +86,7 @@
     position: relative;
     overflow: hidden;
   
-    &:not(.rz-state-disabled):before {
+    &:before {
       content: "";
       position: absolute;
       inset: 0;
@@ -96,8 +96,12 @@
       transition: background-size 0.8s, opacity 0.8s;
       pointer-events: none;
     }
+
+    &.rz-state-disabled:before {
+      background: transparent;
+    }
   
-    &:not(.rz-state-disabled):active {
+    &:active {
       &:before {
         transition: background-size 0s, opacity 0s;
         opacity: .32;
@@ -111,10 +115,14 @@
     transition: background-size 0.8s;
     background: radial-gradient(circle, transparent 1%, $ripple-background 1%)  center/15000%;
 
-    &:not(.rz-state-disabled):active {
+    &:active {
         background-color: $ripple-background;
         transition: background-size 0s;
         background-size: 0%;
+    }
+
+    &.rz-state-disabled:active {
+        background-color: transparent;
     }
   }
 }
