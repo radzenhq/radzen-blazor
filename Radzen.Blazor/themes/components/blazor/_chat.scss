@@ -1,0 +1,196 @@
+$rz-chat-background-color: var(--rz-base-background-color) !default;
+$rz-chat-border: var(--rz-border-normal) !default;
+$rz-chat-border-radius: var(--rz-border-radius) !default;
+$rz-chat-header-padding-block: 0.5rem !default;
+$rz-chat-header-padding-inline: 1rem 0.5rem !default;
+$rz-chat-header-background-color: $rz-chat-background-color !default;
+$rz-chat-header-bottom-border: var(--rz-border-normal) !default;
+$rz-chat-header-shadow: none !default;
+$rz-chat-header-title-font-size: 1rem !default;
+$rz-chat-header-title-font-weight: 600 !default;
+$rz-chat-message-user-color: var(--rz-on-primary-lighter) !default;
+$rz-chat-message-user-background-color: var(--rz-primary-lighter) !default;
+$rz-chat-message-assistant-color: var(--rz-on-base) !default;
+$rz-chat-message-assistant-background-color: var(--rz-base) !default;
+$rz-chat-message-text-padding: 0.25rem 0.5rem !default;
+$rz-chat-message-text-border-radius: var(--rz-border-radius) !default;
+$rz-chat-avatar-size: 2rem !default;
+$rz-chat-avatar-border-radius: var(--rz-border-radius) !default;
+$rz-chat-avatar-font-size: 1rem !default;
+$rz-chat-avatar-font-weight: 700 !default;
+$rz-chat-message-time-padding: 0 !default;
+$rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
+
+// Chat Component Styles - ChatGPT-like UI
+.rz-chat {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--rz-chat-background-color);
+    border: var(--rz-chat-border);
+    border-radius: var(--rz-chat-border-radius);
+    overflow: hidden;
+}
+
+.rz-chat-header {
+    z-index: 1;
+    padding-block: var(--rz-chat-header-padding-block);
+    padding-inline: var(--rz-chat-header-padding-inline);
+    background-color: var(--rz-chat-header-background-color);
+    border-bottom: var(--rz-chat-header-bottom-border);
+    box-shadow: var(--rz-chat-header-shadow);
+}
+
+.rz-chat-header-title {
+    flex: 1;
+    font-size: var(--rz-chat-header-title-font-size);
+    font-weight: var(--rz-chat-header-title-font-weight);
+}
+
+.rz-chat-messages {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.rz-chat-empty {
+    height: 100%;
+
+    .rzi {
+        font-size: 3rem;
+        opacity: 0.3;
+    }
+}
+
+.rz-chat-message {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.5rem;
+    max-width: 90%;
+}
+
+.rz-chat-message-text {
+    padding: var(--rz-chat-message-text-padding);
+    border-radius: var(--rz-chat-message-text-border-radius);
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    font-size: 1rem;
+    line-height: 1;
+    --rz-text-h1-margin-block-end: 0;
+    --rz-text-h2-margin-block-end: 0;
+    --rz-text-h3-margin-block-end: 0;
+    --rz-text-h4-margin-block-end: 0;
+    --rz-text-h5-margin-block-end: 0;
+    --rz-text-h6-margin-block-end: 0;
+    --rz-text-body1-margin-block-end: 0;
+    --rz-text-body2-margin-block-end: 0;
+}
+
+.rz-chat-message-avatar {
+    width: var(--rz-chat-avatar-size);
+    height: var(--rz-chat-avatar-size);
+    border-radius: var(--rz-chat-avatar-border-radius);
+    font-size: var(--rz-chat-avatar-font-size);
+    font-weight: var(--rz-chat-avatar-font-weight);
+    background-color: var(--rz-base);
+    color: var(--rz-on-base);
+    flex-shrink: 0;
+}
+
+.rz-chat-avatar-initials {
+    width: 100%;
+    overflow: hidden;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rz-chat-message-time {
+    font-size: 0.75rem;
+    color: var(--rz-text-disabled-color);
+    padding: var(--rz-chat-message-time-padding); 
+}
+
+.rz-chat-message-user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+
+    .rz-chat-message-avatar {
+        background-color: var(--rz-chat-message-user-background-color);
+        color: var(--rz-chat-message-user-color);
+    }
+
+    .rz-chat-message-text {
+        background-color: var(--rz-chat-message-user-background-color);
+        color: var(--rz-chat-message-user-color);
+        border-end-end-radius: var(--rz-chat-message-callout-radius);
+/*         --rz-text-h1-color: var(--rz-chat-message-user-color);
+        --rz-text-h2-color: var(--rz-chat-message-user-color);
+        --rz-text-h3-color: var(--rz-chat-message-user-color);
+        --rz-text-h4-color: var(--rz-chat-message-user-color);
+        --rz-text-h5-color: var(--rz-chat-message-user-color);
+        --rz-text-h6-color: var(--rz-chat-message-user-color);
+        --rz-text-body1-color: var(--rz-chat-message-user-color);
+        --rz-text-body2-color: var(--rz-chat-message-user-color); */
+    }
+}
+
+.rz-chat-message-assistant {
+    align-self: flex-start;
+
+    .rz-chat-message-avatar {
+        background-color: var(--rz-chat-message-assistant-background-color);
+        color: var(--rz-chat-message-assistant-color);
+    }
+
+    .rz-chat-message-text {
+        background-color: var(--rz-chat-message-assistant-background-color);
+        color: var(--rz-chat-message-assistant-color);
+        border-end-start-radius: var(--rz-chat-message-callout-radius);
+/*         --rz-text-h1-color: var(--rz-chat-message-assistant-color);
+        --rz-text-h2-color: var(--rz-chat-message-assistant-color);
+        --rz-text-h3-color: var(--rz-chat-message-assistant-color);
+        --rz-text-h4-color: var(--rz-chat-message-assistant-color);
+        --rz-text-h5-color: var(--rz-chat-message-assistant-color);
+        --rz-text-h6-color: var(--rz-chat-message-assistant-color);
+        --rz-text-body1-color: var(--rz-chat-message-assistant-color);
+        --rz-text-body2-color: var(--rz-chat-message-assistant-color); */
+    }
+}
+
+.rz-chat-input {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+}
+
+.rz-chat-input-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: stretch;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    height: fit-content;
+}
+
+.rz-chat-textarea {
+    width: 100%;
+    height: fit-content;
+    max-height: 10rem;
+    overflow-y: scroll;
+    padding-block: var(--rz-text-area-padding-block);
+    padding-inline: var(--rz-text-area-padding-inline);
+    field-sizing: content;
+    resize: none;
+}
+
+.rz-chat-message-streaming-icon {
+    animation: rz-pulse 1.5s infinite;
+}
+
+/* Right-to-left send button */
+*[dir="rtl"] .rz-chat-send-btn {
+    transform: scaleX(-1);
+}

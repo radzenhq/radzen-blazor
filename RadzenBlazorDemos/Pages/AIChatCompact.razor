@@ -1,0 +1,14 @@
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenAIChat @ref="compactChat"
+                Placeholder="Quick message..."
+                ShowClearButton="false"
+                Style="height: 300px; max-width: 100%;"
+                />
+</RadzenStack>
+
+@code {
+    RadzenAIChat compactChat;
+} 
