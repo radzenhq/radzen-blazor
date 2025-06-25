@@ -1,11 +1,12 @@
 @using Radzen.Blazor.Spreadsheet
 @implements IDisposable
 
-<RadzenSplitButton Icon="view_column" Text="Freeze" Click=@OnFreezeClick ButtonStyle="ButtonStyle.Base" Disabled=@IsDisabled>
+<RadzenSplitButton Icon="view_column" Text="Freeze panes" Click=@OnFreezeClick ButtonStyle="ButtonStyle.Base" Disabled=@IsDisabled>
     <ChildContent>
-        <RadzenSplitButtonItem Text="Freeze Panes" Value="range" Icon="view_column" />
-        <RadzenSplitButtonItem Text="Freeze Rows" Value="rows" Icon="view_column" />
-        <RadzenSplitButtonItem Text="Freeze Columns" Value="columns" Icon="view_column" />
+        <RadzenSplitButtonItem Text="Freeze Top Row" Value="row" Icon="view_column" />
+        <RadzenSplitButtonItem Text="Freeze Selected Rows" Value="rows" Icon="view_column" />
+        <RadzenSplitButtonItem Text="Freeze First Column" Value="column" Icon="view_column" />
+        <RadzenSplitButtonItem Text="Freeze Selected Columns" Value="columns" Icon="view_column" />
         <RadzenSplitButtonItem Text="Unfreeze" Value="unfreeze" Icon="view_column" />
     </ChildContent>
 </RadzenSplitButton>
@@ -20,22 +21,47 @@
 
     private void OnFreezeClick(RadzenSplitButtonItem? item)
     {
-        if (Sheet == null || item == null) return;
-
-        switch (item.Value)
+        switch (item?.Value)
         {
+            case null:
+                FreezePanes();
+                break;
+            case "row":
+                FreezeTopRow();
+                break;
             case "rows":
                 FreezeRows();
+                break;
+            case "column":
+                FreezeFirstColumn();
                 break;
             case "columns":
                 FreezeColumns();
                 break;
             case "range":
-                FreezeRange();
+                FreezePanes();
                 break;
             case "unfreeze":
                 Unfreeze();
                 break;
+        }
+    }
+
+    private void FreezeFirstColumn()
+    {
+        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        {
+            Sheet.Rows.Frozen = 0;
+            Sheet.Columns.Frozen = 1;
+        }
+    }
+
+    private void FreezeTopRow()
+    {
+        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        {
+            Sheet.Rows.Frozen = 1;
+            Sheet.Columns.Frozen = 0;
         }
     }
 
@@ -56,7 +82,7 @@
         }
     }
 
-    private void FreezeRange()
+    private void FreezePanes()
     {
         if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
         {
