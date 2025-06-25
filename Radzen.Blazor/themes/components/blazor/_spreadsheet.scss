@@ -288,3 +288,34 @@
         background-color: #258cfb;
     }
 }
+
+// Cell chevron icon styles
+.rz-spreadsheet-cell-chevron {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    font-size: 12px;
+    color: #666;
+    cursor: pointer;
+    z-index: 5;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 2px;
+    padding: 1px;
+    
+    &:hover {
+        color: #258cfb;
+        background: rgba(255, 255, 255, 1);
+    }
+}
+
+.rz-spreadsheet-cell-popup {
+    display: none;
+    position: absolute;
+    overflow: hidden;
+}
+
+.rz-spreadsheet-cell-chevron {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}

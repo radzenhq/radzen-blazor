@@ -7,6 +7,8 @@ using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor.Spreadsheet;
 
+#nullable enable
+
 /// <summary>
 /// Represents the event arguments for cell-related events in a spreadsheet.
 /// </summary>
@@ -55,6 +57,47 @@ public partial class CellView : CellBase, IDisposable
                                      .ToString();
 
     private Cell cell = default!;
+
+    /// <summary>
+    /// Gets a value indicating whether the chevron icon should be shown.
+    /// </summary>
+    protected bool ShouldShowChevron => IsInDataTableFirstRow || IsFiltered;
+
+    /// <summary>
+    /// Gets a value indicating whether the cell is in the first row of a data table.
+    /// </summary>
+    protected bool IsInDataTableFirstRow
+    {
+        get
+        {
+            if (Sheet?.DataTables == null) return false;
+            
+            foreach (var dataTable in Sheet.DataTables)
+            {
+                if (dataTable.Range.Start.Row == Row && 
+                    Column >= dataTable.Range.Start.Column && 
+                    Column <= dataTable.Range.End.Column)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the cell is part of a filter.
+    /// </summary>
+    protected bool IsFiltered
+    {
+        get
+        {
+            // TODO: Implement filter state tracking
+            // For now, return false until filter state tracking is implemented
+            return false;
+        }
+    }
 
     /// <inheritdoc/>
     protected override string Style => GetStyle();
