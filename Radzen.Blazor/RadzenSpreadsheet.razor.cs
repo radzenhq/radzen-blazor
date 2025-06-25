@@ -232,10 +232,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     /// <summary>
-    /// Invoked by JS interop when a cell is clicked with the mouse.
+    /// Invoked by JS interop when a cell is clicked with the pointer.
     /// </summary>
     [JSInvokable]
-    public async Task<bool> OnCellMouseDownAsync(CellEventArgs args)
+    public async Task<bool> OnCellPointerDownAsync(CellEventArgs args)
     {
         var result = await AcceptAsync();
 
@@ -243,7 +243,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             var address = new CellRef(args.Row, args.Column);
 
-            if (args.Mouse.ShiftKey)
+            if (args.Pointer.ShiftKey)
             {
                 Sheet?.Selection.Merge(address);
             }
@@ -255,48 +255,48 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             if (grid is not null)
             {
-                var capture = new MouseCapture
+                var capture = new PointerCapture
                 {
                     ScrollTop = grid.ScrollTop,
                     ScrollLeft = grid.ScrollLeft,
                     Row = args.Row,
                     Column = args.Column,
-                    Mouse = args.Mouse
+                    Pointer = args.Pointer
                 };
 
-                onCellMouseMoveAsync = mouse => OnCellMouseMoveAsync(capture, mouse);
+                onCellPointerMoveAsync = pointer => OnCellPointerMoveAsync(capture, pointer);
             }
         }
 
         return result;
     }
 
-    private Func<MouseEventArgs, Task>? onCellMouseMoveAsync;
+    private Func<PointerEventArgs, Task>? onCellPointerMoveAsync;
 
     /// <summary>
-    /// Invoked by JS interop when the mouse moves over a cell.
+    /// Invoked by JS interop when the pointer moves over a cell.
     /// </summary>
     [JSInvokable]
-    public async Task OnCellMouseMoveAsync(MouseEventArgs args)
+    public async Task OnCellPointerMoveAsync(PointerEventArgs args)
     {
-        if (onCellMouseMoveAsync is not null)
+        if (onCellPointerMoveAsync is not null)
         {
-            await onCellMouseMoveAsync(args);
+            await onCellPointerMoveAsync(args);
         }
     }
 
-    class MouseCapture
+    class PointerCapture
     {
         public double ScrollTop { get; set; }
         public double ScrollLeft { get; set; }
         public int Row { get; set; }
         public int Column { get; set; }
-        public MouseEventArgs Mouse { get; set; } = default!;
+        public PointerEventArgs Pointer { get; set; } = default!;
     }
 
-    private async Task OnCellMouseMoveAsync(MouseCapture capture, MouseEventArgs mouse)
+    private async Task OnCellPointerMoveAsync(PointerCapture capture, PointerEventArgs pointer)
     {
-        var address = GetDeltaCell(capture, mouse);
+        var address = GetDeltaCell(capture, pointer);
 
         if (address != CellRef.Invalid)
         {
@@ -306,15 +306,15 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private CellRef GetDeltaCell(MouseCapture capture, MouseEventArgs args)
+    private CellRef GetDeltaCell(PointerCapture capture, PointerEventArgs args)
     {
         if (grid is not null)
         {
-            var deltaX = args.ClientX - capture.Mouse.ClientX + capture.Mouse.OffsetX;
+            var deltaX = args.ClientX - capture.Pointer.ClientX + capture.Pointer.OffsetX;
 
             deltaX += grid.ScrollLeft - capture.ScrollLeft;
 
-            var deltaY = args.ClientY - capture.Mouse.ClientY + capture.Mouse.OffsetY;
+            var deltaY = args.ClientY - capture.Pointer.ClientY + capture.Pointer.OffsetY;
 
             deltaY += grid.ScrollTop - capture.ScrollTop;
 
@@ -333,16 +333,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     /// <summary>
-    /// Invoked by JS interop when a row header is clicked with the mouse.
+    /// Invoked by JS interop when a row header is clicked with the pointer.
     /// </summary>
     [JSInvokable]
-    public async Task<bool> OnRowMouseDownAsync(CellEventArgs args)
+    public async Task<bool> OnRowPointerDownAsync(CellEventArgs args)
     {
         var result = await AcceptAsync();
 
         if (result)
         {
-            if (args.Mouse.ShiftKey)
+            if (args.Pointer.ShiftKey)
             {
                 Sheet?.Selection.Merge(new CellRef(args.Row, Sheet.ColumnCount - 1));
             }
@@ -353,38 +353,38 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             if (grid is not null)
             {
-                var capture = new MouseCapture
+                var capture = new PointerCapture
                 {
                     ScrollTop = grid.ScrollTop,
                     ScrollLeft = grid.ScrollLeft,
                     Row = args.Row,
-                    Mouse = args.Mouse
+                    Pointer = args.Pointer
                 };
 
-                onRowMouseMoveAsync = mouse => OnRowMouseMoveAsync(capture, mouse);
+                onRowPointerMoveAsync = pointer => OnRowPointerMoveAsync(capture, pointer);
             }
         }
 
         return result;
     }
 
-    private Func<MouseEventArgs, Task>? onRowMouseMoveAsync;
+    private Func<PointerEventArgs, Task>? onRowPointerMoveAsync;
 
     /// <summary>
-    /// Invoked by JS interop when the mouse moves over a row header.
+    /// Invoked by JS interop when the pointer moves over a row header.
     /// </summary>
     [JSInvokable]
-    public async Task OnRowMouseMoveAsync(MouseEventArgs args)
+    public async Task OnRowPointerMoveAsync(PointerEventArgs args)
     {
-        if (onRowMouseMoveAsync is not null)
+        if (onRowPointerMoveAsync is not null)
         {
-            await onRowMouseMoveAsync(args);
+            await onRowPointerMoveAsync(args);
         }
     }
 
-    private async Task OnRowMouseMoveAsync(MouseCapture capture, MouseEventArgs mouse)
+    private async Task OnRowPointerMoveAsync(PointerCapture capture, PointerEventArgs pointer)
     {
-        var address = GetDeltaCell(capture, mouse);
+        var address = GetDeltaCell(capture, pointer);
 
         if (address != CellRef.Invalid)
         {
@@ -395,16 +395,16 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     /// <summary>
-    /// Invoked by JS interop when a column header is clicked with the mouse.
+    /// Invoked by JS interop when a column header is clicked with the pointer.
     /// </summary>
     [JSInvokable]
-    public async Task<bool> OnColumnMouseDownAsync(CellEventArgs args)
+    public async Task<bool> OnColumnPointerDownAsync(CellEventArgs args)
     {
         var result = await AcceptAsync();
 
         if (result)
         {
-            if (args.Mouse.ShiftKey)
+            if (args.Pointer.ShiftKey)
             {
                 Sheet?.Selection.Merge(new CellRef(Sheet.RowCount - 1, args.Column));
             }
@@ -415,38 +415,38 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
             if (grid is not null)
             {
-                var capture = new MouseCapture
+                var capture = new PointerCapture
                 {
                     ScrollTop = grid.ScrollTop,
                     ScrollLeft = grid.ScrollLeft,
                     Column = args.Column,
-                    Mouse = args.Mouse
+                    Pointer = args.Pointer
                 };
 
-                onColumnMouseMoveAsync = mouse => OnColumnMouseMoveAsync(capture, mouse);
+                onColumnPointerMoveAsync = pointer => OnColumnPointerMoveAsync(capture, pointer);
             }
         }
 
         return result;
     }
 
-    private Func<MouseEventArgs, Task>? onColumnMouseMoveAsync;
+    private Func<PointerEventArgs, Task>? onColumnPointerMoveAsync;
 
     /// <summary>
-    /// Invoked by JS interop when the mouse moves over a column header.
+    /// Invoked by JS interop when the pointer moves over a column header.
     /// </summary>
     [JSInvokable]
-    public async Task OnColumnMouseMoveAsync(MouseEventArgs args)
+    public async Task OnColumnPointerMoveAsync(PointerEventArgs args)
     {
-        if (onColumnMouseMoveAsync is not null)
+        if (onColumnPointerMoveAsync is not null)
         {
-            await onColumnMouseMoveAsync(args);
+            await onColumnPointerMoveAsync(args);
         }
     }
 
-    private async Task OnColumnMouseMoveAsync(MouseCapture capture, MouseEventArgs mouse)
+    private async Task OnColumnPointerMoveAsync(PointerCapture capture, PointerEventArgs pointer)
     {
-        var address = GetDeltaCell(capture, mouse);
+        var address = GetDeltaCell(capture, pointer);
 
         if (address != CellRef.Invalid)
         {
@@ -457,7 +457,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     /// <summary>
-    /// Invoked by JS interop when a cell is double-clicked with the mouse.
+    /// Invoked by JS interop when a cell is double-clicked with the pointer.
     /// </summary>
     [JSInvokable]
     public async Task OnCellDoubleClickAsync(CellEventArgs args)
@@ -534,14 +534,14 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private Func<MouseEventArgs, Task>? onColumnResizeMouseMoveAsync;
-    private Func<MouseEventArgs, Task>? onRowResizeMouseMoveAsync;
+    private Func<PointerEventArgs, Task>? onColumnResizePointerMoveAsync;
+    private Func<PointerEventArgs, Task>? onRowResizePointerMoveAsync;
 
     /// <summary>
     /// Invoked by JS interop when the column resize handle is pressed.
     /// </summary>
     [JSInvokable]
-    public async Task<bool> OnColumnResizeMouseDownAsync(CellEventArgs args)
+    public async Task<bool> OnColumnResizePointerDownAsync(CellEventArgs args)
     {
         var result = await AcceptAsync();
 
@@ -554,11 +554,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     ScrollTop = grid.ScrollTop,
                     ScrollLeft = grid.ScrollLeft,
                     Column = args.Column,
-                    StartX = args.Mouse.ClientX,
+                    StartX = args.Pointer.ClientX,
                     StartWidth = Sheet?.Columns[args.Column] ?? 100
                 };
 
-                onColumnResizeMouseMoveAsync = mouse => OnColumnResizeMouseMoveAsync(capture, mouse);
+                onColumnResizePointerMoveAsync = pointer => OnColumnResizePointerMoveAsync(capture, pointer);
             }
         }
 
@@ -569,7 +569,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// Invoked by JS interop when the row resize handle is pressed.
     /// </summary>
     [JSInvokable]
-    public async Task<bool> OnRowResizeMouseDownAsync(CellEventArgs args)
+    public async Task<bool> OnRowResizePointerDownAsync(CellEventArgs args)
     {
         var result = await AcceptAsync();
 
@@ -582,11 +582,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
                     ScrollTop = grid.ScrollTop,
                     ScrollLeft = grid.ScrollLeft,
                     Row = args.Row,
-                    StartY = args.Mouse.ClientY,
+                    StartY = args.Pointer.ClientY,
                     StartHeight = Sheet?.Rows[args.Row] ?? 20
                 };
 
-                onRowResizeMouseMoveAsync = mouse => OnRowResizeMouseMoveAsync(capture, mouse);
+                onRowResizePointerMoveAsync = pointer => OnRowResizePointerMoveAsync(capture, pointer);
             }
         }
 
@@ -594,34 +594,34 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     /// <summary>
-    /// Invoked by JS interop when the mouse moves while resizing a column.
+    /// Invoked by JS interop when the pointer moves while resizing a column.
     /// </summary>
     [JSInvokable]
-    public async Task OnColumnResizeMouseMoveAsync(MouseEventArgs args)
+    public async Task OnColumnResizePointerMoveAsync(PointerEventArgs args)
     {
-        if (onColumnResizeMouseMoveAsync is not null)
+        if (onColumnResizePointerMoveAsync is not null)
         {
-            await onColumnResizeMouseMoveAsync(args);
+            await onColumnResizePointerMoveAsync(args);
         }
     }
 
     /// <summary>
-    /// Invoked by JS interop when the mouse moves while resizing a row.
+    /// Invoked by JS interop when the pointer moves while resizing a row.
     /// </summary>
     [JSInvokable]
-    public async Task OnRowResizeMouseMoveAsync(MouseEventArgs args)
+    public async Task OnRowResizePointerMoveAsync(PointerEventArgs args)
     {
-        if (onRowResizeMouseMoveAsync is not null)
+        if (onRowResizePointerMoveAsync is not null)
         {
-            await onRowResizeMouseMoveAsync(args);
+            await onRowResizePointerMoveAsync(args);
         }
     }
 
-    private Task OnColumnResizeMouseMoveAsync(ColumnResizeCapture capture, MouseEventArgs mouse)
+    private Task OnColumnResizePointerMoveAsync(ColumnResizeCapture capture, PointerEventArgs pointer)
     {
         if (Sheet != null && capture.Column >= 0 && capture.Column < Sheet.Columns.Count)
         {
-            var delta = mouse.ClientX - capture.StartX;
+            var delta = pointer.ClientX - capture.StartX;
             var newWidth = Math.Max(24, capture.StartWidth + delta);
             Sheet.Columns[capture.Column] = newWidth;
             StateHasChanged();
@@ -630,11 +630,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         return Task.CompletedTask;
     }
 
-    private Task OnRowResizeMouseMoveAsync(RowResizeCapture capture, MouseEventArgs mouse)
+    private Task OnRowResizePointerMoveAsync(RowResizeCapture capture, PointerEventArgs pointer)
     {
         if (Sheet != null && capture.Row >= 0 && capture.Row < Sheet.Rows.Count)
         {
-            var delta = mouse.ClientY - capture.StartY;
+            var delta = pointer.ClientY - capture.StartY;
             var newHeight = Math.Max(16, capture.StartHeight + delta);
             Sheet.Rows[capture.Row] = newHeight;
             StateHasChanged();
