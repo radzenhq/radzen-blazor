@@ -1730,6 +1730,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "AIChat",
+                    Path = "aichat",
+                    New = true,
+                    Description = "A modern chat component with AI integration that provides a conversational interface similar to popular chat applications.",
+                    Icon = "\ue0b7",
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
+                },
+                new Example
+                {
                     Name = "TextBox",
                     Path = "textbox",
                     Description = "Demonstration and configuration of the Radzen Blazor TextBox input component.",

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Radzen;
@@ -45,6 +46,9 @@ builder.Services.AddDbContextFactory<NorthwindContext>();
 builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
+
+builder.Services.AddAIChatService(options =>
+    builder.Configuration.GetSection("AIChatService").Bind(options));
 
 builder.Services.AddLocalization();
 

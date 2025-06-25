@@ -1,0 +1,170 @@
+@using Radzen.Blazor
+@using Radzen
+@inherits ComponentBase
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenAIChat Title="AI Assistant with Memory" 
+                Placeholder="Ask me anything... I'll remember our conversation!"
+                SessionId="@currentSessionId"
+                SessionIdChanged="@OnSessionIdChanged"
+                MessageAdded="@OnMessageAdded"
+                ResponseReceived="@OnResponseReceived"
+                ShowClearButton="true"
+                class="rz-h-100" />
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenRow>
+            <RadzenColumn Size="12" SizeLG="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Memory Statistics</RadzenText>
+                    <RadzenRow>
+                        <RadzenColumn Size="6">
+                            <RadzenText TextStyle="TextStyle.H4">@activeSessionsCount</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Caption">Active Sessions</RadzenText>
+                        </RadzenColumn>
+                        <RadzenColumn Size="6">
+                            <RadzenText TextStyle="TextStyle.H4">@totalMessagesCount</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Caption">Total Messages</RadzenText>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Session Management</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap">
+                            <RadzenButton Text="New Session" Icon="add" ButtonStyle="ButtonStyle.Primary" Click="@OnNewSession" Variant="Variant.Flat" />
+                            <RadzenButton Text="Load Session" Icon="folder_open" ButtonStyle="ButtonStyle.Base" Click="@OnLoadSession" Variant="Variant.Flat" />
+                            <RadzenButton Text="Clear Session" Icon="clear_all" ButtonStyle="ButtonStyle.Danger" Click="@OnClearSession" Variant="Variant.Flat" />
+                        </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                            <RadzenLabel Style="white-space: nowrap;">Current Session ID:</RadzenLabel>
+                            <RadzenTextBox @bind-Value="@currentSessionId" ReadOnly="true" Style="flex: 1; min-width: 360px;" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Session History</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        <RadzenDropDown TValue="string" Data="@sessionIds" @bind-Value="@selectedSessionId" Placeholder="Select a session to load" Style="width: 100%;" />
+                        <RadzenButton Text="Load Selected Session" Icon="folder_open" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat"
+                                    Click="@OnLoadSelectedSession" Style="width: 100%;" Disabled="@(string.IsNullOrEmpty(selectedSessionId))" />
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenColumn>
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle1">Memory Features</RadzenText>
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenText TextStyle="TextStyle.H6">Conversation Memory</RadzenText>
+                    <ul>
+                        <li>The AI remembers all previous messages in the conversation</li>
+                        <li>Context is maintained across multiple questions</li>
+                        <li>You can ask follow-up questions naturally</li>
+                        <li>The AI can reference previous parts of the conversation</li>
+                    </ul>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenText TextStyle="TextStyle.H6">Session Management</RadzenText>
+                    <ul>
+                        <li>Create new sessions for different conversations</li>
+                        <li>Switch between different conversation contexts</li>
+                        <li>Clear sessions to start fresh</li>
+                        <li>Session data persists during the application session</li>
+                    </ul>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private string currentSessionId;
+    private string selectedSessionId;
+    private List<string> sessionIds = new();
+    private int activeSessionsCount = 0;
+    private int totalMessagesCount = 0;
+
+    [Inject]
+    private IAIChatService ChatService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        // Create a new session by default
+        currentSessionId = Guid.NewGuid().ToString();
+        
+        // Update session statistics
+        await UpdateSessionStatistics();
+    }
+
+    private async Task OnSessionIdChanged(string sessionId)
+    {
+        currentSessionId = sessionId;
+        await UpdateSessionStatistics();
+    }
+
+    private async Task OnMessageAdded(Radzen.Blazor.ChatMessage message)
+    {
+        // Update statistics when a message is added
+        await UpdateSessionStatistics();
+    }
+
+    private async Task OnResponseReceived(string response)
+    {
+        // Update statistics when a response is received
+        await UpdateSessionStatistics();
+    }
+
+    private async Task OnNewSession()
+    {
+        currentSessionId = Guid.NewGuid().ToString();
+        await UpdateSessionStatistics();
+    }
+
+    private async Task OnLoadSession()
+    {
+        // This would typically open a dialog to select a session
+        // For demo purposes, we'll just create a new session
+        currentSessionId = Guid.NewGuid().ToString();
+        await UpdateSessionStatistics();
+    }
+
+    private async Task OnClearSession()
+    {
+        if (!string.IsNullOrEmpty(currentSessionId))
+        {
+            ChatService.ClearSession(currentSessionId);
+            await UpdateSessionStatistics();
+        }
+    }
+
+    private async Task OnLoadSelectedSession()
+    {
+        if (!string.IsNullOrEmpty(selectedSessionId))
+        {
+            currentSessionId = selectedSessionId;
+            await UpdateSessionStatistics();
+        }
+    }
+
+    private async Task UpdateSessionStatistics()
+    {
+        var sessions = ChatService.GetActiveSessions().ToList();
+        activeSessionsCount = sessions.Count;
+        totalMessagesCount = sessions.Sum(s => s.Messages.Count);
+        
+        // Update session IDs list
+        sessionIds = sessions.Select(s => s.Id).ToList();
+        
+        await InvokeAsync(StateHasChanged);
+    }
+} 

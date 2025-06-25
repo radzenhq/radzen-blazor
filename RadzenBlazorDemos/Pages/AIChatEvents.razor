@@ -1,0 +1,42 @@
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenAIChat @ref="eventsChat" 
+                Title="Event Demo" 
+                Placeholder="Type a message to see events..."
+                Style="height: 400px;"
+                MessageAdded="@OnMessageAdded"
+                MessageSent="@OnMessageSent"
+                ResponseReceived="@OnResponseReceived"
+                ChatCleared="@OnChatCleared"
+                />
+</RadzenStack>
+
+<EventConsole @ref="console" Style="min-height: 200px;" />
+
+@code {
+    RadzenAIChat eventsChat;
+    EventConsole console;
+
+    void OnMessageAdded(Radzen.Blazor.ChatMessage message)
+    {
+        console.Log($"Message added: {(message.IsUser ? "User" : "Assistant")} - {message.Content.Substring(0, Math.Min(50, message.Content.Length))}...", 
+                   message.IsUser ? AlertStyle.Info : AlertStyle.Success);
+    }
+
+    void OnMessageSent(string message)
+    {
+        console.Log($"Message sent: {message}", AlertStyle.Info);
+    }
+
+    void OnResponseReceived(string response)
+    {
+        console.Log($"AI Response received: {response.Substring(0, Math.Min(50, response.Length))}...", AlertStyle.Success);
+    }
+
+    void OnChatCleared()
+    {
+        console.Log("Chat cleared", AlertStyle.Warning);
+    }
+} 

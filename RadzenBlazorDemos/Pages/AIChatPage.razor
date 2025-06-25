@@ -1,0 +1,59 @@
+@page "/aichat"
+@page "/docs/guides/components/aichat.html"
+
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    AIChat
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The component requires the <strong>IAIChatService</strong> to be registered in your application, please use our demos source for reference.
+    This service supports any OpenAI-compatible endpoint, including OpenAI, Azure OpenAI, Cloudflare AI, and other compatible providers.
+    For WebAssembly applications, you'll need to use a server-side proxy endpoint since browsers cannot make direct requests to external APIs due to CORS restrictions, refer to AIChatController.
+</RadzenText>
+
+<RadzenExample ComponentName="AIChat" Example="AIChatConfig">
+    <AIChatConfig />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#custom-styling" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom styling
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Customize the appearance of the <strong>AIChat</strong> component using <code>Style</code>, <code>ShowClearButton</code>, <code>Disabled</code>, and <code>ReadOnly</code> properties.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatCustomStyling">
+    <AIChatCustomStyling />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#compact-aichat" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Compact aichat
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Create a more compact chat interface suitable for smaller spaces or sidebar implementations.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatCompact">
+    <AIChatCompact />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#events" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Events and interactions
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Handle chat events like <code>MessageAdded</code>, <code>MessageSent</code>, <code>ResponseReceived</code>, and <code>ChatCleared</code> to integrate with your application logic.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatEvents">
+    <AIChatEvents />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#memory" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    AI Chat with Memory
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <strong>AIChat</strong> component supports conversation memory that remembers previous questions and maintains context across multiple interactions. 
+    Use <code>SessionId</code> to maintain conversation state and <code>SessionIdChanged</code> to track session changes.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatWithMemory">
+    <AIChatWithMemory />
+</RadzenExample> 
