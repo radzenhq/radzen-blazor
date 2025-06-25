@@ -1,5 +1,11 @@
 @using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor.Rendering
+@using Radzen.Blazor.Spreadsheet.Tools
 @inherits CellBase
 <div class=@Class style=@Style data-row=@Row data-column=@Column>
     @cell?.Value
+    @if (ShouldShowChevron)
+    {
+        <Chevron Sheet=@Sheet Row=@Row Column=@Column />
+    }
 </div>
