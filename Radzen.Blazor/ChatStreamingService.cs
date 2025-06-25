@@ -17,27 +17,22 @@ namespace Radzen
     public class ChatStreamingServiceOptions
     {
         /// <summary>
-        /// Gets or sets the API key for authentication with the AI service.
-        /// </summary>
-        public string ApiKey { get; set; } = string.Empty;
-
-        /// <summary>
         /// Gets or sets the endpoint URL for the AI service.
         /// </summary>
         public string Endpoint { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets the deployment name (used for Azure OpenAI Service).
+        /// Gets or sets the API key for authentication with the AI service.
         /// </summary>
-        public string Deployment { get; set; } = string.Empty;
+        public string ApiKey { get; set; } = string.Empty;
 
         /// <summary>
-        /// Gets or sets a flag indicating whether to use Azure OpenAI Service (true) or OpenAI API (false).
+        /// Gets or sets the header name for the API key (e.g., 'Authorization' or 'api-key').
         /// </summary>
-        public bool UseAzure { get; set; } = false;
+        public string ApiKeyHeader { get; set; } = "Authorization";
 
         /// <summary>
-        /// Gets or sets the model name to use (only applicable when UseAzure is false).
+        /// Gets or sets the model name to use.
         /// </summary>
         public string Model { get; set; } = "gpt-3.5-turbo";
 
@@ -58,8 +53,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Provides streaming chat completion functionality for AI models through OpenAI API or Azure OpenAI Service.
-    /// This service enables real-time streaming of AI responses for interactive chat applications.
+    /// Provides streaming chat completion functionality for AI models through a configurable endpoint (OpenAI, Azure, Cloudflare, etc).
     /// </summary>
     public class ChatStreamingService
     {
@@ -99,18 +93,16 @@ namespace Radzen
             if (string.IsNullOrWhiteSpace(userInput))
                 throw new ArgumentException("User input cannot be null or empty.", nameof(userInput));
 
-            var url = _options.UseAzure
-                ? $"{_options.Endpoint}/openai/deployments/{_options.Deployment}/chat/completions?api-version=2023-05-15"
-                : "https://api.openai.com/v1/chat/completions";
+            var url = _options.Endpoint;
 
             var payload = new
             {
-                model = _options.UseAzure ? null : _options.Model,
+                model = _options.Model,
                 messages = new[]
                 {
-                new { role = "system", content = _options.SystemPrompt },
-                new { role = "user", content = userInput }
-            },
+                    new { role = "system", content = _options.SystemPrompt },
+                    new { role = "user", content = userInput }
+                },
                 temperature = _options.Temperature,
                 max_tokens = _options.MaxTokens,
                 stream = true
@@ -121,10 +113,15 @@ namespace Radzen
                 Content = new StringContent(JsonSerializer.Serialize(payload, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }), Encoding.UTF8, "application/json")
             };
 
-            if (_options.UseAzure)
-                request.Headers.Add("api-key", _options.ApiKey);
-            else
+            // Use configurable API key header
+            if (string.Equals(_options.ApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
+            {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+            }
+            else
+            {
+                request.Headers.Add(_options.ApiKeyHeader, _options.ApiKey);
+            }
 
             var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 

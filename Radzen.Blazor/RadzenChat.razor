@@ -1,10 +1,12 @@
 ﻿@using Radzen
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
+@using System.Net.Http
 
 @inherits RadzenComponent
 
 @inject ChatStreamingService ChatService
+@inject HttpClient Http
 
 @if (Visible)
 {

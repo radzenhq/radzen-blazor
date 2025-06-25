@@ -28,7 +28,8 @@
                    ShowClearButton="@showClearButton"
                    Disabled="@isDisabled"
                    ReadOnly="@isReadOnly"
-                   Style="height: 400px; border: 2px solid var(--rz-primary-color);" />
+                   Style="height: 400px; border: 2px solid var(--rz-primary-color);"
+                   UseProxy="@OperatingSystem.IsBrowser()" />
     </RadzenCard>
 </RadzenStack>
 
