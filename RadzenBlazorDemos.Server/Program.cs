@@ -39,6 +39,9 @@ builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
 
+builder.Services.AddChatStreamingService(options =>
+    builder.Configuration.GetSection("ChatStreamingService").Bind(options));
+
 builder.Services.AddLocalization();
 
 /* --> Uncomment to enable localization

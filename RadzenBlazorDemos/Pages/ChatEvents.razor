@@ -1,0 +1,48 @@
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+            Handle chat events like <code>MessageAdded</code>, <code>MessageSent</code>, <code>ResponseReceived</code>, and <code>ChatCleared</code> to integrate with your application logic.
+        </RadzenText>
+    </RadzenCard>
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenChat @ref="eventsChat" 
+                   Title="Event Demo" 
+                   Placeholder="Type a message to see events..."
+                   Style="height: 400px;"
+                   MessageAdded="@OnMessageAdded"
+                   MessageSent="@OnMessageSent"
+                   ResponseReceived="@OnResponseReceived"
+                   ChatCleared="@OnChatCleared" />
+    </RadzenCard>
+</RadzenStack>
+
+<EventConsole @ref="console" Style="min-height: 200px;" />
+
+@code {
+    RadzenChat eventsChat;
+    EventConsole console;
+
+    void OnMessageAdded(ChatMessage message)
+    {
+        console.Log($"Message added: {(message.IsUser ? "User" : "Assistant")} - {message.Content.Substring(0, Math.Min(50, message.Content.Length))}...", 
+                   message.IsUser ? AlertStyle.Info : AlertStyle.Success);
+    }
+
+    void OnMessageSent(string message)
+    {
+        console.Log($"Message sent: {message}", AlertStyle.Info);
+    }
+
+    void OnResponseReceived(string response)
+    {
+        console.Log($"AI Response received: {response.Substring(0, Math.Min(50, response.Length))}...", AlertStyle.Success);
+    }
+
+    void OnChatCleared()
+    {
+        console.Log("Chat cleared", AlertStyle.Warning);
+    }
+} 

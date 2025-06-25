@@ -1,0 +1,90 @@
+﻿@using Radzen
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+
+@inherits RadzenComponent
+
+@inject ChatStreamingService ChatService
+
+@if (Visible)
+{
+    <div @ref="@Element" class="@GetCssClass()" style="@Style" id="@GetId()">
+        <!-- Chat Header -->
+        <div class="rz-chat-header">
+            <span class="rz-chat-header-title">@Title</span>
+            @if (ShowClearButton)
+            {
+                <RadzenButton Icon="clear_all" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" 
+                             Click="@OnClearChat" Title="Clear chat history" class="rz-chat-header-clear" />
+            }
+        </div>
+
+        <!-- Chat Messages -->
+        <div class="rz-chat-messages" @ref="messagesContainer">
+            @if (Messages.Count == 0)
+            {
+                <div class="rz-chat-empty">
+                    <RadzenIcon Icon="chat_bubble_outline" Style="font-size: 3rem; opacity: 0.3;" />
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">@EmptyMessage</RadzenText>
+                </div>
+            }
+            else
+            {
+                @foreach (var message in Messages)
+                {
+                    <div class="rz-chat-message @(message.IsUser ? "rz-chat-message-user" : "rz-chat-message-assistant")" @key="message.Id">
+                        <div class="rz-chat-message-avatar">
+                            @if (message.IsUser)
+                            {
+                                <span class="rz-chat-avatar-initials">U</span>
+                            }
+                            else
+                            {
+                                <span class="rz-chat-avatar-initials">AI</span>
+                            }
+                        </div>
+                        <div class="rz-chat-message-content">
+                            <div class="rz-chat-message-text">
+                                @if (message.IsStreaming)
+                                {
+                                    <span>@message.Content<RadzenIcon Icon="more_horiz" Style="animation: pulse 1.5s infinite; margin-left: 0.25rem;" /></span>
+                                }
+                                else
+                                {
+                                    @message.Content
+                                }
+                            </div>
+                            <div class="rz-chat-message-time">
+                                @message.Timestamp.ToString("HH:mm")
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Chat Input -->
+        <div class="rz-chat-input">
+            <div class="rz-chat-input-inner">
+                <textarea @ref="inputElement" 
+                          @oninput="OnInput" 
+                          @onkeydown="OnKeyDown" 
+                          @onkeydown:preventDefault="preventDefault"
+                          class="rz-chat-textarea"
+                          placeholder="@Placeholder"
+                          disabled="@Disabled"
+                          readonly="@ReadOnly"
+                          rows="1"
+                          style="resize: none; overflow: hidden;"
+                          @attributes="Attributes"></textarea>
+                <RadzenButton Icon="send" 
+                             ButtonStyle="ButtonStyle.Primary" 
+                             Size="ButtonSize.Small"
+                             Disabled="@(string.IsNullOrWhiteSpace(CurrentInput) || IsLoading || Disabled)"
+                             Click="@OnSendMessage"
+                             Title="Send message"
+                             class="rz-chat-send-btn" />
+            </div>
+        </div>
+    </div>
+}

@@ -7,6 +7,7 @@ using RadzenBlazorDemos.Services;
 using Radzen;
 using RadzenBlazorDemos.Data;
 using RadzenBlazorDemos;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -22,5 +23,8 @@ builder.Services.AddScoped<ExampleService>();
 builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
+
+builder.Services.AddChatStreamingService(options =>
+    builder.Configuration.GetSection("ChatStreamingService").Bind(options));
 
 await builder.Build().RunAsync();
