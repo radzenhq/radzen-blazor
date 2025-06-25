@@ -71,6 +71,13 @@ public partial class Sheet
     /// </summary>
     public IReadOnlyList<DataTable> DataTables => dataTables;
 
+    private readonly HashSet<int> filteredColumns = new();
+
+    /// <summary>
+    /// Gets the set of columns that have filters applied.
+    /// </summary>
+    public IReadOnlySet<int> FilteredColumns => filteredColumns;
+
     private Workbook? workbook;
 
     /// <summary>
@@ -94,7 +101,7 @@ public partial class Sheet
             throw new ArgumentException("Invalid range for DataTable.");
         }
 
-        dataTables.Add(new DataTable(range));
+        dataTables.Add(new DataTable(this, range));
     }
 
     /// <summary>
