@@ -1,0 +1,76 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor.Rendering
+
+<RadzenButton class="rz-spreadsheet-cell-chevron" @ref=@chevron Variant="Variant.Outlined" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" Icon="expand_more" Click=@OnTogglePopupAsync />
+<Popup @ref=@popup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
+    <ul class="rz-menu">
+        <ChevronItem Text="Sort A to Z" Icon="sort" Click=@OnSortAscendingAsync />
+        <ChevronItem Text="Sort Z to A" Icon="sort" Click=@OnSortDescendingAsync />
+    </ul>
+</Popup>
+
+@code {
+    #nullable enable
+    [Parameter, EditorRequired]
+    public Sheet Sheet { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public int Row { get; set; }
+
+    [Parameter, EditorRequired]
+    public int Column { get; set; }
+
+    private Popup? popup;
+    private RadzenButton? chevron;
+
+    private async Task OnTogglePopupAsync()
+    {
+        await TogglePopupAsync();
+    }
+
+    private async Task TogglePopupAsync()
+    {
+        if (popup != null && chevron != null)
+        {
+            await popup.ToggleAsync(chevron.Element);
+        }
+    }
+
+    private async Task ClosePopupAsync()
+    {
+        if (popup != null && chevron != null)
+        {
+            await popup.CloseAsync(chevron.Element);
+        }
+    }
+
+    private async Task OnSortAscendingAsync()
+    {
+        foreach (var dataTable in Sheet.DataTables)
+        {
+            if (dataTable.Range.Contains(Row, Column))
+            {
+                dataTable.Sort(SortOrder.Ascending, Column);
+                break;
+            }
+        }
+
+        await ClosePopupAsync();
+    }
+
+    private async Task OnSortDescendingAsync()
+    {
+        foreach (var dataTable in Sheet.DataTables)
+        {
+            if (dataTable.Range.Start.Row == Row &&
+                Column >= dataTable.Range.Start.Column &&
+                Column <= dataTable.Range.End.Column)
+            {
+                dataTable.Sort(SortOrder.Descending, Column);
+                break;
+            }
+        }
+
+        await ClosePopupAsync();
+    }
+} 
