@@ -22,7 +22,7 @@ class Spreadsheet {
     this.dotNetRef = options.dotNetRef;
     this.shortcuts = options.shortcuts;
     this.element.addEventListener('keydown', this.onKeyDown);
-    this.element.addEventListener('mousedown', this.onMouseDown);
+    this.element.addEventListener('pointerdown', this.onPointerDown);
     this.element.addEventListener('dblclick', this.onDoubleClick);
     addEventListener('paste', this.onPaste);
     addEventListener('copy', this.onCopy);
@@ -55,42 +55,44 @@ class Spreadsheet {
     }
   }
 
-  onMouseDown = async (e) => {
+  onPointerDown = async (e) => {
+    if (e.button != 0) return;
+
     if (e.target.matches('.rz-spreadsheet-cell')) {
       const cell = e.target;
       const row = +cell.dataset.row;
       const column = +cell.dataset.column;
-      addEventListener('mouseup', this.onCellMouseUp);
-      if (await this.dotNetRef.invokeMethodAsync('OnCellMouseDownAsync', { row, column, mouse: this.toEventArgs(e) })) {
-        addEventListener('mousemove', this.onCellMouseMove);
+      addEventListener('pointerup', this.onCellPointerUp);
+      if (await this.dotNetRef.invokeMethodAsync('OnCellPointerDownAsync', { row, column, pointer: this.toEventArgs(e) })) {
+        addEventListener('pointermove', this.onCellPointerMove);
       }
     } else if (e.target.matches('.rz-spreadsheet-row-header')) {
       const row = +e.target.dataset.row;
-      addEventListener('mouseup', this.onRowMouseUp);
-      addEventListener('mousemove', this.onRowMouseMove);
-      if (await this.dotNetRef.invokeMethodAsync('OnRowMouseDownAsync', { row, mouse: this.toEventArgs(e) })) {
-        addEventListener('mousemove', this.onRowMouseMove);
+      addEventListener('pointerup', this.onRowPointerUp);
+      addEventListener('pointermove', this.onRowPointerMove);
+      if (await this.dotNetRef.invokeMethodAsync('OnRowPointerDownAsync', { row, pointer: this.toEventArgs(e) })) {
+        addEventListener('pointermove', this.onRowPointerMove);
       }
     } else if (e.target.matches('.rz-spreadsheet-column-header')) {
       const column = +e.target.dataset.column;
-      addEventListener('mouseup', this.onColumnMouseUp);
-      addEventListener('mousemove', this.onColumnMouseMove);
-      if (await this.dotNetRef.invokeMethodAsync('OnColumnMouseDownAsync', { column, mouse: this.toEventArgs(e) })) {
-        addEventListener('mousemove', this.onColumnMouseMove);
+      addEventListener('pointerup', this.onColumnPointerUp);
+      addEventListener('pointermove', this.onColumnPointerMove);
+      if (await this.dotNetRef.invokeMethodAsync('OnColumnPointerDownAsync', { column, pointer: this.toEventArgs(e) })) {
+        addEventListener('pointermove', this.onColumnPointerMove);
       }
     } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
       const column = +e.target.dataset.column;
-      if (await this.dotNetRef.invokeMethodAsync('OnColumnResizeMouseDownAsync', { column, mouse: this.toEventArgs(e) })) {
-        addEventListener('mousemove', this.onColumnResizeMove);
-        addEventListener('mouseup', this.onColumnResizeUp);
+      if (await this.dotNetRef.invokeMethodAsync('OnColumnResizePointerDownAsync', { column, pointer: this.toEventArgs(e) })) {
+        addEventListener('pointermove', this.onColumnResizeMove);
+        addEventListener('pointerup', this.onColumnResizeUp);
       }
       e.preventDefault();
       e.stopPropagation();
     } else if (e.target.matches('.rz-spreadsheet-row-resize-handle')) {
       const row = +e.target.dataset.row;
-      if (await this.dotNetRef.invokeMethodAsync('OnRowResizeMouseDownAsync', { row, mouse: this.toEventArgs(e) })) {
-        addEventListener('mousemove', this.onRowResizeMove);
-        addEventListener('mouseup', this.onRowResizeUp);
+      if (await this.dotNetRef.invokeMethodAsync('OnRowResizePointerDownAsync', { row, pointer: this.toEventArgs(e) })) {
+        addEventListener('pointermove', this.onRowResizeMove);
+        addEventListener('pointerup', this.onRowResizeUp);
       }
       e.preventDefault();
       e.stopPropagation();
@@ -102,35 +104,35 @@ class Spreadsheet {
       const cell = e.target;
       const row = +cell.dataset.row;
       const column = +cell.dataset.column;
-      this.dotNetRef.invokeMethodAsync('OnCellDoubleClickAsync', { row, column, mouse: this.toEventArgs(e) });
+      this.dotNetRef.invokeMethodAsync('OnCellDoubleClickAsync', { row, column, pointer: this.toEventArgs(e) });
     }
   }
 
-  onColumnMouseUp = (e) => {
-    removeEventListener('mousemove', this.onColumnMouseMove);
-    removeEventListener('mouseup', this.onColumnMouseUp);
+  onColumnPointerUp = (e) => {
+    removeEventListener('pointermove', this.onColumnPointerMove);
+    removeEventListener('pointerup', this.onColumnPointerUp);
   }
 
-  onColumnMouseMove = (e) => {
-    this.invokeAsync('OnColumnMouseMoveAsync', e);
+  onColumnPointerMove = (e) => {
+    this.invokeAsync('OnColumnPointerMoveAsync', e);
   }
 
-  onRowMouseMove = (e) => {
-    this.invokeAsync('OnRowMouseMoveAsync', e);
+  onRowPointerMove = (e) => {
+    this.invokeAsync('OnRowPointerMoveAsync', e);
   }
 
-  onRowMouseUp = (e) => {
-    removeEventListener('mousemove', this.onRowMouseMove);
-    removeEventListener('mouseup', this.onRowMouseUp);
+  onRowPointerUp = (e) => {
+    removeEventListener('pointermove', this.onRowPointerMove);
+    removeEventListener('pointerup', this.onRowPointerUp);
   }
 
-  onCellMouseMove = (e) => {
-    this.invokeAsync('OnCellMouseMoveAsync', e);
+  onCellPointerMove = (e) => {
+    this.invokeAsync('OnCellPointerMoveAsync', e);
   }
 
-  onCellMouseUp = (e) => {
-    removeEventListener('mousemove', this.onCellMouseMove);
-    removeEventListener('mouseup', this.onCellMouseUp);
+  onCellPointerUp = (e) => {
+    removeEventListener('pointermove', this.onCellPointerMove);
+    removeEventListener('pointerup', this.onCellPointerUp);
   }
 
   onKeyDown = (e) => {
@@ -187,30 +189,30 @@ class Spreadsheet {
 
   dispose() {
     this.element.removeEventListener('keydown', this.onKeyDown);
-    this.element.removeEventListener('mousedown', this.onMouseDown);
+    this.element.removeEventListener('pointerdown', this.onPointerDown);
     this.element.removeEventListener('dblclick', this.onDoubleClick);
     removeEventListener('paste', this.onPaste);
     removeEventListener('copy', this.onCopy);
   }
 
   onColumnResizeMove = (e) => {
-    this.invokeAsync('OnColumnResizeMouseMoveAsync', e);
+    this.invokeAsync('OnColumnResizePointerMoveAsync', e);
   }
 
   onColumnResizeUp = (e) => {
-    this.invokeAsync('OnColumnResizeMouseUpAsync', e);
-    removeEventListener('mousemove', this.onColumnResizeMove);
-    removeEventListener('mouseup', this.onColumnResizeUp);
+    this.invokeAsync('OnColumnResizePointerUpAsync', e);
+    removeEventListener('pointermove', this.onColumnResizeMove);
+    removeEventListener('pointerup', this.onColumnResizeUp);
   }
 
   onRowResizeMove = (e) => {
-    this.invokeAsync('OnRowResizeMouseMoveAsync', e);
+    this.invokeAsync('OnRowResizePointerMoveAsync', e);
   }
 
   onRowResizeUp = (e) => {
-    this.invokeAsync('OnRowResizeMouseUpAsync', e);
-    removeEventListener('mousemove', this.onRowResizeMove);
-    removeEventListener('mouseup', this.onRowResizeUp);
+    this.invokeAsync('OnRowResizePointerUpAsync', e);
+    removeEventListener('pointermove', this.onRowResizeMove);
+    removeEventListener('pointerup', this.onRowResizeUp);
   }
 }
 
