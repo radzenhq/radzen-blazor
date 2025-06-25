@@ -229,6 +229,15 @@ public class Workbook
                 new XElement(XName.Get("worksheet", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                     new XElement(XName.Get("dimension", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                         new XAttribute("ref", $"A1:{new CellRef(sheet.RowCount - 1, sheet.ColumnCount - 1)}")),
+                    new XElement(XName.Get("sheetViews", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                        new XElement(XName.Get("sheetView", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                            new XAttribute("workbookViewId", "0"),
+                            new XElement(XName.Get("pane", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                                new XAttribute("xSplit", sheet.Columns.Frozen),
+                                new XAttribute("ySplit", sheet.Rows.Frozen),
+                                new XAttribute("topLeftCell", new CellRef(sheet.Rows.Frozen, sheet.Columns.Frozen).ToString()),
+                                new XAttribute("activePane", "topLeft"),
+                                new XAttribute("state", "frozen")))),
                     new XElement(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
 
             var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
@@ -616,6 +625,28 @@ public class Workbook
             using var sheetStream = sheetEntry.Open();
             var sheetDoc = XDocument.Load(sheetStream);
             var sNs = sheetDoc.Root!.Name.Namespace;
+
+            // Parse frozen panes
+            var sheetView = sheetDoc.Descendants(sNs + "sheetView").FirstOrDefault();
+            if (sheetView != null)
+            {
+                var pane = sheetView.Element(sNs + "pane");
+                if (pane != null)
+                {
+                    var xSplit = pane.Attribute("xSplit")?.Value;
+                    var ySplit = pane.Attribute("ySplit")?.Value;
+                    
+                    if (xSplit != null && int.TryParse(xSplit, out var frozenColumns))
+                    {
+                        sheet.Columns.Frozen = frozenColumns;
+                    }
+                    
+                    if (ySplit != null && int.TryParse(ySplit, out var frozenRows))
+                    {
+                        sheet.Rows.Frozen = frozenRows;
+                    }
+                }
+            }
 
             foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
             {
