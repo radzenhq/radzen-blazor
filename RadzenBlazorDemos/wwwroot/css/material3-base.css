@@ -25,3 +25,14 @@ Any questions concerning the use or status of this file should be directed to in
     z-index: 5;
     transform: translateY(-50%);
 }
+
+.rz-spreadsheet-cell-popup {
+    display: none;
+    position: absolute;
+}
+
+.rz-spreadsheet-cell-chevron {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+}
