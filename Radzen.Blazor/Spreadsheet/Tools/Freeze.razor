@@ -1,0 +1,104 @@
+@using Radzen.Blazor.Spreadsheet
+@implements IDisposable
+
+<RadzenSplitButton Icon="view_column" Text="Freeze" Click=@OnFreezeClick ButtonStyle="ButtonStyle.Base" Disabled=@IsDisabled>
+    <ChildContent>
+        <RadzenSplitButtonItem Text="Freeze Panes" Value="range" Icon="view_column" />
+        <RadzenSplitButtonItem Text="Freeze Rows" Value="rows" Icon="view_column" />
+        <RadzenSplitButtonItem Text="Freeze Columns" Value="columns" Icon="view_column" />
+        <RadzenSplitButtonItem Text="Unfreeze" Value="unfreeze" Icon="view_column" />
+    </ChildContent>
+</RadzenSplitButton>
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    private void OnFreezeClick(RadzenSplitButtonItem? item)
+    {
+        if (Sheet == null || item == null) return;
+
+        switch (item.Value)
+        {
+            case "rows":
+                FreezeRows();
+                break;
+            case "columns":
+                FreezeColumns();
+                break;
+            case "range":
+                FreezeRange();
+                break;
+            case "unfreeze":
+                Unfreeze();
+                break;
+        }
+    }
+
+    private void FreezeRows()
+    {
+        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        {
+            var frozenRows = Sheet.Selection.Cell.Row;
+            Sheet.Rows.Frozen = frozenRows;
+        }
+    }
+
+    private void FreezeColumns()
+    {
+        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        {
+            Sheet.Columns.Frozen = Sheet.Selection.Cell.Column;
+        }
+    }
+
+    private void FreezeRange()
+    {
+        if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+        {
+            Sheet.Rows.Frozen = Sheet.Selection.Cell.Row;
+            Sheet.Columns.Frozen = Sheet.Selection.Cell.Column;
+        }
+    }
+
+    private void Unfreeze()
+    {
+        if (Sheet != null)
+        {
+            Sheet.Rows.Frozen = 0;
+            Sheet.Columns.Frozen = 0;
+        }
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+} 
