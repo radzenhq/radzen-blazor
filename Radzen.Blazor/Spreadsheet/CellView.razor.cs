@@ -21,9 +21,9 @@ public class CellEventArgs : EventArgs
     /// </summary>
     public int Column { get; set; }
     /// <summary>
-    /// Gets or sets the mouse event arguments associated with the cell event.
+    /// Gets or sets the pointer event arguments associated with the cell event.
     /// </summary>
-    public MouseEventArgs Mouse { get; set; } = default!;
+    public PointerEventArgs Pointer { get; set; } = default!;
 }
 
 /// <summary>
