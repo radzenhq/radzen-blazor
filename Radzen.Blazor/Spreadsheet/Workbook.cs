@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -238,6 +239,12 @@ public class Workbook
                                 new XAttribute("topLeftCell", new CellRef(sheet.Rows.Frozen, sheet.Columns.Frozen).ToString()),
                                 new XAttribute("activePane", "topLeft"),
                                 new XAttribute("state", "frozen")))),
+                    new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                        Enumerable.Range(0, sheet.ColumnCount).Select(col => new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                            new XAttribute("min", col + 1),
+                            new XAttribute("max", col + 1),
+                            new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)), // Convert pixels to Excel column width units
+                            new XAttribute("customWidth", "1")))),
                     new XElement(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
 
             var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
@@ -246,7 +253,9 @@ public class Workbook
             for (var row = 0; row < sheet.RowCount; row++)
             {
                 var rowElement = new XElement(XName.Get("row", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("r", row + 1));
+                    new XAttribute("r", row + 1),
+                    new XAttribute("ht", sheet.Rows[row]), // Row height in pixels
+                    new XAttribute("customHeight", "1"));
 
                 for (var col = 0; col < sheet.ColumnCount; col++)
                 {
@@ -344,7 +353,7 @@ public class Workbook
                                     VerticalAlign.Bottom => "bottom",
                                     _ => "top"
                                 };
-                                
+
                                 var alignmentElement = new XElement(XName.Get("alignment", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"));
                                 if (cell.Format.TextAlign != TextAlign.Left)
                                 {
@@ -408,10 +417,8 @@ public class Workbook
                     rowElement.Add(cellElement);
                 }
 
-                if (rowElement.HasElements)
-                {
-                    sheetData.Add(rowElement);
-                }
+                // Always add the row element, even if it has no cells, to preserve row height
+                sheetData.Add(rowElement);
             }
 
             // Add merged cells
@@ -626,6 +633,18 @@ public class Workbook
             var sheetDoc = XDocument.Load(sheetStream);
             var sNs = sheetDoc.Root!.Name.Namespace;
 
+            // Parse default row height from sheet format properties
+            var defaultRowHeight = 20.0; // Default fallback
+            var sheetFormatPr = sheetDoc.Descendants(sNs + "sheetFormatPr").FirstOrDefault();
+            if (sheetFormatPr != null)
+            {
+                var defaultHeight = sheetFormatPr.Attribute("defaultRowHeight")?.Value;
+                if (defaultHeight != null && double.TryParse(defaultHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
+                {
+                    defaultRowHeight = Math.Round(heightPoints * (96.0 / 72.0));
+                }
+            }
+
             // Parse frozen panes
             var sheetView = sheetDoc.Descendants(sNs + "sheetView").FirstOrDefault();
             if (sheetView != null)
@@ -635,12 +654,12 @@ public class Workbook
                 {
                     var xSplit = pane.Attribute("xSplit")?.Value;
                     var ySplit = pane.Attribute("ySplit")?.Value;
-                    
+
                     if (xSplit != null && int.TryParse(xSplit, out var frozenColumns))
                     {
                         sheet.Columns.Frozen = frozenColumns;
                     }
-                    
+
                     if (ySplit != null && int.TryParse(ySplit, out var frozenRows))
                     {
                         sheet.Rows.Frozen = frozenRows;
@@ -648,8 +667,62 @@ public class Workbook
                 }
             }
 
+            // Parse column widths
+            var cols = sheetDoc.Descendants(sNs + "cols").FirstOrDefault();
+            if (cols != null)
+            {
+                foreach (var col in cols.Elements(sNs + "col"))
+                {
+                    var min = col.Attribute("min")?.Value;
+                    var max = col.Attribute("max")?.Value;
+                    var width = col.Attribute("width")?.Value;
+
+                    if (min != null && max != null && width != null &&
+                        int.TryParse(min, out var minCol) &&
+                        int.TryParse(max, out var maxCol) &&
+                        double.TryParse(width, NumberStyles.Float, CultureInfo.InvariantCulture, out var colWidth))
+                    {
+                        // Excel column width to pixels conversion:
+                        // pixels = Truncate(((256 * width + Truncate(128/7)) / 256) * 7)
+
+                        var pixelWidth = (256 * colWidth + Math.Truncate(128 / 7.0)) / 256 * 7;
+
+                        for (var i = minCol - 1; i <= maxCol - 1 && i < sheet.Columns.Count; i++)
+                        {
+                            sheet.Columns[i] = pixelWidth;
+                        }
+                    }
+                }
+            }
+
+            // Parse row heights
             foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
             {
+                var rowIndex = rowElem.Attribute("r")?.Value;
+                var rowHeight = rowElem.Attribute("ht")?.Value;
+                var customHeight = rowElem.Attribute("customHeight")?.Value;
+
+                if (rowIndex != null && int.TryParse(rowIndex, out var rowNum))
+                {
+                    var actualRowIndex = rowNum - 1; // Convert from 1-based to 0-based
+                    if (actualRowIndex >= 0 && actualRowIndex < sheet.Rows.Count)
+                    {
+                        if (rowHeight != null && double.TryParse(rowHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
+                        {
+                            // Excel row height is in points, convert to pixels
+                            // 1 point = 1/72 inch, 1 inch = 96 pixels (standard DPI)
+                            // So: pixels = points * (96/72) = points * 1.333...
+                            var pixelHeight = Math.Round(heightPoints * (96.0 / 72.0));
+                            sheet.Rows[actualRowIndex] = pixelHeight;
+                        }
+                        else
+                        {
+                            // Use default row height if no custom height specified
+                            sheet.Rows[actualRowIndex] = defaultRowHeight;
+                        }
+                    }
+                }
+
                 foreach (var cellElem in rowElem.Elements(sNs + "c"))
                 {
                     var cellRef = cellElem.Attribute("r")!;
