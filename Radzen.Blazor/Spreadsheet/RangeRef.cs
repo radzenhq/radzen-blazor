@@ -104,11 +104,14 @@ public readonly struct RangeRef : IEquatable<RangeRef>
     public bool Contains(ColumnRef address) => address.Column >= Start.Column && address.Column <= End.Column;
 
     /// <summary>
+    /// Checks if this range contains a specific row and column.
+    /// </summary>
+    public bool Contains(int row, int column) => row >= Start.Row && row <= End.Row && column >= Start.Column && column <= End.Column;
+
+    /// <summary>
     /// Checks if this range contains a specific cell address.
     /// </summary>
-    /// <param name="address"></param>
-    /// <returns></returns>
-    public bool Contains(CellRef address) => address.Row >= Start.Row && address.Row <= End.Row && address.Column >= Start.Column && address.Column <= End.Column;
+    public bool Contains(CellRef address) => Contains(address.Row, address.Column);
 
     /// <summary>
     /// Checks if this range is collapsed, meaning the start and end cell references are the same.
