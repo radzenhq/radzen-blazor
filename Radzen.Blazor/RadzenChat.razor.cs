@@ -127,12 +127,6 @@ namespace Radzen.Blazor
         public EventCallback<string> ResponseReceived { get; set; }
 
         /// <summary>
-        /// Gets or sets whether to use a proxy for getting AI responses.
-        /// </summary>
-        [Parameter]
-        public bool UseProxy { get; set; }
-
-        /// <summary>
         /// Gets the current list of messages.
         /// </summary>
         public IReadOnlyList<ChatMessage> GetMessages() => Messages.AsReadOnly();
@@ -193,14 +187,7 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
 
             // Get AI response
-            if (UseProxy)
-            {
-                await GetAIResponseViaProxy(content);
-            }
-            else
-            {
-                await GetAIResponse(content);
-            }
+            await GetAIResponse(content);
         }
 
         private async Task GetAIResponse(string userInput)
@@ -229,55 +216,6 @@ namespace Radzen.Blazor
                 assistantMessage.IsStreaming = false;
                 await ResponseReceived.InvokeAsync(response);
                 await MessageAdded.InvokeAsync(assistantMessage);
-            }
-            catch (Exception ex)
-            {
-                assistantMessage.Content = $"Sorry, I encountered an error: {ex.Message}";
-                assistantMessage.IsStreaming = false;
-                await InvokeAsync(StateHasChanged);
-            }
-            finally
-            {
-                IsLoading = false;
-                await InvokeAsync(StateHasChanged);
-            }
-        }
-
-        private async Task GetAIResponseViaProxy(string userInput)
-        {
-            IsLoading = true;
-            cts.Cancel();
-            cts = new CancellationTokenSource();
-
-            var assistantMessage = AddMessage("", false);
-            assistantMessage.IsStreaming = true;
-
-            try
-            {
-                var request = new { message = userInput };
-                var response = await Http.PostAsJsonAsync("/api/chat/stream", request, cts.Token);
-                if (response.IsSuccessStatusCode)
-                {
-                    using var stream = await response.Content.ReadAsStreamAsync();
-                    using var reader = new System.IO.StreamReader(stream);
-                    string chunk;
-                    var fullResponse = "";
-                    while ((chunk = await reader.ReadLineAsync()) != null)
-                    {
-                        fullResponse += chunk;
-                        assistantMessage.Content = fullResponse;
-                        await InvokeAsync(StateHasChanged);
-                    }
-                    assistantMessage.IsStreaming = false;
-                    await ResponseReceived.InvokeAsync(fullResponse);
-                    await MessageAdded.InvokeAsync(assistantMessage);
-                }
-                else
-                {
-                    assistantMessage.Content = $"Sorry, I encountered an error: {await response.Content.ReadAsStringAsync()}";
-                    assistantMessage.IsStreaming = false;
-                    await InvokeAsync(StateHasChanged);
-                }
             }
             catch (Exception ex)
             {
