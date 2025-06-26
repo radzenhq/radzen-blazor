@@ -86,6 +86,18 @@ namespace Radzen.Blazor
         public string EmptyMessage { get; set; } = "No messages yet. Start a conversation!";
 
         /// <summary>
+        /// Gets or sets the text displayed in the user avatar.
+        /// </summary>
+        [Parameter]
+        public string UserAvatarText { get; set; } = "U";
+
+        /// <summary>
+        /// Gets or sets the text displayed in the assistant avatar.
+        /// </summary>
+        [Parameter]
+        public string AssistantAvatarText { get; set; } = "AI";
+
+        /// <summary>
         /// Gets or sets whether to show the clear chat button.
         /// </summary>
         [Parameter]

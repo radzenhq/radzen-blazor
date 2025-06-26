@@ -38,11 +38,11 @@
                         <div class="rz-chat-message-avatar">
                             @if (message.IsUser)
                             {
-                                <span class="rz-chat-avatar-initials">U</span>
+                                <span class="rz-chat-avatar-initials">@UserAvatarText</span>
                             }
                             else
                             {
-                                <span class="rz-chat-avatar-initials">AI</span>
+                                <span class="rz-chat-avatar-initials">@AssistantAvatarText</span>
                             }
                         </div>
                         <div class="rz-chat-message-content">
