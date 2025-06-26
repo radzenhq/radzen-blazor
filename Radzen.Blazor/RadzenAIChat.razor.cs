@@ -247,11 +247,9 @@ namespace Radzen.Blazor
         {
             if (e.Key == "Enter" && !e.ShiftKey)
             {
+                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", inputElement, "");
                 preventDefault = true;
                 await OnSendMessage();
-                // Clear the input element after sending the message
-                CurrentInput = string.Empty;
-                await InvokeAsync(StateHasChanged);
             }
             else
             {
