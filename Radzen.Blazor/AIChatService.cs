@@ -26,9 +26,9 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Configuration options for the AIChatService.
+    /// Configuration options for the AIChatStreamingService.
     /// </summary>
-    public class AIChatStreamingServiceOptions
+    public class AIChatServiceOptions
     {
         /// <summary>
         /// Gets or sets the endpoint URL for the AI service.
@@ -64,11 +64,6 @@ namespace Radzen
         /// Gets or sets the temperature for the AI model (0.0 to 2.0).
         /// </summary>
         public double Temperature { get; set; } = 0.7;
-
-        /// <summary>
-        /// Gets or sets the maximum number of tokens per response chunk.
-        /// </summary>
-        public int MaxTokens { get; set; } = 50;
     }
 
     /// <summary>
@@ -77,12 +72,12 @@ namespace Radzen
     public class AIChatService : IAIChatService
     {
         private readonly HttpClient _httpClient;
-        private readonly AIChatStreamingServiceOptions _options;
+        private readonly AIChatServiceOptions _options;
 
         /// <summary>
         /// Gets the configuration options for the chat streaming service.
         /// </summary>
-        public AIChatStreamingServiceOptions Options => _options;
+        public AIChatServiceOptions Options => _options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AIChatService"/> class.
@@ -90,7 +85,7 @@ namespace Radzen
         /// <param name="httpClient">The HTTP client used for making API requests.</param>
         /// <param name="options">The configuration options for the chat streaming service.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-        public AIChatService(HttpClient httpClient, IOptions<AIChatStreamingServiceOptions> options)
+        public AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions> options)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -113,7 +108,6 @@ namespace Radzen
                     new { role = "user", content = userInput }
                 },
                 temperature = _options.Temperature,
-                max_tokens = _options.MaxTokens,
                 stream = true
             };
 
@@ -202,7 +196,7 @@ namespace Radzen
         /// <param name="services">The service collection.</param>
         /// <param name="configureOptions">The action to configure the AIChatService options.</param>
         /// <returns>The updated service collection.</returns>
-        public static IServiceCollection AddChatStreamingService(this IServiceCollection services, Action<AIChatStreamingServiceOptions> configureOptions)
+        public static IServiceCollection AddAIChatService(this IServiceCollection services, Action<AIChatServiceOptions> configureOptions)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
@@ -220,9 +214,9 @@ namespace Radzen
         /// </summary>
         /// <param name="services">The service collection.</param>
         /// <returns>The updated service collection.</returns>
-        public static IServiceCollection AddChatStreamingService(this IServiceCollection services)
+        public static IServiceCollection AddAIChatService(this IServiceCollection services)
         {
-            services.AddOptions<AIChatStreamingServiceOptions>();
+            services.AddOptions<AIChatServiceOptions>();
             services.AddScoped<IAIChatService, AIChatService>();
 
             return services;

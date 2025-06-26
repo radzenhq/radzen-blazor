@@ -11,9 +11,9 @@ namespace RadzenBlazorDemos
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ChatController(HttpClient httpClient, IOptions<AIChatStreamingServiceOptions> chatStreamingServiceOptions) : ControllerBase
+    public class ChatController(HttpClient httpClient, IOptions<AIChatServiceOptions> chatStreamingServiceOptions) : ControllerBase
     {
-        private readonly AIChatStreamingServiceOptions options = chatStreamingServiceOptions.Value;
+        private readonly AIChatServiceOptions options = chatStreamingServiceOptions.Value;
         
         [HttpPost("completions")]
         public async Task<IActionResult> Completions()
