@@ -181,14 +181,8 @@ namespace Radzen
 
                 return string.Empty;
             }
-            catch (JsonException ex)
+            catch
             {
-                System.Diagnostics.Debug.WriteLine($"JSON parsing error: {ex.Message} for line: {json}");
-                return string.Empty;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Error processing stream line: {ex.Message}");
                 return string.Empty;
             }
         }
