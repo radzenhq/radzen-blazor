@@ -61,6 +61,13 @@ namespace Radzen.Blazor
         private CancellationTokenSource cts = new();
 
         /// <summary>
+        /// Specifies additional custom attributes that will be rendered by the input.
+        /// </summary>
+        /// <value>The attributes.</value>
+        [Parameter]
+        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
+        /// <summary>
         /// Gets or sets the title displayed in the chat header.
         /// </summary>
         [Parameter]

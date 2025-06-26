@@ -10,7 +10,7 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" class="@GetCssClass()" style="@Style" id="@GetId()">
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()" >
         <!-- Chat Header -->
         <div class="rz-chat-header">
             <span class="rz-chat-header-title">@Title</span>
@@ -78,7 +78,7 @@
                           readonly="@ReadOnly"
                           rows="1"
                           style="resize: none; overflow: hidden;"
-                          @attributes="Attributes"></textarea>
+                          @attributes="InputAttributes"></textarea>
                 <RadzenButton Icon="send" 
                              ButtonStyle="ButtonStyle.Primary" 
                              Size="ButtonSize.Small"
