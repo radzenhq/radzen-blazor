@@ -27,7 +27,7 @@ builder.Services.AddSingleton<GitHubService>();
 builder.Services.AddChatStreamingService(options =>
 {
     options.Proxy = "api/chat/completions";
-    options.Model = "gpt-3.5-turbo";
+    options.Model = "@cf/meta/llama-3.1-8b-instruct";
     options.SystemPrompt = "You are a helpful AI code assistant.";
     options.Temperature = 0.7;
     options.MaxTokens = 50;
