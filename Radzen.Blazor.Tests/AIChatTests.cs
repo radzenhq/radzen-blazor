@@ -8,18 +8,17 @@ using Xunit;
 
 namespace Radzen.Blazor.Tests
 {
-    public class ChatTests
+    public class AIChatTests
     {
         private void RegisterChatService(TestContext ctx)
         {
-            // Register a dummy HttpClient and default options for ChatStreamingService
+            // Register a dummy HttpClient and default options for AIChatStreamingService
             ctx.Services.AddSingleton(new HttpClient());
-            ctx.Services.AddSingleton<IOptions<ChatStreamingServiceOptions>>(Options.Create(new ChatStreamingServiceOptions()));
-            ctx.Services.AddSingleton<ChatStreamingService>();
+            ctx.Services.AddScoped<IAIChatStreamingService, AIChatStreamingService>();
         }
 
         [Fact]
-        public void RadzenChat_ShouldRenderWithDefaultProperties()
+        public void RadzenAIChat_ShouldRenderWithDefaultProperties()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -29,7 +28,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldRenderWithCustomTitle()
+        public void RadzenAIChat_ShouldRenderWithCustomTitle()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -39,7 +38,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldRenderWithCustomPlaceholder()
+        public void RadzenAIChat_ShouldRenderWithCustomPlaceholder()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -49,7 +48,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldRenderWithCustomEmptyMessage()
+        public void RadzenAIChat_ShouldRenderWithCustomEmptyMessage()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -59,7 +58,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldShowClearButtonByDefault()
+        public void RadzenAIChat_ShouldShowClearButtonByDefault()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -68,7 +67,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldHideClearButtonWhenShowClearButtonIsFalse()
+        public void RadzenAIChat_ShouldHideClearButtonWhenShowClearButtonIsFalse()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -78,7 +77,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldBeDisabledWhenDisabledIsTrue()
+        public void RadzenAIChat_ShouldBeDisabledWhenDisabledIsTrue()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -88,7 +87,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldBeReadOnlyWhenReadOnlyIsTrue()
+        public void RadzenAIChat_ShouldBeReadOnlyWhenReadOnlyIsTrue()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -98,7 +97,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldHaveCorrectCssClass()
+        public void RadzenAIChat_ShouldHaveCorrectCssClass()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -124,7 +123,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_AddMessage_ShouldAddMessageToList()
+        public void RadzenAIChat_AddMessage_ShouldAddMessageToList()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -139,7 +138,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ClearChat_ShouldRemoveAllMessages()
+        public void RadzenAIChat_ClearChat_ShouldRemoveAllMessages()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);
@@ -153,7 +152,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void RadzenChat_ShouldLimitMessagesToMaxMessages()
+        public void RadzenAIChat_ShouldLimitMessagesToMaxMessages()
         {
             using var ctx = new TestContext();
             RegisterChatService(ctx);

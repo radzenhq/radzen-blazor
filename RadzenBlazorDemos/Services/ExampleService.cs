@@ -1730,8 +1730,8 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Name = "Chat",
-                    Path = "chat",
+                    Name = "AIChat",
+                    Path = "aichat",
                     New = true,
                     Description = "A modern chat component with AI integration that provides a conversational interface similar to popular chat applications.",
                     Icon = "\ue0b7",

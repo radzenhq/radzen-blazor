@@ -12,9 +12,23 @@ using Microsoft.Extensions.Options;
 namespace Radzen
 {
     /// <summary>
-    /// Configuration options for the ChatStreamingService.
+    /// Interface for streaming chat completion responses.
     /// </summary>
-    public class ChatStreamingServiceOptions
+    public interface IAIChatStreamingService
+    {
+        /// <summary>
+        /// Streams chat completion responses from the AI model asynchronously.
+        /// </summary>
+        /// <param name="userInput">The user's input message to send to the AI model.</param>
+        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+        /// <returns>An async enumerable that yields streaming response chunks from the AI model.</returns>
+        IAsyncEnumerable<string> StreamChatCompletionAsync(string userInput, CancellationToken cancellationToken);
+    }
+
+    /// <summary>
+    /// Configuration options for the AIChatStreamingService.
+    /// </summary>
+    public class AIChatStreamingServiceOptions
     {
         /// <summary>
         /// Gets or sets the endpoint URL for the AI service.
@@ -58,46 +72,31 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Provides streaming chat completion functionality for AI models through a configurable endpoint (OpenAI, Azure, Cloudflare, etc).
+    /// Provides streaming chat completion functionality for AI models through a configurable endpoint.
     /// </summary>
-    public class ChatStreamingService
+    public class AIChatStreamingService : IAIChatStreamingService
     {
         private readonly HttpClient _httpClient;
-        private readonly ChatStreamingServiceOptions _options;
+        private readonly AIChatStreamingServiceOptions _options;
 
         /// <summary>
         /// Gets the configuration options for the chat streaming service.
         /// </summary>
-        public ChatStreamingServiceOptions Options => _options;
+        public AIChatStreamingServiceOptions Options => _options;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ChatStreamingService"/> class.
+        /// Initializes a new instance of the <see cref="AIChatStreamingService"/> class.
         /// </summary>
         /// <param name="httpClient">The HTTP client used for making API requests.</param>
         /// <param name="options">The configuration options for the chat streaming service.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-        public ChatStreamingService(HttpClient httpClient, IOptions<ChatStreamingServiceOptions> options)
+        public AIChatStreamingService(HttpClient httpClient, IOptions<AIChatStreamingServiceOptions> options)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         }
 
-        /// <summary>
-        /// Streams chat completion responses from the AI model asynchronously.
-        /// </summary>
-        /// <param name="userInput">The user's input message to send to the AI model.</param>
-        /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
-        /// <returns>An async enumerable that yields streaming response chunks from the AI model.</returns>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="userInput"/> is null or empty.</exception>
-        /// <exception cref="HttpRequestException">Thrown when the HTTP request to the AI service fails.</exception>
-        /// <exception cref="JsonException">Thrown when the response from the AI service contains invalid JSON.</exception>
-        /// <exception cref="OperationCanceledException">Thrown when the operation is cancelled via the cancellation token.</exception>
-        /// <remarks>
-        /// This method streams responses from either OpenAI API or Azure OpenAI Service depending on the configuration.
-        /// The AI model is configured with a system prompt as a helpful code assistant and uses a temperature of 0.7
-        /// with a maximum of 50 tokens per response chunk. The method yields content as it becomes available,
-        /// providing real-time streaming capabilities for interactive chat applications.
-        /// </remarks>
+        /// <inheritdoc />
         public async IAsyncEnumerable<string> StreamChatCompletionAsync(string userInput, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(userInput))
@@ -123,7 +122,6 @@ namespace Radzen
                 Content = new StringContent(JsonSerializer.Serialize(payload, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }), Encoding.UTF8, "application/json")
             };
 
-            // Use configurable API key header
             if (string.Equals(_options.ApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
@@ -157,6 +155,11 @@ namespace Radzen
             }
         }
 
+        /// <summary>
+        /// Parses a streaming JSON line from the AI service to extract content.
+        /// </summary>
+        /// <param name="json">The JSON line received from the streaming response.</param>
+        /// <returns>The content text if available; otherwise, an empty string.</returns>
         private string ParseStreamingResponse(string json)
         {
             try
@@ -164,7 +167,6 @@ namespace Radzen
                 var doc = JsonDocument.Parse(json);
                 var root = doc.RootElement;
 
-                // Check if the response has the expected structure
                 if (!root.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
                     return string.Empty;
 
@@ -172,7 +174,6 @@ namespace Radzen
                 if (!firstChoice.TryGetProperty("delta", out var delta))
                     return string.Empty;
 
-                // Check if delta has a content property
                 if (delta.TryGetProperty("content", out var contentElement))
                 {
                     return contentElement.GetString() ?? string.Empty;
@@ -182,13 +183,11 @@ namespace Radzen
             }
             catch (JsonException ex)
             {
-                // Log the JSON parsing error but continue processing
                 System.Diagnostics.Debug.WriteLine($"JSON parsing error: {ex.Message} for line: {json}");
                 return string.Empty;
             }
             catch (Exception ex)
             {
-                // Log any other errors but continue processing
                 System.Diagnostics.Debug.WriteLine($"Error processing stream line: {ex.Message}");
                 return string.Empty;
             }
@@ -196,18 +195,17 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Extension methods for configuring ChatStreamingService in the dependency injection container.
+    /// Extension methods for configuring AIChatStreamingService in the dependency injection container.
     /// </summary>
     public static class ChatStreamingServiceExtensions
     {
         /// <summary>
-        /// Adds the ChatStreamingService to the service collection with the specified configuration.
+        /// Adds the AIChatStreamingService to the service collection with the specified configuration.
         /// </summary>
         /// <param name="services">The service collection.</param>
-        /// <param name="configureOptions">The action to configure the ChatStreamingService options.</param>
-        /// <returns>The service collection for chaining.</returns>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="services"/> or <paramref name="configureOptions"/> is null.</exception>
-        public static IServiceCollection AddChatStreamingService(this IServiceCollection services, Action<ChatStreamingServiceOptions> configureOptions)
+        /// <param name="configureOptions">The action to configure the AIChatStreamingService options.</param>
+        /// <returns>The updated service collection.</returns>
+        public static IServiceCollection AddChatStreamingService(this IServiceCollection services, Action<AIChatStreamingServiceOptions> configureOptions)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
@@ -215,18 +213,20 @@ namespace Radzen
                 throw new ArgumentNullException(nameof(configureOptions));
 
             services.Configure(configureOptions);
-            services.AddScoped<ChatStreamingService>();
+            services.AddScoped<IAIChatStreamingService, AIChatStreamingService>();
 
             return services;
         }
 
         /// <summary>
-        /// Adds the <see cref="ChatStreamingServiceExtensions" /> to the service collection.
+        /// Adds the AIChatStreamingService to the service collection with default options.
         /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <returns>The updated service collection.</returns>
         public static IServiceCollection AddChatStreamingService(this IServiceCollection services)
         {
-            services.AddOptions<ChatStreamingServiceOptions>();
-            services.AddScoped<ChatStreamingService>();
+            services.AddOptions<AIChatStreamingServiceOptions>();
+            services.AddScoped<IAIChatStreamingService, AIChatStreamingService>();
 
             return services;
         }
