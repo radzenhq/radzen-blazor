@@ -12,7 +12,7 @@ using System.Net.Http.Json;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Represents a chat message in the RadzenChat component.
+    /// Represents a chat message in the RadzenAIChat component.
     /// </summary>
     public class ChatMessage
     {
@@ -43,14 +43,14 @@ namespace Radzen.Blazor
     }
 
     /// <summary>
-    /// RadzenChat component that provides a modern chat interface with AI integration.
+    /// RadzenAIChat component that provides a modern chat interface with AI integration.
     /// </summary>
     /// <example>
     /// <code>
-    /// &lt;RadzenChat Title="AI Assistant" Placeholder="Type your message..." @bind-Messages="@chatMessages" /&gt;
+    /// &lt;RadzenAIChat Title="AI Assistant" Placeholder="Type your message..." @bind-Messages="@chatMessages" /&gt;
     /// </code>
     /// </example>
-    public partial class RadzenChat : RadzenComponent
+    public partial class RadzenAIChat : RadzenComponent
     {
         private List<ChatMessage> Messages { get; set; } = new();
         private string CurrentInput { get; set; } = string.Empty;

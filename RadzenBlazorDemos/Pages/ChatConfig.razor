@@ -33,7 +33,7 @@
         </RadzenStack>
     </RadzenCard>
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenChat @ref="basicChat" 
+        <RadzenAIChat @ref="basicChat" 
                    Title="AI Assistant" 
                    Placeholder="Ask me anything..."
                    Style="height: 500px;"
@@ -48,7 +48,7 @@
 <EventConsole @ref="console" Style="min-height: 230px;" />
 
 @code {
-    RadzenChat basicChat;
+    RadzenAIChat basicChat;
     EventConsole console;
 
     void OnMessageAdded(ChatMessage message)

@@ -21,7 +21,7 @@
         </RadzenStack>
     </RadzenCard>
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenChat @ref="customChat" 
+        <RadzenAIChat @ref="customChat" 
                    Title="Custom Assistant" 
                    Placeholder="Type your message here..."
                    EmptyMessage="Welcome! Start chatting with me."
@@ -34,7 +34,7 @@
 </RadzenStack>
 
 @code {
-    RadzenChat customChat;
+    RadzenAIChat customChat;
     
     private bool showClearButton = true;
     private bool isDisabled = false;

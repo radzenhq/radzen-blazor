@@ -8,7 +8,7 @@
         </RadzenText>
     </RadzenCard>
     <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenChat @ref="eventsChat" 
+        <RadzenAIChat @ref="eventsChat" 
                    Title="Event Demo" 
                    Placeholder="Type a message to see events..."
                    Style="height: 400px;"
@@ -23,7 +23,7 @@
 <EventConsole @ref="console" Style="min-height: 200px;" />
 
 @code {
-    RadzenChat eventsChat;
+    RadzenAIChat eventsChat;
     EventConsole console;
 
     void OnMessageAdded(ChatMessage message)
