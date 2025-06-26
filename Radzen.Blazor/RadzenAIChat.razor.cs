@@ -249,6 +249,9 @@ namespace Radzen.Blazor
             {
                 preventDefault = true;
                 await OnSendMessage();
+                // Clear the input element after sending the message
+                CurrentInput = string.Empty;
+                await InvokeAsync(StateHasChanged);
             }
             else
             {

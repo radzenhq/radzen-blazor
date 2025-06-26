@@ -69,6 +69,7 @@
         <div class="rz-chat-input">
             <div class="rz-chat-input-inner">
                 <textarea @ref="inputElement" 
+                          value="@CurrentInput"
                           @oninput="OnInput" 
                           @onkeydown="OnKeyDown" 
                           @onkeydown:preventDefault="preventDefault"
