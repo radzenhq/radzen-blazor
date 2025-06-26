@@ -183,6 +183,7 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
 %rz-dropdown-filter, .rz-dropdown-filter {
   background-color: transparent;
   color: var(--rz-text-color);
+  font-family: inherit;
 }
 
 .rz-multiselect-header {
