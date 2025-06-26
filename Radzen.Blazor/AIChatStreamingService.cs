@@ -26,7 +26,7 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Configuration options for the AIChatStreamingService.
+    /// Configuration options for the AIChatService.
     /// </summary>
     public class AIChatStreamingServiceOptions
     {
@@ -74,7 +74,7 @@ namespace Radzen
     /// <summary>
     /// Provides streaming chat completion functionality for AI models through a configurable endpoint.
     /// </summary>
-    public class AIChatStreamingService : IAIChatService
+    public class AIChatService : IAIChatService
     {
         private readonly HttpClient _httpClient;
         private readonly AIChatStreamingServiceOptions _options;
@@ -85,12 +85,12 @@ namespace Radzen
         public AIChatStreamingServiceOptions Options => _options;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AIChatStreamingService"/> class.
+        /// Initializes a new instance of the <see cref="AIChatService"/> class.
         /// </summary>
         /// <param name="httpClient">The HTTP client used for making API requests.</param>
         /// <param name="options">The configuration options for the chat streaming service.</param>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="httpClient"/> or <paramref name="options"/> is null.</exception>
-        public AIChatStreamingService(HttpClient httpClient, IOptions<AIChatStreamingServiceOptions> options)
+        public AIChatService(HttpClient httpClient, IOptions<AIChatStreamingServiceOptions> options)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
@@ -189,15 +189,15 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Extension methods for configuring AIChatStreamingService in the dependency injection container.
+    /// Extension methods for configuring AIChatService in the dependency injection container.
     /// </summary>
     public static class ChatStreamingServiceExtensions
     {
         /// <summary>
-        /// Adds the AIChatStreamingService to the service collection with the specified configuration.
+        /// Adds the AIChatService to the service collection with the specified configuration.
         /// </summary>
         /// <param name="services">The service collection.</param>
-        /// <param name="configureOptions">The action to configure the AIChatStreamingService options.</param>
+        /// <param name="configureOptions">The action to configure the AIChatService options.</param>
         /// <returns>The updated service collection.</returns>
         public static IServiceCollection AddChatStreamingService(this IServiceCollection services, Action<AIChatStreamingServiceOptions> configureOptions)
         {
@@ -207,20 +207,20 @@ namespace Radzen
                 throw new ArgumentNullException(nameof(configureOptions));
 
             services.Configure(configureOptions);
-            services.AddScoped<IAIChatService, AIChatStreamingService>();
+            services.AddScoped<IAIChatService, AIChatService>();
 
             return services;
         }
 
         /// <summary>
-        /// Adds the AIChatStreamingService to the service collection with default options.
+        /// Adds the AIChatService to the service collection with default options.
         /// </summary>
         /// <param name="services">The service collection.</param>
         /// <returns>The updated service collection.</returns>
         public static IServiceCollection AddChatStreamingService(this IServiceCollection services)
         {
             services.AddOptions<AIChatStreamingServiceOptions>();
-            services.AddScoped<IAIChatService, AIChatStreamingService>();
+            services.AddScoped<IAIChatService, AIChatService>();
 
             return services;
         }

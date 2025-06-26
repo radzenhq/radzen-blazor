@@ -8,7 +8,9 @@
     AIChat
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Demonstration and configuration of the Radzen Blazor <strong>AIChat</strong> component with AI integration.
+    The component requires the <code>IAIChatService</code> to be registered in your application, please use our demos source for reference.
+    This service supports any OpenAI-compatible endpoint, including OpenAI, Azure OpenAI, Cloudflare AI, and other compatible providers.
+    For WebAssembly applications, you'll need to use a server-side proxy endpoint since browsers cannot make direct requests to external APIs due to CORS restrictions, refer to AIChatController.
 </RadzenText>
 
 <RadzenExample ComponentName="AIChat" Example="AIChatConfig">

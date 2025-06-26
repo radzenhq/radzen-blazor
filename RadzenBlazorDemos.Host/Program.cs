@@ -48,7 +48,7 @@ builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
 
 builder.Services.AddChatStreamingService(options =>
-    builder.Configuration.GetSection("AIChatStreamingService").Bind(options));
+    builder.Configuration.GetSection("AIChatService").Bind(options));
 
 builder.Services.AddLocalization();
 
