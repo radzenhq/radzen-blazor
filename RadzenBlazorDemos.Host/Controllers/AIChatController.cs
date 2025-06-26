@@ -11,7 +11,7 @@ namespace RadzenBlazorDemos
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AIChatController(HttpClient httpClient, IOptions<AIChatStreamingServiceOptions> chatStreamingServiceOptions) : ControllerBase
+    public class ChatController(HttpClient httpClient, IOptions<AIChatStreamingServiceOptions> chatStreamingServiceOptions) : ControllerBase
     {
         private readonly AIChatStreamingServiceOptions options = chatStreamingServiceOptions.Value;
         
