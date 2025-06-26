@@ -14,7 +14,7 @@ namespace Radzen
     /// <summary>
     /// Interface for streaming chat completion responses.
     /// </summary>
-    public interface IAIChatStreamingService
+    public interface IAIChatService
     {
         /// <summary>
         /// Streams chat completion responses from the AI model asynchronously.
@@ -22,7 +22,7 @@ namespace Radzen
         /// <param name="userInput">The user's input message to send to the AI model.</param>
         /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
         /// <returns>An async enumerable that yields streaming response chunks from the AI model.</returns>
-        IAsyncEnumerable<string> StreamChatCompletionAsync(string userInput, CancellationToken cancellationToken);
+        IAsyncEnumerable<string> GetCompletionsAsync(string userInput, CancellationToken cancellationToken);
     }
 
     /// <summary>
@@ -74,7 +74,7 @@ namespace Radzen
     /// <summary>
     /// Provides streaming chat completion functionality for AI models through a configurable endpoint.
     /// </summary>
-    public class AIChatStreamingService : IAIChatStreamingService
+    public class AIChatStreamingService : IAIChatService
     {
         private readonly HttpClient _httpClient;
         private readonly AIChatStreamingServiceOptions _options;
@@ -97,7 +97,7 @@ namespace Radzen
         }
 
         /// <inheritdoc />
-        public async IAsyncEnumerable<string> StreamChatCompletionAsync(string userInput, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(userInput))
                 throw new ArgumentException("User input cannot be null or empty.", nameof(userInput));
@@ -207,7 +207,7 @@ namespace Radzen
                 throw new ArgumentNullException(nameof(configureOptions));
 
             services.Configure(configureOptions);
-            services.AddScoped<IAIChatStreamingService, AIChatStreamingService>();
+            services.AddScoped<IAIChatService, AIChatStreamingService>();
 
             return services;
         }
@@ -220,7 +220,7 @@ namespace Radzen
         public static IServiceCollection AddChatStreamingService(this IServiceCollection services)
         {
             services.AddOptions<AIChatStreamingServiceOptions>();
-            services.AddScoped<IAIChatStreamingService, AIChatStreamingService>();
+            services.AddScoped<IAIChatService, AIChatStreamingService>();
 
             return services;
         }

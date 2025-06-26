@@ -14,7 +14,7 @@ namespace Radzen.Blazor.Tests
         {
             // Register a dummy HttpClient and default options for AIChatStreamingService
             ctx.Services.AddSingleton(new HttpClient());
-            ctx.Services.AddScoped<IAIChatStreamingService, AIChatStreamingService>();
+            ctx.Services.AddScoped<IAIChatService, AIChatStreamingService>();
         }
 
         [Fact]

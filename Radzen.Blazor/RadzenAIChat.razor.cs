@@ -206,7 +206,7 @@ namespace Radzen.Blazor
             try
             {
                 var response = "";
-                await foreach (var token in ChatService.StreamChatCompletionAsync(userInput, cts.Token))
+                await foreach (var token in ChatService.GetCompletionsAsync(userInput, cts.Token))
                 {
                     response += token;
                     assistantMessage.Content = response;
