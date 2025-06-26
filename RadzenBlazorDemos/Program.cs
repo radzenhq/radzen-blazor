@@ -25,6 +25,12 @@ builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
 
 builder.Services.AddChatStreamingService(options =>
-    builder.Configuration.GetSection("ChatStreamingService").Bind(options));
+{
+    options.Endpoint = "api/chat/completions";
+    options.Model = "gpt-3.5-turbo";
+    options.SystemPrompt = "You are a helpful AI code assistant.";
+    options.Temperature = 0.7;
+    options.MaxTokens = 50;
+});
 
 await builder.Build().RunAsync();

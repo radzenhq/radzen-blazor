@@ -22,6 +22,11 @@ namespace Radzen
         public string Endpoint { get; set; } = string.Empty;
 
         /// <summary>
+        /// Gets or sets the proxy URL for the AI service, if any.
+        /// </summary>
+        public string Proxy { get; set; } = null;
+
+        /// <summary>
         /// Gets or sets the API key for authentication with the AI service.
         /// </summary>
         public string ApiKey { get; set; } = string.Empty;
@@ -98,7 +103,7 @@ namespace Radzen
             if (string.IsNullOrWhiteSpace(userInput))
                 throw new ArgumentException("User input cannot be null or empty.", nameof(userInput));
 
-            var url = _options.Endpoint;
+            var url = _options.Proxy ?? _options.Endpoint;
 
             var payload = new
             {

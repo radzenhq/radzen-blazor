@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Radzen;
 using System;
 using System.Linq;
@@ -10,15 +11,17 @@ namespace RadzenBlazorDemos
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ChatController(HttpClient httpClient) : ControllerBase
+    public class ChatController(HttpClient httpClient, IOptions<ChatStreamingServiceOptions> chatStreamingServiceOptions) : ControllerBase
     {
+        private readonly ChatStreamingServiceOptions options = chatStreamingServiceOptions.Value;
+        
         [HttpPost("completions")]
         public async Task<IActionResult> Completions()
         {
             var request = new HttpRequestMessage
             {
                 Method = new HttpMethod(Request.Method),
-                RequestUri = new Uri("https://api.openai.com/v1/chat/completions"),
+                RequestUri = new Uri(options.Endpoint),
                 Content = new StreamContent(Request.Body)
             };
 
@@ -29,7 +32,16 @@ namespace RadzenBlazorDemos
                 request.Content.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
 
-            request.Headers.TryAddWithoutValidation("Authorization", Request.Headers.Authorization.ToString());
+            // Use configurable API key header
+
+            if (string.Equals(options.ApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
+            {
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", options.ApiKey);
+            }
+            else
+            {
+                request.Headers.Add(options.ApiKeyHeader, options.ApiKey);
+            }
 
             request.Headers.Host = request.RequestUri.Host;
 
