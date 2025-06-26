@@ -61,6 +61,11 @@ namespace Radzen
         private readonly ChatStreamingServiceOptions _options;
 
         /// <summary>
+        /// Gets the configuration options for the chat streaming service.
+        /// </summary>
+        public ChatStreamingServiceOptions Options => _options;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ChatStreamingService"/> class.
         /// </summary>
         /// <param name="httpClient">The HTTP client used for making API requests.</param>

@@ -1,34 +1,69 @@
 using Microsoft.AspNetCore.Mvc;
 using Radzen;
+using System;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace RadzenBlazorDemos
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ChatController : ControllerBase
+    public class ChatController(HttpClient httpClient) : ControllerBase
     {
-        private readonly ChatStreamingService _chatService;
-        public ChatController(ChatStreamingService chatService)
+        [HttpPost("completions")]
+        public async Task<IActionResult> Completions()
         {
-            _chatService = chatService;
-        }
-
-        public class ChatRequest
-        {
-            public string Message { get; set; } = string.Empty;
-        }
-
-        [HttpPost("stream")]
-        public async Task Stream([FromBody] ChatRequest request)
-        {
-            Response.ContentType = "text/plain";
-            await foreach (var chunk in _chatService.StreamChatCompletionAsync(request.Message, HttpContext.RequestAborted))
+            var request = new HttpRequestMessage
             {
-                var bytes = System.Text.Encoding.UTF8.GetBytes(chunk);
-                await Response.Body.WriteAsync(bytes, 0, bytes.Length);
-                await Response.Body.FlushAsync();
+                Method = new HttpMethod(Request.Method),
+                RequestUri = new Uri("https://api.openai.com/v1/chat/completions"),
+                Content = new StreamContent(Request.Body)
+            };
+
+            request.RequestUri = new UriBuilder(request.RequestUri) { Query = Request.QueryString.ToString() }.Uri;
+
+            foreach (var header in Request.Headers)
+            {
+                request.Content.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
+            }
+
+            request.Headers.TryAddWithoutValidation("Authorization", Request.Headers.Authorization.ToString());
+
+            request.Headers.Host = request.RequestUri.Host;
+
+            try
+            {
+                var response = await httpClient.SendAsync(request);
+
+                Response.StatusCode = (int)response.StatusCode;
+
+                foreach (var header in response.Headers)
+                {
+                    Response.Headers[header.Key] = header.Value.ToArray();
+                }
+
+                foreach (var contentHeader in response.Content.Headers)
+                {
+                    Response.Headers[contentHeader.Key] = contentHeader.Value.ToArray();
+                }
+
+                Response.Headers.Remove("transfer-encoding");
+
+                if (!response.IsSuccessStatusCode && response.Content.Headers.ContentLength == 0)
+                {
+                    return new StatusCodeResult((int)response.StatusCode);
+                }
+
+                var responseContentStream = await response.Content.ReadAsStreamAsync();
+
+                return new FileStreamResult(responseContentStream, response.Content.Headers.ContentType?.ToString());
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(500, ex.Message);
             }
         }
     }
-} 
+}
