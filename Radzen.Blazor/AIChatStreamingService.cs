@@ -53,7 +53,7 @@ namespace Radzen
         /// <summary>
         /// Gets or sets the model name to use.
         /// </summary>
-        public string Model { get; set; } = "gpt-3.5-turbo";
+        public string Model { get; set; }
 
         /// <summary>
         /// Gets or sets the system prompt for the AI assistant.
@@ -122,13 +122,16 @@ namespace Radzen
                 Content = new StringContent(JsonSerializer.Serialize(payload, new JsonSerializerOptions { DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull }), Encoding.UTF8, "application/json")
             };
 
-            if (string.Equals(_options.ApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrWhiteSpace(_options.ApiKey))
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
-            }
-            else
-            {
-                request.Headers.Add(_options.ApiKeyHeader, _options.ApiKey);
+                if (string.Equals(_options.ApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
+                {
+                    request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _options.ApiKey);
+                }
+                else
+                {
+                    request.Headers.Add(_options.ApiKeyHeader, _options.ApiKey);
+                }
             }
 
             var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
