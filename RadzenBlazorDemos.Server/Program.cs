@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.Options;
 using Radzen;
 using RadzenBlazorDemos;
 using RadzenBlazorDemos.Data;
@@ -40,7 +41,12 @@ builder.Services.AddScoped<NorthwindODataService>();
 builder.Services.AddSingleton<GitHubService>();
 
 builder.Services.AddChatStreamingService(options =>
-    builder.Configuration.GetSection("AIChatStreamingService").Bind(options));
+{
+    builder.Configuration.GetSection("AIChatStreamingService").Bind(options);
+
+    options.ApiKey = builder.Configuration["AIChatStreamingService:ApiKey"];
+});
+
 
 builder.Services.AddLocalization();
 
