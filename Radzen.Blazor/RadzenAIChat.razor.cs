@@ -216,7 +216,8 @@ namespace Radzen.Blazor
         /// <param name="model">Optional model name to override the configured model.</param>
         /// <param name="systemPrompt">Optional system prompt to override the configured system prompt.</param>
         /// <param name="temperature">Optional temperature to override the configured temperature.</param>
-        public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null)
+        /// <param name="maxTokens">Optional maximum tokens to override the configured max tokens.</param>
+        public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
                 return;
@@ -231,7 +232,7 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
 
             // Get AI response with custom parameters
-            await GetAIResponse(content, model, systemPrompt, temperature);
+            await GetAIResponse(content, model, systemPrompt, temperature, maxTokens);
         }
 
         private async Task GetAIResponse(string userInput)
@@ -274,7 +275,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private async Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null)
+        private async Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null)
         {
             if (string.IsNullOrWhiteSpace(userInput))
                 return;
@@ -290,7 +291,7 @@ namespace Radzen.Blazor
             try
             {
                 var response = "";
-                await foreach (var token in ChatService.GetCompletionsAsync(userInput, cts.Token, model, systemPrompt, temperature))
+                await foreach (var token in ChatService.GetCompletionsAsync(userInput, cts.Token, model, systemPrompt, temperature, maxTokens))
                 {
                     response += token;
                     assistantMessage.Content = response;

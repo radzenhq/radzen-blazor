@@ -25,8 +25,9 @@ public interface IAIChatService
     /// <param name="model">Optional model name to override the configured model.</param>
     /// <param name="systemPrompt">Optional system prompt to override the configured system prompt.</param>
     /// <param name="temperature">Optional temperature to override the configured temperature.</param>
+    /// <param name="maxTokens">Optional maximum tokens to override the configured max tokens.</param>
     /// <returns>An async enumerable that yields streaming response chunks from the AI model.</returns>
-    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null);
+    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null);
 }
 
 /// <summary>
@@ -68,6 +69,11 @@ public class AIChatServiceOptions
     /// Gets or sets the temperature for the AI model (0.0 to 2.0). Set to 0.0 for deterministic responses, higher values for more creative outputs.
     /// </summary>
     public double Temperature { get; set; } = 0.7;
+
+    /// <summary>
+    /// Gets or sets the maximum number of tokens to generate in the response.
+    /// </summary>
+    public int MaxTokens { get; set; } = 2048;
 }
 
 /// <summary>
@@ -81,7 +87,7 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
     public AIChatServiceOptions Options => options.Value;
 
     /// <inheritdoc />
-    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null)
+    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null)
     {
         if (string.IsNullOrWhiteSpace(userInput))
         {
@@ -99,6 +105,7 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
                 new { role = "user", content = userInput }
             },
             temperature = temperature ?? Options.Temperature,
+            max_tokens = maxTokens ?? Options.MaxTokens,
             stream = true
         };
 
