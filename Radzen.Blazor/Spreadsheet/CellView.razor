@@ -4,8 +4,9 @@
 @inherits CellBase
 <div class=@Class style=@Style data-row=@Row data-column=@Column>
     @cell?.Value
-    @if (ShouldShowChevron)
+    @if (ShouldShowCellMenu)
     {
-        <Chevron Sheet=@Sheet Row=@Row Column=@Column />
+        <RadzenButton @ref=@cellMenuButton class="rz-spreadsheet-cell-chevron" Variant="Variant.Outlined"
+            ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" Icon="expand_more" Click=@OnToggleAsync />
     }
 </div>

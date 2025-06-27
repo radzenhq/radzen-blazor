@@ -1,8 +1,26 @@
 namespace Radzen.Blazor.Spreadsheet;
 
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 #nullable enable
+
+/// <summary>
+/// Represents a filter applied to a sheet, which includes a filter criterion and the range of rows that the filter applies to.
+/// </summary>
+public class SheetFilter(FilterCriterion criterion, RangeRef range)
+{
+    /// <summary>
+    /// Gets or sets the filter criterion used to filter rows in the sheet.
+    /// </summary>
+    public FilterCriterion Criterion { get; } = criterion;
+
+    /// <summary>
+    /// Gets or sets the range of rows that the filter applies to.
+    /// </summary>
+    public RangeRef Range { get; } = range;
+}
 
 /// <summary>
 /// Represents a base class for filter criteria used in filtering rows of a spreadsheet.
@@ -16,6 +34,47 @@ public abstract class FilterCriterion
     /// <param name="row"></param>
     /// <returns></returns>
     public abstract bool Matches(Sheet sheet, int row);
+
+    /// <summary>
+    /// Accepts a visitor that can perform operations on this filter criterion.
+    /// </summary>
+    public abstract void Accept(IFilterCriterionVisitor visitor);
+}
+
+/// <summary>
+/// Defines a visitor interface for filter criteria, allowing different operations to be performed on various types of filter criteria.
+/// </summary>
+public interface IFilterCriterionVisitor
+{
+    /// <summary>
+    /// Visits an OrCriterion.
+    /// </summary>
+    void Visit(OrCriterion criterion);
+
+    /// <summary>
+    /// Visits an AndCriterion.
+    /// </summary>
+    void Visit(AndCriterion criterion);
+
+    /// <summary>
+    /// Visits an EqualsCriterion.
+    /// </summary>
+    void Visit(EqualsCriterion criterion);
+
+    /// <summary>
+    /// Visits a GreaterThanCriterion.
+    /// </summary>
+    void Visit(GreaterThanCriterion criterion);
+
+    /// <summary>
+    /// Visits an InListCriterion.
+    /// </summary>
+    void Visit(InListCriterion criterion);
+
+    /// <summary>
+    /// Visits an IsNullCriterion.
+    /// </summary>
+    void Visit(IsNullCriterion criterion);
 }
 
 /// <summary>
@@ -41,6 +100,9 @@ public class OrCriterion : FilterCriterion
 
         return false;
     }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
 }
 
 /// <summary>
@@ -66,6 +128,9 @@ public class AndCriterion : FilterCriterion
 
         return true;
     }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
 }
 
 /// <summary>
@@ -76,12 +141,12 @@ public abstract class FilterCriterionLeaf : FilterCriterion
     /// <summary>
     /// Gets or sets the index of the column that this filter criterion applies to.
     /// </summary>
-    public int ColumnIndex { get; init; }
+    public int Column { get; init; }
 
     /// <inheritdoc/>
     public override bool Matches(Sheet sheet, int row)
     {
-        var cell = sheet.Cells[row, ColumnIndex];
+        var cell = sheet.Cells[row, Column];
         return Matches(cell.Value);
     }
 
@@ -155,6 +220,9 @@ public class EqualsCriterion : FilterCriterionLeaf
 
         return false;
     }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
 }
 
 /// <summary>
@@ -182,6 +250,9 @@ public class GreaterThanCriterion : FilterCriterionLeaf
 
         return false;
     }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
 }
 
 /// <summary>
@@ -223,6 +294,9 @@ public class InListCriterion : FilterCriterionLeaf
 
         return false;
     }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
 }
 
 /// <summary>
@@ -235,16 +309,48 @@ public class IsNullCriterion : FilterCriterionLeaf
     {
         return value == null;
     }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
 }
 
 public partial class Sheet
 {
+    private readonly List<SheetFilter> filters = [];
+
     /// <summary>
-    /// Filters the rows in the specified range based on the provided filter criterion.
+    /// Gets the list of filters applied to the sheet.
     /// </summary>
-    /// <param name="range"></param>
-    /// <param name="criterion"></param>
-    public void Filter(RangeRef range, FilterCriterion criterion)
+    public IReadOnlyList<SheetFilter> Filters => filters;
+
+    /// <summary>
+    /// Adds a filter to the sheet.
+    /// </summary>
+    public void AddFilter(SheetFilter filter)
+    {
+        if (filter == null)
+        {
+            throw new ArgumentNullException(nameof(filter));
+        }
+
+        filters.Add(filter);
+
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        Rows.BeginUpdate();
+
+        foreach (var filter in filters)
+        {
+            Filter(filter.Range, filter.Criterion);
+        }
+
+        Rows.EndUpdate();
+    }
+
+    internal void Filter(RangeRef range, FilterCriterion criterion)
     {
         if (range == RangeRef.Invalid)
         {
