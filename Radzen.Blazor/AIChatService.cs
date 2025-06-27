@@ -22,8 +22,11 @@ public interface IAIChatService
     /// </summary>
     /// <param name="userInput">The user's input message to send to the AI model.</param>
     /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <param name="model">Optional model name to override the configured model.</param>
+    /// <param name="systemPrompt">Optional system prompt to override the configured system prompt.</param>
+    /// <param name="temperature">Optional temperature to override the configured temperature.</param>
     /// <returns>An async enumerable that yields streaming response chunks from the AI model.</returns>
-    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, CancellationToken cancellationToken);
+    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null);
 }
 
 /// <summary>
@@ -78,7 +81,7 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
     public AIChatServiceOptions Options => options.Value;
 
     /// <inheritdoc />
-    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken)
+    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null)
     {
         if (string.IsNullOrWhiteSpace(userInput))
         {
@@ -89,13 +92,13 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
 
         var payload = new
         {
-            model = Options.Model,
+            model = model ?? Options.Model,
             messages = new[]
             {
-                new { role = "system", content = Options.SystemPrompt },
+                new { role = "system", content = systemPrompt ?? Options.SystemPrompt },
                 new { role = "user", content = userInput }
             },
-            temperature = Options.Temperature,
+            temperature = temperature ?? Options.Temperature,
             stream = true
         };
 
@@ -128,7 +131,7 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
 
         while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
         {
-            var line = await reader.ReadLineAsync(cancellationToken);
+            var line = await reader.ReadLineAsync();
 
             if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data:"))
             {
@@ -143,7 +146,6 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
             }
 
             var content = ParseStreamingResponse(json);
-
             if (!string.IsNullOrEmpty(content))
             {
                 yield return content;

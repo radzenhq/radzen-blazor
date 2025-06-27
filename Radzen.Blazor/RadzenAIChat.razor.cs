@@ -209,6 +209,31 @@ namespace Radzen.Blazor
             await GetAIResponse(content);
         }
 
+        /// <summary>
+        /// Sends a message programmatically with custom AI parameters.
+        /// </summary>
+        /// <param name="content">The message content to send.</param>
+        /// <param name="model">Optional model name to override the configured model.</param>
+        /// <param name="systemPrompt">Optional system prompt to override the configured system prompt.</param>
+        /// <param name="temperature">Optional temperature to override the configured temperature.</param>
+        public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null)
+        {
+            if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
+                return;
+
+            // Add user message
+            var userMessage = AddMessage(content, true);
+            await MessageAdded.InvokeAsync(userMessage);
+            await MessageSent.InvokeAsync(content);
+
+            // Clear input
+            CurrentInput = string.Empty;
+            await InvokeAsync(StateHasChanged);
+
+            // Get AI response with custom parameters
+            await GetAIResponse(content, model, systemPrompt, temperature);
+        }
+
         private async Task GetAIResponse(string userInput)
         {
             if (string.IsNullOrWhiteSpace(userInput))
@@ -226,6 +251,46 @@ namespace Radzen.Blazor
             {
                 var response = "";
                 await foreach (var token in ChatService.GetCompletionsAsync(userInput, cts.Token))
+                {
+                    response += token;
+                    assistantMessage.Content = response;
+                    await InvokeAsync(StateHasChanged);
+                }
+
+                assistantMessage.IsStreaming = false;
+                await ResponseReceived.InvokeAsync(response);
+                await MessageAdded.InvokeAsync(assistantMessage);
+            }
+            catch (Exception ex)
+            {
+                assistantMessage.Content = $"Sorry, I encountered an error: {ex.Message}";
+                assistantMessage.IsStreaming = false;
+                await InvokeAsync(StateHasChanged);
+            }
+            finally
+            {
+                IsLoading = false;
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        private async Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null)
+        {
+            if (string.IsNullOrWhiteSpace(userInput))
+                return;
+
+            IsLoading = true;
+            cts.Cancel();
+            cts = new CancellationTokenSource();
+
+            // Add assistant message placeholder
+            var assistantMessage = AddMessage("", false);
+            assistantMessage.IsStreaming = true;
+
+            try
+            {
+                var response = "";
+                await foreach (var token in ChatService.GetCompletionsAsync(userInput, cts.Token, model, systemPrompt, temperature))
                 {
                     response += token;
                     assistantMessage.Content = response;
