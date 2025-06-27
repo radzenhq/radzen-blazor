@@ -1,0 +1,25 @@
+@using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor.Rendering
+<ul class="rz-menu">
+    <ChevronItem Text="Sort A to Z" Icon="sort" Click=@OnSortAscendingAsync />
+    <ChevronItem Text="Sort Z to A" Icon="sort" Click=@OnSortDescendingAsync />
+    <ChevronItem>
+        <div style="height: 200px; overflow-y: auto;">
+            @foreach (var item in LoadAvailableValues())
+            {
+                <div style="display: flex; align-items: center; padding: 2px 0;">
+                    <RadzenCheckBox TValue="bool" Value=@IsValueSelected(item.Value) Change=@(isChecked => OnValueSelectionChanged(item.Value, (bool)isChecked)) />
+                    <RadzenLabel Text=@item.Text />
+                </div>
+            }
+        </div>
+    </ChevronItem>
+    <ChevronItem>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="10px">
+            <RadzenButton Text="OK" Click=@OnApplyFilterAsync ButtonStyle="ButtonStyle.Primary"
+                Size="ButtonSize.Small" />
+            <RadzenButton Text="Cancel" Click=@OnCancelFilterAsync ButtonStyle="ButtonStyle.Base"
+                Size="ButtonSize.Small" />
+        </RadzenStack>
+    </ChevronItem>
+</ul>
