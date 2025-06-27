@@ -29,6 +29,27 @@ public class CellEventArgs : EventArgs
 }
 
 /// <summary>
+/// Represents the event arguments for cell menu toggle events in a spreadsheet.
+/// </summary>
+public class CellMenuToggleEventArgs
+{
+    /// <summary>
+    /// Gets or sets the element reference of the toggle button.
+    /// </summary>
+    public ElementReference Element { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the row index of the cell.
+    /// </summary>
+    public int Row { get; set; }
+    
+    /// <summary>
+    /// Gets or sets the column index of the cell.
+    /// </summary>
+    public int Column { get; set; }
+}
+
+/// <summary>
 /// Renders a cell in a spreadsheet.
 /// </summary>
 public partial class CellView : CellBase, IDisposable
@@ -51,6 +72,14 @@ public partial class CellView : CellBase, IDisposable
     [Parameter, EditorRequired]
     public Sheet Sheet { get; set; } = default!;
 
+    /// <summary>
+    /// Event callback that is invoked when the toggle button is clicked.
+    /// </summary>
+    [Parameter]
+    public EventCallback<CellMenuToggleEventArgs> Toggle { get; set; }
+
+    private RadzenButton? cellMenuButton;
+
     private string Class => ClassList.Create("rz-spreadsheet-cell")
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
                                      .Add("rz-spreadsheet-frozen-column", FrozenState.HasFlag(FrozenState.Column))
@@ -59,14 +88,14 @@ public partial class CellView : CellBase, IDisposable
     private Cell cell = default!;
 
     /// <summary>
-    /// Gets a value indicating whether the chevron icon should be shown.
+    /// Gets a value indicating whether the cell menu icon should be shown.
     /// </summary>
-    protected bool ShouldShowChevron => IsInDataTableFirstRow || IsFiltered;
+    protected bool ShouldShowCellMenu => IsInDataTableFirstVisibleRow || IsFiltered;
 
     /// <summary>
-    /// Gets a value indicating whether the cell is in the first row of a data table.
+    /// Gets a value indicating whether the cell is in the first visible row of a data table.
     /// </summary>
-    protected bool IsInDataTableFirstRow
+    protected bool IsInDataTableFirstVisibleRow
     {
         get
         {
@@ -74,11 +103,10 @@ public partial class CellView : CellBase, IDisposable
             
             foreach (var dataTable in Sheet.DataTables)
             {
-                if (dataTable.Range.Start.Row == Row && 
-                    Column >= dataTable.Range.Start.Column && 
+                if (Column >= dataTable.Range.Start.Column && 
                     Column <= dataTable.Range.End.Column)
                 {
-                    return true;
+                    return Row == dataTable.Start.Row;
                 }
             }
 
@@ -107,6 +135,20 @@ public partial class CellView : CellBase, IDisposable
     {
         base.AppendStyle(sb);
         cell.Format?.AppendStyle(sb);
+    }
+
+    private async Task OnToggleAsync()
+    {
+        if (cellMenuButton != null)
+        {
+            var args = new CellMenuToggleEventArgs
+            {
+                Element = cellMenuButton.Element,
+                Row = Row,
+                Column = Column
+            };
+            await Toggle.InvokeAsync(args);
+        }
     }
 
     /// <inheritdoc/>
