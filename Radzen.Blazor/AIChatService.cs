@@ -73,7 +73,7 @@ public class AIChatServiceOptions
     /// <summary>
     /// Gets or sets the maximum number of tokens to generate in the response.
     /// </summary>
-    public int MaxTokens { get; set; } = 2048;
+    public int? MaxTokens { get; set; }
 }
 
 /// <summary>
