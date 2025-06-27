@@ -152,4 +152,145 @@ public class FilteringTests
         Assert.False(sheet.Rows.IsHidden(3)); // Pending + 95
         Assert.True(sheet.Rows.IsHidden(4));  // Inactive
     }
+
+    [Fact]
+    public void Should_FilterWithInListCriterion()
+    {
+        sheet.Cells[0, 0].Value = "Apple";
+        sheet.Cells[1, 0].Value = "Banana";
+        sheet.Cells[2, 0].Value = "Cherry";
+        sheet.Cells[3, 0].Value = "Date";
+
+        sheet.Filter(
+            RangeRef.Parse("A1:A4"),
+            new InListCriterion { ColumnIndex = 0, Values = ["Apple", "Cherry"] }
+        );
+
+        Assert.False(sheet.Rows.IsHidden(0)); // Apple - matches
+        Assert.True(sheet.Rows.IsHidden(1));  // Banana - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // Cherry - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // Date - doesn't match
+    }
+
+    [Fact]
+    public void Should_FilterWithInListCriterionForNumbers()
+    {
+        sheet.Cells[0, 0].Value = 10;
+        sheet.Cells[1, 0].Value = 20;
+        sheet.Cells[2, 0].Value = 30;
+        sheet.Cells[3, 0].Value = 40;
+
+        sheet.Filter(
+            RangeRef.Parse("A1:A4"),
+            new InListCriterion { ColumnIndex = 0, Values = [10, 30, 50] }
+        );
+
+        Assert.False(sheet.Rows.IsHidden(0)); // 10 - matches
+        Assert.True(sheet.Rows.IsHidden(1));  // 20 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // 30 - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // 40 - doesn't match
+    }
+
+    [Fact]
+    public void Should_FilterWithInListCriterionForMixedTypes()
+    {
+        sheet.Cells[0, 0].Value = "10";    // string
+        sheet.Cells[1, 0].Value = 20;      // number
+        sheet.Cells[2, 0].Value = "30.0";  // string
+        sheet.Cells[3, 0].Value = 40;      // number
+
+        sheet.Filter(
+            RangeRef.Parse("A1:A4"),
+            new InListCriterion { ColumnIndex = 0, Values = [10, 30, "20"] }
+        );
+
+        Assert.False(sheet.Rows.IsHidden(0)); // "10" matches 10 (numeric coercion)
+        Assert.False(sheet.Rows.IsHidden(1)); // 20 matches "20" (numeric coercion)
+        Assert.False(sheet.Rows.IsHidden(2)); // "30.0" matches 30 (numeric coercion)
+        Assert.True(sheet.Rows.IsHidden(3));  // 40 - doesn't match
+    }
+
+    [Fact]
+    public void Should_FilterWithInListCriterionForNullValues()
+    {
+        sheet.Cells[0, 0].Value = "Apple";
+        sheet.Cells[1, 0].Value = null;
+        sheet.Cells[2, 0].Value = "Cherry";
+
+        sheet.Filter(
+            RangeRef.Parse("A1:A3"),
+            new InListCriterion { ColumnIndex = 0, Values = ["Apple", null, "Cherry"] }
+        );
+
+        Assert.False(sheet.Rows.IsHidden(0)); // Apple - matches
+        Assert.False(sheet.Rows.IsHidden(1)); // null - matches
+        Assert.False(sheet.Rows.IsHidden(2)); // Cherry - matches
+    }
+
+    [Fact]
+    public void Should_FilterWithInListCriterionForEmptyList()
+    {
+        sheet.Cells[0, 0].Value = "Apple";
+        sheet.Cells[1, 0].Value = "Banana";
+        sheet.Cells[2, 0].Value = "Cherry";
+
+        sheet.Filter(
+            RangeRef.Parse("A1:A3"),
+            new InListCriterion { ColumnIndex = 0, Values = [] }
+        );
+
+        Assert.True(sheet.Rows.IsHidden(0));  // No matches in empty list
+        Assert.True(sheet.Rows.IsHidden(1));  // No matches in empty list
+        Assert.True(sheet.Rows.IsHidden(2));  // No matches in empty list
+    }
+
+    [Fact]
+    public void Should_FilterWithInListCriterionInComplexFilter()
+    {
+        var sheet = new Sheet(6, 2);
+
+        sheet.Cells[1, 0].Value = "Active"; sheet.Cells[1, 1].Value = 90;
+        sheet.Cells[2, 0].Value = "Pending"; sheet.Cells[2, 1].Value = 45;
+        sheet.Cells[3, 0].Value = "Inactive"; sheet.Cells[3, 1].Value = 95;
+        sheet.Cells[4, 0].Value = "Suspended"; sheet.Cells[4, 1].Value = 100;
+        sheet.Cells[5, 0].Value = "Active"; sheet.Cells[5, 1].Value = 30;
+
+        sheet.Filter(RangeRef.Parse("A2:B6"), new AndCriterion
+        {
+            Criteria = [
+                new InListCriterion {
+                    ColumnIndex = 0,
+                    Values = ["Active", "Pending", "Suspended"]
+                },
+                new GreaterThanCriterion {
+                    ColumnIndex = 1, Value = 50
+                }
+            ]
+        });
+
+        Assert.False(sheet.Rows.IsHidden(1)); // Active + 90 - matches both
+        Assert.True(sheet.Rows.IsHidden(2));  // Pending + 45 - matches status but not value (should be hidden)
+        Assert.True(sheet.Rows.IsHidden(3));  // Inactive + 95 - doesn't match status
+        Assert.False(sheet.Rows.IsHidden(4)); // Suspended + 100 - matches both
+        Assert.True(sheet.Rows.IsHidden(5));  // Active + 30 - matches status but not value
+    }
+
+    [Fact]
+    public void Should_FilterWithIsNullCriterion()
+    {
+        sheet.Cells[0, 0].Value = null;
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = 10;
+        sheet.Cells[3, 0].Value = null;
+
+        sheet.Filter(
+            RangeRef.Parse("A1:A4"),
+            new IsNullCriterion { ColumnIndex = 0 }
+        );
+
+        Assert.False(sheet.Rows.IsHidden(0)); // null - matches
+        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" - doesn't match
+        Assert.True(sheet.Rows.IsHidden(2));  // 10 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // null - matches
+    }
 }
