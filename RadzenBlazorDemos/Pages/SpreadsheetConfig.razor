@@ -12,11 +12,6 @@
 <button @onclick=@(SortAscending)>Sort Ascending</button>
 <button @onclick=@(SortDescending)>Sort Descending</button>
 
-<div>
-    <input type="text" @bind="filter" placeholder="Filter..." />
-    <button @onclick=@(Filter)>Filter</button>
-</div>
-
 <RadzenSpreadsheet Workbook=@workbook style="height: 500px" />
 
 @code {
@@ -46,19 +41,6 @@
         sheet.Selection.Select(RangeRef.Parse("A1:B2"));
         sheet.Validation.Add(RangeRef.Parse("E1:E10"), new NumberValidator());
         sheet.EndUpdate();
-    }
-    private string filter;
-
-    void Filter()
-    {
-        if (!string.IsNullOrEmpty(filter))
-        {
-            sheet.Filter(sheet.Selection.Range, new EqualsCriterion
-            {
-                ColumnIndex = sheet.Selection.Cell.Column,
-                Value = filter,
-            });
-        }
     }
 
     void SortAscending()
