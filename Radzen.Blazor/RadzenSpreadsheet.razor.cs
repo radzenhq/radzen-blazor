@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Spreadsheet;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor;
 
@@ -55,6 +56,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     protected override string GetComponentCssClass() => "rz-spreadsheet";
 
     private VirtualGrid? grid;
+    private Popup? cellMenuPopup;
+    private int cellMenuRow = -1;
+    private int cellMenuColumn = -1;
 
     /// <inheritdoc/>
     public override async Task SetParametersAsync(ParameterView parameters)
@@ -78,6 +82,32 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         workbook = value;
 
         await WorkbookChanged.InvokeAsync(value);
+    }
+
+    private async Task OnCellToggleAsync(CellMenuToggleEventArgs args)
+    {
+        if (cellMenuPopup != null)
+        {
+            cellMenuRow = args.Row;
+            cellMenuColumn = args.Column;
+            await cellMenuPopup.ToggleAsync(args.Element);
+        }
+    }
+
+    private async Task OnCellMenuCancelAsync()
+    {
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
+    }
+
+    private async Task OnCellMenuApplyAsync()
+    {
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
     }
 
     private async Task MoveSelectionAsync(int rowOffset, int columnOffset)
