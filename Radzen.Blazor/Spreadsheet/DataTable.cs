@@ -15,6 +15,27 @@ public class DataTable(Sheet sheet, RangeRef range)
     public RangeRef Range { get; } = range;
 
     /// <summary>
+    /// Gets the first visible cell reference in the data table range.
+    /// </summary>
+    public CellRef Start
+    {
+        get
+        {
+            // Find the first visible row in the data table range
+            for (int row = Range.Start.Row; row <= Range.End.Row; row++)
+            {
+                if (!sheet.Rows.IsHidden(row))
+                {
+                    return new CellRef(row, Range.Start.Column);
+                }
+            }
+            
+            // If all rows are hidden, return the original start
+            return Range.Start;
+        }
+    }
+
+    /// <summary>
     /// Sorts the data table in ascending order based on the specified column index.
     /// </summary>
     public void Sort(SortOrder order, int column)
