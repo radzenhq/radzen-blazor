@@ -318,6 +318,11 @@ public partial class CellMenu : ComponentBase
         await Apply.InvokeAsync();
     }
 
+    private bool CanApplyFilter()
+    {
+        return selectedFilterValues.Any();
+    }
+
     private List<(string Text, object? Value)> LoadAvailableValues()
     {
         var availableValues = new List<(string Text, object? Value)>();
