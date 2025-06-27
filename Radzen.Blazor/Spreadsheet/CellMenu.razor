@@ -28,7 +28,7 @@
     <ChevronItem>
         <RadzenStack Orientation="Orientation.Horizontal" Gap="10px">
             <RadzenButton Text="OK" Click=@OnApplyFilterAsync ButtonStyle="ButtonStyle.Primary"
-                Size="ButtonSize.Small" />
+                Size="ButtonSize.Small" Disabled=@(!CanApplyFilter()) />
             <RadzenButton Text="Cancel" Click=@OnCancelFilterAsync ButtonStyle="ButtonStyle.Base"
                 Size="ButtonSize.Small" />
         </RadzenStack>
