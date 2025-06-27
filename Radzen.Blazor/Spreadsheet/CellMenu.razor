@@ -5,11 +5,22 @@
     <ChevronItem Text="Sort Z to A" Icon="sort" Click=@OnSortDescendingAsync />
     <ChevronItem>
         <div style="height: 200px; overflow-y: auto;">
+            <div style="display: flex; align-items: center; padding: 2px 0;">
+                <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" />
+                <RadzenLabel Text="(Select All)" />
+            </div>
             @foreach (var item in LoadAvailableValues())
             {
                 <div style="display: flex; align-items: center; padding: 2px 0;">
                     <RadzenCheckBox TValue="bool" Value=@IsValueSelected(item.Value) Change=@(isChecked => OnValueSelectionChanged(item.Value, (bool)isChecked)) />
                     <RadzenLabel Text=@item.Text />
+                </div>
+            }
+            @if (ShouldShowBlankOption())
+            {
+                <div style="display: flex; align-items: center; padding: 2px 0;">
+                    <RadzenCheckBox TValue="bool" Value=@IsBlankSelected() Change=@OnBlankSelectionChanged />
+                    <RadzenLabel Text="(Blank)" />
                 </div>
             }
         </div>
