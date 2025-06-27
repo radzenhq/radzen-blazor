@@ -1,14 +1,24 @@
 <li class="rz-navigation-item">
-    <div class="rz-navigation-item-wrapper" @onclick=@OnClickAsync>
-        <div class="rz-navigation-item-link">
-            <i class="notranslate rzi rz-navigation-item-icon">@Icon</i>
-            <span class="rz-navigation-item-text">@Text</span>
+    @if (ChildContent != null)
+    {
+        @ChildContent
+    }
+    else
+    {
+        <div class="rz-navigation-item-wrapper" @onclick=@OnClickAsync>
+            <div class="rz-navigation-item-link">
+                <i class="notranslate rzi rz-navigation-item-icon">@Icon</i>
+                <span class="rz-navigation-item-text">@Text</span>
+            </div>
         </div>
-    </div>
+    }
 </li>
 @code {
     [Parameter]
     public EventCallback Click { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
 
     [Parameter] 
     public string Icon { get; set; }
