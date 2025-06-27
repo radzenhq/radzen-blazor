@@ -184,6 +184,59 @@ public class GreaterThanCriterion : FilterCriterionLeaf
     }
 }
 
+/// <summary>
+/// Represents a filter criterion that checks if the value is in a predefined list of values.
+/// </summary>
+public class InListCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the list of values that this filter criterion checks against.
+    /// </summary>
+    public object?[] Values { get; init; } = [];
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        // Check for exact matches first (including null)
+        foreach (var listValue in Values)
+        {
+            if (Equals(value, listValue))
+            {
+                return true;
+            }
+        }
+
+        // Check for numeric coercion matches (only if value is not null)
+        if (value != null && TryCoerce(value, out var numericValue))
+        {
+            foreach (var listValue in Values)
+            {
+                if (listValue != null && TryCoerce(listValue, out var numericListValue))
+                {
+                    if (numericValue == numericListValue)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+}
+
+/// <summary>
+/// Represents a filter criterion that matches only if the value is null.
+/// </summary>
+public class IsNullCriterion : FilterCriterionLeaf
+{
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        return value == null;
+    }
+}
+
 public partial class Sheet
 {
     /// <summary>
