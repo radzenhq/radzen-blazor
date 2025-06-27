@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Blazor.Spreadsheet.Tools
+@using Radzen.Blazor.Rendering
 @inherits RadzenComponent
 
 <div @ref=@Element class=@GetCssClass() style=@Style @attributes=@Attributes tabindex="0">
@@ -57,7 +58,7 @@
                         <RowHeader Sheet=@Sheet FrozenState=@row.FrozenState Row=@row.Row Rect=@context.Rect />
                         break;
                     case VirtualDataItem item:
-                        <CellView Sheet=@Sheet Column=@item.Column Row=@item.Row FrozenState=@item.FrozenState Rect=@context.Rect />
+                        <CellView Sheet=@Sheet Column=@item.Column Row=@item.Row FrozenState=@item.FrozenState Rect=@context.Rect Toggle=@OnCellToggleAsync />
                         break;
                     case VirtualHorizontalSplitter horizontalSplitter:
                         <Splitter class="rz-spreadsheet-horizontal-splitter" Rect=@horizontalSplitter.Rect />
@@ -76,6 +77,12 @@
                 }
             </ChildContent>
         </VirtualGrid>
+        <Popup @ref=@cellMenuPopup class="rz-spreadsheet-cell-popup rz-context-menu" Lazy="true">
+            @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
+            {
+                <CellMenu Sheet=@Sheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync />
+            }
+        </Popup>
 }
     </CascadingValue>
 </div>

@@ -15,7 +15,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A3"),
-            new EqualsCriterion { ColumnIndex = 0, Value = "A" }
+            new EqualsCriterion { Column = 0, Value = "A" }
         );
 
         Assert.False(sheet.Rows.IsHidden(0));
@@ -32,7 +32,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A3"),
-            new EqualsCriterion { ColumnIndex = 0, Value = "A" }
+            new EqualsCriterion { Column = 0, Value = "A" }
         );
 
         Assert.False(sheet.Rows.IsHidden(0));
@@ -42,7 +42,7 @@ public class FilteringTests
         // Apply a different criterion
         sheet.Filter(
             RangeRef.Parse("A1:A3"),
-            new EqualsCriterion { ColumnIndex = 0, Value = "B" }
+            new EqualsCriterion { Column = 0, Value = "B" }
         );
 
         Assert.True(sheet.Rows.IsHidden(0));
@@ -61,7 +61,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A4"), // includes rows 0–3
-            new EqualsCriterion { ColumnIndex = 0, Value = 10 }
+            new EqualsCriterion { Column = 0, Value = 10 }
         );
 
         Assert.False(sheet.Rows.IsHidden(0)); // "10"
@@ -89,8 +89,8 @@ public class FilteringTests
         sheet.Filter(RangeRef.Parse("A2:B4"), new OrCriterion
         {
             Criteria = [
-                new EqualsCriterion { ColumnIndex = 0, Value = "Pending" },
-            new EqualsCriterion { ColumnIndex = 1, Value = 90 }
+                new EqualsCriterion { Column = 0, Value = "Pending" },
+            new EqualsCriterion { Column = 1, Value = 90 }
             ]
         });
 
@@ -111,8 +111,8 @@ public class FilteringTests
         sheet.Filter(RangeRef.Parse("A2:B4"), new AndCriterion
         {
             Criteria = [
-                new EqualsCriterion { ColumnIndex = 0, Value = "Active" },
-                new EqualsCriterion { ColumnIndex = 1, Value = 85 }
+                new EqualsCriterion { Column = 0, Value = "Active" },
+                new EqualsCriterion { Column = 1, Value = 85 }
             ]
         });
 
@@ -137,12 +137,12 @@ public class FilteringTests
             Criteria = [
                 new OrCriterion {
                 Criteria = [
-                    new EqualsCriterion { ColumnIndex = 0, Value = "Active" },
-                    new EqualsCriterion { ColumnIndex = 0, Value = "Pending" }
+                    new EqualsCriterion { Column = 0, Value = "Active" },
+                    new EqualsCriterion { Column = 0, Value = "Pending" }
                 ]
             },
             new GreaterThanCriterion {
-                ColumnIndex = 1, Value = 80
+                Column = 1, Value = 80
             }
             ]
         });
@@ -163,7 +163,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A4"),
-            new InListCriterion { ColumnIndex = 0, Values = ["Apple", "Cherry"] }
+            new InListCriterion { Column = 0, Values = ["Apple", "Cherry"] }
         );
 
         Assert.False(sheet.Rows.IsHidden(0)); // Apple - matches
@@ -182,7 +182,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A4"),
-            new InListCriterion { ColumnIndex = 0, Values = [10, 30, 50] }
+            new InListCriterion { Column = 0, Values = [10, 30, 50] }
         );
 
         Assert.False(sheet.Rows.IsHidden(0)); // 10 - matches
@@ -201,7 +201,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A4"),
-            new InListCriterion { ColumnIndex = 0, Values = [10, 30, "20"] }
+            new InListCriterion { Column = 0, Values = [10, 30, "20"] }
         );
 
         Assert.False(sheet.Rows.IsHidden(0)); // "10" matches 10 (numeric coercion)
@@ -219,7 +219,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A3"),
-            new InListCriterion { ColumnIndex = 0, Values = ["Apple", null, "Cherry"] }
+            new InListCriterion { Column = 0, Values = ["Apple", null, "Cherry"] }
         );
 
         Assert.False(sheet.Rows.IsHidden(0)); // Apple - matches
@@ -236,7 +236,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A3"),
-            new InListCriterion { ColumnIndex = 0, Values = [] }
+            new InListCriterion { Column = 0, Values = [] }
         );
 
         Assert.True(sheet.Rows.IsHidden(0));  // No matches in empty list
@@ -259,11 +259,11 @@ public class FilteringTests
         {
             Criteria = [
                 new InListCriterion {
-                    ColumnIndex = 0,
+                    Column = 0,
                     Values = ["Active", "Pending", "Suspended"]
                 },
                 new GreaterThanCriterion {
-                    ColumnIndex = 1, Value = 50
+                    Column = 1, Value = 50
                 }
             ]
         });
@@ -285,7 +285,7 @@ public class FilteringTests
 
         sheet.Filter(
             RangeRef.Parse("A1:A4"),
-            new IsNullCriterion { ColumnIndex = 0 }
+            new IsNullCriterion { Column = 0 }
         );
 
         Assert.False(sheet.Rows.IsHidden(0)); // null - matches
