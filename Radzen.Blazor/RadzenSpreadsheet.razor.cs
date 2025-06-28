@@ -106,7 +106,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (filter != null && Sheet != null)
         {
-            Sheet.AddFilter(filter);
+            var command = new FilterCommand(Sheet, filter);
+            Sheet.Commands.Execute(command);
         }
 
         if (cellMenuPopup != null)
