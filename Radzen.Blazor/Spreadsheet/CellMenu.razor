@@ -1,36 +1,30 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Radzen.Blazor.Rendering
-<ul class="rz-menu">
+<ul class="rz-menu rz-spreadsheet-cell-menu">
     <ChevronItem Text="Sort A to Z" Icon="sort" Click=@OnSortAscendingAsync />
     <ChevronItem Text="Sort Z to A" Icon="sort" Click=@OnSortDescendingAsync />
-    <ChevronItem>
-        <div style="height: 200px; overflow-y: auto;">
-            <div style="display: flex; align-items: center; padding: 2px 0;">
-                <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" />
-                <RadzenLabel Text="(Select All)" />
-            </div>
-            @foreach (var item in LoadAvailableValues())
-            {
-                <div style="display: flex; align-items: center; padding: 2px 0;">
-                    <RadzenCheckBox TValue="bool" Value=@IsValueSelected(item.Value) Change=@(isChecked => OnValueSelectionChanged(item.Value, (bool)isChecked)) />
-                    <RadzenLabel Text=@item.Text />
-                </div>
-            }
-            @if (ShouldShowBlankOption())
-            {
-                <div style="display: flex; align-items: center; padding: 2px 0;">
-                    <RadzenCheckBox TValue="bool" Value=@IsBlankSelected() Change=@OnBlankSelectionChanged />
-                    <RadzenLabel Text="(Blank)" />
-                </div>
-            }
-        </div>
-    </ChevronItem>
-    <ChevronItem>
-        <RadzenStack Orientation="Orientation.Horizontal" Gap="10px">
-            <RadzenButton Text="OK" Click=@OnApplyFilterAsync ButtonStyle="ButtonStyle.Primary"
-                Size="ButtonSize.Small" Disabled=@(!CanApplyFilter()) />
-            <RadzenButton Text="Cancel" Click=@OnCancelFilterAsync ButtonStyle="ButtonStyle.Base"
-                Size="ButtonSize.Small" />
-        </RadzenStack>
-    </ChevronItem>
+    <div class="rz-spreadsheet-cell-menu-filter">
+        <ChevronItem>
+            <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" />
+            <RadzenLabel Text="(Select All)" />
+        </ChevronItem>
+        @foreach (var item in LoadAvailableValues())
+        {
+            <ChevronItem>
+                <RadzenCheckBox TValue="bool" Value=@IsValueSelected(item.Value) Change=@(isChecked => OnValueSelectionChanged(item.Value, isChecked)) />
+                <RadzenLabel Text=@item.Text />
+            </ChevronItem>
+        }
+        @if (ShouldShowBlankOption())
+        {
+            <ChevronItem>
+                <RadzenCheckBox TValue="bool" Value=@IsBlankSelected() Change=@OnBlankSelectionChanged />
+                <RadzenLabel Text="(Blank)" />
+            </ChevronItem>
+        }
+    </div>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End">
+        <RadzenButton Text="OK" Click=@OnApplyFilterAsync ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" Disabled=@(!CanApplyFilter()) />
+        <RadzenButton Text="Cancel" Click=@OnCancelFilterAsync ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
+    </RadzenStack>
 </ul>
