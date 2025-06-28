@@ -87,42 +87,30 @@ public partial class CellView : CellBase, IDisposable
 
     private Cell cell = default!;
 
-    /// <summary>
-    /// Gets a value indicating whether the cell menu icon should be shown.
-    /// </summary>
-    protected bool ShouldShowCellMenu => IsInDataTableFirstVisibleRow || IsFiltered;
-
-    /// <summary>
-    /// Gets a value indicating whether the cell is in the first visible row of a data table.
-    /// </summary>
-    protected bool IsInDataTableFirstVisibleRow
+    private bool ShouldShowCellMenu
     {
         get
         {
-            if (Sheet?.DataTables == null) return false;
-            
-            foreach (var dataTable in Sheet.DataTables)
+            if (Sheet?.DataTables != null)
             {
-                if (Column >= dataTable.Range.Start.Column && 
-                    Column <= dataTable.Range.End.Column)
+                foreach (var dataTable in Sheet.DataTables)
                 {
-                    return Row == dataTable.Start.Row;
+                    if (Column >= dataTable.Range.Start.Column &&
+                        Column <= dataTable.Range.End.Column)
+                    {
+                        return Row == dataTable.Start.Row;
+                    }
                 }
             }
 
-            return false;
-        }
-    }
+            if (Sheet?.AutoFilter != null)
+            {
+                if (Column >= Sheet.AutoFilter.Range.Start.Column && Column <= Sheet.AutoFilter.Range.End.Column)
+                {
+                    return Row == Sheet.AutoFilter.Start.Row;
+                }
+            }
 
-    /// <summary>
-    /// Gets a value indicating whether the cell is part of a filter.
-    /// </summary>
-    protected bool IsFiltered
-    {
-        get
-        {
-            // TODO: Implement filter state tracking
-            // For now, return false until filter state tracking is implemented
             return false;
         }
     }
