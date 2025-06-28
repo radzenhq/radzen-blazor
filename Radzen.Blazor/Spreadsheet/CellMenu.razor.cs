@@ -250,10 +250,26 @@ public partial class CellMenu : ComponentBase
     private bool ShouldShowBlankOption()
     {
         var dataTable = GetCurrentDataTable();
-        if (dataTable == null) return false;
+        var autoFilter = GetCurrentAutoFilter();
+
+        // Determine the range to use for checking blank values
+        RangeRef rangeToUse = RangeRef.Invalid;
+        
+        if (dataTable != null)
+        {
+            // Use data table range if the cell is part of a data table
+            rangeToUse = dataTable.Range;
+        }
+        else if (autoFilter != null)
+        {
+            // Use auto filter range if the cell is part of an auto filter
+            rangeToUse = autoFilter.Range;
+        }
+
+        if (rangeToUse == RangeRef.Invalid) return false;
 
         // Check if any cell in the column has null or empty value
-        for (int row = dataTable.Range.Start.Row; row <= dataTable.Range.End.Row; row++)
+        for (int row = rangeToUse.Start.Row; row <= rangeToUse.End.Row; row++)
         {
             var cell = Sheet.Cells[row, Column];
             var value = cell.Value;
@@ -292,12 +308,28 @@ public partial class CellMenu : ComponentBase
         if (selectedFilterValues.Any())
         {
             var dataTable = GetCurrentDataTable();
+            var autoFilter = GetCurrentAutoFilter();
+
+            // Determine the range to use for the filter
+            RangeRef rangeToUse = RangeRef.Invalid;
+            
             if (dataTable != null)
             {
-                // Create a new range for the current column using the data table's row range
+                // Use data table range if the cell is part of a data table
+                rangeToUse = dataTable.Range;
+            }
+            else if (autoFilter != null)
+            {
+                // Use auto filter range if the cell is part of an auto filter
+                rangeToUse = autoFilter.Range;
+            }
+
+            if (rangeToUse != RangeRef.Invalid)
+            {
+                // Create a new range for the current column using the determined range
                 var columnRange = new RangeRef(
-                    new CellRef(dataTable.Range.Start.Row, Column),
-                    new CellRef(dataTable.Range.End.Row, Column)
+                    new CellRef(rangeToUse.Start.Row, Column),
+                    new CellRef(rangeToUse.End.Row, Column)
                 );
 
                 var filter = new SheetFilter(
@@ -325,13 +357,28 @@ public partial class CellMenu : ComponentBase
     {
         var availableValues = new List<(string Text, object? Value)>();
         var dataTable = GetCurrentDataTable();
+        var autoFilter = GetCurrentAutoFilter();
 
+        // Determine the range to use for loading values
+        RangeRef rangeToUse = RangeRef.Invalid;
+        
         if (dataTable != null)
+        {
+            // Use data table range if the cell is part of a data table
+            rangeToUse = dataTable.Range;
+        }
+        else if (autoFilter != null)
+        {
+            // Use auto filter range if the cell is part of an auto filter
+            rangeToUse = autoFilter.Range;
+        }
+
+        if (rangeToUse != RangeRef.Invalid)
         {
             var uniqueValues = new List<(string Text, object? Value)>();
 
-            // Get all values from the column in the data table range
-            for (int row = dataTable.Range.Start.Row; row <= dataTable.Range.End.Row; row++)
+            // Get all values from the column in the determined range
+            for (int row = rangeToUse.Start.Row; row <= rangeToUse.End.Row; row++)
             {
                 // Check if this row is hidden by a filter that affects the current column
                 bool shouldSkipRow = false;
@@ -384,6 +431,16 @@ public partial class CellMenu : ComponentBase
             {
                 return dataTable;
             }
+        }
+        return null;
+    }
+
+    private AutoFilter? GetCurrentAutoFilter()
+    {
+        // Check if the sheet has an auto filter and if the current cell is within its range
+        if (Sheet.AutoFilter != null && Sheet.AutoFilter.Range.Contains(Row, Column))
+        {
+            return Sheet.AutoFilter;
         }
         return null;
     }
