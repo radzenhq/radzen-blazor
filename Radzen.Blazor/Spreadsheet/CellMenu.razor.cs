@@ -57,11 +57,20 @@ public partial class CellMenu : ComponentBase
     private readonly HashSet<object?> selectedFilterValues = [];
 
     /// <inheritdoc />
-    protected override void OnInitialized()
+    public override async Task SetParametersAsync(ParameterView parameters)
     {
-        base.OnInitialized();
+        var didRowChange = parameters.TryGetValue<int>(nameof(Row), out var row) && Row != row;
+        var didColumnChange = parameters.TryGetValue<int>(nameof(Column), out var column) && Column != column;
+        var didSheetChange = parameters.TryGetValue<Sheet>(nameof(Sheet), out var sheet) && Sheet != sheet;
 
-        InitializeSelectedFilterValues();
+        await base.SetParametersAsync(parameters);
+
+        // Check if any of the key parameters have changed
+        if (didRowChange || didColumnChange || didSheetChange)
+        {
+            // Reinitialize the selected filter values
+            InitializeSelectedFilterValues();
+        }
     }
 
     private void InitializeSelectedFilterValues()
@@ -75,8 +84,7 @@ public partial class CellMenu : ComponentBase
             filter.Criterion.Accept(visitor);
         }
 
-        // If there are existing filter values for this column, use them
-        if (visitor.FoundValues.Any())
+        if (visitor.FoundValues.Count != 0)
         {
             foreach (var value in visitor.FoundValues)
             {
@@ -85,14 +93,13 @@ public partial class CellMenu : ComponentBase
         }
         else
         {
-            // No existing filters for this column, so select all available values by default
             var availableValues = LoadAvailableValues();
-            foreach (var value in availableValues)
+
+            foreach (var (_, Value) in availableValues)
             {
-                selectedFilterValues.Add(value.Value);
+                selectedFilterValues.Add(Value);
             }
             
-            // Also select null if blank option should be shown
             if (ShouldShowBlankOption())
             {
                 selectedFilterValues.Add(null);
@@ -173,8 +180,6 @@ public partial class CellMenu : ComponentBase
         {
             selectedFilterValues.Remove(value);
         }
-        
-        StateHasChanged();
     }
 
     private bool IsValueSelected(object value)
@@ -186,9 +191,11 @@ public partial class CellMenu : ComponentBase
     {
         var availableValues = LoadAvailableValues();
         var showBlank = ShouldShowBlankOption();
-        
-        if (!availableValues.Any() && !showBlank)
+
+        if (availableValues.Count == 0 && !showBlank)
+        {
             return false;
+        }
 
         var totalItems = availableValues.Count + (showBlank ? 1 : 0);
         var selectedCount = availableValues.Count(v => selectedFilterValues.Contains(v.Value));
@@ -198,13 +205,13 @@ public partial class CellMenu : ComponentBase
         {
             selectedCount++;
         }
-        
-        if (selectedCount == 0)
-            return false;
-        else if (selectedCount == totalItems)
-            return true;
-        else
-            return null; // Indeterminate state
+
+        return selectedCount switch
+        {
+            0 => false, // No items selected
+            var count when count == totalItems => true, // All items selected
+            _ => null // Indeterminate state
+        };
     }
 
     private void OnSelectAllChanged(bool? isChecked)
@@ -212,19 +219,13 @@ public partial class CellMenu : ComponentBase
         var availableValues = LoadAvailableValues();
         var showBlank = ShouldShowBlankOption();
         
-        // For tristate checkbox behavior:
-        // - When indeterminate (null) and clicked -> becomes checked (true) -> select all
-        // - When checked (true) and clicked -> becomes unchecked (false) -> deselect all
-        // - When unchecked (false) and clicked -> becomes checked (true) -> select all
         if (isChecked != false)
         {
-            // Select all values
-            foreach (var value in availableValues)
+            foreach (var (_, Value) in availableValues)
             {
-                selectedFilterValues.Add(value.Value);
+                selectedFilterValues.Add(Value);
             }
             
-            // Also select blank if it should be shown
             if (showBlank)
             {
                 selectedFilterValues.Add(null);
@@ -232,19 +233,14 @@ public partial class CellMenu : ComponentBase
         }
         else if (isChecked == false)
         {
-            // Deselect all values
-            foreach (var value in availableValues)
+
+            foreach (var (_, Value) in availableValues)
             {
-                selectedFilterValues.Remove(value.Value);
+                selectedFilterValues.Remove(Value);
             }
             
-            // Also deselect blank
             selectedFilterValues.Remove(null);
         }
-        // Note: isChecked == null (indeterminate) should not happen in the Change event
-        // as clicking indeterminate should transition to true
-        
-        StateHasChanged();
     }
 
     private bool ShouldShowBlankOption()
@@ -299,15 +295,13 @@ public partial class CellMenu : ComponentBase
         {
             selectedFilterValues.Remove(null);
         }
-        
-        StateHasChanged();
     }
 
     private async Task OnApplyFilterAsync()
     {
         SheetFilter? filter = null;
         
-        if (selectedFilterValues.Any())
+        if (selectedFilterValues.Count != 0)
         {
             var dataTable = GetCurrentDataTable();
             var autoFilter = GetCurrentAutoFilter();
@@ -350,7 +344,7 @@ public partial class CellMenu : ComponentBase
 
     private bool CanApplyFilter()
     {
-        return selectedFilterValues.Any();
+        return selectedFilterValues.Count != 0;
     }
 
     private List<(string Text, object? Value)> LoadAvailableValues()
