@@ -1,26 +1,26 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Radzen.Blazor.Rendering
 <ul class="rz-menu rz-spreadsheet-cell-menu">
-    <ChevronItem Text="Sort A to Z" Icon="sort" Click=@OnSortAscendingAsync />
-    <ChevronItem Text="Sort Z to A" Icon="sort" Click=@OnSortDescendingAsync />
+    <CellMenuItem Text="Sort A to Z" Icon="sort" Click=@OnSortAscendingAsync />
+    <CellMenuItem Text="Sort Z to A" Icon="sort" Click=@OnSortDescendingAsync />
     <div class="rz-spreadsheet-cell-menu-filter">
-        <ChevronItem>
+        <CellMenuItem>
             <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" />
             <RadzenLabel Text="(Select All)" />
-        </ChevronItem>
+        </CellMenuItem>
         @foreach (var item in LoadAvailableValues())
         {
-            <ChevronItem>
+            <CellMenuItem>
                 <RadzenCheckBox TValue="bool" Value=@IsValueSelected(item.Value) Change=@(isChecked => OnValueSelectionChanged(item.Value, isChecked)) />
                 <RadzenLabel Text=@item.Text />
-            </ChevronItem>
+            </CellMenuItem>
         }
         @if (ShouldShowBlankOption())
         {
-            <ChevronItem>
+            <CellMenuItem>
                 <RadzenCheckBox TValue="bool" Value=@IsBlankSelected() Change=@OnBlankSelectionChanged />
                 <RadzenLabel Text="(Blank)" />
-            </ChevronItem>
+            </CellMenuItem>
         }
     </div>
     <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End">
