@@ -29,10 +29,19 @@ Any questions concerning the use or status of this file should be directed to in
 .rz-spreadsheet-cell-popup {
     display: none;
     position: absolute;
+    width: 300px;
 }
 
 .rz-spreadsheet-cell-chevron {
     position: absolute;
     right: 0;
     bottom: 0;
+}
+
+.rz-spreadsheet-cell-menu-filter {
+    flex: 1;
+    height: 200px;
+    overflow-y: auto;
+    padding-block: var(--rz-menu-item-padding-block);
+    padding-inline: var(--rz-menu-item-padding-inline);
 }
