@@ -1,0 +1,115 @@
+@using Radzen.Blazor.Spreadsheet
+@implements IDisposable
+
+<RadzenToggleButton @bind-Value=@IsAutoFilterEnabled Icon="filter_list" Disabled=@IsDisabled ButtonStyle="ButtonStyle.Base" />
+
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsAutoFilterEnabled
+    {
+        get
+        {
+            if (Sheet == null) return false;
+
+            // Check if we're in a data table
+            var dataTable = GetCurrentDataTable();
+            if (dataTable != null)
+            {
+                return dataTable.ShowFilterButton;
+            }
+
+            // Check if sheet has auto filter
+            return Sheet.AutoFilter != null;
+        }
+        set
+        {
+            if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
+            {
+                // Check if we're in a data table
+                var dataTable = GetCurrentDataTable();
+                if (dataTable != null)
+                {
+                    var dataTableIndex = GetDataTableIndex(dataTable);
+                    if (dataTableIndex >= 0)
+                    {
+                        var command = new DataTableFilterCommand(Sheet, dataTableIndex);
+                        Sheet.Commands.Execute(command);
+                    }
+                }
+                else
+                {
+                    // Apply to sheet selection range
+                    var command = new SheetAutoFilterCommand(Sheet, Sheet.Selection.Range);
+                    Sheet.Commands.Execute(command);
+                }
+            }
+        }
+    }
+
+    private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
+
+    private DataTable? GetCurrentDataTable()
+    {
+        if (Sheet?.DataTables == null) return null;
+
+        var selectedCell = Sheet.Selection.Cell;
+        if (selectedCell == CellRef.Invalid) return null;
+
+        foreach (var dataTable in Sheet.DataTables)
+        {
+            if (dataTable.Range.Contains(selectedCell.Row, selectedCell.Column))
+            {
+                return dataTable;
+            }
+        }
+
+        return null;
+    }
+
+    private int GetDataTableIndex(DataTable dataTable)
+    {
+        if (Sheet?.DataTables == null) return -1;
+
+        for (int i = 0; i < Sheet.DataTables.Count; i++)
+        {
+            if (Sheet.DataTables[i] == dataTable)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    public override async Task SetParametersAsync(ParameterView parameters)
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+
+        await base.SetParametersAsync(parameters);
+
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed += OnSelectionChanged;
+        }
+    }
+
+    private void OnSelectionChanged()
+    {
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        if (Sheet?.Selection != null)
+        {
+            Sheet.Selection.Changed -= OnSelectionChanged;
+        }
+    }
+} 
