@@ -323,6 +323,11 @@ public partial class Sheet
     /// </summary>
     public event Action? AutoFilterChanged;
 
+    internal void OnAutoFilterChanged()
+    {
+        AutoFilterChanged?.Invoke();
+    }
+
     /// <summary>
     /// Gets or sets the range for the auto filter applied to the sheet.
     /// </summary>
@@ -335,7 +340,7 @@ public partial class Sheet
             {
                 autoFilter = value;
 
-                AutoFilterChanged?.Invoke();
+                OnAutoFilterChanged();
             }
         }
     }

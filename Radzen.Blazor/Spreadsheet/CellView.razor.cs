@@ -79,6 +79,7 @@ public partial class CellView : CellBase, IDisposable
     public EventCallback<CellMenuToggleEventArgs> Toggle { get; set; }
 
     private RadzenButton? cellMenuButton;
+    private bool showCellMenu;
 
     private string Class => ClassList.Create("rz-spreadsheet-cell")
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
@@ -87,32 +88,29 @@ public partial class CellView : CellBase, IDisposable
 
     private Cell cell = default!;
 
-    private bool ShouldShowCellMenu
+    private bool ShowCellMenu()
     {
-        get
+        if (Sheet?.DataTables != null)
         {
-            if (Sheet?.DataTables != null)
+            foreach (var dataTable in Sheet.DataTables)
             {
-                foreach (var dataTable in Sheet.DataTables)
+                if (Column >= dataTable.Range.Start.Column &&
+                    Column <= dataTable.Range.End.Column)
                 {
-                    if (Column >= dataTable.Range.Start.Column &&
-                        Column <= dataTable.Range.End.Column)
-                    {
-                        return Row == dataTable.Start.Row;
-                    }
+                    return Row == dataTable.Start.Row && dataTable.ShowFilterButton;
                 }
             }
-
-            if (Sheet?.AutoFilter != null)
-            {
-                if (Column >= Sheet.AutoFilter.Range.Start.Column && Column <= Sheet.AutoFilter.Range.End.Column)
-                {
-                    return Row == Sheet.AutoFilter.Start.Row;
-                }
-            }
-
-            return false;
         }
+
+        if (Sheet?.AutoFilter != null)
+        {
+            if (Column >= Sheet.AutoFilter.Range.Start.Column && Column <= Sheet.AutoFilter.Range.End.Column)
+            {
+                return Row == Sheet.AutoFilter.Start.Row;
+            }
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>
@@ -146,6 +144,11 @@ public partial class CellView : CellBase, IDisposable
         var didColumnChange = parameters.TryGetValue<int>(nameof(Column), out var column) && Column != column;
         var didSheetChange = parameters.TryGetValue<Sheet>(nameof(Sheet), out var sheet) && Sheet != sheet;
 
+        if (Sheet != null)
+        {
+            Sheet.AutoFilterChanged -= OnAutoFilterChanged;
+        }
+
         await base.SetParametersAsync(parameters);
 
         if (didRowChange || didColumnChange || didSheetChange)
@@ -155,8 +158,18 @@ public partial class CellView : CellBase, IDisposable
                 cell.Changed -= OnCellChanged;
             }
 
-            cell = Sheet.Cells[Row, Column];
-            cell.Changed += OnCellChanged;
+            if (Sheet != null)
+            {
+                cell = Sheet.Cells[Row, Column];
+                cell.Changed += OnCellChanged;
+            }
+
+            showCellMenu = ShowCellMenu();
+        }
+
+        if (Sheet != null)
+        {
+            Sheet.AutoFilterChanged += OnAutoFilterChanged;
         }
     }
 
@@ -164,6 +177,16 @@ public partial class CellView : CellBase, IDisposable
     {
         //Console.WriteLine($"Cell {Row}:{Column} changed: {cell.Value}");
         StateHasChanged();
+    }
+
+    private void OnAutoFilterChanged()
+    {
+        var show = ShowCellMenu();
+        if (showCellMenu != show)
+        {
+            showCellMenu = show;
+            StateHasChanged();
+        }
     }
 
     /// <inheritdoc/>
@@ -182,6 +205,11 @@ public partial class CellView : CellBase, IDisposable
         if (cell != null)
         {
             cell.Changed -= OnCellChanged;
+        }
+        
+        if (Sheet != null)
+        {
+            Sheet.AutoFilterChanged -= OnAutoFilterChanged;
         }
     }
 }
