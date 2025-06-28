@@ -367,9 +367,49 @@ public partial class Sheet
         ApplyFilters();
     }
 
+    /// <summary>
+    /// Removes a specific filter from the sheet.
+    /// </summary>
+    /// <param name="filter">The filter to remove.</param>
+    /// <returns>True if the filter was found and removed; otherwise, false.</returns>
+    public bool RemoveFilter(SheetFilter filter)
+    {
+        if (filter == null)
+        {
+            throw new ArgumentNullException(nameof(filter));
+        }
+
+        var removed = filters.Remove(filter);
+
+        if (removed)
+        {
+            ApplyFilters();
+        }
+
+        return removed;
+    }
+
+    /// <summary>
+    /// Removes a filter from the sheet at the specified index.
+    /// </summary>
+    /// <param name="index">The index of the filter to remove.</param>
+    public void RemoveFilterAt(int index)
+    {
+        if (index < 0 || index >= filters.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        filters.RemoveAt(index);
+
+        ApplyFilters();
+    }
+
     private void ApplyFilters()
     {
         Rows.BeginUpdate();
+
+        Rows.ShowAll();
 
         foreach (var filter in filters)
         {
@@ -379,27 +419,19 @@ public partial class Sheet
         Rows.EndUpdate();
     }
 
-    internal void Filter(RangeRef range, FilterCriterion criterion)
+    private void Filter(RangeRef range, FilterCriterion criterion)
     {
         if (range == RangeRef.Invalid)
         {
             return;
         }
 
-        Rows.BeginUpdate();
-
         for (var row = range.Start.Row; row <= range.End.Row; row++)
         {
-            if (criterion.Matches(this, row))
-            {
-                Rows.Show(row);
-            }
-            else
+            if (!criterion.Matches(this, row))
             {
                 Rows.Hide(row);
             }
         }
-
-        Rows.EndUpdate();
     }
 }
