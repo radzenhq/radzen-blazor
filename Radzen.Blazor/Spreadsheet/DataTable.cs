@@ -1,21 +1,45 @@
-using System;
-
 namespace Radzen.Blazor.Spreadsheet;
 
 /// <summary>
 /// Represents a data table in a spreadsheet, defined by a range.
-/// Tables are used to organize and manage data within a specific range of cells.
-/// A data table can be used to apply styles, formatting, and other operations on the specified range.
 /// </summary>
-public class DataTable(Sheet sheet, RangeRef range)
+public class DataTable(Sheet sheet, RangeRef range) : AutoFilter(sheet, range)
 {
     /// <summary>
-    /// Gets the range that defines the data table.
+    /// Sorts the data table order based on the specified column index.
     /// </summary>
-    public RangeRef Range { get; } = range;
+    public void Sort(SortOrder order, int column)
+    {
+        Sheet.Sort(Range, order, column - Range.Start.Column);
+    }
+}
+
+/// <summary>
+/// Represents an auto filter applied to a range in a spreadsheet.
+/// </summary>
+public class AutoFilter
+{
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AutoFilter"/> class.
+    /// </summary>
+    public AutoFilter(Sheet sheet, RangeRef range)
+    {
+        Sheet = sheet;
+        Range = range;
+    }
 
     /// <summary>
-    /// Gets the first visible cell reference in the data table range.
+    /// Gets the sheet to which the auto filter is applied.
+    /// </summary>
+    public Sheet Sheet { get; }
+
+    /// <summary>
+    /// Gets the range of the filter
+    /// </summary>
+    public RangeRef Range { get; }
+
+    /// <summary>
+    /// Gets the first visible cell reference in the range.
     /// </summary>
     public CellRef Start
     {
@@ -24,7 +48,7 @@ public class DataTable(Sheet sheet, RangeRef range)
             // Find the first visible row in the data table range
             for (int row = Range.Start.Row; row <= Range.End.Row; row++)
             {
-                if (!sheet.Rows.IsHidden(row))
+                if (!Sheet.Rows.IsHidden(row))
                 {
                     return new CellRef(row, Range.Start.Column);
                 }
@@ -33,13 +57,5 @@ public class DataTable(Sheet sheet, RangeRef range)
             // If all rows are hidden, return the original start
             return Range.Start;
         }
-    }
-
-    /// <summary>
-    /// Sorts the data table in ascending order based on the specified column index.
-    /// </summary>
-    public void Sort(SortOrder order, int column)
-    {
-        sheet.Sort(Range, order, column - Range.Start.Column);
     }
 }

@@ -316,6 +316,30 @@ public class IsNullCriterion : FilterCriterionLeaf
 
 public partial class Sheet
 {
+    private AutoFilter? autoFilter;
+
+    /// <summary>
+    /// Gets or sets the range for the auto filter applied to the sheet.
+    /// </summary>
+    public event Action? AutoFilterChanged;
+
+    /// <summary>
+    /// Gets or sets the range for the auto filter applied to the sheet.
+    /// </summary>
+    public AutoFilter? AutoFilter
+    {
+        get => autoFilter;
+        set
+        {
+            if (autoFilter != value)
+            {
+                autoFilter = value;
+
+                AutoFilterChanged?.Invoke();
+            }
+        }
+    }
+
     private readonly List<SheetFilter> filters = [];
 
     /// <summary>
