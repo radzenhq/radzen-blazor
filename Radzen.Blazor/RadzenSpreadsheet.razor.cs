@@ -110,6 +110,46 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
+    private async Task OnCellMenuSortAscendingAsync()
+    {
+        if (Sheet != null)
+        {
+            foreach (var dataTable in Sheet.DataTables)
+            {
+                if (dataTable.Range.Contains(cellMenuRow, cellMenuColumn))
+                {
+                    dataTable.Sort(SortOrder.Ascending, cellMenuColumn);
+                    break;
+                }
+            }
+        }
+
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
+    }
+
+    private async Task OnCellMenuSortDescendingAsync()
+    {
+        if (Sheet != null)
+        {
+            foreach (var dataTable in Sheet.DataTables)
+            {
+                if (dataTable.Range.Contains(cellMenuRow, cellMenuColumn))
+                {
+                    dataTable.Sort(SortOrder.Descending, cellMenuColumn);
+                    break;
+                }
+            }
+        }
+
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
+    }
+
     private async Task MoveSelectionAsync(int rowOffset, int columnOffset)
     {
         if (Sheet is not null)
