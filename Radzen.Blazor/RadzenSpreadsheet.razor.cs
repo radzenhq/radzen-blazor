@@ -124,7 +124,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 if (dataTable.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    dataTable.Sort(SortOrder.Ascending, cellMenuColumn);
+                    var command = new DataTableSortCommand(Sheet, dataTable.Range, SortOrder.Ascending, cellMenuColumn);
+                    Sheet.Commands.Execute(command);
                     break;
                 }
             }
@@ -144,7 +145,8 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             {
                 if (dataTable.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    dataTable.Sort(SortOrder.Descending, cellMenuColumn);
+                    var command = new DataTableSortCommand(Sheet, dataTable.Range, SortOrder.Descending, cellMenuColumn);
+                    Sheet.Commands.Execute(command);
                     break;
                 }
             }
