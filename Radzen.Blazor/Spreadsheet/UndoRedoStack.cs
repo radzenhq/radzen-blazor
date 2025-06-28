@@ -84,7 +84,14 @@ public class UndoRedoStack
         if (redoStack.Count > 0)
         {
             var command = redoStack.Pop();
-            Execute(command);
+            var result = command.Execute();
+
+            if (result)
+            {
+                undoStack.Push(command);
+            }
+
+            Changed?.Invoke();
         }
     }
 }

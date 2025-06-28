@@ -221,6 +221,18 @@ public class Axis(double defaultValue, int count)
     }
 
     /// <summary>
+    /// Shows all hidden indices in the axis.
+    /// </summary>
+    public void ShowAll()
+    {
+        if (hidden.Count > 0)
+        {
+            hidden.Clear();
+            TriggerChange();
+        }
+    }
+
+    /// <summary>
     /// Gets or sets the size of the axis at the specified index.
     /// </summary>
     public double this[int index]
