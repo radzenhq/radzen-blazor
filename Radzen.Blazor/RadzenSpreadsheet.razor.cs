@@ -120,14 +120,22 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (Sheet != null)
         {
+            // Check if we're in a data table
             foreach (var dataTable in Sheet.DataTables)
             {
                 if (dataTable.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    var command = new DataTableSortCommand(Sheet, dataTable.Range, SortOrder.Ascending, cellMenuColumn);
+                    var command = new SortCommand(Sheet, dataTable.Range, SortOrder.Ascending, cellMenuColumn);
                     Sheet.Commands.Execute(command);
                     break;
                 }
+            }
+
+            // Check if we're in an auto filter
+            if (Sheet.AutoFilter != null && Sheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
+            {
+                var command = new SortCommand(Sheet, Sheet.AutoFilter.Range, SortOrder.Ascending, cellMenuColumn, skipHeaderRow: true);
+                Sheet.Commands.Execute(command);
             }
         }
 
@@ -141,14 +149,22 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     {
         if (Sheet != null)
         {
+            // Check if we're in a data table
             foreach (var dataTable in Sheet.DataTables)
             {
                 if (dataTable.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    var command = new DataTableSortCommand(Sheet, dataTable.Range, SortOrder.Descending, cellMenuColumn);
+                    var command = new SortCommand(Sheet, dataTable.Range, SortOrder.Descending, cellMenuColumn);
                     Sheet.Commands.Execute(command);
                     break;
                 }
+            }
+
+            // Check if we're in an auto filter
+            if (Sheet.AutoFilter != null && Sheet.AutoFilter.Range.Contains(cellMenuRow, cellMenuColumn))
+            {
+                var command = new SortCommand(Sheet, Sheet.AutoFilter.Range, SortOrder.Descending, cellMenuColumn, skipHeaderRow: true);
+                Sheet.Commands.Execute(command);
             }
         }
 
