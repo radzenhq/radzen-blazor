@@ -40,7 +40,7 @@ public partial class CellMenu : ComponentBase
     /// Invoked the user clicks the apply button in the cell menu.
     /// </summary>
     [Parameter]
-    public EventCallback Apply { get; set; }
+    public EventCallback<SheetFilter?> Apply { get; set; }
 
     /// <summary>
     /// Invoked when the user clicks the sort ascending option in the cell menu.
@@ -305,6 +305,8 @@ public partial class CellMenu : ComponentBase
 
     private async Task OnApplyFilterAsync()
     {
+        SheetFilter? filter = null;
+        
         if (selectedFilterValues.Any())
         {
             var dataTable = GetCurrentDataTable();
@@ -332,7 +334,7 @@ public partial class CellMenu : ComponentBase
                     new CellRef(rangeToUse.End.Row, Column)
                 );
 
-                var filter = new SheetFilter(
+                filter = new SheetFilter(
                     new InListCriterion
                     {
                         Column = Column,
@@ -340,12 +342,10 @@ public partial class CellMenu : ComponentBase
                     },
                     columnRange
                 );
-
-                Sheet.AddFilter(filter);
             }
         }
 
-        await Apply.InvokeAsync();
+        await Apply.InvokeAsync(filter);
     }
 
     private bool CanApplyFilter()

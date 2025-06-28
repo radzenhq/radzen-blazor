@@ -102,8 +102,13 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private async Task OnCellMenuApplyAsync()
+    private async Task OnCellMenuApplyAsync(SheetFilter? filter)
     {
+        if (filter != null && Sheet != null)
+        {
+            Sheet.AddFilter(filter);
+        }
+
         if (cellMenuPopup != null)
         {
             await cellMenuPopup.CloseAsync();
