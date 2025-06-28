@@ -42,6 +42,18 @@ public partial class CellMenu : ComponentBase
     [Parameter]
     public EventCallback Apply { get; set; }
 
+    /// <summary>
+    /// Invoked when the user clicks the sort ascending option in the cell menu.
+    /// </summary>
+    [Parameter]
+    public EventCallback SortAscending { get; set; }
+
+    /// <summary>
+    /// Invoked when the user clicks the sort descending option in the cell menu.
+    /// </summary>
+    [Parameter]
+    public EventCallback SortDescending { get; set; }
+
     private readonly HashSet<object?> selectedFilterValues = [];
 
     /// <inheritdoc />
@@ -136,28 +148,14 @@ public partial class CellMenu : ComponentBase
         }
     }
 
-    private void OnSortAscendingAsync()
+    private async Task OnSortAscendingAsync()
     {
-        foreach (var dataTable in Sheet.DataTables)
-        {
-            if (dataTable.Range.Contains(Row, Column))
-            {
-                dataTable.Sort(SortOrder.Ascending, Column);
-                break;
-            }
-        }
+        await SortAscending.InvokeAsync();
     }
 
-    private void OnSortDescendingAsync()
+    private async Task OnSortDescendingAsync()
     {
-        foreach (var dataTable in Sheet.DataTables)
-        {
-            if (dataTable.Range.Contains(Row, Column))
-            {
-                dataTable.Sort(SortOrder.Descending, Column);
-                break;
-            }
-        }
+        await SortDescending.InvokeAsync();
     }
 
     private async Task OnCancelFilterAsync()
