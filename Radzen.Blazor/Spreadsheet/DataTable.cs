@@ -5,6 +5,24 @@ namespace Radzen.Blazor.Spreadsheet;
 /// </summary>
 public class DataTable(Sheet sheet, RangeRef range) : AutoFilter(sheet, range)
 {
+    private bool showFilterButton = true;
+
+    /// <summary>
+    /// Gets or sets whether to show the filter button for this data table.
+    /// </summary>
+    public bool ShowFilterButton
+    {
+        get => showFilterButton;
+        set
+        {
+            if (showFilterButton != value)
+            {
+                showFilterButton = value;
+                Sheet.OnAutoFilterChanged();
+            }
+        }
+    }
+
     /// <summary>
     /// Sorts the data table order based on the specified column index.
     /// </summary>
