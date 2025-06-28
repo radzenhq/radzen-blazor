@@ -3,10 +3,10 @@ using Xunit;
 
 namespace Radzen.Blazor.Spreadsheet.Tests;
 
-public class DataTableSortCommandTests
+public class SortCommandTests
 {
     [Fact]
-    public void DataTableSortCommand_ShouldSortDataInAscendingOrder()
+    public void SortCommand_ShouldSortDataInAscendingOrder()
     {
         // Arrange
         var sheet = new Sheet(5, 5);
@@ -17,7 +17,7 @@ public class DataTableSortCommandTests
         sheet.Cells["A2"].Value = "Alice";
         sheet.Cells["A3"].Value = "Bob";
         
-        var command = new DataTableSortCommand(sheet, range, SortOrder.Ascending, 0);
+        var command = new SortCommand(sheet, range, SortOrder.Ascending, 0);
         
         // Act
         var result = command.Execute();
@@ -30,7 +30,7 @@ public class DataTableSortCommandTests
     }
     
     [Fact]
-    public void DataTableSortCommand_ShouldSortDataInDescendingOrder()
+    public void SortCommand_ShouldSortDataInDescendingOrder()
     {
         // Arrange
         var sheet = new Sheet(5, 5);
@@ -41,7 +41,7 @@ public class DataTableSortCommandTests
         sheet.Cells["A2"].Value = "Bob";
         sheet.Cells["A3"].Value = "Charlie";
         
-        var command = new DataTableSortCommand(sheet, range, SortOrder.Descending, 0);
+        var command = new SortCommand(sheet, range, SortOrder.Descending, 0);
         
         // Act
         var result = command.Execute();
@@ -54,7 +54,7 @@ public class DataTableSortCommandTests
     }
     
     [Fact]
-    public void DataTableSortCommand_ShouldRestoreOriginalOrderWhenUndone()
+    public void SortCommand_ShouldRestoreOriginalOrderWhenUndone()
     {
         // Arrange
         var sheet = new Sheet(5, 5);
@@ -65,7 +65,7 @@ public class DataTableSortCommandTests
         sheet.Cells["A2"].Value = "Alice";
         sheet.Cells["A3"].Value = "Bob";
         
-        var command = new DataTableSortCommand(sheet, range, SortOrder.Ascending, 0);
+        var command = new SortCommand(sheet, range, SortOrder.Ascending, 0);
         
         // Act
         command.Execute();
@@ -78,11 +78,11 @@ public class DataTableSortCommandTests
     }
     
     [Fact]
-    public void DataTableSortCommand_ShouldReturnFalseForInvalidRange()
+    public void SortCommand_ShouldReturnFalseForInvalidRange()
     {
         // Arrange
         var sheet = new Sheet(5, 5);
-        var command = new DataTableSortCommand(sheet, RangeRef.Invalid, SortOrder.Ascending, 0);
+        var command = new SortCommand(sheet, RangeRef.Invalid, SortOrder.Ascending, 0);
         
         // Act
         var result = command.Execute();
@@ -92,7 +92,7 @@ public class DataTableSortCommandTests
     }
     
     [Fact]
-    public void DataTableSortCommand_ShouldPreserveCellFormatting()
+    public void SortCommand_ShouldPreserveCellFormatting()
     {
         // Arrange
         var sheet = new Sheet(5, 5);
@@ -104,7 +104,7 @@ public class DataTableSortCommandTests
         sheet.Cells["A2"].Value = "Alice";
         sheet.Cells["A2"].Format.Italic = true;
         
-        var command = new DataTableSortCommand(sheet, range, SortOrder.Ascending, 0);
+        var command = new SortCommand(sheet, range, SortOrder.Ascending, 0);
         
         // Act
         command.Execute();
@@ -115,5 +115,33 @@ public class DataTableSortCommandTests
         Assert.True(sheet.Cells["A1"].Format.Bold);
         Assert.Equal("Alice", sheet.Cells["A2"].Value);
         Assert.True(sheet.Cells["A2"].Format.Italic);
+    }
+
+    [Fact]
+    public void SortCommand_ShouldWorkWithAutoFilterRange()
+    {
+        // Arrange
+        var sheet = new Sheet(5, 5);
+        var range = RangeRef.Parse("A1:B3");
+        
+        // Set up test data in a format similar to AutoFilter
+        sheet.Cells["A1"].Value = "Name";
+        sheet.Cells["B1"].Value = "Age";
+        sheet.Cells["A2"].Value = "Charlie";
+        sheet.Cells["B2"].Value = 30;
+        sheet.Cells["A3"].Value = "Alice";
+        sheet.Cells["B3"].Value = 25;
+        
+        var command = new SortCommand(sheet, range, SortOrder.Ascending, 0, skipHeaderRow: true);
+        
+        // Act
+        var result = command.Execute();
+        
+        // Assert
+        Assert.True(result);
+        Assert.Equal("Alice", sheet.Cells["A2"].Value);
+        Assert.Equal(25.0, sheet.Cells["B2"].Value);
+        Assert.Equal("Charlie", sheet.Cells["A3"].Value);
+        Assert.Equal(30.0, sheet.Cells["B3"].Value);
     }
 } 
