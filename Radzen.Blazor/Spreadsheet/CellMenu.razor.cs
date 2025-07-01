@@ -401,7 +401,7 @@ public partial class CellMenu : ComponentBase
 
                 var cell = Sheet.Cells[row, Column];
                 var value = cell.Value;
-                var text = cell.GetValue();
+                var text = cell.GetValueAsString();
 
                 if (!string.IsNullOrEmpty(text))
                 {
