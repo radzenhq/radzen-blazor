@@ -159,6 +159,20 @@ public class Cell
     }
 
     /// <summary>
+    /// Gets the value of the cell as a string.
+    /// </summary>
+    public string? GetValueAsString()
+    {
+        return value switch
+        {
+            null => null,
+            CellError error => error.ToString(),
+            string str => str,
+            _ => value.ToString()
+        };
+    }
+
+    /// <summary>
     /// Sets the value of the cell based on a string input.
     /// If the string starts with '=', it is treated as a formula.
     /// Otherwise, it attempts to parse the string as a number or keeps it as a string.
