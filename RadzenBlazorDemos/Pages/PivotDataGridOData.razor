@@ -1,0 +1,156 @@
+@using RadzenBlazorDemos.Models.Northwind
+
+@inject HttpClient httpClient
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenSwitch @bind-Value=@showColumnsTotals Name="ShowColumnsTotals" TValue="bool" />
+        <RadzenLabel Text="Show columns totals" Component="ShowColumnsTotals" />
+        <RadzenSwitch @bind-Value=@showRowsTotals Name="ShowRowsTotals" TValue="bool" />
+        <RadzenLabel Text="Show rows totals" Component="ShowRowsTotals" />
+        <RadzenSwitch @bind-Value=@allowDrillDown Name="AllowDrillDown" TValue="bool" />
+        <RadzenLabel Text="Allow drill-down" Component="AllowDrillDown" />
+        <RadzenSwitch @bind-Value=@allowPaging Name="AllowPaging" TValue="bool" />
+        <RadzenLabel Text="AllowPaging" Component="AllowPaging" />
+        <RadzenDropDown @bind-Value="@pagerPosition" Visible="@allowPaging" TextProperty="Text" Name="PagerPosition" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenPivotDataGrid @ref=pivot IsLoading="@isLoading" Data=@salesData Count="@count" LoadData="@LoadData" TItem="SalesData" 
+                     AllowPaging="@allowPaging" PagerPosition="@pagerPosition" 
+                     AllowFieldsPicking="true" AllowFiltering="true" AllowSorting="true"
+                     ShowColumnsTotals="@showColumnsTotals" ShowRowsTotals="@showRowsTotals" AllowDrillDown="@allowDrillDown"
+                     GridLines="Radzen.DataGridGridLines.Default" AllowAlternatingRows="true">
+    <Columns>
+        <RadzenPivotColumn TItem="SalesData" Property="OrderYear" Title="Order Year" Width="150px" />
+        <RadzenPivotColumn TItem="SalesData" Property="ShipCountry" Title="Ship Country" Width="150px" />
+    </Columns>
+    <Rows>
+        <RadzenPivotRow TItem="SalesData" Property="CategoryName" Title="Product Category" />
+        <RadzenPivotRow TItem="SalesData" Property="ProductName" Title="Product" />
+    </Rows>
+    <Aggregates>
+        <RadzenPivotAggregate TItem="SalesData" Property="TotalAmount" Title="Total Sales"
+                              Aggregate="AggregateFunction.Sum" FormatString="{0:C}">
+            <RowTotalTemplate>
+                Total: <PivotDataGridODataAggregateValue TItem="SalesData" Context="context" />
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+        <RadzenPivotAggregate TItem="SalesData" Property="Quantity" Title="Quantity Sold"
+                              Aggregate="AggregateFunction.Sum">
+            <Template>
+                Qty: @(context ?? 0)
+            </Template>
+            <ColumnTotalTemplate>
+                Total: @(context ?? 0)
+            </ColumnTotalTemplate>
+            <RowTotalTemplate>
+                Total: <PivotDataGridODataAggregateValue TItem="SalesData" Context="context" />
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+        <RadzenPivotAggregate TItem="SalesData" Property="UnitPrice" Title="Average Unit Price"
+                              Aggregate="AggregateFunction.Average" FormatString="{0:C}">
+            <RowTotalTemplate>
+                Avg: <PivotDataGridODataAggregateValue TItem="SalesData" Context="context" />
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+        <RadzenPivotAggregate TItem="SalesData" Property="Discount" Title="Average Discount"
+                              Aggregate="AggregateFunction.Average" FormatString="{0:P}">
+            <RowTotalTemplate>
+                Avg: <PivotDataGridODataAggregateValue TItem="SalesData" Context="context" />
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+    </Aggregates>
+</RadzenPivotDataGrid>
+
+@code {
+    RadzenPivotDataGrid<SalesData> pivot;
+    int count;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+        await Task.Yield();
+
+        var result = await GetOrderDetails(top: args.Top, skip: args.Skip, 
+            orderby: GetODataSubProperties(args.OrderBy), 
+            filter: GetODataSubProperties(args.Filter),
+            expand: "NorthwindOrder,NorthwindProduct($expand=Category)", 
+            count: true);
+
+        salesData = result.Value.Select(od => new SalesData
+            {
+                CategoryName = od.Product.Category.CategoryName,
+                ProductName = od.Product.ProductName,
+                OrderYear = od.Order.OrderDate.HasValue ? od.Order.OrderDate.Value.Year : 0,
+                OrderMonth = od.Order.OrderDate.HasValue ? od.Order.OrderDate.Value.Month : 0,
+                ShipCountry = od.Order.ShipCountry,
+                UnitPrice = od.UnitPrice,
+                Quantity = od.Quantity,
+                Discount = od.Discount,
+                TotalAmount = (od.UnitPrice ?? 0) * (od.Quantity ?? 0) * (double)(1 - (od.Discount ?? 0))
+            }).AsODataEnumerable();
+
+        count = result.Count;
+
+        isLoading = false;
+    }
+
+    public async Task<ODataServiceResult<Order_Detail>> GetOrderDetails(string filter = default(string), int? top = default(int?), int? skip = default(int?), string orderby = default(string), string expand = default(string), string select = default(string), string apply = default(string), bool? count = default(bool?))
+    {
+        var uri = new Uri("https://services.radzen.com/odata/Northwind/NorthwindOrderDetails/");
+        uri = uri.GetODataUri(filter: filter, top: top, skip: skip, orderby: orderby, expand: expand, select: select, apply: apply, count: count);
+
+        var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
+
+        var response = await httpClient.SendAsync(httpRequestMessage);
+
+        return await response.ReadAsync<ODataServiceResult<Order_Detail>>();
+    }
+
+    string GetODataSubProperties(string value)
+    {
+        return value?
+        .Replace("CategoryName", "NorthwindProduct/Category/CategoryName")?
+        .Replace("ProductName", "NorthwindProduct/ProductName")?
+        .Replace("OrderYear", "NorthwindOrder/OrderYear")?
+        .Replace("OrderMonth", "NorthwindOrder/OrderMonth")?
+        .Replace("ShipCountry", "NorthwindOrder/ShipCountry");
+    }
+
+    bool isLoading;
+    bool allowDrillDown;
+    bool showColumnsTotals;
+    bool showRowsTotals;
+    bool allowPaging = true;
+    PagerPosition pagerPosition = PagerPosition.Bottom;
+
+    private ODataEnumerable<SalesData> salesData;
+
+    public class SalesData
+    {
+        public string CategoryName { get; set; }
+        public string ProductName { get; set; }
+        public int OrderYear { get; set; }
+        public int OrderMonth { get; set; }
+        public string ShipCountry { get; set; }
+        public double? UnitPrice { get; set; }
+        public short? Quantity { get; set; }
+        public float? Discount { get; set; }
+        public double? TotalAmount { get; set; }
+    }
+
+    public partial class Order_Detail
+    {
+        public Order Order => NorthwindOrder;
+        public Product Product => NorthwindProduct;
+        public int OrderID { get; set; }
+        public Order NorthwindOrder { get; set; }
+        public int ProductID { get; set; }
+        public Product NorthwindProduct { get; set; }
+        public double? UnitPrice { get; set; }
+        public short? Quantity { get; set; }
+        public float? Discount { get; set; }
+    }
+}
