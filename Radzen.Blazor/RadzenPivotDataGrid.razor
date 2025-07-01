@@ -1,0 +1,163 @@
+@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Forms
+@using Radzen
+@typeparam TItem
+@inherits PagedDataBoundComponent<TItem>
+
+@functions {
+    private bool IsRowHeaderExpanded(int level, List<string> parentValues)
+    {
+        if (level == 0) return true;
+        var pathKey = string.Join("|", parentValues);
+        return !_collapsedRowGroups.ContainsKey(pathKey) || !_collapsedRowGroups[pathKey];
+    }
+}
+
+<CascadingValue Value=this>
+@if (Columns != null)
+{
+    @Columns
+}
+@if (Rows != null)
+{
+    @Rows
+}
+@if (Aggregates != null)
+{
+    @Aggregates
+}
+</CascadingValue>
+
+@if (Visible)
+{
+    <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-pivot-data-grid @GetCssClass()" id="@GetId()" tabindex=0>
+        
+         @if (AllowPaging && PagerPosition.HasFlag(PagerPosition.Top))
+        {
+            <RadzenPager HorizontalAlign="@PagerHorizontalAlign" AlwaysVisible="@PagerAlwaysVisible" @ref="topPager"
+                         Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount"
+                         PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged"
+                         PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary"
+                         PagingSummaryFormat="@PagingSummaryFormat" PagingSummaryTemplate="@PagingSummaryTemplate"
+                         PageSizeText="@PageSizeText" Density="@Density"
+                         FirstPageTitle="@FirstPageTitle" FirstPageAriaLabel="@FirstPageAriaLabel"
+                         PrevPageAriaLabel="@PrevPageAriaLabel" PrevPageTitle="@PrevPageTitle"
+                         NextPageAriaLabel="@NextPageAriaLabel" NextPageTitle="@NextPageTitle"
+                         LastPageAriaLabel="@LastPageAriaLabel" LastPageTitle="@LastPageTitle"
+                         PageAriaLabelFormat="@PageAriaLabelFormat" PageTitleFormat="@PageTitleFormat"
+                         PrevPageLabel="@PrevPageLabel" NextPageLabel="@NextPageLabel" />
+        }
+
+        <div class="rz-pivot-content">
+            @if (View.Count() > 0)
+            {
+                <div class="rz-pivot-table-container">
+                    <table class="rz-pivot-table @GetTableCssClass()">
+                        <thead class="rz-pivot-header">
+                            @foreach (var headerRow in GetColumnHeaderRows())
+                            {
+                                <tr class="rz-pivot-header-row">
+                                    @if (headerRow == 0)
+                                    {
+                                        var rowHeaderCellsCount = CachedPivotRows.FirstOrDefault() != null ?
+                                            Math.Min(CachedPivotRows.Select(r => r.RowHeaderCells.Count).Max(), pivotRows.Count) : pivotRows.Count;
+                                        @for (int i = 0; i < rowHeaderCellsCount; i++)
+                                        {
+                                            <th class="rz-pivot-row-header @GetFrozenRowHeaderClass(i)"
+                                                rowspan="@(pivotColumns.Count + 1)"
+                                                style="inset-inline-start: @(i * 140)px">
+                                                @pivotRows[i].GetTitle()
+                                            </th>
+                                        }
+                                    }
+                                    @foreach (var cell in GetColumnHeaderCells(headerRow))
+                                    {
+                                        <th class="rz-pivot-column-header" 
+                                            colspan="@(cell.ColSpan * pivotAggregates.Count)" 
+                                            rowspan="@cell.RowSpan"
+                                            style="@(!string.IsNullOrEmpty(cell.Width) ? $"width: {cell.Width};" : "")">
+                                            @if (AllowDrillDown && !string.IsNullOrEmpty(cell.PathKey))
+                                            {
+                                                <div class="rz-pivot-drill-down-header">
+                                                    <span @onclick="@(() => ToggleColumnDrillDown(cell.PathKey))"
+                                                        class="notranslate rz-tree-toggler rzi rzi-caret-@(cell.IsCollapsed ? "right" : "down")" style="margin-inline-start:0"></span>
+                                                    <span class="rz-pivot-header-text">@cell.Title</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                @cell.Title
+                                            }
+                                        </th>
+                                    }
+                                    @if (headerRow == 0 && ShowRowsTotals)
+                                    {
+                                        foreach (var aggregate in pivotAggregates)
+                                        {
+                                            <th class="rz-pivot-total-header @GetFrozenTotalHeaderClass()" 
+                                                rowspan="@(pivotColumns.Count + 1)"
+                                                style="inset-inline-end: @((pivotAggregates.Count - 1 - pivotAggregates.IndexOf(aggregate)) * 120)px">
+                                                @aggregate.GetTitle()
+                                            </th>
+                                        }
+                                    }
+                                </tr>
+                            }
+                            <tr class="rz-pivot-header-row rz-pivot-aggregate-header-row">
+                                @foreach (var colPath in CachedColumnLeaves)
+                                {
+                                    foreach (var aggregate in pivotAggregates)
+                                    {
+                                        <th class="rz-pivot-aggregate-header">
+                                            @aggregate.GetTitle()
+                                        </th>
+                                    }
+                                }
+                            </tr>
+                        </thead>
+                        <tbody class="rz-pivot-body">
+                            @RenderPivotRows()
+                        </tbody>
+                        @if (ShowColumnsTotals)
+                        {
+                            <tfoot class="rz-pivot-footer">
+                                @RenderFooter()
+                            </tfoot>
+                        }
+                    </table>
+                </div>
+            }
+            else
+            {
+                @if (EmptyTemplate != null)
+                {
+                    @EmptyTemplate
+                }
+                else
+                {
+                    <div class="rz-pivot-empty">
+                        <RadzenText TextStyle="TextStyle.Body1" class="rz-text-color-secondary">
+                            @EmptyText
+                        </RadzenText>
+                    </div>
+                }
+            }
+        </div>
+
+        @if (AllowPaging && PagerPosition.HasFlag(PagerPosition.Bottom))
+        {
+            <RadzenPager HorizontalAlign="@PagerHorizontalAlign" AlwaysVisible="@PagerAlwaysVisible" @ref="bottomPager" 
+                         Count="@Count" PageSize="@PageSize" PageNumbersCount="@PageNumbersCount" 
+                         PageChanged="@OnPageChanged" PageSizeChanged="@OnPageSizeChanged" 
+                         PageSizeOptions="@PageSizeOptions" ShowPagingSummary="@ShowPagingSummary" 
+                         PagingSummaryFormat="@PagingSummaryFormat" PagingSummaryTemplate="@PagingSummaryTemplate" 
+                         PageSizeText="@PageSizeText" Density="@Density" 
+                         FirstPageTitle="@FirstPageTitle" FirstPageAriaLabel="@FirstPageAriaLabel" 
+                         PrevPageAriaLabel="@PrevPageAriaLabel" PrevPageTitle="@PrevPageTitle" 
+                         NextPageAriaLabel="@NextPageAriaLabel" NextPageTitle="@NextPageTitle" 
+                         LastPageAriaLabel="@LastPageAriaLabel" LastPageTitle="@LastPageTitle" 
+                         PageAriaLabelFormat="@PageAriaLabelFormat" PageTitleFormat="@PageTitleFormat" 
+                         PrevPageLabel="@PrevPageLabel" NextPageLabel="@NextPageLabel" />
+        }
+    </div>
+} 

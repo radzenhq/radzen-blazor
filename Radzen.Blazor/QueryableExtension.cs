@@ -190,6 +190,18 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Returns the last element of a sequence, or a default value if the sequence contains no elements.
+        /// </summary>
+        /// <param name="source">The <see cref="IQueryable"/> to return the last element of.</param>
+        /// <returns>default if source is empty; otherwise, the last element in source.</returns>
+        public static dynamic LastOrDefault(this IQueryable source)
+        {
+            return source.Provider.Execute(Expression.Call(null,
+                typeof(Queryable).GetTypeInfo().GetDeclaredMethods(nameof(Queryable.LastOrDefault)).FirstOrDefault(mi => mi.IsGenericMethod).MakeGenericMethod(source.ElementType),
+                source.Expression));
+        }
+
+        /// <summary>
         /// Converts the elements of an <see cref="IQueryable"/> to the specified type.
         /// </summary>
         /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be converted.</param>
@@ -199,6 +211,59 @@ namespace Radzen
         {
             return source.Provider.CreateQuery(Expression.Call(null,
                 typeof(Queryable).GetTypeInfo().GetDeclaredMethods(nameof(Queryable.Cast)).FirstOrDefault(mi => mi.IsGenericMethod).MakeGenericMethod(type),
+                source.Expression));
+        }
+
+        /// <summary>
+        /// Sums the elements of an <see cref="IQueryable"/> using the specified type.
+        /// </summary>
+        /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be summed.</param>
+        /// <param name="type">The type to cast the elements of source to.</param>
+        /// <returns>The result.</returns>
+        public static dynamic Sum(this IQueryable source, Type type)
+        {
+            return source.Provider.Execute(Expression.Call(null,
+                typeof(Queryable).GetTypeInfo().GetDeclaredMethods(nameof(Queryable.Sum)).FirstOrDefault(mi => mi.GetParameters().Length == 1 && mi.ReturnType == type),
+                source.Expression));
+        }
+
+        /// <summary>
+        /// Calculates the average of the elements of an <see cref="IQueryable"/> using the specified type.
+        /// </summary>
+        /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be used for average calculation.</param>
+        /// <param name="type">The type to cast the elements of source to.</param>
+        /// <returns>The result.</returns>
+        public static dynamic Average(this IQueryable source, Type type)
+        {
+            return source.Provider.Execute(Expression.Call(null,
+                typeof(Queryable).GetTypeInfo().GetDeclaredMethods(nameof(Queryable.Average))
+                .FirstOrDefault(mi => mi.GetParameters().Length == 1 && mi.GetParameters()[0].ParameterType.IsGenericType && mi.GetParameters()[0].ParameterType.GetGenericArguments()[0] == type && mi.ReturnType == type),
+                source.Expression));
+        }
+
+        /// <summary>
+        /// Gets the minimum value of elements of an <see cref="IQueryable"/> using the specified type.
+        /// </summary>
+        /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be used to get the minimum value.</param>
+        /// <param name="type">The type to cast the elements of source to.</param>
+        /// <returns>The result.</returns>
+        public static dynamic Min(this IQueryable source, Type type)
+        {
+            return source.Provider.Execute(Expression.Call(null,
+                typeof(Queryable).GetTypeInfo().GetDeclaredMethods(nameof(Queryable.Min)).FirstOrDefault(mi => mi.GetParameters().Length == 1 && mi.ReturnType == type),
+                source.Expression));
+        }
+
+        /// <summary>
+        /// Gets the maximum value of elements of an <see cref="IQueryable"/> using the specified type.
+        /// </summary>
+        /// <param name="source">The <see cref="IQueryable"/> that contains the elements to be used to get the maximum value.</param>
+        /// <param name="type">The type to cast the elements of source to.</param>
+        /// <returns>The result.</returns>
+        public static dynamic Max(this IQueryable source, Type type)
+        {
+            return source.Provider.Execute(Expression.Call(null,
+                typeof(Queryable).GetTypeInfo().GetDeclaredMethods(nameof(Queryable.Max)).FirstOrDefault(mi => mi.GetParameters().Length == 1 && mi.ReturnType == type),
                 source.Expression));
         }
 
