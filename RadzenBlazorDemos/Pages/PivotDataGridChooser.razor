@@ -1,0 +1,140 @@
+@using Radzen.Blazor
+@using RadzenBlazorDemos.Pages
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using System.Reflection
+
+@inherits DbContextPage
+
+<div class="row">
+    <div class="col-md-12">
+        <RadzenCard class="mb-4">
+            <h3>Northwind Sales Analysis Pivot Table with Dynamic Field Selection</h3>
+            <p>This example demonstrates dynamic selection of rows, columns and aggregates.</p>
+            <RadzenRow>
+                <RadzenColumn SizeMD="4">
+                    <RadzenLabel Component="Rows" Text="Rows" />
+                    <RadzenDropDown Name="Rows" Data="@allProperties" @bind-Value="@selectedRows" 
+                        Multiple="true" Style="width: 100%;" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="4">
+                    <RadzenLabel Component="Columns" Text="Columns" />
+                    <RadzenDropDown Name="Columns" Data="@allProperties" @bind-Value="@selectedColumns" 
+                        Multiple="true" Style="width: 100%;" />
+                </RadzenColumn>
+                <RadzenColumn SizeMD="4">
+                    <RadzenLabel Component="Aggregates" Text="Aggregates" />
+                    <RadzenDropDown Name="Aggregates" Data="@aggregates" TextProperty="Property" @bind-Value="@selectedAggregates" 
+                        Multiple="true" Style="width: 100%;" />
+                    @foreach (var agg in selectedAggregates)
+                    {
+                        <RadzenColumn SizeMD="12" Style="margin-bottom: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                <label style="margin: 0; font-size: 0.875rem; min-width: 80px;">@agg.Property:</label>
+                                <RadzenDropDown TValue="AggregateFunction" 
+                                    Data="@(Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>())" 
+                                        @bind-Value="@agg.Aggregate" Style="flex: 1;">
+                                </RadzenDropDown>
+                            </div>
+                        </RadzenColumn>
+                    }
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </div>
+</div>
+
+<RadzenRow>
+    <RadzenColumn SizeMD="12">
+        <RadzenCard class="mb-4">
+            <h4>Dynamic Pivot DataGrid</h4>
+            <RadzenPivotDataGrid Data=@salesData TItem="SalesData" Style="height:500px"
+            AllowPaging="true" PageSize="20" 
+            GridLines="Radzen.DataGridGridLines.Default" AllowAlternatingRows="true">
+                <Columns>
+                    @foreach (var column in selectedColumns)
+                    {
+                        <RadzenPivotColumn TItem="SalesData" Property="@column" Title="@column" Width="150px" />
+                    }
+                </Columns>
+                <Rows>
+                    @foreach (var row in selectedRows)
+                    {
+                        <RadzenPivotRow TItem="SalesData" Property="@row" Title="@row" />
+                    }
+                </Rows>
+                <Aggregates>
+                    @foreach (var aggregate in selectedAggregates)
+                    {
+                        <RadzenPivotAggregate TItem="SalesData" Property="@aggregate.Property" Title="@aggregate.Property"
+                            Aggregate="@aggregate.Aggregate" FormatString="@aggregate.FormatString" />
+                    }
+                </Aggregates>
+            </RadzenPivotDataGrid>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private List<string> allProperties => typeof(SalesData)
+        .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+        .Select(p => p.Name)
+        .ToList();
+
+    private IEnumerable<SalesData> salesData;
+
+    private List<string> selectedRows = new();
+    private List<string> selectedColumns = new();
+    private List<RadzenPivotAggregate<SalesData>> selectedAggregates = new();
+    private List<RadzenPivotAggregate<SalesData>> aggregates = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        // Create sales data from Northwind orders and order details
+        salesData = (from od in dbContext.OrderDetails
+                     join o in dbContext.Orders on od.OrderID equals o.OrderID
+                     join p in dbContext.Products on od.ProductID equals p.ProductID
+                     join c in dbContext.Categories on p.CategoryID equals c.CategoryID
+                     select new SalesData
+                         {
+                             CategoryName = c.CategoryName,
+                             ProductName = p.ProductName,
+                             OrderYear = o.OrderDate.HasValue ? o.OrderDate.Value.Year : 0,
+                             OrderMonth = o.OrderDate.HasValue ? o.OrderDate.Value.Month : 0,
+                             ShipCountry = o.ShipCountry,
+                             UnitPrice = od.UnitPrice ?? 0,
+                             Quantity = od.Quantity ?? 0,
+                             Discount = od.Discount ?? 0,
+                             TotalAmount = (od.UnitPrice ?? 0) * (od.Quantity ?? 0) * (1 - (od.Discount ?? 0))
+                         });
+
+        // Set default selections
+        selectedRows = new List<string> { nameof(SalesData.CategoryName), nameof(SalesData.ProductName) };
+        selectedColumns = new List<string> { nameof(SalesData.ShipCountry), nameof(SalesData.OrderYear) };
+
+        aggregates = allProperties.Select(p => new RadzenPivotAggregate<SalesData>() { Property = p }).ToList();
+        selectedAggregates = new List<RadzenPivotAggregate<SalesData>>
+        {
+            new RadzenPivotAggregate<SalesData> { Property = nameof(SalesData.TotalAmount), Aggregate = AggregateFunction.Sum, FormatString = "{0:C}" },
+            new RadzenPivotAggregate<SalesData> { Property = nameof(SalesData.Quantity), Aggregate = AggregateFunction.Sum },
+            new RadzenPivotAggregate<SalesData> { Property = nameof(SalesData.UnitPrice), Aggregate = AggregateFunction.Average, FormatString = "{0:C}" },
+            new RadzenPivotAggregate<SalesData> { Property = nameof(SalesData.Discount), Aggregate = AggregateFunction.Average, FormatString = "{0:P}" }
+        };
+    }
+
+    public class SalesData
+    {
+        public string CategoryName { get; set; }
+        public string ProductName { get; set; }
+        public int OrderYear { get; set; }
+        public int OrderMonth { get; set; }
+        public string ShipCountry { get; set; }
+        public double UnitPrice { get; set; }
+        public short Quantity { get; set; }
+        public float Discount { get; set; }
+        public double TotalAmount { get; set; }
+    }
+} 

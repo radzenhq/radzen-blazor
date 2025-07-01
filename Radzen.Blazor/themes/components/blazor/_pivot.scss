@@ -1,0 +1,533 @@
+// Pivot DataGrid Component Styles
+.rz-pivot-data-grid {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    border: var(--rz-grid-cell-border);
+    border-radius: var(--rz-grid-border-radius);
+    background-color: var(--rz-grid-background-color);
+    color: var(--rz-grid-cell-color);
+    font-family: var(--rz-text-font-family);
+    font-size: var(--rz-grid-cell-font-size);
+
+    .rz-pivot-content {
+        flex: 1;
+        overflow: auto;
+        position: relative;
+
+        .rz-pivot-table-container {
+            width: 100%;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: auto;
+            position: relative;
+            
+            // CSS custom properties for dynamic row header positioning
+            --rz-pivot-row-header-width: 140px;
+        }
+
+        .rz-pivot-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            table-layout: auto;
+            background-color: var(--rz-grid-background-color);
+
+            // Grid lines
+            &.rz-grid-gridlines-default {
+                .rz-pivot-corner-cell,
+                .rz-pivot-column-header,
+                .rz-pivot-value-header,
+                .rz-pivot-row-header,
+                .rz-pivot-value-cell,
+                .rz-pivot-total-cell {
+                    border: var(--rz-grid-cell-border);
+                }
+            }
+
+            &.rz-grid-gridlines-horizontal {
+                .rz-pivot-corner-cell,
+                .rz-pivot-column-header,
+                .rz-pivot-value-header,
+                .rz-pivot-row-header,
+                .rz-pivot-value-cell,
+                .rz-pivot-total-cell {
+                    border-bottom: var(--rz-grid-bottom-cell-border);
+                }
+            }
+
+            &.rz-grid-gridlines-vertical {
+                .rz-pivot-corner-cell,
+                .rz-pivot-column-header,
+                .rz-pivot-value-header,
+                .rz-pivot-row-header,
+                .rz-pivot-value-cell,
+                .rz-pivot-total-cell {
+                    border-right: var(--rz-grid-right-cell-border);
+                }
+            }
+
+            &.rz-grid-gridlines-none {
+                .rz-pivot-corner-cell,
+                .rz-pivot-column-header,
+                .rz-pivot-value-header,
+                .rz-pivot-row-header,
+                .rz-pivot-value-cell,
+                .rz-pivot-total-cell {
+                    border: none;
+                }
+            }
+
+            // Striped rows
+            &.rz-grid-table-striped {
+                .rz-pivot-row:nth-child(even) {
+                    background-color: var(--rz-grid-stripe-background-color);
+                }
+            }
+        }
+
+        .rz-pivot-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--rz-grid-background-color);
+
+            .rz-pivot-header-row {
+                .rz-pivot-corner-cell {
+                    padding: var(--rz-grid-header-cell-padding);
+                    font-weight: var(--rz-grid-header-font-weight);
+                    text-align: center;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    position: sticky;
+                    left: 0;
+                    z-index: 20;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    border: var(--rz-grid-header-cell-border);
+                    min-width: 140px;
+                    font-size: var(--rz-grid-header-font-size);
+
+                    .rz-pivot-corner-title {
+                        font-size: var(--rz-grid-header-font-size);
+                        font-weight: var(--rz-grid-header-font-weight);
+                    }
+
+                    &:hover {
+                        background-color: var(--rz-grid-header-sorted-background-color);
+                    }
+                }
+
+                .rz-pivot-column-header {
+                    padding: var(--rz-grid-header-cell-padding);
+                    font-weight: var(--rz-grid-header-font-weight);
+                    text-align: center;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    position: relative;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    border: var(--rz-grid-header-cell-border);
+                    min-width: 120px;
+                    font-size: var(--rz-grid-header-font-size);
+
+                    .rz-pivot-drill-down-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.5rem;
+
+                        .rz-pivot-drill-down-button {
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            padding: 0.25rem;
+                            border-radius: 0.25rem;
+                            color: var(--rz-grid-header-color);
+                            font-size: 0.875rem;
+                            transition: background-color 0.2s ease;
+
+                            &:hover {
+                                background-color: var(--rz-grid-header-sorted-background-color);
+                            }
+
+                            &:focus {
+                                outline: 2px solid var(--rz-focus-outline-color);
+                                outline-offset: 2px;
+                            }
+                        }
+
+                        .rz-pivot-header-text {
+                            flex: 1;
+                            text-align: center;
+                        }
+                    }
+
+                    &:hover {
+                        background-color: var(--rz-grid-header-sorted-background-color);
+                    }
+                }
+
+                .rz-pivot-row-header {
+                    padding: var(--rz-grid-header-cell-padding);
+                    font-weight: var(--rz-grid-header-font-weight);
+                    text-align: center;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    position: sticky;
+                    z-index: 15;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    border: var(--rz-grid-header-cell-border);
+                    min-width: var(--rz-pivot-row-header-width, 140px);
+                    font-size: var(--rz-grid-header-font-size);
+
+                    .rz-pivot-drill-down-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+                        gap: 0.5rem;
+
+                        .rz-pivot-drill-down-button {
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            padding: 0.25rem;
+                            border-radius: 0.25rem;
+                            color: var(--rz-grid-header-color);
+                            font-size: 0.875rem;
+                            transition: background-color 0.2s ease;
+                            min-width: 1.5rem;
+                            height: 1.5rem;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+
+                            &:hover {
+                                background-color: var(--rz-grid-header-sorted-background-color);
+                            }
+
+                            &:focus {
+                                outline: 2px solid var(--rz-focus-outline-color);
+                                outline-offset: 2px;
+                            }
+                        }
+
+                        .rz-pivot-header-text {
+                            flex: 1;
+                            text-align: left;
+                        }
+                    }
+
+                    &:hover {
+                        background-color: var(--rz-grid-header-sorted-background-color);
+                    }
+                }
+
+                .rz-pivot-total-header {
+                    padding: var(--rz-grid-header-cell-padding);
+                    font-weight: var(--rz-grid-header-font-weight);
+                    text-align: center;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    position: sticky;
+                    z-index: 15;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    border: var(--rz-grid-header-cell-border);
+                    min-width: 120px;
+                    font-size: var(--rz-grid-header-font-size);
+
+                    &:hover {
+                        background-color: var(--rz-grid-header-sorted-background-color);
+                    }
+                }
+            }
+
+            .rz-pivot-value-headers {
+                .rz-pivot-value-header {
+                    padding: var(--rz-grid-header-cell-padding);
+                    font-weight: var(--rz-grid-header-font-weight);
+                    text-align: center;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    position: relative;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    border: var(--rz-grid-header-cell-border);
+                    min-width: 100px;
+                    font-size: var(--rz-grid-header-font-size);
+
+                    .rz-pivot-value-title {
+                        font-size: var(--rz-grid-header-font-size);
+                        font-weight: var(--rz-grid-header-font-weight);
+                        margin-bottom: 0.25rem;
+                        color: var(--rz-grid-header-color);
+                    }
+
+                    .rz-pivot-aggregate-type {
+                        font-size: 0.75rem;
+                        color: var(--rz-text-secondary-color);
+                        font-style: italic;
+                    }
+
+                    &:hover {
+                        background-color: var(--rz-grid-header-sorted-background-color);
+                    }
+                }
+            }
+        }
+
+        .rz-pivot-body {
+            .rz-pivot-row {
+                &:hover {
+                    background-color: var(--rz-grid-hover-background-color);
+                }
+
+                .rz-pivot-row-header {
+                    padding: var(--rz-grid-cell-padding);
+                    font-weight: 500;
+                    text-align: left;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    position: sticky;
+                    z-index: 5;
+                    min-width: var(--rz-pivot-row-header-width, 140px);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+
+                    .rz-pivot-drill-down-header {
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+                        gap: 0.5rem;
+
+                        .rz-pivot-drill-down-button {
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            padding: 0.25rem;
+                            border-radius: 0.25rem;
+                            color: var(--rz-grid-header-color);
+                            font-size: 0.875rem;
+                            transition: background-color 0.2s ease;
+                            min-width: 1.5rem;
+                            height: 1.5rem;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+
+                            &:hover {
+                                background-color: var(--rz-grid-header-sorted-background-color);
+                            }
+
+                            &:focus {
+                                outline: 2px solid var(--rz-focus-outline-color);
+                                outline-offset: 2px;
+                            }
+                        }
+
+                        .rz-pivot-header-text {
+                            flex: 1;
+                            text-align: left;
+                        }
+                    }
+                }
+
+                .rz-pivot-value-cell {
+                    padding: var(--rz-grid-cell-padding);
+                    min-width: 100px;
+                    text-align: right;
+                    background-color: var(--rz-grid-background-color);
+                    color: var(--rz-grid-cell-color);
+                    border: var(--rz-grid-cell-border);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .rz-pivot-total-cell {
+                    padding: var(--rz-grid-cell-padding);
+                    min-width: 120px;
+                    text-align: right;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    font-weight: 600;
+                    border: var(--rz-grid-cell-border);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+
+        .rz-pivot-footer {
+            position: sticky;
+            bottom: 0;
+            z-index: 10;
+            background-color: var(--rz-grid-foot-background-color);
+
+            .rz-pivot-footer-row {
+                .rz-pivot-footer-header {
+                    padding: var(--rz-grid-cell-padding);
+                    font-weight: 600;
+                    text-align: left;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    position: sticky;
+                    z-index: 5;
+                    min-width: var(--rz-pivot-row-header-width, 140px);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+                .rz-pivot-footer-cell {
+                    padding: var(--rz-grid-cell-padding);
+                    font-weight: 600;
+                    text-align: right;
+                    background-color: var(--rz-grid-foot-background-color);
+                    color: var(--rz-grid-foot-cell-color);
+                    border: var(--rz-grid-cell-border);
+                    font-size: var(--rz-grid-cell-font-size);
+
+                    &:first-child {
+                        text-align: left;
+                        border-right: 2px solid var(--rz-grid-cell-border);
+                        background-color: var(--rz-grid-header-background-color);
+                        color: var(--rz-grid-header-color);
+                    }
+
+                    &:hover {
+                        background-color: var(--rz-grid-hover-background-color);
+                    }
+                }
+
+                .rz-pivot-footer-total {
+                    padding: var(--rz-grid-cell-padding);
+                    font-weight: 600;
+                    text-align: right;
+                    background-color: var(--rz-grid-header-background-color);
+                    color: var(--rz-grid-header-color);
+                    border: var(--rz-grid-cell-border);
+                    font-size: var(--rz-grid-cell-font-size);
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+    }
+
+    .rz-pivot-empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1.5rem;
+        color: var(--rz-text-secondary-color);
+        font-style: italic;
+        min-height: 200px;
+        background-color: var(--rz-grid-background-color);
+        border-radius: var(--rz-grid-border-radius);
+        margin: 0.5rem;
+    }
+
+    // Responsive design
+    @media (max-width: 768px) {
+        .rz-pivot-table {
+            font-size: var(--rz-grid-cell-font-size);
+
+            .rz-pivot-corner-cell,
+            .rz-pivot-column-header,
+            .rz-pivot-value-header,
+            .rz-pivot-row-header,
+            .rz-pivot-value-cell,
+            .rz-pivot-total-cell {
+                padding: var(--rz-grid-cell-padding);
+                min-width: 80px;
+            }
+        }
+    }
+}
+
+// Pivot DataGrid density variants
+.rz-pivot-data-grid.rz-density-compact {
+    .rz-pivot-content {
+        .rz-pivot-table {
+            .rz-pivot-header-cell,
+            .rz-pivot-cell,
+            .rz-pivot-row-header,
+            .rz-pivot-footer-cell,
+            .rz-pivot-total-cell {
+                padding: var(--rz-grid-cell-padding);
+            }
+        }
+    }
+}
+
+// Pivot DataGrid with height
+.rz-pivot-data-grid.rz-has-height {
+    .rz-pivot-content {
+        .rz-pivot-table-container {
+            overflow: auto;
+        }
+    }
+}
+
+// Pivot DataGrid scrollable
+.rz-pivot-data-grid.rz-pivot-datatable-scrollable {
+    .rz-pivot-content {
+        .rz-pivot-table-container {
+            overflow: auto;
+        }
+    }
+}
+
+// Frozen row headers - same pattern as DataGrid frozen columns
+.rz-pivot-table {
+    table-layout: fixed;
+
+    .rz-frozen-cell {
+        position: -webkit-sticky;
+        position: sticky;
+    }
+
+    .rz-frozen-cell-left, 
+    .rz-frozen-cell-right,
+    .rz-frozen-cell-left-inner,
+    .rz-frozen-cell-right-inner {
+        background: var(--rz-grid-frozen-cell-background-color);
+        z-index: 1;
+    }
+
+    .rz-frozen-cell-left.rz-frozen-cell-left-end {
+        box-shadow: 5px 0 5px -5px rgba(0,0,0,0.12);
+        border-inline-end: var(--rz-grid-frozen-cell-border) !important;
+
+        *[dir="rtl"] & {
+            box-shadow: -5px 0 5px -5px rgba(0,0,0,0.12);
+        }
+    }
+
+    .rz-frozen-cell-right.rz-frozen-cell-right-end {
+        box-shadow: -5px 0 5px -5px rgba(0,0,0,0.12);
+        border-inline-start: var(--rz-grid-frozen-cell-border) !important;
+
+        *[dir="rtl"] & {
+            box-shadow: 5px 0 5px -5px rgba(0,0,0,0.12);
+        }
+    }
+
+    .rz-frozen-cell-left-inner,
+    .rz-frozen-cell-right-inner {
+        border-inline-end: var(--rz-grid-frozen-cell-border) !important;
+        border-inline-start: var(--rz-grid-frozen-cell-border) !important;
+    }
+} 

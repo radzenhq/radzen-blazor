@@ -1,0 +1,84 @@
+@typeparam TItem
+
+@inject HttpClient httpClient
+
+@formattedValue
+
+@code {
+    string formattedValue;
+
+    [Parameter]
+    public RadzenPivotAggreateContext<TItem> Context { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            formattedValue = await GetAggregateValue(Context);
+            StateHasChanged();
+        }
+    }
+
+    async Task<string> GetAggregateValue(RadzenPivotAggreateContext<TItem> context)
+    {
+        if (context.Index != null)
+        {
+            return await Task.FromResult(context.Aggregate.FormatValue(context.Value));
+        }
+        else
+        {
+            var uri = new Uri("https://services.radzen.com/odata/Northwind/NorthwindOrderDetails/");
+
+            switch(context.Aggregate.Aggregate)
+            {
+                case AggregateFunction.Sum:
+                    if (context.Aggregate.Property == "TotalAmount")
+                    {
+                        uri = uri.GetODataUri(apply: "aggregate((UnitPrice mul Quantity mul (1 sub Discount)) with sum as TotalAmount)");
+                    }
+                    else if (context.Aggregate.Property == "Quantity")
+                    {
+                        uri = uri.GetODataUri(apply: "aggregate(cast(Quantity,Edm.Int32) with sum as TotalQuantity)");
+                    }
+                    break;
+                case AggregateFunction.Average:
+                    if (context.Aggregate.Property == "UnitPrice")
+                    {
+                        uri = uri.GetODataUri(apply: "aggregate(UnitPrice with average as AverageUnitPrice)");
+                    }
+                    else if (context.Aggregate.Property == "Discount")
+                    {
+                        uri = uri.GetODataUri(apply: "aggregate(Discount with average as AverageDiscount)");
+                    }
+                    break;
+            }
+
+            var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, uri);
+
+            var response = await httpClient.SendAsync(httpRequestMessage);
+
+            var result = await response.ReadAsync<ODataServiceResult<AggregateValue>>();
+            var item = result.Value.FirstOrDefault();
+            var value = context.Aggregate.Property switch
+            {
+                "TotalAmount" => item?.TotalAmount,
+                "Quantity" => item?.TotalQuantity,
+                "UnitPrice" => item?.AverageUnitPrice,
+                "Discount" => item?.AverageDiscount,
+                _ => null
+            };
+
+            return context.Aggregate.FormatValue(value);
+        }
+    }
+
+    public class AggregateValue
+    {
+        public double? TotalAmount { get; set; }
+        public int? TotalQuantity { get; set; }
+        public double? AverageUnitPrice { get; set; }
+        public double? AverageDiscount { get; set; }
+    }
+}
