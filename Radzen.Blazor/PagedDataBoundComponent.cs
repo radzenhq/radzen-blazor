@@ -42,6 +42,34 @@ namespace Radzen
         public Density Density { get; set; } = Density.Default;
 
         /// <summary>
+        /// Gets or sets a value indicating whether picking of fields runtime is allowed. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if picking of fields runtime is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowFieldsPicking { get; set; }
+
+        /// <summary>
+        /// Gets or sets the fields picker header template.
+        /// </summary>
+        /// <value>The fields picker header template.</value>
+        [Parameter]
+        public RenderFragment FieldsPickerHeaderTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the fields picker header text.
+        /// </summary>
+        /// <value>The fields picker header text.</value>
+        [Parameter]
+        public string FieldsPickerHeaderText { get; set; } = "Settings";
+
+        /// <summary>
+        /// Gets or sets value indicating if the fields picker is expanded.
+        /// </summary>
+        /// <value>The fields picker expanded.</value>
+        [Parameter]
+        public bool FieldsPickerExpanded { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether paging is allowed. Set to <c>false</c> by default.
         /// </summary>
         /// <value><c>true</c> if paging is allowed; otherwise, <c>false</c>.</value>
