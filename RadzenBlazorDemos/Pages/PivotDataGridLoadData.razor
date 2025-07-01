@@ -1,0 +1,163 @@
+@using Radzen.Blazor
+@using RadzenBlazorDemos.Pages
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using System.Linq.Dynamic.Core
+@inherits DbContextPage
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenSwitch @bind-Value=@showColumnsTotals Name="ShowColumnsTotals" TValue="bool" />
+        <RadzenLabel Text="Show columns totals" Component="ShowColumnsTotals" />
+        <RadzenSwitch @bind-Value=@showRowsTotals Name="ShowRowsTotals" TValue="bool" />
+        <RadzenLabel Text="Show rows totals" Component="ShowRowsTotals" />
+        <RadzenSwitch @bind-Value=@allowDrillDown Name="AllowDrillDown" TValue="bool" />
+        <RadzenLabel Text="Allow drill-down" Component="AllowDrillDown" />
+        <RadzenSwitch @bind-Value=@allowPaging Name="AllowPaging" TValue="bool" />
+        <RadzenLabel Text="AllowPaging" Component="AllowPaging" />
+        <RadzenDropDown @bind-Value="@pagerPosition" Visible="@allowPaging" TextProperty="Text" Name="PagerPosition" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenPivotDataGrid @ref=pivot IsLoading="@isLoading" Data=@salesData Count="@count" LoadData="@LoadData" TItem="SalesData" 
+                     AllowPaging="@allowPaging" PagerPosition="@pagerPosition"  
+                     AllowFieldsPicking="true" AllowFiltering="true" AllowSorting="true"
+                     ShowColumnsTotals="@showColumnsTotals" ShowRowsTotals="@showRowsTotals" AllowDrillDown="@allowDrillDown"
+                     GridLines="Radzen.DataGridGridLines.Default" AllowAlternatingRows="true">
+    <Columns>
+        <RadzenPivotColumn TItem="SalesData" Property="OrderYear" Title="Order Year" Width="150px" />
+        <RadzenPivotColumn TItem="SalesData" Property="ShipCountry" Title="Ship Country" Width="150px" />
+    </Columns>
+    <Rows>
+        <RadzenPivotRow TItem="SalesData" Property="CategoryName" Title="Product Category" />
+        <RadzenPivotRow TItem="SalesData" Property="ProductName" Title="Product" />
+    </Rows>
+    <Aggregates>
+        <RadzenPivotAggregate TItem="SalesData" Property="TotalAmount" Title="Total Sales"
+                              Aggregate="AggregateFunction.Sum" FormatString="{0:C}">
+            <RowTotalTemplate>
+                Total: @GetAggregateValue(context)
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+        <RadzenPivotAggregate TItem="SalesData" Property="Quantity" Title="Quantity Sold"
+                              Aggregate="AggregateFunction.Sum">
+            <Template>
+                Qty: @(context ?? 0)
+            </Template>
+            <ColumnTotalTemplate>
+                Total: @(context ?? 0)
+            </ColumnTotalTemplate>
+            <RowTotalTemplate>
+                Total: @GetAggregateValue(context)
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+        <RadzenPivotAggregate TItem="SalesData" Property="UnitPrice" Title="Average Unit Price"
+                              Aggregate="AggregateFunction.Average" FormatString="{0:C}">
+            <RowTotalTemplate>
+                Avg: @GetAggregateValue(context)
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+        <RadzenPivotAggregate TItem="SalesData" Property="Discount" Title="Average Discount"
+                              Aggregate="AggregateFunction.Average" FormatString="{0:P}">
+            <RowTotalTemplate>
+                Avg: @GetAggregateValue(context)
+            </RowTotalTemplate>
+        </RadzenPivotAggregate>
+    </Aggregates>
+</RadzenPivotDataGrid>
+
+@code {
+    RadzenPivotDataGrid<SalesData> pivot;
+    int count;
+
+    IQueryable<SalesData> salesDataQuery;
+    IQueryable<SalesData> SalesDataQuery
+    {
+        get
+        {
+            if (salesDataQuery == null)
+            {
+                salesDataQuery = from od in dbContext.OrderDetails
+                                 join o in dbContext.Orders on od.OrderID equals o.OrderID
+                                 join p in dbContext.Products on od.ProductID equals p.ProductID
+                                 join c in dbContext.Categories on p.CategoryID equals c.CategoryID
+                                 select new SalesData
+                                 {
+                                     CategoryName = c.CategoryName,
+                                     ProductName = p.ProductName,
+                                     OrderYear = o.OrderDate.HasValue ? o.OrderDate.Value.Year : 0,
+                                     OrderMonth = o.OrderDate.HasValue ? o.OrderDate.Value.Month : 0,
+                                     ShipCountry = o.ShipCountry,
+                                     UnitPrice = od.UnitPrice,
+                                     Quantity = od.Quantity,
+                                     Discount = od.Discount,
+                                     TotalAmount = (od.UnitPrice ?? 0) * (od.Quantity ?? 0) * (double)(1 - (od.Discount ?? 0))
+                                 };
+            }
+
+            return salesDataQuery;
+        }
+    }
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+
+        var query = SalesDataQuery;
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(args.Filter);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        count = await Task.FromResult(query.Count());
+
+        salesData = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
+
+        isLoading = false;
+    }
+
+    async ValueTask<object> GetAggregateValue(RadzenPivotAggreateContext<SalesData> context)
+    {
+        object value = context.Value;
+
+        // Grand total
+        if (context.Index == null)
+        {
+            value = await Task.FromResult(context.Aggregate.FormatValue(pivot.GetAggregateValue(SalesDataQuery, context.Aggregate)));
+        }
+
+        return context.Aggregate.FormatValue(value);
+    }
+
+    bool isLoading;
+    bool allowDrillDown;
+    bool showColumnsTotals;
+    bool showRowsTotals;
+    bool allowPaging = true;
+    PagerPosition pagerPosition = PagerPosition.Bottom;
+
+    private IEnumerable<SalesData> salesData;
+
+    public class SalesData
+    {
+        public string CategoryName { get; set; }
+        public string ProductName { get; set; }
+        public int OrderYear { get; set; }
+        public int OrderMonth { get; set; }
+        public string ShipCountry { get; set; }
+        public double? UnitPrice { get; set; }
+        public short? Quantity { get; set; }
+        public float? Discount { get; set; }
+        public double? TotalAmount { get; set; }
+    }
+}

@@ -100,7 +100,7 @@ namespace Radzen.Blazor
             allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
             {
                 var item = new RadzenSelectBarItem();
-                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
+                item.SetText($"{PropertyAccess.GetItemOrValueFromProperty(i, TextProperty)}");
                 item.SetValue(PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
                 return item;
             })).ToList();
