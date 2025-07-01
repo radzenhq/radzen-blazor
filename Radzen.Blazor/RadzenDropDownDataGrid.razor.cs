@@ -456,10 +456,17 @@ namespace Radzen.Blazor
             if (column.Type == typeof(string)) return true;
 
             var property = column.GetFilterProperty();
-            var itemType = Data != null ? Data.AsQueryable().ElementType : typeof(object);
-            var type = PropertyAccess.GetPropertyType(itemType, property);
+            if(property is not null)
+            {
+                var itemType = Data != null ? Data.AsQueryable().ElementType : typeof(object);
+                var type = PropertyAccess.GetPropertyType(itemType, property);
 
-            return type == typeof(string);
+                return type == typeof(string);
+            }
+            else
+            {
+                return false;
+            }
         }
 
         string prevSearch;
