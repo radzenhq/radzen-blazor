@@ -1,0 +1,103 @@
+@typeparam TItem
+@using System.Reflection
+@using Radzen.Blazor
+
+<RadzenRow>
+    <RadzenColumn SizeMD="4">
+        <RadzenLabel Component="Rows" Text="Rows" />
+        <RadzenDropDown Name="Rows" TValue="IEnumerable<string>" Data="@AllProperties" @bind-Value="@selectedRows" Change="@OnRowsChanged" Multiple="true" Style="width: 100%;" />
+    </RadzenColumn>
+    <RadzenColumn SizeMD="4">
+        <RadzenLabel Component="Columns" Text="Columns" />
+        <RadzenDropDown Name="Columns" TValue="IEnumerable<string>" Data="@AllProperties" @bind-Value="@selectedColumns" Change="@OnColumnsChanged" Multiple="true" Style="width: 100%;" />
+    </RadzenColumn>
+    <RadzenColumn SizeMD="4">
+        <RadzenLabel Component="Aggregates" Text="Aggregates" />
+        <RadzenDropDown Name="Aggregates" TValue="IEnumerable<string>" Data="@AllProperties" @bind-Value="@selectedAggregates" Change="@OnValuesChanged" Multiple="true" Style="width: 100%;" />
+        @foreach (var val in (selectedAggregates ?? Enumerable.Empty<string>()))
+        {
+            var config = Aggregates.FirstOrDefault(v => v.Property == val) ?? new Aggregate { Property = val };
+            <RadzenColumn SizeMD="12" Style="margin-bottom: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label style="margin: 0; font-size: 0.875rem; min-width: 80px;">@val:</label>
+                    <RadzenDropDown TValue="AggregateFunction" Data="@(Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>())" @bind-Value="@config.Function" Change="@(() => OnAggregateChanged(config))" Style="flex: 1;">
+                    </RadzenDropDown>
+                </div>
+            </RadzenColumn>
+        }
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    [Parameter] public List<string> Rows { get; set; } = new();
+    [Parameter] public List<string> Columns { get; set; } = new();
+    [Parameter] public List<Aggregate> Aggregates { get; set; } = new();
+    [Parameter] public EventCallback Change { get; set; }
+
+    private List<string> AllProperties => typeof(TItem)
+        .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+        .Select(p => p.Name)
+        .ToList();
+
+    private IEnumerable<string> selectedRows;
+    private IEnumerable<string> selectedColumns;
+    private IEnumerable<string> selectedAggregates;
+
+    public class Aggregate
+    {
+        public string Property { get; set; }
+        public AggregateFunction Function { get; set; }
+    }
+
+    protected override void OnInitialized()
+    {
+        selectedRows = Rows.ToList();
+        selectedColumns = Columns.ToList();
+        selectedAggregates = Aggregates.Select(v => v.Property).ToList();
+        // Ensure all selected values have a config
+        foreach (var val in selectedAggregates)
+        {
+            if (!Aggregates.Any(v => v.Property == val))
+            {
+                Aggregates.Add(new Aggregate { Property = val });
+            }
+        }
+    }
+
+    void OnRowsChanged(object newRows)
+    {
+        selectedRows = ((IEnumerable<string>)newRows).ToList();
+        Rows.Clear();
+        Rows.AddRange(selectedRows);
+        Change.InvokeAsync();
+    }
+
+    void OnColumnsChanged(object newColumns)
+    {
+        selectedColumns = ((IEnumerable<string>)newColumns).ToList();
+        Columns.Clear();
+        Columns.AddRange(selectedColumns);
+        Change.InvokeAsync();
+    }
+
+    void OnValuesChanged(object newValues)
+    {
+        selectedAggregates = ((IEnumerable<string>)newValues).ToList();
+        // Only keep configs for checked values
+        Aggregates.RemoveAll(v => !selectedAggregates.Contains(v.Property));
+        // Add configs for newly checked values
+        foreach (var val in selectedAggregates)
+        {
+            if (!Aggregates.Any(v => v.Property == val))
+            {
+                Aggregates.Add(new Aggregate { Property = val });
+            }
+        }
+        Change.InvokeAsync();
+    }
+
+    void OnAggregateChanged(Aggregate val)
+    {
+        Change.InvokeAsync();
+    }
+} 

@@ -1175,9 +1175,35 @@ namespace RadzenBlazorDemos
                             Tags = new [] { "tree", "treeview", "filter" },
                         }
                     }
+                },
+                new Example
+                {
+                    New = true,
+                    Name = "Pivot DataGrid",
+                    Icon = "\ue871",
+                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table" },
+                    Children = new[] 
+                    {
+                        new Example
+                        {
+                            Name = "Static columns and rows",
+                            Path = "/pivot-data-grid",
+                            Title = "Blazor Pivot DataGrid Component - Static columns and rows | Free UI Components by Radzen",
+                            Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation tables for analyzing large datasets with grouping, aggregation, drilling down, and filtering capabilities.",
+                            Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table" }
+                        },
+                        new Example
+                        {
+                            Name = "Columns and rows chooser",
+                            Path = "/pivot-data-grid-chooser",
+                            Title = "Blazor Pivot DataGrid Component - Columns and rows chooser | Free UI Components by Radzen",
+                            Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation tables for analyzing large datasets with grouping, aggregation, drilling down, and filtering capabilities.",
+                            Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table" }
+                        }
+                    }
                 }
             }
-},
+        },
         new Example
         {
             Toc = [ new () { Text = "Gravatar with email (info@radzen.com)", Anchor = "#gravatar-with-email" } ],

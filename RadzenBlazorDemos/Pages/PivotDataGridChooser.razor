@@ -1,0 +1,139 @@
+@using Radzen.Blazor
+@using RadzenBlazorDemos.Pages
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@inherits DbContextPage
+
+<div class="row">
+    <div class="col-md-12">
+        <RadzenCard class="mb-4">
+            <h3>Northwind Sales Analysis Pivot Table with Dynamic Field Selection</h3>
+            <p>This example demonstrates dynamic selection of rows, columns, and aggregates using the RadzenPivotFieldChooser component.</p>
+
+            <RadzenPivotFieldChooser TItem="SalesData" 
+                                     Rows="@selectedRows" 
+                                     Columns="@selectedColumns" 
+                                     Aggregates="@selectedAggregates"
+                                     Change="@OnFieldSelectionChanged" />
+        </RadzenCard>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <RadzenCard class="mb-4">
+            <h4>Dynamic Pivot DataGrid</h4>
+            <RadzenPivotDataGrid Data=@salesData TItem="SalesData" Style="height:500px"
+                                 AllowPaging="true" PageSize="20" 
+                                 ShowFooter="true"
+                                 GridLines="Radzen.DataGridGridLines.Default" AllowAlternatingRows="true">
+                <Columns>
+                    @foreach (var column in selectedColumns)
+                    {
+                        <RadzenPivotColumn TItem="SalesData" Property="@column" Title="@column" Width="150px" />
+                    }
+                </Columns>
+                <Rows>
+                    @foreach (var row in selectedRows)
+                    {
+                        <RadzenPivotRow TItem="SalesData" Property="@row" Title="@row" />
+                    }
+                </Rows>
+                <Aggregates>
+                    @foreach (var aggregate in selectedAggregates)
+                    {
+                        <RadzenPivotAggregate TItem="SalesData" Property="@aggregate.Property" Title="@aggregate.Property"
+                                              Aggregate="@aggregate.Function" FormatString="@GetFormatString(aggregate.Property)" />
+                    }
+                </Aggregates>
+            </RadzenPivotDataGrid>
+        </RadzenCard>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <RadzenCard>
+            <h4>Data Summary</h4>
+            <div style="font-size: 14px;">
+                <p><strong>Categories:</strong> @(salesData?.Select(s => s.CategoryName).Distinct().Count() ?? 0)</p>
+                <p><strong>Products:</strong> @(salesData?.Select(s => s.ProductName).Distinct().Count() ?? 0)</p>
+                <p><strong>Countries:</strong> @(salesData?.Select(s => s.ShipCountry).Distinct().Count() ?? 0)</p>
+                <p><strong>Years:</strong> @(salesData?.Select(s => s.OrderYear).Distinct().Count() ?? 0)</p>
+                <p><strong>Total Records:</strong> @(salesData?.Count() ?? 0)</p>
+            </div>
+        </RadzenCard>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<SalesData> salesData;
+    private List<string> selectedRows = new();
+    private List<string> selectedColumns = new();
+    private List<RadzenPivotFieldChooser<SalesData>.Aggregate> selectedAggregates = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        // Create sales data from Northwind orders and order details
+        salesData = (from od in dbContext.OrderDetails
+                     join o in dbContext.Orders on od.OrderID equals o.OrderID
+                     join p in dbContext.Products on od.ProductID equals p.ProductID
+                     join c in dbContext.Categories on p.CategoryID equals c.CategoryID
+                     select new SalesData
+                         {
+                             CategoryName = c.CategoryName,
+                             ProductName = p.ProductName,
+                             OrderYear = o.OrderDate.HasValue ? o.OrderDate.Value.Year : 0,
+                             OrderMonth = o.OrderDate.HasValue ? o.OrderDate.Value.Month : 0,
+                             ShipCountry = o.ShipCountry,
+                             UnitPrice = od.UnitPrice ?? 0,
+                             Quantity = od.Quantity ?? 0,
+                             Discount = od.Discount ?? 0,
+                             TotalAmount = (od.UnitPrice ?? 0) * (od.Quantity ?? 0) * (1 - (od.Discount ?? 0))
+                         });
+
+        // Set default selections
+        selectedRows = new List<string> { nameof(SalesData.CategoryName), nameof(SalesData.ProductName) };
+        selectedColumns = new List<string> { nameof(SalesData.ShipCountry), nameof(SalesData.OrderYear) };
+        selectedAggregates = new List<RadzenPivotFieldChooser<SalesData>.Aggregate>
+        {
+            new RadzenPivotFieldChooser<SalesData>.Aggregate { Property = nameof(SalesData.TotalAmount), Function = AggregateFunction.Sum },
+            new RadzenPivotFieldChooser<SalesData>.Aggregate { Property = nameof(SalesData.Quantity), Function = AggregateFunction.Sum },
+            new RadzenPivotFieldChooser<SalesData>.Aggregate { Property = nameof(SalesData.UnitPrice), Function = AggregateFunction.Average },
+            new RadzenPivotFieldChooser<SalesData>.Aggregate { Property = nameof(SalesData.Discount), Function = AggregateFunction.Average }
+        };
+    }
+
+    private void OnFieldSelectionChanged()
+    {
+        // Force re-render when field selection changes
+        StateHasChanged();
+    }
+
+    private string GetFormatString(string fieldName)
+    {
+        return fieldName switch
+        {
+            "TotalAmount" => "{0:C}",
+            "UnitPrice" => "{0:C}",
+            "Discount" => "{0:P}",
+            _ => ""
+        };
+    }
+
+    public class SalesData
+    {
+        public string CategoryName { get; set; }
+        public string ProductName { get; set; }
+        public int OrderYear { get; set; }
+        public int OrderMonth { get; set; }
+        public string ShipCountry { get; set; }
+        public double UnitPrice { get; set; }
+        public short Quantity { get; set; }
+        public float Discount { get; set; }
+        public double TotalAmount { get; set; }
+    }
+} 
