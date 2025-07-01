@@ -566,7 +566,7 @@
             IReadOnlyDictionary<string, object> CellAttributes = new System.Collections.ObjectModel.ReadOnlyDictionary<string, object>(cellAttributes);
 
             var spanAttributes = new Dictionary<string, object>();
-            var title = column.Template == null && this.ShowCellDataAsTooltip ? $"{column.GetValue(Item)}" : "";
+            var title = column.Template == null && this.ShowCellDataAsTooltip || column.ShowCellDataAsTooltip ? $"{column.GetValue(Item)}" : "";
             if(!string.IsNullOrEmpty(title))
             {
                 SetAttribute(spanAttributes, "title", title);

@@ -38,6 +38,13 @@ namespace Radzen.Blazor
         public RadzenDataGridColumn<TItem> Parent { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether cell data should be shown as tooltip.
+        /// </summary>
+        /// <value><c>true</c> if cell data is shown as tooltip; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowCellDataAsTooltip { get; set; }
+
+        /// <summary>
         /// Specifies wether CheckBoxList filter list virtualization is enabled. Set to <c>true</c> by default.
         /// </summary>
         [Parameter]
