@@ -32,6 +32,12 @@ namespace Radzen.Blazor
         public bool ShowCalendarWeek { get; set; }
 
         /// <summary>
+        /// Gets or sets the today button.
+        /// </summary>
+        [Parameter]
+        public bool ShowTodayButton { get; set; }
+
+        /// <summary>
         /// Gets or sets the previous month aria label text.
         /// </summary>
         /// <value>The previous month aria label text.</value>
@@ -72,6 +78,12 @@ namespace Radzen.Blazor
         /// <value>The toggle Am/Pm aria label text.</value>
         [Parameter]
         public string ToggleAmPmAriaLabel { get; set; } = "Toggle Am/Pm";
+
+        /// <summary>
+        /// Gets or sets the text of the today button.
+        /// </summary>
+        [Parameter]
+        public string TodayButtonText { get; set; } = "Today";
 
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
@@ -195,7 +207,15 @@ namespace Radzen.Blazor
             seconds = newValue.Second;
             await UpdateValueFromTime(newValue);
         }
-
+        /// <summary>
+        /// Sets the <see cref="Value"/> property to the current date and time.
+        /// </summary>
+        /// <remarks>This method updates the <see cref="Value"/> property to the system's current date and
+        /// time based on the local time zone. It is typically used to quickly reset the value to "today."</remarks>
+        public void OnTodayClicked()
+        {
+            this.Value = DateTime.Now;
+        }
         async Task OkClick(bool shouldClose = true)
         {
             if (shouldClose)

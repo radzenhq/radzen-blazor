@@ -1,0 +1,8 @@
+﻿<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Date" Component="DatePickerWithTodayButton" />
+    <RadzenDatePicker @bind-Value=@value Name="DatePickerWithTodayButton" ShowTodayButton="true" TodayButtonText="Today" AllowClear="true"  />
+</RadzenStack>
+
+@code {
+    DateOnly? value;
+}
