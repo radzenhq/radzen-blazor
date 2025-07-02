@@ -31,13 +31,17 @@
                         <RadzenStack Orientation="Orientation.Horizontal">
                             <TextAlign Sheet=@Sheet />
                             <VerticalAlign Sheet=@Sheet />
-                            <AutoFilter Sheet=@Sheet />
                         </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="View">
                     <RadzenStack Orientation="Orientation.Horizontal">
                         <Freeze Sheet=@Sheet />
+                    </RadzenStack>
+                </RadzenTabsItem>
+                <RadzenTabsItem Text="Data">
+                    <RadzenStack Orientation="Orientation.Horizontal">
+                        <AutoFilter Sheet=@Sheet />
                     </RadzenStack>
                 </RadzenTabsItem>
             </Tabs>
