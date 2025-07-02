@@ -83,7 +83,11 @@ public partial class RangeSelectionItem
         get
         {
             var rect = Context.GetRectangle(Range.Start.Row, Range.Start.Column, Range.End.Row, Range.End.Column);
-            var cellRect = Context.GetRectangle(Cell.Row, Cell.Column);
+
+            var mergedCellRange = Sheet.MergedCells.GetMergedRangeOrSelf(Cell);
+
+            var intersectionRange = Range.Intersection(mergedCellRange);
+            var cellRect = Context.GetRectangle(intersectionRange.Start.Row, intersectionRange.Start.Column, intersectionRange.End.Row, intersectionRange.End.Column);
 
             var intersectionRect = rect.Intersection(cellRect);
 
@@ -93,4 +97,4 @@ public partial class RangeSelectionItem
             return $@"transform: translate({rect.Left.ToPx()}, {rect.Top.ToPx()}); width: {rect.Width.ToPx()}; height: {rect.Height.ToPx()}; mask-size: 100% 100%, {intersectionRect.Width.ToPx()} {intersectionRect.Height.ToPx()}; mask-position: 0 0, {offsetX.ToPx()} {offsetY.ToPx()};";
         }
     }
-} 
+}
