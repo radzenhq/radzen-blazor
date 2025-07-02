@@ -57,9 +57,9 @@ public interface IFilterCriterionVisitor
     void Visit(AndCriterion criterion);
 
     /// <summary>
-    /// Visits an EqualsCriterion.
+    /// Visits an EqualToCriterion.
     /// </summary>
-    void Visit(EqualsCriterion criterion);
+    void Visit(EqualToCriterion criterion);
 
     /// <summary>
     /// Visits a GreaterThanCriterion.
@@ -75,6 +75,26 @@ public interface IFilterCriterionVisitor
     /// Visits an IsNullCriterion.
     /// </summary>
     void Visit(IsNullCriterion criterion);
+
+    /// <summary>
+    /// Visits a LessThanCriterion.
+    /// </summary>
+    void Visit(LessThanCriterion criterion);
+
+    /// <summary>
+    /// Visits a GreaterThanOrEqualCriterion.
+    /// </summary>
+    void Visit(GreaterThanOrEqualCriterion criterion);
+
+    /// <summary>
+    /// Visits a LessThanOrEqualCriterion.
+    /// </summary>
+    void Visit(LessThanOrEqualCriterion criterion);
+
+    /// <summary>
+    /// Visits a NotEqualToCriterion.
+    /// </summary>
+    void Visit(NotEqualToCriterion criterion);
 }
 
 /// <summary>
@@ -193,7 +213,7 @@ public abstract class FilterCriterionLeaf : FilterCriterion
 /// <summary>
 /// Represents a filter criterion that checks for equality with a specified value.
 /// </summary>
-public class EqualsCriterion : FilterCriterionLeaf
+public class EqualToCriterion : FilterCriterionLeaf
 {
     /// <summary>
     /// Gets or sets the value that this filter criterion checks for equality against.
@@ -308,6 +328,131 @@ public class IsNullCriterion : FilterCriterionLeaf
     public override bool Matches(object? value)
     {
         return value == null;
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if the value is less than a specified value.
+/// </summary>
+public class LessThanCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for being less than.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
+        {
+            return numericValue < numericCriterion;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if the value is greater than or equal to a specified value.
+/// </summary>
+public class GreaterThanOrEqualCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for being greater than or equal to.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
+        {
+            return numericValue >= numericCriterion;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if the value is less than or equal to a specified value.
+/// </summary>
+public class LessThanOrEqualCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for being less than or equal to.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
+        {
+            return numericValue <= numericCriterion;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks for inequality with a specified value.
+/// </summary>
+public class NotEqualToCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for inequality against.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        if (Equals(value, Value))
+        {
+            return false;
+        }
+
+        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
+        {
+            return numericValue != numericCriterion;
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>

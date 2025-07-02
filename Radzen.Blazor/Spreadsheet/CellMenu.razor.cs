@@ -128,7 +128,7 @@ public partial class CellMenu : ComponentBase
             }
         }
 
-        public void Visit(EqualsCriterion criterion)
+        public void Visit(EqualToCriterion criterion)
         {
             // Not relevant for InListCriterion extraction
         }
@@ -150,6 +150,26 @@ public partial class CellMenu : ComponentBase
         }
 
         public void Visit(IsNullCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(LessThanCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(GreaterThanOrEqualCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(LessThanOrEqualCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(NotEqualToCriterion criterion)
         {
             // Not relevant for InListCriterion extraction
         }
