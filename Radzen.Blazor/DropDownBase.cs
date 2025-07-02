@@ -757,8 +757,9 @@ namespace Radzen
 
                 Debounce(DebounceFilter, FilterDelay);
             }
-            else if(!args.CtrlKey && !args.AltKey && !args.ShiftKey)
+            else if (args.Key.Length == 1 && !args.CtrlKey && !args.AltKey && !args.ShiftKey)
             {
+                // searching for element
                 var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
                     Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
                     Query)

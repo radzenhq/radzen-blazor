@@ -393,6 +393,8 @@ $tabs-tab-hover-background-color: var(--rz-base-600) !default;
 $grid-border-radius: 0 !default;
 $grid-cell-border: var(--rz-border-base-700);
 $grid-data-border-shadow: 0 1px 0 0 var(--rz-base-600), 0 -1px 0 0 var(--rz-base-600);
+$grid-cell-focus-background-color: var(--rz-primary-lighter) !default;
+$grid-cell-focus-color: var(--rz-on-primary-lighter) !default;
 $grid-hover-background-color: var(--rz-primary-lighter) !default;
 $grid-hover-color: var(--rz-on-primary-lighter) !default;
 $grid-selected-background-color: var(--rz-primary-lighter) !default;
