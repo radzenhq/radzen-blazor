@@ -3,9 +3,44 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents a data table in a spreadsheet, defined by a range.
 /// </summary>
-public class DataTable(Sheet sheet, RangeRef range) : AutoFilter(sheet, range)
+public class Table
 {
     private bool showFilterButton = true;
+    private AutoFilter filter;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Table"/> class.
+    /// </summary>
+    public Table(Sheet sheet, RangeRef range)
+    {
+        Sheet = sheet;
+        Range = range;
+        Filter = new AutoFilter(sheet, range);
+    }
+
+    /// <summary>
+    /// Gets the sheet to which the table is applied.
+    /// </summary>
+    public Sheet Sheet { get; }
+
+    /// <summary>
+    /// Gets the range of the table.
+    /// </summary>
+    public RangeRef Range { get; }
+
+    /// <summary>
+    /// Gets the auto filter for this table.
+    /// </summary>
+    public AutoFilter Filter
+    {
+        get => filter;
+        private set => filter = value;
+    }
+
+    /// <summary>
+    /// Gets the first visible cell reference in the range.
+    /// </summary>
+    public CellRef Start => Filter.Start;
 
     /// <summary>
     /// Gets or sets whether to show the filter button for this data table.

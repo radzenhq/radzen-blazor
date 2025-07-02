@@ -234,35 +234,35 @@
     z-index: 6;
 }
 
-.rz-spreadsheet-datatable-frame {
+.rz-spreadsheet-table-frame {
     position: absolute;
     z-index: 1;
     pointer-events: none;
 }
 
-.rz-spreadsheet-datatable-frame-top {
+.rz-spreadsheet-table-frame-top {
     border-top: 1px solid black;
 }
 
-.rz-spreadsheet-datatable-frame-left {
+.rz-spreadsheet-table-frame-left {
     border-left: 1px solid black;
 }
 
-.rz-spreadsheet-datatable-frame-right {
+.rz-spreadsheet-table-frame-right {
     border-right: 1px solid black;
 }
 
-.rz-spreadsheet-datatable-frame-bottom {
+.rz-spreadsheet-table-frame-bottom {
     border-bottom: 1px solid black;
 }
 
-.rz-spreadsheet-datatable-frame.rz-spreadsheet-frozen-row,
-.rz-spreadsheet-datatable-frame.rz-spreadsheet-frozen-column {
+.rz-spreadsheet-table-frame.rz-spreadsheet-frozen-row,
+.rz-spreadsheet-table-frame.rz-spreadsheet-frozen-column {
     z-index: 3;
 }
 
 .rz-spreadsheet-selection-cell.rz-spreadsheet-frozen-row.rz-spreadsheet-frozen-column,
-.rz-spreadsheet-datatable-frame.rz-spreadsheet-frozen-row.rz-spreadsheet-frozen-column {
+.rz-spreadsheet-table-frame.rz-spreadsheet-frozen-row.rz-spreadsheet-frozen-column {
     z-index: 4;
     z-index: 4;
 }
