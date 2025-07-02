@@ -15,7 +15,7 @@ public class FilterCommandTests
 
         // Create a filter
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "Test" },
+            new EqualToCriterion { Column = 0, Value = "Test" },
             RangeRef.Parse("A1:A5")
         );
 
@@ -39,7 +39,7 @@ public class FilterCommandTests
 
         // Create a filter
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "Test" },
+            new EqualToCriterion { Column = 0, Value = "Test" },
             RangeRef.Parse("A1:A5")
         );
 
@@ -65,7 +65,7 @@ public class FilterCommandTests
 
         // Create a filter
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "Test" },
+            new EqualToCriterion { Column = 0, Value = "Test" },
             RangeRef.Parse("A1:A5")
         );
 
@@ -106,12 +106,12 @@ public class FilterCommandTests
 
         // Create multiple filters
         var filter1 = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "Test1" },
+            new EqualToCriterion { Column = 0, Value = "Test1" },
             RangeRef.Parse("A1:A5")
         );
 
         var filter2 = new SheetFilter(
-            new EqualsCriterion { Column = 1, Value = "Test2" },
+            new EqualToCriterion { Column = 1, Value = "Test2" },
             RangeRef.Parse("B1:B5")
         );
 
