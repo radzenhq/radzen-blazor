@@ -8,14 +8,14 @@ public class FilteringTests
     private readonly Sheet sheet = new(10, 10);
 
     [Fact]
-    public void Should_FilterEqualsCriterion()
+    public void Should_FilterEqualToCriterion()
     {
         sheet.Cells[0, 0].Value = "A";
         sheet.Cells[1, 0].Value = "B";
         sheet.Cells[2, 0].Value = "A";
 
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "A" },
+            new EqualToCriterion { Column = 0, Value = "A" },
             RangeRef.Parse("A1:A3")
         );
         sheet.AddFilter(filter);
@@ -33,7 +33,7 @@ public class FilteringTests
         sheet.Cells[2, 0].Value = "A";
 
         var filterA = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "A" },
+            new EqualToCriterion { Column = 0, Value = "A" },
             RangeRef.Parse("A1:A3")
         );
         sheet.AddFilter(filterA);
@@ -43,7 +43,7 @@ public class FilteringTests
         // Remove previous filter and apply new one
         sheet.RemoveFilter(filterA);
         var filterB = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "B" },
+            new EqualToCriterion { Column = 0, Value = "B" },
             RangeRef.Parse("A1:A3")
         );
         sheet.AddFilter(filterB);
@@ -63,7 +63,7 @@ public class FilteringTests
         sheet.Cells[3, 0].Value = "abc";   // row 3: non-numeric string
 
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = 10 },
+            new EqualToCriterion { Column = 0, Value = 10 },
             RangeRef.Parse("A1:A4")
         );
         sheet.AddFilter(filter);
@@ -94,8 +94,8 @@ public class FilteringTests
             new OrCriterion
             {
                 Criteria = [
-                    new EqualsCriterion { Column = 0, Value = "Pending" },
-                    new EqualsCriterion { Column = 1, Value = 90 }
+                    new EqualToCriterion { Column = 0, Value = "Pending" },
+                    new EqualToCriterion { Column = 1, Value = 90 }
                 ]
             },
             RangeRef.Parse("A2:B4")
@@ -120,8 +120,8 @@ public class FilteringTests
             new AndCriterion
             {
                 Criteria = [
-                    new EqualsCriterion { Column = 0, Value = "Active" },
-                    new EqualsCriterion { Column = 1, Value = 85 }
+                    new EqualToCriterion { Column = 0, Value = "Active" },
+                    new EqualToCriterion { Column = 1, Value = 85 }
                 ]
             },
             RangeRef.Parse("A2:B4")
@@ -149,8 +149,8 @@ public class FilteringTests
                 Criteria = [
                     new OrCriterion {
                         Criteria = [
-                            new EqualsCriterion { Column = 0, Value = "Active" },
-                            new EqualsCriterion { Column = 0, Value = "Pending" }
+                            new EqualToCriterion { Column = 0, Value = "Active" },
+                            new EqualToCriterion { Column = 0, Value = "Pending" }
                         ]
                     },
                     new GreaterThanCriterion {
@@ -327,7 +327,7 @@ public class FilteringTests
         sheet.Cells[2, 0].Value = "A";
 
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "A" },
+            new EqualToCriterion { Column = 0, Value = "A" },
             RangeRef.Parse("A1:A3")
         );
 
@@ -359,7 +359,7 @@ public class FilteringTests
         sheet.Cells[2, 0].Value = "A";
 
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "A" },
+            new EqualToCriterion { Column = 0, Value = "A" },
             RangeRef.Parse("A1:A3")
         );
 
@@ -386,7 +386,7 @@ public class FilteringTests
     public void Should_RemoveFilterReturnFalseForNonExistentFilter()
     {
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "A" },
+            new EqualToCriterion { Column = 0, Value = "A" },
             RangeRef.Parse("A1:A3")
         );
 
@@ -420,7 +420,7 @@ public class FilteringTests
         sheet.Cells[2, 0].Value = "A";
 
         var filter = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "A" },
+            new EqualToCriterion { Column = 0, Value = "A" },
             RangeRef.Parse("A1:A3")
         );
 
@@ -447,7 +447,7 @@ public class FilteringTests
         sheet.Cells[2, 0].Value = "A"; sheet.Cells[2, 1].Value = 30;
 
         var filter1 = new SheetFilter(
-            new EqualsCriterion { Column = 0, Value = "A" },
+            new EqualToCriterion { Column = 0, Value = "A" },
             RangeRef.Parse("A1:A3")
         );
 
@@ -485,5 +485,275 @@ public class FilteringTests
         Assert.False(sheet.Rows.IsHidden(0));
         Assert.False(sheet.Rows.IsHidden(1));
         Assert.False(sheet.Rows.IsHidden(2));
+    }
+
+    [Fact]
+    public void Should_FilterWithLessThanCriterion()
+    {
+        sheet.Cells[0, 0].Value = 10;
+        sheet.Cells[1, 0].Value = 20;
+        sheet.Cells[2, 0].Value = 30;
+        sheet.Cells[3, 0].Value = 40;
+
+        var filter = new SheetFilter(
+            new LessThanCriterion { Column = 0, Value = 25 },
+            RangeRef.Parse("A1:A4")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.False(sheet.Rows.IsHidden(0)); // 10 < 25 - matches
+        Assert.False(sheet.Rows.IsHidden(1)); // 20 < 25 - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // 30 >= 25 - doesn't match
+        Assert.True(sheet.Rows.IsHidden(3));  // 40 >= 25 - doesn't match
+    }
+
+    [Fact]
+    public void Should_FilterWithLessThanCriterionForMixedTypes()
+    {
+        sheet.Cells[0, 0].Value = "10";    // string
+        sheet.Cells[1, 0].Value = 20;      // number
+        sheet.Cells[2, 0].Value = "30.0";  // string
+        sheet.Cells[3, 0].Value = 40;      // number
+
+        var filter = new SheetFilter(
+            new LessThanCriterion { Column = 0, Value = 25 },
+            RangeRef.Parse("A1:A4")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.False(sheet.Rows.IsHidden(0)); // "10" < 25 - matches
+        Assert.False(sheet.Rows.IsHidden(1)); // 20 < 25 - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // "30.0" >= 25 - doesn't match
+        Assert.True(sheet.Rows.IsHidden(3));  // 40 >= 25 - doesn't match
+    }
+
+    [Fact]
+    public void Should_FilterWithLessThanCriterionForNonNumericValues()
+    {
+        sheet.Cells[0, 0].Value = "Apple";
+        sheet.Cells[1, 0].Value = "Banana";
+        sheet.Cells[2, 0].Value = 10;
+
+        var filter = new SheetFilter(
+            new LessThanCriterion { Column = 0, Value = 20 },
+            RangeRef.Parse("A1:A3")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.True(sheet.Rows.IsHidden(0));  // "Apple" - not numeric, doesn't match
+        Assert.True(sheet.Rows.IsHidden(1));  // "Banana" - not numeric, doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // 10 < 20 - matches
+    }
+
+    [Fact]
+    public void Should_FilterWithGreaterThanOrEqualCriterion()
+    {
+        sheet.Cells[0, 0].Value = 10;
+        sheet.Cells[1, 0].Value = 20;
+        sheet.Cells[2, 0].Value = 30;
+        sheet.Cells[3, 0].Value = 40;
+
+        var filter = new SheetFilter(
+            new GreaterThanOrEqualCriterion { Column = 0, Value = 25 },
+            RangeRef.Parse("A1:A4")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.True(sheet.Rows.IsHidden(0));  // 10 < 25 - doesn't match
+        Assert.True(sheet.Rows.IsHidden(1));  // 20 < 25 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // 30 >= 25 - matches
+        Assert.False(sheet.Rows.IsHidden(3)); // 40 >= 25 - matches
+    }
+
+    [Fact]
+    public void Should_FilterWithGreaterThanOrEqualCriterionForExactMatch()
+    {
+        sheet.Cells[0, 0].Value = 10;
+        sheet.Cells[1, 0].Value = 25;
+        sheet.Cells[2, 0].Value = 30;
+
+        var filter = new SheetFilter(
+            new GreaterThanOrEqualCriterion { Column = 0, Value = 25 },
+            RangeRef.Parse("A1:A3")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.True(sheet.Rows.IsHidden(0));  // 10 < 25 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(1)); // 25 >= 25 - matches (exact)
+        Assert.False(sheet.Rows.IsHidden(2)); // 30 >= 25 - matches
+    }
+
+    [Fact]
+    public void Should_FilterWithLessThanOrEqualCriterion()
+    {
+        sheet.Cells[0, 0].Value = 10;
+        sheet.Cells[1, 0].Value = 20;
+        sheet.Cells[2, 0].Value = 30;
+        sheet.Cells[3, 0].Value = 40;
+
+        var filter = new SheetFilter(
+            new LessThanOrEqualCriterion { Column = 0, Value = 25 },
+            RangeRef.Parse("A1:A4")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.False(sheet.Rows.IsHidden(0)); // 10 <= 25 - matches
+        Assert.False(sheet.Rows.IsHidden(1)); // 20 <= 25 - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // 30 > 25 - doesn't match
+        Assert.True(sheet.Rows.IsHidden(3));  // 40 > 25 - doesn't match
+    }
+
+    [Fact]
+    public void Should_FilterWithLessThanOrEqualCriterionForExactMatch()
+    {
+        sheet.Cells[0, 0].Value = 10;
+        sheet.Cells[1, 0].Value = 25;
+        sheet.Cells[2, 0].Value = 30;
+
+        var filter = new SheetFilter(
+            new LessThanOrEqualCriterion { Column = 0, Value = 25 },
+            RangeRef.Parse("A1:A3")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.False(sheet.Rows.IsHidden(0)); // 10 <= 25 - matches
+        Assert.False(sheet.Rows.IsHidden(1)); // 25 <= 25 - matches (exact)
+        Assert.True(sheet.Rows.IsHidden(2));  // 30 > 25 - doesn't match
+    }
+
+    [Fact]
+    public void Should_FilterWithNotEqualToCriterion()
+    {
+        sheet.Cells[0, 0].Value = "Apple";
+        sheet.Cells[1, 0].Value = "Banana";
+        sheet.Cells[2, 0].Value = "Apple";
+        sheet.Cells[3, 0].Value = "Cherry";
+
+        var filter = new SheetFilter(
+            new NotEqualToCriterion { Column = 0, Value = "Apple" },
+            RangeRef.Parse("A1:A4")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.True(sheet.Rows.IsHidden(0));  // "Apple" == "Apple" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(1)); // "Banana" != "Apple" - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // "Apple" == "Apple" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // "Cherry" != "Apple" - matches
+    }
+
+    [Fact]
+    public void Should_FilterWithNotEqualToCriterionForNumbers()
+    {
+        sheet.Cells[0, 0].Value = 10;
+        sheet.Cells[1, 0].Value = 20;
+        sheet.Cells[2, 0].Value = 10;
+        sheet.Cells[3, 0].Value = 30;
+
+        var filter = new SheetFilter(
+            new NotEqualToCriterion { Column = 0, Value = 10 },
+            RangeRef.Parse("A1:A4")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.True(sheet.Rows.IsHidden(0));  // 10 == 10 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(1)); // 20 != 10 - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // 10 == 10 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // 30 != 10 - matches
+    }
+
+    [Fact]
+    public void Should_FilterWithNotEqualToCriterionForMixedTypes()
+    {
+        sheet.Cells[0, 0].Value = "10";    // string
+        sheet.Cells[1, 0].Value = 20;      // number
+        sheet.Cells[2, 0].Value = "10.0";  // string
+        sheet.Cells[3, 0].Value = 40;      // number
+
+        var filter = new SheetFilter(
+            new NotEqualToCriterion { Column = 0, Value = 10 },
+            RangeRef.Parse("A1:A4")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.True(sheet.Rows.IsHidden(0));  // "10" == 10 (numeric coercion) - doesn't match
+        Assert.False(sheet.Rows.IsHidden(1)); // 20 != 10 - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // "10.0" == 10 (numeric coercion) - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // 40 != 10 - matches
+    }
+
+    [Fact]
+    public void Should_FilterWithNotEqualToCriterionForNonNumericStrings()
+    {
+        sheet.Cells[0, 0].Value = "Apple";
+        sheet.Cells[1, 0].Value = "Banana";
+        sheet.Cells[2, 0].Value = 10;
+
+        var filter = new SheetFilter(
+            new NotEqualToCriterion { Column = 0, Value = 10 },
+            RangeRef.Parse("A1:A3")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.False(sheet.Rows.IsHidden(0)); // "Apple" != 10 - matches
+        Assert.False(sheet.Rows.IsHidden(1)); // "Banana" != 10 - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // 10 == 10 - doesn't match
+    }
+
+    [Fact]
+    public void Should_FilterWithNotEqualToCriterionForNullValues()
+    {
+        sheet.Cells[0, 0].Value = null;
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = null;
+
+        var filter = new SheetFilter(
+            new NotEqualToCriterion { Column = 0, Value = "Apple" },
+            RangeRef.Parse("A1:A3")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.True(sheet.Rows.IsHidden(0));  // null != "Apple" but null handling returns false
+        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" == "Apple" - doesn't match
+        Assert.True(sheet.Rows.IsHidden(2));  // null != "Apple" but null handling returns false
+    }
+
+    [Fact]
+    public void Should_FilterWithComplexCombinationOfNewCriteria()
+    {
+        var sheet = new Sheet(6, 2);
+
+        sheet.Cells[1, 0].Value = "Active"; sheet.Cells[1, 1].Value = 85;
+        sheet.Cells[2, 0].Value = "Pending"; sheet.Cells[2, 1].Value = 60;
+        sheet.Cells[3, 0].Value = "Inactive"; sheet.Cells[3, 1].Value = 90;
+        sheet.Cells[4, 0].Value = "Suspended"; sheet.Cells[4, 1].Value = 45;
+        sheet.Cells[5, 0].Value = "Active"; sheet.Cells[5, 1].Value = 95;
+
+        var filter = new SheetFilter(
+            new AndCriterion
+            {
+                Criteria = [
+                    new OrCriterion {
+                        Criteria = [
+                            new EqualToCriterion { Column = 0, Value = "Active" },
+                            new NotEqualToCriterion { Column = 0, Value = "Inactive" }
+                        ]
+                    },
+                    new AndCriterion {
+                        Criteria = [
+                            new GreaterThanOrEqualCriterion { Column = 1, Value = 50 },
+                            new LessThanOrEqualCriterion { Column = 1, Value = 90 }
+                        ]
+                    }
+                ]
+            },
+            RangeRef.Parse("A2:B6")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.False(sheet.Rows.IsHidden(1)); // Active + 85 - matches both criteria
+        Assert.False(sheet.Rows.IsHidden(2)); // Pending + 60 - matches both criteria
+        Assert.True(sheet.Rows.IsHidden(3));  // Inactive + 90 - doesn't match first criterion
+        Assert.True(sheet.Rows.IsHidden(4));  // Suspended + 45 - doesn't match second criterion
+        Assert.True(sheet.Rows.IsHidden(5));  // Active + 95 - doesn't match second criterion
     }
 }
