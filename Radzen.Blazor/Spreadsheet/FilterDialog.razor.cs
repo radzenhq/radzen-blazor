@@ -65,18 +65,20 @@ public partial class FilterDialog : ComponentBase
     [Inject]
     public DialogService DialogService { get; set; } = default!;
 
-    private FilterOperator SelectedOperator { get; set; } = FilterOperator.Equals;
-    private string FilterValue { get; set; } = "";
-    
-    private LogicalFilterOperator LogicalOperator { get; set; } = LogicalFilterOperator.And;
+    /// <summary>
+    /// Optional existing filter criterion to populate default values.
+    /// </summary>
+    [Parameter]
+    public FilterCriterion? Filter { get; set; }
 
-    private FilterOperator SelectedOperator2 { get; set; } = FilterOperator.None;
-    private string FilterValue2 { get; set; } = "";
-
-    private List<FilterOperatorOption> AvailableOperators { get; set; } = [];
-    private List<LogicalOperatorOption> LogicalOperators { get; set; } = [];
-
-    private string FieldName { get; set; } = "";
+    private FilterOperator selectedOperator = FilterOperator.Equals;
+    private string filterValue = "";
+    private LogicalFilterOperator logicalOperator = LogicalFilterOperator.And;
+    private FilterOperator secondOperator = FilterOperator.None;
+    private string secondFilterValue = "";
+    private List<FilterOperatorOption> availableOperators = [];
+    private List<LogicalOperatorOption> logicalOperators = [];
+    private string fieldName = "";
 
     /// <inheritdoc />
     protected override void OnInitialized()
@@ -84,9 +86,16 @@ public partial class FilterDialog : ComponentBase
         InitializeFieldName();
         InitializeAvailableOperators();
         InitializeLogicalOperators();
-        
-        SelectedOperator = FilterOperator.Equals;
-        SelectedOperator2 = FilterOperator.None;
+
+        selectedOperator = FilterOperator.Equals;
+        secondOperator = FilterOperator.None;
+
+        if (Filter != null)
+        {
+            var visitor = new FilterCriterionVisitor(Column);
+            Filter.Accept(visitor);
+            PopulateFromVisitor(visitor);
+        }
     }
 
     private void InitializeFieldName()
@@ -106,17 +115,17 @@ public partial class FilterDialog : ComponentBase
         {
             var headerCell = Sheet.Cells[rangeToUse.Start.Row, Column];
             var headerText = headerCell.GetValueAsString();
-            FieldName = string.IsNullOrEmpty(headerText) ? $"Column {Column + 1}" : headerText;
+            fieldName = string.IsNullOrEmpty(headerText) ? $"Column {Column + 1}" : headerText;
         }
         else
         {
-            FieldName = $"Column {Column + 1}";
+            fieldName = $"Column {Column + 1}";
         }
     }
 
     private void InitializeAvailableOperators()
     {
-        AvailableOperators = [
+        availableOperators = [
             new FilterOperatorOption { Text = "", Value = FilterOperator.None },
             new FilterOperatorOption { Text = "equals", Value = FilterOperator.Equals },
             new FilterOperatorOption { Text = "does not equal", Value = FilterOperator.NotEquals },
@@ -137,15 +146,10 @@ public partial class FilterDialog : ComponentBase
 
     private void InitializeLogicalOperators()
     {
-        LogicalOperators = [
+        logicalOperators = [
             new LogicalOperatorOption { Text = "AND", Value = LogicalFilterOperator.And },
             new LogicalOperatorOption { Text = "OR", Value = LogicalFilterOperator.Or }
         ];
-    }
-
-    private string GetFieldName(int columnIndex)
-    {
-        return FieldName;
     }
 
     private void OnOk()
@@ -165,7 +169,7 @@ public partial class FilterDialog : ComponentBase
         var autoFilter = GetCurrentAutoFilter();
 
         RangeRef rangeToUse = RangeRef.Invalid;
-        
+
         if (dataTable != null)
         {
             rangeToUse = dataTable.Range;
@@ -182,12 +186,12 @@ public partial class FilterDialog : ComponentBase
 
         FilterCriterion criterion;
 
-        if (SelectedOperator2 != FilterOperator.None)
+        if (secondOperator != FilterOperator.None)
         {
-            var criterion1 = CreateCriterion(Column, SelectedOperator, FilterValue);
-            var criterion2 = CreateCriterion(Column, SelectedOperator2, FilterValue2);
+            var criterion1 = CreateCriterion(Column, selectedOperator, filterValue);
+            var criterion2 = CreateCriterion(Column, secondOperator, secondFilterValue);
 
-            if (LogicalOperator == LogicalFilterOperator.And)
+            if (logicalOperator == LogicalFilterOperator.And)
             {
                 criterion = new AndCriterion { Criteria = [criterion1, criterion2] };
             }
@@ -198,7 +202,7 @@ public partial class FilterDialog : ComponentBase
         }
         else
         {
-            criterion = CreateCriterion(Column, SelectedOperator, FilterValue);
+            criterion = CreateCriterion(Column, selectedOperator, filterValue);
         }
 
         return new SheetFilter(criterion, rangeToUse);
@@ -246,4 +250,162 @@ public partial class FilterDialog : ComponentBase
         }
         return null;
     }
-} 
+
+    private void PopulateFromVisitor(FilterCriterionVisitor visitor)
+    {
+        if (visitor.Criteria.Count > 0)
+        {
+            var firstCriterion = visitor.Criteria[0];
+            selectedOperator = firstCriterion.Operator;
+            filterValue = firstCriterion.Value ?? "";
+
+            if (visitor.Criteria.Count > 1)
+            {
+                var secondCriterion = visitor.Criteria[1];
+                secondOperator = secondCriterion.Operator;
+                secondFilterValue = secondCriterion.Value ?? "";
+                logicalOperator = visitor.LogicalOperator;
+            }
+        }
+    }
+
+    private class FilterCriterionVisitor(int column) : IFilterCriterionVisitor
+    {
+        public List<(FilterOperator Operator, string? Value)> Criteria { get; } = [];
+        public LogicalFilterOperator LogicalOperator { get; set; } = LogicalFilterOperator.And;
+
+        public void Visit(OrCriterion criterion)
+        {
+            LogicalOperator = LogicalFilterOperator.Or;
+            foreach (var c in criterion.Criteria)
+            {
+                c.Accept(this);
+            }
+        }
+
+        public void Visit(AndCriterion criterion)
+        {
+            LogicalOperator = LogicalFilterOperator.And;
+            foreach (var c in criterion.Criteria)
+            {
+                c.Accept(this);
+            }
+        }
+
+        public void Visit(EqualToCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.Equals, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(GreaterThanCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.GreaterThan, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(InListCriterion criterion)
+        {
+            // Not used for custom filter dialog
+        }
+
+        public void Visit(IsNullCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.IsEmpty, null));
+            }
+        }
+
+        public void Visit(LessThanCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.LessThan, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(GreaterThanOrEqualCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.GreaterThanOrEqual, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(LessThanOrEqualCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.LessThanOrEqual, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(NotEqualToCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                if (criterion.Value == null)
+                {
+                    Criteria.Add((FilterOperator.IsNotEmpty, null));
+                }
+                else
+                {
+                    Criteria.Add((FilterOperator.NotEquals, criterion.Value?.ToString()));
+                }
+            }
+        }
+
+        public void Visit(StartsWithCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.BeginsWith, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(DoesNotStartWithCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.DoesNotBeginWith, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(EndsWithCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.EndsWith, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(DoesNotEndWithCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.DoesNotEndWith, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(ContainsCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.Contains, criterion.Value?.ToString()));
+            }
+        }
+
+        public void Visit(DoesNotContainCriterion criterion)
+        {
+            if (criterion.Column == column)
+            {
+                Criteria.Add((FilterOperator.DoesNotContain, criterion.Value?.ToString()));
+            }
+        }
+    }
+}
