@@ -173,6 +173,36 @@ public partial class CellMenu : ComponentBase
         {
             // Not relevant for InListCriterion extraction
         }
+
+        public void Visit(StartsWithCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(DoesNotStartWithCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(EndsWithCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(DoesNotEndWithCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(ContainsCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
+
+        public void Visit(DoesNotContainCriterion criterion)
+        {
+            // Not relevant for InListCriterion extraction
+        }
     }
 
     private async Task OnSortAscendingAsync()
