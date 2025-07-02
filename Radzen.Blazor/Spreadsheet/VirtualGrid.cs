@@ -554,7 +554,16 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
 
         foreach (var range in visibleMergedCells)
         {
-            var ranges = MergedCells.SplitRange(range);
+            // Adjust the range to start from the first visible row and column
+            var adjustedRange = AdjustRangeForHiddenRowsAndColumns(range);
+            
+            // Skip if the entire range is hidden
+            if (adjustedRange == null)
+            {
+                continue;
+            }
+
+            var ranges = MergedCells.SplitRange(adjustedRange.Value);
 
             foreach (var splitRange in ranges)
             {
@@ -592,6 +601,30 @@ public partial class VirtualGrid : ComponentBase, IAsyncDisposable, IVirtualGrid
         }
         
         return state;
+    }
+
+    private RangeRef? AdjustRangeForHiddenRowsAndColumns(RangeRef range)
+    {
+        var row = range.Start.Row;
+
+        while (row <= range.End.Row && Rows.IsHidden(row))
+        {
+            row++;
+        }
+
+        var column = range.Start.Column;
+
+        while (column <= range.End.Column && Columns.IsHidden(column))
+        {
+            column++;
+        }
+
+        if (row > range.End.Row || column > range.End.Column)
+        {
+            return null;
+        }
+
+        return new RangeRef(new CellRef(row, column), range.End);
     }
 
     ValueTask IAsyncDisposable.DisposeAsync()
