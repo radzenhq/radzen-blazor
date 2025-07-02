@@ -194,7 +194,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Animation Types", Anchor = "#animation-types" }, new () { Text = "Complex Example", Anchor = "#complex-example" }, new () { Text = "Configuration", Anchor = "#configuration" } ],
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Animation Types", Anchor = "#animation-types" }, new () { Text = "Complex Example", Anchor = "#complex-example" } ],
                     Name = "Skeleton",
                     Title = "Blazor Skeleton Component | Free UI Components by Radzen",
                     Description = "RadzenSkeleton component displays loading placeholders with various animation types.",
