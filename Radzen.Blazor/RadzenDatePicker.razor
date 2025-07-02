@@ -99,6 +99,14 @@
                             </table>
                         </div>
                         }
+                        @if (ShowTodayButton)
+                        {
+                            <div class="rz-w-100 rz-text-align-center rz-pb-1">
+                                <button aria-label="TodayButtonText" type="button" class="rz-button rz-button-md rz-primary" tabindex="1" @onclick="@(args => OnTodayClicked())">
+                                <span class="rz-button-text">@TodayButtonText</span>
+                            </button>
+                            </div>      
+                        }
                         @if (FooterTemplate != null)
                         {
                             <div class="rz-datepicker-footer">
@@ -106,7 +114,7 @@
                             </div>
                         }
                     }
-                </div>
+                </div>                
                 @if (ShowTime)
                 {
                 <div class="rz-timepicker" @onmousedown:stopPropagation>
@@ -138,13 +146,15 @@
                                 </a>
                             </div>
                         }
+                        
                         @if (ShowTimeOkButton)
                         {
                             <button aria-label="@OkAriaLabel" type="button" class="rz-button rz-button-md rz-secondary" tabindex="0" @onclick="@(args => OkClick())">
                                 <span class="rz-button-text">@OkAriaLabel</span>
                             </button>
                         }
-                    </div>
+                    
+                </div>
                 }
         </Popup>
 
