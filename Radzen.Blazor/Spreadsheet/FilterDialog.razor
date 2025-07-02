@@ -4,20 +4,20 @@
 <RadzenStack Orientation="Orientation.Vertical" Gap="20px">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
         <RadzenLabel Text="Show rows where:" />
-        <RadzenLabel Text=@GetFieldName(SelectedField) Style="font-weight: bold; min-width: 100px;" />
+        <RadzenLabel Text=@fieldName />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
-        <RadzenDropDown @bind-Value=@SelectedOperator Data=@AvailableOperators TextProperty="Text" ValueProperty="Value"
+        <RadzenDropDown @bind-Value=@selectedOperator Data=@availableOperators TextProperty="Text" ValueProperty="Value"
             Placeholder="Select operator..." />
-        <RadzenTextBox @bind-Value=@FilterValue Placeholder="Enter value..." />
+        <RadzenTextBox @bind-Value=@filterValue Placeholder="Enter value..." Style="flex: 1" />
     </RadzenStack>
 
-    <RadzenSelectBar @bind-Value=@LogicalOperator Data=@LogicalOperators TextProperty="Text" ValueProperty="Value" />
+    <RadzenSelectBar @bind-Value=@logicalOperator Data=@logicalOperators TextProperty="Text" ValueProperty="Value" />
     <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
-        <RadzenDropDown @bind-Value=@SelectedOperator2 Data=@AvailableOperators TextProperty="Text"
+        <RadzenDropDown @bind-Value=@secondOperator Data=@availableOperators TextProperty="Text"
             ValueProperty="Value" Placeholder="Select operator..." />
-        <RadzenTextBox @bind-Value=@FilterValue2 Placeholder="Enter value..." />
+        <RadzenTextBox @bind-Value=@secondFilterValue Placeholder="Enter value..." Style="flex:1" />
     </RadzenStack>
 
     <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End">
