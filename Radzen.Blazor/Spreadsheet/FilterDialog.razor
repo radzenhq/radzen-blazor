@@ -1,0 +1,27 @@
+@using Microsoft.AspNetCore.Components
+@using Radzen.Blazor.Spreadsheet
+
+<RadzenStack Orientation="Orientation.Vertical" Gap="20px">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
+        <RadzenLabel Text="Show rows where:" />
+        <RadzenLabel Text=@GetFieldName(SelectedField) Style="font-weight: bold; min-width: 100px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
+        <RadzenDropDown @bind-Value=@SelectedOperator Data=@AvailableOperators TextProperty="Text" ValueProperty="Value"
+            Placeholder="Select operator..." />
+        <RadzenTextBox @bind-Value=@FilterValue Placeholder="Enter value..." />
+    </RadzenStack>
+
+    <RadzenSelectBar @bind-Value=@LogicalOperator Data=@LogicalOperators TextProperty="Text" ValueProperty="Value" />
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" AlignItems="AlignItems.Center">
+        <RadzenDropDown @bind-Value=@SelectedOperator2 Data=@AvailableOperators TextProperty="Text"
+            ValueProperty="Value" Placeholder="Select operator..." />
+        <RadzenTextBox @bind-Value=@FilterValue2 Placeholder="Enter value..." />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="10px" JustifyContent="JustifyContent.End">
+        <RadzenButton Text="OK" Click=@OnOk ButtonStyle="ButtonStyle.Primary" Size="ButtonSize.Small" />
+        <RadzenButton Text="Cancel" Click=@OnCancel ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" />
+    </RadzenStack>
+</RadzenStack>

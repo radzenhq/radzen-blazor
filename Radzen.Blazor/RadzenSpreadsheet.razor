@@ -3,6 +3,7 @@
 @using Radzen.Blazor.Spreadsheet
 @using Radzen.Blazor.Spreadsheet.Tools
 @using Radzen.Blazor.Rendering
+@inject DialogService DialogService
 @inherits RadzenComponent
 
 <div @ref=@Element class=@GetCssClass() style=@Style @attributes=@Attributes tabindex="0">
@@ -86,7 +87,8 @@
             @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
             {
                 <CellMenu Sheet=@Sheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync 
-                         SortAscending=@OnCellMenuSortAscendingAsync SortDescending=@OnCellMenuSortDescendingAsync Clear=@OnCellMenuClearAsync />
+                         SortAscending=@OnCellMenuSortAscendingAsync SortDescending=@OnCellMenuSortDescendingAsync Clear=@OnCellMenuClearAsync 
+                         CustomFilter=@OnCellMenuCustomFilterAsync />
             }
         </Popup>
 }
