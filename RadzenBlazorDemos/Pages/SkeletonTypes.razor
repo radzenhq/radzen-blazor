@@ -1,0 +1,38 @@
+@using Radzen
+
+<div class="rz-p-12">
+    <RadzenRow Gap="2rem">
+        <RadzenColumn Size="6">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                <RadzenText TextStyle="TextStyle.H6">Shape Types</RadzenText>
+                <RadzenSkeleton Type="SkeletonType.Text" Style="width: 100%; height: 16px;" />
+                <RadzenSkeleton Type="SkeletonType.Circular" Style="width: 40px; height: 40px;" />
+                <RadzenSkeleton Type="SkeletonType.Rectangular" Style="width: 100%; height: 60px;" />
+                <RadzenSkeleton Type="SkeletonType.Rounded" Style="width: 100%; height: 60px;" />
+                
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4">Wave Animation</RadzenText>
+                <RadzenSkeleton Type="SkeletonType.Text" Animation="SkeletonAnimation.Wave" Style="width: 100%; height: 16px;" />
+                <RadzenSkeleton Type="SkeletonType.Text" Animation="SkeletonAnimation.Wave" Style="width: 80%; height: 16px;" />
+                <RadzenSkeleton Type="SkeletonType.Text" Animation="SkeletonAnimation.Wave" Style="width: 60%; height: 16px;" />
+            </RadzenStack>
+        </RadzenColumn>
+        
+        <RadzenColumn Size="6">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                <RadzenText TextStyle="TextStyle.H6">Pulse Animation</RadzenText>
+                <RadzenSkeleton Type="SkeletonType.Text" Animation="SkeletonAnimation.Pulse" Style="width: 100%; height: 16px;" />
+                <RadzenSkeleton Type="SkeletonType.Text" Animation="SkeletonAnimation.Pulse" Style="width: 80%; height: 16px;" />
+                <RadzenSkeleton Type="SkeletonType.Text" Animation="SkeletonAnimation.Pulse" Style="width: 60%; height: 16px;" />
+                
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4">Mixed Shapes & Animations</RadzenText>
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center">
+                    <RadzenSkeleton Type="SkeletonType.Circular" Animation="SkeletonAnimation.Wave" Style="width: 40px; height: 40px;" />
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                        <RadzenSkeleton Type="SkeletonType.Rectangular" Animation="SkeletonAnimation.Pulse" Style="width: 120px; height: 12px;" />
+                        <RadzenSkeleton Type="SkeletonType.Rectangular" Animation="SkeletonAnimation.Pulse" Style="width: 80px; height: 12px;" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenColumn>
+    </RadzenRow>
+</div> 

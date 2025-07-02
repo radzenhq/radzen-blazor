@@ -4007,4 +4007,46 @@ namespace Radzen
         /// </summary>
         Right
     }
+
+    /// <summary>
+    /// Skeleton shape types.
+    /// </summary>
+    public enum SkeletonType
+    {
+        /// <summary>
+        /// Text skeleton shape.
+        /// </summary>
+        Text,
+        /// <summary>
+        /// Circular skeleton shape.
+        /// </summary>
+        Circular,
+        /// <summary>
+        /// Rectangular skeleton shape.
+        /// </summary>
+        Rectangular,
+        /// <summary>
+        /// Rounded skeleton shape.
+        /// </summary>
+        Rounded
+    }
+
+    /// <summary>
+    /// Skeleton animation types.
+    /// </summary>
+    public enum SkeletonAnimation
+    {
+        /// <summary>
+        /// No animation.
+        /// </summary>
+        None,
+        /// <summary>
+        /// Wave animation.
+        /// </summary>
+        Wave,
+        /// <summary>
+        /// Pulse animation.
+        /// </summary>
+        Pulse
+    }
 }
