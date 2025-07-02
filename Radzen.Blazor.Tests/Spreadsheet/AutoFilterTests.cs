@@ -33,70 +33,70 @@ public class AutoFilterTests
     {
         // Add a data table
         var range = RangeRef.Parse("A1:C5");
-        sheet.AddDataTable(range);
+        sheet.AddTable(range);
 
-        var dataTable = sheet.DataTables[0];
+        var table = sheet.Tables[0];
         
         // Initially ShowFilterButton should be true
-        Assert.True(dataTable.ShowFilterButton);
+        Assert.True(table.ShowFilterButton);
 
         // Toggle filter button off
-        var command = new DataTableFilterCommand(sheet, 0);
+        var command = new TableFilterCommand(sheet, 0);
         command.Execute();
 
         // ShowFilterButton should be false
-        Assert.False(dataTable.ShowFilterButton);
+        Assert.False(table.ShowFilterButton);
 
         // Undo the command
         command.Unexecute();
 
         // ShowFilterButton should be true again
-        Assert.True(dataTable.ShowFilterButton);
+        Assert.True(table.ShowFilterButton);
     }
 
     [Fact]
     public void Should_HandleMultipleDataTables()
     {
         // Add two data tables
-        sheet.AddDataTable(RangeRef.Parse("A1:C5"));
-        sheet.AddDataTable(RangeRef.Parse("E1:G5"));
+        sheet.AddTable(RangeRef.Parse("A1:C5"));
+        sheet.AddTable(RangeRef.Parse("E1:G5"));
 
-        var dataTable1 = sheet.DataTables[0];
-        var dataTable2 = sheet.DataTables[1];
+        var table1 = sheet.Tables[0];
+        var table2 = sheet.Tables[1];
 
         // Initially both should have ShowFilterButton = true
-        Assert.True(dataTable1.ShowFilterButton);
-        Assert.True(dataTable2.ShowFilterButton);
+        Assert.True(table1.ShowFilterButton);
+        Assert.True(table2.ShowFilterButton);
 
         // Toggle filter button for first data table
-        var command1 = new DataTableFilterCommand(sheet, 0);
+        var command1 = new TableFilterCommand(sheet, 0);
         command1.Execute();
 
         // Only first data table should be affected
-        Assert.False(dataTable1.ShowFilterButton);
-        Assert.True(dataTable2.ShowFilterButton);
+        Assert.False(table1.ShowFilterButton);
+        Assert.True(table2.ShowFilterButton);
 
         // Toggle filter button for second data table
-        var command2 = new DataTableFilterCommand(sheet, 1);
+        var command2 = new TableFilterCommand(sheet, 1);
         command2.Execute();
 
         // Both should be affected
-        Assert.False(dataTable1.ShowFilterButton);
-        Assert.False(dataTable2.ShowFilterButton);
+        Assert.False(table1.ShowFilterButton);
+        Assert.False(table2.ShowFilterButton);
 
         // Undo second command
         command2.Unexecute();
 
         // Only second data table should be restored
-        Assert.False(dataTable1.ShowFilterButton);
-        Assert.True(dataTable2.ShowFilterButton);
+        Assert.False(table1.ShowFilterButton);
+        Assert.True(table2.ShowFilterButton);
     }
 
     [Fact]
     public void Should_HandleInvalidDataTableIndex()
     {
         // Try to toggle filter button for non-existent data table
-        var command = new DataTableFilterCommand(sheet, 0);
+        var command = new TableFilterCommand(sheet, 0);
         
         // Should not throw exception
         var result = command.Execute();

@@ -64,12 +64,12 @@ public partial class Sheet
     /// Gets the name of the sheet.
     /// </summary>
     public string Name { get; internal set; } = "Sheet1";
-    private readonly List<DataTable> dataTables = [];
+    private readonly List<Table> tables = [];
 
     /// <summary>
-    /// Gets the list of data tables associated with the sheet.
+    /// Gets the list of tables associated with the sheet.
     /// </summary>
-    public IReadOnlyList<DataTable> DataTables => dataTables;
+    public IReadOnlyList<Table> Tables => tables;
 
     private readonly HashSet<int> filteredColumns = new();
 
@@ -90,18 +90,17 @@ public partial class Sheet
     }
 
     /// <summary>
-    /// Adds a data table to the sheet.
+    /// Adds a table to the sheet.
     /// </summary>
     /// <param name="range"></param>
     /// <exception cref="ArgumentException"></exception>
-    public void AddDataTable(RangeRef range)
+    public void AddTable(RangeRef range)
     {
         if (range == RangeRef.Invalid || range.Rows == 0 || range.Columns == 0)
         {
-            throw new ArgumentException("Invalid range for DataTable.");
+            throw new ArgumentException("Invalid range for Table.");
         }
-
-        dataTables.Add(new DataTable(this, range));
+        tables.Add(new Table(this, range));
     }
 
     /// <summary>

@@ -14,7 +14,7 @@
         workbook.AddSheet(sheet);
 
         sheet.BeginUpdate();
-        sheet.AddDataTable(RangeRef.Parse("A1:F10"));
+        sheet.AddTable(RangeRef.Parse("A1:F10"));
         sheet.Rows.Frozen = 3;
         sheet.Columns.Frozen = 2;
         sheet.MergedCells.Add(RangeRef.Parse("A1:D1"));

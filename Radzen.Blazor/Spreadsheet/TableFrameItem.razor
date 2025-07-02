@@ -1,0 +1,14 @@
+@using Microsoft.AspNetCore.Components
+@using Radzen.Blazor.Rendering
+@inherits FrameItemBase
+
+<div class=@Class style=@Style></div>
+
+@code {
+    protected override string Class => ClassList.Create("rz-spreadsheet-table-frame")
+        .Add("rz-spreadsheet-table-frame-top", Top)
+        .Add("rz-spreadsheet-table-frame-left", Left)
+        .Add("rz-spreadsheet-table-frame-bottom", Bottom)
+        .Add("rz-spreadsheet-table-frame-right", Right)
+        .ToString();
+}
