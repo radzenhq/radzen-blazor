@@ -82,7 +82,7 @@
             @if (cellMenuRow >= 0 && cellMenuColumn >= 0)
             {
                 <CellMenu Sheet=@Sheet Row=@cellMenuRow Column=@cellMenuColumn Cancel=@OnCellMenuCancelAsync Apply=@OnCellMenuApplyAsync 
-                         SortAscending=@OnCellMenuSortAscendingAsync SortDescending=@OnCellMenuSortDescendingAsync />
+                         SortAscending=@OnCellMenuSortAscendingAsync SortDescending=@OnCellMenuSortDescendingAsync Clear=@OnCellMenuClearAsync />
             }
         </Popup>
 }

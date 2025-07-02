@@ -54,6 +54,12 @@ public partial class CellMenu : ComponentBase
     [Parameter]
     public EventCallback SortDescending { get; set; }
 
+    /// <summary>
+    /// Invoked when the user clicks the clear filter option in the cell menu.
+    /// </summary>
+    [Parameter]
+    public EventCallback Clear { get; set; }
+
     private readonly HashSet<object?> selectedFilterValues = [];
 
     /// <inheritdoc />
@@ -215,6 +221,11 @@ public partial class CellMenu : ComponentBase
         await SortDescending.InvokeAsync();
     }
 
+    private async Task OnClearFilterAsync()
+    {
+        await Clear.InvokeAsync();
+    }
+
     private async Task OnCancelFilterAsync()
     {
         await Cancel.InvokeAsync();
@@ -350,6 +361,24 @@ public partial class CellMenu : ComponentBase
 
     private async Task OnApplyFilterAsync()
     {
+        var availableValues = LoadAvailableValues();
+        var showBlank = ShouldShowBlankOption();
+        var totalItems = availableValues.Count + (showBlank ? 1 : 0);
+        var selectedCount = availableValues.Count(v => selectedFilterValues.Contains(v.Value));
+        
+        // Add 1 to selected count if blank is selected
+        if (showBlank && selectedFilterValues.Contains(null))
+        {
+            selectedCount++;
+        }
+
+        // If all items are selected, clear the filter instead
+        if (selectedCount == totalItems && totalItems > 0)
+        {
+            await Clear.InvokeAsync();
+            return;
+        }
+
         SheetFilter? filter = null;
         
         if (selectedFilterValues.Count != 0)
@@ -396,6 +425,18 @@ public partial class CellMenu : ComponentBase
     private bool CanApplyFilter()
     {
         return selectedFilterValues.Count != 0;
+    }
+
+    private bool HasFilterApplied()
+    {
+        foreach (var filter in Sheet.Filters)
+        {
+            if (filter.Range.Contains(Row, Column))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private List<(string Text, object? Value)> LoadAvailableValues()

@@ -1,4 +1,6 @@
-<li class="rz-navigation-item">
+@using Radzen.Blazor.Rendering
+
+<li class="@Class">
     @if (ChildContent != null)
     {
         @ChildContent
@@ -26,8 +28,16 @@
     [Parameter]
     public string Text { get; set; }
 
+    [Parameter]
+    public bool Disabled { get; set; }
+
+    private string Class => ClassList.Create("rz-navigation-item").AddDisabled(Disabled).ToString();
+
     private async Task OnClickAsync()
     {
-        await Click.InvokeAsync(null);
+        if (!Disabled)
+        {
+            await Click.InvokeAsync(null);
+        }
     }
 }
