@@ -3,6 +3,7 @@
 <ul class="rz-menu rz-spreadsheet-cell-menu">
     <CellMenuItem Text="Sort A to Z" Icon="sort" Click=@OnSortAscendingAsync />
     <CellMenuItem Text="Sort Z to A" Icon="sort" Click=@OnSortDescendingAsync />
+    <CellMenuItem Text="Clear Filter" Icon="filter_alt_off" Click=@OnClearFilterAsync Disabled=@(!HasFilterApplied()) />
     <div class="rz-spreadsheet-cell-menu-filter">
         <CellMenuItem>
             <RadzenCheckBox TValue="bool?" Value=@IsSelectAllChecked() Change=@OnSelectAllChanged TriState="true" />
