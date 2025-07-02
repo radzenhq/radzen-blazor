@@ -1,0 +1,249 @@
+using Microsoft.AspNetCore.Components;
+using System.Collections.Generic;
+
+namespace Radzen.Blazor.Spreadsheet;
+
+#nullable enable
+
+/// <summary>
+/// Dialog for filtering data in a spreadsheet.
+/// </summary>
+public partial class FilterDialog : ComponentBase
+{
+    enum FilterOperator
+    {
+        None,
+        Equals,
+        NotEquals,
+        GreaterThan,
+        GreaterThanOrEqual,
+        LessThan,
+        LessThanOrEqual,
+        BeginsWith,
+        DoesNotBeginWith,
+        EndsWith,
+        DoesNotEndWith,
+        Contains,
+        DoesNotContain,
+        IsEmpty,
+        IsNotEmpty
+    }
+
+    class FilterOperatorOption
+    {
+        public string Text { get; set; } = "";
+        public FilterOperator Value { get; set; }
+    }
+
+    class LogicalOperatorOption
+    {
+        public string Text { get; set; } = "";
+        public LogicalFilterOperator Value { get; set; }
+    }
+
+    /// <summary>
+    /// The sheet containing the data to filter.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public Sheet Sheet { get; set; } = default!;
+
+    /// <summary>
+    /// The column index to filter.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public int Column { get; set; }
+
+    /// <summary>
+    /// The row index where the filter was triggered.
+    /// </summary>
+    [Parameter, EditorRequired]
+    public int Row { get; set; }
+
+    /// <summary>
+    /// The dialog service instance.
+    /// </summary>
+    [Inject]
+    public DialogService DialogService { get; set; } = default!;
+
+    private FilterOperator SelectedOperator { get; set; } = FilterOperator.Equals;
+    private string FilterValue { get; set; } = "";
+    
+    private LogicalFilterOperator LogicalOperator { get; set; } = LogicalFilterOperator.And;
+
+    private FilterOperator SelectedOperator2 { get; set; } = FilterOperator.None;
+    private string FilterValue2 { get; set; } = "";
+
+    private List<FilterOperatorOption> AvailableOperators { get; set; } = [];
+    private List<LogicalOperatorOption> LogicalOperators { get; set; } = [];
+
+    private string FieldName { get; set; } = "";
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        InitializeFieldName();
+        InitializeAvailableOperators();
+        InitializeLogicalOperators();
+        
+        SelectedOperator = FilterOperator.Equals;
+        SelectedOperator2 = FilterOperator.None;
+    }
+
+    private void InitializeFieldName()
+    {
+        var dataTable = GetCurrentTable();
+        var autoFilter = GetCurrentAutoFilter();
+        var rangeToUse = RangeRef.Invalid;
+        if (dataTable != null)
+        {
+            rangeToUse = dataTable.Range;
+        }
+        else if (autoFilter != null)
+        {
+            rangeToUse = autoFilter.Range;
+        }
+        if (rangeToUse != RangeRef.Invalid)
+        {
+            var headerCell = Sheet.Cells[rangeToUse.Start.Row, Column];
+            var headerText = headerCell.GetValueAsString();
+            FieldName = string.IsNullOrEmpty(headerText) ? $"Column {Column + 1}" : headerText;
+        }
+        else
+        {
+            FieldName = $"Column {Column + 1}";
+        }
+    }
+
+    private void InitializeAvailableOperators()
+    {
+        AvailableOperators = [
+            new FilterOperatorOption { Text = "", Value = FilterOperator.None },
+            new FilterOperatorOption { Text = "equals", Value = FilterOperator.Equals },
+            new FilterOperatorOption { Text = "does not equal", Value = FilterOperator.NotEquals },
+            new FilterOperatorOption { Text = "is greater than", Value = FilterOperator.GreaterThan },
+            new FilterOperatorOption { Text = "is greater than or equal to", Value = FilterOperator.GreaterThanOrEqual },
+            new FilterOperatorOption { Text = "is less than", Value = FilterOperator.LessThan },
+            new FilterOperatorOption { Text = "is less than or equal to", Value = FilterOperator.LessThanOrEqual },
+            new FilterOperatorOption { Text = "begins with", Value = FilterOperator.BeginsWith },
+            new FilterOperatorOption { Text = "does not begin with", Value = FilterOperator.DoesNotBeginWith },
+            new FilterOperatorOption { Text = "ends with", Value = FilterOperator.EndsWith },
+            new FilterOperatorOption { Text = "does not end with", Value = FilterOperator.DoesNotEndWith },
+            new FilterOperatorOption { Text = "contains", Value = FilterOperator.Contains },
+            new FilterOperatorOption { Text = "does not contain", Value = FilterOperator.DoesNotContain },
+            new FilterOperatorOption { Text = "is empty", Value = FilterOperator.IsEmpty },
+            new FilterOperatorOption { Text = "is not empty", Value = FilterOperator.IsNotEmpty }
+        ];
+    }
+
+    private void InitializeLogicalOperators()
+    {
+        LogicalOperators = [
+            new LogicalOperatorOption { Text = "AND", Value = LogicalFilterOperator.And },
+            new LogicalOperatorOption { Text = "OR", Value = LogicalFilterOperator.Or }
+        ];
+    }
+
+    private string GetFieldName(int columnIndex)
+    {
+        return FieldName;
+    }
+
+    private void OnOk()
+    {
+        var filter = CreateFilter();
+        DialogService.Close(filter);
+    }
+
+    private void OnCancel()
+    {
+        DialogService.Close();
+    }
+
+    private SheetFilter? CreateFilter()
+    {
+        var dataTable = GetCurrentTable();
+        var autoFilter = GetCurrentAutoFilter();
+
+        RangeRef rangeToUse = RangeRef.Invalid;
+        
+        if (dataTable != null)
+        {
+            rangeToUse = dataTable.Range;
+        }
+        else if (autoFilter != null)
+        {
+            rangeToUse = autoFilter.Range;
+        }
+
+        if (rangeToUse == RangeRef.Invalid)
+        {
+            return null;
+        }
+
+        FilterCriterion criterion;
+
+        if (SelectedOperator2 != FilterOperator.None)
+        {
+            var criterion1 = CreateCriterion(Column, SelectedOperator, FilterValue);
+            var criterion2 = CreateCriterion(Column, SelectedOperator2, FilterValue2);
+
+            if (LogicalOperator == LogicalFilterOperator.And)
+            {
+                criterion = new AndCriterion { Criteria = [criterion1, criterion2] };
+            }
+            else
+            {
+                criterion = new OrCriterion { Criteria = [criterion1, criterion2] };
+            }
+        }
+        else
+        {
+            criterion = CreateCriterion(Column, SelectedOperator, FilterValue);
+        }
+
+        return new SheetFilter(criterion, rangeToUse);
+    }
+
+    private static FilterCriterion CreateCriterion(int column, FilterOperator operatorType, string value)
+    {
+        return operatorType switch
+        {
+            FilterOperator.Equals => new EqualToCriterion { Column = column, Value = value },
+            FilterOperator.NotEquals => new NotEqualToCriterion { Column = column, Value = value },
+            FilterOperator.GreaterThan => new GreaterThanCriterion { Column = column, Value = value },
+            FilterOperator.GreaterThanOrEqual => new GreaterThanOrEqualCriterion { Column = column, Value = value },
+            FilterOperator.LessThan => new LessThanCriterion { Column = column, Value = value },
+            FilterOperator.LessThanOrEqual => new LessThanOrEqualCriterion { Column = column, Value = value },
+            FilterOperator.BeginsWith => new StartsWithCriterion { Column = column, Value = value },
+            FilterOperator.DoesNotBeginWith => new DoesNotStartWithCriterion { Column = column, Value = value },
+            FilterOperator.EndsWith => new EndsWithCriterion { Column = column, Value = value },
+            FilterOperator.DoesNotEndWith => new DoesNotEndWithCriterion { Column = column, Value = value },
+            FilterOperator.Contains => new ContainsCriterion { Column = column, Value = value },
+            FilterOperator.DoesNotContain => new DoesNotContainCriterion { Column = column, Value = value },
+            FilterOperator.IsEmpty => new IsNullCriterion { Column = column },
+            FilterOperator.IsNotEmpty => new NotEqualToCriterion { Column = column, Value = null },
+            _ => new EqualToCriterion { Column = column, Value = value }
+        };
+    }
+
+    private Table? GetCurrentTable()
+    {
+        foreach (var table in Sheet.Tables)
+        {
+            if (table.Range.Contains(Row, Column))
+            {
+                return table;
+            }
+        }
+        return null;
+    }
+
+    private AutoFilter? GetCurrentAutoFilter()
+    {
+        if (Sheet.AutoFilter != null && Sheet.AutoFilter.Range.Contains(Row, Column))
+        {
+            return Sheet.AutoFilter;
+        }
+        return null;
+    }
+} 
