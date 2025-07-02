@@ -6,6 +6,8 @@
 
 @code {
     protected override string Class => ClassList.Create("rz-spreadsheet-table-frame")
+        .Add("rz-spreadsheet-frozen-column", FrozenColumn)
+        .Add("rz-spreadsheet-frozen-row", FrozenRow)
         .Add("rz-spreadsheet-table-frame-top", Top)
         .Add("rz-spreadsheet-table-frame-left", Left)
         .Add("rz-spreadsheet-table-frame-bottom", Bottom)

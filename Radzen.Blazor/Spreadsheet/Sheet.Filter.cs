@@ -95,6 +95,36 @@ public interface IFilterCriterionVisitor
     /// Visits a NotEqualToCriterion.
     /// </summary>
     void Visit(NotEqualToCriterion criterion);
+
+    /// <summary>
+    /// Visits a StartsWithCriterion.
+    /// </summary>
+    void Visit(StartsWithCriterion criterion);
+
+    /// <summary>
+    /// Visits a DoesNotStartWithCriterion.
+    /// </summary>
+    void Visit(DoesNotStartWithCriterion criterion);
+
+    /// <summary>
+    /// Visits an EndsWithCriterion.
+    /// </summary>
+    void Visit(EndsWithCriterion criterion);
+
+    /// <summary>
+    /// Visits a DoesNotEndWithCriterion.
+    /// </summary>
+    void Visit(DoesNotEndWithCriterion criterion);
+
+    /// <summary>
+    /// Visits a ContainsCriterion.
+    /// </summary>
+    void Visit(ContainsCriterion criterion);
+
+    /// <summary>
+    /// Visits a DoesNotContainCriterion.
+    /// </summary>
+    void Visit(DoesNotContainCriterion criterion);
 }
 
 /// <summary>
@@ -453,6 +483,174 @@ public class NotEqualToCriterion : FilterCriterionLeaf
         }
 
         return true;
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if a string value starts with a specified value.
+/// </summary>
+public class StartsWithCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for at the start of the string.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        var stringValue = value.ToString();
+        var stringCriterion = Value.ToString();
+
+        return stringValue!.StartsWith(stringCriterion!, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if a string value does not start with a specified value.
+/// </summary>
+public class DoesNotStartWithCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for at the start of the string.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        var stringValue = value.ToString();
+        var stringCriterion = Value!.ToString();
+
+        return !stringValue!.StartsWith(stringCriterion!, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if a string value ends with a specified value.
+/// </summary>
+public class EndsWithCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for at the end of the string.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        var stringValue = value.ToString();
+        var stringCriterion = Value!.ToString();
+
+        return stringValue!.EndsWith(stringCriterion!, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if a string value does not end with a specified value.
+/// </summary>
+public class DoesNotEndWithCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for at the end of the string.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        var stringValue = value.ToString();
+        var stringCriterion = Value!.ToString();
+
+        return !stringValue!.EndsWith(stringCriterion!, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if a string value contains a specified value.
+/// </summary>
+public class ContainsCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for within the string.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        var stringValue = value.ToString();
+        var stringCriterion = Value!.ToString();
+
+        return stringValue!.Contains(stringCriterion!, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if a string value does not contain a specified value.
+/// </summary>
+public class DoesNotContainCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks for within the string.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        var stringValue = value.ToString();
+        var stringCriterion = Value!.ToString();
+
+        return !stringValue!.Contains(stringCriterion!, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <inheritdoc/>
