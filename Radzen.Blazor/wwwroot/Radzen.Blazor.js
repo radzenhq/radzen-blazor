@@ -1812,33 +1812,19 @@ window.Radzen = {
         inside = false;
         instance.invokeMethodAsync('MouseMove', -1, -1);
     };
-    ref.clickListener = function (e) {
-      if (e.target) {
-        if (e.target.matches('a,button')) {
-          e.preventDefault();
-        }
-
-        // Remove resize handles from all images
-        Radzen.removeImageResizeHandles(ref);
-
-        for (var img of ref.querySelectorAll('img.rz-state-selected')) {
-          img.classList.remove('rz-state-selected');
-        }
-        if (e.target.matches('img')) {
-          e.target.classList.add('rz-state-selected');
-          Radzen.addImageResizeHandles(e.target, ref, instance);
-          var range = document.createRange();
-          range.selectNode(e.target);
-          getSelection().removeAllRanges();
-          getSelection().addRange(range);
-        }
+    ref.clickHandler = function (e) {
+      var rect = ref.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      if (!e.target.closest('.rz-marker')) {
+        instance.invokeMethodAsync('Click', x, y);
       }
     };
 
     ref.addEventListener('mouseenter', ref.mouseEnterHandler);
     ref.addEventListener('mouseleave', ref.mouseLeaveHandler);
     ref.addEventListener('mousemove', ref.mouseMoveHandler);
-    ref.addEventListener('click', ref.clickListener);
+    ref.addEventListener('click', ref.clickHandler);
 
     return this.createResizable(ref, instance);
   },
@@ -1944,9 +1930,6 @@ window.Radzen = {
     };
 
     ref.clickListener = function (e) {
-      console.log('Editor click event on:', e.target);
-      console.log('Target matches img:', e.target.matches('img'));
-      
       if (e.target) {
         if (e.target.matches('a,button')) {
           e.preventDefault();
@@ -1959,9 +1942,10 @@ window.Radzen = {
           img.classList.remove('rz-state-selected');
         }
         if (e.target.matches('img')) {
-          console.log('Image clicked:', e.target);
           e.target.classList.add('rz-state-selected');
           Radzen.addImageResizeHandles(e.target, ref, instance);
+          
+          // Create a range that selects only the image element, not the wrapper
           var range = document.createRange();
           range.selectNode(e.target);
           getSelection().removeAllRanges();
@@ -1974,6 +1958,14 @@ window.Radzen = {
       if (document.activeElement == ref) {
         instance.invokeMethodAsync('OnSelectionChange');
       }
+    };
+    
+    // Add a listener to ensure proper image selection after certain operations
+    ref.ensureImageSelectionListener = function () {
+      // Small delay to ensure the operation is complete
+      setTimeout(function() {
+        Radzen.ensureImageSelection(ref);
+      }, 10);
     };
     ref.pasteListener = function (e) {
       var item = e.clipboardData.items[0];
@@ -2044,6 +2036,27 @@ window.Radzen = {
     ref.addEventListener('keydown', ref.keydownListener);
     ref.addEventListener('click', ref.clickListener);
     document.addEventListener('selectionchange', ref.selectionChangeListener);
+    
+    // Add mutation observer to watch for content changes
+    ref.mutationObserver = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList' || mutation.type === 'attributes') {
+          // Check if any selected images need their selection updated
+          var selectedImages = ref.querySelectorAll('img.rz-state-selected');
+          if (selectedImages.length > 0) {
+            ref.ensureImageSelectionListener();
+          }
+        }
+      });
+    });
+    
+    ref.mutationObserver.observe(ref, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['href', 'src']
+    });
+    
     document.execCommand('styleWithCSS', false, true);
   },
   saveSelection: function (ref) {
@@ -2115,6 +2128,12 @@ window.Radzen = {
       ref.removeEventListener('keydown', ref.keydownListener);
       ref.removeEventListener('click', ref.clickListener);
       document.removeEventListener('selectionchange', ref.selectionChangeListener);
+      
+      // Disconnect mutation observer
+      if (ref.mutationObserver) {
+        ref.mutationObserver.disconnect();
+        delete ref.mutationObserver;
+      }
       
       // Remove image resize handles
       Radzen.removeImageResizeHandles(ref);
@@ -2615,6 +2634,12 @@ window.Radzen = {
       img.parentNode.insertBefore(wrapper, img);
       wrapper.appendChild(img);
       
+      // Ensure the image is selected (not the wrapper)
+      var range = document.createRange();
+      range.selectNode(img);
+      getSelection().removeAllRanges();
+      getSelection().addRange(range);
+      
       // Create resize handles
       var handles = ['nw', 'ne', 'sw', 'se'];
       var resizeData = {
@@ -2778,6 +2803,21 @@ window.Radzen = {
           height: computedHeight
         });
       }
+    },
+    ensureImageSelection: function (container) {
+      // Find any selected images and ensure they are properly selected
+      var selectedImages = container.querySelectorAll('img.rz-state-selected');
+      selectedImages.forEach(function(img) {
+        // Check if the image is inside a resize container
+        var wrapper = img.closest('.rz-image-resize-container');
+        if (wrapper) {
+          // Ensure the image is selected, not the wrapper
+          var range = document.createRange();
+          range.selectNode(img);
+          getSelection().removeAllRanges();
+          getSelection().addRange(range);
+        }
+      });
     }
 };
 
