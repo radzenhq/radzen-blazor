@@ -8,6 +8,7 @@ using Microsoft.JSInterop;
 using Radzen.Blazor.Spreadsheet;
 using Radzen.Blazor.Rendering;
 using Radzen;
+using System.Linq;
 
 namespace Radzen.Blazor;
 
@@ -181,7 +182,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         {
             // Remove all filters that affect the current column
             var filtersToRemove = new List<SheetFilter>();
-            
+
             foreach (var filter in Sheet.Filters)
             {
                 if (filter.Range.Contains(cellMenuRow, cellMenuColumn))
@@ -213,11 +214,15 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         if (Sheet != null)
         {
-            var parameters = new Dictionary<string, object>
+            FilterCriterion? existingFilter = Sheet.Filters.FirstOrDefault(f => f.Range.Contains(cellMenuRow, cellMenuColumn))?.Criterion;
+
+
+            var parameters = new Dictionary<string, object?>
             {
                 { nameof(FilterDialog.Sheet), Sheet },
                 { nameof(FilterDialog.Column), cellMenuColumn },
-                { nameof(FilterDialog.Row), cellMenuRow }
+                { nameof(FilterDialog.Row), cellMenuRow },
+                { nameof(FilterDialog.Filter), existingFilter }
             };
 
             var result = await DialogService.OpenAsync<FilterDialog>("Custom Filter", parameters, new DialogOptions
