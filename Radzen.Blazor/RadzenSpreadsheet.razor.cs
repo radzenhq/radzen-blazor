@@ -174,6 +174,35 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
+    private async Task OnCellMenuClearAsync()
+    {
+        if (Sheet != null)
+        {
+            // Remove all filters that affect the current column
+            var filtersToRemove = new List<SheetFilter>();
+            
+            foreach (var filter in Sheet.Filters)
+            {
+                if (filter.Range.Contains(cellMenuRow, cellMenuColumn))
+                {
+                    filtersToRemove.Add(filter);
+                }
+            }
+
+            // Execute remove commands for each filter
+            foreach (var filter in filtersToRemove)
+            {
+                var command = new RemoveFilterCommand(Sheet, filter);
+                Sheet.Commands.Execute(command);
+            }
+        }
+
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
+    }
+
     private async Task MoveSelectionAsync(int rowOffset, int columnOffset)
     {
         if (Sheet is not null)
