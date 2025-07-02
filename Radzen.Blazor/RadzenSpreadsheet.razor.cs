@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Spreadsheet;
 using Radzen.Blazor.Rendering;
+using Radzen;
 
 namespace Radzen.Blazor;
 
@@ -200,6 +201,35 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (cellMenuPopup != null)
         {
             await cellMenuPopup.CloseAsync();
+        }
+    }
+
+    private async Task OnCellMenuCustomFilterAsync()
+    {
+        if (cellMenuPopup != null)
+        {
+            await cellMenuPopup.CloseAsync();
+        }
+
+        if (Sheet != null)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { nameof(FilterDialog.Sheet), Sheet },
+                { nameof(FilterDialog.Column), cellMenuColumn },
+                { nameof(FilterDialog.Row), cellMenuRow }
+            };
+
+            var result = await DialogService.OpenAsync<FilterDialog>("Custom Filter", parameters, new DialogOptions
+            {
+                Width = "600px",
+            });
+
+            if (result is SheetFilter filter)
+            {
+                var command = new FilterCommand(Sheet, filter);
+                Sheet.Commands.Execute(command);
+            }
         }
     }
 
