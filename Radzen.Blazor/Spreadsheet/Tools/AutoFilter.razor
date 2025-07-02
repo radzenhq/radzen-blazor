@@ -16,7 +16,7 @@
             if (Sheet == null) return false;
 
             // Check if we're in a data table
-            var dataTable = GetCurrentDataTable();
+            var dataTable = GetCurrentTable();
             if (dataTable != null)
             {
                 return dataTable.ShowFilterButton;
@@ -30,13 +30,13 @@
             if (Sheet != null && Sheet.Selection.Cell != CellRef.Invalid)
             {
                 // Check if we're in a data table
-                var dataTable = GetCurrentDataTable();
+                var dataTable = GetCurrentTable();
                 if (dataTable != null)
                 {
-                    var dataTableIndex = GetDataTableIndex(dataTable);
+                    var dataTableIndex = GetTableIndex(dataTable);
                     if (dataTableIndex >= 0)
                     {
-                        var command = new DataTableFilterCommand(Sheet, dataTableIndex);
+                        var command = new TableFilterCommand(Sheet, dataTableIndex);
                         Sheet.Commands.Execute(command);
                     }
                 }
@@ -52,31 +52,31 @@
 
     private bool IsDisabled => Sheet?.Selection.Cell == CellRef.Invalid;
 
-    private DataTable? GetCurrentDataTable()
+    private Table? GetCurrentTable()
     {
-        if (Sheet?.DataTables == null) return null;
+        if (Sheet?.Tables == null) return null;
 
         var selectedCell = Sheet.Selection.Cell;
         if (selectedCell == CellRef.Invalid) return null;
 
-        foreach (var dataTable in Sheet.DataTables)
+        foreach (var table in Sheet.Tables)
         {
-            if (dataTable.Range.Contains(selectedCell.Row, selectedCell.Column))
+            if (table.Range.Contains(selectedCell.Row, selectedCell.Column))
             {
-                return dataTable;
+                return table;
             }
         }
 
         return null;
     }
 
-    private int GetDataTableIndex(DataTable dataTable)
+    private int GetTableIndex(Table table)
     {
-        if (Sheet?.DataTables == null) return -1;
+        if (Sheet?.Tables == null) return -1;
 
-        for (int i = 0; i < Sheet.DataTables.Count; i++)
+        for (int i = 0; i < Sheet.Tables.Count; i++)
         {
-            if (Sheet.DataTables[i] == dataTable)
+            if (Sheet.Tables[i] == table)
             {
                 return i;
             }

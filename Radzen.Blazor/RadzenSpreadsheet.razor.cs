@@ -121,11 +121,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Sheet != null)
         {
             // Check if we're in a data table
-            foreach (var dataTable in Sheet.DataTables)
+            foreach (var table in Sheet.Tables)
             {
-                if (dataTable.Range.Contains(cellMenuRow, cellMenuColumn))
+                if (table.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    var command = new SortCommand(Sheet, dataTable.Range, SortOrder.Ascending, cellMenuColumn);
+                    var command = new SortCommand(Sheet, table.Range, SortOrder.Ascending, cellMenuColumn);
                     Sheet.Commands.Execute(command);
                     break;
                 }
@@ -150,11 +150,11 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         if (Sheet != null)
         {
             // Check if we're in a data table
-            foreach (var dataTable in Sheet.DataTables)
+            foreach (var table in Sheet.Tables)
             {
-                if (dataTable.Range.Contains(cellMenuRow, cellMenuColumn))
+                if (table.Range.Contains(cellMenuRow, cellMenuColumn))
                 {
-                    var command = new SortCommand(Sheet, dataTable.Range, SortOrder.Descending, cellMenuColumn);
+                    var command = new SortCommand(Sheet, table.Range, SortOrder.Descending, cellMenuColumn);
                     Sheet.Commands.Execute(command);
                     break;
                 }

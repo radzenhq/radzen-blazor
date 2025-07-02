@@ -72,9 +72,9 @@
             <ChildContent>
                 <SelectionOverlay Sheet=@Sheet Context=@context />
                 <CellEditor Sheet=@Sheet Context=@context />
-                @foreach (var dataTable in Sheet.DataTables)
+                @foreach (var table in Sheet.Tables)
                 {
-                    <DataTableFrame Sheet=@Sheet DataTable=@dataTable Context=@context />
+                    <TableFrame Sheet=@Sheet Table=@table Context=@context />
                 }
             </ChildContent>
         </VirtualGrid>
