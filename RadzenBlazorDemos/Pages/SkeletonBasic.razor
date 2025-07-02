@@ -1,0 +1,23 @@
+@using Radzen
+
+<div class="rz-p-12">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+        <RadzenText TextStyle="TextStyle.H6">Text Skeleton (Default)</RadzenText>
+        <RadzenSkeleton Type="SkeletonType.Text" Style="width: 200px; height: 20px;" />
+        
+        <RadzenText TextStyle="TextStyle.H6">Circular Skeleton</RadzenText>
+        <RadzenSkeleton Type="SkeletonType.Circular" Style="width: 60px; height: 60px;" />
+        
+        <RadzenText TextStyle="TextStyle.H6">Rectangular Skeleton</RadzenText>
+        <RadzenSkeleton Type="SkeletonType.Rectangular" Style="width: 150px; height: 100px;" />
+        
+        <RadzenText TextStyle="TextStyle.H6">Rounded Skeleton</RadzenText>
+        <RadzenSkeleton Type="SkeletonType.Rounded" Style="width: 120px; height: 80px;" />
+        
+        <RadzenText TextStyle="TextStyle.H6">Text with Wave Animation</RadzenText>
+        <RadzenSkeleton Type="SkeletonType.Text" Animation="SkeletonAnimation.Wave" Style="width: 200px; height: 20px;" />
+        
+        <RadzenText TextStyle="TextStyle.H6">Circular with Pulse Animation</RadzenText>
+        <RadzenSkeleton Type="SkeletonType.Circular" Animation="SkeletonAnimation.Pulse" Style="width: 60px; height: 60px;" />
+    </RadzenStack>
+</div> 
