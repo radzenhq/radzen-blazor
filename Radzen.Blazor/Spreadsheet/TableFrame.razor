@@ -1,0 +1,4 @@
+@foreach (var range in Sheet.GetRanges(Table.Range))
+{
+    <TableFrameItem Context=@Context Range=@range.Range Sheet=@Sheet FrozenRow=@range.FrozenRow FrozenColumn=@range.FrozenColumn Top=@range.Top Left=@range.Left Bottom=@range.Bottom Right=@range.Right />
+}

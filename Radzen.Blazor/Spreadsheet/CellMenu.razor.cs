@@ -245,7 +245,8 @@ public partial class CellMenu : ComponentBase
 
     private bool ShouldShowBlankOption()
     {
-        var dataTable = GetCurrentDataTable();
+        var table = GetCurrentTable();
+        var dataTable = GetCurrentTable();
         var autoFilter = GetCurrentAutoFilter();
 
         // Determine the range to use for checking blank values
@@ -303,7 +304,7 @@ public partial class CellMenu : ComponentBase
         
         if (selectedFilterValues.Count != 0)
         {
-            var dataTable = GetCurrentDataTable();
+            var dataTable = GetCurrentTable();
             var autoFilter = GetCurrentAutoFilter();
 
             // Determine the range to use for the filter
@@ -350,7 +351,7 @@ public partial class CellMenu : ComponentBase
     private List<(string Text, object? Value)> LoadAvailableValues()
     {
         var availableValues = new List<(string Text, object? Value)>();
-        var dataTable = GetCurrentDataTable();
+        var dataTable = GetCurrentTable();
         var autoFilter = GetCurrentAutoFilter();
 
         // Determine the range to use for loading values
@@ -417,13 +418,13 @@ public partial class CellMenu : ComponentBase
         return availableValues;
     }
 
-    private DataTable? GetCurrentDataTable()
+    private Table? GetCurrentTable()
     {
-        foreach (var dataTable in Sheet.DataTables)
+        foreach (var table in Sheet.Tables)
         {
-            if (dataTable.Range.Contains(Row, Column))
+            if (table.Range.Contains(Row, Column))
             {
-                return dataTable;
+                return table;
             }
         }
         return null;

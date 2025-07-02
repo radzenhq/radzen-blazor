@@ -90,14 +90,14 @@ public partial class CellView : CellBase, IDisposable
 
     private bool ShowCellMenu()
     {
-        if (Sheet?.DataTables != null)
+        if (Sheet?.Tables != null)
         {
-            foreach (var dataTable in Sheet.DataTables)
+            foreach (var table in Sheet.Tables)
             {
-                if (Column >= dataTable.Range.Start.Column &&
-                    Column <= dataTable.Range.End.Column)
+                if (Column >= table.Range.Start.Column &&
+                    Column <= table.Range.End.Column)
                 {
-                    return Row == dataTable.Start.Row && dataTable.ShowFilterButton;
+                    return Row == table.Start.Row && table.ShowFilterButton;
                 }
             }
         }
