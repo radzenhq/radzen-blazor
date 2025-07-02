@@ -1,0 +1,64 @@
+// Skeleton component variables
+$skeleton-background-color: var(--rz-base-200) !default;
+$skeleton-animation-color: var(--rz-base-100) !default;
+$skeleton-border-radius: var(--rz-border-radius) !default;
+$skeleton-animation-duration: 1.5s !default;
+$skeleton-wave-animation-duration: 2s !default;
+$skeleton-pulse-animation-duration: 1.5s !default;
+
+// Base skeleton styles
+.rz-skeleton {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  background-color: $skeleton-background-color;
+  border-radius: $skeleton-border-radius;
+}
+
+// Shape types
+.rz-skeleton.rz-skeleton-text {
+  // default border-radius
+}
+.rz-skeleton.rz-skeleton-circular {
+  border-radius: 50%;
+}
+.rz-skeleton.rz-skeleton-rectangular {
+  border-radius: 0;
+}
+.rz-skeleton.rz-skeleton-rounded {
+  border-radius: $skeleton-border-radius;
+}
+
+// Animations
+.rz-skeleton.rz-skeleton-wave {
+  background: linear-gradient(90deg, $skeleton-background-color 25%, $skeleton-animation-color 50%, $skeleton-background-color 75%);
+  background-size: 200% 100%;
+  animation: skeleton-wave $skeleton-wave-animation-duration infinite;
+}
+
+.rz-skeleton.rz-skeleton-pulse {
+  animation: skeleton-pulse $skeleton-pulse-animation-duration infinite;
+}
+
+// Wave animation keyframes
+@keyframes skeleton-wave {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Pulse animation keyframes
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+} 

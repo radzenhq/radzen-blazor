@@ -1,0 +1,51 @@
+@page "/skeleton"
+
+<PageTitle>Blazor Skeleton Component | Free UI Components by Radzen</PageTitle>
+<HeadContent>
+    <meta name="description" content="RadzenSkeleton component displays loading placeholders with various animation types.">
+</HeadContent>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Skeleton
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    RadzenSkeleton component displays loading placeholders with various shape types and animations.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
+    The <code>RadzenSkeleton</code> component is used to display loading placeholders while content is being loaded. 
+    It supports different shape types (Text, Circular, Rectangular, Rounded) and animation types (Wave, Pulse) that can be combined independently.
+</RadzenText>
+
+<RadzenText Anchor="skeleton#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Basic Usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Type</code> property to specify the skeleton animation type and <code>Style</code> to control dimensions.
+</RadzenText>
+
+<RadzenExample Example="SkeletonBasic">
+    <SkeletonBasic />
+</RadzenExample>
+
+<RadzenText Anchor="skeleton#animation-types" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Shape Types and Animations
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The component supports four shape types (Text, Circular, Rectangular, Rounded) and three animation types (None, Wave, Pulse) that can be combined independently.
+</RadzenText>
+
+<RadzenExample Example="SkeletonTypes">
+    <SkeletonTypes />
+</RadzenExample>
+
+<RadzenText Anchor="skeleton#complex-example" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Complex Example
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Here's how you might use skeletons in a card layout to show loading states.
+</RadzenText>
+
+<RadzenExample Example="SkeletonCard">
+    <SkeletonCard />
+</RadzenExample>
