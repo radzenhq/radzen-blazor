@@ -60,6 +60,12 @@ public partial class CellMenu : ComponentBase
     [Parameter]
     public EventCallback Clear { get; set; }
 
+    /// <summary>
+    /// Invoked when the user clicks the custom filter option in the cell menu.
+    /// </summary>
+    [Parameter]
+    public EventCallback CustomFilter { get; set; }
+
     private readonly HashSet<object?> selectedFilterValues = [];
 
     /// <inheritdoc />
@@ -529,5 +535,10 @@ public partial class CellMenu : ComponentBase
             return Sheet.AutoFilter;
         }
         return null;
+    }
+
+    private async Task OnCustomFilterAsync()
+    {
+        await CustomFilter.InvokeAsync();
     }
 }
