@@ -241,6 +241,41 @@ public abstract class FilterCriterionLeaf : FilterCriterion
 }
 
 /// <summary>
+/// Represents a base class for filter criteria that operate on numeric values.
+/// </summary>
+public abstract class NumericFilterCriterion : FilterCriterionLeaf
+{
+    /// <summary>
+    /// Gets or sets the value that this filter criterion checks against.
+    /// </summary>
+    public object? Value { get; init; }
+
+    /// <inheritdoc/>
+    public override bool Matches(object? value)
+    {
+        if (value == null || Value == null)
+        {
+            return false;
+        }
+
+        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
+        {
+            return Matches(numericValue, numericCriterion);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Performs the specific numeric operation for this filter criterion.
+    /// </summary>
+    /// <param name="numericValue">The numeric value to check.</param>
+    /// <param name="numericCriterion">The criterion numeric value to check against.</param>
+    /// <returns>True if the operation succeeds; otherwise, false.</returns>
+    protected abstract bool Matches(double numericValue, double numericCriterion);
+}
+
+/// <summary>
 /// Represents a filter criterion that checks for equality with a specified value.
 /// </summary>
 public class EqualToCriterion : FilterCriterionLeaf
@@ -278,10 +313,58 @@ public class EqualToCriterion : FilterCriterionLeaf
 /// <summary>
 /// Represents a filter criterion that checks for inequality with a specified value.
 /// </summary>
-public class GreaterThanCriterion : FilterCriterionLeaf
+public class GreaterThanCriterion : NumericFilterCriterion
+{
+    /// <inheritdoc/>
+    protected override bool Matches(double numericValue, double numericCriterion) => numericValue > numericCriterion;
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if the value is less than a specified value.
+/// </summary>
+public class LessThanCriterion : NumericFilterCriterion
+{
+    /// <inheritdoc/>
+    protected override bool Matches(double numericValue, double numericCriterion) => numericValue < numericCriterion;
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if the value is greater than or equal to a specified value.
+/// </summary>
+public class GreaterThanOrEqualCriterion : NumericFilterCriterion
+{
+    /// <inheritdoc/>
+    protected override bool Matches(double numericValue, double numericCriterion) => numericValue >= numericCriterion;
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks if the value is less than or equal to a specified value.
+/// </summary>
+public class LessThanOrEqualCriterion : NumericFilterCriterion
+{
+    /// <inheritdoc/>
+    protected override bool Matches(double numericValue, double numericCriterion) => numericValue <= numericCriterion;
+
+    /// <inheritdoc/>
+    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+}
+
+/// <summary>
+/// Represents a filter criterion that checks for inequality with a specified value.
+/// </summary>
+public class NotEqualToCriterion : FilterCriterionLeaf
 {
     /// <summary>
-    /// Gets or sets the value that this filter criterion checks for being greater than.
+    /// Gets or sets the value that this filter criterion checks for inequality against.
     /// </summary>
     public object? Value { get; init; }
 
@@ -293,12 +376,17 @@ public class GreaterThanCriterion : FilterCriterionLeaf
             return false;
         }
 
-        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
+        if (Equals(value, Value))
         {
-            return numericValue > numericCriterion;
+            return false;
         }
 
-        return false;
+        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
+        {
+            return numericValue != numericCriterion;
+        }
+
+        return true;
     }
 
     /// <inheritdoc/>
@@ -365,12 +453,12 @@ public class IsNullCriterion : FilterCriterionLeaf
 }
 
 /// <summary>
-/// Represents a filter criterion that checks if the value is less than a specified value.
+/// Represents a base class for filter criteria that operate on string values.
 /// </summary>
-public class LessThanCriterion : FilterCriterionLeaf
+public abstract class StringFilterCriterion : FilterCriterionLeaf
 {
     /// <summary>
-    /// Gets or sets the value that this filter criterion checks for being less than.
+    /// Gets or sets the value that this filter criterion checks against.
     /// </summary>
     public object? Value { get; init; }
 
@@ -382,136 +470,25 @@ public class LessThanCriterion : FilterCriterionLeaf
             return false;
         }
 
-        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
-        {
-            return numericValue < numericCriterion;
-        }
-
-        return false;
+        return Matches(value!.ToString()!, Value.ToString()!);
     }
 
-    /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
-}
-
-/// <summary>
-/// Represents a filter criterion that checks if the value is greater than or equal to a specified value.
-/// </summary>
-public class GreaterThanOrEqualCriterion : FilterCriterionLeaf
-{
     /// <summary>
-    /// Gets or sets the value that this filter criterion checks for being greater than or equal to.
+    /// Performs the specific string operation for this filter criterion.
     /// </summary>
-    public object? Value { get; init; }
-
-    /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
-        {
-            return numericValue >= numericCriterion;
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
-}
-
-/// <summary>
-/// Represents a filter criterion that checks if the value is less than or equal to a specified value.
-/// </summary>
-public class LessThanOrEqualCriterion : FilterCriterionLeaf
-{
-    /// <summary>
-    /// Gets or sets the value that this filter criterion checks for being less than or equal to.
-    /// </summary>
-    public object? Value { get; init; }
-
-    /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
-        {
-            return numericValue <= numericCriterion;
-        }
-
-        return false;
-    }
-
-    /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
-}
-
-/// <summary>
-/// Represents a filter criterion that checks for inequality with a specified value.
-/// </summary>
-public class NotEqualToCriterion : FilterCriterionLeaf
-{
-    /// <summary>
-    /// Gets or sets the value that this filter criterion checks for inequality against.
-    /// </summary>
-    public object? Value { get; init; }
-
-    /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        if (Equals(value, Value))
-        {
-            return false;
-        }
-
-        if (TryCoerce(value, out var numericValue) && TryCoerce(Value, out var numericCriterion))
-        {
-            return numericValue != numericCriterion;
-        }
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    /// <param name="stringValue">The string value to check.</param>
+    /// <param name="stringCriterion">The criterion string to check against.</param>
+    /// <returns>True if the operation succeeds; otherwise, false.</returns>
+    protected abstract bool Matches(string stringValue, string stringCriterion);
 }
 
 /// <summary>
 /// Represents a filter criterion that checks if a string value starts with a specified value.
 /// </summary>
-public class StartsWithCriterion : FilterCriterionLeaf
+public class StartsWithCriterion : StringFilterCriterion
 {
-    /// <summary>
-    /// Gets or sets the value that this filter criterion checks for at the start of the string.
-    /// </summary>
-    public object? Value { get; init; }
-
     /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        var stringValue = value.ToString();
-        var stringCriterion = Value.ToString();
-
-        return stringValue!.StartsWith(stringCriterion!, StringComparison.OrdinalIgnoreCase);
-    }
+    protected override bool Matches(string stringValue, string stringCriterion) => stringValue.StartsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
@@ -520,26 +497,10 @@ public class StartsWithCriterion : FilterCriterionLeaf
 /// <summary>
 /// Represents a filter criterion that checks if a string value does not start with a specified value.
 /// </summary>
-public class DoesNotStartWithCriterion : FilterCriterionLeaf
+public class DoesNotStartWithCriterion : StringFilterCriterion
 {
-    /// <summary>
-    /// Gets or sets the value that this filter criterion checks for at the start of the string.
-    /// </summary>
-    public object? Value { get; init; }
-
     /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        var stringValue = value.ToString();
-        var stringCriterion = Value!.ToString();
-
-        return !stringValue!.StartsWith(stringCriterion!, StringComparison.OrdinalIgnoreCase);
-    }
+    protected override bool Matches(string stringValue, string stringCriterion) => !stringValue.StartsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
@@ -548,26 +509,10 @@ public class DoesNotStartWithCriterion : FilterCriterionLeaf
 /// <summary>
 /// Represents a filter criterion that checks if a string value ends with a specified value.
 /// </summary>
-public class EndsWithCriterion : FilterCriterionLeaf
+public class EndsWithCriterion : StringFilterCriterion
 {
-    /// <summary>
-    /// Gets or sets the value that this filter criterion checks for at the end of the string.
-    /// </summary>
-    public object? Value { get; init; }
-
     /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        var stringValue = value.ToString();
-        var stringCriterion = Value!.ToString();
-
-        return stringValue!.EndsWith(stringCriterion!, StringComparison.OrdinalIgnoreCase);
-    }
+    protected override bool Matches(string stringValue, string stringCriterion) => stringValue.EndsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
@@ -576,26 +521,10 @@ public class EndsWithCriterion : FilterCriterionLeaf
 /// <summary>
 /// Represents a filter criterion that checks if a string value does not end with a specified value.
 /// </summary>
-public class DoesNotEndWithCriterion : FilterCriterionLeaf
+public class DoesNotEndWithCriterion : StringFilterCriterion
 {
-    /// <summary>
-    /// Gets or sets the value that this filter criterion checks for at the end of the string.
-    /// </summary>
-    public object? Value { get; init; }
-
     /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        var stringValue = value.ToString();
-        var stringCriterion = Value!.ToString();
-
-        return !stringValue!.EndsWith(stringCriterion!, StringComparison.OrdinalIgnoreCase);
-    }
+    protected override bool Matches(string stringValue, string stringCriterion) => !stringValue.EndsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
@@ -604,26 +533,10 @@ public class DoesNotEndWithCriterion : FilterCriterionLeaf
 /// <summary>
 /// Represents a filter criterion that checks if a string value contains a specified value.
 /// </summary>
-public class ContainsCriterion : FilterCriterionLeaf
+public class ContainsCriterion : StringFilterCriterion
 {
-    /// <summary>
-    /// Gets or sets the value that this filter criterion checks for within the string.
-    /// </summary>
-    public object? Value { get; init; }
-
     /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        var stringValue = value.ToString();
-        var stringCriterion = Value!.ToString();
-
-        return stringValue!.Contains(stringCriterion!, StringComparison.OrdinalIgnoreCase);
-    }
+    protected override bool Matches(string stringValue, string stringCriterion) => stringValue.Contains(stringCriterion, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
@@ -632,26 +545,10 @@ public class ContainsCriterion : FilterCriterionLeaf
 /// <summary>
 /// Represents a filter criterion that checks if a string value does not contain a specified value.
 /// </summary>
-public class DoesNotContainCriterion : FilterCriterionLeaf
+public class DoesNotContainCriterion : StringFilterCriterion
 {
-    /// <summary>
-    /// Gets or sets the value that this filter criterion checks for within the string.
-    /// </summary>
-    public object? Value { get; init; }
-
     /// <inheritdoc/>
-    public override bool Matches(object? value)
-    {
-        if (value == null || Value == null)
-        {
-            return false;
-        }
-
-        var stringValue = value.ToString();
-        var stringCriterion = Value!.ToString();
-
-        return !stringValue!.Contains(stringCriterion!, StringComparison.OrdinalIgnoreCase);
-    }
+    protected override bool Matches(string stringValue, string stringCriterion) => !stringValue.Contains(stringCriterion, StringComparison.OrdinalIgnoreCase);
 
     /// <inheritdoc/>
     public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
