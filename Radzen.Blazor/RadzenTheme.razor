@@ -2,7 +2,7 @@
 @inject IServiceProvider ServiceProvider
 @if (PreloadIconFont)
 {
-<link rel="preload" href="@IconFontHref" as="font" type="font/woff2" />
+<link rel="preload" href="@IconFontHref" as="font" type="font/woff2" crossorigin="anonymous" />
 }
 <link rel="stylesheet" href="@Href" />
 @if (wcag)
