@@ -3,17 +3,24 @@
 @using Microsoft.JSInterop
 @inherits RadzenHtmlEditorButtonBase
 @inject DialogService DialogService
+@inject IJSRuntime JSRuntime
 
 <EditorButton Title=@Title Click=@OnClick Icon="insert_link" />
 
 @code {
     protected override async Task OnClick()
     {
+        // Remove resize handles if an image is selected
+        await JSRuntime.InvokeVoidAsync("Radzen.removeImageResizeHandlesForLink", Editor.Element);
+        
         await Editor.SaveSelectionAsync();
 
         bool blank = false;
 
-        var attributes = await Editor.GetSelectionAttributes<LinkAttributes>("a", new[] {"innerText", "href", "target" });
+        // Check if we have an image selected using JavaScript
+        var isImageSelected = await JSRuntime.InvokeAsync<bool>("Radzen.hasSelectedImage", Editor.Element);
+        
+        var attributes = await Editor.GetSelectionAttributes<LinkAttributes>("a", ["innerText", "href", "target", "innerHTML"]);
 
         if (attributes.Target == "_blank")
         {
@@ -46,18 +53,26 @@
 
         await Editor.RestoreSelectionAsync();
 
-        if (result == true && !String.IsNullOrEmpty(attributes.Href))
+        if (result == true && !string.IsNullOrEmpty(attributes.Href))
         {
-            var html = new StringBuilder();
-            html.AppendFormat("<a href=\"{0}\"", attributes.Href);
-            if (blank)
+            if (isImageSelected)
             {
-                html.Append(" target=\"_blank\"");
+                // Use JS interop to wrap the <img> in a link
+                await JSRuntime.InvokeVoidAsync("Radzen.wrapSelectedImageWithLink", attributes.Href, blank);
             }
+            else
+            {
+                var html = new StringBuilder();
+                html.AppendFormat("<a href=\"{0}\"", attributes.Href);
+                if (blank)
+                {
+                    html.Append(" target=\"_blank\"");
+                }
 
-            html.AppendFormat(">{0}</a>", string.IsNullOrEmpty(attributes.InnerText) ? attributes.InnerHtml : attributes.InnerText);
+                html.AppendFormat(">{0}</a>", string.IsNullOrEmpty(attributes.InnerText) ? attributes.InnerHtml : attributes.InnerText);
 
-            await Editor.ExecuteCommandAsync("insertHTML", html.ToString());
+                await Editor.ExecuteCommandAsync("insertHTML", html.ToString());
+            }
         }
     }
 }

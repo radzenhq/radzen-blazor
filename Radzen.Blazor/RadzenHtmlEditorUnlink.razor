@@ -1,4 +1,16 @@
 @using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
 @inherits RadzenHtmlEditorButtonBase
+@inject IJSRuntime JSRuntime
 
 <EditorButton Title=@Title Click=@OnClick Icon="link_off" Disabled=@(!Editor.State.Unlink) />
+
+@code {
+    protected override async Task OnClick()
+    {
+        // Remove resize handles if an image is selected
+        await JSRuntime.InvokeVoidAsync("Radzen.removeImageResizeHandlesForLink", Editor.Element);
+        
+        await Editor.ExecuteCommandAsync(CommandName);
+    }
+}

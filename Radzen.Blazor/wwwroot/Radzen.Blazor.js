@@ -1941,13 +1941,29 @@ window.Radzen = {
         for (var img of ref.querySelectorAll('img.rz-state-selected')) {
           img.classList.remove('rz-state-selected');
         }
+        
+        // Handle image clicks (including linked images)
         if (e.target.matches('img')) {
+          e.preventDefault();
           e.target.classList.add('rz-state-selected');
           Radzen.addImageResizeHandles(e.target, ref, instance);
           
           // Create a range that selects only the image element, not the wrapper
           var range = document.createRange();
           range.selectNode(e.target);
+          getSelection().removeAllRanges();
+          getSelection().addRange(range);
+        }
+        // Handle link clicks that contain images
+        else if (e.target.matches('a') && e.target.querySelector('img')) {
+          e.preventDefault();
+          var img = e.target.querySelector('img');
+          img.classList.add('rz-state-selected');
+          Radzen.addImageResizeHandles(img, ref, instance);
+          
+          // Create a range that selects only the image element, not the wrapper
+          var range = document.createRange();
+          range.selectNode(img);
           getSelection().removeAllRanges();
           getSelection().addRange(range);
         }
@@ -2100,6 +2116,17 @@ window.Radzen = {
 
     if (img && selector == 'img') {
       target = img;
+    } else if (img && selector == 'a') {
+      // If we have a selected image and we're looking for 'a' tags, 
+      // check if the image is inside a link or if we should create a link around it
+      var linkElement = img.closest('a');
+      if (linkElement) {
+        target = linkElement;
+      } else {
+        // If no link exists, we'll create one around the image
+        // For now, return empty attributes so the link dialog can work
+        target = img;
+      }
     } else if (target) {
       if (target.nodeType == 3) {
         target = target.parentElement;
@@ -2116,7 +2143,9 @@ window.Radzen = {
 
     return attributes.reduce(function (result, name) {
       if (target) {
-        result[name] = name == 'innerText' ? target[name] : target.getAttribute(name);
+        var value = name == 'innerText' ? target[name] : target.getAttribute(name);
+        // Ensure all values are strings for JSON serialization
+        result[name] = value != null ? String(value) : null;
       }
       return result;
     }, { innerText: selection.toString(), innerHTML: innerHTML });
@@ -2624,15 +2653,25 @@ window.Radzen = {
       // Remove existing handles first
       Radzen.removeImageResizeHandles(container);
       
+      // Check if the image is inside a link
+      var link = img.closest('a');
+      var targetElement = link || img;
+      
       // Create container for the image and handles
       var wrapper = document.createElement('div');
       wrapper.className = 'rz-image-resize-container';
       wrapper.style.position = 'relative';
       wrapper.style.display = 'inline-block';
       
-      // Insert wrapper before the image
-      img.parentNode.insertBefore(wrapper, img);
-      wrapper.appendChild(img);
+      // Preserve the original display style of the target element
+      var originalDisplay = window.getComputedStyle(targetElement).display;
+      if (originalDisplay === 'block' || originalDisplay === 'flex' || originalDisplay === 'grid') {
+        wrapper.style.display = originalDisplay;
+      }
+      
+      // Insert wrapper before the target element
+      targetElement.parentNode.insertBefore(wrapper, targetElement);
+      wrapper.appendChild(targetElement);
       
       // Ensure the image is selected (not the wrapper)
       var range = document.createRange();
@@ -2701,9 +2740,9 @@ window.Radzen = {
     removeImageResizeHandles: function (container) {
       var wrappers = container.querySelectorAll('.rz-image-resize-container');
       wrappers.forEach(function(wrapper) {
-        var img = wrapper.querySelector('img');
-        if (img) {
-          wrapper.parentNode.insertBefore(img, wrapper);
+        // Move the first child (which should be the target element) back to its original position
+        if (wrapper.firstChild) {
+          wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
           wrapper.parentNode.removeChild(wrapper);
         }
       });
@@ -2799,8 +2838,8 @@ window.Radzen = {
       if (instance) {
         instance.invokeMethodAsync('OnImageResize', {
           src: data.img.src,
-          width: computedWidth,
-          height: computedHeight
+          width: String(computedWidth),
+          height: String(computedHeight)
         });
       }
     },
@@ -2818,6 +2857,95 @@ window.Radzen = {
           getSelection().addRange(range);
         }
       });
+    },
+  removeImageResizeHandlesForLink: function (container) {
+    // Remove all resize handles and wrappers, leaving just the images
+    var wrappers = container.querySelectorAll('.rz-image-resize-container');
+    wrappers.forEach(function(wrapper) {
+      var img = wrapper.querySelector('img');
+      if (img) {
+        // Clone the image to preserve all its attributes
+        var imgClone = img.cloneNode(true);
+        
+        // Replace the wrapper with the cloned image
+        wrapper.parentNode.replaceChild(imgClone, wrapper);
+        
+        // Ensure the cloned image is selected
+        var range = document.createRange();
+        range.selectNode(imgClone);
+        getSelection().removeAllRanges();
+        getSelection().addRange(range);
+      }
+    });
+  },
+  hasSelectedImage: function (ref) {
+    var img = ref.querySelector('img.rz-state-selected');
+    return img !== null;
+  },
+  wrapSelectedImageWithLink: function (href, blank) {
+    // Find the editor container
+    var editorContainer = document.querySelector('.rz-html-editor-content');
+    if (!editorContainer) {
+      return;
     }
+    
+    // Look for selected image in the editor
+    var img = editorContainer.querySelector('img.rz-state-selected');
+    if (!img) {
+      // If no selected image, try to find any image in the current selection
+      var selection = getSelection();
+      if (selection.rangeCount > 0) {
+        var range = selection.getRangeAt(0);
+        var container = range.commonAncestorContainer;
+        
+        // If selection is a text node, get parent
+        if (container.nodeType === 3) {
+          container = container.parentElement;
+        }
+        
+        // Try to find image in the selection
+        if (container && container.tagName === 'IMG') {
+          img = container;
+        } else if (container && container.querySelector) {
+          img = container.querySelector('img');
+        }
+      }
+    }
+    
+    if (!img) {
+      return;
+    }
+    
+    // If image is already inside a link, update link
+    var link = img.closest('a');
+    if (link) {
+      link.setAttribute('href', href);
+      if (blank) {
+        link.setAttribute('target', '_blank');
+      } else {
+        link.removeAttribute('target');
+      }
+      return;
+    }
+    
+    // Create link and wrap the image
+    var a = document.createElement('a');
+    a.setAttribute('href', href);
+    if (blank) {
+      a.setAttribute('target', '_blank');
+    }
+    
+    // Insert link before image and move image inside
+    img.parentNode.insertBefore(a, img);
+    a.appendChild(img);
+    
+    // Remove the selected class
+    img.classList.remove('rz-state-selected');
+    
+    // Trigger change event to notify Blazor
+    if (editorContainer.inputListener) {
+      editorContainer.inputListener();
+    }
+  }
 };
 
