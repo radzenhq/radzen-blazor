@@ -11,6 +11,18 @@
         // Remove resize handles if an image is selected
         await JSRuntime.InvokeVoidAsync("Radzen.removeImageResizeHandlesForLink", Editor.Element);
         
-        await Editor.ExecuteCommandAsync(CommandName);
+        // Check if we have an image selected
+        var hasImage = await JSRuntime.InvokeAsync<bool>("Radzen.hasSelectedImage", Editor.Element);
+        
+        if (hasImage)
+        {
+            // Use custom unlink function for images
+            await JSRuntime.InvokeVoidAsync("Radzen.unlinkSelectedImage", Editor.Element);
+        }
+        else
+        {
+            // Use standard unlink command for text links
+            await Editor.ExecuteCommandAsync(CommandName);
+        }
     }
 }

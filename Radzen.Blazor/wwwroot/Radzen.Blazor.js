@@ -1976,13 +1976,7 @@ window.Radzen = {
       }
     };
     
-    // Add a listener to ensure proper image selection after certain operations
-    ref.ensureImageSelectionListener = function () {
-      // Small delay to ensure the operation is complete
-      setTimeout(function() {
-        Radzen.ensureImageSelection(ref);
-      }, 10);
-    };
+
     ref.pasteListener = function (e) {
       var item = e.clipboardData.items[0];
 
@@ -2053,25 +2047,7 @@ window.Radzen = {
     ref.addEventListener('click', ref.clickListener);
     document.addEventListener('selectionchange', ref.selectionChangeListener);
     
-    // Add mutation observer to watch for content changes
-    ref.mutationObserver = new MutationObserver(function(mutations) {
-      mutations.forEach(function(mutation) {
-        if (mutation.type === 'childList' || mutation.type === 'attributes') {
-          // Check if any selected images need their selection updated
-          var selectedImages = ref.querySelectorAll('img.rz-state-selected');
-          if (selectedImages.length > 0) {
-            ref.ensureImageSelectionListener();
-          }
-        }
-      });
-    });
-    
-    ref.mutationObserver.observe(ref, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ['href', 'src']
-    });
+
     
     document.execCommand('styleWithCSS', false, true);
   },
@@ -2157,12 +2133,6 @@ window.Radzen = {
       ref.removeEventListener('keydown', ref.keydownListener);
       ref.removeEventListener('click', ref.clickListener);
       document.removeEventListener('selectionchange', ref.selectionChangeListener);
-      
-      // Disconnect mutation observer
-      if (ref.mutationObserver) {
-        ref.mutationObserver.disconnect();
-        delete ref.mutationObserver;
-      }
       
       // Remove image resize handles
       Radzen.removeImageResizeHandles(ref);
@@ -2806,33 +2776,14 @@ window.Radzen = {
       data.img.style.width = computedWidth + 'px';
       data.img.style.height = computedHeight + 'px';
       
-      // Use the stored editor container reference
-      var editorContainer = data.editorContainer;
+      // Remove resize handles before notifying Blazor
+      Radzen.removeImageResizeHandles(data.editorContainer);
       
-      // Notify Blazor immediately about the HTML change
+      // Notify Blazor about the HTML change
+      var editorContainer = data.editorContainer;
       if (editorContainer && editorContainer.inputListener) {
         editorContainer.inputListener();
-      } else if (instance && editorContainer) {
-        var updatedHtml = editorContainer.innerHTML;
-        instance.invokeMethodAsync('OnChange', updatedHtml);
       }
-      
-      // Also try the setTimeout approach as backup
-      setTimeout(function() {
-        // Use the stored editor container reference again
-        var editorContainer = data.editorContainer;
-        
-        // Use the existing inputListener to notify Blazor about the HTML change
-        if (editorContainer && editorContainer.inputListener) {
-          editorContainer.inputListener();
-        } else {
-          // Fallback: directly call OnChange with the updated HTML
-          if (instance && editorContainer) {
-            var updatedHtml = editorContainer.innerHTML;
-            instance.invokeMethodAsync('OnChange', updatedHtml);
-          }
-        }
-      }, 10);
       
       // Notify the Blazor component about the image resize event
       if (instance) {
@@ -2843,38 +2794,14 @@ window.Radzen = {
         });
       }
     },
-    ensureImageSelection: function (container) {
-      // Find any selected images and ensure they are properly selected
-      var selectedImages = container.querySelectorAll('img.rz-state-selected');
-      selectedImages.forEach(function(img) {
-        // Check if the image is inside a resize container
-        var wrapper = img.closest('.rz-image-resize-container');
-        if (wrapper) {
-          // Ensure the image is selected, not the wrapper
-          var range = document.createRange();
-          range.selectNode(img);
-          getSelection().removeAllRanges();
-          getSelection().addRange(range);
-        }
-      });
-    },
+
   removeImageResizeHandlesForLink: function (container) {
     // Remove all resize handles and wrappers, leaving just the images
     var wrappers = container.querySelectorAll('.rz-image-resize-container');
     wrappers.forEach(function(wrapper) {
-      var img = wrapper.querySelector('img');
-      if (img) {
-        // Clone the image to preserve all its attributes
-        var imgClone = img.cloneNode(true);
-        
-        // Replace the wrapper with the cloned image
-        wrapper.parentNode.replaceChild(imgClone, wrapper);
-        
-        // Ensure the cloned image is selected
-        var range = document.createRange();
-        range.selectNode(imgClone);
-        getSelection().removeAllRanges();
-        getSelection().addRange(range);
+      if (wrapper.firstChild) {
+        wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+        wrapper.parentNode.removeChild(wrapper);
       }
     });
   },
@@ -2882,6 +2809,27 @@ window.Radzen = {
     var img = ref.querySelector('img.rz-state-selected');
     return img !== null;
   },
+  unlinkSelectedImage: function (ref) {
+    var img = ref.querySelector('img.rz-state-selected');
+    if (img) {
+      var link = img.closest('a');
+      if (link) {
+        // Move the image out of the link
+        link.parentNode.insertBefore(img, link);
+        link.parentNode.removeChild(link);
+      }
+      
+      // Remove the selected class
+      img.classList.remove('rz-state-selected');
+      
+      // Find the editor container and trigger change event
+      var editorContainer = document.querySelector('.rz-html-editor-content');
+      if (editorContainer && editorContainer.inputListener) {
+        editorContainer.inputListener();
+      }
+    }
+  },
+
   wrapSelectedImageWithLink: function (href, blank) {
     // Find the editor container
     var editorContainer = document.querySelector('.rz-html-editor-content');
@@ -2891,27 +2839,6 @@ window.Radzen = {
     
     // Look for selected image in the editor
     var img = editorContainer.querySelector('img.rz-state-selected');
-    if (!img) {
-      // If no selected image, try to find any image in the current selection
-      var selection = getSelection();
-      if (selection.rangeCount > 0) {
-        var range = selection.getRangeAt(0);
-        var container = range.commonAncestorContainer;
-        
-        // If selection is a text node, get parent
-        if (container.nodeType === 3) {
-          container = container.parentElement;
-        }
-        
-        // Try to find image in the selection
-        if (container && container.tagName === 'IMG') {
-          img = container;
-        } else if (container && container.querySelector) {
-          img = container.querySelector('img');
-        }
-      }
-    }
-    
     if (!img) {
       return;
     }
