@@ -3,7 +3,6 @@
 @using Microsoft.JSInterop
 @inherits RadzenHtmlEditorButtonBase
 @inject DialogService DialogService
-@inject IJSRuntime JSRuntime
 
 <EditorButton Title=@Title Click=@OnClick Icon="insert_link" />
 
@@ -11,14 +10,14 @@
     protected override async Task OnClick()
     {
         // Remove resize handles if an image is selected
-        await JSRuntime.InvokeVoidAsync("Radzen.removeImageResizeHandlesForLink", Editor.Element);
+        await JsRuntime.InvokeVoidAsync("Radzen.removeImageResizeHandlesForLink", Editor.Element);
         
         await Editor.SaveSelectionAsync();
 
         bool blank = false;
 
         // Check if we have an image selected using JavaScript
-        var isImageSelected = await JSRuntime.InvokeAsync<bool>("Radzen.hasSelectedImage", Editor.Element);
+        var isImageSelected = await JsRuntime.InvokeAsync<bool>("Radzen.hasSelectedImage", Editor.Element);
         
         var attributes = await Editor.GetSelectionAttributes<LinkAttributes>("a", ["innerText", "href", "target", "innerHTML"]);
 
@@ -58,7 +57,7 @@
             if (isImageSelected)
             {
                 // Use JS interop to wrap the <img> in a link
-                await JSRuntime.InvokeVoidAsync("Radzen.wrapSelectedImageWithLink", attributes.Href, blank);
+                await JsRuntime.InvokeVoidAsync("Radzen.wrapSelectedImageWithLink", attributes.Href, blank);
             }
             else
             {
