@@ -55,18 +55,6 @@
                 <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.EndsWith)</span><span>@Grid.EndsWithText</span>
             </li>
                 }
-                @if (Column.GetFilterOperators().Contains(FilterOperator.IsEmpty) && Column.FilterPropertyType == typeof(string))
-                {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsEmpty))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsEmpty)</span><span>@Grid.IsEmptyText</span>
-            </li>
-                }
-                @if (Column.GetFilterOperators().Contains(FilterOperator.IsNotEmpty) && Column.FilterPropertyType == typeof(string))
-                {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotEmpty))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotEmpty)</span><span>@Grid.IsNotEmptyText</span>
-            </li>
-                }
             }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.Equals))
                 {
