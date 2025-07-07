@@ -2180,7 +2180,8 @@ namespace Radzen.Blazor
                     FilterOperator = c.GetFilterOperator(),
                     SecondFilterValue = c.GetSecondFilterValue(),
                     SecondFilterOperator = c.GetSecondFilterOperator(),
-                    LogicalFilterOperator = c.GetLogicalFilterOperator()
+                    LogicalFilterOperator = c.GetLogicalFilterOperator(),
+                    Type = c.GetType()
                 })
                 .ToList();
 
