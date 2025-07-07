@@ -15,6 +15,7 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -2376,6 +2377,7 @@ namespace Radzen
         /// Gets or sets the property type.
         /// </summary>
         /// <value>The property type.</value>
+        [JsonIgnore]
         public Type Type { get; set; }
 
         /// <summary>
