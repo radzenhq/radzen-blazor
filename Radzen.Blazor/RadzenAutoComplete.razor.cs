@@ -150,7 +150,7 @@ namespace Radzen.Blazor
                     //
                 }
             }
-            else if (key == "Enter" || key == "NumpadEnter" key == "Tab")
+            else if (key == "Enter" || key == "NumpadEnter" || key == "Tab")
             {
                 if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
                 {
