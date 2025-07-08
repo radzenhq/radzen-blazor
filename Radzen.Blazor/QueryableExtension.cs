@@ -347,9 +347,9 @@ namespace Radzen
 
             ParameterExpression collectionItemTypeParameter = collectionItemType != null ? Expression.Parameter(collectionItemType, "x") : null;
 
-            if (collectionItemType != null && !string.IsNullOrEmpty(filter.FilterProperty) && filter.Property != filter.FilterProperty)
+            if (collectionItemType != null && filter.Property != filter.FilterProperty)
             {
-                property = GetNestedPropertyExpression(collectionItemTypeParameter, filter.FilterProperty);
+                property = !string.IsNullOrEmpty(filter.FilterProperty) ? GetNestedPropertyExpression(collectionItemTypeParameter, filter.FilterProperty) : collectionItemTypeParameter;
 
                 filter.FilterOperator = filter.FilterOperator == FilterOperator.In ? FilterOperator.Contains :
                     filter.FilterOperator == FilterOperator.NotIn ? FilterOperator.DoesNotContain : filter.FilterOperator;
