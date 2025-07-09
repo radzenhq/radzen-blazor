@@ -121,11 +121,11 @@ public class SortingTests
         sheet.Sort(RangeRef.Parse("A1:B3"), SortOrder.Ascending);
 
         Assert.Equal("Alice", sheet.Cells[0, 0].Value);
-        Assert.Equal("25", sheet.Cells[0, 1].Value);
+        Assert.Equal(25d, sheet.Cells[0, 1].Value);
         Assert.Equal("Bob", sheet.Cells[1, 0].Value);
-        Assert.Equal("20", sheet.Cells[1, 1].Value);
+        Assert.Equal(20d, sheet.Cells[1, 1].Value);
         Assert.Equal("Charlie", sheet.Cells[2, 0].Value);
-        Assert.Equal("30", sheet.Cells[2, 1].Value);
+        Assert.Equal(30d, sheet.Cells[2, 1].Value);
     }
 
 
