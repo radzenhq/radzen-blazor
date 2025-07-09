@@ -602,9 +602,37 @@ public partial class Sheet
             throw new ArgumentNullException(nameof(filter));
         }
 
+        var existingFilter = GetFilter(filter.Range);
+
+        if (existingFilter != null)
+        {
+            RemoveFilter(existingFilter);
+        }
+
         filters.Add(filter);
 
         ApplyFilters();
+    }
+
+    /// <summary>
+    /// Retrieves a filter for the specified range.
+    /// </summary>
+    public SheetFilter? GetFilter(RangeRef range)
+    {
+        if (range == RangeRef.Invalid)
+        {
+            return null;
+        }
+
+        foreach (var filter in filters)
+        {
+            if (filter.Range == range)
+            {
+                return filter;
+            }
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -666,7 +694,11 @@ public partial class Sheet
             return;
         }
 
-        for (var row = range.Start.Row; row <= range.End.Row; row++)
+        // Excel treats the first row as a header and excludes it from filtering
+        var startRow = range.Start.Row + 1;
+        var endRow = range.End.Row;
+
+        for (var row = startRow; row <= endRow; row++)
         {
             if (!criterion.Matches(this, row))
             {
