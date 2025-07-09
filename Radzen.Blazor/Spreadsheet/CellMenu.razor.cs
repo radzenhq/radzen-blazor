@@ -100,7 +100,15 @@ public partial class CellMenu : ComponentBase
         {
             foreach (var value in visitor.FoundValues)
             {
-                selectedFilterValues.Add(value);
+                if (value is string str)
+                {
+                    Cell.TryParse(str, out var parsedValue);
+                    selectedFilterValues.Add(parsedValue);
+                }
+                else
+                {
+                    selectedFilterValues.Add(value);
+                }
             }
         }
         else
@@ -332,8 +340,9 @@ public partial class CellMenu : ComponentBase
 
         if (rangeToUse == RangeRef.Invalid) return false;
 
-        // Check if any cell in the column has null or empty value
-        for (int row = rangeToUse.Start.Row; row <= rangeToUse.End.Row; row++)
+        // Excel treats the first row as a header and excludes it from blank checking
+        // Check if any cell in the column (excluding header) has null or empty value
+        for (int row = rangeToUse.Start.Row + 1; row <= rangeToUse.End.Row; row++)
         {
             var cell = Sheet.Cells[row, Column];
             var value = cell.Value;
@@ -469,8 +478,9 @@ public partial class CellMenu : ComponentBase
         {
             var uniqueValues = new List<(string Text, object? Value)>();
 
-            // Get all values from the column in the determined range
-            for (int row = rangeToUse.Start.Row; row <= rangeToUse.End.Row; row++)
+            // Excel treats the first row as a header and excludes it from the available values
+            // Start from the second row (header row + 1)
+            for (int row = rangeToUse.Start.Row + 1; row <= rangeToUse.End.Row; row++)
             {
                 // Check if this row is hidden by a filter that affects the current column
                 bool shouldSkipRow = false;
