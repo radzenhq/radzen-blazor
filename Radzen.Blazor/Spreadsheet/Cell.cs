@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -113,27 +114,7 @@ public class Cell
         get => value;
         set
         {
-            this.value = value;
-
-            valueType = DetermineValueType(value);
-
-            if (valueType == CellValueType.Number)
-            {
-                this.value = value switch
-                {
-                    int i => (double)i,
-                    uint ui => (double)ui,
-                    float f => (double)f,
-                    decimal d => (double)d,
-                    long l => (double)l,
-                    ulong ul => (double)ul,
-                    short s => (double)s,
-                    ushort us => (double)us,
-                    byte b => (double)b,
-                    sbyte sb => (double)sb,
-                    _ => value
-                };
-            }
+            AssignValue(value);
 
             Sheet.OnCellValueChanged(this);
         }
@@ -256,15 +237,48 @@ public class Cell
         Sheet = sheet;
     }
 
-    private static CellValueType DetermineValueType(object? value)
+    internal static bool TryParse(string value, out object? parsedValue)
     {
-        return value switch
+        if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number))
         {
-            null => CellValueType.Empty,
-            CellError => CellValueType.Error,
-            string => CellValueType.String,
-            int or double or float or decimal or long or ulong => CellValueType.Number,
-            _ => CellValueType.String
-        };
+            parsedValue = number;
+            return true;
+        }
+
+        parsedValue = value;
+        return false;
+    }
+
+    private void AssignValue(object? value)
+    {
+        this.value = value;
+
+        switch (value)
+        {
+            case null:
+                valueType = CellValueType.Empty;
+                break;
+            case CellError:
+                valueType = CellValueType.Error;
+                break;
+            case string str:
+                if (TryParse(str, out var number))
+                {
+                    this.value = number;
+                    valueType = CellValueType.Number;
+                }
+                else
+                {
+                    valueType = CellValueType.String;
+                }
+                break;
+            case int or short or uint or ushort or byte or double or float or decimal or long or ulong:
+                this.value = Convert.ToDouble(value);
+                valueType = CellValueType.Number;
+                break;
+            default:
+                valueType = CellValueType.String;
+                break;
+        }
     }
 }
