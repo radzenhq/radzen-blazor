@@ -51,7 +51,7 @@
     RadzenAIChat basicChat;
     EventConsole console;
 
-    void OnMessageAdded(ChatMessage message)
+    void OnMessageAdded(Radzen.Blazor.ChatMessage message)
     {
         console.Log($"Message added: {(message.IsUser ? "User" : "Assistant")} - {message.Content.Substring(0, Math.Min(50, message.Content.Length))}...", 
                    message.IsUser ? AlertStyle.Info : AlertStyle.Success);

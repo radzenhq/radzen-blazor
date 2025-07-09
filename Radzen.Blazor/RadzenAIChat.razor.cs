@@ -43,11 +43,11 @@ namespace Radzen.Blazor
     }
 
     /// <summary>
-    /// RadzenAIChat component that provides a modern chat interface with AI integration.
+    /// RadzenAIChat component that provides a modern chat interface with AI integration and conversation memory.
     /// </summary>
     /// <example>
     /// <code>
-    /// &lt;RadzenAIChat Title="AI Assistant" Placeholder="Type your message..." @bind-Messages="@chatMessages" /&gt;
+    /// &lt;RadzenAIChat Title="AI Assistant" Placeholder="Type your message..." @bind-Messages="@chatMessages" SessionId="@sessionId" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenAIChat : RadzenComponent
@@ -59,6 +59,19 @@ namespace Radzen.Blazor
         private ElementReference inputElement;
         private ElementReference messagesContainer;
         private CancellationTokenSource cts = new();
+        private string? currentSessionId;
+
+        /// <summary>
+        /// Gets or sets the session ID for maintaining conversation memory. If null, a new session will be created.
+        /// </summary>
+        [Parameter]
+        public string? SessionId { get; set; }
+
+        /// <summary>
+        /// Event callback that is invoked when a session ID is created or retrieved.
+        /// </summary>
+        [Parameter]
+        public EventCallback<string> SessionIdChanged { get; set; }
 
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
@@ -151,6 +164,11 @@ namespace Radzen.Blazor
         public IReadOnlyList<ChatMessage> GetMessages() => Messages.AsReadOnly();
 
         /// <summary>
+        /// Gets the current session ID.
+        /// </summary>
+        public string? GetSessionId() => currentSessionId;
+
+        /// <summary>
         /// Adds a message to the chat.
         /// </summary>
         /// <param name="content">The message content.</param>
@@ -183,6 +201,13 @@ namespace Radzen.Blazor
         public async Task ClearChat()
         {
             Messages.Clear();
+            
+            // Clear the session in the AI service
+            if (!string.IsNullOrEmpty(currentSessionId))
+            {
+                ChatService.ClearSession(currentSessionId);
+            }
+            
             await ChatCleared.InvokeAsync();
             await InvokeAsync(StateHasChanged);
         }
@@ -235,6 +260,29 @@ namespace Radzen.Blazor
             await GetAIResponse(content, model, systemPrompt, temperature, maxTokens);
         }
 
+        /// <summary>
+        /// Loads conversation history from the AI service session.
+        /// </summary>
+        public async Task LoadConversationHistory()
+        {
+            if (string.IsNullOrEmpty(currentSessionId))
+                return;
+
+            var session = ChatService.GetOrCreateSession(currentSessionId);
+            
+            // Clear current messages
+            Messages.Clear();
+            
+            // Add messages from session history
+            foreach (var message in session.Messages)
+            {
+                var isUser = message.Role.Equals("user", StringComparison.OrdinalIgnoreCase);
+                AddMessage(message.Content, isUser);
+            }
+            
+            await InvokeAsync(StateHasChanged);
+        }
+
         private async Task GetAIResponse(string userInput)
         {
             if (string.IsNullOrWhiteSpace(userInput))
@@ -244,6 +292,13 @@ namespace Radzen.Blazor
             cts.Cancel();
             cts = new CancellationTokenSource();
 
+            // Ensure we have a session ID
+            if (string.IsNullOrEmpty(currentSessionId))
+            {
+                currentSessionId = SessionId ?? Guid.NewGuid().ToString();
+                await SessionIdChanged.InvokeAsync(currentSessionId);
+            }
+
             // Add assistant message placeholder
             var assistantMessage = AddMessage("", false);
             assistantMessage.IsStreaming = true;
@@ -251,7 +306,7 @@ namespace Radzen.Blazor
             try
             {
                 var response = "";
-                await foreach (var token in ChatService.GetCompletionsAsync(userInput, cts.Token))
+                await foreach (var token in ChatService.GetCompletionsAsync(userInput, currentSessionId, cts.Token))
                 {
                     response += token;
                     assistantMessage.Content = response;
@@ -284,6 +339,13 @@ namespace Radzen.Blazor
             cts.Cancel();
             cts = new CancellationTokenSource();
 
+            // Ensure we have a session ID
+            if (string.IsNullOrEmpty(currentSessionId))
+            {
+                currentSessionId = SessionId ?? Guid.NewGuid().ToString();
+                await SessionIdChanged.InvokeAsync(currentSessionId);
+            }
+
             // Add assistant message placeholder
             var assistantMessage = AddMessage("", false);
             assistantMessage.IsStreaming = true;
@@ -291,7 +353,7 @@ namespace Radzen.Blazor
             try
             {
                 var response = "";
-                await foreach (var token in ChatService.GetCompletionsAsync(userInput, cts.Token, model, systemPrompt, temperature, maxTokens))
+                await foreach (var token in ChatService.GetCompletionsAsync(userInput, currentSessionId, cts.Token, model, systemPrompt, temperature, maxTokens))
                 {
                     response += token;
                     assistantMessage.Content = response;
@@ -312,6 +374,33 @@ namespace Radzen.Blazor
             {
                 IsLoading = false;
                 await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        protected override async Task OnInitializedAsync()
+        {
+            await base.OnInitializedAsync();
+            
+            // Initialize session ID
+            currentSessionId = SessionId ?? Guid.NewGuid().ToString();
+            if (currentSessionId != SessionId)
+            {
+                await SessionIdChanged.InvokeAsync(currentSessionId);
+            }
+        }
+
+        protected override async Task OnParametersSetAsync()
+        {
+            await base.OnParametersSetAsync();
+            
+            // Update session ID if it changed
+            if (SessionId != currentSessionId)
+            {
+                currentSessionId = SessionId ?? Guid.NewGuid().ToString();
+                await SessionIdChanged.InvokeAsync(currentSessionId);
+                
+                // Load conversation history for the new session
+                await LoadConversationHistory();
             }
         }
 
