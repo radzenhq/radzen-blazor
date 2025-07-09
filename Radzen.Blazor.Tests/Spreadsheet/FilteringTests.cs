@@ -10,79 +10,86 @@ public class FilteringTests
     [Fact]
     public void Should_FilterEqualToCriterion()
     {
-        sheet.Cells[0, 0].Value = "A";
-        sheet.Cells[1, 0].Value = "B";
-        sheet.Cells[2, 0].Value = "A";
+        sheet.Cells[0, 0].Value = "Header"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "A";
+        sheet.Cells[2, 0].Value = "B";
+        sheet.Cells[3, 0].Value = "A";
 
         var filter = new SheetFilter(
             new EqualToCriterion { Column = 0, Value = "A" },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
         sheet.AddFilter(filter);
 
-        Assert.False(sheet.Rows.IsHidden(0));
-        Assert.True(sheet.Rows.IsHidden(1));
-        Assert.False(sheet.Rows.IsHidden(2));
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.False(sheet.Rows.IsHidden(1)); // "A" - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // "B" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // "A" - matches
     }
 
     [Fact]
     public void Should_ShowRowsAfterApplyingDifferentCriterion()
     {
-        sheet.Cells[0, 0].Value = "A";
-        sheet.Cells[1, 0].Value = "B";
-        sheet.Cells[2, 0].Value = "A";
+        sheet.Cells[0, 0].Value = "Header"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "A";
+        sheet.Cells[2, 0].Value = "B";
+        sheet.Cells[3, 0].Value = "A";
 
         var filterA = new SheetFilter(
             new EqualToCriterion { Column = 0, Value = "A" },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
         sheet.AddFilter(filterA);
 
-        Assert.True(sheet.Rows.IsHidden(1)); // row 1 hidden by filterA
+        Assert.True(sheet.Rows.IsHidden(2)); // row 2 ("B") hidden by filterA
 
         // Remove previous filter and apply new one
         sheet.RemoveFilter(filterA);
         var filterB = new SheetFilter(
             new EqualToCriterion { Column = 0, Value = "B" },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
         sheet.AddFilter(filterB);
 
-        Assert.True(sheet.Rows.IsHidden(0));
-        Assert.False(sheet.Rows.IsHidden(1));
-        Assert.True(sheet.Rows.IsHidden(2));
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // "A" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // "B" - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // "A" - doesn't match
     }
 
     [Fact]
     public void Should_TreatNumericStringsEqualToNumbers()
     {
-        var sheet = new Sheet(4, 1);
-        sheet.Cells[0, 0].Value = "10";    // row 0: string
-        sheet.Cells[1, 0].Value = 10;      // row 1: number
-        sheet.Cells[2, 0].Value = "10.0";  // row 2: string
-        sheet.Cells[3, 0].Value = "abc";   // row 3: non-numeric string
+        var sheet = new Sheet(5, 1);
+        sheet.Cells[0, 0].Value = "Header"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "10";     // row 1: string
+        sheet.Cells[2, 0].Value = 10;       // row 2: number
+        sheet.Cells[3, 0].Value = "10.0";   // row 3: string
+        sheet.Cells[4, 0].Value = "abc";    // row 4: non-numeric string
 
         var filter = new SheetFilter(
             new EqualToCriterion { Column = 0, Value = 10 },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.False(sheet.Rows.IsHidden(0)); // "10"
-        Assert.False(sheet.Rows.IsHidden(1)); // 10
-        Assert.False(sheet.Rows.IsHidden(2)); // "10.0"
-        Assert.True(sheet.Rows.IsHidden(3));  // "abc" → not a number
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.False(sheet.Rows.IsHidden(1)); // "10"
+        Assert.False(sheet.Rows.IsHidden(2)); // 10
+        Assert.False(sheet.Rows.IsHidden(3)); // "10.0"
+        Assert.True(sheet.Rows.IsHidden(4));  // "abc" → not a number
     }
 
     [Fact]
     public void Should_FilterWithOrCriterion()
     {
         // Setup:
-        // Row 0: ignored (header)
+        // Row 0: Header row (should not be filtered)
         // Row 1: A=Active, B=20
         // Row 2: A=Pending, B=70
         // Row 3: A=Inactive, B=90
 
+        sheet.Cells[0, 0].Value = "Status"; sheet.Cells[0, 1].Value = "Value"; // Header row
         sheet.Cells[1, 0].Value = "Active";
         sheet.Cells[1, 1].Value = 20;
         sheet.Cells[2, 0].Value = "Pending";
@@ -98,10 +105,11 @@ public class FilteringTests
                     new EqualToCriterion { Column = 1, Value = 90 }
                 ]
             },
-            RangeRef.Parse("A2:B4")
+            RangeRef.Parse("A1:B4")
         );
         sheet.AddFilter(filter);
 
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
         Assert.True(sheet.Rows.IsHidden(1));  // A=Active, B=20 — doesn't match either
         Assert.False(sheet.Rows.IsHidden(2)); // A=Pending — matches
         Assert.False(sheet.Rows.IsHidden(3)); // B=90 — matches
@@ -112,6 +120,7 @@ public class FilteringTests
     {
         var sheet = new Sheet(4, 2);
 
+        sheet.Cells[0, 0].Value = "Status"; sheet.Cells[0, 1].Value = "Value"; // Header row
         sheet.Cells[1, 0].Value = "Active"; sheet.Cells[1, 1].Value = 85;
         sheet.Cells[2, 0].Value = "Active"; sheet.Cells[2, 1].Value = 60;
         sheet.Cells[3, 0].Value = "Inactive"; sheet.Cells[3, 1].Value = 90;
@@ -124,10 +133,11 @@ public class FilteringTests
                     new EqualToCriterion { Column = 1, Value = 85 }
                 ]
             },
-            RangeRef.Parse("A2:B4")
+            RangeRef.Parse("A1:B4")
         );
         sheet.AddFilter(filter);
 
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
         Assert.False(sheet.Rows.IsHidden(1)); // Matches both
         Assert.True(sheet.Rows.IsHidden(2));  // B too low
         Assert.True(sheet.Rows.IsHidden(3));  // Not Active
@@ -138,6 +148,7 @@ public class FilteringTests
     {
         var sheet = new Sheet(5, 2);
 
+        sheet.Cells[0, 0].Value = "Status"; sheet.Cells[0, 1].Value = "Value"; // Header row
         sheet.Cells[1, 0].Value = "Active"; sheet.Cells[1, 1].Value = 90;
         sheet.Cells[2, 0].Value = "Pending"; sheet.Cells[2, 1].Value = 45;
         sheet.Cells[3, 0].Value = "Pending"; sheet.Cells[3, 1].Value = 95;
@@ -158,10 +169,11 @@ public class FilteringTests
                     }
                 ]
             },
-            RangeRef.Parse("A2:B5")
+            RangeRef.Parse("A1:B5")
         );
         sheet.AddFilter(filter);
 
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
         Assert.False(sheet.Rows.IsHidden(1)); // Active + 90
         Assert.True(sheet.Rows.IsHidden(2));  // Pending + 45 (too low)
         Assert.False(sheet.Rows.IsHidden(3)); // Pending + 95
@@ -171,41 +183,45 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithInListCriterion()
     {
-        sheet.Cells[0, 0].Value = "Apple";
-        sheet.Cells[1, 0].Value = "Banana";
-        sheet.Cells[2, 0].Value = "Cherry";
-        sheet.Cells[3, 0].Value = "Date";
+        sheet.Cells[0, 0].Value = "Fruit"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = "Banana";
+        sheet.Cells[3, 0].Value = "Cherry";
+        sheet.Cells[4, 0].Value = "Date";
 
         var filter = new SheetFilter(
             new InListCriterion { Column = 0, Values = ["Apple", "Cherry"] },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.False(sheet.Rows.IsHidden(0)); // Apple - matches
-        Assert.True(sheet.Rows.IsHidden(1));  // Banana - doesn't match
-        Assert.False(sheet.Rows.IsHidden(2)); // Cherry - matches
-        Assert.True(sheet.Rows.IsHidden(3));  // Date - doesn't match
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.False(sheet.Rows.IsHidden(1)); // Apple - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // Banana - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // Cherry - matches
+        Assert.True(sheet.Rows.IsHidden(4));  // Date - doesn't match
     }
 
     [Fact]
     public void Should_FilterWithInListCriterionForNumbers()
     {
-        sheet.Cells[0, 0].Value = 10;
-        sheet.Cells[1, 0].Value = 20;
-        sheet.Cells[2, 0].Value = 30;
-        sheet.Cells[3, 0].Value = 40;
+        sheet.Cells[0, 0].Value = "Number"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = 10;
+        sheet.Cells[2, 0].Value = 20;
+        sheet.Cells[3, 0].Value = 30;
+        sheet.Cells[4, 0].Value = 40;
 
         var filter = new SheetFilter(
             new InListCriterion { Column = 0, Values = [10, 30, 50] },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.False(sheet.Rows.IsHidden(0)); // 10 - matches
-        Assert.True(sheet.Rows.IsHidden(1));  // 20 - doesn't match
-        Assert.False(sheet.Rows.IsHidden(2)); // 30 - matches
-        Assert.True(sheet.Rows.IsHidden(3));  // 40 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.False(sheet.Rows.IsHidden(1)); // 10 - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // 20 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // 30 - matches
+        Assert.True(sheet.Rows.IsHidden(4));  // 40 - doesn't match
     }
 
     [Fact]
@@ -249,19 +265,21 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithInListCriterionForEmptyList()
     {
-        sheet.Cells[0, 0].Value = "Apple";
-        sheet.Cells[1, 0].Value = "Banana";
-        sheet.Cells[2, 0].Value = "Cherry";
+        sheet.Cells[0, 0].Value = "Fruit"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = "Banana";
+        sheet.Cells[3, 0].Value = "Cherry";
 
         var filter = new SheetFilter(
             new InListCriterion { Column = 0, Values = [] },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // No matches in empty list
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
         Assert.True(sheet.Rows.IsHidden(1));  // No matches in empty list
         Assert.True(sheet.Rows.IsHidden(2));  // No matches in empty list
+        Assert.True(sheet.Rows.IsHidden(3));  // No matches in empty list
     }
 
     [Fact]
@@ -302,33 +320,36 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithIsNullCriterion()
     {
-        sheet.Cells[0, 0].Value = null;
-        sheet.Cells[1, 0].Value = "Apple";
-        sheet.Cells[2, 0].Value = 10;
-        sheet.Cells[3, 0].Value = null;
+        sheet.Cells[0, 0].Value = "Value"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = null;
+        sheet.Cells[2, 0].Value = "Apple";
+        sheet.Cells[3, 0].Value = 10;
+        sheet.Cells[4, 0].Value = null;
 
         var filter = new SheetFilter(
             new IsNullCriterion { Column = 0 },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.False(sheet.Rows.IsHidden(0)); // null - matches
-        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" - doesn't match
-        Assert.True(sheet.Rows.IsHidden(2));  // 10 - doesn't match
-        Assert.False(sheet.Rows.IsHidden(3)); // null - matches
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.False(sheet.Rows.IsHidden(1)); // null - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // "Apple" - doesn't match
+        Assert.True(sheet.Rows.IsHidden(3));  // 10 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(4)); // null - matches
     }
 
     [Fact]
     public void Should_RemoveFilter()
     {
-        sheet.Cells[0, 0].Value = "A";
-        sheet.Cells[1, 0].Value = "B";
-        sheet.Cells[2, 0].Value = "A";
+        sheet.Cells[0, 0].Value = "Header"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "A";
+        sheet.Cells[2, 0].Value = "B";
+        sheet.Cells[3, 0].Value = "A";
 
         var filter = new SheetFilter(
             new EqualToCriterion { Column = 0, Value = "A" },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
 
         // Add filter
@@ -336,9 +357,10 @@ public class FilteringTests
 
         // Verify filter is applied
         Assert.Single(sheet.Filters);
-        Assert.False(sheet.Rows.IsHidden(0));
-        Assert.True(sheet.Rows.IsHidden(1));
-        Assert.False(sheet.Rows.IsHidden(2));
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.False(sheet.Rows.IsHidden(1)); // "A" - matches
+        Assert.True(sheet.Rows.IsHidden(2));  // "B" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // "A" - matches
 
         // Remove filter
         var removed = sheet.RemoveFilter(filter);
@@ -349,6 +371,7 @@ public class FilteringTests
         Assert.False(sheet.Rows.IsHidden(0));
         Assert.False(sheet.Rows.IsHidden(1));
         Assert.False(sheet.Rows.IsHidden(2));
+        Assert.False(sheet.Rows.IsHidden(3));
     }
 
     [Fact]
@@ -442,18 +465,19 @@ public class FilteringTests
     [Fact]
     public void Should_HandleMultipleFiltersWithRemove()
     {
-        sheet.Cells[0, 0].Value = "A"; sheet.Cells[0, 1].Value = 10;
-        sheet.Cells[1, 0].Value = "B"; sheet.Cells[1, 1].Value = 20;
-        sheet.Cells[2, 0].Value = "A"; sheet.Cells[2, 1].Value = 30;
+        sheet.Cells[0, 0].Value = "Letter"; sheet.Cells[0, 1].Value = "Number"; // Header row
+        sheet.Cells[1, 0].Value = "A"; sheet.Cells[1, 1].Value = 10;
+        sheet.Cells[2, 0].Value = "B"; sheet.Cells[2, 1].Value = 20;
+        sheet.Cells[3, 0].Value = "A"; sheet.Cells[3, 1].Value = 30;
 
         var filter1 = new SheetFilter(
             new EqualToCriterion { Column = 0, Value = "A" },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
 
         var filter2 = new SheetFilter(
             new GreaterThanCriterion { Column = 1, Value = 15 },
-            RangeRef.Parse("B1:B3")
+            RangeRef.Parse("B1:B4")
         );
 
         // Add both filters
@@ -462,9 +486,10 @@ public class FilteringTests
 
         // Verify both filters are applied
         Assert.Equal(2, sheet.Filters.Count);
-        Assert.True(sheet.Rows.IsHidden(0));  // A=10 matches first filter but not second (10 <= 15)
-        Assert.True(sheet.Rows.IsHidden(1));  // B=20 matches second filter but not first
-        Assert.False(sheet.Rows.IsHidden(2)); // A=30 matches both filters
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // A=10 matches first filter but not second (10 <= 15)
+        Assert.True(sheet.Rows.IsHidden(2));  // B=20 matches second filter but not first
+        Assert.False(sheet.Rows.IsHidden(3)); // A=30 matches both filters
 
         // Remove first filter using the same instance
         var removed = sheet.RemoveFilter(filter1);
@@ -472,9 +497,10 @@ public class FilteringTests
 
         // Verify only second filter remains
         Assert.Single(sheet.Filters);
-        Assert.True(sheet.Rows.IsHidden(0)); // A=10 doesn't match second filter (10 <= 15)
-        Assert.False(sheet.Rows.IsHidden(1)); // B=20 matches second filter (20 > 15)
-        Assert.False(sheet.Rows.IsHidden(2)); // A=30 matches second filter (30 > 15)
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1)); // A=10 doesn't match second filter (10 <= 15)
+        Assert.False(sheet.Rows.IsHidden(2)); // B=20 matches second filter (20 > 15)
+        Assert.False(sheet.Rows.IsHidden(3)); // A=30 matches second filter (30 > 15)
 
         // Remove second filter using the same instance
         removed = sheet.RemoveFilter(filter2);
@@ -485,26 +511,29 @@ public class FilteringTests
         Assert.False(sheet.Rows.IsHidden(0));
         Assert.False(sheet.Rows.IsHidden(1));
         Assert.False(sheet.Rows.IsHidden(2));
+        Assert.False(sheet.Rows.IsHidden(3));
     }
 
     [Fact]
     public void Should_FilterWithLessThanCriterion()
     {
-        sheet.Cells[0, 0].Value = 10;
-        sheet.Cells[1, 0].Value = 20;
-        sheet.Cells[2, 0].Value = 30;
-        sheet.Cells[3, 0].Value = 40;
+        sheet.Cells[0, 0].Value = "Number"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = 10;
+        sheet.Cells[2, 0].Value = 20;
+        sheet.Cells[3, 0].Value = 30;
+        sheet.Cells[4, 0].Value = 40;
 
         var filter = new SheetFilter(
             new LessThanCriterion { Column = 0, Value = 25 },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.False(sheet.Rows.IsHidden(0)); // 10 < 25 - matches
-        Assert.False(sheet.Rows.IsHidden(1)); // 20 < 25 - matches
-        Assert.True(sheet.Rows.IsHidden(2));  // 30 >= 25 - doesn't match
-        Assert.True(sheet.Rows.IsHidden(3));  // 40 >= 25 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.False(sheet.Rows.IsHidden(1)); // 10 < 25 - matches
+        Assert.False(sheet.Rows.IsHidden(2)); // 20 < 25 - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // 30 >= 25 - doesn't match
+        Assert.True(sheet.Rows.IsHidden(4));  // 40 >= 25 - doesn't match
     }
 
     [Fact]
@@ -530,28 +559,52 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithLessThanCriterionForNonNumericValues()
     {
-        sheet.Cells[0, 0].Value = "Apple";
-        sheet.Cells[1, 0].Value = "Banana";
-        sheet.Cells[2, 0].Value = 10;
+        sheet.Cells[0, 0].Value = "Value"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = "Banana";
+        sheet.Cells[3, 0].Value = 10;
 
         var filter = new SheetFilter(
             new LessThanCriterion { Column = 0, Value = 20 },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // "Apple" - not numeric, doesn't match
-        Assert.True(sheet.Rows.IsHidden(1));  // "Banana" - not numeric, doesn't match
-        Assert.False(sheet.Rows.IsHidden(2)); // 10 < 20 - matches
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" - not numeric, doesn't match
+        Assert.True(sheet.Rows.IsHidden(2));  // "Banana" - not numeric, doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // 10 < 20 - matches
     }
 
     [Fact]
     public void Should_FilterWithGreaterThanOrEqualCriterion()
     {
-        sheet.Cells[0, 0].Value = 10;
-        sheet.Cells[1, 0].Value = 20;
-        sheet.Cells[2, 0].Value = 30;
-        sheet.Cells[3, 0].Value = 40;
+        sheet.Cells[0, 0].Value = "Number"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = 10;
+        sheet.Cells[2, 0].Value = 20;
+        sheet.Cells[3, 0].Value = 30;
+        sheet.Cells[4, 0].Value = 40;
+
+        var filter = new SheetFilter(
+            new GreaterThanOrEqualCriterion { Column = 0, Value = 25 },
+            RangeRef.Parse("A1:A5")
+        );
+        sheet.AddFilter(filter);
+
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // 10 < 25 - doesn't match
+        Assert.True(sheet.Rows.IsHidden(2));  // 20 < 25 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // 30 >= 25 - matches
+        Assert.False(sheet.Rows.IsHidden(4)); // 40 >= 25 - matches
+    }
+
+    [Fact]
+    public void Should_FilterWithGreaterThanOrEqualCriterionForExactMatch()
+    {
+        sheet.Cells[0, 0].Value = "Number"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = 10;
+        sheet.Cells[2, 0].Value = 25;
+        sheet.Cells[3, 0].Value = 30;
 
         var filter = new SheetFilter(
             new GreaterThanOrEqualCriterion { Column = 0, Value = 25 },
@@ -559,28 +612,10 @@ public class FilteringTests
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // 10 < 25 - doesn't match
-        Assert.True(sheet.Rows.IsHidden(1));  // 20 < 25 - doesn't match
-        Assert.False(sheet.Rows.IsHidden(2)); // 30 >= 25 - matches
-        Assert.False(sheet.Rows.IsHidden(3)); // 40 >= 25 - matches
-    }
-
-    [Fact]
-    public void Should_FilterWithGreaterThanOrEqualCriterionForExactMatch()
-    {
-        sheet.Cells[0, 0].Value = 10;
-        sheet.Cells[1, 0].Value = 25;
-        sheet.Cells[2, 0].Value = 30;
-
-        var filter = new SheetFilter(
-            new GreaterThanOrEqualCriterion { Column = 0, Value = 25 },
-            RangeRef.Parse("A1:A3")
-        );
-        sheet.AddFilter(filter);
-
-        Assert.True(sheet.Rows.IsHidden(0));  // 10 < 25 - doesn't match
-        Assert.False(sheet.Rows.IsHidden(1)); // 25 >= 25 - matches (exact)
-        Assert.False(sheet.Rows.IsHidden(2)); // 30 >= 25 - matches
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // 10 < 25 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // 25 >= 25 - matches (exact)
+        Assert.False(sheet.Rows.IsHidden(3)); // 30 >= 25 - matches
     }
 
     [Fact]
@@ -624,61 +659,67 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithNotEqualToCriterion()
     {
-        sheet.Cells[0, 0].Value = "Apple";
-        sheet.Cells[1, 0].Value = "Banana";
-        sheet.Cells[2, 0].Value = "Apple";
-        sheet.Cells[3, 0].Value = "Cherry";
+        sheet.Cells[0, 0].Value = "Fruit"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = "Banana";
+        sheet.Cells[3, 0].Value = "Apple";
+        sheet.Cells[4, 0].Value = "Cherry";
 
         var filter = new SheetFilter(
             new NotEqualToCriterion { Column = 0, Value = "Apple" },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // "Apple" == "Apple" - doesn't match
-        Assert.False(sheet.Rows.IsHidden(1)); // "Banana" != "Apple" - matches
-        Assert.True(sheet.Rows.IsHidden(2));  // "Apple" == "Apple" - doesn't match
-        Assert.False(sheet.Rows.IsHidden(3)); // "Cherry" != "Apple" - matches
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" == "Apple" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // "Banana" != "Apple" - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // "Apple" == "Apple" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(4)); // "Cherry" != "Apple" - matches
     }
 
     [Fact]
     public void Should_FilterWithNotEqualToCriterionForNumbers()
     {
-        sheet.Cells[0, 0].Value = 10;
-        sheet.Cells[1, 0].Value = 20;
-        sheet.Cells[2, 0].Value = 10;
-        sheet.Cells[3, 0].Value = 30;
+        sheet.Cells[0, 0].Value = "Number"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = 10;
+        sheet.Cells[2, 0].Value = 20;
+        sheet.Cells[3, 0].Value = 10;
+        sheet.Cells[4, 0].Value = 30;
 
         var filter = new SheetFilter(
             new NotEqualToCriterion { Column = 0, Value = 10 },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // 10 == 10 - doesn't match
-        Assert.False(sheet.Rows.IsHidden(1)); // 20 != 10 - matches
-        Assert.True(sheet.Rows.IsHidden(2));  // 10 == 10 - doesn't match
-        Assert.False(sheet.Rows.IsHidden(3)); // 30 != 10 - matches
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // 10 == 10 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // 20 != 10 - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // 10 == 10 - doesn't match
+        Assert.False(sheet.Rows.IsHidden(4)); // 30 != 10 - matches
     }
 
     [Fact]
     public void Should_FilterWithNotEqualToCriterionForMixedTypes()
     {
-        sheet.Cells[0, 0].Value = "10";    // string
-        sheet.Cells[1, 0].Value = 20;      // number
-        sheet.Cells[2, 0].Value = "10.0";  // string
-        sheet.Cells[3, 0].Value = 40;      // number
+        sheet.Cells[0, 0].Value = "Value"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "10";    // string
+        sheet.Cells[2, 0].Value = 20;      // number
+        sheet.Cells[3, 0].Value = "10.0";  // string
+        sheet.Cells[4, 0].Value = 40;      // number
 
         var filter = new SheetFilter(
             new NotEqualToCriterion { Column = 0, Value = 10 },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // "10" == 10 (numeric coercion) - doesn't match
-        Assert.False(sheet.Rows.IsHidden(1)); // 20 != 10 - matches
-        Assert.True(sheet.Rows.IsHidden(2));  // "10.0" == 10 (numeric coercion) - doesn't match
-        Assert.False(sheet.Rows.IsHidden(3)); // 40 != 10 - matches
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // "10" == 10 (numeric coercion) - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // 20 != 10 - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // "10.0" == 10 (numeric coercion) - doesn't match
+        Assert.False(sheet.Rows.IsHidden(4)); // 40 != 10 - matches
     }
 
     [Fact]
@@ -702,19 +743,21 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithNotEqualToCriterionForNullValues()
     {
-        sheet.Cells[0, 0].Value = null;
-        sheet.Cells[1, 0].Value = "Apple";
-        sheet.Cells[2, 0].Value = null;
+        sheet.Cells[0, 0].Value = "Value"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = null;
+        sheet.Cells[2, 0].Value = "Apple";
+        sheet.Cells[3, 0].Value = null;
 
         var filter = new SheetFilter(
             new NotEqualToCriterion { Column = 0, Value = "Apple" },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // null != "Apple" but null handling returns false
-        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" == "Apple" - doesn't match
-        Assert.True(sheet.Rows.IsHidden(2));  // null != "Apple" but null handling returns false
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // null != "Apple" but null handling returns false
+        Assert.True(sheet.Rows.IsHidden(2));  // "Apple" == "Apple" - doesn't match
+        Assert.True(sheet.Rows.IsHidden(3));  // null != "Apple" but null handling returns false
     }
 
     [Fact]
@@ -760,21 +803,23 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithStartsWithCriterion()
     {
-        sheet.Cells[0, 0].Value = "Apple";
-        sheet.Cells[1, 0].Value = "Application";
-        sheet.Cells[2, 0].Value = "Banana";
-        sheet.Cells[3, 0].Value = "App";
+        sheet.Cells[0, 0].Value = "Word"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = "Application";
+        sheet.Cells[3, 0].Value = "Banana";
+        sheet.Cells[4, 0].Value = "App";
 
         var filter = new SheetFilter(
             new StartsWithCriterion { Column = 0, Value = "App" },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.False(sheet.Rows.IsHidden(0)); // "Apple" starts with "App" - matches
-        Assert.False(sheet.Rows.IsHidden(1)); // "Application" starts with "App" - matches
-        Assert.True(sheet.Rows.IsHidden(2));  // "Banana" doesn't start with "App" - doesn't match
-        Assert.False(sheet.Rows.IsHidden(3)); // "App" starts with "App" - matches
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.False(sheet.Rows.IsHidden(1)); // "Apple" starts with "App" - matches
+        Assert.False(sheet.Rows.IsHidden(2)); // "Application" starts with "App" - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // "Banana" doesn't start with "App" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(4)); // "App" starts with "App" - matches
     }
 
     [Fact]
@@ -820,21 +865,23 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithDoesNotStartWithCriterion()
     {
-        sheet.Cells[0, 0].Value = "Apple";
-        sheet.Cells[1, 0].Value = "Application";
-        sheet.Cells[2, 0].Value = "Banana";
-        sheet.Cells[3, 0].Value = "App";
+        sheet.Cells[0, 0].Value = "Word"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = "Application";
+        sheet.Cells[3, 0].Value = "Banana";
+        sheet.Cells[4, 0].Value = "App";
 
         var filter = new SheetFilter(
             new DoesNotStartWithCriterion { Column = 0, Value = "App" },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // "Apple" starts with "App" - doesn't match
-        Assert.True(sheet.Rows.IsHidden(1));  // "Application" starts with "App" - doesn't match
-        Assert.False(sheet.Rows.IsHidden(2)); // "Banana" doesn't start with "App" - matches
-        Assert.True(sheet.Rows.IsHidden(3));  // "App" starts with "App" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" starts with "App" - doesn't match
+        Assert.True(sheet.Rows.IsHidden(2));  // "Application" starts with "App" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // "Banana" doesn't start with "App" - matches
+        Assert.True(sheet.Rows.IsHidden(4));  // "App" starts with "App" - doesn't match
     }
 
     [Fact]
@@ -900,21 +947,23 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithDoesNotEndWithCriterion()
     {
-        sheet.Cells[0, 0].Value = "Apple";
-        sheet.Cells[1, 0].Value = "Pineapple";
-        sheet.Cells[2, 0].Value = "Banana";
-        sheet.Cells[3, 0].Value = "Ple";
+        sheet.Cells[0, 0].Value = "Word"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = "Pineapple";
+        sheet.Cells[3, 0].Value = "Banana";
+        sheet.Cells[4, 0].Value = "Ple";
 
         var filter = new SheetFilter(
             new DoesNotEndWithCriterion { Column = 0, Value = "ple" },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // "Apple" ends with "ple" - doesn't match
-        Assert.True(sheet.Rows.IsHidden(1));  // "Pineapple" ends with "ple" - doesn't match
-        Assert.False(sheet.Rows.IsHidden(2)); // "Banana" doesn't end with "ple" - matches
-        Assert.True(sheet.Rows.IsHidden(3));  // "Ple" ends with "ple" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" ends with "ple" - doesn't match
+        Assert.True(sheet.Rows.IsHidden(2));  // "Pineapple" ends with "ple" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // "Banana" doesn't end with "ple" - matches
+        Assert.True(sheet.Rows.IsHidden(4));  // "Ple" ends with "ple" - doesn't match
     }
 
     [Fact]
@@ -980,39 +1029,43 @@ public class FilteringTests
     [Fact]
     public void Should_FilterWithDoesNotContainCriterion()
     {
-        sheet.Cells[0, 0].Value = "Apple";
-        sheet.Cells[1, 0].Value = "Pineapple";
-        sheet.Cells[2, 0].Value = "Banana";
-        sheet.Cells[3, 0].Value = "Application";
+        sheet.Cells[0, 0].Value = "Word"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = "Apple";
+        sheet.Cells[2, 0].Value = "Pineapple";
+        sheet.Cells[3, 0].Value = "Banana";
+        sheet.Cells[4, 0].Value = "Application";
 
         var filter = new SheetFilter(
             new DoesNotContainCriterion { Column = 0, Value = "app" },
-            RangeRef.Parse("A1:A4")
+            RangeRef.Parse("A1:A5")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // "Apple" contains "app" - doesn't match
-        Assert.True(sheet.Rows.IsHidden(1));  // "Pineapple" contains "app" - doesn't match
-        Assert.False(sheet.Rows.IsHidden(2)); // "Banana" doesn't contain "app" - matches
-        Assert.True(sheet.Rows.IsHidden(3));  // "Application" contains "app" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // "Apple" contains "app" - doesn't match
+        Assert.True(sheet.Rows.IsHidden(2));  // "Pineapple" contains "app" - doesn't match
+        Assert.False(sheet.Rows.IsHidden(3)); // "Banana" doesn't contain "app" - matches
+        Assert.True(sheet.Rows.IsHidden(4));  // "Application" contains "app" - doesn't match
     }
 
     [Fact]
     public void Should_FilterWithStringCriteriaForNullValues()
     {
-        sheet.Cells[0, 0].Value = null;
-        sheet.Cells[1, 0].Value = "Apple";
-        sheet.Cells[2, 0].Value = null;
+        sheet.Cells[0, 0].Value = "Value"; // Header row (should not be filtered)
+        sheet.Cells[1, 0].Value = null;
+        sheet.Cells[2, 0].Value = "Apple";
+        sheet.Cells[3, 0].Value = null;
 
         var filter = new SheetFilter(
             new StartsWithCriterion { Column = 0, Value = "App" },
-            RangeRef.Parse("A1:A3")
+            RangeRef.Parse("A1:A4")
         );
         sheet.AddFilter(filter);
 
-        Assert.True(sheet.Rows.IsHidden(0));  // null - doesn't match
-        Assert.False(sheet.Rows.IsHidden(1)); // "Apple" starts with "App" - matches
-        Assert.True(sheet.Rows.IsHidden(2));  // null - doesn't match
+        Assert.False(sheet.Rows.IsHidden(0)); // Header row should remain visible
+        Assert.True(sheet.Rows.IsHidden(1));  // null - doesn't match
+        Assert.False(sheet.Rows.IsHidden(2)); // "Apple" starts with "App" - matches
+        Assert.True(sheet.Rows.IsHidden(3));  // null - doesn't match
     }
 
     [Fact]

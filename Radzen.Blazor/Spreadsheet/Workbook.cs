@@ -225,9 +225,12 @@ public class Workbook
                 new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"),
                 new XAttribute("Target", sheetName)));
 
+            var uid = Guid.NewGuid().ToString("B").ToUpperInvariant();
             // Create sheet XML
             var sheetDoc = new XDocument(
                 new XElement(XName.Get("worksheet", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid),
+                    new XElement(XName.Get("sheetPr", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), sheet.Filters.Count > 0 ? new XAttribute("filterMode", "1") : null),
                     new XElement(XName.Get("dimension", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                         new XAttribute("ref", $"A1:{new CellRef(sheet.RowCount - 1, sheet.ColumnCount - 1)}")),
                     new XElement(XName.Get("sheetViews", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
@@ -256,6 +259,12 @@ public class Workbook
                     new XAttribute("r", row + 1),
                     new XAttribute("ht", sheet.Rows[row]), // Row height in pixels
                     new XAttribute("customHeight", "1"));
+
+                // Add hidden attribute if row is hidden
+                if (sheet.Rows.IsHidden(row))
+                {
+                    rowElement.Add(new XAttribute("hidden", "1"));
+                }
 
                 for (var col = 0; col < sheet.ColumnCount; col++)
                 {
@@ -436,6 +445,70 @@ public class Workbook
                 sheetDoc.Root.Add(mergeCells);
             }
 
+            // Add auto filter with custom filters
+            if (sheet.AutoFilter != null)
+            {
+                var autoFilter = new XElement(XName.Get("autoFilter", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("ref", sheet.AutoFilter.Range.ToString()),
+                    new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid));
+                
+                // Process each filter and create filterColumn elements
+                foreach (var filter in sheet.Filters)
+                {
+                    if (filter.Criterion is FilterCriterionLeaf leaf)
+                    {
+                        var colId = leaf.Column - sheet.AutoFilter.Range.Start.Column;
+                        if (colId >= 0 && colId <= sheet.AutoFilter.Range.End.Column - sheet.AutoFilter.Range.Start.Column)
+                        {
+                            var filterColumn = new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                                new XAttribute("colId", colId));
+                            
+                            var filterElement = SerializeFilterCriterion(filter.Criterion, colId);
+                            filterColumn.Add(filterElement);
+                            autoFilter.Add(filterColumn);
+                        }
+                    }
+                    else if (filter.Criterion is OrCriterion orCriterion)
+                    {
+                        // For OR criteria, we need to find the first column that has a leaf criterion
+                        var firstLeaf = orCriterion.Criteria.OfType<FilterCriterionLeaf>().FirstOrDefault();
+                        if (firstLeaf != null)
+                        {
+                            var colId = firstLeaf.Column - sheet.AutoFilter.Range.Start.Column;
+                            if (colId >= 0 && colId <= sheet.AutoFilter.Range.End.Column - sheet.AutoFilter.Range.Start.Column)
+                            {
+                                var filterColumn = new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                                    new XAttribute("colId", colId));
+                                
+                                var filterElement = SerializeFilterCriterion(filter.Criterion, colId);
+                                filterColumn.Add(filterElement);
+                                autoFilter.Add(filterColumn);
+                            }
+                        }
+                    }
+                    else if (filter.Criterion is AndCriterion andCriterion)
+                    {
+                        // For AND criteria, we need to find the first column that has a leaf criterion
+                        var firstLeaf = andCriterion.Criteria.OfType<FilterCriterionLeaf>().FirstOrDefault();
+                        if (firstLeaf != null)
+                        {
+                            var colId = firstLeaf.Column - sheet.AutoFilter.Range.Start.Column;
+                            if (colId >= 0 && colId <= sheet.AutoFilter.Range.End.Column - sheet.AutoFilter.Range.Start.Column)
+                            {
+                                var filterColumn = new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                                    new XAttribute("colId", colId));
+                                
+                                var filterElement = SerializeFilterCriterion(filter.Criterion, colId);
+                                filterColumn.Add(filterElement);
+                                autoFilter.Add(filterColumn);
+                            }
+                        }
+                    }
+                }
+                
+                sheetDoc.Root.Add(autoFilter);
+            }
+
             // Save sheet
             using var entry = archive.CreateEntry($"xl/{sheetName}").Open();
             sheetDoc.Save(entry);
@@ -468,6 +541,133 @@ public class Workbook
         {
             stylesDoc.Save(entry);
         }
+    }
+
+    /// <summary>
+    /// Serializes a filter criterion to Excel autoFilter XML format.
+    /// </summary>
+    private static XElement SerializeFilterCriterion(FilterCriterion criterion, int columnIndex)
+    {
+        return criterion switch
+        {
+            OrCriterion orCriterion => new XElement(XName.Get("customFilters", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                orCriterion.Criteria.Select(c => SerializeCustomFilter(c))),
+            
+            AndCriterion andCriterion => new XElement(XName.Get("customFilters", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("and", "1"),
+                andCriterion.Criteria.Select(c => SerializeCustomFilter(c))),
+            
+            InListCriterion inListCriterion => new XElement(XName.Get("filters", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                inListCriterion.Values.Select(v => new XElement(XName.Get("filter", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("val", v?.ToString() ?? "")))),
+            
+            _ => new XElement(XName.Get("customFilters", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                SerializeCustomFilter(criterion))
+        };
+    }
+
+    /// <summary>
+    /// Serializes a single filter criterion to a customFilter element.
+    /// </summary>
+    private static XElement SerializeCustomFilter(FilterCriterion criterion)
+    {
+        var (operatorName, value) = criterion switch
+        {
+            EqualToCriterion equalCriterion => ("equal", equalCriterion.Value?.ToString() ?? ""),
+            NotEqualToCriterion notEqualCriterion => ("notEqual", notEqualCriterion.Value?.ToString() ?? ""),
+            GreaterThanCriterion greaterCriterion => ("greaterThan", greaterCriterion.Value?.ToString() ?? ""),
+            LessThanCriterion lessCriterion => ("lessThan", lessCriterion.Value?.ToString() ?? ""),
+            GreaterThanOrEqualCriterion greaterEqualCriterion => ("greaterThanOrEqual", greaterEqualCriterion.Value?.ToString() ?? ""),
+            LessThanOrEqualCriterion lessEqualCriterion => ("lessThanOrEqual", lessEqualCriterion.Value?.ToString() ?? ""),
+            StartsWithCriterion startsWithCriterion => ("beginsWith", startsWithCriterion.Value?.ToString() ?? ""),
+            DoesNotStartWithCriterion doesNotStartWithCriterion => ("notBeginsWith", doesNotStartWithCriterion.Value?.ToString() ?? ""),
+            EndsWithCriterion endsWithCriterion => ("endsWith", endsWithCriterion.Value?.ToString() ?? ""),
+            DoesNotEndWithCriterion doesNotEndWithCriterion => ("notEndsWith", doesNotEndWithCriterion.Value?.ToString() ?? ""),
+            ContainsCriterion containsCriterion => ("contains", containsCriterion.Value?.ToString() ?? ""),
+            DoesNotContainCriterion doesNotContainCriterion => ("notContains", doesNotContainCriterion.Value?.ToString() ?? ""),
+            IsNullCriterion => ("equal", ""),
+            InListCriterion inListCriterion => throw new NotSupportedException("InListCriterion must be converted to OrCriterion before serialization"),
+            _ => throw new NotSupportedException($"Filter criterion type {criterion.GetType().Name} is not supported for serialization.")
+        };
+
+        return new XElement(XName.Get("customFilter", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("operator", operatorName),
+            new XAttribute("val", value));
+    }
+
+    /// <summary>
+    /// Deserializes a filter criterion from Excel autoFilter XML format.
+    /// </summary>
+    private static FilterCriterion DeserializeFilterCriterion(XElement element, int columnIndex)
+    {
+        var ns = element.Name.Namespace;
+        
+        if (element.Name.LocalName == "customFilters")
+        {
+            var customFilters = element.Elements(ns + "customFilter").ToList();
+            if (customFilters.Count == 0)
+            {
+                throw new NotSupportedException("No customFilter elements found in customFilters");
+            }
+            
+            if (customFilters.Count == 1)
+            {
+                return DeserializeCustomFilter(customFilters[0], columnIndex);
+            }
+            
+            // Multiple filters - check if it's AND or OR logic
+            var isAnd = element.Attribute("and")?.Value == "1";
+            
+            if (isAnd)
+            {
+                var criteria = customFilters.Select(f => DeserializeCustomFilter(f, columnIndex)).ToArray();
+                return new AndCriterion { Criteria = criteria };
+            }
+            else
+            {
+                var criteria = customFilters.Select(f => DeserializeCustomFilter(f, columnIndex)).ToArray();
+                return new OrCriterion { Criteria = criteria };
+            }
+        }
+        else if (element.Name.LocalName == "filters")
+        {
+            var filters = element.Elements(ns + "filter").ToList();
+            if (filters.Count == 0)
+            {
+                throw new NotSupportedException("No filter elements found in filters");
+            }
+            
+            var values = filters.Select(f => f.Attribute("val")?.Value).ToArray();
+            return new InListCriterion { Column = columnIndex, Values = values };
+        }
+        
+        throw new NotSupportedException($"Filter element type {element.Name.LocalName} is not supported for deserialization.");
+    }
+
+    /// <summary>
+    /// Deserializes a single customFilter element.
+    /// </summary>
+    private static FilterCriterion DeserializeCustomFilter(XElement element, int columnIndex)
+    {
+        var operatorName = element.Attribute("operator")?.Value ?? "";
+        var value = element.Attribute("val")?.Value ?? "";
+        
+        return operatorName switch
+        {
+            "equal" => value == "" ? new IsNullCriterion { Column = columnIndex } : new EqualToCriterion { Column = columnIndex, Value = value },
+            "notEqual" => new NotEqualToCriterion { Column = columnIndex, Value = value },
+            "greaterThan" => new GreaterThanCriterion { Column = columnIndex, Value = value },
+            "lessThan" => new LessThanCriterion { Column = columnIndex, Value = value },
+            "greaterThanOrEqual" => new GreaterThanOrEqualCriterion { Column = columnIndex, Value = value },
+            "lessThanOrEqual" => new LessThanOrEqualCriterion { Column = columnIndex, Value = value },
+            "beginsWith" => new StartsWithCriterion { Column = columnIndex, Value = value },
+            "notBeginsWith" => new DoesNotStartWithCriterion { Column = columnIndex, Value = value },
+            "endsWith" => new EndsWithCriterion { Column = columnIndex, Value = value },
+            "notEndsWith" => new DoesNotEndWithCriterion { Column = columnIndex, Value = value },
+            "contains" => new ContainsCriterion { Column = columnIndex, Value = value },
+            "notContains" => new DoesNotContainCriterion { Column = columnIndex, Value = value },
+            _ => throw new NotSupportedException($"Filter operator {operatorName} is not supported for deserialization.")
+        };
     }
 
     /// <summary>
@@ -801,6 +1001,46 @@ public class Workbook
 
                 var range = RangeRef.Parse(mergedRange);
                 sheet.MergedCells.Add(range);
+            }
+
+            // Load auto filter with custom filters
+            var autoFilterElement = sheetDoc.Descendants(sNs + "autoFilter").FirstOrDefault();
+            if (autoFilterElement != null)
+            {
+                var refAttribute = autoFilterElement.Attribute("ref")?.Value;
+                if (!string.IsNullOrEmpty(refAttribute))
+                {
+                    var range = RangeRef.Parse(refAttribute);
+                    sheet.AutoFilter = new AutoFilter(sheet, range);
+                    
+                    // Load filter columns
+                    var filterColumns = autoFilterElement.Elements(sNs + "filterColumn").ToList();
+                    foreach (var filterColumn in filterColumns)
+                    {
+                        var colIdAttribute = filterColumn.Attribute("colId")?.Value;
+                        if (!string.IsNullOrEmpty(colIdAttribute) && int.TryParse(colIdAttribute, out var colId))
+                        {
+                            var actualColumn = range.Start.Column + colId;
+                            
+                            // Find customFilters or filters element
+                            var customFiltersElement = filterColumn.Element(sNs + "customFilters");
+                            var filtersElement = filterColumn.Element(sNs + "filters");
+                            
+                            if (customFiltersElement != null)
+                            {
+                                var criterion = DeserializeFilterCriterion(customFiltersElement, actualColumn);
+                                var sheetFilter = new SheetFilter(criterion, range);
+                                sheet.AddFilter(sheetFilter);
+                            }
+                            else if (filtersElement != null)
+                            {
+                                var criterion = DeserializeFilterCriterion(filtersElement, actualColumn);
+                                var sheetFilter = new SheetFilter(criterion, range);
+                                sheet.AddFilter(sheetFilter);
+                            }
+                        }
+                    }
+                }
             }
 
             sheet.Name = sheetInfo.Name;
