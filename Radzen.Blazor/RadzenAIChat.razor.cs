@@ -84,7 +84,7 @@ namespace Radzen.Blazor
         /// Gets or sets the title displayed in the chat header.
         /// </summary>
         [Parameter]
-        public string Title { get; set; } = "Chat";
+        public string Title { get; set; }
 
         /// <summary>
         /// Gets or sets the placeholder text for the input field.
