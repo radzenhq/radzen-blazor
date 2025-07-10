@@ -12,44 +12,46 @@
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()" >
         <!-- Chat Header -->
-        <div class="rz-chat-header">
+        <RadzenStack class="rz-chat-header" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem">
             <span class="rz-chat-header-title">@Title</span>
+            <RadzenStack class="rz-chat-header-actions" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
             @if (ShowClearButton)
             {
-                <RadzenButton Icon="clear_all" ButtonStyle="ButtonStyle.Light" Size="ButtonSize.Small" 
+                <RadzenButton Icon="delete_history" Variant="Variant.Text" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.Small" 
                              Click="@OnClearChat" Title="Clear chat history" class="rz-chat-header-clear" />
             }
-        </div>
+            </RadzenStack>
+        </RadzenStack>
 
         <!-- Chat Messages -->
         <div class="rz-chat-messages" @ref="messagesContainer">
             @if (Messages.Count == 0)
             {
-                <div class="rz-chat-empty">
-                    <RadzenIcon Icon="chat_bubble_outline" Style="font-size: 3rem; opacity: 0.3;" />
-                    <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">@EmptyMessage</RadzenText>
-                </div>
+                <RadzenStack class="rz-chat-empty" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem">
+                    <RadzenIcon Icon="chat_bubble_outline" class="rz-text-secondary-color" />
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2 rz-text-tertiary-color">@EmptyMessage</RadzenText>
+                </RadzenStack>
             }
             else
             {
                 @foreach (var message in Messages)
                 {
                     <div class="rz-chat-message @(message.IsUser ? "rz-chat-message-user" : "rz-chat-message-assistant")" @key="message.Id">
-                        <div class="rz-chat-message-avatar">
+                        <RadzenStack class="rz-chat-message-avatar" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0">
                             @if (message.IsUser)
                             {
-                                <span class="rz-chat-avatar-initials">@UserAvatarText</span>
+                                <span class="rz-chat-avatar-initials" title="@UserAvatarText">@UserAvatarText</span>
                             }
                             else
                             {
-                                <span class="rz-chat-avatar-initials">@AssistantAvatarText</span>
+                                <span class="rz-chat-avatar-initials" title="@AssistantAvatarText">@AssistantAvatarText</span>
                             }
-                        </div>
-                        <div class="rz-chat-message-content">
+                        </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="@(message.IsUser ? AlignItems.End : AlignItems.Start)" Gap="0.125rem" class="rz-chat-message-content">
                             <div class="rz-chat-message-text">
                                 @if (message.IsStreaming)
                                 {
-                                    <span>@message.Content<RadzenIcon Icon="more_horiz" Style="animation: pulse 1.5s infinite; margin-left: 0.25rem;" /></span>
+                                    @message.Content <RadzenIcon Icon="more_horiz" class="rz-chat-message-streaming-icon" />
                                 }
                                 else
                                 {
@@ -59,7 +61,7 @@
                             <div class="rz-chat-message-time">
                                 @message.Timestamp.ToString("HH:mm")
                             </div>
-                        </div>
+                        </RadzenStack>
                     </div>
                 }
             }
@@ -73,20 +75,19 @@
                           @oninput="OnInput" 
                           @onkeydown="OnKeyDown" 
                           @onkeydown:preventDefault="preventDefault"
-                          class="rz-chat-textarea"
+                          class="rz-textarea rz-chat-textarea"
                           placeholder="@Placeholder"
                           disabled="@Disabled"
                           readonly="@ReadOnly"
                           rows="1"
-                          style="resize: none; overflow: hidden;"
                           @attributes="@InputAttributes"></textarea>
-                <RadzenButton Icon="send" 
-                             ButtonStyle="ButtonStyle.Primary" 
-                             Size="ButtonSize.Small"
-                             Disabled="@(string.IsNullOrWhiteSpace(CurrentInput) || IsLoading || Disabled)"
-                             Click="@OnSendMessage"
-                             Title="Send message"
-                             class="rz-chat-send-btn" />
+                    <RadzenButton Icon="send"
+                                ButtonStyle="ButtonStyle.Primary" 
+                                Variant="Variant.Text"
+                                Disabled="@(string.IsNullOrWhiteSpace(CurrentInput) || IsLoading || Disabled)"
+                                Click="@OnSendMessage"
+                                Title="Send message"
+                                class="rz-chat-send-btn" />
             </div>
         </div>
     </div>

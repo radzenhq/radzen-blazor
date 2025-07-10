@@ -193,6 +193,30 @@
   --rz-chart-tooltip-item-hover-background-color: #{$chart-tooltip-item-hover-background-color};
   --rz-chart-marker-stroke: #{$chart-marker-stroke};
 
+  /* Chat */
+  --rz-chat-background-color: #{$rz-chat-background-color};
+  --rz-chat-border: #{$rz-chat-border};
+  --rz-chat-border-radius: #{$rz-chat-border-radius};
+  --rz-chat-header-padding-block: #{$rz-chat-header-padding-block};
+  --rz-chat-header-padding-inline: #{$rz-chat-header-padding-inline};
+  --rz-chat-header-background-color: #{$rz-chat-header-background-color};
+  --rz-chat-header-bottom-border: #{$rz-chat-header-bottom-border};
+  --rz-chat-header-shadow: #{$rz-chat-header-shadow};
+  --rz-chat-header-title-font-size: #{$rz-chat-header-title-font-size};
+  --rz-chat-header-title-font-weight: #{$rz-chat-header-title-font-weight};
+  --rz-chat-message-user-color: #{$rz-chat-message-user-color};
+  --rz-chat-message-user-background-color: #{$rz-chat-message-user-background-color};
+  --rz-chat-message-assistant-color: #{$rz-chat-message-assistant-color};
+  --rz-chat-message-assistant-background-color: #{$rz-chat-message-assistant-background-color};
+  --rz-chat-message-text-padding: #{$rz-chat-message-text-padding};
+  --rz-chat-message-text-border-radius: #{$rz-chat-message-text-border-radius};
+  --rz-chat-avatar-size: #{$rz-chat-avatar-size};
+  --rz-chat-avatar-border-radius: #{$rz-chat-avatar-border-radius};
+  --rz-chat-avatar-font-size: #{$rz-chat-avatar-font-size};
+  --rz-chat-avatar-font-weight: #{$rz-chat-avatar-font-weight};
+  --rz-chat-message-time-padding: #{$rz-chat-message-time-padding};
+  --rz-chat-message-callout-radius: #{$rz-chat-message-callout-radius};
+
   /* Checkbox */
   --rz-checkbox-width: #{$checkbox-width};
   --rz-checkbox-height: #{$checkbox-height};

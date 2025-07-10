@@ -562,6 +562,30 @@ $rz-toc-link-selected-color: var(--rz-primary) !default;
 $rz-toc-link-selected-indicator-color: var(--rz-primary) !default;
 $rz-toc-horizontal-link-selected-color: var(--rz-primary) !default;
 
+// Chat
+$rz-chat-background-color: var(--rz-base-background-color) !default;
+$rz-chat-border: var(--rz-border-normal) !default;
+$rz-chat-border-radius: var(--rz-border-radius) !default;
+$rz-chat-header-padding-block: 0.5rem !default;
+$rz-chat-header-padding-inline: 1rem 0.5rem !default;
+$rz-chat-header-background-color: $rz-chat-background-color !default;
+$rz-chat-header-bottom-border: var(--rz-border-normal) !default;
+$rz-chat-header-shadow: none !default;
+$rz-chat-header-title-font-size: 1rem !default;
+$rz-chat-header-title-font-weight: 600 !default;
+$rz-chat-message-user-color: var(--rz-on-primary-lighter) !default;
+$rz-chat-message-user-background-color: var(--rz-primary-lighter) !default;
+$rz-chat-message-assistant-color: var(--rz-on-base-light) !default;
+$rz-chat-message-assistant-background-color: var(--rz-base-light) !default;
+$rz-chat-message-text-padding: 0.5rem 0.75rem !default;
+$rz-chat-message-text-border-radius: var(--rz-border-radius) !default;
+$rz-chat-avatar-size: 2rem !default;
+$rz-chat-avatar-border-radius: var(--rz-border-radius) !default;
+$rz-chat-avatar-font-size: 1rem !default;
+$rz-chat-avatar-font-weight: 700 !default;
+$rz-chat-message-time-padding: 0 !default;
+$rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
+
 @import 'fonts';
 @import 'components';
 
