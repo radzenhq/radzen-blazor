@@ -149,7 +149,9 @@ namespace Radzen.Blazor
         /// Gets the field identifier.
         /// </summary>
         /// <value>The field identifier.</value>
-        public FieldIdentifier FieldIdentifier { get; private set; }
+        [Parameter]
+        public FieldIdentifier FieldIdentifier { get; set; }
+
         /// <summary>
         /// Gets or sets the value expression.
         /// </summary>

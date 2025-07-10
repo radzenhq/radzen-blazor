@@ -387,7 +387,8 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the field identifier.
         /// </summary>
-        public FieldIdentifier FieldIdentifier { get; private set; }
+        [Parameter]
+        public FieldIdentifier FieldIdentifier { get; set; }
 
         /// <summary>
         /// Gets the input reference.
