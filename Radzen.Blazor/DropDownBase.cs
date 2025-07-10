@@ -699,7 +699,7 @@ namespace Radzen
                     //
                 }
             }
-            else if (key == "Enter" || key == "NumpadEnter" || key == "Space")
+            else if (key == "Enter" || key == "NumpadEnter" || (key == "Space" && !isFilter))
             {
                 preventKeydown = true;
 
