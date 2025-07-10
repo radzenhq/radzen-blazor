@@ -2070,6 +2070,7 @@ namespace Radzen.Blazor
                     c.SetOrderIndex(null);
                     c.SetWidth(null);
                     c.SetVisible(null);
+                    c.SetCustomFilterExpression(null);
                 });
                 selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
                 sorts.Clear();
