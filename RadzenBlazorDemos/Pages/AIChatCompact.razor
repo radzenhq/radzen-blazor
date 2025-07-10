@@ -2,19 +2,11 @@
 @using Radzen.Blazor
 
 <RadzenStack class="rz-p-0 rz-p-md-12">
-    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
-            A compact chat interface suitable for smaller spaces or sidebar implementations.
-        </RadzenText>
-    </RadzenCard>
-    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenAIChat @ref="compactChat" 
-                   Title="Quick Chat" 
-                   Placeholder="Quick message..."
-                   ShowClearButton="false"
-                   Style="height: 300px; max-width: 100%;"
-                    />
-    </RadzenCard>
+    <RadzenAIChat @ref="compactChat"
+                Placeholder="Quick message..."
+                ShowClearButton="false"
+                Style="height: 300px; max-width: 100%;"
+                />
 </RadzenStack>
 
 @code {

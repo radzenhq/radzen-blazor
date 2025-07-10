@@ -20,17 +20,15 @@
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
-    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenAIChat @ref="customChat" 
-                   Title="Custom Assistant" 
-                   Placeholder="Type your message here..."
-                   EmptyMessage="Welcome! Start chatting with me."
-                   ShowClearButton="@showClearButton"
-                   Disabled="@isDisabled"
-                   ReadOnly="@isReadOnly"
-                   Style="height: 400px; border: 2px solid var(--rz-primary-color);"
-                    />
-    </RadzenCard>
+    <RadzenAIChat @ref="customChat" 
+                Title="Custom Assistant" 
+                Placeholder="Type your message here..."
+                EmptyMessage="Welcome! Start chatting with me."
+                ShowClearButton="@showClearButton"
+                Disabled="@isDisabled"
+                ReadOnly="@isReadOnly"
+                Style="height: 400px; border: 2px solid var(--rz-primary);"
+                />
 </RadzenStack>
 
 @code {

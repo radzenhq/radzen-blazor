@@ -2,22 +2,15 @@
 @using Radzen.Blazor
 
 <RadzenStack class="rz-p-0 rz-p-md-12">
-    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
-            Handle chat events like <code>MessageAdded</code>, <code>MessageSent</code>, <code>ResponseReceived</code>, and <code>ChatCleared</code> to integrate with your application logic.
-        </RadzenText>
-    </RadzenCard>
-    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
-        <RadzenAIChat @ref="eventsChat" 
-                   Title="Event Demo" 
-                   Placeholder="Type a message to see events..."
-                   Style="height: 400px;"
-                   MessageAdded="@OnMessageAdded"
-                   MessageSent="@OnMessageSent"
-                   ResponseReceived="@OnResponseReceived"
-                   ChatCleared="@OnChatCleared"
-                    />
-    </RadzenCard>
+    <RadzenAIChat @ref="eventsChat" 
+                Title="Event Demo" 
+                Placeholder="Type a message to see events..."
+                Style="height: 400px;"
+                MessageAdded="@OnMessageAdded"
+                MessageSent="@OnMessageSent"
+                ResponseReceived="@OnResponseReceived"
+                ChatCleared="@OnChatCleared"
+                />
 </RadzenStack>
 
 <EventConsole @ref="console" Style="min-height: 200px;" />
