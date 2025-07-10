@@ -3569,7 +3569,7 @@ namespace Radzen
         /// Gets the field identifier.
         /// </summary>
         /// <value>The field identifier.</value>
-        FieldIdentifier FieldIdentifier { get; }
+        FieldIdentifier FieldIdentifier { get; set; }
 
         /// <summary>
         /// Sets the focus.
