@@ -283,6 +283,18 @@ namespace Radzen
         /// The selected item
         /// </summary>
         protected object selectedItem = null;
+        Type GetItemType(IEnumerable items)
+        {
+            var firstType = items.Cast<object>().FirstOrDefault()?.GetType() ?? typeof(object);
+            var hasNull = items.Cast<object>().Where(i => i == null).Any();
+
+            if (hasNull && firstType.IsValueType && Nullable.GetUnderlyingType(firstType) == null)
+            {
+                return typeof(Nullable<>).MakeGenericType(firstType);
+            }
+
+            return firstType;
+        }
 
         /// <summary>
         /// Selects all.
@@ -311,7 +323,8 @@ namespace Radzen
             }
             else
             {
-                var type = typeof(T).IsGenericType ? typeof(T).GetGenericArguments()[0] : typeof(T);
+                var type = typeof(T).IsGenericType ? typeof(T).GetGenericArguments()[0] :
+                    QueryableExtension.IsEnumerable(typeof(T)) ? GetItemType(selectedItems) : typeof(T);
                 internalValue = selectedItems.AsQueryable().Cast(type);
             }
 
