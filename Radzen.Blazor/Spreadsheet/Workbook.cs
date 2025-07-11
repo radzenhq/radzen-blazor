@@ -830,6 +830,26 @@ public class Workbook
         using var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
 
         // Parse styles
+        var styleInfo = ParseStyles(archive);
+
+        // Parse shared strings
+        var sharedStrings = ParseSharedStrings(archive);
+
+        // Parse sheet definitions and relationships
+        var sheetInfos = ParseSheetDefinitions(archive);
+
+        // Load each sheet
+        foreach (var sheetInfo in sheetInfos)
+        {
+            var sheet = LoadSheet(archive, sheetInfo, styleInfo, sharedStrings);
+            workbook.AddSheet(sheet);
+        }
+
+        return workbook;
+    }
+
+    private static StyleInfo ParseStyles(ZipArchive archive)
+    {
         var fontStyles = new Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)>();
         var fillColors = new Dictionary<int, string>();
         var cellStyles = new Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)>(0);
@@ -841,84 +861,109 @@ public class Workbook
             var stylesDoc = XDocument.Load(s);
             var stylesNs = stylesDoc.Root!.Name.Namespace;
 
-            // Parse fonts
-            var fonts = stylesDoc.Descendants(stylesNs + "font").ToList();
-            for (var i = 0; i < fonts.Count; i++)
+            ParseFonts(stylesDoc, stylesNs, fontStyles);
+            ParseFills(stylesDoc, stylesNs, fillColors);
+            ParseCellStyles(stylesDoc, stylesNs, fontStyles, fillColors, cellStyles);
+        }
+
+        return new StyleInfo(fontStyles, fillColors, cellStyles);
+    }
+
+    private static void ParseFonts(XDocument stylesDoc, XNamespace stylesNs, Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles)
+    {
+        var fonts = stylesDoc.Descendants(stylesNs + "font").ToList();
+        for (var i = 0; i < fonts.Count; i++)
+        {
+            var color = fonts[i].Element(stylesNs + "color")?.Attribute("rgb")?.Value;
+            string? colorValue = null;
+            if (color != null)
             {
-                var color = fonts[i].Element(stylesNs + "color")?.Attribute("rgb")?.Value;
-                string? colorValue = null;
-                if (color != null)
-                {
-                    colorValue = "#" + color[2..]; // Convert from "FFFF0000" to "#FF0000"
-                }
-                bool bold = fonts[i].Element(stylesNs + "b") != null;
-                bool italic = fonts[i].Element(stylesNs + "i") != null;
-                bool underline = fonts[i].Element(stylesNs + "u") != null;
-                fontStyles[i] = (colorValue, bold, italic, underline);
+                colorValue = "#" + color[2..]; // Convert from "FFFF0000" to "#FF0000"
             }
+            bool bold = fonts[i].Element(stylesNs + "b") != null;
+            bool italic = fonts[i].Element(stylesNs + "i") != null;
+            bool underline = fonts[i].Element(stylesNs + "u") != null;
+            fontStyles[i] = (colorValue, bold, italic, underline);
+        }
+    }
 
-            // Parse fills
-            var fills = stylesDoc.Descendants(stylesNs + "fill").ToList();
-            for (var i = 0; i < fills.Count; i++)
+    private static void ParseFills(XDocument stylesDoc, XNamespace stylesNs, Dictionary<int, string> fillColors)
+    {
+        var fills = stylesDoc.Descendants(stylesNs + "fill").ToList();
+        for (var i = 0; i < fills.Count; i++)
+        {
+            var fgColor = fills[i].Element(stylesNs + "patternFill")?.Element(stylesNs + "fgColor")?.Attribute("rgb")?.Value;
+            if (fgColor != null)
             {
-                var fgColor = fills[i].Element(stylesNs + "patternFill")?.Element(stylesNs + "fgColor")?.Attribute("rgb")?.Value;
-                if (fgColor != null)
-                {
-                    fillColors[i] = "#" + fgColor[2..]; // Convert from "FFFF0000" to "#FF0000"
-                }
+                fillColors[i] = "#" + fgColor[2..]; // Convert from "FFFF0000" to "#FF0000"
             }
+        }
+    }
 
-            // Parse cell styles
-            var cellXfs = stylesDoc.Descendants(stylesNs + "cellXfs").FirstOrDefault()?.Elements(stylesNs + "xf").ToList() ?? [];
-            for (var i = 0; i < cellXfs.Count; i++)
+    private static void ParseCellStyles(XDocument stylesDoc, XNamespace stylesNs, 
+        Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles,
+        Dictionary<int, string> fillColors,
+        Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)> cellStyles)
+    {
+        var cellXfs = stylesDoc.Descendants(stylesNs + "cellXfs").FirstOrDefault()?.Elements(stylesNs + "xf").ToList() ?? [];
+        for (var i = 0; i < cellXfs.Count; i++)
+        {
+            var fontId = cellXfs[i].Attribute("fontId")?.Value;
+            var fillId = cellXfs[i].Attribute("fillId")?.Value;
+            var applyFont = cellXfs[i].Attribute("applyFont")?.Value;
+            var applyFill = cellXfs[i].Attribute("applyFill")?.Value;
+            var applyAlignment = cellXfs[i].Attribute("applyAlignment")?.Value;
+
+            if (fontId != null && fillId != null)
             {
-                var fontId = cellXfs[i].Attribute("fontId")?.Value;
-                var fillId = cellXfs[i].Attribute("fillId")?.Value;
-                var applyFont = cellXfs[i].Attribute("applyFont")?.Value;
-                var applyFill = cellXfs[i].Attribute("applyFill")?.Value;
-                var applyAlignment = cellXfs[i].Attribute("applyAlignment")?.Value;
+                // Only include styles that are actually applied
+                var fontIdValue = int.Parse(fontId);
+                var fillIdValue = int.Parse(fillId);
 
-                if (fontId != null && fillId != null)
+                var (textAlign, verticalAlign) = ParseAlignment(cellXfs[i], stylesNs, applyAlignment);
+
+                if (applyFont == "1" && fontStyles.ContainsKey(fontIdValue) ||
+                    applyFill == "1" && fillColors.ContainsKey(fillIdValue))
                 {
-                    // Only include styles that are actually applied
-                    var fontIdValue = int.Parse(fontId);
-                    var fillIdValue = int.Parse(fillId);
-
-                    var textAlign = TextAlign.Left;
-                    var verticalAlign = VerticalAlign.Top;
-                    if (applyAlignment == "1")
-                    {
-                        var alignment = cellXfs[i].Element(stylesNs + "alignment");
-                        if (alignment != null)
-                        {
-                            var horizontal = alignment.Attribute("horizontal")?.Value;
-                            textAlign = horizontal switch
-                            {
-                                "center" => TextAlign.Center,
-                                "right" => TextAlign.Right,
-                                "justify" => TextAlign.Justify,
-                                _ => TextAlign.Left
-                            };
-                            var vertical = alignment.Attribute("vertical")?.Value;
-                            verticalAlign = vertical switch
-                            {
-                                "center" => VerticalAlign.Middle,
-                                "bottom" => VerticalAlign.Bottom,
-                                _ => VerticalAlign.Top
-                            };
-                        }
-                    }
-
-                    if (applyFont == "1" && fontStyles.ContainsKey(fontIdValue) ||
-                        applyFill == "1" && fillColors.ContainsKey(fillIdValue))
-                    {
-                        cellStyles[i] = (fontIdValue, fillIdValue, textAlign, verticalAlign);
-                    }
+                    cellStyles[i] = (fontIdValue, fillIdValue, textAlign, verticalAlign);
                 }
             }
         }
+    }
 
-        // 1. Parse shared strings (used in all sheets)
+    private static (TextAlign TextAlign, VerticalAlign VerticalAlign) ParseAlignment(XElement cellXf, XNamespace stylesNs, string? applyAlignment)
+    {
+        var textAlign = TextAlign.Left;
+        var verticalAlign = VerticalAlign.Top;
+        
+        if (applyAlignment == "1")
+        {
+            var alignment = cellXf.Element(stylesNs + "alignment");
+            if (alignment != null)
+            {
+                var horizontal = alignment.Attribute("horizontal")?.Value;
+                textAlign = horizontal switch
+                {
+                    "center" => TextAlign.Center,
+                    "right" => TextAlign.Right,
+                    "justify" => TextAlign.Justify,
+                    _ => TextAlign.Left
+                };
+                var vertical = alignment.Attribute("vertical")?.Value;
+                verticalAlign = vertical switch
+                {
+                    "center" => VerticalAlign.Middle,
+                    "bottom" => VerticalAlign.Bottom,
+                    _ => VerticalAlign.Top
+                };
+            }
+        }
+
+        return (textAlign, verticalAlign);
+    }
+
+    private static List<string> ParseSharedStrings(ZipArchive archive)
+    {
         var sharedStrings = new List<string>();
         var sharedEntry = archive.GetEntry("xl/sharedStrings.xml");
 
@@ -929,7 +974,12 @@ public class Workbook
             sharedStrings = doc.Descendants().Where(e => e.Name.LocalName == "t").Select(e => e.Value).ToList();
         }
 
-        // 2. Parse sheet definitions (sheet names + target file paths)
+        return sharedStrings;
+    }
+
+    private static List<SheetInfo> ParseSheetDefinitions(ZipArchive archive)
+    {
+        // Parse sheet definitions (sheet names + target file paths)
         var workbookEntry = archive.GetEntry("xl/workbook.xml") ?? throw new InvalidDataException("workbook.xml not found");
 
         using var wbStream = workbookEntry.Open();
@@ -946,7 +996,7 @@ public class Workbook
         })
         .ToList();
 
-        // 3. Parse workbook relationships to resolve actual .xml file for each sheet
+        // Parse workbook relationships to resolve actual .xml file for each sheet
         var relsEntry = archive.GetEntry("xl/_rels/workbook.xml.rels") ?? throw new InvalidDataException("workbook.xml.rels not found");
         using var relsStream = relsEntry.Open();
         var relsDoc = XDocument.Load(relsStream);
@@ -958,245 +1008,335 @@ public class Workbook
                 r => r.Attribute("Target")!.Value.Replace("\\", "/")
             );
 
-        // 4. Load each sheet
-        foreach (var sheetInfo in sheets)
+        return sheets.Select(sheet => new SheetInfo(sheet.Name, sheet.SheetId, sheet.RelId, relMap))
+            .Where(sheet => sheet.HasValidPath)
+            .ToList();
+    }
+
+    private static Sheet LoadSheet(ZipArchive archive, SheetInfo sheetInfo, StyleInfo styleInfo, List<string> sharedStrings)
+    {
+        var sheet = new Sheet(100, 100); // adjust size as needed
+
+        var sheetEntry = archive.GetEntry(sheetInfo.FullPath);
+        if (sheetEntry == null)
         {
-            if (!relMap.TryGetValue(sheetInfo.RelId, out var sheetPath))
-            {
-                continue;
-            }
-
-            var fullPath = $"xl/{sheetPath.TrimStart('/')}"; // Excel paths are relative
-
-            var sheetEntry = archive.GetEntry(fullPath);
-
-            if (sheetEntry == null)
-            {
-                continue;
-            }
-
-            var sheet = new Sheet(100, 100); // adjust size as needed
-
-            using var sheetStream = sheetEntry.Open();
-            var sheetDoc = XDocument.Load(sheetStream);
-            var sNs = sheetDoc.Root!.Name.Namespace;
-
-            // Parse default row height from sheet format properties
-            var defaultRowHeight = 20.0; // Default fallback
-            var sheetFormatPr = sheetDoc.Descendants(sNs + "sheetFormatPr").FirstOrDefault();
-            if (sheetFormatPr != null)
-            {
-                var defaultHeight = sheetFormatPr.Attribute("defaultRowHeight")?.Value;
-                if (defaultHeight != null && double.TryParse(defaultHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
-                {
-                    defaultRowHeight = Math.Round(heightPoints * (96.0 / 72.0));
-                }
-            }
-
-            // Parse frozen panes
-            var sheetView = sheetDoc.Descendants(sNs + "sheetView").FirstOrDefault();
-            if (sheetView != null)
-            {
-                var pane = sheetView.Element(sNs + "pane");
-                if (pane != null)
-                {
-                    var xSplit = pane.Attribute("xSplit")?.Value;
-                    var ySplit = pane.Attribute("ySplit")?.Value;
-
-                    if (xSplit != null && int.TryParse(xSplit, out var frozenColumns))
-                    {
-                        sheet.Columns.Frozen = frozenColumns;
-                    }
-
-                    if (ySplit != null && int.TryParse(ySplit, out var frozenRows))
-                    {
-                        sheet.Rows.Frozen = frozenRows;
-                    }
-                }
-            }
-
-            // Parse column widths
-            var cols = sheetDoc.Descendants(sNs + "cols").FirstOrDefault();
-            if (cols != null)
-            {
-                foreach (var col in cols.Elements(sNs + "col"))
-                {
-                    var min = col.Attribute("min")?.Value;
-                    var max = col.Attribute("max")?.Value;
-                    var width = col.Attribute("width")?.Value;
-
-                    if (min != null && max != null && width != null &&
-                        int.TryParse(min, out var minCol) &&
-                        int.TryParse(max, out var maxCol) &&
-                        double.TryParse(width, NumberStyles.Float, CultureInfo.InvariantCulture, out var colWidth))
-                    {
-                        // Excel column width to pixels conversion:
-                        // pixels = Truncate(((256 * width + Truncate(128/7)) / 256) * 7)
-
-                        var pixelWidth = (256 * colWidth + Math.Truncate(128 / 7.0)) / 256 * 7;
-
-                        for (var i = minCol - 1; i <= maxCol - 1 && i < sheet.Columns.Count; i++)
-                        {
-                            sheet.Columns[i] = pixelWidth;
-                        }
-                    }
-                }
-            }
-
-            // Parse row heights
-            foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
-            {
-                var rowIndex = rowElem.Attribute("r")?.Value;
-                var rowHeight = rowElem.Attribute("ht")?.Value;
-                var customHeight = rowElem.Attribute("customHeight")?.Value;
-
-                if (rowIndex != null && int.TryParse(rowIndex, out var rowNum))
-                {
-                    var actualRowIndex = rowNum - 1; // Convert from 1-based to 0-based
-                    if (actualRowIndex >= 0 && actualRowIndex < sheet.Rows.Count)
-                    {
-                        if (rowHeight != null && double.TryParse(rowHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
-                        {
-                            // Excel row height is in points, convert to pixels
-                            // 1 point = 1/72 inch, 1 inch = 96 pixels (standard DPI)
-                            // So: pixels = points * (96/72) = points * 1.333...
-                            var pixelHeight = Math.Round(heightPoints * (96.0 / 72.0));
-                            sheet.Rows[actualRowIndex] = pixelHeight;
-                        }
-                        else
-                        {
-                            // Use default row height if no custom height specified
-                            sheet.Rows[actualRowIndex] = defaultRowHeight;
-                        }
-                    }
-                }
-
-                foreach (var cellElem in rowElem.Elements(sNs + "c"))
-                {
-                    var cellRef = cellElem.Attribute("r")!;
-
-                    if (cellRef == null)
-                    {
-                        continue;
-                    }
-
-                    var address = CellRef.Parse(cellRef.Value);
-
-                    var valueElem = cellElem.Element(sNs + "v");
-                    var formulaElem = cellElem.Element(sNs + "f");
-
-                    if (valueElem == null && formulaElem == null)
-                    {
-                        continue;
-                    }
-
-                    var cellType = (string?)cellElem.Attribute("t") ?? "n";
-
-                    // Apply cell style if present
-                    var styleId = cellElem.Attribute("s")?.Value;
-                    if (styleId != null && cellStyles.TryGetValue(int.Parse(styleId), out var style))
-                    {
-                        if (fontStyles.TryGetValue(style.FontId, out var fontStyle))
-                        {
-                            if (fontStyle.Color != null)
-                            {
-                                sheet.Cells[address.Row, address.Column].Format.Color = fontStyle.Color;
-                            }
-                            sheet.Cells[address.Row, address.Column].Format.Bold = fontStyle.Bold;
-                            sheet.Cells[address.Row, address.Column].Format.Italic = fontStyle.Italic;
-                            sheet.Cells[address.Row, address.Column].Format.Underline = fontStyle.Underline;
-                        }
-                        sheet.Cells[address.Row, address.Column].Format.TextAlign = style.TextAlign;
-                        sheet.Cells[address.Row, address.Column].Format.VerticalAlign = style.VerticalAlign;
-                        if (fillColors.TryGetValue(style.FillId, out var fillColor))
-                        {
-                            sheet.Cells[address.Row, address.Column].Format.BackgroundColor = fillColor;
-                        }
-                    }
-
-                    if (formulaElem != null)
-                    {
-                        var formulaValue = formulaElem.Value;
-                        if (!formulaValue.StartsWith("="))
-                        {
-                            formulaValue = "=" + formulaValue;
-                        }
-                        sheet.Cells[address.Row, address.Column].Formula = formulaValue;
-                    }
-                    else
-                    {
-                        var value = cellType switch
-                        {
-                            "s" => sharedStrings[Convert.ToInt32(valueElem!.Value)],
-                            _ => valueElem!.Value
-                        };
-
-                        sheet.Cells[address.Row, address.Column].Value = value;
-                    }
-                }
-            }
-
-            var mergeCells = sheetDoc.Descendants(sNs + "mergeCell")
-                .Select(m => m.Attribute("ref")?.Value)
-                .ToList();
-
-            foreach (var mergedRange in mergeCells)
-            {
-                if (string.IsNullOrEmpty(mergedRange))
-                {
-                    continue;
-                }
-
-                var range = RangeRef.Parse(mergedRange);
-                sheet.MergedCells.Add(range);
-            }
-
-            // Load auto filter with custom filters
-            var autoFilterElement = sheetDoc.Descendants(sNs + "autoFilter").FirstOrDefault();
-            if (autoFilterElement != null)
-            {
-                var refAttribute = autoFilterElement.Attribute("ref")?.Value;
-                if (!string.IsNullOrEmpty(refAttribute))
-                {
-                    var range = RangeRef.Parse(refAttribute);
-                    sheet.AutoFilter = new AutoFilter(sheet, range);
-
-                    // Load filter columns
-                    var filterColumns = autoFilterElement.Elements(sNs + "filterColumn").ToList();
-                    foreach (var filterColumn in filterColumns)
-                    {
-                        var colIdAttribute = filterColumn.Attribute("colId")?.Value;
-                        if (!string.IsNullOrEmpty(colIdAttribute) && int.TryParse(colIdAttribute, out var colId))
-                        {
-                            var actualColumn = range.Start.Column + colId;
-
-                            // Find customFilters or filters element
-                            var customFiltersElement = filterColumn.Element(sNs + "customFilters");
-                            var filtersElement = filterColumn.Element(sNs + "filters");
-
-                            if (customFiltersElement != null)
-                            {
-                                var criterion = DeserializeFilterCriterion(customFiltersElement, actualColumn);
-                                var sheetFilter = new SheetFilter(criterion, range);
-                                sheet.AddFilter(sheetFilter);
-                            }
-                            else if (filtersElement != null)
-                            {
-                                var criterion = DeserializeFilterCriterion(filtersElement, actualColumn);
-                                var sheetFilter = new SheetFilter(criterion, range);
-                                sheet.AddFilter(sheetFilter);
-                            }
-                        }
-                    }
-                }
-            }
-
-            sheet.Name = sheetInfo.Name;
-
-            workbook.AddSheet(sheet);
+            return sheet;
         }
 
-        return workbook;
+        using var sheetStream = sheetEntry.Open();
+        var sheetDoc = XDocument.Load(sheetStream);
+        var sNs = sheetDoc.Root!.Name.Namespace;
+
+        // Parse default row height
+        var defaultRowHeight = ParseDefaultRowHeight(sheetDoc, sNs);
+
+        // Parse frozen panes
+        ParseFrozenPanes(sheetDoc, sNs, sheet);
+
+        // Parse column widths
+        ParseColumnWidths(sheetDoc, sNs, sheet);
+
+        // Parse rows and cells
+        ParseRowsAndCells(sheetDoc, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight);
+
+        // Parse merged cells
+        ParseMergedCells(sheetDoc, sNs, sheet);
+
+        // Parse auto filter
+        ParseAutoFilter(sheetDoc, sNs, sheet);
+
+        sheet.Name = sheetInfo.Name;
+        return sheet;
+    }
+
+    private static double ParseDefaultRowHeight(XDocument sheetDoc, XNamespace sNs)
+    {
+        // Parse default row height from sheet format properties
+        var defaultRowHeight = 20.0; // Default fallback
+        var sheetFormatPr = sheetDoc.Descendants(sNs + "sheetFormatPr").FirstOrDefault();
+        if (sheetFormatPr != null)
+        {
+            var defaultHeight = sheetFormatPr.Attribute("defaultRowHeight")?.Value;
+            if (defaultHeight != null && double.TryParse(defaultHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
+            {
+                defaultRowHeight = Math.Round(heightPoints * (96.0 / 72.0));
+            }
+        }
+
+        return defaultRowHeight;
+    }
+
+    private static void ParseFrozenPanes(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    {
+        var sheetView = sheetDoc.Descendants(sNs + "sheetView").FirstOrDefault();
+        if (sheetView != null)
+        {
+            var pane = sheetView.Element(sNs + "pane");
+            if (pane != null)
+            {
+                var xSplit = pane.Attribute("xSplit")?.Value;
+                var ySplit = pane.Attribute("ySplit")?.Value;
+
+                if (xSplit != null && int.TryParse(xSplit, out var frozenColumns))
+                {
+                    sheet.Columns.Frozen = frozenColumns;
+                }
+
+                if (ySplit != null && int.TryParse(ySplit, out var frozenRows))
+                {
+                    sheet.Rows.Frozen = frozenRows;
+                }
+            }
+        }
+    }
+
+    private static void ParseColumnWidths(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    {
+        var cols = sheetDoc.Descendants(sNs + "cols").FirstOrDefault();
+        if (cols != null)
+        {
+            foreach (var col in cols.Elements(sNs + "col"))
+            {
+                var min = col.Attribute("min")?.Value;
+                var max = col.Attribute("max")?.Value;
+                var width = col.Attribute("width")?.Value;
+
+                if (min != null && max != null && width != null &&
+                    int.TryParse(min, out var minCol) &&
+                    int.TryParse(max, out var maxCol) &&
+                    double.TryParse(width, NumberStyles.Float, CultureInfo.InvariantCulture, out var colWidth))
+                {
+                    // Excel column width to pixels conversion:
+                    // pixels = Truncate(((256 * width + Truncate(128/7)) / 256) * 7)
+                    var pixelWidth = (256 * colWidth + Math.Truncate(128 / 7.0)) / 256 * 7;
+
+                    for (var i = minCol - 1; i <= maxCol - 1 && i < sheet.Columns.Count; i++)
+                    {
+                        sheet.Columns[i] = pixelWidth;
+                    }
+                }
+            }
+        }
+    }
+
+    private static void ParseRowsAndCells(XDocument sheetDoc, XNamespace sNs, Sheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
+    {
+        foreach (var rowElem in sheetDoc.Descendants(sNs + "row"))
+        {
+            ParseRow(rowElem, sNs, sheet, styleInfo, sharedStrings, defaultRowHeight);
+        }
+    }
+
+    private static void ParseRow(XElement rowElem, XNamespace sNs, Sheet sheet, StyleInfo styleInfo, List<string> sharedStrings, double defaultRowHeight)
+    {
+        var rowIndex = rowElem.Attribute("r")?.Value;
+        var rowHeight = rowElem.Attribute("ht")?.Value;
+        var customHeight = rowElem.Attribute("customHeight")?.Value;
+
+        if (rowIndex != null && int.TryParse(rowIndex, out var rowNum))
+        {
+            var actualRowIndex = rowNum - 1; // Convert from 1-based to 0-based
+            if (actualRowIndex >= 0 && actualRowIndex < sheet.Rows.Count)
+            {
+                if (rowHeight != null && double.TryParse(rowHeight, NumberStyles.Float, CultureInfo.InvariantCulture, out var heightPoints))
+                {
+                    // Excel row height is in points, convert to pixels
+                    // 1 point = 1/72 inch, 1 inch = 96 pixels (standard DPI)
+                    // So: pixels = points * (96/72) = points * 1.333...
+                    var pixelHeight = Math.Round(heightPoints * (96.0 / 72.0));
+                    sheet.Rows[actualRowIndex] = pixelHeight;
+                }
+                else
+                {
+                    // Use default row height if no custom height specified
+                    sheet.Rows[actualRowIndex] = defaultRowHeight;
+                }
+            }
+        }
+
+        foreach (var cellElem in rowElem.Elements(sNs + "c"))
+        {
+            ParseCell(cellElem, sNs, sheet, styleInfo, sharedStrings);
+        }
+    }
+
+    private static void ParseCell(XElement cellElem, XNamespace sNs, Sheet sheet, StyleInfo styleInfo, List<string> sharedStrings)
+    {
+        var cellRef = cellElem.Attribute("r")!;
+
+        if (cellRef == null)
+        {
+            return;
+        }
+
+        var address = CellRef.Parse(cellRef.Value);
+
+        var valueElem = cellElem.Element(sNs + "v");
+        var formulaElem = cellElem.Element(sNs + "f");
+
+        if (valueElem == null && formulaElem == null)
+        {
+            return;
+        }
+
+        var cellType = (string?)cellElem.Attribute("t") ?? "n";
+
+        // Apply cell style if present
+        ApplyCellStyle(cellElem, sheet, address, styleInfo);
+
+        if (formulaElem != null)
+        {
+            var formulaValue = formulaElem.Value;
+            if (!formulaValue.StartsWith("="))
+            {
+                formulaValue = "=" + formulaValue;
+            }
+            sheet.Cells[address.Row, address.Column].Formula = formulaValue;
+        }
+        else
+        {
+            var value = cellType switch
+            {
+                "s" => sharedStrings[Convert.ToInt32(valueElem!.Value)],
+                _ => valueElem!.Value
+            };
+
+            sheet.Cells[address.Row, address.Column].Value = value;
+        }
+    }
+
+    private static void ApplyCellStyle(XElement cellElem, Sheet sheet, CellRef address, StyleInfo styleInfo)
+    {
+        var styleId = cellElem.Attribute("s")?.Value;
+        if (styleId != null && styleInfo.CellStyles.TryGetValue(int.Parse(styleId), out var style))
+        {
+            if (styleInfo.FontStyles.TryGetValue(style.FontId, out var fontStyle))
+            {
+                if (fontStyle.Color != null)
+                {
+                    sheet.Cells[address.Row, address.Column].Format.Color = fontStyle.Color;
+                }
+                sheet.Cells[address.Row, address.Column].Format.Bold = fontStyle.Bold;
+                sheet.Cells[address.Row, address.Column].Format.Italic = fontStyle.Italic;
+                sheet.Cells[address.Row, address.Column].Format.Underline = fontStyle.Underline;
+            }
+            sheet.Cells[address.Row, address.Column].Format.TextAlign = style.TextAlign;
+            sheet.Cells[address.Row, address.Column].Format.VerticalAlign = style.VerticalAlign;
+            if (styleInfo.FillColors.TryGetValue(style.FillId, out var fillColor))
+            {
+                sheet.Cells[address.Row, address.Column].Format.BackgroundColor = fillColor;
+            }
+        }
+    }
+
+    private static void ParseMergedCells(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    {
+        var mergeCells = sheetDoc.Descendants(sNs + "mergeCell")
+            .Select(m => m.Attribute("ref")?.Value)
+            .ToList();
+
+        foreach (var mergedRange in mergeCells)
+        {
+            if (string.IsNullOrEmpty(mergedRange))
+            {
+                continue;
+            }
+
+            var range = RangeRef.Parse(mergedRange);
+            sheet.MergedCells.Add(range);
+        }
+    }
+
+    private static void ParseAutoFilter(XDocument sheetDoc, XNamespace sNs, Sheet sheet)
+    {
+        var autoFilterElement = sheetDoc.Descendants(sNs + "autoFilter").FirstOrDefault();
+        if (autoFilterElement != null)
+        {
+            var refAttribute = autoFilterElement.Attribute("ref")?.Value;
+            if (!string.IsNullOrEmpty(refAttribute))
+            {
+                var range = RangeRef.Parse(refAttribute);
+                sheet.AutoFilter = new AutoFilter(sheet, range);
+
+                // Load filter columns
+                var filterColumns = autoFilterElement.Elements(sNs + "filterColumn").ToList();
+                foreach (var filterColumn in filterColumns)
+                {
+                    ParseFilterColumn(filterColumn, sNs, range, sheet);
+                }
+            }
+        }
+    }
+
+    private static void ParseFilterColumn(XElement filterColumn, XNamespace sNs, RangeRef range, Sheet sheet)
+    {
+        var colIdAttribute = filterColumn.Attribute("colId")?.Value;
+        if (!string.IsNullOrEmpty(colIdAttribute) && int.TryParse(colIdAttribute, out var colId))
+        {
+            var actualColumn = range.Start.Column + colId;
+
+            // Find customFilters or filters element
+            var customFiltersElement = filterColumn.Element(sNs + "customFilters");
+            var filtersElement = filterColumn.Element(sNs + "filters");
+
+            if (customFiltersElement != null)
+            {
+                var criterion = DeserializeFilterCriterion(customFiltersElement, actualColumn);
+                var sheetFilter = new SheetFilter(criterion, range);
+                sheet.AddFilter(sheetFilter);
+            }
+            else if (filtersElement != null)
+            {
+                var criterion = DeserializeFilterCriterion(filtersElement, actualColumn);
+                var sheetFilter = new SheetFilter(criterion, range);
+                sheet.AddFilter(sheetFilter);
+            }
+        }
+    }
+
+    private class StyleInfo
+    {
+        public Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> FontStyles { get; }
+        public Dictionary<int, string> FillColors { get; }
+        public Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)> CellStyles { get; }
+
+        public StyleInfo(
+            Dictionary<int, (string? Color, bool Bold, bool Italic, bool Underline)> fontStyles,
+            Dictionary<int, string> fillColors,
+            Dictionary<int, (int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign)> cellStyles)
+        {
+            FontStyles = fontStyles;
+            FillColors = fillColors;
+            CellStyles = cellStyles;
+        }
+    }
+
+    private class SheetInfo
+    {
+        public string Name { get; }
+        public string SheetId { get; }
+        public string RelId { get; }
+        public Dictionary<string, string> RelMap { get; }
+        public bool HasValidPath => RelMap.TryGetValue(RelId, out _);
+        public string FullPath
+        {
+            get
+            {
+                if (RelMap.TryGetValue(RelId, out var sheetPath))
+                {
+                    return $"xl/{sheetPath.TrimStart('/')}"; // Excel paths are relative
+                }
+                return string.Empty;
+            }
+        }
+
+        public SheetInfo(string name, string sheetId, string relId, Dictionary<string, string> relMap)
+        {
+            Name = name;
+            SheetId = sheetId;
+            RelId = relId;
+            RelMap = relMap;
+        }
     }
 
     private static void UpdateAndSaveSharedStrings(ZipArchive archive, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
