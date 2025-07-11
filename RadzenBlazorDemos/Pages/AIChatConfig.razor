@@ -8,21 +8,25 @@
             <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
                 <RadzenButton Text="Add Welcome" 
                               Icon="add"
-                              Click="@(() => basicChat?.AddMessage("Hello! How can I help you today?", false))" />
+                              Click="@(() => basicChat?.AddMessage("Hello! How can I help you today?", false))"
+                              Variant="Variant.Flat" />
                 
                 <RadzenButton Text="Add User Message" 
                               Icon="person_add"
-                              Click="@(() => basicChat?.AddMessage("This is a test message from the user.", true))" />
+                              Click="@(() => basicChat?.AddMessage("This is a test message from the user.", true))"
+                              Variant="Variant.Flat" />
                 
                 <RadzenButton Text="Clear Chat" 
                               Icon="delete_history"
                               ButtonStyle="ButtonStyle.Light"
-                              Click="@(() => basicChat?.ClearChat())" />
+                              Click="@(() => basicChat?.ClearChat())"
+                              Variant="Variant.Flat" />
                 
                 <RadzenButton Text="Send Test" 
                               Icon="send" 
                               ButtonStyle="ButtonStyle.Primary"
-                              Click="@(() => basicChat?.SendMessage("What is Blazor?"))" />
+                              Click="@(() => basicChat?.SendMessage("What is Blazor?"))"
+                              Variant="Variant.Flat" />
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
