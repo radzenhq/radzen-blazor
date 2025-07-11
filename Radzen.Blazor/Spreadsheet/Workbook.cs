@@ -64,77 +64,45 @@ public class Workbook
     {
         using var archive = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true);
 
-        // Track unique styles
-        var fontStyles = new Dictionary<(string? Color, bool Bold, bool Italic, bool Underline), int>();
-        var fillStyles = new Dictionary<string, int>();
-        var cellStyles = new Dictionary<(int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign), int>();
+        // Create style tracking with initialized styles document
+        var styleTracker = CreateStylesDocument();
 
-        // Create styles.xml
-        var stylesDoc = new XDocument(
-            new XElement(XName.Get("styleSheet", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XElement(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("count", "1"),
-                    // Default font
-                    new XElement(XName.Get("font", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                        new XElement(XName.Get("sz", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                            new XAttribute("val", "11")),
-                        new XElement(XName.Get("name", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                            new XAttribute("val", "Aptos Narrow"))))));
+        // Create and save content types
+        SaveContentTypes(archive);
 
-        // Add fills section
-        var fillsElement = new XElement(XName.Get("fills", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            new XAttribute("count", "2"),
-            // Default fills
-            new XElement(XName.Get("fill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XElement(XName.Get("patternFill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("patternType", "none"))),
-            new XElement(XName.Get("fill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XElement(XName.Get("patternFill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("patternType", "gray125"))));
+        // Create and save relationships
+        SaveRelationships(archive);
 
-        stylesDoc.Root!.Add(fillsElement);
+        // Create and save shared strings
+        var sharedStrings = new Dictionary<string, int>();
+        var sharedStringsDoc = CreateSharedStringsDocument(sharedStrings);
 
-        // Add borders section
-        stylesDoc.Root.Add(new XElement(XName.Get("borders", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            new XAttribute("count", "1"),
-            new XElement(XName.Get("border", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XElement(XName.Get("left", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")),
-                new XElement(XName.Get("right", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")),
-                new XElement(XName.Get("top", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")),
-                new XElement(XName.Get("bottom", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")),
-                new XElement(XName.Get("diagonal", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")))));
+        // Process and save each sheet
+        SaveSheets(archive, styleTracker, sharedStrings, sharedStringsDoc);
 
-        // Add cellStyleXfs section
-        stylesDoc.Root.Add(new XElement(XName.Get("cellStyleXfs", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            new XAttribute("count", "1"),
-            new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("numFmtId", "0"),
-                new XAttribute("fontId", "0"),
-                new XAttribute("fillId", "0"),
-                new XAttribute("borderId", "0"))));
+        // Save styles (after processing all sheets to collect all styles)
+        SaveStyles(archive, styleTracker);
 
-        // Add cellXfs section
-        var cellXfsElement = new XElement(XName.Get("cellXfs", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            new XAttribute("count", "1"),
-            // Default style
-            new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("numFmtId", "0"),
-                new XAttribute("fontId", "0"),
-                new XAttribute("fillId", "0"),
-                new XAttribute("borderId", "0"),
-                new XAttribute("xfId", "0")));
+        // Update and save shared strings
+        UpdateAndSaveSharedStrings(archive, sharedStrings, sharedStringsDoc);
 
-        stylesDoc.Root.Add(cellXfsElement);
+        // Save workbook
+        SaveWorkbook(archive);
+    }
 
-        // Add cellStyles section
-        stylesDoc.Root.Add(new XElement(XName.Get("cellStyles", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            new XAttribute("count", "1"),
-            new XElement(XName.Get("cellStyle", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("name", "Normal"),
-                new XAttribute("xfId", "0"),
-                new XAttribute("builtinId", "0"))));
+    private class StyleTracker
+    {
+        public Dictionary<(string? Color, bool Bold, bool Italic, bool Underline), int> FontStyles { get; } = new();
+        public Dictionary<string, int> FillStyles { get; } = new();
+        public Dictionary<(int FontId, int FillId, TextAlign TextAlign, VerticalAlign VerticalAlign), int> CellStyles { get; } = new();
+        public XDocument StylesDocument { get; set; } = null!;
+        public XElement FontsElement { get; set; } = null!;
+        public XElement FillsElement { get; set; } = null!;
+        public XElement CellXfsElement { get; set; } = null!;
+    }
 
-        // 1. Create [Content_Types].xml
+    private static void SaveContentTypes(ZipArchive archive)
+    {
         var contentTypes = new XDocument(
             new XElement(XName.Get("Types", "http://schemas.openxmlformats.org/package/2006/content-types"),
                 new XElement(XName.Get("Default", "http://schemas.openxmlformats.org/package/2006/content-types"),
@@ -153,12 +121,12 @@ public class Workbook
                     new XAttribute("PartName", "/xl/styles.xml"),
                     new XAttribute("ContentType", "application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"))));
 
-        using (var entry = archive.CreateEntry("[Content_Types].xml").Open())
-        {
-            contentTypes.Save(entry);
-        }
+        using var entry = archive.CreateEntry("[Content_Types].xml").Open();
+        contentTypes.Save(entry);
+    }
 
-        // 2. Create _rels/.rels
+    private static void SaveRelationships(ZipArchive archive)
+    {
         var rels = new XDocument(
             new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships"),
                 new XElement(XName.Get("Relationship", "http://schemas.openxmlformats.org/package/2006/relationships"),
@@ -166,409 +134,595 @@ public class Workbook
                     new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument"),
                     new XAttribute("Target", "xl/workbook.xml"))));
 
-        using (var entry = archive.CreateEntry("_rels/.rels").Open())
-        {
-            rels.Save(entry);
-        }
+        using var entry = archive.CreateEntry("_rels/.rels").Open();
+        rels.Save(entry);
+    }
 
-        // 3. Create xl/workbook.xml
-        var workbook = new XDocument(
-            new XElement(XName.Get("workbook", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XElement(XName.Get("sheets", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
+    private static XDocument CreateSharedStringsDocument(Dictionary<string, int> sharedStrings)
+    {
+        return new XDocument(
+            new XElement(XName.Get("sst", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("count", "0"),
+                new XAttribute("uniqueCount", "0")));
+    }
 
-        var sheetsElement = workbook.Root!.Element(XName.Get("sheets", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
+    private static void SaveStyles(ZipArchive archive, StyleTracker styleTracker)
+    {
+        using var entry = archive.CreateEntry("xl/styles.xml").Open();
+        styleTracker.StylesDocument.Save(entry);
+    }
 
-        // 4. Create xl/_rels/workbook.xml.rels
-        var workbookRels = new XDocument(
-            new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships")));
+    private static StyleTracker CreateStylesDocument()
+    {
+        var styleTracker = new StyleTracker();
 
+        var stylesDoc = new XDocument(
+            new XElement(XName.Get("styleSheet", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                CreateFontsElement(),
+                CreateFillsElement(),
+                CreateBordersElement(),
+                CreateCellStyleXfsElement(),
+                CreateCellXfsElement(),
+                CreateCellStylesElement()));
+
+        styleTracker.StylesDocument = stylesDoc;
+        styleTracker.FontsElement = stylesDoc.Root!.Element(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
+        styleTracker.FillsElement = stylesDoc.Root!.Element(XName.Get("fills", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
+        styleTracker.CellXfsElement = stylesDoc.Root!.Element(XName.Get("cellXfs", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
+
+        return styleTracker;
+    }
+
+    private static XElement CreateFontsElement()
+    {
+        return new XElement(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("count", "1"),
+            new XElement(XName.Get("font", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XElement(XName.Get("sz", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("val", "11")),
+                new XElement(XName.Get("name", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("val", "Aptos Narrow"))));
+    }
+
+    private static XElement CreateFillsElement()
+    {
+        return new XElement(XName.Get("fills", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("count", "2"),
+            new XElement(XName.Get("fill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XElement(XName.Get("patternFill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("patternType", "none"))),
+            new XElement(XName.Get("fill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XElement(XName.Get("patternFill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("patternType", "gray125"))));
+    }
+
+    private static XElement CreateBordersElement()
+    {
+        return new XElement(XName.Get("borders", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("count", "1"),
+            new XElement(XName.Get("border", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XElement(XName.Get("left", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")),
+                new XElement(XName.Get("right", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")),
+                new XElement(XName.Get("top", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")),
+                new XElement(XName.Get("bottom", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")),
+                new XElement(XName.Get("diagonal", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
+    }
+
+    private static XElement CreateCellStyleXfsElement()
+    {
+        return new XElement(XName.Get("cellStyleXfs", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("count", "1"),
+            new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("numFmtId", "0"),
+                new XAttribute("fontId", "0"),
+                new XAttribute("fillId", "0"),
+                new XAttribute("borderId", "0")));
+    }
+
+    private static XElement CreateCellXfsElement()
+    {
+        return new XElement(XName.Get("cellXfs", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("count", "1"),
+            new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("numFmtId", "0"),
+                new XAttribute("fontId", "0"),
+                new XAttribute("fillId", "0"),
+                new XAttribute("borderId", "0"),
+                new XAttribute("xfId", "0")));
+    }
+
+    private static XElement CreateCellStylesElement()
+    {
+        return new XElement(XName.Get("cellStyles", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("count", "1"),
+            new XElement(XName.Get("cellStyle", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("name", "Normal"),
+                new XAttribute("xfId", "0"),
+                new XAttribute("builtinId", "0")));
+    }
+
+    private void SaveSheets(ZipArchive archive, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    {
+        var workbookRels = CreateWorkbookRelationships();
         var workbookRelsElement = workbookRels.Root!;
 
-        // Add shared strings relationship
+        // Add shared strings and styles relationships
         workbookRelsElement.Add(new XElement(XName.Get("Relationship", "http://schemas.openxmlformats.org/package/2006/relationships"),
             new XAttribute("Id", "rId1"),
             new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings"),
             new XAttribute("Target", "sharedStrings.xml")));
 
-        // Add styles relationship
         workbookRelsElement.Add(new XElement(XName.Get("Relationship", "http://schemas.openxmlformats.org/package/2006/relationships"),
             new XAttribute("Id", "rId2"),
             new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles"),
             new XAttribute("Target", "styles.xml")));
 
-        // 5. Create shared strings
-        var sharedStrings = new Dictionary<string, int>();
-        var sharedStringsDoc = new XDocument(
-            new XElement(XName.Get("sst", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("count", "0"),
-                new XAttribute("uniqueCount", "0")));
-
-        var sstElement = sharedStringsDoc.Root!;
-
-        // 6. Process each sheet
+        // Process each sheet
         for (var i = 0; i < sheets.Count; i++)
         {
             var sheet = sheets[i];
             var sheetId = i + 1;
             var sheetName = $"sheet{sheetId}.xml";
-            var relId = $"rId{sheetId + 2}"; // +2 because we have sharedStrings and styles relationships
+            var relId = $"rId{sheetId + 2}";
 
-            // Add sheet to workbook.xml
-            sheetsElement.Add(new XElement(XName.Get("sheet", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("name", sheet.Name),
-                new XAttribute("sheetId", sheetId),
-                new XAttribute(XName.Get("id", "http://schemas.openxmlformats.org/officeDocument/2006/relationships"), relId)));
-
-            // Add relationship
+            // Add sheet relationship
             workbookRelsElement.Add(new XElement(XName.Get("Relationship", "http://schemas.openxmlformats.org/package/2006/relationships"),
                 new XAttribute("Id", relId),
                 new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"),
                 new XAttribute("Target", sheetName)));
 
-            var uid = Guid.NewGuid().ToString("B").ToUpperInvariant();
-            // Create sheet XML
-            var sheetDoc = new XDocument(
-                new XElement(XName.Get("worksheet", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid),
-                    new XElement(XName.Get("sheetPr", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), sheet.Filters.Count > 0 ? new XAttribute("filterMode", "1") : null),
-                    new XElement(XName.Get("dimension", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                        new XAttribute("ref", $"A1:{new CellRef(sheet.RowCount - 1, sheet.ColumnCount - 1)}")),
-                    new XElement(XName.Get("sheetViews", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                        new XElement(XName.Get("sheetView", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                            new XAttribute("workbookViewId", "0"),
-                            new XElement(XName.Get("pane", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                new XAttribute("xSplit", sheet.Columns.Frozen),
-                                new XAttribute("ySplit", sheet.Rows.Frozen),
-                                new XAttribute("topLeftCell", new CellRef(sheet.Rows.Frozen, sheet.Columns.Frozen).ToString()),
-                                new XAttribute("activePane", "topLeft"),
-                                new XAttribute("state", "frozen")))),
-                    new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                        Enumerable.Range(0, sheet.ColumnCount).Select(col => new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                            new XAttribute("min", col + 1),
-                            new XAttribute("max", col + 1),
-                            new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)), // Convert pixels to Excel column width units
-                            new XAttribute("customWidth", "1")))),
-                    new XElement(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
+            // Save individual sheet
+            SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, sharedStringsDoc);
+        }
 
-            var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
+        // Save workbook relationships
+        using var relsEntry = archive.CreateEntry("xl/_rels/workbook.xml.rels").Open();
+        workbookRels.Save(relsEntry);
+    }
 
-            // Process cells
-            for (var row = 0; row < sheet.RowCount; row++)
+    private static XDocument CreateWorkbookRelationships()
+    {
+        return new XDocument(
+            new XElement(XName.Get("Relationships", "http://schemas.openxmlformats.org/package/2006/relationships")));
+    }
+
+    private void SaveSheet(ZipArchive archive, Sheet sheet, string sheetName, int sheetId, string relId, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    {
+        var sheetDoc = CreateSheetDocument(sheet, sheetId, relId);
+        var sheetData = sheetDoc.Root!.Element(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
+
+        // Process all rows and cells
+        ProcessSheetData(sheet, sheetData, styleTracker, sharedStrings, sharedStringsDoc);
+
+        // Add merged cells
+        AddMergedCells(sheet, sheetDoc);
+
+        // Add auto filter
+        AddAutoFilter(sheet, sheetDoc);
+
+        // Save sheet
+        using var entry = archive.CreateEntry($"xl/{sheetName}").Open();
+        sheetDoc.Save(entry);
+    }
+
+    private static XDocument CreateSheetDocument(Sheet sheet, int sheetId, string relId)
+    {
+        var uid = Guid.NewGuid().ToString("B").ToUpperInvariant();
+
+        return new XDocument(
+            new XElement(XName.Get("worksheet", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid),
+                CreateSheetProperties(sheet),
+                CreateDimension(sheet),
+                CreateSheetViews(sheet),
+                CreateColumns(sheet),
+                new XElement(XName.Get("sheetData", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
+    }
+
+    private static XElement CreateSheetProperties(Sheet sheet)
+    {
+        return new XElement(XName.Get("sheetPr", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            sheet.Filters.Count > 0 ? new XAttribute("filterMode", "1") : null);
+    }
+
+    private static XElement CreateDimension(Sheet sheet)
+    {
+        return new XElement(XName.Get("dimension", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("ref", $"A1:{new CellRef(sheet.RowCount - 1, sheet.ColumnCount - 1)}"));
+    }
+
+    private static XElement CreateSheetViews(Sheet sheet)
+    {
+        return new XElement(XName.Get("sheetViews", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XElement(XName.Get("sheetView", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("workbookViewId", "0"),
+                new XElement(XName.Get("pane", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("xSplit", sheet.Columns.Frozen),
+                    new XAttribute("ySplit", sheet.Rows.Frozen),
+                    new XAttribute("topLeftCell", new CellRef(sheet.Rows.Frozen, sheet.Columns.Frozen).ToString()),
+                    new XAttribute("activePane", "topLeft"),
+                    new XAttribute("state", "frozen"))));
+    }
+
+    private static XElement CreateColumns(Sheet sheet)
+    {
+        return new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            Enumerable.Range(0, sheet.ColumnCount).Select(col => new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("min", col + 1),
+                new XAttribute("max", col + 1),
+                new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)),
+                new XAttribute("customWidth", "1"))));
+    }
+
+    private void ProcessSheetData(Sheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    {
+        for (var row = 0; row < sheet.RowCount; row++)
+        {
+            var rowElement = CreateRowElement(sheet, row);
+
+            for (var col = 0; col < sheet.ColumnCount; col++)
             {
-                var rowElement = new XElement(XName.Get("row", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("r", row + 1),
-                    new XAttribute("ht", sheet.Rows[row]), // Row height in pixels
-                    new XAttribute("customHeight", "1"));
+                var cell = sheet.Cells[row, col];
+                var value = cell.GetValue();
 
-                // Add hidden attribute if row is hidden
-                if (sheet.Rows.IsHidden(row))
+                if (value == null)
                 {
-                    rowElement.Add(new XAttribute("hidden", "1"));
+                    continue;
                 }
 
-                for (var col = 0; col < sheet.ColumnCount; col++)
-                {
-                    var cell = sheet.Cells[row, col];
-                    var value = cell.GetValue();
-
-                    if (value == null)
-                    {
-                        continue;
-                    }
-
-                    var cellElement = new XElement(XName.Get("c", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                        new XAttribute("r", new CellRef(row, col).ToString()));
-
-                    // Add style reference if cell has formatting
-                    if (cell.Format.Color != null || cell.Format.BackgroundColor != null || cell.Format.Bold || cell.Format.Italic || cell.Format.Underline || cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top)
-                    {
-                        var fontKey = (cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline);
-                        var fontId = 0;
-                        if (!fontStyles.TryGetValue(fontKey, out fontId))
-                        {
-                            fontId = fontStyles.Count + 1;
-                            fontStyles[fontKey] = fontId;
-                            var fontElement = new XElement(XName.Get("font", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                new XElement(XName.Get("sz", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                    new XAttribute("val", "11")),
-                                new XElement(XName.Get("name", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                    new XAttribute("val", "Aptos Narrow")));
-                            if (cell.Format.Color != null)
-                            {
-                                fontElement.Add(new XElement(XName.Get("color", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                    new XAttribute("rgb", cell.Format.Color.ToXLSXColor())));
-                            }
-                            if (cell.Format.Bold)
-                            {
-                                fontElement.Add(new XElement(XName.Get("b", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
-                            }
-                            if (cell.Format.Italic)
-                            {
-                                fontElement.Add(new XElement(XName.Get("i", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
-                            }
-                            if (cell.Format.Underline)
-                            {
-                                fontElement.Add(new XElement(XName.Get("u", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
-                            }
-                            stylesDoc.Root!.Element(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!.Add(fontElement);
-                            stylesDoc.Root!.Element(XName.Get("fonts", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!.Attribute("count")!.Value = (fontStyles.Count + 1).ToString();
-                        }
-
-                        var fillId = 0;
-                        if (cell.Format.BackgroundColor != null)
-                        {
-                            if (!fillStyles.TryGetValue(cell.Format.BackgroundColor, out fillId))
-                            {
-                                fillId = fillStyles.Count + 2; // Start from 2 as 0 and 1 are reserved
-                                fillStyles[cell.Format.BackgroundColor] = fillId;
-                                fillsElement.Add(new XElement(XName.Get("fill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                    new XElement(XName.Get("patternFill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                        new XAttribute("patternType", "solid"),
-                                        new XElement(XName.Get("fgColor", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                            new XAttribute("rgb", cell.Format.BackgroundColor.ToXLSXColor())),
-                                        new XElement(XName.Get("bgColor", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                            new XAttribute("indexed", "64")))));
-                                fillsElement.Attribute("count")!.Value = (fillStyles.Count + 2).ToString();
-                            }
-                        }
-
-                        var styleKey = (fontId, fillId, cell.Format.TextAlign, cell.Format.VerticalAlign);
-                        if (!cellStyles.TryGetValue(styleKey, out int styleId))
-                        {
-                            styleId = cellStyles.Count + 1;
-                            cellStyles[styleKey] = styleId;
-                            var xfElement = new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                new XAttribute("numFmtId", "0"),
-                                new XAttribute("fontId", fontId.ToString()),
-                                new XAttribute("fillId", fillId.ToString()),
-                                new XAttribute("borderId", "0"),
-                                new XAttribute("xfId", "0"),
-                                new XAttribute("applyFont", fontId > 0 ? "1" : "0"),
-                                new XAttribute("applyFill", fillId > 0 ? "1" : "0"));
-
-                            // Add alignment if not default (left-aligned and top-aligned)
-                            if (cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top)
-                            {
-                                var horizontalAlign = cell.Format.TextAlign switch
-                                {
-                                    TextAlign.Center => "center",
-                                    TextAlign.Right => "right",
-                                    TextAlign.Justify => "justify",
-                                    _ => "left"
-                                };
-                                var verticalAlign = cell.Format.VerticalAlign switch
-                                {
-                                    VerticalAlign.Middle => "center",
-                                    VerticalAlign.Bottom => "bottom",
-                                    _ => "top"
-                                };
-
-                                var alignmentElement = new XElement(XName.Get("alignment", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"));
-                                if (cell.Format.TextAlign != TextAlign.Left)
-                                {
-                                    alignmentElement.Add(new XAttribute("horizontal", horizontalAlign));
-                                }
-                                if (cell.Format.VerticalAlign != VerticalAlign.Top)
-                                {
-                                    alignmentElement.Add(new XAttribute("vertical", verticalAlign));
-                                }
-                                xfElement.Add(alignmentElement);
-                                xfElement.Add(new XAttribute("applyAlignment", "1"));
-                            }
-
-                            cellXfsElement.Add(xfElement);
-                            cellXfsElement.Attribute("count")!.Value = (cellStyles.Count + 1).ToString();
-                        }
-
-                        cellElement.Add(new XAttribute("s", styleId));
-                    }
-
-                    if (!string.IsNullOrEmpty(cell.Formula))
-                    {
-                        cellElement.Add(new XAttribute("t", "str"));
-                        var formulaValue = cell.Formula.StartsWith("=") ? cell.Formula[1..] : cell.Formula;
-                        cellElement.Add(new XElement(XName.Get("f", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), formulaValue));
-                        cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), value));
-                    }
-                    else
-                    {
-                        switch (cell.ValueType)
-                        {
-                            case CellValueType.Number:
-                                cellElement.Add(new XAttribute("t", "n"));
-                                cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), value));
-                                break;
-
-                            case CellValueType.String:
-                                var strValue = cell.GetValue() ?? string.Empty;
-                                if (!sharedStrings.TryGetValue(strValue, out var index))
-                                {
-                                    index = sharedStrings.Count;
-                                    sharedStrings[strValue] = index;
-                                    sstElement.Add(new XElement(XName.Get("si", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                        new XElement(XName.Get("t", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), strValue)));
-                                }
-
-                                cellElement.Add(new XAttribute("t", "s"));
-                                cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), index));
-                                break;
-
-                            case CellValueType.Error:
-                                cellElement.Add(new XAttribute("t", "e"));
-                                cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), value));
-                                break;
-
-                            case CellValueType.Empty:
-                                break;
-                        }
-                    }
-
-                    rowElement.Add(cellElement);
-                }
-
-                // Always add the row element, even if it has no cells, to preserve row height
-                sheetData.Add(rowElement);
+                var cellElement = CreateCellElement(sheet, row, col, cell, styleTracker, sharedStrings, sharedStringsDoc);
+                rowElement.Add(cellElement);
             }
 
-            // Add merged cells
-            if (sheet.MergedCells.Ranges.Count > 0)
-            {
-                var mergeCells = new XElement(XName.Get("mergeCells", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("count", sheet.MergedCells.Ranges.Count));
-
-                foreach (var range in sheet.MergedCells.Ranges)
-                {
-                    mergeCells.Add(new XElement(XName.Get("mergeCell", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                        new XAttribute("ref", range.ToString())));
-                }
-
-                sheetDoc.Root.Add(mergeCells);
-            }
-
-            // Add auto filter with custom filters
-            if (sheet.AutoFilter != null)
-            {
-                var autoFilter = new XElement(XName.Get("autoFilter", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                    new XAttribute("ref", sheet.AutoFilter.Range.ToString()),
-                    new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid));
-                
-                // Process each filter and create filterColumn elements
-                foreach (var filter in sheet.Filters)
-                {
-                    if (filter.Criterion is FilterCriterionLeaf leaf)
-                    {
-                        var colId = leaf.Column - sheet.AutoFilter.Range.Start.Column;
-                        if (colId >= 0 && colId <= sheet.AutoFilter.Range.End.Column - sheet.AutoFilter.Range.Start.Column)
-                        {
-                            var filterColumn = new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                new XAttribute("colId", colId));
-                            
-                            var filterElement = SerializeFilterCriterion(filter.Criterion, colId);
-                            filterColumn.Add(filterElement);
-                            autoFilter.Add(filterColumn);
-                        }
-                    }
-                    else if (filter.Criterion is OrCriterion orCriterion)
-                    {
-                        // For OR criteria, we need to find the first column that has a leaf criterion
-                        var firstLeaf = orCriterion.Criteria.OfType<FilterCriterionLeaf>().FirstOrDefault();
-                        if (firstLeaf != null)
-                        {
-                            var colId = firstLeaf.Column - sheet.AutoFilter.Range.Start.Column;
-                            if (colId >= 0 && colId <= sheet.AutoFilter.Range.End.Column - sheet.AutoFilter.Range.Start.Column)
-                            {
-                                var filterColumn = new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                    new XAttribute("colId", colId));
-                                
-                                var filterElement = SerializeFilterCriterion(filter.Criterion, colId);
-                                filterColumn.Add(filterElement);
-                                autoFilter.Add(filterColumn);
-                            }
-                        }
-                    }
-                    else if (filter.Criterion is AndCriterion andCriterion)
-                    {
-                        // For AND criteria, we need to find the first column that has a leaf criterion
-                        var firstLeaf = andCriterion.Criteria.OfType<FilterCriterionLeaf>().FirstOrDefault();
-                        if (firstLeaf != null)
-                        {
-                            var colId = firstLeaf.Column - sheet.AutoFilter.Range.Start.Column;
-                            if (colId >= 0 && colId <= sheet.AutoFilter.Range.End.Column - sheet.AutoFilter.Range.Start.Column)
-                            {
-                                var filterColumn = new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                                    new XAttribute("colId", colId));
-                                
-                                var filterElement = SerializeFilterCriterion(filter.Criterion, colId);
-                                filterColumn.Add(filterElement);
-                                autoFilter.Add(filterColumn);
-                            }
-                        }
-                    }
-                }
-                
-                sheetDoc.Root.Add(autoFilter);
-            }
-
-            // Save sheet
-            using var entry = archive.CreateEntry($"xl/{sheetName}").Open();
-            sheetDoc.Save(entry);
-        }
-
-        // Update shared strings count
-        sstElement.Attribute("count")!.Value = sharedStrings.Count.ToString();
-        sstElement.Attribute("uniqueCount")!.Value = sharedStrings.Count.ToString();
-
-        // Save shared strings
-        using (var entry = archive.CreateEntry("xl/sharedStrings.xml").Open())
-        {
-            sharedStringsDoc.Save(entry);
-        }
-
-        // Save workbook.xml
-        using (var entry = archive.CreateEntry("xl/workbook.xml").Open())
-        {
-            workbook.Save(entry);
-        }
-
-        // Save workbook.xml.rels
-        using (var entry = archive.CreateEntry("xl/_rels/workbook.xml.rels").Open())
-        {
-            workbookRels.Save(entry);
-        }
-
-        // Save styles.xml
-        using (var entry = archive.CreateEntry("xl/styles.xml").Open())
-        {
-            stylesDoc.Save(entry);
+            // Always add the row element, even if it has no cells, to preserve row height
+            sheetData.Add(rowElement);
         }
     }
 
+    private static XElement CreateRowElement(Sheet sheet, int row)
+    {
+        var rowElement = new XElement(XName.Get("row", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("r", row + 1),
+            new XAttribute("ht", sheet.Rows[row]),
+            new XAttribute("customHeight", "1"));
+
+        // Add hidden attribute if row is hidden
+        if (sheet.Rows.IsHidden(row))
+        {
+            rowElement.Add(new XAttribute("hidden", "1"));
+        }
+
+        return rowElement;
+    }
+
+    private XElement CreateCellElement(Sheet sheet, int row, int col, Cell cell, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    {
+        var cellElement = new XElement(XName.Get("c", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("r", new CellRef(row, col).ToString()));
+
+        // Add style reference if cell has formatting
+        if (HasCellFormatting(cell))
+        {
+            var styleId = GetOrCreateCellStyle(cell, styleTracker);
+            cellElement.Add(new XAttribute("s", styleId));
+        }
+
+        // Add cell value based on type
+        Workbook.AddCellValue(cellElement, cell, sharedStrings, sharedStringsDoc);
+
+        return cellElement;
+    }
+
+    private static bool HasCellFormatting(Cell cell)
+    {
+        return cell.Format.Color != null ||
+               cell.Format.BackgroundColor != null ||
+               cell.Format.Bold ||
+               cell.Format.Italic ||
+               cell.Format.Underline ||
+               cell.Format.TextAlign != TextAlign.Left ||
+               cell.Format.VerticalAlign != VerticalAlign.Top;
+    }
+
+    private int GetOrCreateCellStyle(Cell cell, StyleTracker styleTracker)
+    {
+        var fontId = GetOrCreateFontStyle(cell, styleTracker);
+        var fillId = GetOrCreateFillStyle(cell, styleTracker);
+
+        var styleKey = (fontId, fillId, cell.Format.TextAlign, cell.Format.VerticalAlign);
+
+        if (!styleTracker.CellStyles.TryGetValue(styleKey, out int styleId))
+        {
+            styleId = styleTracker.CellStyles.Count + 1;
+            styleTracker.CellStyles[styleKey] = styleId;
+            CreateCellStyleElement(cell, fontId, fillId, styleId, styleTracker);
+        }
+
+        return styleId;
+    }
+
+    private int GetOrCreateFontStyle(Cell cell, StyleTracker styleTracker)
+    {
+        var fontKey = (cell.Format.Color, cell.Format.Bold, cell.Format.Italic, cell.Format.Underline);
+
+        if (!styleTracker.FontStyles.TryGetValue(fontKey, out int fontId))
+        {
+            fontId = styleTracker.FontStyles.Count + 1;
+            styleTracker.FontStyles[fontKey] = fontId;
+            CreateFontElement(cell, fontId, styleTracker);
+        }
+
+        return fontId;
+    }
+
+    private int GetOrCreateFillStyle(Cell cell, StyleTracker styleTracker)
+    {
+        if (cell.Format.BackgroundColor == null)
+        {
+            return 0;
+        }
+
+        if (!styleTracker.FillStyles.TryGetValue(cell.Format.BackgroundColor, out int fillId))
+        {
+            fillId = styleTracker.FillStyles.Count + 2; // Start from 2 as 0 and 1 are reserved
+            styleTracker.FillStyles[cell.Format.BackgroundColor] = fillId;
+            CreateFillElement(cell, fillId, styleTracker);
+        }
+
+        return fillId;
+    }
+
+    private void CreateFontElement(Cell cell, int fontId, StyleTracker styleTracker)
+    {
+        var fontElement = new XElement(XName.Get("font", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XElement(XName.Get("sz", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("val", "11")),
+            new XElement(XName.Get("name", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("val", "Aptos Narrow")));
+
+        if (cell.Format.Color != null)
+        {
+            fontElement.Add(new XElement(XName.Get("color", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("rgb", cell.Format.Color.ToXLSXColor())));
+        }
+        if (cell.Format.Bold)
+        {
+            fontElement.Add(new XElement(XName.Get("b", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
+        }
+        if (cell.Format.Italic)
+        {
+            fontElement.Add(new XElement(XName.Get("i", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
+        }
+        if (cell.Format.Underline)
+        {
+            fontElement.Add(new XElement(XName.Get("u", "http://schemas.openxmlformats.org/spreadsheetml/2006/main")));
+        }
+
+        styleTracker.FontsElement.Add(fontElement);
+        styleTracker.FontsElement.Attribute("count")!.Value = (styleTracker.FontStyles.Count + 1).ToString();
+    }
+
+    private void CreateFillElement(Cell cell, int fillId, StyleTracker styleTracker)
+    {
+        var fillElement = new XElement(XName.Get("fill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XElement(XName.Get("patternFill", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("patternType", "solid"),
+                new XElement(XName.Get("fgColor", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("rgb", cell.Format.BackgroundColor!.ToXLSXColor())),
+                new XElement(XName.Get("bgColor", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("indexed", "64"))));
+
+        styleTracker.FillsElement.Add(fillElement);
+        styleTracker.FillsElement.Attribute("count")!.Value = (styleTracker.FillStyles.Count + 2).ToString();
+    }
+
     /// <summary>
-    /// Serializes a filter criterion to Excel autoFilter XML format.
+    /// Creates a cell style element in the styles document.
     /// </summary>
+    private void CreateCellStyleElement(Cell cell, int fontId, int fillId, int styleId, StyleTracker styleTracker)
+    {
+        var xfElement = new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+            new XAttribute("numFmtId", "0"),
+            new XAttribute("fontId", fontId.ToString()),
+            new XAttribute("fillId", fillId.ToString()),
+            new XAttribute("borderId", "0"),
+            new XAttribute("xfId", "0"),
+            new XAttribute("applyFont", fontId > 0 ? "1" : "0"),
+            new XAttribute("applyFill", fillId > 0 ? "1" : "0"));
+
+        // Add alignment if not default
+        if (cell.Format.TextAlign != TextAlign.Left || cell.Format.VerticalAlign != VerticalAlign.Top)
+        {
+            var alignmentElement = CreateAlignmentElement(cell);
+            xfElement.Add(alignmentElement);
+            xfElement.Add(new XAttribute("applyAlignment", "1"));
+        }
+
+        styleTracker.CellXfsElement.Add(xfElement);
+        styleTracker.CellXfsElement.Attribute("count")!.Value = (styleTracker.CellStyles.Count + 1).ToString();
+    }
+
+    /// <summary>
+    /// Creates an alignment element for cell formatting.
+    /// </summary>
+    private static XElement CreateAlignmentElement(Cell cell)
+    {
+        var alignmentElement = new XElement(XName.Get("alignment", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"));
+
+        if (cell.Format.TextAlign != TextAlign.Left)
+        {
+            var horizontalAlign = cell.Format.TextAlign switch
+            {
+                TextAlign.Center => "center",
+                TextAlign.Right => "right",
+                TextAlign.Justify => "justify",
+                _ => "left"
+            };
+            alignmentElement.Add(new XAttribute("horizontal", horizontalAlign));
+        }
+
+        if (cell.Format.VerticalAlign != VerticalAlign.Top)
+        {
+            var verticalAlign = cell.Format.VerticalAlign switch
+            {
+                VerticalAlign.Middle => "center",
+                VerticalAlign.Bottom => "bottom",
+                _ => "top"
+            };
+            alignmentElement.Add(new XAttribute("vertical", verticalAlign));
+        }
+
+        return alignmentElement;
+    }
+
+    private static void AddCellValue(XElement cellElement, Cell cell, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    {
+        if (!string.IsNullOrEmpty(cell.Formula))
+        {
+            cellElement.Add(new XAttribute("t", "str"));
+            var formulaValue = cell.Formula.StartsWith("=") ? cell.Formula[1..] : cell.Formula;
+            cellElement.Add(new XElement(XName.Get("f", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), formulaValue));
+            cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), cell.GetValue()));
+        }
+        else
+        {
+            switch (cell.ValueType)
+            {
+                case CellValueType.Number:
+                    cellElement.Add(new XAttribute("t", "n"));
+                    cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), cell.GetValue()));
+                    break;
+
+                case CellValueType.String:
+                    var strValue = cell.GetValue() ?? string.Empty;
+                    if (!sharedStrings.TryGetValue(strValue, out var index))
+                    {
+                        index = sharedStrings.Count;
+                        sharedStrings[strValue] = index;
+                        var sstElement = sharedStringsDoc.Root!;
+                        sstElement.Add(new XElement(XName.Get("si", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                            new XElement(XName.Get("t", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), strValue)));
+                    }
+
+                    cellElement.Add(new XAttribute("t", "s"));
+                    cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), index));
+                    break;
+
+                case CellValueType.Error:
+                    cellElement.Add(new XAttribute("t", "e"));
+                    cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), cell.GetValue()));
+                    break;
+
+                case CellValueType.Empty:
+                    break;
+            }
+        }
+    }
+
+    private static void AddMergedCells(Sheet sheet, XDocument sheetDoc)
+    {
+        if (sheet.MergedCells.Ranges.Count > 0)
+        {
+            var mergeCells = new XElement(XName.Get("mergeCells", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("count", sheet.MergedCells.Ranges.Count));
+
+            foreach (var range in sheet.MergedCells.Ranges)
+            {
+                mergeCells.Add(new XElement(XName.Get("mergeCell", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("ref", range.ToString())));
+            }
+
+            sheetDoc.Root!.Add(mergeCells);
+        }
+    }
+
+    private static void AddAutoFilter(Sheet sheet, XDocument sheetDoc)
+    {
+        if (sheet.AutoFilter != null)
+        {
+            var uid = Guid.NewGuid().ToString("B").ToUpperInvariant();
+            var autoFilter = new XElement(XName.Get("autoFilter", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("ref", sheet.AutoFilter.Range.ToString()),
+                new XAttribute(XName.Get("uid", "http://schemas.microsoft.com/office/spreadsheetml/2014/revision"), uid));
+
+            // Process each filter and create filterColumn elements
+            foreach (var filter in sheet.Filters)
+            {
+                var filterColumn = CreateFilterColumn(filter, sheet.AutoFilter.Range);
+                if (filterColumn != null)
+                {
+                    autoFilter.Add(filterColumn);
+                }
+            }
+
+            sheetDoc.Root!.Add(autoFilter);
+        }
+    }
+
+    private static XElement? CreateFilterColumn(SheetFilter filter, RangeRef autoFilterRange)
+    {
+        if (filter.Criterion is FilterCriterionLeaf leaf)
+        {
+            var colId = leaf.Column - autoFilterRange.Start.Column;
+            if (colId >= 0 && colId <= autoFilterRange.End.Column - autoFilterRange.Start.Column)
+            {
+                return new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("colId", colId),
+                    SerializeFilterCriterion(filter.Criterion, colId));
+            }
+        }
+        else if (filter.Criterion is OrCriterion orCriterion)
+        {
+            var firstLeaf = orCriterion.Criteria.OfType<FilterCriterionLeaf>().FirstOrDefault();
+            if (firstLeaf != null)
+            {
+                var colId = firstLeaf.Column - autoFilterRange.Start.Column;
+                if (colId >= 0 && colId <= autoFilterRange.End.Column - autoFilterRange.Start.Column)
+                {
+                    return new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                        new XAttribute("colId", colId),
+                        SerializeFilterCriterion(filter.Criterion, colId));
+                }
+            }
+        }
+        else if (filter.Criterion is AndCriterion andCriterion)
+        {
+            var firstLeaf = andCriterion.Criteria.OfType<FilterCriterionLeaf>().FirstOrDefault();
+            if (firstLeaf != null)
+            {
+                var colId = firstLeaf.Column - autoFilterRange.Start.Column;
+                if (colId >= 0 && colId <= autoFilterRange.End.Column - autoFilterRange.Start.Column)
+                {
+                    return new XElement(XName.Get("filterColumn", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                        new XAttribute("colId", colId),
+                        SerializeFilterCriterion(filter.Criterion, colId));
+                }
+            }
+        }
+
+        return null;
+    }
+
     private static XElement SerializeFilterCriterion(FilterCriterion criterion, int columnIndex)
     {
         return criterion switch
         {
             OrCriterion orCriterion => new XElement(XName.Get("customFilters", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 orCriterion.Criteria.Select(c => SerializeCustomFilter(c))),
-            
+
             AndCriterion andCriterion => new XElement(XName.Get("customFilters", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 new XAttribute("and", "1"),
                 andCriterion.Criteria.Select(c => SerializeCustomFilter(c))),
-            
+
             InListCriterion inListCriterion => new XElement(XName.Get("filters", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 inListCriterion.Values.Select(v => new XElement(XName.Get("filter", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                     new XAttribute("val", v?.ToString() ?? "")))),
-            
+
             _ => new XElement(XName.Get("customFilters", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
                 SerializeCustomFilter(criterion))
         };
     }
 
-    /// <summary>
-    /// Serializes a single filter criterion to a customFilter element.
-    /// </summary>
     private static XElement SerializeCustomFilter(FilterCriterion criterion)
     {
         var (operatorName, value) = criterion switch
@@ -595,13 +749,10 @@ public class Workbook
             new XAttribute("val", value));
     }
 
-    /// <summary>
-    /// Deserializes a filter criterion from Excel autoFilter XML format.
-    /// </summary>
     private static FilterCriterion DeserializeFilterCriterion(XElement element, int columnIndex)
     {
         var ns = element.Name.Namespace;
-        
+
         if (element.Name.LocalName == "customFilters")
         {
             var customFilters = element.Elements(ns + "customFilter").ToList();
@@ -609,15 +760,15 @@ public class Workbook
             {
                 throw new NotSupportedException("No customFilter elements found in customFilters");
             }
-            
+
             if (customFilters.Count == 1)
             {
                 return DeserializeCustomFilter(customFilters[0], columnIndex);
             }
-            
+
             // Multiple filters - check if it's AND or OR logic
             var isAnd = element.Attribute("and")?.Value == "1";
-            
+
             if (isAnd)
             {
                 var criteria = customFilters.Select(f => DeserializeCustomFilter(f, columnIndex)).ToArray();
@@ -636,22 +787,19 @@ public class Workbook
             {
                 throw new NotSupportedException("No filter elements found in filters");
             }
-            
+
             var values = filters.Select(f => f.Attribute("val")?.Value).ToArray();
             return new InListCriterion { Column = columnIndex, Values = values };
         }
-        
+
         throw new NotSupportedException($"Filter element type {element.Name.LocalName} is not supported for deserialization.");
     }
 
-    /// <summary>
-    /// Deserializes a single customFilter element.
-    /// </summary>
     private static FilterCriterion DeserializeCustomFilter(XElement element, int columnIndex)
     {
         var operatorName = element.Attribute("operator")?.Value ?? "";
         var value = element.Attribute("val")?.Value ?? "";
-        
+
         return operatorName switch
         {
             "equal" => value == "" ? new IsNullCriterion { Column = columnIndex } : new EqualToCriterion { Column = columnIndex, Value = value },
@@ -1012,7 +1160,7 @@ public class Workbook
                 {
                     var range = RangeRef.Parse(refAttribute);
                     sheet.AutoFilter = new AutoFilter(sheet, range);
-                    
+
                     // Load filter columns
                     var filterColumns = autoFilterElement.Elements(sNs + "filterColumn").ToList();
                     foreach (var filterColumn in filterColumns)
@@ -1021,11 +1169,11 @@ public class Workbook
                         if (!string.IsNullOrEmpty(colIdAttribute) && int.TryParse(colIdAttribute, out var colId))
                         {
                             var actualColumn = range.Start.Column + colId;
-                            
+
                             // Find customFilters or filters element
                             var customFiltersElement = filterColumn.Element(sNs + "customFilters");
                             var filtersElement = filterColumn.Element(sNs + "filters");
-                            
+
                             if (customFiltersElement != null)
                             {
                                 var criterion = DeserializeFilterCriterion(customFiltersElement, actualColumn);
@@ -1049,5 +1197,40 @@ public class Workbook
         }
 
         return workbook;
+    }
+
+    private static void UpdateAndSaveSharedStrings(ZipArchive archive, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
+    {
+        var sstElement = sharedStringsDoc.Root!;
+        sstElement.Attribute("count")!.Value = sharedStrings.Count.ToString();
+        sstElement.Attribute("uniqueCount")!.Value = sharedStrings.Count.ToString();
+
+        using var entry = archive.CreateEntry("xl/sharedStrings.xml").Open();
+        sharedStringsDoc.Save(entry);
+    }
+
+    private void SaveWorkbook(ZipArchive archive)
+    {
+        var workbook = new XDocument(
+            new XElement(XName.Get("workbook", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XElement(XName.Get("sheets", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))));
+
+        var sheetsElement = workbook.Root!.Element(XName.Get("sheets", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"))!;
+
+        // Add sheet references
+        for (var i = 0; i < sheets.Count; i++)
+        {
+            var sheet = sheets[i];
+            var sheetId = i + 1;
+            var relId = $"rId{sheetId + 2}";
+
+            sheetsElement.Add(new XElement(XName.Get("sheet", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                new XAttribute("name", sheet.Name),
+                new XAttribute("sheetId", sheetId),
+                new XAttribute(XName.Get("id", "http://schemas.openxmlformats.org/officeDocument/2006/relationships"), relId)));
+        }
+
+        using var entry = archive.CreateEntry("xl/workbook.xml").Open();
+        workbook.Save(entry);
     }
 }
