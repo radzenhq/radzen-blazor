@@ -2070,6 +2070,7 @@ namespace Radzen.Blazor
                     c.SetOrderIndex(null);
                     c.SetWidth(null);
                     c.SetVisible(null);
+                    c.SetCustomFilterExpression(null);
                 });
                 selectedColumns = allColumns.Where(c => c.Pickable && c.GetVisible()).ToList();
                 sorts.Clear();
@@ -2180,7 +2181,8 @@ namespace Radzen.Blazor
                     FilterOperator = c.GetFilterOperator(),
                     SecondFilterValue = c.GetSecondFilterValue(),
                     SecondFilterOperator = c.GetSecondFilterOperator(),
-                    LogicalFilterOperator = c.GetLogicalFilterOperator()
+                    LogicalFilterOperator = c.GetLogicalFilterOperator(),
+                    Type = c.Type
                 })
                 .ToList();
 

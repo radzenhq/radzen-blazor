@@ -347,9 +347,9 @@ namespace Radzen
 
             ParameterExpression collectionItemTypeParameter = collectionItemType != null ? Expression.Parameter(collectionItemType, "x") : null;
 
-            if (collectionItemType != null && !string.IsNullOrEmpty(filter.FilterProperty) && filter.Property != filter.FilterProperty)
+            if (collectionItemType != null && filter.Property != filter.FilterProperty)
             {
-                property = GetNestedPropertyExpression(collectionItemTypeParameter, filter.FilterProperty);
+                property = !string.IsNullOrEmpty(filter.FilterProperty) ? GetNestedPropertyExpression(collectionItemTypeParameter, filter.FilterProperty) : collectionItemTypeParameter;
 
                 filter.FilterOperator = filter.FilterOperator == FilterOperator.In ? FilterOperator.Contains :
                     filter.FilterOperator == FilterOperator.NotIn ? FilterOperator.DoesNotContain : filter.FilterOperator;
@@ -540,6 +540,8 @@ namespace Radzen
                && c.GetFilterProperty() != null;
 
             var columnsToFilter = columns.Where(canFilter);
+            var columnsWithCustomFilter = columns.Where(canFilterCustom);
+
             var grid = columns.FirstOrDefault()?.Grid;
             var gridLogicalFilterOperator = grid != null ? grid.LogicalFilterOperator : LogicalFilterOperator.And;
             var gridFilterCaseSensitivity = grid != null ? grid.FilterCaseSensitivity : FilterCaseSensitivity.Default;
@@ -563,7 +565,7 @@ namespace Radzen
 
                 if (filters.Any())
                 {
-                    var parameter = Expression.Parameter(typeof(T), "x");
+                    var parameter = Expression.Parameter(typeof(T), columnsWithCustomFilter.Any() ? "it" : "x");
                     Expression combinedExpression = null;
 
                     foreach (var filter in filters)
@@ -585,8 +587,6 @@ namespace Radzen
                 }
 
             }
-
-            var columnsWithCustomFilter = columns.Where(canFilterCustom);
 
             var customFilterExpression = "";
 
