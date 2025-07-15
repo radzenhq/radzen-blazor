@@ -1,0 +1,238 @@
+@page "/sankey-demo"
+@using Radzen.Blazor
+@using System.Collections.Generic
+@inject DialogService DialogService
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Sankey Chart
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    Demonstration of the Radzen Blazor Sankey Chart component for visualizing flow and relationships.
+</RadzenText>
+
+<RadzenTabs>
+    <Tabs>
+        <RadzenTabsItem Text="Interactive Demo">
+            <RadzenCard class="rz-my-4">
+                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Interactive Sankey Chart with All Features</RadzenText>
+                
+                <RadzenRow AlignItems="AlignItems.Start" class="rz-pb-4">
+                    <RadzenColumn Size="12" SizeMD="3">
+                        <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Node Width</RadzenText>
+                        <RadzenNumeric @bind-Value="nodeWidth" Min="10" Max="50" Step="5" class="w-100" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="3">
+                        <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Node Padding</RadzenText>
+                        <RadzenNumeric @bind-Value="nodePadding" Min="0" Max="30" Step="2" class="w-100" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="3">
+                        <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Node Alignment</RadzenText>
+                        <RadzenDropDown @bind-Value="nodeAlignment" Data="@alignments" class="w-100" />
+                    </RadzenColumn>
+                    <RadzenColumn Size="12" SizeMD="3">
+                        <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Color Scheme</RadzenText>
+                        <RadzenDropDown @bind-Value="colorScheme" Data="@colorSchemes" class="w-100" />
+                    </RadzenColumn>
+                </RadzenRow>
+                
+                <RadzenSankeyChart Nodes="@nodes" Links="@links" Width="800" Height="400" 
+                                   NodeWidth="@nodeWidth" NodePadding="@nodePadding"
+                                   NodeAlignment="@nodeAlignment" ColorScheme="@colorScheme"
+                                   MarginLeft="60" MarginRight="60" MarginTop="10" MarginBottom="10"
+                                   Style="width: 100%; height: 400px;">
+                </RadzenSankeyChart>
+                
+            </RadzenCard>
+        </RadzenTabsItem>
+        
+        <RadzenTabsItem Text="How to Use">
+            <RadzenCard class="rz-my-4">
+                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">How to Use RadzenSankeyChart</RadzenText>
+                
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">1. Basic Usage</RadzenText>
+                <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
+&lt;RadzenSankeyChart Nodes="@@nodes" Links="@@links" Width="800" Height="400" 
+                   NodeWidth="24" NodePadding="8"
+                   MarginLeft="60" MarginRight="60" MarginTop="10" MarginBottom="10"
+                   Style="width: 100%; height: 400px;"&gt;
+&lt;/RadzenSankeyChart&gt;</pre>
+
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">2. Define Your Data</RadzenText>
+                <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
+@@code {
+    private List&lt;SankeyNode&gt; nodes = new List&lt;SankeyNode&gt;
+    {
+        new SankeyNode { Id = "A", Label = "Source A", Fill = "#3B82F6" },
+        new SankeyNode { Id = "B", Label = "Source B", Fill = "#10B981" },
+        new SankeyNode { Id = "C", Label = "Process 1", Fill = "#F59E0B" },
+        new SankeyNode { Id = "D", Label = "Process 2", Fill = "#EF4444" },
+        new SankeyNode { Id = "E", Label = "Target X", Fill = "#8B5CF6" },
+        new SankeyNode { Id = "F", Label = "Target Y", Fill = "#EC4899" },
+        new SankeyNode { Id = "G", Label = "Target Z", Fill = "#6366F1" }
+    };
+
+    private List&lt;SankeyLink&gt; links = new List&lt;SankeyLink&gt;
+    {
+        new SankeyLink { Source = "A", Target = "C", Value = 10 },
+        new SankeyLink { Source = "A", Target = "D", Value = 15 },
+        new SankeyLink { Source = "B", Target = "C", Value = 20 },
+        new SankeyLink { Source = "B", Target = "D", Value = 25 },
+        new SankeyLink { Source = "C", Target = "E", Value = 15 },
+        new SankeyLink { Source = "C", Target = "F", Value = 10 },
+        new SankeyLink { Source = "C", Target = "G", Value = 5 },
+        new SankeyLink { Source = "D", Target = "E", Value = 20 },
+        new SankeyLink { Source = "D", Target = "F", Value = 15 },
+        new SankeyLink { Source = "D", Target = "G", Value = 5 }
+    };
+}</pre>
+
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">3. Available Properties</RadzenText>
+                <RadzenDataGrid Data="@propertyInfo" TItem="PropertyInfo" AllowFiltering="false" AllowPaging="false" AllowSorting="false">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Name" Title="Property" Width="150px" />
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Type" Title="Type" Width="150px" />
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Default" Title="Default" Width="100px" />
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Description" Title="Description" />
+                    </Columns>
+                </RadzenDataGrid>
+
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">4. Node Properties</RadzenText>
+                <RadzenDataGrid Data="@nodePropertyInfo" TItem="PropertyInfo" AllowFiltering="false" AllowPaging="false" AllowSorting="false">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Name" Title="Property" Width="150px" />
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Type" Title="Type" Width="150px" />
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Description" Title="Description" />
+                    </Columns>
+                </RadzenDataGrid>
+
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">5. Link Properties</RadzenText>
+                <RadzenDataGrid Data="@linkPropertyInfo" TItem="PropertyInfo" AllowFiltering="false" AllowPaging="false" AllowSorting="false">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Name" Title="Property" Width="150px" />
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Type" Title="Type" Width="150px" />
+                        <RadzenDataGridColumn TItem="PropertyInfo" Property="Description" Title="Description" />
+                    </Columns>
+                </RadzenDataGrid>
+
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">6. Node Alignment Options</RadzenText>
+                <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
+// Available values for NodeAlignment:
+SankeyAlignment.Justify  // Nodes fill the width (default)
+SankeyAlignment.Left     // Nodes align to the left
+SankeyAlignment.Right    // Nodes align to the right
+SankeyAlignment.Center   // Nodes center in each column</pre>
+
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">7. Color Schemes</RadzenText>
+                <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
+// Use ColorScheme property for automatic colors
+&lt;RadzenSankeyChart ColorScheme="ColorScheme.Pastel" ... /&gt;
+
+// Option 1: Automatic colors (omit Fill property)
+private List&lt;SankeyNode&gt; nodes = new List&lt;SankeyNode&gt;
+{
+    new SankeyNode { Id = "A", Label = "Source A" }, // Uses color scheme
+    new SankeyNode { Id = "B", Label = "Source B" }, // Uses color scheme
+    new SankeyNode { Id = "C", Label = "Target" }    // Uses color scheme
+};
+
+// Option 2: Mix automatic and explicit colors
+private List&lt;SankeyNode&gt; nodes = new List&lt;SankeyNode&gt;
+{
+    new SankeyNode { Id = "A", Label = "Source A" },              // Uses color scheme
+    new SankeyNode { Id = "B", Label = "Source B", Fill = "#FF0000" }, // Explicit red
+    new SankeyNode { Id = "C", Label = "Target" }                 // Uses color scheme
+};</pre>
+
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">10. Tips</RadzenText>
+                <ul class="rz-pl-4">
+                    <li class="rz-mb-2">• Each node must have a unique Id</li>
+                    <li class="rz-mb-2">• Link Source and Target must match node Ids</li>
+                    <li class="rz-mb-2">• Links automatically inherit color from their source node</li>
+                    <li class="rz-mb-2">• Use NodePadding to control vertical spacing between nodes</li>
+                    <li class="rz-mb-2">• Use NodeWidth to control the width of node rectangles</li>
+                    <li class="rz-mb-2">• The component automatically handles overflow with proper margins</li>
+                    <li class="rz-mb-2">• Use ColorScheme for automatic theming</li>
+                    <li class="rz-mb-2">• Add tooltips for better user experience</li>
+                </ul>
+            </RadzenCard>
+        </RadzenTabsItem>
+    </Tabs>
+</RadzenTabs>
+
+@code {
+    // Configuration variables
+    private double nodeWidth = 24;
+    private double nodePadding = 8;
+    private SankeyAlignment nodeAlignment = SankeyAlignment.Justify;
+    private ColorScheme colorScheme = ColorScheme.Pastel;
+    
+    private IEnumerable<SankeyAlignment> alignments = Enum.GetValues<SankeyAlignment>();
+    private IEnumerable<ColorScheme> colorSchemes = Enum.GetValues<ColorScheme>();
+    
+    
+    // Property documentation
+    private class PropertyInfo
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Default { get; set; }
+        public string Description { get; set; }
+    }
+
+    private List<PropertyInfo> propertyInfo = new List<PropertyInfo>
+    {
+        new PropertyInfo { Name = "Nodes", Type = "List<SankeyNode>", Default = "null", Description = "The collection of nodes to display" },
+        new PropertyInfo { Name = "Links", Type = "List<SankeyLink>", Default = "null", Description = "The collection of links between nodes" },
+        new PropertyInfo { Name = "Width", Type = "double", Default = "800", Description = "The width of the chart" },
+        new PropertyInfo { Name = "Height", Type = "double", Default = "400", Description = "The height of the chart" },
+        new PropertyInfo { Name = "NodeWidth", Type = "double", Default = "24", Description = "The width of node rectangles" },
+        new PropertyInfo { Name = "NodePadding", Type = "double", Default = "8", Description = "The vertical padding between nodes" },
+        new PropertyInfo { Name = "NodeAlignment", Type = "SankeyAlignment", Default = "Justify", Description = "How nodes are aligned horizontally" },
+        new PropertyInfo { Name = "ColorScheme", Type = "ColorScheme", Default = "Pastel", Description = "The color scheme for automatic coloring" },
+        new PropertyInfo { Name = "Style", Type = "string", Default = "null", Description = "Custom CSS styles for the component" }
+    };
+
+    private List<PropertyInfo> nodePropertyInfo = new List<PropertyInfo>
+    {
+        new PropertyInfo { Name = "Id", Type = "string", Default = "", Description = "Unique identifier for the node (required)" },
+        new PropertyInfo { Name = "Label", Type = "string", Default = "", Description = "Display text for the node" },
+        new PropertyInfo { Name = "Fill", Type = "string", Default = "null", Description = "Fill color (omit for automatic coloring)" },
+        new PropertyInfo { Name = "Stroke", Type = "string", Default = "null", Description = "Stroke color for the node" },
+        new PropertyInfo { Name = "Value", Type = "double?", Default = "null", Description = "Optional fixed value for the node" }
+    };
+
+    private List<PropertyInfo> linkPropertyInfo = new List<PropertyInfo>
+    {
+        new PropertyInfo { Name = "Source", Type = "string", Default = "", Description = "Id of the source node (required)" },
+        new PropertyInfo { Name = "Target", Type = "string", Default = "", Description = "Id of the target node (required)" },
+        new PropertyInfo { Name = "Value", Type = "double", Default = "", Description = "The flow value for this link (required)" },
+        new PropertyInfo { Name = "Fill", Type = "string", Default = "null", Description = "Optional custom fill color (defaults to source node color)" }
+    };
+
+    // Basic example data - no explicit fills to demonstrate color scheme
+    private List<SankeyNode> nodes = new List<SankeyNode>
+    {
+        new SankeyNode { Id = "A", Label = "Source A" },
+        new SankeyNode { Id = "B", Label = "Source B" },
+        new SankeyNode { Id = "C", Label = "Process 1" },
+        new SankeyNode { Id = "D", Label = "Process 2" },
+        new SankeyNode { Id = "E", Label = "Target X" },
+        new SankeyNode { Id = "F", Label = "Target Y" },
+        new SankeyNode { Id = "G", Label = "Target Z" }
+    };
+
+    private List<SankeyLink> links = new List<SankeyLink>
+    {
+        new SankeyLink { Source = "A", Target = "C", Value = 10 },
+        new SankeyLink { Source = "A", Target = "D", Value = 15 },
+        new SankeyLink { Source = "B", Target = "C", Value = 20 },
+        new SankeyLink { Source = "B", Target = "D", Value = 25 },
+        new SankeyLink { Source = "C", Target = "E", Value = 15 },
+        new SankeyLink { Source = "C", Target = "F", Value = 10 },
+        new SankeyLink { Source = "C", Target = "G", Value = 5 },
+        new SankeyLink { Source = "D", Target = "E", Value = 20 },
+        new SankeyLink { Source = "D", Target = "F", Value = 15 },
+        new SankeyLink { Source = "D", Target = "G", Value = 5 }
+    };
+}

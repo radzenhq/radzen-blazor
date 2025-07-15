@@ -1,0 +1,171 @@
+// Variables
+$sankey-node-stroke: var(--rz-base-400) !default;
+$sankey-node-stroke-width: 1px !default;
+$sankey-link-opacity: 0.5 !default;
+$sankey-link-hover-opacity: 0.7 !default;
+$sankey-label-font-size: var(--rz-body-font-size) !default;
+$sankey-label-color: var(--rz-text-secondary-color) !default;
+
+// Component styles
+.rz-sankey-chart {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--rz-border-radius);
+    
+    svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .rz-sankey-link {
+        cursor: pointer;
+        opacity: $sankey-link-opacity;
+        transition: opacity 0.2s;
+        
+        &:hover {
+            opacity: $sankey-link-hover-opacity;
+        }
+    }
+    
+    .rz-sankey-node {
+        cursor: pointer;
+        
+        rect {
+            stroke: $sankey-node-stroke;
+            stroke-width: $sankey-node-stroke-width;
+            transition: opacity 0.2s, stroke-width 0.2s;
+        }
+        
+        &:hover rect {
+            opacity: 0.9;
+            stroke-width: 2px;
+        }
+    }
+    
+    // Ensure text uses theme colors
+    text {
+        fill: $sankey-label-color;
+    }
+    
+    .rz-sankey-node-label {
+        font-size: $sankey-label-font-size;
+        fill: $sankey-label-color;
+        font-weight: normal;
+        pointer-events: none;
+        user-select: none;
+    }
+    
+    // Color scheme support - Pastel (default)
+    &.rz-scheme-pastel {
+        @for $i from 0 through 23 {
+            .rz-series-item-#{$i} {
+                rect {
+                    fill: var(--rz-series-#{$i + 1});
+                }
+                
+                &.rz-sankey-link {
+                    fill: var(--rz-series-#{$i + 1});
+                    opacity: $sankey-link-opacity;
+                }
+            }
+        }
+    }
+    
+    // Palette color scheme
+    &.rz-scheme-palette {
+        $palette-colors: #003f5c, #2f4b7c, #665191, #a05195, #d45087, #f95d6a, #ff7c43, #ffa600;
+        
+        @for $i from 0 through 7 {
+            .rz-series-item-#{$i} {
+                rect {
+                    fill: nth($palette-colors, $i + 1);
+                }
+                
+                &.rz-sankey-link {
+                    fill: nth($palette-colors, $i + 1);
+                    opacity: $sankey-link-opacity;
+                }
+            }
+        }
+        
+        // Repeat colors for items beyond 8
+        @for $i from 8 through 23 {
+            .rz-series-item-#{$i} {
+                rect {
+                    fill: nth($palette-colors, ($i % 8) + 1);
+                }
+                
+                &.rz-sankey-link {
+                    fill: nth($palette-colors, ($i % 8) + 1);
+                    opacity: $sankey-link-opacity;
+                }
+            }
+        }
+    }
+    
+    // Monochrome color scheme
+    &.rz-scheme-monochrome {
+        $mono-colors: #004c6d, #255e7e, #3d708f, #5383a1, #6996b3, #7faac6, #94bed9, #abd2ec, #c1e7ff;
+        
+        @for $i from 0 through 8 {
+            .rz-series-item-#{$i} {
+                rect {
+                    fill: nth($mono-colors, $i + 1);
+                }
+                
+                &.rz-sankey-link {
+                    fill: nth($mono-colors, $i + 1);
+                    opacity: $sankey-link-opacity;
+                }
+            }
+        }
+        
+        // Repeat colors for items beyond 9
+        @for $i from 9 through 23 {
+            .rz-series-item-#{$i} {
+                rect {
+                    fill: nth($mono-colors, ($i % 9) + 1);
+                }
+                
+                &.rz-sankey-link {
+                    fill: nth($mono-colors, ($i % 9) + 1);
+                    opacity: $sankey-link-opacity;
+                }
+            }
+        }
+    }
+    
+    // Divergent color scheme
+    &.rz-scheme-divergent {
+        $divergent-colors: #00876c, #469f76, #70b77e, #98ce86, #c1e48e, #eaf898, #ffffad, #fed693, #fcaa78, #f77b5f, #ed4a46, #d92632, #c31e28, #aa1620, #8b0e1a;
+        
+        @for $i from 0 through 14 {
+            .rz-series-item-#{$i} {
+                rect {
+                    fill: nth($divergent-colors, $i + 1);
+                }
+                
+                &.rz-sankey-link {
+                    fill: nth($divergent-colors, $i + 1);
+                    opacity: $sankey-link-opacity;
+                }
+            }
+        }
+        
+        // Repeat colors for items beyond 15
+        @for $i from 15 through 23 {
+            .rz-series-item-#{$i} {
+                rect {
+                    fill: nth($divergent-colors, ($i % 15) + 1);
+                }
+                
+                &.rz-sankey-link {
+                    fill: nth($divergent-colors, ($i % 15) + 1);
+                    opacity: $sankey-link-opacity;
+                }
+            }
+        }
+    }
+}

@@ -1832,6 +1832,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "Sankey Chart",
+                            Path = "sankey-demo",
+                            Description = "Radzen Blazor Sankey Chart for visualizing flow and relationships between nodes.",
+                            Tags = new [] { "chart", "graph", "sankey", "flow", "diagram" },
+                            New = true
+                        },
+                        new Example
+                        {
                             Name = "Stacked Area Chart",
                             Path = "stacked-area-chart",
                             Description = "Radzen Blazor Chart with stacked area series.",

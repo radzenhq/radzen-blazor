@@ -1,0 +1,45 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2">
+        Basic Sankey Chart
+    </RadzenText>
+    <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4">
+        A simple example showing flow from sources through processes to targets.
+    </RadzenText>
+
+    <RadzenCard class="w-100">
+        <RadzenSankeyChart Nodes="@nodes" Links="@links" Width="800" Height="400" 
+                           NodeWidth="24" NodePadding="8"
+                           MarginLeft="10" MarginRight="10" MarginTop="10" MarginBottom="10">
+        </RadzenSankeyChart>
+    </RadzenCard>
+</RadzenStack>
+
+@code {
+    private List<SankeyNode> nodes = new List<SankeyNode>
+    {
+        new SankeyNode { Id = "A", Label = "Source A", Fill = "#3B82F6" },
+        new SankeyNode { Id = "B", Label = "Source B", Fill = "#10B981" },
+        new SankeyNode { Id = "C", Label = "Process 1", Fill = "#F59E0B" },
+        new SankeyNode { Id = "D", Label = "Process 2", Fill = "#EF4444" },
+        new SankeyNode { Id = "E", Label = "Target X", Fill = "#8B5CF6" },
+        new SankeyNode { Id = "F", Label = "Target Y", Fill = "#EC4899" },
+        new SankeyNode { Id = "G", Label = "Target Z", Fill = "#6366F1" }
+    };
+
+    private List<SankeyLink> links = new List<SankeyLink>
+    {
+        new SankeyLink { Source = "A", Target = "C", Value = 10, Fill = "#3B82F680" },
+        new SankeyLink { Source = "A", Target = "D", Value = 15, Fill = "#3B82F680" },
+        new SankeyLink { Source = "B", Target = "C", Value = 20, Fill = "#10B98180" },
+        new SankeyLink { Source = "B", Target = "D", Value = 25, Fill = "#10B98180" },
+        new SankeyLink { Source = "C", Target = "E", Value = 15, Fill = "#F59E0B80" },
+        new SankeyLink { Source = "C", Target = "F", Value = 10, Fill = "#F59E0B80" },
+        new SankeyLink { Source = "C", Target = "G", Value = 5, Fill = "#F59E0B80" },
+        new SankeyLink { Source = "D", Target = "E", Value = 20, Fill = "#EF444480" },
+        new SankeyLink { Source = "D", Target = "F", Value = 15, Fill = "#EF444480" },
+        new SankeyLink { Source = "D", Target = "G", Value = 5, Fill = "#EF444480" }
+    };
+}
