@@ -3,19 +3,17 @@
 @using Radzen.Blazor.Rendering
 @using System.Linq
 
+@typeparam TNode
+@typeparam TLink
 @inherits RadzenComponent
+
 @if (Visible)
 {
-    <CascadingValue Value="@this">
-        @ChildContent
-    </CascadingValue>
     <div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
-        @if (ActualWidth > 0 && ActualHeight > 0)
+        @if (Width.HasValue && Height.HasValue && ComputedNodes != null && ComputedLinks != null)
         {
             <svg style="width: 100%; height: 100%; overflow: visible;">
                 <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
-                    @if (ComputedNodes != null && ComputedLinks != null)
-                    {
                         @foreach (var link in ComputedLinks)
                         {
                             var linkClass = "rz-sankey-link";
@@ -86,175 +84,8 @@
                                 }
                             </g>
                         }
-                    }
                 </g>
             </svg>
         }
     </div>
-}
-
-@code {
-    /// <summary>
-    /// Gets or sets the child content of the component.
-    /// </summary>
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
-
-    /// <summary>
-    /// Gets or sets the data nodes.
-    /// </summary>
-    [Parameter]
-    public IEnumerable<SankeyNode> Nodes { get; set; }
-
-    /// <summary>
-    /// Gets or sets the data links.
-    /// </summary>
-    [Parameter]
-    public IEnumerable<SankeyLink> Links { get; set; }
-
-    /// <summary>
-    /// Gets or sets the width.
-    /// </summary>
-    [Parameter]
-    public double Width { get; set; } = 800;
-
-    /// <summary>
-    /// Gets or sets the height.
-    /// </summary>
-    [Parameter]
-    public double Height { get; set; } = 400;
-
-    /// <summary>
-    /// Gets or sets the left margin.
-    /// </summary>
-    [Parameter]
-    public double MarginLeft { get; set; } = 60;
-
-    /// <summary>
-    /// Gets or sets the top margin.
-    /// </summary>
-    [Parameter]
-    public double MarginTop { get; set; } = 10;
-
-    /// <summary>
-    /// Gets or sets the right margin.
-    /// </summary>
-    [Parameter]
-    public double MarginRight { get; set; } = 60;
-
-    /// <summary>
-    /// Gets or sets the bottom margin.
-    /// </summary>
-    [Parameter]
-    public double MarginBottom { get; set; } = 10;
-
-    /// <summary>
-    /// Gets or sets the node width.
-    /// </summary>
-    [Parameter]
-    public double NodeWidth { get; set; } = 24;
-
-    /// <summary>
-    /// Gets or sets the node padding.
-    /// </summary>
-    [Parameter]
-    public double NodePadding { get; set; } = 8;
-
-    /// <summary>
-    /// Gets or sets the node alignment.
-    /// </summary>
-    [Parameter]
-    public SankeyAlignment NodeAlignment { get; set; } = SankeyAlignment.Justify;
-
-    /// <summary>
-    /// Gets or sets the node sort function.
-    /// </summary>
-    [Parameter]
-    public Func<SankeyNode, SankeyNode, int> NodeSort { get; set; }
-
-    /// <summary>
-    /// Gets or sets the link sort function.
-    /// </summary>
-    [Parameter]
-    public Func<SankeyLink, SankeyLink, int> LinkSort { get; set; }
-
-    /// <summary>
-    /// Gets the computed nodes with layout.
-    /// </summary>
-    public IList<ComputedSankeyNode> ComputedNodes { get; private set; }
-
-    /// <summary>
-    /// Gets the computed links with paths.
-    /// </summary>
-    public IList<ComputedSankeyLink> ComputedLinks { get; private set; }
-
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-        ComputeLayout();
-    }
-
-    protected override void OnInitialized()
-    {
-        base.OnInitialized();
-        // Ensure visibility
-        Visible = true;
-    }
-
-    private string layoutError = "";
-    
-    private void ComputeLayout()
-    {
-        layoutError = "";
-        
-        if (Nodes == null || Links == null || ActualWidth <= 0 || ActualHeight <= 0)
-        {
-            ComputedNodes = null;
-            ComputedLinks = null;
-            return;
-        }
-
-        try
-        {
-            var layoutWidth = ActualWidth - MarginLeft - MarginRight;
-            var layoutHeight = ActualHeight - MarginTop - MarginBottom;
-            
-            // Ensure positive dimensions
-            layoutWidth = Math.Max(100, layoutWidth);
-            layoutHeight = Math.Max(100, layoutHeight);
-            
-            var layout = new SankeyLayout
-            {
-                Width = layoutWidth,
-                Height = layoutHeight,
-                NodeWidth = NodeWidth,
-                NodePadding = NodePadding,
-                NodeAlignment = NodeAlignment,
-                NodeSort = NodeSort,
-                LinkSort = LinkSort
-            };
-
-            (ComputedNodes, ComputedLinks) = layout.Compute(Nodes, Links);
-            
-            // Assign color indexes to nodes without explicit fill colors
-            if (ComputedNodes != null)
-            {
-                var colorIndex = 0;
-                foreach (var node in ComputedNodes)
-                {
-                    if (string.IsNullOrEmpty(node.Fill))
-                    {
-                        node.ColorIndex = colorIndex++;
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            layoutError = ex.Message;
-            ComputedNodes = null;
-            ComputedLinks = null;
-        }
-    }
 }

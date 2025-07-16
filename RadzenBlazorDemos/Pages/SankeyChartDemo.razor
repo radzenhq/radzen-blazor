@@ -36,13 +36,79 @@
                     </RadzenColumn>
                 </RadzenRow>
                 
-                <RadzenSankeyChart Nodes="@nodes" Links="@links" Width="800" Height="400" 
+                <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                                   Nodes="@nodes" Links="@links" 
                                    NodeWidth="@nodeWidth" NodePadding="@nodePadding"
                                    NodeAlignment="@nodeAlignment" ColorScheme="@colorScheme"
                                    MarginLeft="60" MarginRight="60" MarginTop="10" MarginBottom="10"
                                    Style="width: 100%; height: 400px;">
                 </RadzenSankeyChart>
                 
+            </RadzenCard>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Energy Flow">
+            <RadzenCard class="rz-my-4">
+                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Energy Flow Example</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">This example shows energy flow from sources through conversions to final usage.</RadzenText>
+                
+                <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                                   Nodes="@energyNodes" Links="@energyLinks" 
+                                   Style="width: 100%; height: 500px"
+                                   NodeWidth="30" NodePadding="10"
+                                   NodeAlignment="SankeyAlignment.Justify"
+                                   MarginLeft="20" MarginRight="20" MarginTop="20" MarginBottom="20">
+                </RadzenSankeyChart>
+            </RadzenCard>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Budget Flow">
+            <RadzenCard class="rz-my-4">
+                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Budget Flow Example</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">Visualize how budget flows from income sources to various expenses.</RadzenText>
+                
+                <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                                   Nodes="@budgetNodes" Links="@budgetLinks" 
+                                   Style="width: 100%; height: 500px"
+                                   NodeWidth="20" NodePadding="15"
+                                   NodeAlignment="SankeyAlignment.Left"
+                                   MarginLeft="20" MarginRight="20" MarginTop="20" MarginBottom="20">
+                </RadzenSankeyChart>
+            </RadzenCard>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Multi-Level">
+            <RadzenCard class="rz-my-4">
+                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Multi-Level Sankey Chart</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">This example demonstrates a Sankey chart with multiple levels (5 layers) showing a complex flow.</RadzenText>
+                
+                <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                                   Nodes="@multiLevelNodes" Links="@multiLevelLinks" 
+                                   Style="width: 100%; height: 500px"
+                                   NodeWidth="24" NodePadding="8"
+                                   NodeAlignment="SankeyAlignment.Justify"
+                                   MarginLeft="80" MarginRight="80" MarginTop="20" MarginBottom="20">
+                </RadzenSankeyChart>
+            </RadzenCard>
+        </RadzenTabsItem>
+
+        <RadzenTabsItem Text="Generic Data">
+            <RadzenCard class="rz-my-4">
+                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Using Custom Data Types</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">This example demonstrates using the generic RadzenSankeyChart with custom data models.</RadzenText>
+                
+                <RadzenSankeyChart TNode="Department" TLink="Budget" 
+                                   Nodes="@departments" 
+                                   Links="@departmentBudgets"
+                                   NodeIdProperty="@nameof(Department.Code)"
+                                   NodeLabelProperty="@nameof(Department.Name)"
+                                   LinkSourceProperty="@nameof(Budget.From)"
+                                   LinkTargetProperty="@nameof(Budget.To)"
+                                   LinkValueProperty="@nameof(Budget.Amount)"
+                                   ColorScheme="ColorScheme.Palette"
+                                   Style="width: 100%; height: 400px"
+                                   NodeWidth="30" NodePadding="10">
+                </RadzenSankeyChart>
             </RadzenCard>
         </RadzenTabsItem>
         
@@ -52,7 +118,8 @@
                 
                 <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">1. Basic Usage</RadzenText>
                 <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
-&lt;RadzenSankeyChart Nodes="@@nodes" Links="@@links" Width="800" Height="400" 
+&lt;RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                   Nodes="@@nodes" Links="@@links" 
                    NodeWidth="24" NodePadding="8"
                    MarginLeft="60" MarginRight="60" MarginTop="10" MarginBottom="10"
                    Style="width: 100%; height: 400px;"&gt;
@@ -144,7 +211,35 @@ private List&lt;SankeyNode&gt; nodes = new List&lt;SankeyNode&gt;
     new SankeyNode { Id = "C", Label = "Target" }                 // Uses color scheme
 };</pre>
 
-                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">10. Tips</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">8. Using Custom Data Types</RadzenText>
+                <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
+// Define your custom types
+public class Department
+{
+    public string Code { get; set; }
+    public string Name { get; set; }
+}
+
+public class Budget
+{
+    public string From { get; set; }
+    public string To { get; set; }
+    public double Amount { get; set; }
+}
+
+// Use the generic component with property selectors
+&lt;RadzenSankeyChart TNode="Department" TLink="Budget" 
+                   Nodes="@@departments" 
+                   Links="@@budgets"
+                   NodeIdProperty="@@nameof(Department.Code)"
+                   NodeLabelProperty="@@nameof(Department.Name)"
+                   LinkSourceProperty="@@nameof(Budget.From)"
+                   LinkTargetProperty="@@nameof(Budget.To)"
+                   LinkValueProperty="@@nameof(Budget.Amount)"
+                   Style="width: 100%; height: 400px"&gt;
+&lt;/RadzenSankeyChart&gt;</pre>
+
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">9. Tips</RadzenText>
                 <ul class="rz-pl-4">
                     <li class="rz-mb-2">• Each node must have a unique Id</li>
                     <li class="rz-mb-2">• Link Source and Target must match node Ids</li>
@@ -182,15 +277,22 @@ private List&lt;SankeyNode&gt; nodes = new List&lt;SankeyNode&gt;
 
     private List<PropertyInfo> propertyInfo = new List<PropertyInfo>
     {
-        new PropertyInfo { Name = "Nodes", Type = "List<SankeyNode>", Default = "null", Description = "The collection of nodes to display" },
-        new PropertyInfo { Name = "Links", Type = "List<SankeyLink>", Default = "null", Description = "The collection of links between nodes" },
-        new PropertyInfo { Name = "Width", Type = "double", Default = "800", Description = "The width of the chart" },
-        new PropertyInfo { Name = "Height", Type = "double", Default = "400", Description = "The height of the chart" },
+        new PropertyInfo { Name = "Nodes", Type = "IEnumerable<TNode>", Default = "null", Description = "The collection of nodes to display" },
+        new PropertyInfo { Name = "Links", Type = "IEnumerable<TLink>", Default = "null", Description = "The collection of links between nodes" },
+        new PropertyInfo { Name = "Style", Type = "string", Default = "null", Description = "CSS style for sizing (e.g., 'width: 100%; height: 400px')" },
         new PropertyInfo { Name = "NodeWidth", Type = "double", Default = "24", Description = "The width of node rectangles" },
         new PropertyInfo { Name = "NodePadding", Type = "double", Default = "8", Description = "The vertical padding between nodes" },
         new PropertyInfo { Name = "NodeAlignment", Type = "SankeyAlignment", Default = "Justify", Description = "How nodes are aligned horizontally" },
         new PropertyInfo { Name = "ColorScheme", Type = "ColorScheme", Default = "Pastel", Description = "The color scheme for automatic coloring" },
-        new PropertyInfo { Name = "Style", Type = "string", Default = "null", Description = "Custom CSS styles for the component" }
+        new PropertyInfo { Name = "NodeIdProperty", Type = "string", Default = "null", Description = "Property name for node ID" },
+        new PropertyInfo { Name = "NodeLabelProperty", Type = "string", Default = "null", Description = "Property name for node label" },
+        new PropertyInfo { Name = "NodeFillProperty", Type = "string", Default = "null", Description = "Property name for node fill color" },
+        new PropertyInfo { Name = "NodeStrokeProperty", Type = "string", Default = "null", Description = "Property name for node stroke color" },
+        new PropertyInfo { Name = "NodeValueProperty", Type = "string", Default = "null", Description = "Property name for node value" },
+        new PropertyInfo { Name = "LinkSourceProperty", Type = "string", Default = "null", Description = "Property name for link source ID" },
+        new PropertyInfo { Name = "LinkTargetProperty", Type = "string", Default = "null", Description = "Property name for link target ID" },
+        new PropertyInfo { Name = "LinkValueProperty", Type = "string", Default = "null", Description = "Property name for link value" },
+        new PropertyInfo { Name = "LinkFillProperty", Type = "string", Default = "null", Description = "Property name for link fill color" }
     };
 
     private List<PropertyInfo> nodePropertyInfo = new List<PropertyInfo>
@@ -234,5 +336,212 @@ private List&lt;SankeyNode&gt; nodes = new List&lt;SankeyNode&gt;
         new SankeyLink { Source = "D", Target = "E", Value = 20 },
         new SankeyLink { Source = "D", Target = "F", Value = 15 },
         new SankeyLink { Source = "D", Target = "G", Value = 5 }
+    };
+
+    // Energy flow example data
+    private List<SankeyNode> energyNodes = new List<SankeyNode>
+    {
+        // Sources
+        new SankeyNode { Id = "coal", Label = "Coal", Fill = "#525252" },
+        new SankeyNode { Id = "gas", Label = "Natural Gas", Fill = "#3B82F6" },
+        new SankeyNode { Id = "nuclear", Label = "Nuclear", Fill = "#10B981" },
+        new SankeyNode { Id = "renewable", Label = "Renewable", Fill = "#06B6D4" },
+        
+        // Conversion
+        new SankeyNode { Id = "electricity", Label = "Electricity", Fill = "#F59E0B" },
+        new SankeyNode { Id = "heat", Label = "Heat", Fill = "#EF4444" },
+        
+        // End use
+        new SankeyNode { Id = "residential", Label = "Residential", Fill = "#8B5CF6" },
+        new SankeyNode { Id = "commercial", Label = "Commercial", Fill = "#EC4899" },
+        new SankeyNode { Id = "industrial", Label = "Industrial", Fill = "#6366F1" },
+        new SankeyNode { Id = "transport", Label = "Transport", Fill = "#14B8A6" },
+        new SankeyNode { Id = "losses", Label = "Losses", Fill = "#9CA3AF" }
+    };
+
+    private List<SankeyLink> energyLinks = new List<SankeyLink>
+    {
+        // Sources to conversion
+        new SankeyLink { Source = "coal", Target = "electricity", Value = 45 },
+        new SankeyLink { Source = "coal", Target = "heat", Value = 15 },
+        new SankeyLink { Source = "gas", Target = "electricity", Value = 30 },
+        new SankeyLink { Source = "gas", Target = "heat", Value = 25 },
+        new SankeyLink { Source = "nuclear", Target = "electricity", Value = 35 },
+        new SankeyLink { Source = "renewable", Target = "electricity", Value = 25 },
+        
+        // Conversion to end use
+        new SankeyLink { Source = "electricity", Target = "residential", Value = 40 },
+        new SankeyLink { Source = "electricity", Target = "commercial", Value = 35 },
+        new SankeyLink { Source = "electricity", Target = "industrial", Value = 45 },
+        new SankeyLink { Source = "electricity", Target = "losses", Value = 15 },
+        new SankeyLink { Source = "heat", Target = "residential", Value = 20 },
+        new SankeyLink { Source = "heat", Target = "commercial", Value = 10 },
+        new SankeyLink { Source = "heat", Target = "industrial", Value = 5 },
+        new SankeyLink { Source = "heat", Target = "losses", Value = 5 },
+        
+        // Direct use
+        new SankeyLink { Source = "gas", Target = "transport", Value = 20 },
+        new SankeyLink { Source = "renewable", Target = "transport", Value = 5 }
+    };
+
+    // Budget flow example data
+    private List<SankeyNode> budgetNodes = new List<SankeyNode>
+    {
+        // Income
+        new SankeyNode { Id = "salary", Label = "Salary", Fill = "#10B981" },
+        new SankeyNode { Id = "investment", Label = "Investments", Fill = "#06B6D4" },
+        new SankeyNode { Id = "other", Label = "Other Income", Fill = "#3B82F6" },
+        
+        // Categories
+        new SankeyNode { Id = "housing", Label = "Housing", Fill = "#F59E0B" },
+        new SankeyNode { Id = "food", Label = "Food", Fill = "#EF4444" },
+        new SankeyNode { Id = "transport_exp", Label = "Transportation", Fill = "#8B5CF6" },
+        new SankeyNode { Id = "utilities", Label = "Utilities", Fill = "#EC4899" },
+        new SankeyNode { Id = "entertainment", Label = "Entertainment", Fill = "#6366F1" },
+        new SankeyNode { Id = "savings", Label = "Savings", Fill = "#10B981" },
+        new SankeyNode { Id = "healthcare", Label = "Healthcare", Fill = "#14B8A6" }
+    };
+
+    private List<SankeyLink> budgetLinks = new List<SankeyLink>
+    {
+        // Income to expenses
+        new SankeyLink { Source = "salary", Target = "housing", Value = 2000 },
+        new SankeyLink { Source = "salary", Target = "food", Value = 800 },
+        new SankeyLink { Source = "salary", Target = "transport_exp", Value = 500 },
+        new SankeyLink { Source = "salary", Target = "utilities", Value = 300 },
+        new SankeyLink { Source = "salary", Target = "entertainment", Value = 200 },
+        new SankeyLink { Source = "salary", Target = "savings", Value = 1000 },
+        new SankeyLink { Source = "salary", Target = "healthcare", Value = 200 },
+        
+        new SankeyLink { Source = "investment", Target = "savings", Value = 500 },
+        new SankeyLink { Source = "investment", Target = "entertainment", Value = 100 },
+        
+        new SankeyLink { Source = "other", Target = "food", Value = 100 },
+        new SankeyLink { Source = "other", Target = "entertainment", Value = 100 }
+    };
+
+    // Multi-level example data
+    private List<SankeyNode> multiLevelNodes = new List<SankeyNode>
+    {
+        // Level 1 - Sources
+        new SankeyNode { Id = "S1", Label = "Source 1", Fill = "#3B82F6" },
+        new SankeyNode { Id = "S2", Label = "Source 2", Fill = "#10B981" },
+        new SankeyNode { Id = "S3", Label = "Source 3", Fill = "#F59E0B" },
+        
+        // Level 2 - Primary Processing
+        new SankeyNode { Id = "P1", Label = "Process A", Fill = "#EF4444" },
+        new SankeyNode { Id = "P2", Label = "Process B", Fill = "#8B5CF6" },
+        new SankeyNode { Id = "P3", Label = "Process C", Fill = "#EC4899" },
+        
+        // Level 3 - Secondary Processing
+        new SankeyNode { Id = "SP1", Label = "Refine X", Fill = "#6366F1" },
+        new SankeyNode { Id = "SP2", Label = "Refine Y", Fill = "#14B8A6" },
+        new SankeyNode { Id = "SP3", Label = "Refine Z", Fill = "#06B6D4" },
+        
+        // Level 4 - Distribution
+        new SankeyNode { Id = "D1", Label = "Dist North", Fill = "#A855F7" },
+        new SankeyNode { Id = "D2", Label = "Dist South", Fill = "#F97316" },
+        new SankeyNode { Id = "D3", Label = "Dist East", Fill = "#84CC16" },
+        new SankeyNode { Id = "D4", Label = "Dist West", Fill = "#06B6D4" },
+        
+        // Level 5 - Final
+        new SankeyNode { Id = "F1", Label = "Market 1", Fill = "#F43F5E" },
+        new SankeyNode { Id = "F2", Label = "Market 2", Fill = "#3B82F6" },
+        new SankeyNode { Id = "F3", Label = "Market 3", Fill = "#10B981" },
+        new SankeyNode { Id = "F4", Label = "Export", Fill = "#6B7280" },
+        new SankeyNode { Id = "F5", Label = "Storage", Fill = "#9333EA" }
+    };
+
+    private List<SankeyLink> multiLevelLinks = new List<SankeyLink>
+    {
+        // Level 1 to 2
+        new SankeyLink { Source = "S1", Target = "P1", Value = 50 },
+        new SankeyLink { Source = "S1", Target = "P2", Value = 30 },
+        new SankeyLink { Source = "S2", Target = "P1", Value = 40 },
+        new SankeyLink { Source = "S2", Target = "P3", Value = 35 },
+        new SankeyLink { Source = "S3", Target = "P2", Value = 45 },
+        new SankeyLink { Source = "S3", Target = "P3", Value = 25 },
+        
+        // Level 2 to 3
+        new SankeyLink { Source = "P1", Target = "SP1", Value = 40 },
+        new SankeyLink { Source = "P1", Target = "SP2", Value = 30 },
+        new SankeyLink { Source = "P1", Target = "SP3", Value = 20 },
+        new SankeyLink { Source = "P2", Target = "SP1", Value = 35 },
+        new SankeyLink { Source = "P2", Target = "SP2", Value = 25 },
+        new SankeyLink { Source = "P2", Target = "SP3", Value = 15 },
+        new SankeyLink { Source = "P3", Target = "SP1", Value = 20 },
+        new SankeyLink { Source = "P3", Target = "SP2", Value = 20 },
+        new SankeyLink { Source = "P3", Target = "SP3", Value = 20 },
+        
+        // Level 3 to 4
+        new SankeyLink { Source = "SP1", Target = "D1", Value = 25 },
+        new SankeyLink { Source = "SP1", Target = "D2", Value = 25 },
+        new SankeyLink { Source = "SP1", Target = "D3", Value = 20 },
+        new SankeyLink { Source = "SP1", Target = "D4", Value = 25 },
+        new SankeyLink { Source = "SP2", Target = "D1", Value = 20 },
+        new SankeyLink { Source = "SP2", Target = "D2", Value = 25 },
+        new SankeyLink { Source = "SP2", Target = "D3", Value = 15 },
+        new SankeyLink { Source = "SP2", Target = "D4", Value = 15 },
+        new SankeyLink { Source = "SP3", Target = "D1", Value = 15 },
+        new SankeyLink { Source = "SP3", Target = "D2", Value = 15 },
+        new SankeyLink { Source = "SP3", Target = "D3", Value = 10 },
+        new SankeyLink { Source = "SP3", Target = "D4", Value = 15 },
+        
+        // Level 4 to 5
+        new SankeyLink { Source = "D1", Target = "F1", Value = 20 },
+        new SankeyLink { Source = "D1", Target = "F2", Value = 15 },
+        new SankeyLink { Source = "D1", Target = "F3", Value = 10 },
+        new SankeyLink { Source = "D1", Target = "F4", Value = 10 },
+        new SankeyLink { Source = "D1", Target = "F5", Value = 5 },
+        new SankeyLink { Source = "D2", Target = "F1", Value = 25 },
+        new SankeyLink { Source = "D2", Target = "F2", Value = 20 },
+        new SankeyLink { Source = "D2", Target = "F3", Value = 15 },
+        new SankeyLink { Source = "D2", Target = "F4", Value = 5 },
+        new SankeyLink { Source = "D3", Target = "F1", Value = 15 },
+        new SankeyLink { Source = "D3", Target = "F2", Value = 10 },
+        new SankeyLink { Source = "D3", Target = "F3", Value = 15 },
+        new SankeyLink { Source = "D3", Target = "F5", Value = 5 },
+        new SankeyLink { Source = "D4", Target = "F1", Value = 10 },
+        new SankeyLink { Source = "D4", Target = "F2", Value = 20 },
+        new SankeyLink { Source = "D4", Target = "F3", Value = 15 },
+        new SankeyLink { Source = "D4", Target = "F4", Value = 10 },
+        new SankeyLink { Source = "D4", Target = "F5", Value = 5 }
+    };
+
+    // Custom data types for generic example
+    public class Department
+    {
+        public string Code { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class Budget
+    {
+        public string From { get; set; }
+        public string To { get; set; }
+        public double Amount { get; set; }
+    }
+
+    private List<Department> departments = new List<Department>
+    {
+        new Department { Code = "SALES", Name = "Sales Department" },
+        new Department { Code = "MKTG", Name = "Marketing" },
+        new Department { Code = "DEV", Name = "Development" },
+        new Department { Code = "OPS", Name = "Operations" },
+        new Department { Code = "HR", Name = "Human Resources" },
+        new Department { Code = "IT", Name = "IT Infrastructure" },
+        new Department { Code = "PROJ", Name = "Projects" }
+    };
+
+    private List<Budget> departmentBudgets = new List<Budget>
+    {
+        new Budget { From = "SALES", To = "MKTG", Amount = 150000 },
+        new Budget { From = "SALES", To = "OPS", Amount = 80000 },
+        new Budget { From = "MKTG", To = "PROJ", Amount = 100000 },
+        new Budget { From = "DEV", To = "PROJ", Amount = 200000 },
+        new Budget { From = "DEV", To = "IT", Amount = 120000 },
+        new Budget { From = "OPS", To = "IT", Amount = 60000 },
+        new Budget { From = "OPS", To = "HR", Amount = 40000 },
+        new Budget { From = "HR", To = "PROJ", Amount = 30000 }
     };
 }

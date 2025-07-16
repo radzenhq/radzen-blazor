@@ -1,0 +1,80 @@
+@using Radzen.Blazor
+
+<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Multi-Level Sankey Chart
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4">
+    This example demonstrates a Sankey chart with multiple levels (4+ layers) showing a complex flow.
+</RadzenText>
+
+<RadzenExample ComponentName="SankeyChart" Documentation="false">
+    <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink" 
+                       Nodes="@nodes" Links="@links" 
+                       Style="width: 900px; height: 500px"
+                       NodeWidth="24" NodePadding="8"
+                       NodeAlignment="SankeyAlignment.Justify"
+                       MarginLeft="80" MarginRight="80" MarginTop="20" MarginBottom="20">
+    </RadzenSankeyChart>
+</RadzenExample>
+
+@code {
+    // Multi-level example with 5 layers
+    private List<SankeyNode> nodes = new List<SankeyNode>
+    {
+        // Layer 0: Sources
+        new SankeyNode { Id = "source1", Label = "Raw Material A" },
+        new SankeyNode { Id = "source2", Label = "Raw Material B" },
+        new SankeyNode { Id = "source3", Label = "Raw Material C" },
+        
+        // Layer 1: Primary Processing
+        new SankeyNode { Id = "process1", Label = "Refining" },
+        new SankeyNode { Id = "process2", Label = "Purification" },
+        
+        // Layer 2: Secondary Processing
+        new SankeyNode { Id = "transform1", Label = "Chemical Process" },
+        new SankeyNode { Id = "transform2", Label = "Physical Process" },
+        new SankeyNode { Id = "transform3", Label = "Mixing" },
+        
+        // Layer 3: Quality Control
+        new SankeyNode { Id = "quality1", Label = "Testing" },
+        new SankeyNode { Id = "quality2", Label = "Validation" },
+        
+        // Layer 4: Final Products
+        new SankeyNode { Id = "product1", Label = "Product Alpha" },
+        new SankeyNode { Id = "product2", Label = "Product Beta" },
+        new SankeyNode { Id = "product3", Label = "Product Gamma" },
+        new SankeyNode { Id = "waste", Label = "Waste/Recycle" }
+    };
+
+    private List<SankeyLink> links = new List<SankeyLink>
+    {
+        // Sources to Primary Processing
+        new SankeyLink { Source = "source1", Target = "process1", Value = 30 },
+        new SankeyLink { Source = "source1", Target = "process2", Value = 20 },
+        new SankeyLink { Source = "source2", Target = "process1", Value = 25 },
+        new SankeyLink { Source = "source3", Target = "process2", Value = 35 },
+        
+        // Primary to Secondary Processing
+        new SankeyLink { Source = "process1", Target = "transform1", Value = 25 },
+        new SankeyLink { Source = "process1", Target = "transform2", Value = 20 },
+        new SankeyLink { Source = "process1", Target = "transform3", Value = 10 },
+        new SankeyLink { Source = "process2", Target = "transform1", Value = 15 },
+        new SankeyLink { Source = "process2", Target = "transform2", Value = 25 },
+        new SankeyLink { Source = "process2", Target = "transform3", Value = 15 },
+        
+        // Secondary Processing to Quality Control
+        new SankeyLink { Source = "transform1", Target = "quality1", Value = 30 },
+        new SankeyLink { Source = "transform1", Target = "quality2", Value = 10 },
+        new SankeyLink { Source = "transform2", Target = "quality1", Value = 25 },
+        new SankeyLink { Source = "transform2", Target = "quality2", Value = 20 },
+        new SankeyLink { Source = "transform3", Target = "quality2", Value = 25 },
+        
+        // Quality Control to Final Products
+        new SankeyLink { Source = "quality1", Target = "product1", Value = 30 },
+        new SankeyLink { Source = "quality1", Target = "product2", Value = 20 },
+        new SankeyLink { Source = "quality1", Target = "waste", Value = 5 },
+        new SankeyLink { Source = "quality2", Target = "product2", Value = 25 },
+        new SankeyLink { Source = "quality2", Target = "product3", Value = 25 },
+        new SankeyLink { Source = "quality2", Target = "waste", Value = 5 }
+    };
+}
