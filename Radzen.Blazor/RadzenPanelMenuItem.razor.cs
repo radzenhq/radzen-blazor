@@ -16,6 +16,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass() => ClassList.Create("rz-navigation-item")
             .Add("rz-state-focused", Parent?.IsFocused(this) == true)
+            .AddDisabled(Disabled)
             .ToString();
 
         /// <summary>
@@ -119,6 +120,13 @@ namespace Radzen.Blazor
         /// <value>The child content.</value>
         [Parameter]
         public RenderFragment ChildContent { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="RadzenPanelMenuItem"/> is disabled.
+        /// </summary>
+        /// <value><c>true</c> if disabled; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool Disabled { get; set; }
 
         internal async Task Toggle()
         {
