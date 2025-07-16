@@ -51,6 +51,18 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Returns wether the FilterRow is visible on the DataGrid.
+        /// </summary>
+        /// <value><c>true</c> if all conditions for showing the row with the filter controls are met otherwise <c>false</c>.</value>
+        public bool FilterRowActive
+        {
+            get
+            {
+                return AllowFiltering && (columns.Where(c => c.GetVisible()).Any(c => c.FilterMode == FilterMode.Simple || c.FilterMode == FilterMode.SimpleWithMenu) || FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets a value indicating whether this instance is virtualized.
         /// </summary>
         /// <value><c>true</c> if this instance is virtualized; otherwise, <c>false</c>.</value>
@@ -561,7 +573,12 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    var itemToSelect = PagedView.ElementAtOrDefault(focusedIndex - 1);
+                    var pagedViewIndex = focusedIndex - 1;
+                    if (FilterRowActive)
+                    {
+                        pagedViewIndex = pagedViewIndex - 1;
+                    }
+                    var itemToSelect = PagedView.ElementAtOrDefault(pagedViewIndex);
                     if (itemToSelect != null)
                     {
                         if (SelectionMode == DataGridSelectionMode.Multiple && !args.ShiftKey)

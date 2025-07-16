@@ -145,7 +145,7 @@
                             }
                         </tr>
                     }
-                    @if (AllowFiltering && (visibleColumns.Any(c => c.FilterMode == FilterMode.Simple || c.FilterMode == FilterMode.SimpleWithMenu) || FilterMode == FilterMode.Simple || FilterMode == FilterMode.SimpleWithMenu) && columns.Where(column => column.Filterable && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null)).Any())
+                    @if (FilterRowActive)
                     {
                         <tr @onkeydown:stopPropagation>
                              @if (ShowGroupExpandColumn)
