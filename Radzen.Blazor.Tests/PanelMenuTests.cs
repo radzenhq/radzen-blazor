@@ -1,8 +1,9 @@
 using Bunit;
-using Bunit.TestDoubles;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.Collections.Generic;
+using System.Linq;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
@@ -22,6 +23,9 @@ namespace Radzen.Blazor.Tests
         }
 
         private static string CreatePanelMenu(string currentAbsoluteUrl, NavLinkMatch match, params string[] urls)
+            => CreatePanelMenu(currentAbsoluteUrl, match, new Dictionary<string, bool>(urls.Select(url => new KeyValuePair<string, bool>(url, false))));
+
+        private static string CreatePanelMenu(string currentAbsoluteUrl, NavLinkMatch match, Dictionary<string, bool> urls)
         {
             using var ctx = new TestContext();
 
@@ -30,12 +34,13 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenPanelMenu>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Match, match).AddChildContent(builder => 
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Match, match).AddChildContent(builder =>
             {
                 foreach (var url in urls)
                 {
                     builder.OpenComponent<RadzenPanelMenuItem>(0);
-                    builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Path), url);
+                    builder.AddAttribute(1, nameof(RadzenPanelMenuItem.Path), url.Key);
+                    builder.AddAttribute(2, nameof(RadzenPanelMenuItem.Disabled), url.Value);
                     builder.CloseComponent();
                 }
             }));
@@ -53,6 +58,19 @@ namespace Radzen.Blazor.Tests
 
             Assert.NotEqual(-1, firstIndex);
             Assert.Equal(firstIndex, lastIndex);
+        }
+
+        [Fact]
+        public void RadzenPanelMenu_CanDisableMenuItem()
+        {
+            var urls = new Dictionary<string, bool>
+            {
+                {"/datagrid", false},
+                {"/disabled-url", true}
+            };
+            var component = CreatePanelMenu("http://www.example.com/", NavLinkMatch.All, urls);
+
+            Assert.Contains("rz-state-disabled", component);
         }
 
         [Fact]
