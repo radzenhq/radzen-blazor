@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSankeyChart component.
+    /// RadzenSankeyDiagram component.
     /// </summary>
     /// <typeparam name="TNode">The type of node data item.</typeparam>
     /// <typeparam name="TLink">The type of link data item.</typeparam>
-    public partial class RadzenSankeyChart<TNode, TLink> : RadzenComponent
+    public partial class RadzenSankeyDiagram<TNode, TLink> : RadzenComponent
     {
         /// <summary>
         /// Gets or sets the node data.
@@ -81,6 +80,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string LinkFillProperty { get; set; }
 
+
         /// <summary>
         /// Gets or sets the color scheme of the chart.
         /// </summary>
@@ -101,7 +101,7 @@ namespace Radzen.Blazor
         /// Gets or sets the left margin.
         /// </summary>
         [Parameter]
-        public double MarginLeft { get; set; } = 60;
+        public double MarginLeft { get; set; } = 80;
 
         /// <summary>
         /// Gets or sets the top margin.
@@ -113,7 +113,7 @@ namespace Radzen.Blazor
         /// Gets or sets the right margin.
         /// </summary>
         [Parameter]
-        public double MarginRight { get; set; } = 60;
+        public double MarginRight { get; set; } = 80;
 
         /// <summary>
         /// Gets or sets the bottom margin.
@@ -174,11 +174,12 @@ namespace Radzen.Blazor
 
 
 
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             var colorScheme = ColorScheme.ToString().ToLower();
-            return $"rz-sankey-chart rz-scheme-{colorScheme}";
+            return $"rz-sankey-diagram rz-scheme-{colorScheme}";
         }
 
         /// <inheritdoc />
@@ -425,9 +426,11 @@ namespace Radzen.Blazor
 
             try
             {
+
                 // Convert generic data to SankeyNode/SankeyLink
                 var sankeyNodes = new List<SankeyNode>();
-                foreach (var node in Nodes)
+                var nodesList = Nodes.ToList();
+                foreach (var node in nodesList)
                 {
                     sankeyNodes.Add(new SankeyNode
                     {
@@ -440,7 +443,8 @@ namespace Radzen.Blazor
                 }
 
                 var sankeyLinks = new List<SankeyLink>();
-                foreach (var link in Links)
+                var linksList = Links.ToList();
+                foreach (var link in linksList)
                 {
                     sankeyLinks.Add(new SankeyLink
                     {

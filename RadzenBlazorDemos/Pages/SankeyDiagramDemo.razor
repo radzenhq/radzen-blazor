@@ -4,11 +4,11 @@
 @inject DialogService DialogService
 
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
-    Radzen Blazor Sankey Chart
+    Radzen Blazor Sankey Diagram
 </RadzenText>
 
 <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
-    Demonstration of the Radzen Blazor Sankey Chart component for visualizing flow and relationships.
+    Demonstration of the Radzen Blazor Sankey Diagram component for visualizing flow and relationships.
 </RadzenText>
 
 <RadzenTabs>
@@ -18,31 +18,27 @@
                 <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Interactive Sankey Chart with All Features</RadzenText>
                 
                 <RadzenRow AlignItems="AlignItems.Start" class="rz-pb-4">
-                    <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenColumn Size="12" SizeMD="4">
                         <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Node Width</RadzenText>
                         <RadzenNumeric @bind-Value="nodeWidth" Min="10" Max="50" Step="5" class="w-100" />
                     </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenColumn Size="12" SizeMD="4">
                         <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Node Padding</RadzenText>
                         <RadzenNumeric @bind-Value="nodePadding" Min="0" Max="30" Step="2" class="w-100" />
                     </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenColumn Size="12" SizeMD="4">
                         <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Node Alignment</RadzenText>
                         <RadzenDropDown @bind-Value="nodeAlignment" Data="@alignments" class="w-100" />
                     </RadzenColumn>
-                    <RadzenColumn Size="12" SizeMD="3">
-                        <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">Color Scheme</RadzenText>
-                        <RadzenDropDown @bind-Value="colorScheme" Data="@colorSchemes" class="w-100" />
-                    </RadzenColumn>
                 </RadzenRow>
                 
-                <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                <RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                                    Nodes="@nodes" Links="@links" 
                                    NodeWidth="@nodeWidth" NodePadding="@nodePadding"
-                                   NodeAlignment="@nodeAlignment" ColorScheme="@colorScheme"
-                                   MarginLeft="60" MarginRight="60" MarginTop="10" MarginBottom="10"
+                                   NodeAlignment="@nodeAlignment" ColorScheme="ColorScheme.Pastel"
+                                   MarginLeft="80" MarginRight="80" MarginTop="20" MarginBottom="20"
                                    Style="width: 100%; height: 400px;">
-                </RadzenSankeyChart>
+                </RadzenSankeyDiagram>
                 
             </RadzenCard>
         </RadzenTabsItem>
@@ -52,13 +48,13 @@
                 <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Energy Flow Example</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">This example shows energy flow from sources through conversions to final usage.</RadzenText>
                 
-                <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                <RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                                    Nodes="@energyNodes" Links="@energyLinks" 
                                    Style="width: 100%; height: 500px"
-                                   NodeWidth="30" NodePadding="10"
+                                   NodeWidth="24" NodePadding="8"
                                    NodeAlignment="SankeyAlignment.Justify"
-                                   MarginLeft="20" MarginRight="20" MarginTop="20" MarginBottom="20">
-                </RadzenSankeyChart>
+                                   MarginLeft="80" MarginRight="80" MarginTop="20" MarginBottom="20">
+                </RadzenSankeyDiagram>
             </RadzenCard>
         </RadzenTabsItem>
 
@@ -67,13 +63,13 @@
                 <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Budget Flow Example</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">Visualize how budget flows from income sources to various expenses.</RadzenText>
                 
-                <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                <RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                                    Nodes="@budgetNodes" Links="@budgetLinks" 
                                    Style="width: 100%; height: 500px"
-                                   NodeWidth="20" NodePadding="15"
-                                   NodeAlignment="SankeyAlignment.Left"
-                                   MarginLeft="20" MarginRight="20" MarginTop="20" MarginBottom="20">
-                </RadzenSankeyChart>
+                                   NodeWidth="24" NodePadding="8"
+                                   NodeAlignment="SankeyAlignment.Justify"
+                                   MarginLeft="80" MarginRight="80" MarginTop="20" MarginBottom="20">
+                </RadzenSankeyDiagram>
             </RadzenCard>
         </RadzenTabsItem>
 
@@ -82,48 +78,27 @@
                 <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Multi-Level Sankey Chart</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">This example demonstrates a Sankey chart with multiple levels (5 layers) showing a complex flow.</RadzenText>
                 
-                <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+                <RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                                    Nodes="@multiLevelNodes" Links="@multiLevelLinks" 
                                    Style="width: 100%; height: 500px"
                                    NodeWidth="24" NodePadding="8"
                                    NodeAlignment="SankeyAlignment.Justify"
                                    MarginLeft="80" MarginRight="80" MarginTop="20" MarginBottom="20">
-                </RadzenSankeyChart>
+                </RadzenSankeyDiagram>
             </RadzenCard>
         </RadzenTabsItem>
-
-        <RadzenTabsItem Text="Generic Data">
-            <RadzenCard class="rz-my-4">
-                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">Using Custom Data Types</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-3">This example demonstrates using the generic RadzenSankeyChart with custom data models.</RadzenText>
-                
-                <RadzenSankeyChart TNode="Department" TLink="Budget" 
-                                   Nodes="@departments" 
-                                   Links="@departmentBudgets"
-                                   NodeIdProperty="@nameof(Department.Code)"
-                                   NodeLabelProperty="@nameof(Department.Name)"
-                                   LinkSourceProperty="@nameof(Budget.From)"
-                                   LinkTargetProperty="@nameof(Budget.To)"
-                                   LinkValueProperty="@nameof(Budget.Amount)"
-                                   ColorScheme="ColorScheme.Palette"
-                                   Style="width: 100%; height: 400px"
-                                   NodeWidth="30" NodePadding="10">
-                </RadzenSankeyChart>
-            </RadzenCard>
-        </RadzenTabsItem>
-        
         <RadzenTabsItem Text="How to Use">
             <RadzenCard class="rz-my-4">
-                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">How to Use RadzenSankeyChart</RadzenText>
+                <RadzenText TextStyle="TextStyle.H5" class="rz-mb-4">How to Use RadzenSankeyDiagram</RadzenText>
                 
                 <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">1. Basic Usage</RadzenText>
                 <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
-&lt;RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+&lt;RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                    Nodes="@@nodes" Links="@@links" 
                    NodeWidth="24" NodePadding="8"
                    MarginLeft="60" MarginRight="60" MarginTop="10" MarginBottom="10"
                    Style="width: 100%; height: 400px;"&gt;
-&lt;/RadzenSankeyChart&gt;</pre>
+&lt;/RadzenSankeyDiagram&gt;</pre>
 
                 <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">2. Define Your Data</RadzenText>
                 <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
@@ -193,7 +168,7 @@ SankeyAlignment.Center   // Nodes center in each column</pre>
                 <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">7. Color Schemes</RadzenText>
                 <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
 // Use ColorScheme property for automatic colors
-&lt;RadzenSankeyChart ColorScheme="ColorScheme.Pastel" ... /&gt;
+&lt;RadzenSankeyDiagram ColorScheme="ColorScheme.Pastel" ... /&gt;
 
 // Option 1: Automatic colors (omit Fill property)
 private List&lt;SankeyNode&gt; nodes = new List&lt;SankeyNode&gt;
@@ -211,44 +186,15 @@ private List&lt;SankeyNode&gt; nodes = new List&lt;SankeyNode&gt;
     new SankeyNode { Id = "C", Label = "Target" }                 // Uses color scheme
 };</pre>
 
-                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">8. Using Custom Data Types</RadzenText>
-                <pre class="rz-p-4 rz-mb-4" style="background-color: #f5f5f5; border-radius: 4px; overflow-x: auto;">
-// Define your custom types
-public class Department
-{
-    public string Code { get; set; }
-    public string Name { get; set; }
-}
-
-public class Budget
-{
-    public string From { get; set; }
-    public string To { get; set; }
-    public double Amount { get; set; }
-}
-
-// Use the generic component with property selectors
-&lt;RadzenSankeyChart TNode="Department" TLink="Budget" 
-                   Nodes="@@departments" 
-                   Links="@@budgets"
-                   NodeIdProperty="@@nameof(Department.Code)"
-                   NodeLabelProperty="@@nameof(Department.Name)"
-                   LinkSourceProperty="@@nameof(Budget.From)"
-                   LinkTargetProperty="@@nameof(Budget.To)"
-                   LinkValueProperty="@@nameof(Budget.Amount)"
-                   Style="width: 100%; height: 400px"&gt;
-&lt;/RadzenSankeyChart&gt;</pre>
-
-                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">9. Tips</RadzenText>
+                <RadzenText TextStyle="TextStyle.H6" class="rz-mt-4 rz-mb-2">8. Tips</RadzenText>
                 <ul class="rz-pl-4">
-                    <li class="rz-mb-2">• Each node must have a unique Id</li>
-                    <li class="rz-mb-2">• Link Source and Target must match node Ids</li>
-                    <li class="rz-mb-2">• Links automatically inherit color from their source node</li>
-                    <li class="rz-mb-2">• Use NodePadding to control vertical spacing between nodes</li>
-                    <li class="rz-mb-2">• Use NodeWidth to control the width of node rectangles</li>
-                    <li class="rz-mb-2">• The component automatically handles overflow with proper margins</li>
-                    <li class="rz-mb-2">• Use ColorScheme for automatic theming</li>
-                    <li class="rz-mb-2">• Add tooltips for better user experience</li>
+                    <li class="rz-mb-2"> Each node must have a unique Id</li>
+                    <li class="rz-mb-2"> Link Source and Target must match node Ids</li>
+                    <li class="rz-mb-2"> Links automatically inherit color from their source node</li>
+                    <li class="rz-mb-2"> Use NodePadding to control vertical spacing between nodes</li>
+                    <li class="rz-mb-2"> Use NodeWidth to control the width of node rectangles</li>
+                    <li class="rz-mb-2"> The component automatically handles overflow with proper margins</li>
+                    <li class="rz-mb-2"> Use ColorScheme for automatic theming</li>
                 </ul>
             </RadzenCard>
         </RadzenTabsItem>
@@ -260,10 +206,8 @@ public class Budget
     private double nodeWidth = 24;
     private double nodePadding = 8;
     private SankeyAlignment nodeAlignment = SankeyAlignment.Justify;
-    private ColorScheme colorScheme = ColorScheme.Pastel;
     
     private IEnumerable<SankeyAlignment> alignments = Enum.GetValues<SankeyAlignment>();
-    private IEnumerable<ColorScheme> colorSchemes = Enum.GetValues<ColorScheme>();
     
     
     // Property documentation
@@ -312,16 +256,16 @@ public class Budget
         new PropertyInfo { Name = "Fill", Type = "string", Default = "null", Description = "Optional custom fill color (defaults to source node color)" }
     };
 
-    // Basic example data - no explicit fills to demonstrate color scheme
+    // Basic example data with vibrant colors
     private List<SankeyNode> nodes = new List<SankeyNode>
     {
-        new SankeyNode { Id = "A", Label = "Source A" },
-        new SankeyNode { Id = "B", Label = "Source B" },
-        new SankeyNode { Id = "C", Label = "Process 1" },
-        new SankeyNode { Id = "D", Label = "Process 2" },
-        new SankeyNode { Id = "E", Label = "Target X" },
-        new SankeyNode { Id = "F", Label = "Target Y" },
-        new SankeyNode { Id = "G", Label = "Target Z" }
+        new SankeyNode { Id = "A", Label = "Source A", Fill = "#3B82F6" },
+        new SankeyNode { Id = "B", Label = "Source B", Fill = "#10B981" },
+        new SankeyNode { Id = "C", Label = "Process 1", Fill = "#F59E0B" },
+        new SankeyNode { Id = "D", Label = "Process 2", Fill = "#EF4444" },
+        new SankeyNode { Id = "E", Label = "Target X", Fill = "#8B5CF6" },
+        new SankeyNode { Id = "F", Label = "Target Y", Fill = "#EC4899" },
+        new SankeyNode { Id = "G", Label = "Target Z", Fill = "#6366F1" }
     };
 
     private List<SankeyLink> links = new List<SankeyLink>
@@ -506,42 +450,5 @@ public class Budget
         new SankeyLink { Source = "D4", Target = "F3", Value = 15 },
         new SankeyLink { Source = "D4", Target = "F4", Value = 10 },
         new SankeyLink { Source = "D4", Target = "F5", Value = 5 }
-    };
-
-    // Custom data types for generic example
-    public class Department
-    {
-        public string Code { get; set; }
-        public string Name { get; set; }
-    }
-
-    public class Budget
-    {
-        public string From { get; set; }
-        public string To { get; set; }
-        public double Amount { get; set; }
-    }
-
-    private List<Department> departments = new List<Department>
-    {
-        new Department { Code = "SALES", Name = "Sales Department" },
-        new Department { Code = "MKTG", Name = "Marketing" },
-        new Department { Code = "DEV", Name = "Development" },
-        new Department { Code = "OPS", Name = "Operations" },
-        new Department { Code = "HR", Name = "Human Resources" },
-        new Department { Code = "IT", Name = "IT Infrastructure" },
-        new Department { Code = "PROJ", Name = "Projects" }
-    };
-
-    private List<Budget> departmentBudgets = new List<Budget>
-    {
-        new Budget { From = "SALES", To = "MKTG", Amount = 150000 },
-        new Budget { From = "SALES", To = "OPS", Amount = 80000 },
-        new Budget { From = "MKTG", To = "PROJ", Amount = 100000 },
-        new Budget { From = "DEV", To = "PROJ", Amount = 200000 },
-        new Budget { From = "DEV", To = "IT", Amount = 120000 },
-        new Budget { From = "OPS", To = "IT", Amount = 60000 },
-        new Budget { From = "OPS", To = "HR", Amount = 40000 },
-        new Budget { From = "HR", To = "PROJ", Amount = 30000 }
     };
 }

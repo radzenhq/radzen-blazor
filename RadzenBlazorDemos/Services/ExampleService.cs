@@ -1832,14 +1832,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "Sankey Chart",
-                            Path = "sankey-demo",
-                            Description = "Radzen Blazor Sankey Chart for visualizing flow and relationships between nodes.",
-                            Tags = new [] { "chart", "graph", "sankey", "flow", "diagram" },
-                            New = true
-                        },
-                        new Example
-                        {
                             Name = "Stacked Area Chart",
                             Path = "stacked-area-chart",
                             Description = "Radzen Blazor Chart with stacked area series.",
@@ -1987,6 +1979,15 @@ namespace RadzenBlazorDemos
                     Description = "Demonstration and configuration of Radzen SSRS Viewer Radzen Blazor Arc Gauge component.",
                     Icon = "\ue9e4",
                     Tags = new [] { "report", "ssrs" }
+                },
+                new Example
+                {
+                    Name = "Sankey Diagram",
+                    Path = "sankey-demo",
+                    Description = "Radzen Blazor Sankey Diagram for visualizing flow and relationships between nodes.",
+                    Icon = "\uf38d",
+                    Tags = new [] { "sankey", "flow", "diagram", "visualization", "relationships" },
+                    New = true
                 },
             }
         },

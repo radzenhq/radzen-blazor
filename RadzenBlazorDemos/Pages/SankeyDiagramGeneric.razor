@@ -6,12 +6,12 @@
         Generic Sankey Chart with Custom Data Types
     </RadzenText>
     <RadzenText TextStyle="TextStyle.Body1" class="rz-pb-4">
-        This example demonstrates using the generic RadzenSankeyChart with custom data models,
+        This example demonstrates using the generic RadzenSankeyDiagram with custom data models,
         similar to how RadzenChart and RadzenScheduler work.
     </RadzenText>
 
     <RadzenCard class="w-100">
-        <RadzenSankeyChart TNode="ProcessStep" TLink="ProcessFlow" 
+        <RadzenSankeyDiagram TNode="ProcessStep" TLink="ProcessFlow" 
                            Nodes="@processSteps" 
                            Links="@processFlows"
                            NodeIdProperty="@nameof(ProcessStep.StepId)"
@@ -24,7 +24,7 @@
                            Style="width: 100%; height: 400px"
                            NodeWidth="24" NodePadding="8"
                            MarginLeft="10" MarginRight="10" MarginTop="10" MarginBottom="10">
-        </RadzenSankeyChart>
+        </RadzenSankeyDiagram>
     </RadzenCard>
 
     <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
@@ -35,7 +35,7 @@
     </RadzenText>
 
     <RadzenCard class="w-100">
-        <RadzenSankeyChart TNode="Department" TLink="Budget" 
+        <RadzenSankeyDiagram TNode="Department" TLink="Budget" 
                            Nodes="@departments" 
                            Links="@budgets"
                            NodeIdProperty="@nameof(Department.Code)"
@@ -46,7 +46,7 @@
                            ColorScheme="ColorScheme.Palette"
                            Style="width: 100%; height: 400px"
                            NodeWidth="30" NodePadding="10">
-        </RadzenSankeyChart>
+        </RadzenSankeyDiagram>
     </RadzenCard>
 </RadzenStack>
 

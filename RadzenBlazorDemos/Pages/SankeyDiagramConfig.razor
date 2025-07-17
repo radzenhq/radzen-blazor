@@ -28,13 +28,13 @@
         </RadzenColumn>
     </RadzenRow>
     
-    <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+    <RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                        Nodes="@nodes" Links="@links" 
                        Style="width: 800px; height: 400px"
                        NodeWidth="@nodeWidth" NodePadding="@nodePadding"
                        NodeAlignment="@nodeAlignment" ColorScheme="@colorScheme"
                        MarginLeft="60" MarginRight="60" MarginTop="10" MarginBottom="10">
-    </RadzenSankeyChart>
+    </RadzenSankeyDiagram>
     
 </RadzenExample>
 
@@ -46,13 +46,13 @@
 </RadzenText>
 
 <RadzenExample ComponentName="SankeyChart" Documentation="false">
-    <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+    <RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                        Nodes="@energyNodes" Links="@energyLinks" 
                        Style="width: 900px; height: 500px"
                        NodeWidth="30" NodePadding="10"
                        NodeAlignment="SankeyAlignment.Justify"
                        MarginLeft="20" MarginRight="20" MarginTop="20" MarginBottom="20">
-    </RadzenSankeyChart>
+    </RadzenSankeyDiagram>
 </RadzenExample>
 
 <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
@@ -63,13 +63,13 @@
 </RadzenText>
 
 <RadzenExample ComponentName="SankeyChart" Documentation="false">
-    <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+    <RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                        Nodes="@budgetNodes" Links="@budgetLinks" 
                        Style="width: 900px; height: 500px"
                        NodeWidth="20" NodePadding="15"
                        NodeAlignment="SankeyAlignment.Left"
                        MarginLeft="20" MarginRight="20" MarginTop="20" MarginBottom="20">
-    </RadzenSankeyChart>
+    </RadzenSankeyDiagram>
 </RadzenExample>
 
 <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
@@ -87,13 +87,13 @@
         </RadzenColumn>
     </RadzenRow>
     
-    <RadzenSankeyChart TNode="SankeyNode" TLink="SankeyLink"
+    <RadzenSankeyDiagram TNode="SankeyNode" TLink="SankeyLink"
                        Nodes="@colorSchemeNodes" Links="@colorSchemeLinks" 
                        Style="width: 900px; height: 400px"
                        NodeWidth="30" NodePadding="10"
                        ColorScheme="@colorSchemeDemo"
                        MarginLeft="60" MarginRight="60" MarginTop="10" MarginBottom="10">
-    </RadzenSankeyChart>
+    </RadzenSankeyDiagram>
 </RadzenExample>
 
 @code {

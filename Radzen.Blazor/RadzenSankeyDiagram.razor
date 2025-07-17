@@ -12,7 +12,7 @@
     <div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
         @if (Width.HasValue && Height.HasValue && ComputedNodes != null && ComputedLinks != null)
         {
-            <svg style="width: 100%; height: 100%; overflow: visible;">
+            <svg style="width: 100%; height: 100%; overflow: hidden;" viewBox="@($"0 0 {Width.Value.ToInvariantString()} {Height.Value.ToInvariantString()}")" preserveAspectRatio="xMidYMid meet">
                 <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
                         @foreach (var link in ComputedLinks)
                         {
@@ -73,8 +73,8 @@
                                 {
                                     var isLeftSide = node.Layer == 0;
                                     var isRightSide = node.Layer == (ComputedNodes.Max(n => n.Layer));
-                                    var textX = isLeftSide ? node.X - 5 : (isRightSide ? node.X + node.Width + 5 : node.X + node.Width / 2);
-                                    var textAnchor = isLeftSide ? "end" : (isRightSide ? "start" : "middle");
+                                    var textX = isLeftSide ? Math.Max(5, node.X - 5) : (isRightSide ? Math.Min(Width.Value - MarginLeft - MarginRight - 5, node.X + node.Width + 5) : node.X + node.Width / 2);
+                                    var textAnchor = isLeftSide ? (node.X < 10 ? "start" : "end") : (isRightSide ? "start" : "middle");
                                     
                                     <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
                                                                    TextAnchor="@textAnchor"
