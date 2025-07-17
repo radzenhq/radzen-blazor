@@ -1,0 +1,91 @@
+@using Microsoft.JSInterop
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@using System.Linq
+
+@typeparam TNode
+@typeparam TLink
+@inherits RadzenComponent
+
+@if (Visible)
+{
+    <div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        @if (Width.HasValue && Height.HasValue && ComputedNodes != null && ComputedLinks != null)
+        {
+            <svg style="width: 100%; height: 100%; overflow: hidden;" viewBox="@($"0 0 {Width.Value.ToInvariantString()} {Height.Value.ToInvariantString()}")" preserveAspectRatio="xMidYMid meet">
+                <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
+                        @foreach (var link in ComputedLinks)
+                        {
+                            var linkClass = "rz-sankey-link";
+                            var linkFill = link.Fill;
+                            
+                            // If no explicit fill and source node uses color scheme, use color scheme for link too
+                            if (string.IsNullOrEmpty(linkFill) && link.SourceNode != null)
+                            {
+                                if (string.IsNullOrEmpty(link.SourceNode.Fill))
+                                {
+                                    // Source node uses color scheme
+                                    linkClass = $"rz-sankey-link rz-series-item-{link.SourceNode.ColorIndex}";
+                                    linkFill = null; // Let CSS handle it
+                                }
+                                else
+                                {
+                                    // Source node has explicit fill
+                                    linkFill = link.SourceNode.Fill;
+                                    // Add transparency if not already present
+                                    if (linkFill != null && linkFill.Length == 7 && linkFill.StartsWith("#"))
+                                    {
+                                        linkFill = linkFill + "80"; // Add 50% transparency
+                                    }
+                                }
+                            }
+                            else if (!string.IsNullOrEmpty(linkFill))
+                            {
+                                // Link has explicit fill
+                                // Add transparency if not already present
+                                if (linkFill.Length == 7 && linkFill.StartsWith("#"))
+                                {
+                                    linkFill = linkFill + "80"; // Add 50% transparency
+                                }
+                            }
+                            
+                            <path d="@link.Path" 
+                                  fill="@linkFill" 
+                                  stroke="none" 
+                                  class="@linkClass" />
+                        }
+                        
+                        @foreach (var node in ComputedNodes)
+                        {
+                            var nodeClass = string.IsNullOrEmpty(node.Fill) 
+                                ? $"rz-sankey-node rz-series-item-{node.ColorIndex}" 
+                                : "rz-sankey-node";
+                            
+                            <g class="@nodeClass">
+                                <rect x="@node.X.ToInvariantString()" 
+                                      y="@node.Y.ToInvariantString()" 
+                                      width="@node.Width.ToInvariantString()" 
+                                      height="@node.Height.ToInvariantString()"
+                                      fill="@(node.Fill)"
+                                      stroke="@(node.Stroke)"
+                                      stroke-width="1" />
+                                @if (!string.IsNullOrEmpty(node.Label))
+                                {
+                                    var isLeftSide = node.Layer == 0;
+                                    var isRightSide = node.Layer == (ComputedNodes.Max(n => n.Layer));
+                                    var textX = isLeftSide ? Math.Max(5, node.X - 5) : (isRightSide ? Math.Min(Width.Value - MarginLeft - MarginRight - 5, node.X + node.Width + 5) : node.X + node.Width / 2);
+                                    var textAnchor = isLeftSide ? (node.X < 10 ? "start" : "end") : (isRightSide ? "start" : "middle");
+                                    
+                                    <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
+                                                                   TextAnchor="@textAnchor"
+                                                                   Class="rz-sankey-node-label"
+                                                                   Value="@node.Label">
+                                    </Radzen.Blazor.Rendering.Text>
+                                }
+                            </g>
+                        }
+                </g>
+            </svg>
+        }
+    </div>
+}
