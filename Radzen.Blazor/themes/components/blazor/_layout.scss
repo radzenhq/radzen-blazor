@@ -46,6 +46,11 @@ $layout-background-color: var(--rz-body-background-color) !default;
     position: static;
   }
 
+  .rz-sidebar-end,
+  .rz-sidebar-right {
+    grid-area: rz-sidebar-2;
+  }
+
   .rz-header {
     grid-area: rz-header;
     z-index: 2;
@@ -56,6 +61,421 @@ $layout-background-color: var(--rz-body-background-color) !default;
   }
 }
 
+// Variations for .rz-layout with optional sidebars (start, end, left, right, fullheight), header, and footer
+
+// Start/Left only sidebar
+.rz-layout:has(> .rz-sidebar-start),
+.rz-layout:has(> .rz-sidebar-left) {
+  grid-template-areas:
+    "rz-sidebar rz-body";
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr;
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-header"
+      "rz-sidebar rz-body";
+    grid-template-rows: auto 1fr;
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-body"
+      "rz-footer rz-footer";
+    grid-template-rows: 1fr auto;
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-header"
+      "rz-sidebar rz-body"
+      "rz-footer rz-footer";
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+// Start/Left only fullheight sidebar
+.rz-layout:has(> .rz-sidebar-start.rz-sidebar-fullheight),
+.rz-layout:has(> .rz-sidebar-left.rz-sidebar-fullheight) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-sidebar rz-header"
+      "rz-sidebar rz-body";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-body"
+      "rz-sidebar rz-footer";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-header"
+      "rz-sidebar rz-body"
+      "rz-sidebar rz-footer";
+  }
+}
+
+// End/Right only sidebar
+.rz-layout:has(> .rz-sidebar-end),
+.rz-layout:has(> .rz-sidebar-right) {
+  grid-template-areas:
+    "rz-body rz-sidebar-2";
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr;
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-header"
+      "rz-body rz-sidebar-2";
+    grid-template-rows: auto 1fr;
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-body rz-sidebar-2"
+      "rz-footer rz-footer";
+    grid-template-rows: 1fr auto;
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-header"
+      "rz-body rz-sidebar-2"
+      "rz-footer rz-footer";
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+// End/Right only fullheight sidebar
+.rz-layout:has(> .rz-sidebar-end.rz-sidebar-fullheight),
+.rz-layout:has(> .rz-sidebar-right.rz-sidebar-fullheight) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-sidebar-2"
+      "rz-body rz-sidebar-2";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-body rz-sidebar-2"
+      "rz-footer rz-sidebar-2";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-sidebar-2"
+      "rz-body rz-sidebar-2"
+      "rz-footer rz-sidebar-2";
+  }
+}
+
+// Both logical sidebars
+.rz-layout:has(> .rz-sidebar-start):has(> .rz-sidebar-end),
+.rz-layout:has(> .rz-sidebar-start):has(> .rz-sidebar-right),
+.rz-layout:has(> .rz-sidebar-left):has(> .rz-sidebar-right),
+.rz-layout:has(> .rz-sidebar-left):has(> .rz-sidebar-end) {
+  grid-template-areas:
+    "rz-sidebar rz-body rz-sidebar-2";
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 1fr;
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-header rz-header"
+      "rz-sidebar rz-body rz-sidebar-2";
+    grid-template-rows: auto 1fr;
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-body rz-sidebar-2"
+      "rz-footer rz-footer rz-footer";
+    grid-template-rows: 1fr auto;
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-header rz-header"
+      "rz-sidebar rz-body rz-sidebar-2"
+      "rz-footer rz-footer rz-footer";
+    grid-template-rows: auto 1fr auto;
+  }
+}
+
+// Start and Left fullheight sidebar
+.rz-layout:has(> .rz-sidebar-start.rz-sidebar-fullheight):has(> .rz-sidebar-end),
+.rz-layout:has(> .rz-sidebar-start.rz-sidebar-fullheight):has(> .rz-sidebar-right),
+.rz-layout:has(> .rz-sidebar-left.rz-sidebar-fullheight):has(> .rz-sidebar-right),
+.rz-layout:has(> .rz-sidebar-left.rz-sidebar-fullheight):has(> .rz-sidebar-end) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-sidebar rz-header rz-header"
+      "rz-sidebar rz-body rz-sidebar-2";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-body rz-sidebar-2"
+      "rz-sidebar rz-footer rz-footer";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-header rz-header"
+      "rz-sidebar rz-body rz-sidebar-2"
+      "rz-sidebar rz-footer rz-footer";
+  }
+}
+
+// End and Right fullheight sidebar
+.rz-layout:has(> .rz-sidebar-start):has(> .rz-sidebar-end.rz-sidebar-fullheight),
+.rz-layout:has(> .rz-sidebar-left):has(> .rz-sidebar-end.rz-sidebar-fullheight),
+.rz-layout:has(> .rz-sidebar-left):has(> .rz-sidebar-right.rz-sidebar-fullheight),
+.rz-layout:has(> .rz-sidebar-start):has(> .rz-sidebar-right.rz-sidebar-fullheight) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-header rz-sidebar-2"
+      "rz-sidebar rz-body rz-sidebar-2";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-body rz-sidebar-2"
+      "rz-footer rz-footer rz-sidebar-2";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-header rz-sidebar-2"
+      "rz-sidebar rz-body rz-sidebar-2"
+      "rz-footer rz-footer rz-sidebar-2";
+  }
+}
+
+// Both fullheight sidebars
+.rz-layout:has(> .rz-sidebar-start.rz-sidebar-fullheight):has(> .rz-sidebar-end.rz-sidebar-fullheight),
+.rz-layout:has(> .rz-sidebar-start.rz-sidebar-fullheight):has(> .rz-sidebar-right.rz-sidebar-fullheight),
+.rz-layout:has(> .rz-sidebar-left.rz-sidebar-fullheight):has(> .rz-sidebar-right.rz-sidebar-fullheight),
+.rz-layout:has(> .rz-sidebar-left.rz-sidebar-fullheight):has(> .rz-sidebar-end.rz-sidebar-fullheight) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-sidebar rz-head er rz-sidebar-2"
+      "rz-sidebar rz-body rz-sidebar-2";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-body rz-sidebar-2"
+      "rz-sidebar rz-footer rz-sidebar-2";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar rz-header rz-sidebar-2"
+      "rz-sidebar rz-body rz-sidebar-2"
+      "rz-sidebar rz-footer rz-sidebar-2";
+  }
+}
+
+// Left only sidebar RTL
+*[dir="rtl"] .rz-layout:has(> .rz-sidebar-left) {
+  grid-template-areas:
+    "rz-body rz-sidebar";
+  grid-template-columns: 1fr auto;
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-header"
+      "rz-body rz-sidebar";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-body rz-sidebar"
+      "rz-footer rz-footer";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-header"
+      "rz-body rz-sidebar"
+      "rz-footer rz-footer";
+  }
+}
+
+// Left only fullheight sidebar RTL
+*[dir="rtl"] .rz-layout:has(> .rz-sidebar-left.rz-sidebar-fullheight) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-sidebar"
+      "rz-body rz-sidebar";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-body rz-sidebar"
+      "rz-footer rz-sidebar";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-sidebar"
+      "rz-body rz-sidebar"
+      "rz-footer rz-sidebar";
+  }
+}
+
+// Right only sidebar RTL  
+*[dir="rtl"] .rz-layout:has(> .rz-sidebar-right) {
+  grid-template-areas:
+    "rz-sidebar-2 rz-body";
+  grid-template-columns: auto 1fr;
+
+  &:has(> .rz-header) {
+    grid-template-areas:  
+      "rz-header rz-header"
+      "rz-sidebar-2 rz-body";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-body"
+      "rz-footer rz-footer";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-header"
+      "rz-sidebar-2 rz-body"
+      "rz-footer rz-footer";
+  }
+}
+
+// Right only fullheight sidebar RTL
+*[dir="rtl"] .rz-layout:has(> .rz-sidebar-right.rz-sidebar-fullheight) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-header"
+      "rz-sidebar-2 rz-body";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-body"
+      "rz-sidebar-2 rz-footer";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-header"
+      "rz-sidebar-2 rz-body"
+      "rz-sidebar-2 rz-footer";
+  }
+}
+
+// Both Left and Right sidebars RTL
+*[dir="rtl"] .rz-layout:has(> .rz-sidebar-left):has(> .rz-sidebar-right) {
+  grid-template-areas:
+    "rz-sidebar-2 rz-body rz-sidebar";
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-header rz-header"
+      "rz-sidebar-2 rz-body rz-sidebar";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-body rz-sidebar"
+      "rz-footer rz-footer rz-footer";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-header rz-header"
+      "rz-sidebar-2 rz-body rz-sidebar"
+      "rz-footer rz-footer rz-footer";
+  }
+}
+
+// Both with Left fullheight sidebar RTL
+*[dir="rtl"] .rz-layout:has(> .rz-sidebar-left.rz-sidebar-fullheight):has(> .rz-sidebar-right) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-header rz-header rz-sidebar"
+      "rz-sidebar-2 rz-body rz-sidebar";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-body rz-sidebar"
+      "rz-footer rz-footer rz-sidebar";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-header rz-header rz-sidebar"
+      "rz-sidebar-2 rz-body rz-sidebar"
+      "rz-footer rz-footer rz-sidebar";
+  }
+}
+
+// Both with Right fullheight sidebar RTL
+*[dir="rtl"] .rz-layout:has(> .rz-sidebar-left):has(> .rz-sidebar-right.rz-sidebar-fullheight) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-header rz-header"
+      "rz-sidebar-2 rz-body rz-sidebar";  
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-body rz-sidebar"
+      "rz-sidebar-2 rz-footer rz-footer";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-header rz-header"
+      "rz-sidebar-2 rz-body rz-sidebar"
+      "rz-sidebar-2 rz-footer rz-footer";
+  }
+}
+
+// Both Left and Right fullheight sidebars RTL
+*[dir="rtl"] .rz-layout:has(> .rz-sidebar-left.rz-sidebar-fullheight):has(> .rz-sidebar-right.rz-sidebar-fullheight) {
+
+  &:has(> .rz-header) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-header rz-sidebar"
+      "rz-sidebar-2 rz-body rz-sidebar";
+  }
+
+  &:has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-body rz-sidebar"
+      "rz-sidebar-2 rz-footer rz-sidebar";
+  }
+
+  &:has(> .rz-header):has(> .rz-footer) {
+    grid-template-areas:
+      "rz-sidebar-2 rz-header rz-sidebar"
+      "rz-sidebar-2 rz-body rz-sidebar"
+      "rz-sidebar-2 rz-footer rz-sidebar";
+  }
+}
+
 @media (max-width: 768px) {
   body:has(> .rz-layout) {
     overflow-x: hidden;
@@ -63,6 +483,15 @@ $layout-background-color: var(--rz-body-background-color) !default;
   
   .rz-layout {
     height: 100dvh;
+  }
+
+  // Set layout width to 100vw when second Sidebar is not present
+  .rz-layout:not(:has(> .rz-sidebar:nth-of-type(2))) {
+    .rz-header,
+    .rz-footer,
+    .rz-body {
+      width: 100vw;
+    }
   }
 
   // Align layout to the end when second Sidebar is expanded
