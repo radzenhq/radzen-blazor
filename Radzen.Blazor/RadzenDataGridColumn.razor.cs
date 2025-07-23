@@ -169,11 +169,13 @@ namespace Radzen.Blazor
                     _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                 }
 
-                if (!string.IsNullOrEmpty(property) && Type == null && !canSetFilterPropertyType)
+                //Altered logic so that for columns of array<object>[n] filterPropertyType to match (Type)array<object>[n] values in column
+                if (!string.IsNullOrEmpty(property) && !canSetFilterPropertyType)
                 {
-                    _filterPropertyType = _propertyType;
+                    _filterPropertyType = Type ?? _propertyType;
                 }
 
+                //If Else required to handle Column<dynamic> 
                 if (_filterPropertyType == null)
                 {
                     _filterPropertyType = Type;

@@ -3467,19 +3467,22 @@ namespace Radzen
 
         /// <summary>
         /// Gets the type of the property.
+        /// If an Array is passed, will return the underlying Item type
+        /// Throws AmbiguousMatchException if type.GetProperties().Count(x=>x.Name == propPart) > 1
         /// </summary>
         /// <param name="type">The type.</param>
         /// <param name="property">The property.</param>
         /// <returns>Type.</returns>
         public static Type GetPropertyType(Type type, string property)
         {
-            if (property.Contains("."))
+            string propPart = property.Contains("[") ? property.Split("[").First() : property;
+            if (propPart.Contains("."))
             {
-                var part = property.Split('.').FirstOrDefault();
-                return GetPropertyType(GetPropertyTypeIncludeInterface(type, part), property.ReplaceFirst($"{part}.", ""));
+                var part = propPart.Split('.').FirstOrDefault();
+                return GetPropertyType(GetPropertyTypeIncludeInterface(type, part), propPart.ReplaceFirst($"{part}.", ""));
             }
 
-            return GetPropertyTypeIncludeInterface(type, property);
+            return GetPropertyTypeIncludeInterface(type, propPart);
         }
 
         private static Type GetPropertyTypeIncludeInterface(Type type, string property)
@@ -3487,11 +3490,13 @@ namespace Radzen
             if (type != null)
             {
                 return !type.IsInterface ?
-                    type.GetProperty(property)?.PropertyType :
-                        new Type[] { type }
-                        .Concat(type.GetInterfaces())
-                        .FirstOrDefault(t => t.GetProperty(property) != null)?
-                        .GetProperty(property)?.PropertyType;
+                    type.GetProperty(property)?.PropertyType.IsArray ?? false ?
+                        type.GetProperty(property)?.PropertyType.GetElementType() :
+                        type.GetProperty(property)?.PropertyType :
+                            new Type[] { type }
+                            .Concat(type.GetInterfaces())
+                            .FirstOrDefault(t => t.GetProperty(property) != null)?
+                            .GetProperty(property)?.PropertyType;
             }
 
             return null;
