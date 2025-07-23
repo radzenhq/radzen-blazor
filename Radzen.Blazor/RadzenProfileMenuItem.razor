@@ -23,7 +23,7 @@
                 <div class="rz-navigation-item-link" >
                     @if (!string.IsNullOrEmpty(Icon))
                     {
-                        <i class="notranslate rzi rz-navigation-item-icon">@Icon</i>
+                        <i class="notranslate rzi rz-navigation-item-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {
