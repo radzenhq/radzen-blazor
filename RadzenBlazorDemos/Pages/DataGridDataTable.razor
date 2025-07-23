@@ -18,9 +18,9 @@
             </Template>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.FirstName))"
+                              Type="@colType(nameof(Employee.FirstName))"
                               Title="First Name" Frozen="true" Width="160px" />
-        @* Removing the Type def breaks Filtering for this Col
-        Type="@colType(nameof(Employee.FirstName))" *@
+        @* Removing the Type def breaks Filtering for any Col *@
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.LastName))"
                               Type="@colType(nameof(Employee.LastName))"
                               Title="Last Name" Width="160px" />
@@ -109,11 +109,11 @@
         {
             return string.Empty; // Default type if the table is not initialized
         }
-        return $"Item[{employeesTable.Columns.IndexOf(colName)}]";
+        return $"ItemArray[{employeesTable.Columns.IndexOf(colName)}]";
     }
     private Type colType(string colName)
     {
-        if(employeesTable == null || !employeesTable.Columns.Contains(colName))
+        if (employeesTable == null || !employeesTable.Columns.Contains(colName))
         {
             return typeof(string); // Default type if the table is not initialized
         }
