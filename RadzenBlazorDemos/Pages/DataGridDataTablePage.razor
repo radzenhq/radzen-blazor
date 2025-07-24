@@ -5,11 +5,11 @@
     DataGrid <strong>DataTable</strong>
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Assign your System.Data.DataTable to the <code>GridDataTable</code> property
+    DataGrid can use DataTable as the data source by setting <code>Data=System.Data.DataTable.AsEnumerable()</code>
 </RadzenText>
 
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Set the Columns of the table using <code>GridDataColumn</code> property for full integration with data types
+    Set each DataGridColumn <code>Property=ItemArray[n]</code> and <code>Type=System.Data.DataColumn.DataType</code>
 </RadzenText>
 
 <RadzenExample ComponentName="DataGrid" Example="DataGridIQueryable">

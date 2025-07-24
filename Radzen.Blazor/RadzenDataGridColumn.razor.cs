@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -145,13 +146,18 @@ namespace Radzen.Blazor
 
                 if (canSetFilterPropertyType)
                 {
-                    if (Type == null)
+                    if (Type == null || typeof(TItem) == typeof(DataRow))
                     {
                         var fp = GetFilterProperty();
                         var pt = !string.IsNullOrEmpty(fp) ?
                                 PropertyAccess.GetPropertyType(typeof(TItem), fp) : typeof(object);
-
                         _filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
+
+                        if(typeof(TItem) == typeof(DataRow))
+                        {
+                            pt = Type ?? pt;
+                            //_filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
+                        }
                     }
 
                     if (GetFilterOperator() == FilterOperator.Equals)
@@ -166,13 +172,14 @@ namespace Radzen.Blazor
 
                 if (!string.IsNullOrEmpty(property))
                 {
-                    _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
+                    _propertyType = typeof(TItem) == typeof(DataRow) ? Type ?? typeof(object) :
+                        PropertyAccess.GetPropertyType(typeof(TItem), property); 
                 }
 
                 //Altered logic so that for columns of array<object>[n] filterPropertyType to match (Type)array<object>[n] values in column
-                if (!string.IsNullOrEmpty(property) && !canSetFilterPropertyType)
+                if (!string.IsNullOrEmpty(property) && (Type == null || typeof(TItem) == typeof(DataRow)) && !canSetFilterPropertyType)
                 {
-                    _filterPropertyType = Type ?? _propertyType;
+                    _filterPropertyType = Type  ?? _propertyType;
                 }
 
                 //If Else required to handle Column<dynamic> 

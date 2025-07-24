@@ -6,8 +6,9 @@
 
 @inherits DbContextPage
 
-<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
-                Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees>
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees
+                FilterMode="FilterMode.Simple">
     <Columns>
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.EmployeeID))"
                               Type="@colType(nameof(Employee.EmployeeID))"
@@ -19,17 +20,21 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.FirstName))"
                               Type="@colType(nameof(Employee.FirstName))"
-                              Title="First Name" Frozen="true" Width="160px" />
+                              Title="First Name" Frozen="true" Width="160px" 
+                              FilterMode="FilterMode.Advanced"/>
         @* Removing the Type def breaks Filtering for any Col *@
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.LastName))"
                               Type="@colType(nameof(Employee.LastName))"
-                              Title="Last Name" Width="160px" />
+                              Title="Last Name" Width="160px"
+                              FilterMode="FilterMode.CheckBoxList" />
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Title))"
                               Type="@colType(nameof(Employee.Title))"
-                              Title="Job Title" Width="200px" />
+                              Title="Job Title" Width="200px"
+                              FilterMode="FilterMode.CheckBoxList" />
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.TitleOfCourtesy))"
                               Type="@colType(nameof(Employee.TitleOfCourtesy))"
-                              Title="Title" Width="120px" />
+                              Title="Title" Width="120px"
+                              FilterMode="FilterMode.SimpleWithMenu" />
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.BirthDate))"
                               Type="@colType(nameof(Employee.BirthDate))"
                               Title="Birth Date" FormatString="{0:d}" Width="160px" />
@@ -57,8 +62,8 @@
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Extension))"
                               Type="@colType(nameof(Employee.Extension))"
                               Title="Extension" Width="160px" />
+        @* Type="@colType(nameof(Employee.Notes))" *@
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Notes))"
-                              Type="@colType(nameof(Employee.Notes))"
                               Title="Notes" Width="300px" />
     </Columns>
 </RadzenDataGrid>
