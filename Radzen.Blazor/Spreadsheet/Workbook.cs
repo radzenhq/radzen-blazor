@@ -382,9 +382,14 @@ public class Workbook
     private static XElement CreateRowElement(Sheet sheet, int row)
     {
         var rowElement = new XElement(XName.Get("row", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            new XAttribute("r", row + 1),
-            new XAttribute("ht", sheet.Rows[row]),
-            new XAttribute("customHeight", "1"));
+            new XAttribute("r", row + 1));
+
+        // Only persist height if it differs from the default
+        if (sheet.Rows[row] != sheet.Rows.Size)
+        {
+            rowElement.Add(new XAttribute("ht", sheet.Rows[row]));
+            rowElement.Add(new XAttribute("customHeight", "1"));
+        }
 
         // Add hidden attribute if row is hidden
         if (sheet.Rows.IsHidden(row))
