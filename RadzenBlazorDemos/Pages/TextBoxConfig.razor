@@ -20,7 +20,7 @@
     <RadzenColumn Size="12" SizeMD="4">
         <RadzenCard>
             <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Change on every input</RadzenText>
-            <RadzenTextBox @oninput=@(args => OnChange(args.Value.ToString(), "TextBox with change on every input")) Style="width: 100%" aria-label="TextBox with change on every input" />
+            <RadzenTextBox Immediate="true" Change=@(value => OnChange(value, "TextBox with change on every input")) Style="width: 100%" aria-label="TextBox with change on every input" />
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="4">
