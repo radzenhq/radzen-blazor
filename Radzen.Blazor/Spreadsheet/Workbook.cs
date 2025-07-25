@@ -347,11 +347,21 @@ public class Workbook
     private static XElement CreateColumns(Sheet sheet)
     {
         return new XElement(XName.Get("cols", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-            Enumerable.Range(0, sheet.ColumnCount).Select(col => new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
-                new XAttribute("min", col + 1),
-                new XAttribute("max", col + 1),
-                new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)),
-                new XAttribute("customWidth", "1"))));
+            Enumerable.Range(0, sheet.ColumnCount).Select(col =>
+            {
+                var colElement = new XElement(XName.Get("col", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
+                    new XAttribute("min", col + 1),
+                    new XAttribute("max", col + 1));
+
+                // Only persist width if it differs from the default
+                if (sheet.Columns[col] != sheet.Columns.Size)
+                {
+                    colElement.Add(new XAttribute("width", Math.Round(sheet.Columns[col] / 7.0, 8)));
+                    colElement.Add(new XAttribute("customWidth", "1"));
+                }
+
+                return colElement;
+            }));
     }
 
     private void ProcessSheetData(Sheet sheet, XElement sheetData, StyleTracker styleTracker, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
