@@ -2,6 +2,8 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.JSInterop;
+
 
 namespace Radzen.Blazor
 {
@@ -10,6 +12,12 @@ namespace Radzen.Blazor
     /// </summary>
     public abstract class RadzenHtmlEditorButtonBase : ComponentBase, IDisposable
     {
+        /// <summary>
+        /// Gets or sets the IJSRuntime instance.
+        /// </summary>
+        [Inject]
+        protected IJSRuntime JsRuntime { get; set; }
+        
         /// <summary>
         /// The RadzenHtmlEditor component which this tool is part of.
         /// </summary>
@@ -33,6 +41,9 @@ namespace Radzen.Blazor
         /// </summary>
         protected virtual async Task OnClick()
         {
+            // Remove resize handles if an image is selected
+            await JsRuntime.InvokeVoidAsync("Radzen.removeImageResizeHandlesForLink", Editor.Element);
+            
             await Editor.ExecuteCommandAsync(CommandName);
         }
 

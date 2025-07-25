@@ -35,6 +35,56 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   background-color: var(--rz-editor-content-background-color);
 }
 
+.rz-html-editor .rz-html-editor-content img.rz-state-selected {
+  position: relative;
+  outline: 2px solid var(--rz-primary);
+  outline-offset: 2px;
+}
+
+.rz-html-editor .rz-html-editor-content {
+  .rz-image-resize-handle {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background-color: var(--rz-primary);
+    border: 2px solid var(--rz-on-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+    pointer-events: all;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+
+    &.rz-resize-nw {
+      top: -6px;
+      left: -6px;
+      cursor: nw-resize;
+    }
+
+    &.rz-resize-ne {
+      top: -6px;
+      right: -6px;
+      cursor: ne-resize;
+    }
+
+    &.rz-resize-sw {
+      bottom: -6px;
+      left: -6px;
+      cursor: sw-resize;
+    }
+
+    &.rz-resize-se {
+      bottom: -6px;
+      right: -6px;
+      cursor: se-resize;
+    }
+  }
+
+  .rz-image-resize-container {
+    position: relative;
+    display: inline-block;
+  }
+}
+
 .rz-html-editor-source.rz-textarea {
     --rz-input-hover-shadow: none;
     --rz-input-border: none;
@@ -61,6 +111,21 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 
   > * {
     margin: var(--rz-editor-toolbar-item-margin);
+  }
+
+  .rz-html-editor-colorpicker {
+    .rz-colorpicker {
+      &:not(:disabled):not(.rz-state-disabled):hover {
+        border: none;
+      }
+    }
+
+    .rz-colorpicker-trigger {
+      .rzi {
+        font-size: 1.25rem;
+        height: 1rem;
+      }
+    }
   }
 }
 
@@ -209,22 +274,4 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 .rz-html-editor-separator {
   width: 1px;
   background-color: var(--rz-editor-separator-background-color);
-}
-
-.rz-html-editor-toolbar {
-
-  .rz-html-editor-colorpicker {
-    .rz-colorpicker {
-      &:not(:disabled):not(.rz-state-disabled):hover {
-        border: none;
-      }
-    }
-
-    .rz-colorpicker-trigger {
-      .rzi {
-        font-size: 1.25rem;
-        height: 1rem;
-      }
-    }
-  }
 }
