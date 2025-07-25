@@ -73,13 +73,15 @@ public partial class CellEditor : ComponentBase, IDisposable
     {
         var address = Sheet.Selection.Cell;
 
+        var cell = Sheet.Cells[address];
+
         if (address != CellRef.Invalid)
         {
             var rect = Context.GetRectangle(address.Row, address.Column);
             var sb = StringBuilderCache.Acquire();
             rect.AppendStyle(sb);
 
-            var cell = Sheet.Cells[address];
+            cell = Sheet.Cells[address];
 
             cell.Format?.AppendStyle(sb);
 
@@ -93,6 +95,7 @@ public partial class CellEditor : ComponentBase, IDisposable
         className = ClassList.Create("rz-spreadsheet-cell-editor")
             .Add("rz-spreadsheet-frozen-column", Sheet.Selection.Cell != CellRef.Invalid && Sheet.Selection.Cell.Column < Sheet.Columns.Frozen)
             .Add("rz-spreadsheet-frozen-row", Sheet.Selection.Cell != CellRef.Invalid && Sheet.Selection.Cell.Row < Sheet.Rows.Frozen)
+            .Add($"rz-spreadsheet-cell-editor-{cell.ValueType.ToString().ToLowerInvariant()}", cell != null)
             .ToString();
     }
 
