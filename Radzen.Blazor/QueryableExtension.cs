@@ -292,6 +292,9 @@ namespace Radzen
                     if (member.Type.IsArray)
                     {
                         member = Expression.ArrayIndex(member, Expression.Constant(index));
+                        //Converter added so filter can match values in (type)array<object>[]
+                        if(type != null && member.Type != type)
+                            member = Expression.Convert(member, type);
                     }
                     else if (member.Type.IsGenericType &&
                              (member.Type.GetGenericTypeDefinition() == typeof(List<>) ||
