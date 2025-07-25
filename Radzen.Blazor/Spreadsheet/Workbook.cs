@@ -265,11 +265,11 @@ public class Workbook
             var sheetName = $"sheet{sheetId}.xml";
             var relId = $"rId{sheetId + 2}";
 
-            // Add sheet relationship
+            // Add sheet relationship (update Target to worksheets subdirectory)
             workbookRelsElement.Add(new XElement(XName.Get("Relationship", "http://schemas.openxmlformats.org/package/2006/relationships"),
                 new XAttribute("Id", relId),
                 new XAttribute("Type", "http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"),
-                new XAttribute("Target", sheetName)));
+                new XAttribute("Target", $"worksheets/{sheetName}")));
 
             // Save individual sheet
             SaveSheet(archive, sheet, sheetName, sheetId, relId, styleTracker, sharedStrings, sharedStringsDoc);
@@ -300,8 +300,8 @@ public class Workbook
         // Add auto filter
         AddAutoFilter(sheet, sheetDoc);
 
-        // Save sheet
-        using var entry = archive.CreateEntry($"xl/{sheetName}").Open();
+        // Save sheet in xl/worksheets/ subdirectory
+        using var entry = archive.CreateEntry($"xl/worksheets/{sheetName}").Open();
         sheetDoc.Save(entry);
     }
 
