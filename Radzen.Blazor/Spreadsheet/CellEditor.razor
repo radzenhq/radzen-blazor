@@ -5,10 +5,11 @@
 @if (Sheet.Editor.Mode != EditMode.None)
 {
 <div class=@className style=@cellStyle>
-    <ContentEditable class="rz-spreadsheet-cell-editor-input" 
+    <ContentEditable class="rz-spreadsheet-editor-input" 
             @bind-Value=@Sheet.Editor.Value 
             AutoFocus=@(Sheet.Editor.Mode == EditMode.Cell)
             Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
+            Focus=@(this.AsNonRenderingEventHandler(OnFocus))
      />
 </div>
 }

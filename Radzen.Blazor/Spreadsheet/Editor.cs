@@ -118,11 +118,19 @@ public class Editor(Sheet sheet)
         get => value;
         set
         {
-            this.value = value;
+            if (!string.Equals(this.value, value, StringComparison.Ordinal))
+            {
+                this.value = value;
 
-            ValueChanged?.Invoke();
+                ValueChanged?.Invoke();
+            }
         }
     }
+
+    /// <summary>
+    /// Checks if there are changes in the editor that need to be accepted or canceled.
+    /// </summary>
+    public bool HasChanges => Mode != EditMode.None && (Cell == null || Cell.GetValue() != Value);
 
     /// <summary>
     /// Occurs when the value being edited in the spreadsheet editor changes.

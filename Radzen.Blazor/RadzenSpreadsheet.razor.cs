@@ -264,27 +264,34 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
         isAccepting = true;
 
-        if (Sheet is not null && Sheet.Editor.Mode != EditMode.None)
+        if (Sheet is not null)
         {
-            var command = new AcceptEditCommand(Sheet);
-
-            var valid = Sheet.Commands.Execute(command);
-
-            if (!valid && Sheet.Editor.Cell is not null)
+            if (Sheet.Editor.HasChanges)
             {
-                string error = string.Join("\n", Sheet.Editor.Cell.ValidationErrors);
+                var command = new AcceptEditCommand(Sheet);
 
-                await JSRuntime.InvokeVoidAsync("alert", error);
+                var valid = Sheet.Commands.Execute(command);
 
-                command.Unexecute();
+                if (!valid && Sheet.Editor.Cell is not null)
+                {
+                    string error = string.Join("\n", Sheet.Editor.Cell.ValidationErrors);
 
-                Sheet.Editor.Cancel();
+                    await JSRuntime.InvokeVoidAsync("alert", error);
 
-                result = false;
+                    command.Unexecute();
+
+                    Sheet.Editor.Cancel();
+
+                    result = false;
+                }
+                else
+                {
+                    await Element.FocusAsync();
+                }
             }
             else
             {
-                await Element.FocusAsync();
+                Sheet.Editor.EndEdit();
             }
         }
 
