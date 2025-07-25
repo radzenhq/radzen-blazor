@@ -328,3 +328,15 @@
     padding-block: var(--rz-menu-item-padding-block);
     padding-inline: var(--rz-menu-item-padding-inline);
 }
+
+.rz-spreadsheet-cell-number {
+    text-align: right;
+}
+
+.rz-spreadsheet-cell-error {
+    color: var(--rz-form-error-color);
+}
+
+.rz-spreadsheet-cell-editor-number {
+    text-align: right;
+}
