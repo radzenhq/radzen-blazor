@@ -152,24 +152,22 @@
     position: absolute;
     z-index: 1;
 }
-.rz-spreadsheet-cell-editor-input {
-    border: none;
-    font-size: 0.8rem;
-    min-width: fit-content;
-    min-height: 100%;
-    box-sizing: border-box;
-    background-color: #fff;
+
+.rz-spreadsheet-cell-editor .rz-spreadsheet-editor-input {
     outline: none;
     border: 2px solid #258cfb;
 }
 
-.rz-spreadsheet-formula-editor-input {
+.rz-spreadsheet-editor-input {
     border: none;
     font-size: 0.8rem;
     min-width: fit-content;
     min-height: 100%;
     box-sizing: border-box;
     background-color: #fff;
+}
+
+.rz-spreadsheet-formula-editor .rz-spreadsheet-editor-input {
     padding: 0.2rem 0.2rem;
 }
 

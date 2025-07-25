@@ -61,6 +61,15 @@ public partial class CellEditor : ComponentBase, IDisposable
         }
     }
 
+    private void OnFocus()
+    {
+        if (Sheet.Selection.Cell != CellRef.Invalid)
+        {
+            var cell = Sheet.Cells[Sheet.Selection.Cell];
+            Sheet.Editor.StartEdit(cell.Address, Sheet.Editor.Mode == EditMode.Formula ? Sheet.Editor.Value : cell.GetValue(), EditMode.Cell);
+        }
+    }
+
     private void OnEditorValueChanged()
     {
         if (Sheet.Editor.Mode == EditMode.Formula)
