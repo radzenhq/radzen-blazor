@@ -140,10 +140,15 @@ public readonly struct IndexRange(int start, int end, double offset)
 /// <summary>
 /// Represents an axis in a spreadsheet, which can be used to manage the layout of rows or columns.
 /// </summary>
-/// <param name="defaultValue"></param>
+/// <param name="size"></param>
 /// <param name="count"></param>
-public class Axis(double defaultValue, int count)
+public class Axis(double size, int count)
 {
+    /// <summary>
+    /// The default size of an item of the axis.
+    /// </summary>
+    public double Size => size;
+
     /// <summary>
     /// The total size of the axis when.
     /// </summary>
@@ -244,7 +249,7 @@ public class Axis(double defaultValue, int count)
                 return value;
             }
 
-            return defaultValue;
+            return size;
         }
         set
         {
@@ -357,7 +362,7 @@ public class Axis(double defaultValue, int count)
                 }
             }
 
-            return total + defaultValue * (Count - data.Count - hidden.Count) + Offset;
+            return total + size * (Count - data.Count - hidden.Count) + Offset;
         }
     }
 
