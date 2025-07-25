@@ -46,7 +46,7 @@ public partial class FormulaEditor : ComponentBase, IDisposable
         if (Sheet.Selection.Cell != CellRef.Invalid)
         {
             var cell = Sheet.Cells[Sheet.Selection.Cell];
-            Sheet.Editor.StartEdit(cell.Address, cell.GetValue(), EditMode.Formula);
+            Sheet.Editor.StartEdit(cell.Address, Sheet.Editor.Mode == EditMode.Cell ? Sheet.Editor.Value : cell.GetValue(), EditMode.Formula);
         }
     }
 

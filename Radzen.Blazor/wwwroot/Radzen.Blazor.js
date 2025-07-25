@@ -268,7 +268,11 @@ class ContentEditable {
     }
   };
 
-  onBlur = () => {
+  onBlur = (e) => {
+    if (e.relatedTarget && e.relatedTarget.matches('.rz-spreadsheet-editor-input') && e.relatedTarget.closest('.rz-spreadsheet') == this.element.closest('.rz-spreadsheet')) {
+      return;
+    }
+
     this.dotNetRef.invokeMethodAsync('OnBlurAsync');
   }
 
