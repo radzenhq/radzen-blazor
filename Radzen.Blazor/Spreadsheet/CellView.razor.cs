@@ -84,6 +84,7 @@ public partial class CellView : CellBase, IDisposable
     private string Class => ClassList.Create("rz-spreadsheet-cell")
                                      .Add("rz-spreadsheet-frozen-row", FrozenState.HasFlag(FrozenState.Row))
                                      .Add("rz-spreadsheet-frozen-column", FrozenState.HasFlag(FrozenState.Column))
+                                     .Add($"rz-spreadsheet-cell-{cell.ValueType.ToString().ToLowerInvariant()}", cell != null)
                                      .ToString();
 
     private Cell cell = default!;
@@ -112,9 +113,6 @@ public partial class CellView : CellBase, IDisposable
 
         return false;
     }
-
-    /// <inheritdoc/>
-    protected override string Style => GetStyle();
 
     /// <inheritdoc/>
     protected override void AppendStyle(StringBuilder sb)
