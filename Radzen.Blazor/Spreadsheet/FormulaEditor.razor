@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Components.Web
 
 <div class="rz-spreadsheet-formula-editor">
-    <ContentEditable class="rz-spreadsheet-formula-editor-input" tabindex="-1" @bind-Value=@Sheet.Editor.Value 
+    <ContentEditable class="rz-spreadsheet-editor-input" tabindex="-1" @bind-Value=@Sheet.Editor.Value 
         Focus=@(this.AsNonRenderingEventHandler(OnFocus))
         Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync)) />
 </div>
