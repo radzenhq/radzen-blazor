@@ -76,20 +76,21 @@ namespace Radzen.Blazor.Tests.Integration
 
         [Theory]
         [ClassData(typeof(TestGridData))]
-        public void SortStringTest<T>(IEnumerable<T> data, DataTable table = null)
+        public void SortStringTest<T>(IEnumerable<T> data)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = data.GetTestDataGrid(ctx, table);
+            var component = data.GetTestDataGridIncCols(ctx);
 
             var dg = component.Instance;
             var cols = dg.ColumnsCollection.Count;
             var rows = dg.Data.Count();
 
             var sortCol = component.FindComponents<RadzenDataGridColumn<T>>().FirstOrDefault(x => x.Instance.Title == nameof(Employee.FirstName));
-            Assert.NotNull(sortCol); var sortHead = component.FindAll(".rz-column-title")
+            Assert.NotNull(sortCol); 
+            var sortHead = component.FindAll(".rz-column-title")
                 .FirstOrDefault(x => x.TextContent.Contains(nameof(Employee.FirstName)));
             Assert.NotNull(sortHead);
 
@@ -100,14 +101,12 @@ namespace Radzen.Blazor.Tests.Integration
             Assert.Equal("3", cells[2 * cols].TextContent.Trim());
 
             sortHead.Click();
-            //Assert.Equal(SortOrder.Descending, sortCol.Instance.SortOrder);
             cells = component.FindAll(".rz-cell-data");
             Assert.Equal("2", cells[0 * cols].TextContent.Trim());
             Assert.Equal("9", cells[1 * cols].TextContent.Trim());
             Assert.Equal("3", cells[2 * cols].TextContent.Trim());
 
             sortHead.Click();
-            //Assert.Equal(SortOrder.Ascending, sortCol.Instance.SortOrder);
             cells = component.FindAll(".rz-cell-data");
             Assert.Equal("5", cells[0 * cols].TextContent.Trim());
             Assert.Equal("1", cells[1 * cols].TextContent.Trim());
@@ -117,13 +116,13 @@ namespace Radzen.Blazor.Tests.Integration
 
         [Theory]
         [ClassData(typeof(TestGridData))]
-        public void SortDateTest<T>(IEnumerable<T> data, DataTable table = null)
+        public void SortDateTest<T>(IEnumerable<T> data)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = data.GetTestDataGrid(ctx, table);
+            var component = data.GetTestDataGridIncCols(ctx);
 
             var dg = component.Instance;
             var cols = dg.ColumnsCollection.Count;
@@ -141,14 +140,12 @@ namespace Radzen.Blazor.Tests.Integration
             Assert.Equal("3", cells[2 * cols].TextContent.Trim());
 
             sortHead.Click();
-            //Assert.Equal(SortOrder.Descending, sortCol.Instance.SortOrder);
             cells = component.FindAll(".rz-cell-data");
             Assert.Equal("3", cells[0 * cols].TextContent.Trim());
             Assert.Equal("1", cells[1 * cols].TextContent.Trim());
             Assert.Equal("2", cells[2 * cols].TextContent.Trim());
 
             sortHead.Click();
-            //Assert.Equal(SortOrder.Ascending, sortCol.Instance.SortOrder);
             cells = component.FindAll(".rz-cell-data");
             Assert.Equal("9", cells[0 * cols].TextContent.Trim());
             Assert.Equal("8", cells[1 * cols].TextContent.Trim());
@@ -158,13 +155,13 @@ namespace Radzen.Blazor.Tests.Integration
 
         [Theory]
         [ClassData(typeof(TestGridData))]
-        public void SortIntTestAsync<T>(IEnumerable<T> data, DataTable table = null)
+        public void SortIntTestAsync<T>(IEnumerable<T> data)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = data.GetTestDataGrid(ctx, table);
+            var component = data.GetTestDataGridIncCols(ctx);
 
             var dg = component.Instance;
             var cols = dg.ColumnsCollection.Count;

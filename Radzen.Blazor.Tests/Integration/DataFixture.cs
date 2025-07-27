@@ -19,29 +19,18 @@ namespace Radzen.Blazor.Tests.Integration
     {
         public const int Rows = 9;
         public const int Cols = 4;
-        public static IRenderedComponent<RadzenDataGrid<T>> GetTestDataGrid<T>(this IEnumerable<T> data, TestContext ctx, DataTable table = null)
+        public static IRenderedComponent<RadzenDataGrid<T>> GetTestDataGridIncCols<T>(this IEnumerable<T> data, TestContext ctx)
         {
             var component = ctx.RenderComponent<RadzenDataGrid<T>>(parameterBuilder =>
             {
                 parameterBuilder.Add<IEnumerable<T>>(p => p.Data, data);
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
                 parameterBuilder.Add<bool>(p => p.AllowSorting, true);
-                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Simple);
-                if (typeof(T) == typeof(DataRow))
-                {
-                    Assert.NotNull(table);
-                    parameterBuilder.Add<RenderFragment>(p => p.Columns, b => dataColumnBuilder<T>(b, table.Columns[nameof(Employee.EmployeeID)]));
-                    parameterBuilder.Add<RenderFragment>(p => p.Columns, b => dataColumnBuilder<T>(b, table.Columns[nameof(Employee.FirstName)]));
-                    parameterBuilder.Add<RenderFragment>(p => p.Columns, b => dataColumnBuilder<T>(b, table.Columns[nameof(Employee.LastName)]));
-                    parameterBuilder.Add<RenderFragment>(p => p.Columns, b => dataColumnBuilder<T>(b, table.Columns[nameof(Employee.HireDate)]));
-                }
-                else
-                {
-                    parameterBuilder.Add<RenderFragment>(p => p.Columns, b => columnBuilder<T>(b, nameof(Employee.EmployeeID)));
-                    parameterBuilder.Add<RenderFragment>(p => p.Columns, b => columnBuilder<T>(b, nameof(Employee.FirstName)));
-                    parameterBuilder.Add<RenderFragment>(p => p.Columns, b => columnBuilder<T>(b, nameof(Employee.LastName)));
-                    parameterBuilder.Add<RenderFragment>(p => p.Columns, b => columnBuilder<T>(b, nameof(Employee.HireDate)));
-                }
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, b => columnBuilder<T>(b, nameof(Employee.EmployeeID), data));
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, b => columnBuilder<T>(b, nameof(Employee.FirstName), data));
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, b => columnBuilder<T>(b, nameof(Employee.Title), data));
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, b => columnBuilder<T>(b, nameof(Employee.HireDate), data));
+
             });
 
             var dg = component.Instance;
@@ -51,25 +40,50 @@ namespace Radzen.Blazor.Tests.Integration
             Assert.Equal(Rows, rows);
             return component;
         }
+        public static IRenderedComponent<RadzenDataGrid<T>> GetTestDataGrid<T>(this IEnumerable<T> data, TestContext ctx)
+        {
+            var component = ctx.RenderComponent<RadzenDataGrid<T>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<T>>(p => p.Data, data);
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<bool>(p => p.AllowSorting, true);
+            });
 
-        private static RenderTreeBuilder columnBuilder<T>(RenderTreeBuilder builder, string property, bool sortable = true, bool filterable = true)
-        {
-            builder.OpenComponent(0, typeof(RadzenDataGridColumn<T>));
-            builder.AddAttribute(1, "Title", property);
-            builder.AddAttribute(2, "Property", property);
-            builder.AddAttribute(3, "Filterable", filterable);
-            builder.AddAttribute(4, "Sortable", sortable);
-            builder.CloseComponent();
-            return builder;
+            var dg = component.Instance;
+            var cols = dg.ColumnsCollection.Count;
+            var rows = dg.Data.Count();
+            Assert.Equal(0, cols);
+            Assert.Equal(Rows, rows);
+            return component;
         }
-        private static RenderTreeBuilder dataColumnBuilder<T>(RenderTreeBuilder builder, DataColumn dataCol, bool sortable = true, bool filterable = true)
+
+
+        public static RenderTreeBuilder columnBuilder<T>(this RenderTreeBuilder builder, string property, IEnumerable<T> data, bool sortable = true, bool filterable = true, FilterMode? filterMode = null, object filterValue = null)
         {
-            builder.OpenComponent(0, typeof(RadzenDataGridColumn<T>));
-            builder.AddAttribute(1, "Title", dataCol.ColumnName);
-            builder.AddAttribute(2, "Property", $"ItemArray[{dataCol.Table.Columns.IndexOf(dataCol)}]");
-            builder.AddAttribute(3, "Type", dataCol.DataType);
-            builder.AddAttribute(4, "Filterable", filterable);
-            builder.AddAttribute(5, "Sortable", sortable);
+            int sequ = 0;
+            if (data is IEnumerable<DataRow> rows)
+            {
+                Assert.NotEmpty(rows);
+                var table = (data.First() as DataRow).Table;
+                Assert.NotNull(table);
+                DataColumn dataCol = table.Columns[property];
+                Assert.NotNull(dataCol);
+                builder.OpenComponent(sequ++, typeof(RadzenDataGridColumn<T>));
+                builder.AddAttribute(sequ++, "Title", dataCol.ColumnName);
+                builder.AddAttribute(sequ++, "Property", $"ItemArray[{dataCol.Table.Columns.IndexOf(dataCol)}]");
+                builder.AddAttribute(sequ++, "Type", dataCol.DataType);
+            }
+            else
+            {
+                builder.OpenComponent(sequ++, typeof(RadzenDataGridColumn<T>));
+                builder.AddAttribute(sequ++, "Title", property);
+                builder.AddAttribute(sequ++, "Property", property);
+            }
+
+            builder.AddAttribute(sequ++, "Sortable", sortable);
+            builder.AddAttribute(sequ++, "Filterable", filterable);
+            if (filterMode != null) builder.AddAttribute(sequ++, "FilterMode", filterMode);
+            if (filterValue != null) builder.AddAttribute(sequ++, "FilterValue", filterValue);
             builder.CloseComponent();
             return builder;
         }
@@ -111,9 +125,9 @@ namespace Radzen.Blazor.Tests.Integration
     {
         private readonly IEnumerable<object[]> _data = new List<object[]>
         {
-            new object[] {DataFixtureHelpers.GetEmployees<Employee>(),null },
-            new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsQueryable(),null },
-            new object[] { DataFixtureHelpers.GetEmployees<Employee>().GetDataTable().AsEnumerable(), DataFixtureHelpers.GetEmployees<Employee>().GetDataTable() },
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>() },
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsQueryable()},
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>().GetDataTable().AsEnumerable()},
         };
 
         public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
@@ -121,6 +135,19 @@ namespace Radzen.Blazor.Tests.Integration
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
+    public class TestGridFilterData : IEnumerable<object[]>
+    {
+        private readonly IEnumerable<object[]> _data = new List<object[]>
+        {
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>() },
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsQueryable()},
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>().GetDataTable().AsEnumerable()},
+        };
+
+        public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
     public class DataFixture
     {
         protected const int _rows = DataFixtureHelpers.Rows;
