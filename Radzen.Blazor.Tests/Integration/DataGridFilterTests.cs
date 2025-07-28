@@ -64,27 +64,10 @@ namespace Radzen.Blazor.Tests.Integration
             Assert.Equal(_rows, GridRowCount(component));
 
             //Filter Date
+            ChangeDatetimeValueAsync(component, nameof(Employee.HireDate), new DateTime(2013, 10, 17), 3);
             var dataFilter = component.FindAll("div.rz-date-filter").FirstOrDefault(x => x.OuterHtml.Contains(nameof(Employee.HireDate)));
 
-            //component.SetParametersAndRender(p =>
-            //    p.Add(s => s.Columns, b =>
-            //    {
-            //        b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.Simple);
-            //        b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.Simple);
-            //        b.columnBuilder<T>(nameof(Employee.Title), data, filterMode: FilterMode.Simple);
-
-            //        b.OpenComponent(0, typeof(RadzenDataGridColumn<T>));
-            //        b.AddAttribute(1, "Title", nameof(Employee.HireDate));
-            //        b.AddAttribute(2, "Filterable", true);
-            //        b.AddAttribute(3, "FilterValue", new DateOnly(2013, 10, 13));
-            //        b.AddAttribute(4, "Property", typeof(T) == typeof(DataRow) ?
-            //            $"ItemArray[6]" :
-            //            nameof(Employee.HireDate));
-            //        b.AddAttribute(5, "Type", typeof(DateTime));
-            //        b.CloseComponent();
-            //    }));
-
-            //Assert.Equal(3, GridRowCount(component));
+            Assert.Equal(3, GridRowCount(component));
 
         }
 
@@ -95,6 +78,21 @@ namespace Radzen.Blazor.Tests.Integration
             Assert.NotNull(thisInput);
             thisInput.Change(changeTo);
             return thisInput;
+        }
+
+        private void ChangeDatetimeValueAsync<T>(IRenderedComponent<RadzenDataGrid<T>> component, string colName, DateTime changeTo, int expected)
+        {
+            RadzenDataGrid<T> grid = component.Instance;
+            var col = grid.ColumnsCollection.OfType<RadzenDataGridColumn<T>>().FirstOrDefault(c=>c.Title ==  colName);
+            col.FilterOperator = FilterOperator.Equals;
+            col.FilterValue = changeTo;
+
+            grid.Reload();
+            component.WaitForAssertion(() =>
+            {
+                var view = grid.View; // Try accessing here, after reload
+                Assert.Equal(expected, view.Count());
+            }, timeout: TimeSpan.FromSeconds(1));
         }
 
         private int GridRowCount<T>(IRenderedComponent<RadzenDataGrid<T>> component) => component.FindAll("tbody > tr.rz-data-row").Count();
@@ -111,7 +109,6 @@ namespace Radzen.Blazor.Tests.Integration
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
             var component = data.GetTestDataGrid(ctx);
-
             component.SetParametersAndRender(p =>
                 p.Add(s => s.Columns, b =>
                 {
@@ -130,33 +127,66 @@ namespace Radzen.Blazor.Tests.Integration
             var trs = component.FindAll("tbody > tr.rz-data-row").Count();
             Assert.Equal(_rows, trs);
 
+            RadzenDataGrid<T> grid;
+
+            //Filter Date
+            grid = component.Instance;
+            SetFilterList(grid, "li.rz-multiselect-item", nameof(Employee.HireDate), new DateTime?[] { new DateTime(2013, 10, 17) });
+            component.WaitForAssertion(() =>
+            {
+                var view = grid.View;
+                Assert.Equal(3, view.Count());
+            }, timeout: TimeSpan.FromSeconds(1));
+            component.Dispose();
+
             //Filter String
-            ClickListItem(component, "li.rz-multiselect-item", nameof(Employee.Title), "Sales Representative");
-            Assert.Equal(6, GridRowCount(component));
-            ChangeInuptValue(component, "span.rz-cell-filter-label > input", nameof(Employee.FirstName), null);
-            Assert.Equal(_rows, GridRowCount(component));
+            component = data.GetTestDataGrid(ctx);
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.Title), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.HireDate), data, filterMode: FilterMode.CheckBoxList);
+                }));
+            grid = component.Instance;
+            SetFilterList(grid, "li.rz-multiselect-item", nameof(Employee.Title), new[] { "Sales Representative", "Vice President, Sales" });
+            component.WaitForAssertion(() =>
+            {
+                var view = grid.View;
+                Assert.Equal(7, view.Count());
+            }, timeout: TimeSpan.FromSeconds(1));
+            component.Dispose();
 
-            ////Filter Int
-            //ChangeInuptValue(component, "span.rz-numeric > input", nameof(Employee.EmployeeID), 1);
-            //Assert.Equal(1, GridRowCount(component));
-            //ChangeInuptValue(component, "span.rz-numeric > input", nameof(Employee.EmployeeID), null);
-            //Assert.Equal(_rows, GridRowCount(component));
-
-            ////Filter Date
-            //var dataFilter = component.FindAll("div.rz-date-filter").FirstOrDefault(x => x.OuterHtml.Contains(nameof(Employee.HireDate)));
+            //Filter Int
+            component = data.GetTestDataGrid(ctx);
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.Title), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.HireDate), data, filterMode: FilterMode.CheckBoxList);
+                }));
+            grid = component.Instance;
+            SetFilterList(grid, "li.rz-multiselect-item", nameof(Employee.EmployeeID), new[] { 1, 2, 3 });
+            component.WaitForAssertion(() =>
+            {
+                var view = grid.View;
+                Assert.Equal(3, view.Count());
+            }, timeout: TimeSpan.FromSeconds(1));
+            component.Dispose();
 
         }
 
-        private void ClickListItem<T>(IRenderedComponent<RadzenDataGrid<T>> component, string css, string colName, string value)
+        private void SetFilterList<T,V>(RadzenDataGrid<T> grid, string css, string colName, V[] changeTo)
         {
-            var col = component.FindComponents<RadzenDataGridColumn<T>>().FirstOrDefault(x => x.Instance.Title == colName);
-            Assert.NotNull(col);
-            col.Find("icon").Click();
-            
-            var inputelems = component.FindAll(css);
-            var thisInput = inputelems.FirstOrDefault(x => x.OuterHtml.Contains(value));
-            Assert.NotNull(thisInput);
-            thisInput.Click();
+            var col = grid.ColumnsCollection.OfType<RadzenDataGridColumn<T>>().FirstOrDefault(c => c.Title == colName);
+            col.FilterOperator = FilterOperator.Equals;
+            col.FilterValue = changeTo;
+
+            grid.Reload();
+
         }
 
 

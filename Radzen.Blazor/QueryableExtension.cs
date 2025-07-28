@@ -367,6 +367,14 @@ namespace Radzen
 
             var isEnumerableProperty = IsEnumerable(property.Type) && property.Type != typeof(string);
 
+            //if (filter.FilterValue.GetType() != valueType
+            //    && filter.FilterValue.GetType().IsGenericType)
+            //{
+            //    MethodInfo castMethod = typeof(Queryable)
+            //        .GetMethod(nameof(Queryable.Cast), BindingFlags.Static | BindingFlags.Public)!
+            //        .MakeGenericMethod(propertyType);
+            //    filter.FilterValue = castMethod.Invoke(null, new object[] { filter.FilterValue });
+            //}
             var constant = Expression.Constant(caseInsensitive ?
                 $"{filter.FilterValue}".ToLowerInvariant() :
                     isEnum && !isEnumerable && filter.FilterValue != null ? Enum.ToObject(Nullable.GetUnderlyingType(property.Type) ?? property.Type, filter.FilterValue) : filter.FilterValue,

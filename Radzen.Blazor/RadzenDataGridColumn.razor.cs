@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
@@ -146,18 +147,18 @@ namespace Radzen.Blazor
 
                 if (canSetFilterPropertyType)
                 {
-                    if (Type == null || typeof(TItem) == typeof(DataRow))
+                    if (Type == null || PropertyAccess.GetPropertyType(typeof(TItem), GetFilterProperty()) == null)
                     {
                         var fp = GetFilterProperty();
                         var pt = !string.IsNullOrEmpty(fp) ?
-                                PropertyAccess.GetPropertyType(typeof(TItem), fp) : typeof(object);
-                        _filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
+                                PropertyAccess.GetPropertyType(typeof(TItem), fp) ?? Type : typeof(object);
 
-                        if(typeof(TItem) == typeof(DataRow))
-                        {
-                            pt = Type ?? pt;
-                            //_filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
-                        }
+                        //if (typeof(TItem) == typeof(DataRow))
+                        //{
+                        //    pt = Type ?? pt;
+                        //    //_filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
+                        //}
+                        _filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
                     }
 
                     if (GetFilterOperator() == FilterOperator.Equals)
@@ -172,14 +173,13 @@ namespace Radzen.Blazor
 
                 if (!string.IsNullOrEmpty(property))
                 {
-                    _propertyType = typeof(TItem) == typeof(DataRow) ? Type ?? typeof(object) :
-                        PropertyAccess.GetPropertyType(typeof(TItem), property); 
+                    _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property) ?? Type;
                 }
 
                 //Altered logic so that for columns of array<object>[n] filterPropertyType to match (Type)array<object>[n] values in column
-                if (!string.IsNullOrEmpty(property) && (Type == null || typeof(TItem) == typeof(DataRow)) && !canSetFilterPropertyType)
+                if (!string.IsNullOrEmpty(property) && (Type == null || PropertyAccess.GetPropertyType(typeof(TItem), property) == null) && !canSetFilterPropertyType)
                 {
-                    _filterPropertyType = Type  ?? _propertyType;
+                    _filterPropertyType = Type ?? _propertyType;
                 }
 
                 //If Else required to handle Column<dynamic> 
@@ -187,7 +187,7 @@ namespace Radzen.Blazor
                 {
                     _filterPropertyType = Type;
                 }
-                else if(!string.IsNullOrEmpty(Property))
+                else if (!string.IsNullOrEmpty(Property))
                 {
                     propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
                 }
@@ -198,7 +198,7 @@ namespace Radzen.Blazor
                 }
             }
         }
-        
+
         int? orderIndex;
 
         /// <summary>
@@ -1132,7 +1132,7 @@ namespace Radzen.Blazor
 
             if (isFirst)
             {
-                filterValue = CanSetCurrentValue(value) ? value : 
+                filterValue = CanSetCurrentValue(value) ? value :
                     GetFilterOperator() == FilterOperator.IsEmpty  || GetFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
             }
             else
@@ -1241,7 +1241,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The filter operator.</value>
         [Parameter]
-        public FilterOperator FilterOperator 
+        public FilterOperator FilterOperator
         {
             get
             {

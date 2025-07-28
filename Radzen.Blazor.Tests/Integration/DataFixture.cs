@@ -71,7 +71,9 @@ namespace Radzen.Blazor.Tests.Integration
                 builder.OpenComponent(sequ++, typeof(RadzenDataGridColumn<T>));
                 builder.AddAttribute(sequ++, "Title", dataCol.ColumnName);
                 builder.AddAttribute(sequ++, "Property", $"ItemArray[{dataCol.Table.Columns.IndexOf(dataCol)}]");
-                builder.AddAttribute(sequ++, "Type", dataCol.DataType);
+                builder.AddAttribute(sequ++, "Type", dataCol.AllowDBNull && dataCol.DataType.IsValueType
+                    ? typeof(Nullable<>).MakeGenericType(dataCol.DataType)
+                    : dataCol.DataType);
             }
             else
             {
@@ -88,7 +90,6 @@ namespace Radzen.Blazor.Tests.Integration
             return builder;
         }
 
-
         public static DataTable GetDataTable<T>(this IEnumerable<T> employees)
         {
             DataTable dataTable = new DataTable(typeof(T).Name);
@@ -96,7 +97,11 @@ namespace Radzen.Blazor.Tests.Integration
             PropertyInfo[] properties = typeof(T).GetProperties();
             foreach (PropertyInfo property in properties)
             {
-                dataTable.Columns.Add(property.Name, Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType);
+                var col = new DataColumn();
+                col.ColumnName = property.Name;
+                col.DataType = Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType;
+                col.AllowDBNull = Nullable.GetUnderlyingType(property.PropertyType) != null || !property.PropertyType.IsValueType;
+                dataTable.Columns.Add(col);
             }
             foreach (T item in employees)
             {

@@ -20,8 +20,8 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.FirstName))"
                               Type="@colType(nameof(Employee.FirstName))"
-                              Title="First Name" Frozen="true" Width="160px" 
-                              FilterMode="FilterMode.Advanced"/>
+                              Title="First Name" Frozen="true" Width="160px"
+                              FilterMode="FilterMode.Advanced" />
         @* Removing the Type def breaks Filtering for any Col *@
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.LastName))"
                               Type="@colType(nameof(Employee.LastName))"
@@ -40,7 +40,8 @@
                               Title="Birth Date" FormatString="{0:d}" Width="160px" />
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.HireDate))"
                               Type="@colType(nameof(Employee.HireDate))"
-                              Title="Hire Date" FormatString="{0:d}" Width="160px" />
+                              Title="Hire Date" FormatString="{0:d}" Width="160px"
+                              FilterMode="FilterMode.CheckBoxList" />
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Address))"
                               Type="@colType(nameof(Employee.Address))"
                               Title="Address" Width="200px" />
@@ -93,7 +94,9 @@
         PropertyInfo[] properties = typeof(T).GetProperties();
         foreach (PropertyInfo property in properties)
         {
-            dataTable.Columns.Add(property.Name, Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType);
+            DataColumn col = new(property.Name, Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType);
+            col.AllowDBNull = Nullable.GetUnderlyingType(property.PropertyType) != null || !property.PropertyType.IsValueType;
+            dataTable.Columns.Add(col);
         }
         foreach (T item in employees)
         {
@@ -122,7 +125,10 @@
         {
             return typeof(string); // Default type if the table is not initialized
         }
-        return employeesTable.Columns[colName].DataType;
+        return DataColType(employeesTable.Columns[colName]);
     }
 
+    private Type DataColType(DataColumn dataCol) => dataCol.AllowDBNull && dataCol.DataType.IsValueType
+        ? typeof(Nullable<>).MakeGenericType(dataCol.DataType)
+        : dataCol.DataType;
 }
