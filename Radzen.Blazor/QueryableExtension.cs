@@ -346,7 +346,8 @@ namespace Radzen
 
             Type secondValueType = filter.SecondFilterValue != null ? filter.Type ?? filter.SecondFilterValue.GetType() : null;
 
-            Expression p = GetNestedPropertyExpression(parameter, filter.Property, propertyType);
+            //Expression p = GetNestedPropertyExpression(parameter, filter.Property, propertyType);
+            Expression p = GetNestedPropertyExpression(parameter, filter.FilterProperty ?? filter.Property, propertyType);
 
             Expression property = GetNestedPropertyExpression(parameter, !isEnumerable && !IsEnumerable(p.Type) ? filter.FilterProperty ?? filter.Property : filter.Property, propertyType);
 

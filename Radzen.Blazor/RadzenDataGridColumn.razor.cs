@@ -153,11 +153,6 @@ namespace Radzen.Blazor
                         var pt = !string.IsNullOrEmpty(fp) ?
                                 PropertyAccess.GetPropertyType(typeof(TItem), fp) ?? Type : typeof(object);
 
-                        //if (typeof(TItem) == typeof(DataRow))
-                        //{
-                        //    pt = Type ?? pt;
-                        //    //_filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
-                        //}
                         _filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
                     }
 
@@ -182,14 +177,14 @@ namespace Radzen.Blazor
                     _filterPropertyType = Type ?? _propertyType;
                 }
 
-                //If Else required to handle Column<dynamic> 
                 if (_filterPropertyType == null)
                 {
                     _filterPropertyType = Type;
                 }
                 else if (!string.IsNullOrEmpty(Property))
                 {
-                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
+                    //Send the Enum Type to Getter when there is an explicity Type provided (otherwise it works itself out)
+                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property, (Type != null && Nullable.GetUnderlyingType(Type) != null && !Type.IsEnum) ? null : Type);
                 }
 
                 if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null && _filterOperator == null)

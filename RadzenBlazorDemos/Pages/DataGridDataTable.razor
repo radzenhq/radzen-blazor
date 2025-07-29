@@ -13,7 +13,10 @@
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.EmployeeID))"
                               Type="@colType(nameof(Employee.EmployeeID))"
                               Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center">
+        <RadzenDataGridColumn Title="Photo" Frozen="true"
+                              Sortable="true" SortProperty="@colProperty(nameof(Employee.LastName))"
+                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.LastName))" Type="@colType(nameof(Employee.LastName))"
+                              Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenImage Path="@(data["Photo"] as string)" class="rz-gravatar" AlternateText="@(data["FirstName"] + " " + data["LastName"])" />
             </Template>
@@ -21,6 +24,7 @@
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.FirstName))"
                               Type="@colType(nameof(Employee.FirstName))"
                               Title="First Name" Frozen="true" Width="160px"
+                              FilterProperty="@colProperty(nameof(Employee.LastName))"
                               FilterMode="FilterMode.Advanced" />
         @* Removing the Type def breaks Filtering for any Col *@
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.LastName))"

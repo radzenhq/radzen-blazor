@@ -8,6 +8,14 @@ using System.Threading.Tasks;
 
 namespace Radzen.Blazor.Tests.Integration
 {
+    public enum CourtesyEnum
+    {
+        Mr,
+        Mrs,
+        Ms,
+        Dr
+    }
+
     public class Employee
     {
         public int EmployeeID
@@ -31,7 +39,7 @@ namespace Radzen.Blazor.Tests.Integration
             get;
             set;
         }
-        public string TitleOfCourtesy
+        public CourtesyEnum TitleOfCourtesy
         {
             get;
             set;

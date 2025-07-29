@@ -9,6 +9,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +27,7 @@ namespace Radzen.Blazor.Tests.Integration
         #region Filter Simple
         [Theory]
         [ClassData(typeof(TestGridData))]
-        public void FilterTestAsync<T>(IEnumerable<T> data)
+        public void FilterTestSimpleAsync<T>(IEnumerable<T> data)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -38,6 +40,8 @@ namespace Radzen.Blazor.Tests.Integration
                 {
                     b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.Simple);
                     b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.LastName), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.TitleOfCourtesy), data, filterMode: FilterMode.Simple);
                     b.columnBuilder<T>(nameof(Employee.Title), data, filterMode: FilterMode.Simple);
                     b.columnBuilder<T>(nameof(Employee.HireDate), data, filterMode: FilterMode.Simple);
                 }));
@@ -65,9 +69,69 @@ namespace Radzen.Blazor.Tests.Integration
 
             //Filter Date
             ChangeDatetimeValueAsync(component, nameof(Employee.HireDate), new DateTime(2013, 10, 17), 3);
-            var dataFilter = component.FindAll("div.rz-date-filter").FirstOrDefault(x => x.OuterHtml.Contains(nameof(Employee.HireDate)));
-
             Assert.Equal(3, GridRowCount(component));
+            ChangeDatetimeValueAsync(component, nameof(Employee.HireDate), null, 9);
+            Assert.Equal(_rows, GridRowCount(component));
+
+        }
+
+
+        [Theory]
+        [ClassData(typeof(TestGridData))]
+        public void FilterEnumTestSimpleAsync<T>(IEnumerable<T> data)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = data.GetTestDataGrid(ctx);
+
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.LastName), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.TitleOfCourtesy), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.Title), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.HireDate), data, filterMode: FilterMode.Simple);
+                }));
+
+            var dg = component.Instance;
+            var cols = dg.ColumnsCollection.Count;
+            var rows = dg.Data.Count();
+            Assert.Equal(_cols, cols);
+            Assert.Equal(_rows, rows);
+
+            var cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "Mr");
+            Assert.Contains(cells, x => x.InnerHtml == "Ms");
+
+            RadzenDataGrid<T> grid;
+
+            //Filter Enum
+            grid = component.Instance;
+            SetEnumDropdown(grid, "li.rz-dropdown-item", nameof(Employee.TitleOfCourtesy),  CourtesyEnum.Mr);
+            component.WaitForAssertion(() =>
+            {
+                var view = grid.View;
+                Assert.Equal(3, view.Count());
+            }, timeout: TimeSpan.FromSeconds(1));
+
+            cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "Mr");
+            Assert.DoesNotContain(cells, x => x.InnerHtml == "Ms");
+            component.Dispose();
+
+        }
+
+        private void SetEnumDropdown<T, V>(RadzenDataGrid<T> grid, string css, string colName, V changeTo)
+        {
+            var col = grid.ColumnsCollection.OfType<RadzenDataGridColumn<T>>().FirstOrDefault(c => c.Title == colName);
+            col.FilterOperator = FilterOperator.Equals;
+            col.FilterValue = changeTo;
+
+            grid.Reload();
 
         }
 
@@ -80,10 +144,10 @@ namespace Radzen.Blazor.Tests.Integration
             return thisInput;
         }
 
-        private void ChangeDatetimeValueAsync<T>(IRenderedComponent<RadzenDataGrid<T>> component, string colName, DateTime changeTo, int expected)
+        private void ChangeDatetimeValueAsync<T>(IRenderedComponent<RadzenDataGrid<T>> component, string colName, DateTime? changeTo, int expected)
         {
             RadzenDataGrid<T> grid = component.Instance;
-            var col = grid.ColumnsCollection.OfType<RadzenDataGridColumn<T>>().FirstOrDefault(c=>c.Title ==  colName);
+            var col = grid.ColumnsCollection.OfType<RadzenDataGridColumn<T>>().FirstOrDefault(c => c.Title == colName);
             col.FilterOperator = FilterOperator.Equals;
             col.FilterValue = changeTo;
 
@@ -114,6 +178,8 @@ namespace Radzen.Blazor.Tests.Integration
                 {
                     b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.LastName), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.TitleOfCourtesy), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.Title), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.HireDate), data, filterMode: FilterMode.CheckBoxList);
                 }));
@@ -146,6 +212,8 @@ namespace Radzen.Blazor.Tests.Integration
                 {
                     b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.LastName), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.TitleOfCourtesy), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.Title), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.HireDate), data, filterMode: FilterMode.CheckBoxList);
                 }));
@@ -165,6 +233,8 @@ namespace Radzen.Blazor.Tests.Integration
                 {
                     b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.LastName), data, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder<T>(nameof(Employee.TitleOfCourtesy), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.Title), data, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder<T>(nameof(Employee.HireDate), data, filterMode: FilterMode.CheckBoxList);
                 }));
@@ -179,7 +249,7 @@ namespace Radzen.Blazor.Tests.Integration
 
         }
 
-        private void SetFilterList<T,V>(RadzenDataGrid<T> grid, string css, string colName, V[] changeTo)
+        private void SetFilterList<T, V>(RadzenDataGrid<T> grid, string css, string colName, V[] changeTo)
         {
             var col = grid.ColumnsCollection.OfType<RadzenDataGridColumn<T>>().FirstOrDefault(c => c.Title == colName);
             col.FilterOperator = FilterOperator.Equals;
@@ -190,6 +260,59 @@ namespace Radzen.Blazor.Tests.Integration
         }
 
 
+        #endregion
+
+        #region filter != property
+        [Theory]
+        [ClassData(typeof(TestGridData))]
+        public void FilterOnDifferentPropAsync<T>(IEnumerable<T> data)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = data.GetTestDataGrid(ctx);
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder<T>(nameof(Employee.EmployeeID), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.FirstName), data, filterMode: FilterMode.Simple);
+                    b.columnBuilder<T>(nameof(Employee.HireDate), data, filterMode: FilterMode.Simple);
+
+                    int sequ = 0;
+                    b.OpenComponent(sequ++, typeof(RadzenDataGridColumn<T>));
+                    b.AddAttribute(sequ++, "Title", nameof(Employee.LastName));
+                    b.AddAttribute(sequ++, "Sortable", true);
+                    b.AddAttribute(sequ++, "Filterable", true);
+                    b.AddAttribute(sequ++, "FilterMode", FilterMode.Simple);
+                    if (data is IEnumerable<DataRow> rows)
+                    {
+                        Assert.NotEmpty(rows);
+                        var table = (data.First() as DataRow).Table;
+                        Assert.NotNull(table);
+                        DataColumn dataCol = table.Columns["LastName"];
+                        Assert.NotNull(dataCol);
+                        b.AddAttribute(sequ++, "Property", $"ItemArray[{dataCol.Table.Columns.IndexOf(dataCol)}]");
+                        b.AddAttribute(sequ++, "Type", dataCol.DataColType());
+                        Debug.Print($"DataRow: {sequ}");
+                    }
+                    else
+                    {
+                        b.AddAttribute(sequ++, "Property", nameof(Employee.LastName));
+                        b.AddAttribute(sequ++, "FilterProperty", nameof(Employee.FirstName));
+                        Debug.Print($"Emplyee: {sequ}");
+                    }
+                    b.CloseComponent();
+                }));
+
+            var dg = component.Instance;
+            var cols = dg.ColumnsCollection.Count;
+            var rows = dg.Data.Count();
+            Assert.Equal(4, cols);
+            Assert.Equal(_rows, rows);
+
+
+        }
         #endregion
     }
 }
