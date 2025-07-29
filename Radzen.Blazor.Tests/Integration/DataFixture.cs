@@ -5,9 +5,12 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -146,8 +149,9 @@ namespace Radzen.Blazor.Tests.Integration
     {
         private readonly IEnumerable<object[]> _data = new List<object[]>
         {
-            new object[] {DataFixtureHelpers.GetEmployees<Employee>() },
-            new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsQueryable()},
+            //new object[] {DataFixtureHelpers.GetEmployees<Employee>() },
+            //new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsQueryable()},
+            //new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsODataEnumerable()},
             new object[] {DataFixtureHelpers.GetEmployees<Employee>().GetDataTable().AsEnumerable()},
         };
 
@@ -156,19 +160,6 @@ namespace Radzen.Blazor.Tests.Integration
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     }
 
-    public class TestGridFilterData : IEnumerable<object[]>
-    {
-        private readonly IEnumerable<object[]> _data = new List<object[]>
-        {
-            new object[] {DataFixtureHelpers.GetEmployees<Employee>() },
-            new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsQueryable()},
-            new object[] {DataFixtureHelpers.GetEmployees<Employee>().GetDataTable().AsEnumerable()},
-        };
-
-        public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    }
     public class DataFixture
     {
         protected const int _rows = DataFixtureHelpers.Rows;

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -18,6 +19,35 @@ namespace Radzen.Blazor.Tests.Integration
 
     public class DataGridSortTests : DataFixture
     {
+
+        [Theory]
+        [ClassData(typeof(TestGridData))]
+        public void NullValuesInResultsTest<T>(IEnumerable<T> data)
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = data.GetTestDataGrid(ctx); 
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder<T>(nameof(Employee.EmployeeID), data);
+                    b.columnBuilder<T>(nameof(Employee.FirstName), data);
+                    b.columnBuilder<T>(nameof(Employee.Region), data);
+                    b.columnBuilder<T>(nameof(Employee.TitleOfCourtesy), data);
+                    b.columnBuilder<T>(nameof(Employee.Title), data);
+                    b.columnBuilder<T>(nameof(Employee.HireDate), data);
+                }));
+            var dg = component.Instance;
+            var cols = dg.ColumnsCollection.Count;
+            var rows = dg.Data.Count();
+
+            var cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "");
+
+            //should not throw with null values
+        }
 
         [Fact]
         public void TestingFact()
@@ -48,6 +78,7 @@ namespace Radzen.Blazor.Tests.Integration
                     builder.AddAttribute(2, "Filterable", true);
                     builder.CloseComponent();
                 });
+
             });
 
             component.SetParametersAndRender(p => p.Add<IEnumerable<Employee>>(c => c.Data, data));
@@ -71,6 +102,7 @@ namespace Radzen.Blazor.Tests.Integration
             Assert.Equal("9", cells[0 * cols].TextContent.Trim());
             Assert.Equal("8", cells[1 * cols].TextContent.Trim());
             Assert.Equal("7", cells[2 * cols].TextContent.Trim());
+
         }
 
 

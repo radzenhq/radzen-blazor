@@ -112,4 +112,41 @@ namespace Radzen.Blazor.Tests.Integration
         }
 
     }
+
+    public class EmployeeEnums
+    {
+        public int ID { get; set; }
+        public GenderType Gender { get; set; }
+        public StatusType? Status { get; set; }
+        public ColorType Color { get; set; }
+    }
+
+    public enum GenderType
+    {
+        Ms,
+        Mr,
+        Unknown,
+    }
+
+    public enum ColorType
+    {
+        Red,
+        Green,
+        Blue,
+        [Display(Description = "Almond Green")]
+        AlmondGreen,
+        [Display(Description = "Amber Gray")]
+        AmberGray,
+        [Display(Description = "Apple Blue... ")]
+        AppleBlueSeaGreen,
+        [Display(Description = "Azure")]
+        AzureBlue,
+
+    }
+
+    public enum StatusType
+    {
+        Inactive,
+        Active,
+    }
 }

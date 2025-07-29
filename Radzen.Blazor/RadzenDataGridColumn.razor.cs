@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -183,8 +184,12 @@ namespace Radzen.Blazor
                 }
                 else if (!string.IsNullOrEmpty(Property))
                 {
-                    //Send the Enum Type to Getter when there is an explicity Type provided (otherwise it works itself out)
-                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property, (Type != null && Nullable.GetUnderlyingType(Type) != null && !Type.IsEnum) ? null : Type);
+                    //Send the Enum Type to Getter otherwise it is interpreted and displayed as an int
+                    propertyValueGetter =
+                        Type != null && (Nullable.GetUnderlyingType(Type) ?? Type).IsEnum
+                        ? PropertyAccess.Getter<TItem, object>(Property, Type)
+                        : PropertyAccess.Getter<TItem, object>(Property);
+
                 }
 
                 if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null && _filterOperator == null)

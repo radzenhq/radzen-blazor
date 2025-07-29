@@ -3,6 +3,7 @@ using Radzen.Blazor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -291,10 +292,9 @@ namespace Radzen
                 {
                     if (member.Type.IsArray)
                     {
-                        member = Expression.ArrayIndex(member, Expression.Constant(index));
-                        //Converter added so filter can match values in (type)array<object>[]
-                        if(type != null && member.Type != type)
-                            member = Expression.Convert(member, type);
+                        member = Expression.ArrayIndex( member, Expression.Constant(index));
+                        member = DbNullConverter(expression.Type, member, type);
+
                     }
                     else if (member.Type.IsGenericType &&
                              (member.Type.GetGenericTypeDefinition() == typeof(List<>) ||
@@ -335,18 +335,49 @@ namespace Radzen
                     member;
         }
 
+        private static Expression DbNullConverter(Type itemType, Expression input, Type outType)
+        {
+            outType = outType ?? input.Type;
+            var underlyingType = Nullable.GetUnderlyingType(outType) ?? outType;
+
+            //If this is regular type, return the input, converted if necessary
+            if (itemType != typeof(DataRow))
+            {
+                return outType == input.Type ? input : Expression.Convert(input, outType);
+            }
+
+            //Need a non-nullable conversion to explicit type
+            if(underlyingType == outType && outType != typeof(object))
+            {
+                return outType == input.Type ? input : Expression.Convert(input, outType);
+            }
+
+            //Leaving all object->object and nullable type conversions
+            //Handle object[] where object[n]==DBNull.Value
+            var isDbNull = Expression.Equal(input, Expression.Constant(DBNull.Value, typeof(object)));
+            var nullValue = Expression.Constant(null, outType);
+
+            //Converter for non-null values, input->underlying->output
+            //outType must be nullable or !ValueType
+            Expression nonNullConversion = Expression.Convert(
+                Expression.Convert(input, underlyingType),
+                outType);
+
+            return Expression.Condition(isDbNull, nullValue, nonNullConversion);
+        }
+
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)
         {
             Type valueType = filter.FilterValue != null ? filter.Type ?? filter.FilterValue.GetType() : null;
-
-            Type propertyType = valueType.IsGenericType && valueType.GenericTypeArguments.Length == 1 ?
+            //This gets the underlying type of the target Property when filter.FilterValue is Enumerable<prop Values>
+            //Required below as GetNestedPropertyExpression uses the passed PropertyType for DataRow.ItemArray
+            Type propertyType = IsEnumerable(valueType) && valueType.GenericTypeArguments.Length == 1 ?
                 valueType.GenericTypeArguments.First() : valueType;
 
             var isEnumerable = valueType != null && IsEnumerable(valueType) && valueType != typeof(string);
 
-            Type secondValueType = filter.SecondFilterValue != null ? filter.Type ?? filter.SecondFilterValue.GetType() : null;
+            Type secondValueType = filter.SecondFilterValue != null ? filter.SecondFilterValue.GetType() : null;
 
-            //Expression p = GetNestedPropertyExpression(parameter, filter.Property, propertyType);
             Expression p = GetNestedPropertyExpression(parameter, filter.FilterProperty ?? filter.Property, propertyType);
 
             Expression property = GetNestedPropertyExpression(parameter, !isEnumerable && !IsEnumerable(p.Type) ? filter.FilterProperty ?? filter.Property : filter.Property, propertyType);
@@ -355,7 +386,7 @@ namespace Radzen
 
             ParameterExpression collectionItemTypeParameter = collectionItemType != null ? Expression.Parameter(collectionItemType, "x") : null;
 
-            if (collectionItemType != null && filter.Property != filter.FilterProperty)
+            if (collectionItemType != null && filter.Property != (filter.FilterProperty ?? filter.Property))
             {
                 property = !string.IsNullOrEmpty(filter.FilterProperty) ? GetNestedPropertyExpression(collectionItemTypeParameter, filter.FilterProperty) : collectionItemTypeParameter;
 
@@ -368,18 +399,10 @@ namespace Radzen
 
             var isEnumerableProperty = IsEnumerable(property.Type) && property.Type != typeof(string);
 
-            //if (filter.FilterValue.GetType() != valueType
-            //    && filter.FilterValue.GetType().IsGenericType)
-            //{
-            //    MethodInfo castMethod = typeof(Queryable)
-            //        .GetMethod(nameof(Queryable.Cast), BindingFlags.Static | BindingFlags.Public)!
-            //        .MakeGenericMethod(propertyType);
-            //    filter.FilterValue = castMethod.Invoke(null, new object[] { filter.FilterValue });
-            //}
             var constant = Expression.Constant(caseInsensitive ?
                 $"{filter.FilterValue}".ToLowerInvariant() :
                     isEnum && !isEnumerable && filter.FilterValue != null ? Enum.ToObject(Nullable.GetUnderlyingType(property.Type) ?? property.Type, filter.FilterValue) : filter.FilterValue,
-                    !isEnum && isEnumerable ? valueType : isEnumerableProperty ? valueType : property.Type);
+                    !isEnum && isEnumerable ? valueType : isEnumerableProperty ? valueType: property.Type);
 
             if (caseInsensitive && !isEnumerable)
             {
@@ -430,11 +453,8 @@ namespace Radzen
             if (collectionItemType != null && primaryExpression != null &&
                 !(filter.FilterOperator == FilterOperator.In || filter.FilterOperator == FilterOperator.NotIn))
             {
-                primaryExpression = parameter.Type.IsGenericType ?
-                    Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType },
-                        GetNestedPropertyExpression(parameter, filter.Property), Expression.Lambda(primaryExpression, collectionItemTypeParameter)) :
-                    Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] {  },
-                        GetNestedPropertyExpression(parameter, filter.Property), Expression.Lambda(primaryExpression, collectionItemTypeParameter));
+                primaryExpression = Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType },
+                    GetNestedPropertyExpression(parameter, filter.Property), Expression.Lambda(primaryExpression, collectionItemTypeParameter));
             }
 
             Expression secondExpression = null;

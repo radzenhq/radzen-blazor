@@ -76,6 +76,187 @@ namespace Radzen.Blazor.Tests.Integration
         }
 
 
+        [Fact]
+        public void NullableEnumPocoTest()
+        {
+            var data = Enumerable.Range(0, 9).Select(i =>
+            new EmployeeEnums
+            {
+                ID = i,
+                Gender = i < 3 ? GenderType.Mr : i < 6 ? GenderType.Ms : GenderType.Unknown,
+                Status = i < 3 ? StatusType.Active : i < 6 ? StatusType.Inactive : null,
+                Color = i < 2 ? ColorType.Red : i < 4 ? ColorType.AlmondGreen : i < 6 ? ColorType.AppleBlueSeaGreen : ColorType.AzureBlue,
+            });
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+
+            var component = data.GetTestDataGrid(ctx);
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder<EmployeeEnums>(nameof(EmployeeEnums.ID), data);
+                    b.columnBuilder<EmployeeEnums>(nameof(EmployeeEnums.Gender), data);
+                    b.columnBuilder<EmployeeEnums>(nameof(EmployeeEnums.Status), data);
+                    b.columnBuilder<EmployeeEnums>(nameof(EmployeeEnums.Color), data);
+                }));
+            var dg = component.Instance;
+            var cols = dg.ColumnsCollection.Count;
+            var rows = dg.Data.Count();
+            Assert.Equal(4, cols);
+            Assert.Equal(9, rows);
+
+            var cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "Mr");
+            Assert.Contains(cells, x => x.InnerHtml == "Inactive");
+            Assert.Contains(cells, x => x.InnerHtml == "Almond Green");
+            Assert.Contains(cells, x => x.InnerHtml == "");
+        }
+
+        [Fact]
+        public void NullableEnumTableTest()
+        {
+            var dataValues = Enumerable.Range(0, 9).Select(i =>
+            new EmployeeEnums
+            {
+                ID = i,
+                Gender = i < 3 ? GenderType.Mr : i < 6 ? GenderType.Ms : GenderType.Unknown,
+                Status = i < 3 ? StatusType.Active : i < 6 ? StatusType.Inactive : null,
+                Color = i < 2 ? ColorType.Red : i < 4 ? ColorType.AlmondGreen : i < 6 ? ColorType.AppleBlueSeaGreen : ColorType.AzureBlue,
+            });
+
+            IEnumerable<DataRow> data = dataValues.GetDataTable().AsEnumerable();
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+
+            var component = data.GetTestDataGrid(ctx);
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder(nameof(EmployeeEnums.ID), data);
+                    b.columnBuilder(nameof(EmployeeEnums.Gender), data);
+                    b.columnBuilder(nameof(EmployeeEnums.Status), data);
+                    b.columnBuilder(nameof(EmployeeEnums.Color), data);
+                }));
+            var dg = component.Instance;
+            var cols = dg.ColumnsCollection.Count;
+            var rows = dg.Data.Count();
+            Assert.Equal(4, cols);
+            Assert.Equal(9, rows);
+
+            var cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "Mr");
+            Assert.Contains(cells, x => x.InnerHtml == "Inactive");
+            Assert.Contains(cells, x => x.InnerHtml == "Almond Green");
+            Assert.Contains(cells, x => x.InnerHtml == "");
+
+            //Check Sorting works with null values
+            var sortHead = component.FindAll(".rz-column-title")
+                .FirstOrDefault(x => x.TextContent.Contains("Status"));
+            Assert.NotNull(sortHead);
+
+            cells = component.FindAll(".rz-cell-data");
+            Assert.Equal("0", cells[0 * cols].TextContent.Trim());
+            Assert.Equal("1", cells[1 * cols].TextContent.Trim());
+            Assert.Equal("2", cells[2 * cols].TextContent.Trim());
+            Assert.Equal("3", cells[3 * cols].TextContent.Trim());
+
+            sortHead.Click();
+            cells = component.FindAll(".rz-cell-data");
+            Assert.Equal("6", cells[0 * cols].TextContent.Trim());
+            Assert.Equal("7", cells[1 * cols].TextContent.Trim());
+            Assert.Equal("8", cells[2 * cols].TextContent.Trim());
+            Assert.Equal("3", cells[3 * cols].TextContent.Trim());
+        }
+
+        [Fact]
+        public void NullableEnumTableFilterTest()
+        {
+            var dataValues = Enumerable.Range(0, 9).Select(i =>
+            new EmployeeEnums
+            {
+                ID = i,
+                Gender = i < 3 ? GenderType.Mr : i < 6 ? GenderType.Ms : GenderType.Unknown,
+                Status = i < 3 ? StatusType.Active : i < 6 ? StatusType.Inactive : null,
+                Color = i < 2 ? ColorType.Red : i < 4 ? ColorType.AlmondGreen : i < 6 ? ColorType.AppleBlueSeaGreen : ColorType.AzureBlue,
+            });
+
+            IEnumerable<DataRow> data = dataValues.GetDataTable().AsEnumerable();
+
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+
+            var component = data.GetTestDataGrid(ctx);
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder(nameof(EmployeeEnums.ID), data);
+                    b.columnBuilder(nameof(EmployeeEnums.Gender), data, filterable: true, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder(nameof(EmployeeEnums.Status), data, filterable: true, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder(nameof(EmployeeEnums.Color), data, filterable: true, filterMode: FilterMode.CheckBoxList);
+                }));
+            var dg = component.Instance;
+            var cols = dg.ColumnsCollection.Count;
+            var rows = dg.Data.Count();
+            Assert.Equal(4, cols);
+            Assert.Equal(9, rows);
+
+            RadzenDataGrid<DataRow> grid;
+            var cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "Mr");
+            Assert.Contains(cells, x => x.InnerHtml == "Ms");
+
+            //Filter Enum
+            grid = component.Instance;
+            SetEnumDropdown(grid, "li.rz-dropdown-item", nameof(EmployeeEnums.Gender), new[] { GenderType.Mr });
+            component.WaitForAssertion(() =>
+            {
+                var view = grid.View;
+                Assert.Equal(3, view.Count());
+            }, timeout: TimeSpan.FromSeconds(1));
+
+            cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "Mr");
+            Assert.DoesNotContain(cells, x => x.InnerHtml == "Ms");
+            component.Dispose();
+
+            component = data.GetTestDataGrid(ctx);
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.Columns, b =>
+                {
+                    b.columnBuilder(nameof(EmployeeEnums.ID), data);
+                    b.columnBuilder(nameof(EmployeeEnums.Gender), data, filterable: true, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder(nameof(EmployeeEnums.Status), data, filterable: true, filterMode: FilterMode.CheckBoxList);
+                    b.columnBuilder(nameof(EmployeeEnums.Color), data, filterable: true, filterMode: FilterMode.CheckBoxList);
+                }));
+
+
+            cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "Active");
+            Assert.Contains(cells, x => x.InnerHtml == "Inactive");
+
+            //Filter Enum
+            grid = component.Instance;
+            SetEnumDropdown(grid, "li.rz-dropdown-item", nameof(EmployeeEnums.Status), new  StatusType?[] { StatusType.Active });
+            component.WaitForAssertion(() =>
+            {
+                var view = grid.View;
+                Assert.Equal(3, view.Count());
+            }, timeout: TimeSpan.FromSeconds(1));
+
+            cells = component.FindAll(".rz-cell-data");
+            Assert.Contains(cells, x => x.InnerHtml == "Active");
+            Assert.DoesNotContain(cells, x => x.InnerHtml == "Inactive");
+            component.Dispose();
+        }
+
         [Theory]
         [ClassData(typeof(TestGridData))]
         public void FilterEnumTestSimpleAsync<T>(IEnumerable<T> data)
@@ -122,7 +303,6 @@ namespace Radzen.Blazor.Tests.Integration
             Assert.Contains(cells, x => x.InnerHtml == "Mr");
             Assert.DoesNotContain(cells, x => x.InnerHtml == "Ms");
             component.Dispose();
-
         }
 
         private void SetEnumDropdown<T, V>(RadzenDataGrid<T> grid, string css, string colName, V changeTo)

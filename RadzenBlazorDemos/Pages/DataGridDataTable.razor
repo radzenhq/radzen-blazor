@@ -8,25 +8,28 @@
 
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                 Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees
-                FilterMode="FilterMode.Simple">
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
+    @* FilterMode="FilterMode.Simple"> *@
     <Columns>
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.EmployeeID))"
                               Type="@colType(nameof(Employee.EmployeeID))"
                               Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
-        <RadzenDataGridColumn Title="Photo" Frozen="true"
+        <RadzenDataGridColumn HeaderTooltip="Sort based on Last Name"
+                              Title="Photo" Frozen="true"
                               Sortable="true" SortProperty="@colProperty(nameof(Employee.LastName))"
-                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.LastName))" Type="@colType(nameof(Employee.LastName))"
+                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.LastName))" FilterMode="FilterMode.Advanced"
+                              Type="@colType(nameof(Employee.LastName))"
                               Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenImage Path="@(data["Photo"] as string)" class="rz-gravatar" AlternateText="@(data["FirstName"] + " " + data["LastName"])" />
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.FirstName))"
+        <RadzenDataGridColumn HeaderTooltip="Filter based on Last Name"
+                              Property="@colProperty(nameof(Employee.FirstName))"
                               Type="@colType(nameof(Employee.FirstName))"
                               Title="First Name" Frozen="true" Width="160px"
                               FilterProperty="@colProperty(nameof(Employee.LastName))"
-                              FilterMode="FilterMode.Advanced" />
-        @* Removing the Type def breaks Filtering for any Col *@
+                              FilterMode="FilterMode.SimpleWithMenu" />
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.LastName))"
                               Type="@colType(nameof(Employee.LastName))"
                               Title="Last Name" Width="160px"
@@ -68,7 +71,9 @@
                               Type="@colType(nameof(Employee.Extension))"
                               Title="Extension" Width="160px" />
         @* Type="@colType(nameof(Employee.Notes))" *@
-        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Notes))"
+        @* Removing the Type property will prevent the value rendering and filtering correctly*@
+        <RadzenDataGridColumn HeaderTooltip="Data not displaying as Type= property not set"
+                              Property="@colProperty(nameof(Employee.Notes))"
                               Title="Notes" Width="300px" />
     </Columns>
 </RadzenDataGrid>
