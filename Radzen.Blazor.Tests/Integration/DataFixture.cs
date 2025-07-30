@@ -149,9 +149,9 @@ namespace Radzen.Blazor.Tests.Integration
     {
         private readonly IEnumerable<object[]> _data = new List<object[]>
         {
-            //new object[] {DataFixtureHelpers.GetEmployees<Employee>() },
-            //new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsQueryable()},
-            //new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsODataEnumerable()},
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>() },
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsQueryable()},
+            new object[] {DataFixtureHelpers.GetEmployees<Employee>().AsODataEnumerable()},
             new object[] {DataFixtureHelpers.GetEmployees<Employee>().GetDataTable().AsEnumerable()},
         };
 
