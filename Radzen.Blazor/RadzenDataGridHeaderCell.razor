@@ -219,8 +219,9 @@ else
 
         var property = Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty) ? Column.Property :
             Column.GetFilterProperty();
-
-        var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property) ?? Column.FilterPropertyType;
+            
+        //var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property) ?? Column.FilterPropertyType;
+        var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property) ?? Column.PropertyType;
 
         var loadDataArgsString = $"{loadDataArgs.Skip}|{loadDataArgs.Top}{loadDataArgs.Filter}";
 
@@ -305,7 +306,7 @@ else
         }
         else
         {
-            propertyType = PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty());
+            propertyType = PropertyAccess.GetPropertyType(typeof(TItem), Column.GetFilterProperty()) ?? Column.PropertyType;
         }
 
         if (propertyType == null)
