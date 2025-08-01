@@ -1,0 +1,60 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenSankeyDiagram TItem="FlowData"
+                       Data="@budgetFlows" 
+                       SourceProperty="Source"
+                       TargetProperty="Target"
+                       ValueProperty="Value"
+                       NodeLabels="@budgetNodeLabels"
+                       NodeFills="@budgetColors"
+                       NodeWidth="24" NodePadding="8"
+                       NodeAlignment="SankeyAlignment.Justify">
+    </RadzenSankeyDiagram>
+</div>
+
+@code {
+    public class FlowData
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public double Value { get; set; }
+    }
+    
+    private List<FlowData> budgetFlows = new List<FlowData>
+    {
+        // Income to expenses
+        new FlowData { Source = "salary", Target = "housing", Value = 2000 },
+        new FlowData { Source = "salary", Target = "food", Value = 800 },
+        new FlowData { Source = "salary", Target = "transport_exp", Value = 500 },
+        new FlowData { Source = "salary", Target = "utilities", Value = 300 },
+        new FlowData { Source = "salary", Target = "entertainment", Value = 200 },
+        new FlowData { Source = "salary", Target = "savings", Value = 1000 },
+        new FlowData { Source = "salary", Target = "healthcare", Value = 200 },
+        new FlowData { Source = "investment", Target = "savings", Value = 500 },
+        new FlowData { Source = "investment", Target = "entertainment", Value = 100 },
+        new FlowData { Source = "other", Target = "food", Value = 100 },
+        new FlowData { Source = "other", Target = "entertainment", Value = 100 }
+    };
+    
+    private Dictionary<string, string> budgetNodeLabels = new Dictionary<string, string>
+    {
+        { "salary", "Salary" },
+        { "investment", "Investments" },
+        { "other", "Other Income" },
+        { "housing", "Housing" },
+        { "food", "Food" },
+        { "transport_exp", "Transportation" },
+        { "utilities", "Utilities" },
+        { "entertainment", "Entertainment" },
+        { "savings", "Savings" },
+        { "healthcare", "Healthcare" }
+    };
+    
+    private List<string> budgetColors = new List<string>
+    {
+        "#10B981", "#06B6D4", "#3B82F6", "#F59E0B", "#EF4444", 
+        "#8B5CF6", "#EC4899", "#6366F1", "#10B981", "#14B8A6"
+    };
+}

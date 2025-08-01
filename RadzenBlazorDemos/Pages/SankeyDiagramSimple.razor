@@ -1,0 +1,94 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenCard Variant="Variant.Outlined" class="rz-mb-4">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+            <RadzenLabel Text="Color scheme:" Component="ColorScheme" />
+            <RadzenDropDown @bind-Value="@colorScheme" Data="@colorSchemes" Style="width: 200px;" Name="ColorScheme"
+                            Change="@(args => useCustomColors = false)">
+                <Template Context="scheme">
+                    @Enum.GetName(typeof(ColorScheme), scheme)
+                </Template>
+            </RadzenDropDown>
+            <RadzenCheckBox @bind-Value="@useCustomColors" Name="CustomColors" />
+            <RadzenLabel Text="Use custom colors" Component="CustomColors" />
+        </RadzenStack>
+    </RadzenCard>
+    
+    <RadzenSankeyDiagram TItem="FlowData"
+                         Data="@flows" 
+                         SourceProperty="Source"
+                         TargetProperty="Target"
+                         ValueProperty="Value"
+                         NodeLabels="@nodeLabels"
+                         NodeFills="@(useCustomColors ? customNodeColors : null)"
+                         LinkFills="@(useCustomColors ? customLinkColors : null)"
+                         ColorScheme="@colorScheme"
+                         NodeWidth="24" NodePadding="8">
+    </RadzenSankeyDiagram>
+</div>
+
+@code {
+    public class FlowData
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public double Value { get; set; }
+    }
+    
+    private ColorScheme colorScheme = ColorScheme.Pastel;
+    private bool useCustomColors = false;
+    private IEnumerable<ColorScheme> colorSchemes = Enum.GetValues(typeof(ColorScheme)).Cast<ColorScheme>();
+    
+    private List<FlowData> flows = new List<FlowData>
+    {
+        new FlowData { Source = "A", Target = "C", Value = 10 },
+        new FlowData { Source = "A", Target = "D", Value = 15 },
+        new FlowData { Source = "B", Target = "C", Value = 20 },
+        new FlowData { Source = "B", Target = "D", Value = 25 },
+        new FlowData { Source = "C", Target = "E", Value = 15 },
+        new FlowData { Source = "C", Target = "F", Value = 10 },
+        new FlowData { Source = "C", Target = "G", Value = 5 },
+        new FlowData { Source = "D", Target = "E", Value = 20 },
+        new FlowData { Source = "D", Target = "F", Value = 15 },
+        new FlowData { Source = "D", Target = "G", Value = 5 }
+    };
+    
+    private Dictionary<string, string> nodeLabels = new Dictionary<string, string>
+    {
+        { "A", "Source A" },
+        { "B", "Source B" },
+        { "C", "Process 1" },
+        { "D", "Process 2" },
+        { "E", "Target X" },
+        { "F", "Target Y" },
+        { "G", "Target Z" }
+    };
+    
+    // Custom color scheme
+    private List<string> customNodeColors = new List<string>
+    {
+        "#FF6B6B", // Source A - Red
+        "#4ECDC4", // Source B - Teal
+        "#45B7D1", // Process 1 - Blue
+        "#96CEB4", // Process 2 - Green
+        "#FFEAA7", // Target X - Yellow
+        "#DDA0DD", // Target Y - Plum
+        "#F4A460"  // Target Z - Sandy Brown
+    };
+    
+    private List<string> customLinkColors = new List<string>
+    {
+        "#FF6B6B80", // A to C
+        "#FF6B6B80", // A to D
+        "#4ECDC480", // B to C
+        "#4ECDC480", // B to D
+        "#45B7D180", // C to E
+        "#45B7D180", // C to F
+        "#45B7D180", // C to G
+        "#96CEB480", // D to E
+        "#96CEB480", // D to F
+        "#96CEB480"  // D to G
+    };
+}
