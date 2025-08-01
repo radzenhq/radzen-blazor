@@ -1,5 +1,6 @@
 @using Radzen.Blazor
 @inherits RadzenComponent
+@inject TooltipService TooltipService
 
 @if (Visible)
 {
@@ -14,10 +15,18 @@
         }
         @ChildContent
         <label class="rz-form-field-label rz-text-truncate" for=@Component>  @if (TextTemplate is null) {@Text} else {@TextTemplate} </label>
-        @if (End != null)
+        @if (End != null || !string.IsNullOrEmpty(InfoText))
         {
         <div class="rz-form-field-end">
-            @End
+            @if (End != null)
+            {
+                @End
+            }
+            @if (!string.IsNullOrEmpty(InfoText))
+            {
+                <RadzenIcon Icon="@InfoIcon" IconColor="@InfoIconColor" @ref="infoHelper"
+                            @onmouseenter="@(_ => OpenInfoTooltip(infoHelper.Element, InfoText))"/>
+            }
         </div>
         }
         </CascadingValue>
