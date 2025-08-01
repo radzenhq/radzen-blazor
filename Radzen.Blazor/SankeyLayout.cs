@@ -27,8 +27,6 @@ namespace Radzen.Blazor
             {
                 Id = n.Id,
                 Label = n.Label,
-                Fill = n.Fill,
-                Stroke = n.Stroke,
                 Value = n.Value,
                 Width = NodeWidth,
                 Y = 0,  // Initialize Y to 0
@@ -44,7 +42,6 @@ namespace Radzen.Blazor
                 Source = l.Source,
                 Target = l.Target,
                 Value = l.Value,
-                Fill = l.Fill,
                 SourceNode = nodeById[l.Source],
                 TargetNode = nodeById[l.Target]
             }).ToList();

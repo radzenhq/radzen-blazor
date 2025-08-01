@@ -3,7 +3,366 @@
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Sankey Diagram
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    The Radzen Blazor Sankey Diagram component visualizes flow and relationships between nodes in a system. Perfect for showing how values flow from one set of entities to another, such as energy distribution, budget allocation, or process workflows.
+</RadzenText>
+
+<RadzenText Anchor="sankey-diagram#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Basic usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    RadzenSankeyDiagram requires three essential properties to display your data:
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>Data</code> - specifies the data source containing flow information.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>SourceProperty</code> - the name of the property that provides the source node identifier.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>TargetProperty</code> - the name of the property that provides the target node identifier.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <code>ValueProperty</code> - the name of the property that provides the flow value between nodes.
+</RadzenText>
 
 <RadzenExample ComponentName="SankeyDiagram" Example="SankeyDiagramSimple">
     <SankeyDiagramSimple />
 </RadzenExample>
+
+<RadzenText Anchor="sankey-diagram#node-labels" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Node Labels
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>NodeLabels</code> parameter to provide friendly display names for your nodes. Pass a <code>Dictionary&lt;string, string&gt;</code> where the key is the node ID and the value is the display label.
+</RadzenText>
+
+<RadzenExample ComponentName="SankeyDiagram" Example="SankeyDiagramEnergyFlow">
+    <SankeyDiagramEnergyFlow />
+</RadzenExample>
+
+<RadzenText Anchor="sankey-diagram#custom-colors" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom Colors
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Override the default color scheme using <code>NodeFills</code> and <code>LinkFills</code> parameters. Provide a list of colors that will be applied to nodes and links based on their index.
+</RadzenText>
+
+<RadzenExample ComponentName="SankeyDiagram" Example="SankeyDiagramBudgetFlow">
+    <SankeyDiagramBudgetFlow />
+</RadzenExample>
+
+<RadzenText Anchor="sankey-diagram#generic-data" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Working with Custom Data Types
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    RadzenSankeyDiagram works with any data type using property selectors. Simply specify which properties contain your source, target, and value data. Use <code>NodeAlignment</code> to control how nodes are positioned vertically.
+</RadzenText>
+
+<RadzenExample ComponentName="SankeyDiagram" Example="SankeyDiagramGenericData">
+    <SankeyDiagramGenericData />
+</RadzenExample>
+
+<RadzenText Anchor="sankey-diagram#step-by-step-tutorial" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Step-by-Step Tutorial
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Step 1: Define your data model</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Define a class with properties for source, target, and value:
+</RadzenText>
+
+<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
+<code>// Define your data model
+public class EnergyFlow
+{
+    public string From { get; set; }
+    public string To { get; set; }
+    public double Amount { get; set; }
+}
+
+// Create your data
+var energyFlows = new List&lt;EnergyFlow&gt;
+{
+    new EnergyFlow { From = "Coal", To = "Electricity", Amount = 35 },
+    new EnergyFlow { From = "Solar", To = "Electricity", Amount = 15 }
+};</code>
+</pre>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Step 2: Add the component to your page</strong>
+</RadzenText>
+
+<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
+<code>&lt;RadzenSankeyDiagram TItem="EnergyFlow" 
+                     Data="@@energyFlows"
+                     SourceProperty="From"
+                     TargetProperty="To"
+                     ValueProperty="Amount" /&gt;</code>
+</pre>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Step 3: Add labels (optional)</strong>
+</RadzenText>
+
+<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
+<code>var labels = new Dictionary&lt;string, string&gt;
+{
+    { "Coal", "Coal Power" },
+    { "Solar", "Solar Energy" },
+    { "Electricity", "Electric Grid" }
+};
+
+&lt;RadzenSankeyDiagram Data="@@data" NodeLabels="@@labels" /&gt;</code>
+</pre>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Step 4: Customize colors (optional)</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    You have several options for customizing colors:
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
+    <strong>Option A: Use a built-in color scheme</strong>
+</RadzenText>
+<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
+<code>&lt;RadzenSankeyDiagram Data="@@data" ColorScheme="ColorScheme.Palette" /&gt;</code>
+</pre>
+
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
+    <strong>Option B: Custom node colors</strong>
+</RadzenText>
+<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
+<code>// Colors are applied in order to nodes as they appear in the diagram
+var nodeColors = new List&lt;string&gt; 
+{ 
+    "#FF6B6B",  // First node (e.g., "Coal")
+    "#4ECDC4",  // Second node (e.g., "Solar")
+    "#45B7D1",  // Third node (e.g., "Electricity")
+    "#96CEB4",  // Fourth node (if exists)
+    "#FFEAA7"   // Fifth node (if exists)
+};
+
+&lt;RadzenSankeyDiagram Data="@@data" NodeFills="@@nodeColors" /&gt;</code>
+</pre>
+
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
+    <strong>Option C: Custom link colors</strong>
+</RadzenText>
+<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
+<code>// Links inherit source node color by default, but you can override
+var linkColors = new List&lt;string&gt; 
+{ 
+    "#FF6B6B80",  // First link (80 = 50% opacity)
+    "#4ECDC480",  // Second link
+    "#45B7D180"   // Third link
+};
+
+&lt;RadzenSankeyDiagram Data="@@data" 
+                     NodeFills="@@nodeColors"
+                     LinkFills="@@linkColors" /&gt;</code>
+</pre>
+
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-8">
+    <strong>Option D: Complete customization</strong>
+</RadzenText>
+<pre class="rz-mb-8" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
+<code>// Full example with all customizations
+public class EnergyTransfer
+{
+    public string Source { get; set; }
+    public string Target { get; set; }
+    public double Value { get; set; }
+}
+
+var data = new List&lt;EnergyTransfer&gt;
+{
+    new EnergyTransfer { Source = "Coal", Target = "Power", Value = 35 },
+    new EnergyTransfer { Source = "Solar", Target = "Power", Value = 15 },
+    new EnergyTransfer { Source = "Wind", Target = "Power", Value = 20 },
+    new EnergyTransfer { Source = "Power", Target = "Industry", Value = 40 },
+    new EnergyTransfer { Source = "Power", Target = "Homes", Value = 30 }
+};
+
+var labels = new Dictionary&lt;string, string&gt;
+{
+    { "Coal", "Coal Power" },
+    { "Solar", "Solar Energy" },
+    { "Wind", "Wind Energy" },
+    { "Power", "Electric Grid" },
+    { "Industry", "Industrial Use" },
+    { "Homes", "Residential Use" }
+};
+
+// Node colors - one per unique node
+var nodeColors = new List&lt;string&gt; 
+{ 
+    "#2C3E50",  // Coal - dark gray
+    "#F39C12",  // Solar - orange
+    "#3498DB",  // Wind - blue
+    "#E74C3C",  // Power - red
+    "#9B59B6",  // Industry - purple
+    "#1ABC9C"   // Homes - turquoise
+};
+
+// Link colors - one per link (optional)
+var linkColors = new List&lt;string&gt; 
+{ 
+    "#2C3E5080",  // Coal to Power
+    "#F39C1280",  // Solar to Power
+    "#3498DB80",  // Wind to Power
+    "#E74C3C80",  // Power to Industry
+    "#E74C3C80"   // Power to Homes
+};
+
+&lt;RadzenSankeyDiagram TItem="EnergyTransfer"
+                     Data="@@data" 
+                     SourceProperty="Source"
+                     TargetProperty="Target"
+                     ValueProperty="Value"
+                     NodeLabels="@@labels"
+                     NodeFills="@@nodeColors"
+                     LinkFills="@@linkColors"
+                     NodeWidth="30"
+                     NodePadding="15" /&gt;</code>
+</pre>
+
+
+<RadzenText Anchor="sankey-diagram#properties" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    RadzenSankeyDiagram Properties
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Complete list of all available properties for the RadzenSankeyDiagram component:
+</RadzenText>
+
+<RadzenCard class="rz-mb-8">
+    <RadzenDataGrid TItem="ComponentProperty" Data="@componentProperties" ShowPagingSummary="false" 
+                    PagerHorizontalAlign="HorizontalAlign.Left" AllowPaging="false" 
+                    AllowSorting="false" Density="Density.Compact">
+        <Columns>
+            <RadzenDataGridColumn TItem="ComponentProperty" Property="Name" Title="Property" Width="200px">
+                <Template Context="data">
+                    <code>@data.Name</code>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ComponentProperty" Property="Type" Title="Type" Width="250px">
+                <Template Context="data">
+                    <code style="font-size: 0.875rem;">@data.Type</code>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ComponentProperty" Property="Default" Title="Default" Width="120px" />
+            <RadzenDataGridColumn TItem="ComponentProperty" Property="Description" Title="Description" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+<RadzenText Anchor="sankey-diagram#alignment-options" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Node Alignment Options
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <code>NodeAlignment</code> property controls how nodes are positioned vertically within each column:
+</RadzenText>
+
+<RadzenCard class="rz-mb-8">
+    <RadzenDataGrid TItem="AlignmentOption" Data="@alignmentOptions" ShowPagingSummary="false" 
+                    PagerHorizontalAlign="HorizontalAlign.Left" AllowPaging="false" 
+                    AllowSorting="false" Density="Density.Compact">
+        <Columns>
+            <RadzenDataGridColumn TItem="AlignmentOption" Property="Value" Title="Value" Width="200px">
+                <Template Context="data">
+                    <code>SankeyAlignment.@data.Value</code>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="AlignmentOption" Property="Description" Title="Description" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+<RadzenText Anchor="sankey-diagram#color-schemes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Color Schemes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Available built-in color schemes for the <code>ColorScheme</code> property:
+</RadzenText>
+
+<RadzenCard>
+    <RadzenDataGrid TItem="ColorSchemeOption" Data="@colorSchemes" ShowPagingSummary="false" 
+                    PagerHorizontalAlign="HorizontalAlign.Left" AllowPaging="false" 
+                    AllowSorting="false" Density="Density.Compact">
+        <Columns>
+            <RadzenDataGridColumn TItem="ColorSchemeOption" Property="Value" Title="Value" Width="200px">
+                <Template Context="data">
+                    <code>ColorScheme.@data.Value</code>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ColorSchemeOption" Property="Description" Title="Description" />
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
+
+@code {
+    class PropertyInfo
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Description { get; set; }
+    }
+
+    class ComponentProperty
+    {
+        public string Name { get; set; }
+        public string Type { get; set; }
+        public string Default { get; set; }
+        public string Description { get; set; }
+    }
+
+    class AlignmentOption
+    {
+        public string Value { get; set; }
+        public string Description { get; set; }
+    }
+
+    class ColorSchemeOption
+    {
+        public string Value { get; set; }
+        public string Description { get; set; }
+    }
+
+
+    List<ComponentProperty> componentProperties = new()
+    {
+        new ComponentProperty { Name = "Data", Type = "IEnumerable<TItem>", Default = "null", Description = "The data source containing flow information" },
+        new ComponentProperty { Name = "SourceProperty", Type = "string", Default = "Required", Description = "Property name that provides the source node ID" },
+        new ComponentProperty { Name = "TargetProperty", Type = "string", Default = "Required", Description = "Property name that provides the target node ID" },
+        new ComponentProperty { Name = "ValueProperty", Type = "string", Default = "Required", Description = "Property name that provides the flow value" },
+        new ComponentProperty { Name = "NodeLabels", Type = "IDictionary<string, string>", Default = "null", Description = "Dictionary mapping node IDs to display labels" },
+        new ComponentProperty { Name = "NodeFills", Type = "IList<string>", Default = "null", Description = "List of colors for nodes (overrides ColorScheme)" },
+        new ComponentProperty { Name = "LinkFills", Type = "IList<string>", Default = "null", Description = "List of colors for links (overrides default)" },
+        new ComponentProperty { Name = "NodeWidth", Type = "double", Default = "24", Description = "Width of the node rectangles in pixels" },
+        new ComponentProperty { Name = "NodePadding", Type = "double", Default = "8", Description = "Vertical padding between nodes in pixels" },
+        new ComponentProperty { Name = "NodeAlignment", Type = "SankeyAlignment", Default = "Justify", Description = "Vertical alignment of nodes within columns" },
+        new ComponentProperty { Name = "ColorScheme", Type = "ColorScheme", Default = "Pastel", Description = "Built-in color scheme to use" },
+        new ComponentProperty { Name = "Visible", Type = "bool", Default = "true", Description = "Whether the diagram is visible" },
+        new ComponentProperty { Name = "Style", Type = "string", Default = "null", Description = "Inline CSS styles" },
+        new ComponentProperty { Name = "Class", Type = "string", Default = "null", Description = "CSS class names" }
+    };
+
+    List<AlignmentOption> alignmentOptions = new()
+    {
+        new AlignmentOption { Value = "Justify", Description = "Nodes are distributed evenly in the vertical space (default)" },
+        new AlignmentOption { Value = "Left", Description = "Nodes are aligned to the top of the diagram" },
+        new AlignmentOption { Value = "Right", Description = "Nodes are aligned to the bottom of the diagram" },
+        new AlignmentOption { Value = "Center", Description = "Nodes are centered vertically" }
+    };
+
+    List<ColorSchemeOption> colorSchemes = new()
+    {
+        new ColorSchemeOption { Value = "Pastel", Description = "Soft, muted colors (default)" },
+        new ColorSchemeOption { Value = "Palette", Description = "Rich, vibrant color palette" },
+        new ColorSchemeOption { Value = "Monochrome", Description = "Shades of blue" },
+        new ColorSchemeOption { Value = "Divergent", Description = "Color scale from green to red" }
+    };
+}

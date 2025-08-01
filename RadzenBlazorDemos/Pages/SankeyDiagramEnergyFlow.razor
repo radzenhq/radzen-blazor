@@ -1,0 +1,70 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenSankeyDiagram TItem="FlowData"
+                       Data="@energyFlows" 
+                       SourceProperty="Source"
+                       TargetProperty="Target"
+                       ValueProperty="Value"
+                       NodeLabels="@energyNodeLabels"
+                       NodeFills="@energyColors"
+                       NodeWidth="24" NodePadding="8"
+                       NodeAlignment="SankeyAlignment.Justify">
+    </RadzenSankeyDiagram>
+</div>
+
+@code {
+    public class FlowData
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public double Value { get; set; }
+    }
+    
+    private List<FlowData> energyFlows = new List<FlowData>
+    {
+        // Sources to conversion
+        new FlowData { Source = "coal", Target = "electricity", Value = 45 },
+        new FlowData { Source = "coal", Target = "heat", Value = 15 },
+        new FlowData { Source = "gas", Target = "electricity", Value = 30 },
+        new FlowData { Source = "gas", Target = "heat", Value = 25 },
+        new FlowData { Source = "nuclear", Target = "electricity", Value = 35 },
+        new FlowData { Source = "renewable", Target = "electricity", Value = 25 },
+        
+        // Conversion to end use
+        new FlowData { Source = "electricity", Target = "residential", Value = 40 },
+        new FlowData { Source = "electricity", Target = "commercial", Value = 35 },
+        new FlowData { Source = "electricity", Target = "industrial", Value = 45 },
+        new FlowData { Source = "electricity", Target = "losses", Value = 15 },
+        new FlowData { Source = "heat", Target = "residential", Value = 20 },
+        new FlowData { Source = "heat", Target = "commercial", Value = 10 },
+        new FlowData { Source = "heat", Target = "industrial", Value = 5 },
+        new FlowData { Source = "heat", Target = "losses", Value = 5 },
+        
+        // Direct use
+        new FlowData { Source = "gas", Target = "transport", Value = 20 },
+        new FlowData { Source = "renewable", Target = "transport", Value = 5 }
+    };
+    
+    private Dictionary<string, string> energyNodeLabels = new Dictionary<string, string>
+    {
+        { "coal", "Coal" },
+        { "gas", "Natural Gas" },
+        { "nuclear", "Nuclear" },
+        { "renewable", "Renewable" },
+        { "electricity", "Electricity" },
+        { "heat", "Heat" },
+        { "residential", "Residential" },
+        { "commercial", "Commercial" },
+        { "industrial", "Industrial" },
+        { "transport", "Transport" },
+        { "losses", "Losses" }
+    };
+    
+    private List<string> energyColors = new List<string>
+    {
+        "#525252", "#3B82F6", "#10B981", "#06B6D4", "#F59E0B", "#EF4444", 
+        "#8B5CF6", "#EC4899", "#6366F1", "#14B8A6", "#9CA3AF"
+    };
+}

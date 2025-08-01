@@ -5,7 +5,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Represents a node in the Sankey diagram.
     /// </summary>
-    public class SankeyNode
+    internal class SankeyNode
     {
         /// <summary>
         /// Gets or sets the node identifier.
@@ -18,16 +18,6 @@ namespace Radzen.Blazor
         public string Label { get; set; }
 
         /// <summary>
-        /// Gets or sets the node fill color.
-        /// </summary>
-        public string Fill { get; set; }
-
-        /// <summary>
-        /// Gets or sets the node stroke color.
-        /// </summary>
-        public string Stroke { get; set; }
-
-        /// <summary>
         /// Gets or sets the node value (optional).
         /// </summary>
         public double? Value { get; set; }
@@ -36,7 +26,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Represents a link between nodes in the Sankey diagram.
     /// </summary>
-    public class SankeyLink
+    internal class SankeyLink
     {
         /// <summary>
         /// Gets or sets the source node identifier.
@@ -52,17 +42,12 @@ namespace Radzen.Blazor
         /// Gets or sets the link value.
         /// </summary>
         public double Value { get; set; }
-
-        /// <summary>
-        /// Gets or sets the link fill color.
-        /// </summary>
-        public string Fill { get; set; }
     }
 
     /// <summary>
     /// Represents a computed node with layout information.
     /// </summary>
-    public class ComputedSankeyNode : SankeyNode
+    internal class ComputedSankeyNode : SankeyNode
     {
         /// <summary>
         /// Gets or sets the X position.
@@ -113,7 +98,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// Represents a computed link with path information.
     /// </summary>
-    public class ComputedSankeyLink : SankeyLink
+    internal class ComputedSankeyLink : SankeyLink
     {
         /// <summary>
         /// Gets or sets the SVG path.

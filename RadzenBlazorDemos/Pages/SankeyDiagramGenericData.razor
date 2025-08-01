@@ -1,0 +1,61 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenSankeyDiagram TItem="CustomFlowData"
+                       Data="@customFlows" 
+                       SourceProperty="FromLocation"
+                       TargetProperty="ToLocation"
+                       ValueProperty="Amount"
+                       NodeLabels="@customNodeLabels"
+                       NodeFills="@vibrantColors"
+                       NodeWidth="24" NodePadding="8"
+                       NodeAlignment="SankeyAlignment.Justify">
+    </RadzenSankeyDiagram>
+</div>
+
+@code {
+    // Custom flow data model with different property names
+    public class CustomFlowData
+    {
+        public string FromLocation { get; set; }
+        public string ToLocation { get; set; }
+        public double Amount { get; set; }
+    }
+    
+    private List<CustomFlowData> customFlows = new List<CustomFlowData>
+    {
+        new CustomFlowData { FromLocation = "Warehouse A", ToLocation = "Store 1", Amount = 150 },
+        new CustomFlowData { FromLocation = "Warehouse A", ToLocation = "Store 2", Amount = 200 },
+        new CustomFlowData { FromLocation = "Warehouse B", ToLocation = "Store 1", Amount = 100 },
+        new CustomFlowData { FromLocation = "Warehouse B", ToLocation = "Store 3", Amount = 175 },
+        new CustomFlowData { FromLocation = "Store 1", ToLocation = "Customer", Amount = 180 },
+        new CustomFlowData { FromLocation = "Store 2", ToLocation = "Customer", Amount = 160 },
+        new CustomFlowData { FromLocation = "Store 3", ToLocation = "Customer", Amount = 140 },
+        new CustomFlowData { FromLocation = "Store 1", ToLocation = "Returns", Amount = 70 },
+        new CustomFlowData { FromLocation = "Store 2", ToLocation = "Returns", Amount = 40 },
+        new CustomFlowData { FromLocation = "Store 3", ToLocation = "Returns", Amount = 35 }
+    };
+    
+    private Dictionary<string, string> customNodeLabels = new Dictionary<string, string>
+    {
+        { "Warehouse A", "Distribution Center A" },
+        { "Warehouse B", "Distribution Center B" },
+        { "Store 1", "Retail Store #1" },
+        { "Store 2", "Retail Store #2" },
+        { "Store 3", "Retail Store #3" },
+        { "Customer", "End Customers" },
+        { "Returns", "Product Returns" }
+    };
+    
+    private List<string> vibrantColors = new List<string>
+    {
+        "#FF6B6B", // Vibrant Red
+        "#4ECDC4", // Vibrant Teal
+        "#45B7D1", // Vibrant Blue
+        "#FFA07A", // Light Salmon
+        "#98D8C8", // Mint Green
+        "#FFD93D", // Vibrant Yellow
+        "#6C5CE7"  // Vibrant Purple
+    };
+}

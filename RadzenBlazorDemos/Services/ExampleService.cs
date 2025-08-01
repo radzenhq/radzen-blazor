@@ -1983,7 +1983,7 @@ namespace RadzenBlazorDemos
                 new Example
                 {
                     Name = "Sankey Diagram",
-                    Path = "sankey-demo",
+                    Path = "sankey-diagram",
                     Description = "Radzen Blazor Sankey Diagram for visualizing flow and relationships between nodes.",
                     Icon = "\uf38d",
                     Tags = new [] { "sankey", "flow", "diagram", "visualization", "relationships" },

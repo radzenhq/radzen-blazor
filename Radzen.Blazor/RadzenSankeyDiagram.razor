@@ -3,8 +3,7 @@
 @using Radzen.Blazor.Rendering
 @using System.Linq
 
-@typeparam TNode
-@typeparam TLink
+@typeparam TItem
 @inherits RadzenComponent
 
 @if (Visible)
@@ -17,12 +16,13 @@
                         @foreach (var link in ComputedLinks)
                         {
                             var linkClass = "rz-sankey-link";
-                            var linkFill = link.Fill;
+                            var linkFill = GetLinkFill(link);
                             
                             // If no explicit fill and source node uses color scheme, use color scheme for link too
                             if (string.IsNullOrEmpty(linkFill) && link.SourceNode != null)
                             {
-                                if (string.IsNullOrEmpty(link.SourceNode.Fill))
+                                var nodeFill = GetNodeFill(link.SourceNode);
+                                if (string.IsNullOrEmpty(nodeFill))
                                 {
                                     // Source node uses color scheme
                                     linkClass = $"rz-sankey-link rz-series-item-{link.SourceNode.ColorIndex}";
@@ -31,7 +31,7 @@
                                 else
                                 {
                                     // Source node has explicit fill
-                                    linkFill = link.SourceNode.Fill;
+                                    linkFill = nodeFill;
                                     // Add transparency if not already present
                                     if (linkFill != null && linkFill.Length == 7 && linkFill.StartsWith("#"))
                                     {
@@ -57,7 +57,8 @@
                         
                         @foreach (var node in ComputedNodes)
                         {
-                            var nodeClass = string.IsNullOrEmpty(node.Fill) 
+                            var nodeFill = GetNodeFill(node);
+                            var nodeClass = string.IsNullOrEmpty(nodeFill) 
                                 ? $"rz-sankey-node rz-series-item-{node.ColorIndex}" 
                                 : "rz-sankey-node";
                             
@@ -66,23 +67,27 @@
                                       y="@node.Y.ToInvariantString()" 
                                       width="@node.Width.ToInvariantString()" 
                                       height="@node.Height.ToInvariantString()"
-                                      fill="@(node.Fill)"
-                                      stroke="@(node.Stroke)"
+                                      fill="@nodeFill"
                                       stroke-width="1" />
-                                @if (!string.IsNullOrEmpty(node.Label))
-                                {
-                                    var isLeftSide = node.Layer == 0;
-                                    var isRightSide = node.Layer == (ComputedNodes.Max(n => n.Layer));
-                                    var textX = isLeftSide ? Math.Max(5, node.X - 5) : (isRightSide ? Math.Min(Width.Value - MarginLeft - MarginRight - 5, node.X + node.Width + 5) : node.X + node.Width / 2);
-                                    var textAnchor = isLeftSide ? (node.X < 10 ? "start" : "end") : (isRightSide ? "start" : "middle");
-                                    
-                                    <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
-                                                                   TextAnchor="@textAnchor"
-                                                                   Class="rz-sankey-node-label"
-                                                                   Value="@node.Label">
-                                    </Radzen.Blazor.Rendering.Text>
-                                }
                             </g>
+                        }
+                        
+                        @* Render labels separately to avoid style inheritance *@
+                        @foreach (var node in ComputedNodes)
+                        {
+                            @if (!string.IsNullOrEmpty(node.Label))
+                            {
+                                var isLeftSide = node.Layer == 0;
+                                var isRightSide = node.Layer == (ComputedNodes.Max(n => n.Layer));
+                                var textX = isLeftSide ? Math.Max(5, node.X - 5) : (isRightSide ? Math.Min(Width.Value - MarginLeft - MarginRight - 5, node.X + node.Width + 5) : node.X + node.Width / 2);
+                                var textAnchor = isLeftSide ? (node.X < 10 ? "start" : "end") : (isRightSide ? "start" : "middle");
+                                
+                                <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
+                                                               TextAnchor="@textAnchor"
+                                                               Class="rz-sankey-node-label"
+                                                               Value="@node.Label">
+                                </Radzen.Blazor.Rendering.Text>
+                            }
                         }
                 </g>
             </svg>

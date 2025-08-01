@@ -12,6 +12,7 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
     display: block;
     overflow: hidden;
     border-radius: var(--rz-border-radius);
+    height: 300px; // Default height like rz-chart
     
     svg {
         display: block;
@@ -51,7 +52,7 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
     
     .rz-sankey-node-label {
         font-size: $sankey-label-font-size;
-        fill: $sankey-label-color;
+        fill: $sankey-label-color !important;
         font-weight: normal;
         pointer-events: none;
         user-select: none;
