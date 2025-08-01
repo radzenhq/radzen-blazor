@@ -346,11 +346,9 @@ namespace Radzen.Blazor
 
         private string RemoveNonNumericCharacters(object value)
         {
-            string valueStr = value as string;
-            if (valueStr == null)
-            {
-                valueStr = $"{value}";
-            }
+            string valueStr = value as string ?? $"{value}";
+
+            valueStr = NormalizeDigits(valueStr);
 
             if (!string.IsNullOrEmpty(Format))
             {
@@ -371,6 +369,28 @@ namespace Radzen.Blazor
 
             return new string(valueStr.Where(c => char.IsDigit(c) || char.IsPunctuation(c)).ToArray()).Replace("%", "");
         }
+
+        private static string NormalizeDigits(string input)
+        {
+            if (string.IsNullOrEmpty(input)) return input;
+
+            var sb = new System.Text.StringBuilder(input.Length);
+            foreach (var ch in input)
+            {
+                if (char.GetUnicodeCategory(ch) == System.Globalization.UnicodeCategory.DecimalDigitNumber)
+                {
+                    var numeric = (int)char.GetNumericValue(ch); // 0..9
+                    if (numeric >= 0 && numeric <= 9)
+                    {
+                        sb.Append((char)('0' + numeric));
+                        continue;
+                    }
+                }
+                sb.Append(ch);
+            }
+            return sb.ToString();
+        }
+
 
         /// <summary>
         /// Gets or sets the function which returns TValue from string.

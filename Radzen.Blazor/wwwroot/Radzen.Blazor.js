@@ -980,9 +980,9 @@ window.Radzen = {
           return;
     }
 
-    var ch = String.fromCharCode(e.charCode);
+    var ch = e.key;
 
-    if ((isInteger ? /^[-\d]$/ : /^[-\d,.]$/).test(ch)) {
+    if (/\p{Nd}/u.test(ch) || ch === '-' || (!isInteger && ch === decimalSeparator)) {
       return;
     }
 
