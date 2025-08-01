@@ -34,6 +34,9 @@
                 <RadzenButton Icon="@(password ? "visibility" : "visibility_off")" Click="TogglePassword" Variant="Variant.Text" Size="ButtonSize.Small" />
             </End>
         </RadzenFormField>
+        <RadzenFormField Text="InfoIcon" Variant="@variant" InfoText="This is a RadzenTextBox inside a FormField" InfoIcon="help" InfoIconColor="@Colors.Info" InfoTooltipPosition="TooltipPosition.Bottom">
+            <RadzenTextBox @bind-Value="@value" />
+        </RadzenFormField>
     </RadzenStack>
 </div>
 

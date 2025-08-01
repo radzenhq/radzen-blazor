@@ -120,6 +120,32 @@ namespace Radzen.Blazor
         public string Text { get; set; }
 
         /// <summary>
+        /// Gets or sets the informational text that will be displayed below the form field.
+        /// Useful for providing additional context or instructions to the user.
+        /// </summary>
+        [Parameter]
+        public string InfoText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the icon name for the info tooltip.
+        /// </summary>
+        [Parameter]
+        public string InfoIcon { get; set; } = "help";
+
+        /// <summary>
+        /// Gets or sets the icon color.
+        /// </summary>
+        /// <value>The icon color.</value>
+        [Parameter]
+        public string InfoIconColor { get; set; } = Colors.Info;
+
+        /// <summary>
+        /// Gets or sets the position of the info tooltip.
+        /// </summary>
+        [Parameter]
+        public TooltipPosition InfoTooltipPosition { get; set; } = TooltipPosition.Bottom;
+
+        /// <summary>
         /// Gets or sets a value indicating whether the label is floating or fixed on top.
         /// </summary>
         /// <value><c>true</c> if floating is allowed; otherwise, <c>false</c>.</value>
@@ -142,6 +168,7 @@ namespace Radzen.Blazor
         private bool disabled;
 
         private readonly IFormFieldContext context;
+        private RadzenIcon infoHelper;
 
 
         /// <summary>
@@ -172,5 +199,7 @@ namespace Radzen.Blazor
             .AddDisabled(disabled)
             .Add("rz-floating-label", AllowFloatingLabel)
             .ToString();
+
+        private void OpenInfoTooltip(ElementReference args, string text) => TooltipService.Open(args, text, new TooltipOptions { Position = InfoTooltipPosition });
     }
 }
