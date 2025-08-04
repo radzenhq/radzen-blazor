@@ -8,16 +8,16 @@
 
 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
                 Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees
-                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive">
-    @* FilterMode="FilterMode.Simple"> *@
+                FilterCaseSensitivity="FilterCaseSensitivity.Default" FilterMode="FilterMode.Simple" AllowColumnPicking="true">
     <Columns>
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.EmployeeID))"
-                              Type="@colType(nameof(Employee.EmployeeID))"
-                              Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+                              Type="@colType(nameof(Employee.FirstName))"
+                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.FirstName))"
+                              Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn HeaderTooltip="Sort based on Last Name"
                               Title="Photo" Frozen="true"
                               Sortable="true" SortProperty="@colProperty(nameof(Employee.LastName))"
-                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.LastName))" FilterMode="FilterMode.Advanced"
+                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.LastName))" FilterMode="FilterMode.Simple"
                               Type="@colType(nameof(Employee.LastName))"
                               Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">

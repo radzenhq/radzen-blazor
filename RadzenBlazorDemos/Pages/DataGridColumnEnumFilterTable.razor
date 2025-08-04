@@ -2,7 +2,7 @@
 @using System.Data
 @using System.Reflection
 
-<RadzenDataGrid Data=@employees AllowFiltering="true" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
+<RadzenDataGrid Data=@employees AllowFiltering="true" FilterMode="FilterMode.CheckBoxList" AllowPaging="true" AllowSorting="true" ColumnWidth="200px">
     <Columns>
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.ID))" Type="@colType(nameof(Employee.ID))" Title="ID" />
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Gender))" Type="@colType(nameof(Employee.Gender))" Title="Gender" />

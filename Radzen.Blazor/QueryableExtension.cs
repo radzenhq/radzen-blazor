@@ -335,7 +335,7 @@ namespace Radzen
                     member;
         }
 
-        private static Expression DbNullConverter(Type itemType, Expression input, Type outType)
+        internal static Expression DbNullConverter(Type itemType, Expression input, Type outType)
         {
             outType = outType ?? input.Type;
             var underlyingType = Nullable.GetUnderlyingType(outType) ?? outType;
@@ -346,8 +346,9 @@ namespace Radzen
                 return outType == input.Type ? input : Expression.Convert(input, outType);
             }
 
-            //Need a non-nullable conversion to explicit type
-            if(underlyingType == outType && outType != typeof(object))
+            //Need a non-nullable conversion to explicit ValueType
+            //if (underlyingType == outType && (outType == typeof(object) || outType.IsValueType))
+            if (underlyingType == outType && outType != typeof(object) && outType.IsValueType)
             {
                 return outType == input.Type ? input : Expression.Convert(input, outType);
             }
@@ -365,12 +366,35 @@ namespace Radzen
 
             return Expression.Condition(isDbNull, nullValue, nonNullConversion);
         }
+        /// <summary>
+        /// Handles similar issue to above, for nullable enumerators when managed as IQueryable
+        /// </summary>
+        /// <typeparam name="T">If not DataRow, returns the selected Property cast as object</typeparam>
+        /// <param name="query">IQueryable incoming</param>
+        /// <param name="property">Name of the property</param>
+        /// <param name="propertyType">To cast</param>
+        /// <returns></returns>
+        internal static IQueryable ItemPropertyNullableEnum(this IQueryable query, string property, Type propertyType)
+        {
+            if (query.ElementType == typeof(DataRow) && (Nullable.GetUnderlyingType(propertyType)?.IsEnum ?? false))
+            {
+                return query.Select(property).Cast<object>().AsEnumerable()
+                    .Select(val => val == null || val is DBNull
+                            ? null
+                            : Enum.ToObject(Nullable.GetUnderlyingType(propertyType), Convert.ToInt32(val))
+                    )
+                    .AsQueryable();
+            }
+            return query.Select(property);
+        }
 
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)
         {
-            Type valueType = filter.FilterValue != null ? filter.Type ?? filter.FilterValue.GetType() : null;
-            //This gets the underlying type of the target Property when filter.FilterValue is Enumerable<prop Values>
-            //Required below as GetNestedPropertyExpression uses the passed PropertyType for DataRow.ItemArray
+            Type valueType = filter.FilterValue != null ? filter.FilterValue.GetType() : null;
+            //When parameter is DataRow.ItemArray[n] we need type to be set so the resulting object can be cast to correct type
+            //Necessary when the filter.Property is nullable but filter.FilterValue is not passed as nullable
+            if (parameter.Type == typeof(DataRow))
+                valueType = type ?? valueType;
             Type propertyType = IsEnumerable(valueType) && valueType.GenericTypeArguments.Length == 1 ?
                 valueType.GenericTypeArguments.First() : valueType;
 
@@ -378,7 +402,7 @@ namespace Radzen
 
             Type secondValueType = filter.SecondFilterValue != null ? filter.SecondFilterValue.GetType() : null;
 
-            Expression p = GetNestedPropertyExpression(parameter, filter.FilterProperty ?? filter.Property, propertyType);
+            Expression p = GetNestedPropertyExpression(parameter, filter.Property ?? filter.FilterProperty, propertyType);
 
             Expression property = GetNestedPropertyExpression(parameter, !isEnumerable && !IsEnumerable(p.Type) ? filter.FilterProperty ?? filter.Property : filter.Property, propertyType);
 
@@ -386,7 +410,7 @@ namespace Radzen
 
             ParameterExpression collectionItemTypeParameter = collectionItemType != null ? Expression.Parameter(collectionItemType, "x") : null;
 
-            if (collectionItemType != null && filter.Property != (filter.FilterProperty ?? filter.Property))
+            if (collectionItemType != null && filter.Property != filter.FilterProperty)
             {
                 property = !string.IsNullOrEmpty(filter.FilterProperty) ? GetNestedPropertyExpression(collectionItemTypeParameter, filter.FilterProperty) : collectionItemTypeParameter;
 

@@ -488,7 +488,7 @@
                                         {
                                             @column.FilterValueTemplate(column)
                                         }
-                                        else if (!QueryableExtension.IsEnumerable(column.FilterPropertyType)) //Cannot be filtered on simple filter value
+                                        else //if (!QueryableExtension.IsEnumerable(column.FilterPropertyType)) //Cannot be filtered on simple filter value
                                         {
                                             <input autocomplete="off" aria-label=@(column.Title + FilterValueAriaLabel + column.GetFilterValue()) disabled=@(!column.CanSetFilterValue()) id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.Property && d.FilterProperty == column.FilterProperty))

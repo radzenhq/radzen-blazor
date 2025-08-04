@@ -3,6 +3,7 @@
 @using Radzen.Blazor.Rendering
 @using System.Globalization
 @using System.Collections
+@using System.Linq
 @using Radzen
 
 @if (RowIndex == Column.GetLevel())
@@ -219,8 +220,8 @@ else
 
         var property = Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty) ? Column.Property :
             Column.GetFilterProperty();
-            
-        //var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property) ?? Column.FilterPropertyType;
+
+        //var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property) ?? Column.FilterPropertyType ?? Column.PropertyType;
         var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property) ?? Column.PropertyType;
 
         var loadDataArgsString = $"{loadDataArgs.Skip}|{loadDataArgs.Top}{loadDataArgs.Filter}";
@@ -255,11 +256,14 @@ else
             if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
             {
                 query = query.SelectMany(property).Select(Column.FilterProperty).Distinct().Cast<object>().OrderBy(i => i);
+                //query = query.SelectMany(property).ItemPropertyNullableEnum(Column.FilterProperty, Column.FilterPropertyType);
+                query = query.Distinct().Cast<object>().OrderBy(i => i);
                 propertyType = query.ElementType;
             }
             else
             {
-                query = query.Select(property).Distinct().Cast<object>().OrderBy(i => i);
+                query = query.ItemPropertyNullableEnum(property, propertyType);
+                query = query.Distinct().Cast<object>().OrderBy(i => i);
             }
 
             filterValuesCount = query.Cast<object>().Count();

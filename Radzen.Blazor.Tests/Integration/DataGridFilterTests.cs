@@ -202,6 +202,9 @@ namespace Radzen.Blazor.Tests.Integration
                     b.columnBuilder(nameof(EmployeeEnums.Status), data, filterable: true, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder(nameof(EmployeeEnums.Color), data, filterable: true, filterMode: FilterMode.CheckBoxList);
                 }));
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.FilterMode, FilterMode.CheckBoxList));
+
             var dg = component.Instance;
             var cols = dg.ColumnsCollection.Count;
             var rows = dg.Data.Count();
@@ -236,11 +239,13 @@ namespace Radzen.Blazor.Tests.Integration
                     b.columnBuilder(nameof(EmployeeEnums.Status), data, filterable: true, filterMode: FilterMode.CheckBoxList);
                     b.columnBuilder(nameof(EmployeeEnums.Color), data, filterable: true, filterMode: FilterMode.CheckBoxList);
                 }));
-
+            component.SetParametersAndRender(p =>
+                p.Add(s => s.FilterMode, FilterMode.CheckBoxList));
 
             cells = component.FindAll(".rz-cell-data");
             Assert.Contains(cells, x => x.InnerHtml == "Active");
             Assert.Contains(cells, x => x.InnerHtml == "Inactive");
+            Assert.Contains(cells, x => x.InnerHtml == "");
 
             //Filter Enum
             grid = component.Instance;
@@ -254,6 +259,7 @@ namespace Radzen.Blazor.Tests.Integration
             cells = component.FindAll(".rz-cell-data");
             Assert.Contains(cells, x => x.InnerHtml == "Active");
             Assert.DoesNotContain(cells, x => x.InnerHtml == "Inactive");
+            Assert.DoesNotContain(cells, x => x.InnerHtml == "");
             component.Dispose();
         }
 
@@ -471,8 +477,10 @@ namespace Radzen.Blazor.Tests.Integration
                         var table = (data.First() as DataRow).Table;
                         Assert.NotNull(table);
                         DataColumn dataCol = table.Columns["LastName"];
+                        DataColumn filterCol = table.Columns["FirstName"];
                         Assert.NotNull(dataCol);
                         b.AddAttribute(sequ++, "Property", $"ItemArray[{dataCol.Table.Columns.IndexOf(dataCol)}]");
+                        b.AddAttribute(sequ++, "FilterProperty", $"ItemArray[{dataCol.Table.Columns.IndexOf(filterCol)}]");
                         b.AddAttribute(sequ++, "Type", dataCol.DataColType());
                         Debug.Print($"DataRow: {sequ}");
                     }
@@ -491,7 +499,15 @@ namespace Radzen.Blazor.Tests.Integration
             Assert.Equal(4, cols);
             Assert.Equal(_rows, rows);
 
-
+            //Filter String
+            //values found in FirstName
+            ChangeInuptValue(component, "span.rz-cell-filter-label > input", nameof(Employee.LastName), "an");
+            Assert.Equal(2, GridRowCount(component));
+            //Values not found in FirstName (but are in LastName)
+            ChangeInuptValue(component, "span.rz-cell-filter-label > input", nameof(Employee.LastName), "er");
+            Assert.Equal(0, GridRowCount(component));
+            ChangeInuptValue(component, "span.rz-cell-filter-label > input", nameof(Employee.LastName), null);
+            Assert.Equal(_rows, GridRowCount(component));
         }
         #endregion
     }
