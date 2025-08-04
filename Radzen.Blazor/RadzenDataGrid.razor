@@ -169,7 +169,10 @@
                                 <th colspan="@column.GetColSpan()" class="@($"rz-unselectable-text {getFrozenColumnClass(column, visibleColumns)} {column.HeaderCssClass}")" scope="col" style="@column.GetStyle(true, true)">
                                     @if (allColumns.All(c => c.Parent == null) && AllowFiltering && column.Filterable && column.Columns == null && (!string.IsNullOrEmpty(column.GetFilterProperty()) || column.FilterTemplate != null))
                                     {
-                                        @RenderSimpleFilter(column, filterMode)
+                                        if(filterMode == FilterMode.Simple || filterMode == FilterMode.SimpleWithMenu)
+                                        {
+                                            @RenderSimpleFilter(column, filterMode)
+                                        }
                                     }
                                 </th>
                             }
