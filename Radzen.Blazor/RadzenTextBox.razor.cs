@@ -36,7 +36,13 @@ namespace Radzen.Blazor
         public bool Trim { get; set; }
 
         /// <summary>
-        /// Handles change event of the built-in <c>input</c> elementt.
+        /// Gets or sets a value indicating whether the component should update the value immediately when the user types. Set to <c>false</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool Immediate { get; set; }
+
+        /// <summary>
+        /// Handles change event of the built-in <c>input</c> element.
         /// </summary>
         protected async Task OnChange(ChangeEventArgs args)
         {
