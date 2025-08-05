@@ -7,7 +7,8 @@
                        SourceProperty="FromLocation"
                        TargetProperty="ToLocation"
                        ValueProperty="Amount"
-                       NodeLabels="@customNodeLabels"
+                       SourceLabelProperty="FromLabel"
+                       TargetLabelProperty="ToLabel"
                        NodeFills="@vibrantColors"
                        NodeWidth="24" NodePadding="8"
                        NodeAlignment="SankeyAlignment.Justify">
@@ -21,31 +22,22 @@
         public string FromLocation { get; set; }
         public string ToLocation { get; set; }
         public double Amount { get; set; }
+        public string FromLabel { get; set; }
+        public string ToLabel { get; set; }
     }
     
     private List<CustomFlowData> customFlows = new List<CustomFlowData>
     {
-        new CustomFlowData { FromLocation = "Warehouse A", ToLocation = "Store 1", Amount = 150 },
-        new CustomFlowData { FromLocation = "Warehouse A", ToLocation = "Store 2", Amount = 200 },
-        new CustomFlowData { FromLocation = "Warehouse B", ToLocation = "Store 1", Amount = 100 },
-        new CustomFlowData { FromLocation = "Warehouse B", ToLocation = "Store 3", Amount = 175 },
-        new CustomFlowData { FromLocation = "Store 1", ToLocation = "Customer", Amount = 180 },
-        new CustomFlowData { FromLocation = "Store 2", ToLocation = "Customer", Amount = 160 },
-        new CustomFlowData { FromLocation = "Store 3", ToLocation = "Customer", Amount = 140 },
-        new CustomFlowData { FromLocation = "Store 1", ToLocation = "Returns", Amount = 70 },
-        new CustomFlowData { FromLocation = "Store 2", ToLocation = "Returns", Amount = 40 },
-        new CustomFlowData { FromLocation = "Store 3", ToLocation = "Returns", Amount = 35 }
-    };
-    
-    private Dictionary<string, string> customNodeLabels = new Dictionary<string, string>
-    {
-        { "Warehouse A", "Distribution Center A" },
-        { "Warehouse B", "Distribution Center B" },
-        { "Store 1", "Retail Store #1" },
-        { "Store 2", "Retail Store #2" },
-        { "Store 3", "Retail Store #3" },
-        { "Customer", "End Customers" },
-        { "Returns", "Product Returns" }
+        new CustomFlowData { FromLocation = "Warehouse A", FromLabel = "Distribution Center A", ToLocation = "Store 1", ToLabel = "Retail Store #1", Amount = 150 },
+        new CustomFlowData { FromLocation = "Warehouse A", FromLabel = "Distribution Center A", ToLocation = "Store 2", ToLabel = "Retail Store #2", Amount = 200 },
+        new CustomFlowData { FromLocation = "Warehouse B", FromLabel = "Distribution Center B", ToLocation = "Store 1", ToLabel = "Retail Store #1", Amount = 100 },
+        new CustomFlowData { FromLocation = "Warehouse B", FromLabel = "Distribution Center B", ToLocation = "Store 3", ToLabel = "Retail Store #3", Amount = 175 },
+        new CustomFlowData { FromLocation = "Store 1", FromLabel = "Retail Store #1", ToLocation = "Customer", ToLabel = "End Customers", Amount = 180 },
+        new CustomFlowData { FromLocation = "Store 2", FromLabel = "Retail Store #2", ToLocation = "Customer", ToLabel = "End Customers", Amount = 160 },
+        new CustomFlowData { FromLocation = "Store 3", FromLabel = "Retail Store #3", ToLocation = "Customer", ToLabel = "End Customers", Amount = 140 },
+        new CustomFlowData { FromLocation = "Store 1", FromLabel = "Retail Store #1", ToLocation = "Returns", ToLabel = "Product Returns", Amount = 70 },
+        new CustomFlowData { FromLocation = "Store 2", FromLabel = "Retail Store #2", ToLocation = "Returns", ToLabel = "Product Returns", Amount = 40 },
+        new CustomFlowData { FromLocation = "Store 3", FromLabel = "Retail Store #3", ToLocation = "Returns", ToLabel = "Product Returns", Amount = 35 }
     };
     
     private List<string> vibrantColors = new List<string>

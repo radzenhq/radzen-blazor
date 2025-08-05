@@ -7,7 +7,8 @@
                        SourceProperty="Source"
                        TargetProperty="Target"
                        ValueProperty="Value"
-                       NodeLabels="@energyNodeLabels"
+                       SourceLabelProperty="SourceLabel"
+                       TargetLabelProperty="TargetLabel"
                        NodeFills="@energyColors"
                        NodeWidth="24" NodePadding="8"
                        NodeAlignment="SankeyAlignment.Justify">
@@ -20,46 +21,33 @@
         public string Source { get; set; }
         public string Target { get; set; }
         public double Value { get; set; }
+        public string SourceLabel { get; set; }
+        public string TargetLabel { get; set; }
     }
     
     private List<FlowData> energyFlows = new List<FlowData>
     {
         // Sources to conversion
-        new FlowData { Source = "coal", Target = "electricity", Value = 45 },
-        new FlowData { Source = "coal", Target = "heat", Value = 15 },
-        new FlowData { Source = "gas", Target = "electricity", Value = 30 },
-        new FlowData { Source = "gas", Target = "heat", Value = 25 },
-        new FlowData { Source = "nuclear", Target = "electricity", Value = 35 },
-        new FlowData { Source = "renewable", Target = "electricity", Value = 25 },
+        new FlowData { Source = "coal", SourceLabel = "Coal", Target = "electricity", TargetLabel = "Electricity", Value = 45 },
+        new FlowData { Source = "coal", SourceLabel = "Coal", Target = "heat", TargetLabel = "Heat", Value = 15 },
+        new FlowData { Source = "gas", SourceLabel = "Natural Gas", Target = "electricity", TargetLabel = "Electricity", Value = 30 },
+        new FlowData { Source = "gas", SourceLabel = "Natural Gas", Target = "heat", TargetLabel = "Heat", Value = 25 },
+        new FlowData { Source = "nuclear", SourceLabel = "Nuclear", Target = "electricity", TargetLabel = "Electricity", Value = 35 },
+        new FlowData { Source = "renewable", SourceLabel = "Renewable", Target = "electricity", TargetLabel = "Electricity", Value = 25 },
         
         // Conversion to end use
-        new FlowData { Source = "electricity", Target = "residential", Value = 40 },
-        new FlowData { Source = "electricity", Target = "commercial", Value = 35 },
-        new FlowData { Source = "electricity", Target = "industrial", Value = 45 },
-        new FlowData { Source = "electricity", Target = "losses", Value = 15 },
-        new FlowData { Source = "heat", Target = "residential", Value = 20 },
-        new FlowData { Source = "heat", Target = "commercial", Value = 10 },
-        new FlowData { Source = "heat", Target = "industrial", Value = 5 },
-        new FlowData { Source = "heat", Target = "losses", Value = 5 },
+        new FlowData { Source = "electricity", SourceLabel = "Electricity", Target = "residential", TargetLabel = "Residential", Value = 40 },
+        new FlowData { Source = "electricity", SourceLabel = "Electricity", Target = "commercial", TargetLabel = "Commercial", Value = 35 },
+        new FlowData { Source = "electricity", SourceLabel = "Electricity", Target = "industrial", TargetLabel = "Industrial", Value = 45 },
+        new FlowData { Source = "electricity", SourceLabel = "Electricity", Target = "losses", TargetLabel = "Losses", Value = 15 },
+        new FlowData { Source = "heat", SourceLabel = "Heat", Target = "residential", TargetLabel = "Residential", Value = 20 },
+        new FlowData { Source = "heat", SourceLabel = "Heat", Target = "commercial", TargetLabel = "Commercial", Value = 10 },
+        new FlowData { Source = "heat", SourceLabel = "Heat", Target = "industrial", TargetLabel = "Industrial", Value = 5 },
+        new FlowData { Source = "heat", SourceLabel = "Heat", Target = "losses", TargetLabel = "Losses", Value = 5 },
         
         // Direct use
-        new FlowData { Source = "gas", Target = "transport", Value = 20 },
-        new FlowData { Source = "renewable", Target = "transport", Value = 5 }
-    };
-    
-    private Dictionary<string, string> energyNodeLabels = new Dictionary<string, string>
-    {
-        { "coal", "Coal" },
-        { "gas", "Natural Gas" },
-        { "nuclear", "Nuclear" },
-        { "renewable", "Renewable" },
-        { "electricity", "Electricity" },
-        { "heat", "Heat" },
-        { "residential", "Residential" },
-        { "commercial", "Commercial" },
-        { "industrial", "Industrial" },
-        { "transport", "Transport" },
-        { "losses", "Losses" }
+        new FlowData { Source = "gas", SourceLabel = "Natural Gas", Target = "transport", TargetLabel = "Transport", Value = 20 },
+        new FlowData { Source = "renewable", SourceLabel = "Renewable", Target = "transport", TargetLabel = "Transport", Value = 5 }
     };
     
     private List<string> energyColors = new List<string>

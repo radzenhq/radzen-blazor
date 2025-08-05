@@ -38,10 +38,16 @@ namespace Radzen.Blazor
         public string ValueProperty { get; set; }
 
         /// <summary>
-        /// Gets or sets the node labels. Key is the node ID, value is the label.
+        /// Specifies the property of <typeparamref name="TItem" /> which provides the source node label.
         /// </summary>
         [Parameter]
-        public IDictionary<string, string> NodeLabels { get; set; }
+        public string SourceLabelProperty { get; set; }
+
+        /// <summary>
+        /// Specifies the property of <typeparamref name="TItem" /> which provides the target node label.
+        /// </summary>
+        [Parameter]
+        public string TargetLabelProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the node fill colors. If not specified, uses color scheme.
@@ -64,32 +70,32 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the actual width of the chart.
         /// </summary>
-        protected double? Width { get; set; }
+        private double? Width { get; set; }
 
         /// <summary>
         /// Gets the actual height of the chart.
         /// </summary>
-        protected double? Height { get; set; }
+        private double? Height { get; set; }
 
         /// <summary>
         /// Gets or sets the left margin.
         /// </summary>
-        protected double MarginLeft { get; set; } = 80;
+        private double MarginLeft { get; set; } = 80;
 
         /// <summary>
         /// Gets or sets the top margin.
         /// </summary>
-        protected double MarginTop { get; set; } = 10;
+        private double MarginTop { get; set; } = 10;
 
         /// <summary>
         /// Gets or sets the right margin.
         /// </summary>
-        protected double MarginRight { get; set; } = 80;
+        private double MarginRight { get; set; } = 80;
 
         /// <summary>
         /// Gets or sets the bottom margin.
         /// </summary>
-        protected double MarginBottom { get; set; } = 10;
+        private double MarginBottom { get; set; } = 10;
 
         /// <summary>
         /// Gets or sets the node width.
@@ -127,6 +133,8 @@ namespace Radzen.Blazor
         private Func<TItem, string> sourceGetter;
         private Func<TItem, string> targetGetter;
         private Func<TItem, double> valueGetter;
+        private Func<TItem, string> sourceLabelGetter;
+        private Func<TItem, string> targetLabelGetter;
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
@@ -194,6 +202,36 @@ namespace Radzen.Blazor
                 shouldUpdate = true;
             }
 
+            if (parameters.DidParameterChange(nameof(SourceLabelProperty), SourceLabelProperty))
+            {
+                var property = parameters.GetValueOrDefault<string>(nameof(SourceLabelProperty));
+                if (!string.IsNullOrEmpty(property))
+                {
+                    sourceLabelGetter = PropertyAccess.Getter<TItem, string>(property);
+                    shouldUpdate = true;
+                }
+            }
+            else if (sourceLabelGetter == null && !string.IsNullOrEmpty(SourceLabelProperty))
+            {
+                sourceLabelGetter = PropertyAccess.Getter<TItem, string>(SourceLabelProperty);
+                shouldUpdate = true;
+            }
+
+            if (parameters.DidParameterChange(nameof(TargetLabelProperty), TargetLabelProperty))
+            {
+                var property = parameters.GetValueOrDefault<string>(nameof(TargetLabelProperty));
+                if (!string.IsNullOrEmpty(property))
+                {
+                    targetLabelGetter = PropertyAccess.Getter<TItem, string>(property);
+                    shouldUpdate = true;
+                }
+            }
+            else if (targetLabelGetter == null && !string.IsNullOrEmpty(TargetLabelProperty))
+            {
+                targetLabelGetter = PropertyAccess.Getter<TItem, string>(TargetLabelProperty);
+                shouldUpdate = true;
+            }
+
             if (parameters.DidParameterChange(nameof(Data), Data) || 
                 parameters.DidParameterChange(nameof(NodeWidth), NodeWidth) ||
                 parameters.DidParameterChange(nameof(NodePadding), NodePadding) ||
@@ -201,7 +239,8 @@ namespace Radzen.Blazor
                 parameters.DidParameterChange(nameof(ColorScheme), ColorScheme) ||
                 parameters.DidParameterChange(nameof(NodeFills), NodeFills) ||
                 parameters.DidParameterChange(nameof(LinkFills), LinkFills) ||
-                parameters.DidParameterChange(nameof(NodeLabels), NodeLabels) ||
+                parameters.DidParameterChange(nameof(SourceLabelProperty), SourceLabelProperty) ||
+                parameters.DidParameterChange(nameof(TargetLabelProperty), TargetLabelProperty) ||
                 shouldUpdate)
             {
                 shouldUpdate = true;
@@ -320,13 +359,17 @@ namespace Radzen.Blazor
                     var target = targetGetter(item);
                     var value = valueGetter(item);
                     
+                    // Get labels if label getters are available
+                    var sourceLabel = sourceLabelGetter != null ? sourceLabelGetter(item) : source;
+                    var targetLabel = targetLabelGetter != null ? targetLabelGetter(item) : target;
+                    
                     // Create or update source node
                     if (!nodeMap.ContainsKey(source))
                     {
                         nodeMap[source] = new SankeyNode 
                         { 
                             Id = source,
-                            Label = NodeLabels?.ContainsKey(source) == true ? NodeLabels[source] : source
+                            Label = sourceLabel
                         };
                     }
                     
@@ -336,7 +379,7 @@ namespace Radzen.Blazor
                         nodeMap[target] = new SankeyNode 
                         { 
                             Id = target,
-                            Label = NodeLabels?.ContainsKey(target) == true ? NodeLabels[target] : target
+                            Label = targetLabel
                         };
                     }
                     

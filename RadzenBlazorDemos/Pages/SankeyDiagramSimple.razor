@@ -21,7 +21,8 @@
                          SourceProperty="Source"
                          TargetProperty="Target"
                          ValueProperty="Value"
-                         NodeLabels="@nodeLabels"
+                         SourceLabelProperty="SourceLabel"
+                         TargetLabelProperty="TargetLabel"
                          NodeFills="@(useCustomColors ? customNodeColors : null)"
                          LinkFills="@(useCustomColors ? customLinkColors : null)"
                          ColorScheme="@colorScheme"
@@ -35,6 +36,8 @@
         public string Source { get; set; }
         public string Target { get; set; }
         public double Value { get; set; }
+        public string SourceLabel { get; set; }
+        public string TargetLabel { get; set; }
     }
     
     private ColorScheme colorScheme = ColorScheme.Pastel;
@@ -43,27 +46,16 @@
     
     private List<FlowData> flows = new List<FlowData>
     {
-        new FlowData { Source = "A", Target = "C", Value = 10 },
-        new FlowData { Source = "A", Target = "D", Value = 15 },
-        new FlowData { Source = "B", Target = "C", Value = 20 },
-        new FlowData { Source = "B", Target = "D", Value = 25 },
-        new FlowData { Source = "C", Target = "E", Value = 15 },
-        new FlowData { Source = "C", Target = "F", Value = 10 },
-        new FlowData { Source = "C", Target = "G", Value = 5 },
-        new FlowData { Source = "D", Target = "E", Value = 20 },
-        new FlowData { Source = "D", Target = "F", Value = 15 },
-        new FlowData { Source = "D", Target = "G", Value = 5 }
-    };
-    
-    private Dictionary<string, string> nodeLabels = new Dictionary<string, string>
-    {
-        { "A", "Source A" },
-        { "B", "Source B" },
-        { "C", "Process 1" },
-        { "D", "Process 2" },
-        { "E", "Target X" },
-        { "F", "Target Y" },
-        { "G", "Target Z" }
+        new FlowData { Source = "A", SourceLabel = "Source A", Target = "C", TargetLabel = "Process 1", Value = 10 },
+        new FlowData { Source = "A", SourceLabel = "Source A", Target = "D", TargetLabel = "Process 2", Value = 15 },
+        new FlowData { Source = "B", SourceLabel = "Source B", Target = "C", TargetLabel = "Process 1", Value = 20 },
+        new FlowData { Source = "B", SourceLabel = "Source B", Target = "D", TargetLabel = "Process 2", Value = 25 },
+        new FlowData { Source = "C", SourceLabel = "Process 1", Target = "E", TargetLabel = "Target X", Value = 15 },
+        new FlowData { Source = "C", SourceLabel = "Process 1", Target = "F", TargetLabel = "Target Y", Value = 10 },
+        new FlowData { Source = "C", SourceLabel = "Process 1", Target = "G", TargetLabel = "Target Z", Value = 5 },
+        new FlowData { Source = "D", SourceLabel = "Process 2", Target = "E", TargetLabel = "Target X", Value = 20 },
+        new FlowData { Source = "D", SourceLabel = "Process 2", Target = "F", TargetLabel = "Target Y", Value = 15 },
+        new FlowData { Source = "D", SourceLabel = "Process 2", Target = "G", TargetLabel = "Target Z", Value = 5 }
     };
     
     // Custom color scheme

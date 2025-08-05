@@ -34,7 +34,7 @@
     Node Labels
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Use the <code>NodeLabels</code> parameter to provide friendly display names for your nodes. Pass a <code>Dictionary&lt;string, string&gt;</code> where the key is the node ID and the value is the display label.
+    Use the <code>SourceLabelProperty</code> and <code>TargetLabelProperty</code> parameters to specify which properties contain the display labels for your nodes. This follows the same pattern as other property-based parameters.
 </RadzenText>
 
 <RadzenExample ComponentName="SankeyDiagram" Example="SankeyDiagramEnergyFlow">
@@ -71,11 +71,11 @@
     <strong>Step 1: Define your data model</strong>
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
-    Define a class with properties for source, target, and value:
+    Define a class with properties for source, target, value, and optionally labels:
 </RadzenText>
 
 <pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
-<code>// Define your data model
+<code>// Basic model - IDs will be used as labels
 public class EnergyFlow
 {
     public string From { get; set; }
@@ -83,11 +83,35 @@ public class EnergyFlow
     public double Amount { get; set; }
 }
 
-// Create your data
-var energyFlows = new List&lt;EnergyFlow&gt;
+// Model with custom labels
+public class EnergyFlowWithLabels
 {
-    new EnergyFlow { From = "Coal", To = "Electricity", Amount = 35 },
-    new EnergyFlow { From = "Solar", To = "Electricity", Amount = 15 }
+    public string From { get; set; }
+    public string To { get; set; }
+    public double Amount { get; set; }
+    public string FromLabel { get; set; }
+    public string ToLabel { get; set; }
+}
+
+// Create your data
+var energyFlows = new List&lt;EnergyFlowWithLabels&gt;
+{
+    new EnergyFlowWithLabels 
+    { 
+        From = "coal", 
+        FromLabel = "Coal Power",
+        To = "electricity", 
+        ToLabel = "Electric Grid",
+        Amount = 35 
+    },
+    new EnergyFlowWithLabels 
+    { 
+        From = "solar", 
+        FromLabel = "Solar Energy",
+        To = "electricity", 
+        ToLabel = "Electric Grid",
+        Amount = 15 
+    }
 };</code>
 </pre>
 
@@ -96,139 +120,168 @@ var energyFlows = new List&lt;EnergyFlow&gt;
 </RadzenText>
 
 <pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
-<code>&lt;RadzenSankeyDiagram TItem="EnergyFlow" 
+<code>&lt;!-- Basic usage without labels --&gt;
+&lt;RadzenSankeyDiagram TItem="EnergyFlow" 
                      Data="@@energyFlows"
                      SourceProperty="From"
                      TargetProperty="To"
-                     ValueProperty="Amount" /&gt;</code>
+                     ValueProperty="Amount" /&gt;
+
+&lt;!-- With custom labels --&gt;
+&lt;RadzenSankeyDiagram TItem="EnergyFlowWithLabels" 
+                     Data="@@energyFlows"
+                     SourceProperty="From"
+                     TargetProperty="To"
+                     ValueProperty="Amount"
+                     SourceLabelProperty="FromLabel"
+                     TargetLabelProperty="ToLabel" /&gt;</code>
 </pre>
 
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
-    <strong>Step 3: Add labels (optional)</strong>
+    <strong>Step 3: Customize appearance (optional)</strong>
 </RadzenText>
 
 <pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
-<code>var labels = new Dictionary&lt;string, string&gt;
-{
-    { "Coal", "Coal Power" },
-    { "Solar", "Solar Energy" },
-    { "Electricity", "Electric Grid" }
-};
-
-&lt;RadzenSankeyDiagram Data="@@data" NodeLabels="@@labels" /&gt;</code>
-</pre>
-
-<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
-    <strong>Step 4: Customize colors (optional)</strong>
-</RadzenText>
-<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
-    You have several options for customizing colors:
-</RadzenText>
-
-<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
-    <strong>Option A: Use a built-in color scheme</strong>
-</RadzenText>
-<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
-<code>&lt;RadzenSankeyDiagram Data="@@data" ColorScheme="ColorScheme.Palette" /&gt;</code>
-</pre>
-
-<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
-    <strong>Option B: Custom node colors</strong>
-</RadzenText>
-<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
-<code>// Colors are applied in order to nodes as they appear in the diagram
-var nodeColors = new List&lt;string&gt; 
-{ 
-    "#FF6B6B",  // First node (e.g., "Coal")
-    "#4ECDC4",  // Second node (e.g., "Solar")
-    "#45B7D1",  // Third node (e.g., "Electricity")
-    "#96CEB4",  // Fourth node (if exists)
-    "#FFEAA7"   // Fifth node (if exists)
-};
-
-&lt;RadzenSankeyDiagram Data="@@data" NodeFills="@@nodeColors" /&gt;</code>
-</pre>
-
-<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">
-    <strong>Option C: Custom link colors</strong>
-</RadzenText>
-<pre class="rz-mb-4" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
-<code>// Links inherit source node color by default, but you can override
-var linkColors = new List&lt;string&gt; 
-{ 
-    "#FF6B6B80",  // First link (80 = 50% opacity)
-    "#4ECDC480",  // Second link
-    "#45B7D180"   // Third link
-};
-
+<code>// Option A: Use built-in color schemes
 &lt;RadzenSankeyDiagram Data="@@data" 
-                     NodeFills="@@nodeColors"
-                     LinkFills="@@linkColors" /&gt;</code>
+                     ColorScheme="ColorScheme.Palette" /&gt;
+
+// Available color schemes:
+// - ColorScheme.Pastel (default)
+// - ColorScheme.Palette
+// - ColorScheme.Monochrome
+// - ColorScheme.Divergent</code>
 </pre>
 
-<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-8">
-    <strong>Option D: Complete customization</strong>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Step 4: Complete example</strong>
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    Here's a comprehensive example showing all features:
+</RadzenText>
+
 <pre class="rz-mb-8" style="background-color: var(--rz-base-100); padding: 1rem; border-radius: var(--rz-border-radius); overflow-x: auto;">
-<code>// Full example with all customizations
-public class EnergyTransfer
-{
-    public string Source { get; set; }
-    public string Target { get; set; }
-    public double Value { get; set; }
-}
-
-var data = new List&lt;EnergyTransfer&gt;
-{
-    new EnergyTransfer { Source = "Coal", Target = "Power", Value = 35 },
-    new EnergyTransfer { Source = "Solar", Target = "Power", Value = 15 },
-    new EnergyTransfer { Source = "Wind", Target = "Power", Value = 20 },
-    new EnergyTransfer { Source = "Power", Target = "Industry", Value = 40 },
-    new EnergyTransfer { Source = "Power", Target = "Homes", Value = 30 }
-};
-
-var labels = new Dictionary&lt;string, string&gt;
-{
-    { "Coal", "Coal Power" },
-    { "Solar", "Solar Energy" },
-    { "Wind", "Wind Energy" },
-    { "Power", "Electric Grid" },
-    { "Industry", "Industrial Use" },
-    { "Homes", "Residential Use" }
-};
-
-// Node colors - one per unique node
-var nodeColors = new List&lt;string&gt; 
-{ 
-    "#2C3E50",  // Coal - dark gray
-    "#F39C12",  // Solar - orange
-    "#3498DB",  // Wind - blue
-    "#E74C3C",  // Power - red
-    "#9B59B6",  // Industry - purple
-    "#1ABC9C"   // Homes - turquoise
-};
-
-// Link colors - one per link (optional)
-var linkColors = new List&lt;string&gt; 
-{ 
-    "#2C3E5080",  // Coal to Power
-    "#F39C1280",  // Solar to Power
-    "#3498DB80",  // Wind to Power
-    "#E74C3C80",  // Power to Industry
-    "#E74C3C80"   // Power to Homes
-};
+<code>@@page "/energy-flow"
 
 &lt;RadzenSankeyDiagram TItem="EnergyTransfer"
-                     Data="@@data" 
+                     Data="@@energyData" 
                      SourceProperty="Source"
                      TargetProperty="Target"
                      ValueProperty="Value"
-                     NodeLabels="@@labels"
+                     SourceLabelProperty="SourceLabel"
+                     TargetLabelProperty="TargetLabel"
                      NodeFills="@@nodeColors"
                      LinkFills="@@linkColors"
+                     ColorScheme="ColorScheme.Palette"
                      NodeWidth="30"
-                     NodePadding="15" /&gt;</code>
+                     NodePadding="15"
+                     NodeAlignment="SankeyAlignment.Justify"
+                     Style="height: 500px" /&gt;
+
+@@code {
+    public class EnergyTransfer
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public double Value { get; set; }
+        public string SourceLabel { get; set; }
+        public string TargetLabel { get; set; }
+    }
+
+    private List&lt;EnergyTransfer&gt; energyData = new()
+    {
+        // Energy sources to grid
+        new() { 
+            Source = "coal", SourceLabel = "Coal Power",
+            Target = "grid", TargetLabel = "Electric Grid", 
+            Value = 35 
+        },
+        new() { 
+            Source = "solar", SourceLabel = "Solar Energy",
+            Target = "grid", TargetLabel = "Electric Grid", 
+            Value = 15 
+        },
+        new() { 
+            Source = "wind", SourceLabel = "Wind Energy",
+            Target = "grid", TargetLabel = "Electric Grid", 
+            Value = 20 
+        },
+        new() { 
+            Source = "nuclear", SourceLabel = "Nuclear Power",
+            Target = "grid", TargetLabel = "Electric Grid", 
+            Value = 30 
+        },
+        
+        // Grid to consumers
+        new() { 
+            Source = "grid", SourceLabel = "Electric Grid",
+            Target = "industry", TargetLabel = "Industrial", 
+            Value = 40 
+        },
+        new() { 
+            Source = "grid", SourceLabel = "Electric Grid",
+            Target = "residential", TargetLabel = "Residential", 
+            Value = 35 
+        },
+        new() { 
+            Source = "grid", SourceLabel = "Electric Grid",
+            Target = "commercial", TargetLabel = "Commercial", 
+            Value = 20 
+        },
+        new() { 
+            Source = "grid", SourceLabel = "Electric Grid",
+            Target = "losses", TargetLabel = "Transmission Losses", 
+            Value = 5 
+        }
+    };
+
+    // Custom colors for nodes (optional)
+    private List&lt;string&gt; nodeColors = new()
+    {
+        "#2C3E50",  // Coal - dark gray
+        "#F39C12",  // Solar - orange  
+        "#3498DB",  // Wind - blue
+        "#8E44AD",  // Nuclear - purple
+        "#E74C3C",  // Grid - red
+        "#95A5A6",  // Industry - gray
+        "#1ABC9C",  // Residential - turquoise
+        "#F1C40F",  // Commercial - yellow
+        "#34495E"   // Losses - dark gray
+    };
+
+    // Custom colors for links (optional - usually inherit from source)
+    private List&lt;string&gt; linkColors = new()
+    {
+        "#2C3E5080",  // Coal to Grid
+        "#F39C1280",  // Solar to Grid
+        "#3498DB80",  // Wind to Grid
+        "#8E44AD80",  // Nuclear to Grid
+        "#E74C3C80",  // Grid to Industry
+        "#E74C3C80",  // Grid to Residential
+        "#E74C3C80",  // Grid to Commercial
+        "#E74C3C60"   // Grid to Losses (more transparent)
+    };
+}</code>
 </pre>
+
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Tips and Best Practices</strong>
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">
+    • <strong>Node IDs</strong>: Use consistent, unique identifiers for your nodes across all links
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">
+    • <strong>Labels vs IDs</strong>: Keep IDs short and system-friendly; use labels for display text
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">
+    • <strong>Colors</strong>: Links automatically inherit their source node's color with transparency
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-2">
+    • <strong>Data Structure</strong>: Each item in your data represents one flow/link between nodes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body2" class="rz-mb-8">
+    • <strong>Performance</strong>: For large datasets, consider aggregating small flows to improve readability
+</RadzenText>
 
 
 <RadzenText Anchor="sankey-diagram#properties" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
@@ -338,7 +391,8 @@ var linkColors = new List&lt;string&gt;
         new ComponentProperty { Name = "SourceProperty", Type = "string", Default = "Required", Description = "Property name that provides the source node ID" },
         new ComponentProperty { Name = "TargetProperty", Type = "string", Default = "Required", Description = "Property name that provides the target node ID" },
         new ComponentProperty { Name = "ValueProperty", Type = "string", Default = "Required", Description = "Property name that provides the flow value" },
-        new ComponentProperty { Name = "NodeLabels", Type = "IDictionary<string, string>", Default = "null", Description = "Dictionary mapping node IDs to display labels" },
+        new ComponentProperty { Name = "SourceLabelProperty", Type = "string", Default = "null", Description = "Property name that provides the source node label" },
+        new ComponentProperty { Name = "TargetLabelProperty", Type = "string", Default = "null", Description = "Property name that provides the target node label" },
         new ComponentProperty { Name = "NodeFills", Type = "IList<string>", Default = "null", Description = "List of colors for nodes (overrides ColorScheme)" },
         new ComponentProperty { Name = "LinkFills", Type = "IList<string>", Default = "null", Description = "List of colors for links (overrides default)" },
         new ComponentProperty { Name = "NodeWidth", Type = "double", Default = "24", Description = "Width of the node rectangles in pixels" },

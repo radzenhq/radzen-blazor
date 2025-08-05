@@ -7,7 +7,8 @@
                        SourceProperty="Source"
                        TargetProperty="Target"
                        ValueProperty="Value"
-                       NodeLabels="@budgetNodeLabels"
+                       SourceLabelProperty="SourceLabel"
+                       TargetLabelProperty="TargetLabel"
                        NodeFills="@budgetColors"
                        NodeWidth="24" NodePadding="8"
                        NodeAlignment="SankeyAlignment.Justify">
@@ -20,36 +21,24 @@
         public string Source { get; set; }
         public string Target { get; set; }
         public double Value { get; set; }
+        public string SourceLabel { get; set; }
+        public string TargetLabel { get; set; }
     }
     
     private List<FlowData> budgetFlows = new List<FlowData>
     {
         // Income to expenses
-        new FlowData { Source = "salary", Target = "housing", Value = 2000 },
-        new FlowData { Source = "salary", Target = "food", Value = 800 },
-        new FlowData { Source = "salary", Target = "transport_exp", Value = 500 },
-        new FlowData { Source = "salary", Target = "utilities", Value = 300 },
-        new FlowData { Source = "salary", Target = "entertainment", Value = 200 },
-        new FlowData { Source = "salary", Target = "savings", Value = 1000 },
-        new FlowData { Source = "salary", Target = "healthcare", Value = 200 },
-        new FlowData { Source = "investment", Target = "savings", Value = 500 },
-        new FlowData { Source = "investment", Target = "entertainment", Value = 100 },
-        new FlowData { Source = "other", Target = "food", Value = 100 },
-        new FlowData { Source = "other", Target = "entertainment", Value = 100 }
-    };
-    
-    private Dictionary<string, string> budgetNodeLabels = new Dictionary<string, string>
-    {
-        { "salary", "Salary" },
-        { "investment", "Investments" },
-        { "other", "Other Income" },
-        { "housing", "Housing" },
-        { "food", "Food" },
-        { "transport_exp", "Transportation" },
-        { "utilities", "Utilities" },
-        { "entertainment", "Entertainment" },
-        { "savings", "Savings" },
-        { "healthcare", "Healthcare" }
+        new FlowData { Source = "salary", SourceLabel = "Salary", Target = "housing", TargetLabel = "Housing", Value = 2000 },
+        new FlowData { Source = "salary", SourceLabel = "Salary", Target = "food", TargetLabel = "Food", Value = 800 },
+        new FlowData { Source = "salary", SourceLabel = "Salary", Target = "transport_exp", TargetLabel = "Transportation", Value = 500 },
+        new FlowData { Source = "salary", SourceLabel = "Salary", Target = "utilities", TargetLabel = "Utilities", Value = 300 },
+        new FlowData { Source = "salary", SourceLabel = "Salary", Target = "entertainment", TargetLabel = "Entertainment", Value = 200 },
+        new FlowData { Source = "salary", SourceLabel = "Salary", Target = "savings", TargetLabel = "Savings", Value = 1000 },
+        new FlowData { Source = "salary", SourceLabel = "Salary", Target = "healthcare", TargetLabel = "Healthcare", Value = 200 },
+        new FlowData { Source = "investment", SourceLabel = "Investments", Target = "savings", TargetLabel = "Savings", Value = 500 },
+        new FlowData { Source = "investment", SourceLabel = "Investments", Target = "entertainment", TargetLabel = "Entertainment", Value = 100 },
+        new FlowData { Source = "other", SourceLabel = "Other Income", Target = "food", TargetLabel = "Food", Value = 100 },
+        new FlowData { Source = "other", SourceLabel = "Other Income", Target = "entertainment", TargetLabel = "Entertainment", Value = 100 }
     };
     
     private List<string> budgetColors = new List<string>
