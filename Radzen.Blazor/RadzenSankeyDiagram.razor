@@ -2,6 +2,7 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @using System.Linq
+@inject TooltipService tooltipService
 
 @typeparam TItem
 @inherits RadzenComponent
@@ -51,8 +52,12 @@
                             
                             <path d="@link.Path" 
                                   fill="@linkFill" 
+                                  fill-opacity="0.8"
                                   stroke="none" 
-                                  class="@linkClass" />
+                                  class="@linkClass"
+                                  style="cursor: pointer; pointer-events: painted;"
+                                  @onmouseover="@(args => ShowLinkTooltip(args, link))"
+                                  @onmouseout="@(args => HideTooltip())" />
                         }
                         
                         @foreach (var node in ComputedNodes)
@@ -68,7 +73,10 @@
                                       width="@node.Width.ToInvariantString()" 
                                       height="@node.Height.ToInvariantString()"
                                       fill="@nodeFill"
-                                      stroke-width="1" />
+                                      stroke-width="1"
+                                      style="cursor: pointer; pointer-events: all;"
+                                      @onmouseover="@(args => ShowNodeTooltip(args, node))"
+                                      @onmouseout="@(args => HideTooltip())" />
                             </g>
                         }
                         

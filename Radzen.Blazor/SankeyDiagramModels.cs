@@ -129,6 +129,16 @@ namespace Radzen.Blazor
         /// Gets or sets the width.
         /// </summary>
         public double Width { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the width at the source node.
+        /// </summary>
+        public double WidthSource { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the width at the target node.
+        /// </summary>
+        public double WidthTarget { get; set; }
     }
 
     /// <summary>

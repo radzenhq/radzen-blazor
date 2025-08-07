@@ -75,15 +75,17 @@ namespace Radzen.Blazor
         {
             foreach (var node in nodes)
             {
+                // Calculate and store the actual sums
+                var incomingSum = node.TargetLinks.Sum(l => l.Value);
+                var outgoingSum = node.SourceLinks.Sum(l => l.Value);
+                
                 if (node.Value.HasValue)
                 {
                     node.ComputedValue = node.Value.Value;
                 }
                 else
                 {
-                    var sourceValue = node.TargetLinks.Sum(l => l.Value);
-                    var targetValue = node.SourceLinks.Sum(l => l.Value);
-                    node.ComputedValue = Math.Max(sourceValue, targetValue);
+                    node.ComputedValue = Math.Max(incomingSum, outgoingSum);
                 }
             }
         }
@@ -165,13 +167,15 @@ namespace Radzen.Blazor
                         switch (NodeAlignment)
                         {
                             case SankeyAlignment.Left:
-                                // Use same spacing as Justify but align to left
-                                node.X = node.Layer * Math.Min(layerSpacing, Width / 3);
+                                // Align nodes to the left with compact spacing
+                                var leftSpacing = Math.Min(layerSpacing, (Width * 0.7) / maxLayer);
+                                node.X = node.Layer * leftSpacing;
                                 break;
                             case SankeyAlignment.Right:
-                                // Use same spacing as Justify but align to right
-                                var rightSpacing = Math.Min(layerSpacing, Width / 3);
-                                node.X = Width - NodeWidth - (maxLayer - node.Layer) * rightSpacing;
+                                // Align nodes to the right with compact spacing
+                                var rightSpacing = Math.Min(layerSpacing, (Width * 0.7) / maxLayer);
+                                var totalRightWidth = maxLayer * rightSpacing;
+                                node.X = Width - NodeWidth - totalRightWidth + (node.Layer * rightSpacing);
                                 break;
                             case SankeyAlignment.Center:
                                 // Center with proportional spacing
@@ -235,7 +239,8 @@ namespace Radzen.Blazor
 
                 foreach (var node in nodes)
                 {
-                    node.Height = Math.Max(1, node.ComputedValue * valueScale);
+                    // Ensure minimum height of 3px for visibility
+                    node.Height = Math.Max(3, node.ComputedValue * valueScale);
                     node.Y = y;
                     y += node.Height + NodePadding;
                 }
@@ -407,22 +412,38 @@ namespace Radzen.Blazor
 
         private void AssignLinkDepths(List<ComputedSankeyNode> nodes)
         {
+            // Process all nodes to set source widths and Y0 positions
             foreach (var node in nodes)
             {
-                var y0 = 0.0;
-                foreach (var link in node.SourceLinks.OrderBy(l => l.TargetNode.Y))
+                var outgoingSum = node.SourceLinks.Sum(l => l.Value);
+                if (outgoingSum > 0)
                 {
-                    link.Y0 = y0;
-                    link.Width = link.Value / node.ComputedValue * node.Height;
-                    y0 += link.Width;
+                    var y0 = 0.0;
+                    var sortedSourceLinks = node.SourceLinks.OrderBy(l => l.TargetNode.Y).ToList();
+                    foreach (var link in sortedSourceLinks)
+                    {
+                        link.Y0 = y0;
+                        link.WidthSource = (link.Value / outgoingSum) * node.Height;
+                        link.Width = link.WidthSource; // Default width
+                        y0 += link.WidthSource;
+                    }
                 }
-
-                var y1 = 0.0;
-                foreach (var link in node.TargetLinks.OrderBy(l => l.SourceNode.Y))
+            }
+            
+            // Process all nodes to set target widths and Y1 positions
+            foreach (var node in nodes)
+            {
+                var incomingSum = node.TargetLinks.Sum(l => l.Value);
+                if (incomingSum > 0)
                 {
-                    link.Y1 = y1;
-                    link.Width = link.Value / node.ComputedValue * node.Height;
-                    y1 += link.Width;
+                    var y1 = 0.0;
+                    var sortedTargetLinks = node.TargetLinks.OrderBy(l => l.SourceNode.Y).ToList();
+                    foreach (var link in sortedTargetLinks)
+                    {
+                        link.Y1 = y1;
+                        link.WidthTarget = (link.Value / incomingSum) * node.Height;
+                        y1 += link.WidthTarget;
+                    }
                 }
             }
         }
@@ -435,19 +456,20 @@ namespace Radzen.Blazor
                 var x1 = link.TargetNode.X;
                 var y0 = link.SourceNode.Y + link.Y0;
                 var y1 = link.TargetNode.Y + link.Y1;
-                var width = link.Width;
+                var widthSource = link.WidthSource > 0 ? link.WidthSource : link.Width;
+                var widthTarget = link.WidthTarget > 0 ? link.WidthTarget : link.Width;
 
-                // Create a smooth curve using cubic bezier
+                // Create a smooth curve using cubic bezier that transitions between different widths
                 var xi = (x0 + x1) / 2;
 
                 link.Path = $"M{x0.ToInvariantString()},{y0.ToInvariantString()} " +
                            $"C{xi.ToInvariantString()},{y0.ToInvariantString()} " +
                            $"{xi.ToInvariantString()},{y1.ToInvariantString()} " +
                            $"{x1.ToInvariantString()},{y1.ToInvariantString()} " +
-                           $"L{x1.ToInvariantString()},{(y1 + width).ToInvariantString()} " +
-                           $"C{xi.ToInvariantString()},{(y1 + width).ToInvariantString()} " +
-                           $"{xi.ToInvariantString()},{(y0 + width).ToInvariantString()} " +
-                           $"{x0.ToInvariantString()},{(y0 + width).ToInvariantString()} " +
+                           $"L{x1.ToInvariantString()},{(y1 + widthTarget).ToInvariantString()} " +
+                           $"C{xi.ToInvariantString()},{(y1 + widthTarget).ToInvariantString()} " +
+                           $"{xi.ToInvariantString()},{(y0 + widthSource).ToInvariantString()} " +
+                           $"{x0.ToInvariantString()},{(y0 + widthSource).ToInvariantString()} " +
                            $"Z";
             }
         }

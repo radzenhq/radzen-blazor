@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace Radzen.Blazor
@@ -13,6 +15,11 @@ namespace Radzen.Blazor
     /// <typeparam name="TItem">The type of data item.</typeparam>
     public partial class RadzenSankeyDiagram<TItem> : RadzenComponent
     {
+        /// <summary>
+        /// Gets or sets the tooltip service.
+        /// </summary>
+        [Inject]
+        public TooltipService TooltipService { get; set; }
         /// <summary>
         /// Gets or sets the data. Each item represents a link/flow in the diagram.
         /// </summary>
@@ -115,6 +122,7 @@ namespace Radzen.Blazor
         [Parameter]
         public SankeyAlignment NodeAlignment { get; set; } = SankeyAlignment.Justify;
 
+
         // Node and link sort functions are internal implementation details
         internal Func<SankeyNode, SankeyNode, int> NodeSort { get; set; }
         internal Func<SankeyLink, SankeyLink, int> LinkSort { get; set; }
@@ -208,8 +216,12 @@ namespace Radzen.Blazor
                 if (!string.IsNullOrEmpty(property))
                 {
                     sourceLabelGetter = PropertyAccess.Getter<TItem, string>(property);
-                    shouldUpdate = true;
                 }
+                else
+                {
+                    sourceLabelGetter = null;
+                }
+                shouldUpdate = true;
             }
             else if (sourceLabelGetter == null && !string.IsNullOrEmpty(SourceLabelProperty))
             {
@@ -223,8 +235,12 @@ namespace Radzen.Blazor
                 if (!string.IsNullOrEmpty(property))
                 {
                     targetLabelGetter = PropertyAccess.Getter<TItem, string>(property);
-                    shouldUpdate = true;
                 }
+                else
+                {
+                    targetLabelGetter = null;
+                }
+                shouldUpdate = true;
             }
             else if (targetLabelGetter == null && !string.IsNullOrEmpty(TargetLabelProperty))
             {
@@ -471,6 +487,101 @@ namespace Radzen.Blazor
             }
             return null;
         }
+
+        /// <summary>
+        /// Shows tooltip for a node.
+        /// </summary>
+        private void ShowNodeTooltip(MouseEventArgs args, ComputedSankeyNode node)
+        {
+            if (TooltipService == null) return;
+            
+            // Store current tooltip node to prevent re-opening
+            if (currentTooltipNode == node) return;
+            currentTooltipNode = node;
+            
+            var tooltip = new RenderFragment(builder =>
+            {
+                builder.OpenElement(0, "div");
+                
+                builder.OpenElement(1, "div");
+                builder.OpenElement(2, "strong");
+                builder.AddContent(3, node.Label ?? node.Id);
+                builder.CloseElement();
+                builder.CloseElement();
+                
+                builder.OpenElement(4, "div");
+                builder.AddContent(5, $"Value: {node.ComputedValue:N0}");
+                builder.CloseElement();
+                
+                if (node.SourceLinks.Any())
+                {
+                    builder.OpenElement(6, "div");
+                    builder.AddContent(7, $"Outgoing: {node.SourceLinks.Sum(l => l.Value):N0}");
+                    builder.CloseElement();
+                }
+                
+                if (node.TargetLinks.Any())
+                {
+                    builder.OpenElement(8, "div");
+                    builder.AddContent(9, $"Incoming: {node.TargetLinks.Sum(l => l.Value):N0}");
+                    builder.CloseElement();
+                }
+                
+                builder.CloseElement();
+            });
+            
+            // Use chart tooltip with offset to prevent flickering
+            TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, _ => tooltip, new ChartTooltipOptions());
+        }
+
+        /// <summary>
+        /// Shows tooltip for a link.
+        /// </summary>
+        private void ShowLinkTooltip(MouseEventArgs args, ComputedSankeyLink link)
+        {
+            if (TooltipService == null) return;
+            
+            // Store current tooltip link to prevent re-opening
+            if (currentTooltipLink == link) return;
+            currentTooltipLink = link;
+            
+            var sourceLabel = link.SourceNode?.Label ?? link.Source;
+            var targetLabel = link.TargetNode?.Label ?? link.Target;
+            
+            var tooltip = new RenderFragment(builder =>
+            {
+                builder.OpenElement(0, "div");
+                
+                builder.OpenElement(1, "div");
+                builder.OpenElement(2, "strong");
+                builder.AddContent(3, $"{sourceLabel} → {targetLabel}");
+                builder.CloseElement();
+                builder.CloseElement();
+                
+                builder.OpenElement(4, "div");
+                builder.AddContent(5, $"Flow: {link.Value:N0}");
+                builder.CloseElement();
+                
+                builder.CloseElement();
+            });
+            
+            // Use chart tooltip with offset to prevent flickering
+            TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, _ => tooltip, new ChartTooltipOptions());
+        }
+        
+        /// <summary>
+        /// Hides the tooltip.
+        /// </summary>
+        private void HideTooltip()
+        {
+            currentTooltipNode = null;
+            currentTooltipLink = null;
+            TooltipService?.Close();
+        }
+        
+        // Track current tooltip to prevent flickering
+        private ComputedSankeyNode currentTooltipNode;
+        private ComputedSankeyLink currentTooltipLink;
 
         /// <inheritdoc />
         public override void Dispose()
