@@ -264,6 +264,20 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         override protected async Task OnInitializedAsync()
         {
+            if (Tree != null && ParentItem == null)
+            {
+                Tree.AddItem(this);
+            }
+
+            if (ParentItem != null)
+            {
+                ParentItem.AddItem(this);
+
+                var currentItems = Tree.items;
+
+                Tree.InsertInCurrentItems(currentItems.IndexOf(ParentItem) + (ParentItem != null ? ParentItem.items.Count : 0), this);
+            }
+
             expanded = Expanded;
             clientExpanded = expanded;
 
@@ -277,20 +291,6 @@ namespace Radzen.Blazor
             if (selected)
             {
                 await Tree?.SelectItem(this);
-            }
-
-            if (Tree != null && ParentItem == null)
-            {
-                Tree.AddItem(this);
-            }
-
-            if (ParentItem != null)
-            {
-                ParentItem.AddItem(this);
-
-                var currentItems = Tree.items;
-
-                Tree.InsertInCurrentItems(currentItems.IndexOf(ParentItem) + (ParentItem != null ? ParentItem.items.Count : 0), this);
             }
         }
 
