@@ -78,7 +78,8 @@ $grid-detail-template-border-radius: 0 !default;
 $grid-detail-template-padding: 0 !default;
 $grid-detail-template-background-color: var(--rz-base-background-color) !default;
 $grid-loading-indicator-color: currentColor !default;
-$grid-loading-indicator-background-color: rgba(var(--rz-base-600), 0.5) !default;
+$grid-loading-indicator-background-color: var(--rz-base-600) !default;
+$grid-loading-indicator-background-opacity: 0.5 !default;
 $grid-frozen-cell-border: $grid-cell-border !default;
 $grid-frozen-cell-background-color: $grid-header-background-color !default;
 $grid-state-transition: var(--rz-transition-all) !default;
@@ -892,6 +893,7 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
   position: absolute;
   inset: 0;
   background-color: var(--rz-grid-loading-indicator-background-color);
+  opacity: var(--rz-grid-loading-indicator-background-opacity);
   z-index: 2;
 }
 
