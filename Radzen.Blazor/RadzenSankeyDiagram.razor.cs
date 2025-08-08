@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
@@ -122,6 +123,47 @@ namespace Radzen.Blazor
         [Parameter]
         public SankeyAlignment NodeAlignment { get; set; } = SankeyAlignment.Justify;
 
+        /// <summary>
+        /// Gets or sets the value formatter for tooltip display.
+        /// </summary>
+        [Parameter]
+        public Func<double, string> ValueFormatter { get; set; }
+
+        /// <summary>
+        /// Gets or sets the tooltip text for "Value".
+        /// </summary>
+        [Parameter]
+        public string ValueText { get; set; } = "Value";
+
+        /// <summary>
+        /// Gets or sets the tooltip text for "Incoming".
+        /// </summary>
+        [Parameter]
+        public string IncomingText { get; set; } = "Incoming";
+
+        /// <summary>
+        /// Gets or sets the tooltip text for "Outgoing".
+        /// </summary>
+        [Parameter]
+        public string OutgoingText { get; set; } = "Outgoing";
+
+        /// <summary>
+        /// Gets or sets the tooltip text for "Flow".
+        /// </summary>
+        [Parameter]
+        public string FlowText { get; set; } = "Flow";
+
+        /// <summary>
+        /// Gets or sets the CSS style of the tooltip.
+        /// </summary>
+        [Parameter]
+        public string TooltipStyle { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether to animate the flow in the links.
+        /// </summary>
+        [Parameter]
+        public bool Animated { get; set; }
 
         // Node and link sort functions are internal implementation details
         internal Func<SankeyNode, SankeyNode, int> NodeSort { get; set; }
@@ -257,16 +299,31 @@ namespace Radzen.Blazor
                 parameters.DidParameterChange(nameof(LinkFills), LinkFills) ||
                 parameters.DidParameterChange(nameof(SourceLabelProperty), SourceLabelProperty) ||
                 parameters.DidParameterChange(nameof(TargetLabelProperty), TargetLabelProperty) ||
+                parameters.DidParameterChange(nameof(Animated), Animated) ||
                 shouldUpdate)
             {
                 shouldUpdate = true;
             }
+
+            // Check for tooltip-related parameter changes that don't require layout recomputation
+            var tooltipParametersChanged = 
+                parameters.DidParameterChange(nameof(ValueFormatter), ValueFormatter) ||
+                parameters.DidParameterChange(nameof(ValueText), ValueText) ||
+                parameters.DidParameterChange(nameof(IncomingText), IncomingText) ||
+                parameters.DidParameterChange(nameof(OutgoingText), OutgoingText) ||
+                parameters.DidParameterChange(nameof(FlowText), FlowText) ||
+                parameters.DidParameterChange(nameof(TooltipStyle), TooltipStyle);
 
             await base.SetParametersAsync(parameters);
 
             if (shouldUpdate)
             {
                 ComputeLayout();
+            }
+            else if (tooltipParametersChanged)
+            {
+                // Just trigger a re-render for tooltip changes
+                StateHasChanged();
             }
         }
 
@@ -501,33 +558,63 @@ namespace Radzen.Blazor
             
             var tooltip = new RenderFragment(builder =>
             {
-                builder.OpenElement(0, "div");
+                builder.OpenComponent<Rendering.ChartTooltip>(0);
+                builder.AddAttribute(1, "Title", node.Label ?? node.Id);
                 
-                builder.OpenElement(1, "div");
-                builder.OpenElement(2, "strong");
-                builder.AddContent(3, node.Label ?? node.Id);
-                builder.CloseElement();
-                builder.CloseElement();
-                
-                builder.OpenElement(4, "div");
-                builder.AddContent(5, $"Value: {node.ComputedValue:N0}");
-                builder.CloseElement();
-                
-                if (node.SourceLinks.Any())
+                // Build custom content for node tooltip
+                var content = new RenderFragment(contentBuilder =>
                 {
-                    builder.OpenElement(6, "div");
-                    builder.AddContent(7, $"Outgoing: {node.SourceLinks.Sum(l => l.Value):N0}");
-                    builder.CloseElement();
-                }
+                    // Add the title
+                    contentBuilder.OpenElement(0, "div");
+                    contentBuilder.AddAttribute(1, "class", "rz-chart-tooltip-title");
+                    contentBuilder.AddContent(2, node.Label ?? node.Id);
+                    contentBuilder.CloseElement();
+                    
+                    var valueStr = ValueFormatter != null ? ValueFormatter(node.ComputedValue) : $"{node.ComputedValue:N0}";
+                    
+                    contentBuilder.OpenElement(3, "div");
+                    contentBuilder.AddContent(4, $"{ValueText}: ");
+                    contentBuilder.OpenElement(5, "span");
+                    contentBuilder.AddAttribute(6, "class", "rz-chart-tooltip-item-value");
+                    contentBuilder.AddContent(7, valueStr);
+                    contentBuilder.CloseElement();
+                    contentBuilder.CloseElement();
+                    
+                    if (node.SourceLinks.Any())
+                    {
+                        var outgoingValue = node.SourceLinks.Sum(l => l.Value);
+                        var outgoingStr = ValueFormatter != null ? ValueFormatter(outgoingValue) : $"{outgoingValue:N0}";
+                        
+                        contentBuilder.OpenElement(8, "div");
+                        contentBuilder.AddContent(9, $"{OutgoingText}: ");
+                        contentBuilder.OpenElement(10, "span");
+                        contentBuilder.AddAttribute(11, "class", "rz-chart-tooltip-item-value");
+                        contentBuilder.AddContent(12, outgoingStr);
+                        contentBuilder.CloseElement();
+                        contentBuilder.CloseElement();
+                    }
+                    
+                    if (node.TargetLinks.Any())
+                    {
+                        var incomingValue = node.TargetLinks.Sum(l => l.Value);
+                        var incomingStr = ValueFormatter != null ? ValueFormatter(incomingValue) : $"{incomingValue:N0}";
+                        
+                        contentBuilder.OpenElement(13, "div");
+                        contentBuilder.AddContent(14, $"{IncomingText}: ");
+                        contentBuilder.OpenElement(15, "span");
+                        contentBuilder.AddAttribute(16, "class", "rz-chart-tooltip-item-value");
+                        contentBuilder.AddContent(17, incomingStr);
+                        contentBuilder.CloseElement();
+                        contentBuilder.CloseElement();
+                    }
+                });
                 
-                if (node.TargetLinks.Any())
+                builder.AddAttribute(2, "ChildContent", content);
+                if (!string.IsNullOrEmpty(TooltipStyle))
                 {
-                    builder.OpenElement(8, "div");
-                    builder.AddContent(9, $"Incoming: {node.TargetLinks.Sum(l => l.Value):N0}");
-                    builder.CloseElement();
+                    builder.AddAttribute(3, "Style", TooltipStyle);
                 }
-                
-                builder.CloseElement();
+                builder.CloseComponent();
             });
             
             // Use chart tooltip with offset to prevent flickering
@@ -547,22 +634,19 @@ namespace Radzen.Blazor
             
             var sourceLabel = link.SourceNode?.Label ?? link.Source;
             var targetLabel = link.TargetNode?.Label ?? link.Target;
+            var valueStr = ValueFormatter != null ? ValueFormatter(link.Value) : $"{link.Value:N0}";
             
             var tooltip = new RenderFragment(builder =>
             {
-                builder.OpenElement(0, "div");
-                
-                builder.OpenElement(1, "div");
-                builder.OpenElement(2, "strong");
-                builder.AddContent(3, $"{sourceLabel} → {targetLabel}");
-                builder.CloseElement();
-                builder.CloseElement();
-                
-                builder.OpenElement(4, "div");
-                builder.AddContent(5, $"Flow: {link.Value:N0}");
-                builder.CloseElement();
-                
-                builder.CloseElement();
+                builder.OpenComponent<Rendering.ChartTooltip>(0);
+                builder.AddAttribute(1, "Title", $"{sourceLabel} → {targetLabel}");
+                builder.AddAttribute(2, "Label", FlowText);
+                builder.AddAttribute(3, "Value", valueStr);
+                if (!string.IsNullOrEmpty(TooltipStyle))
+                {
+                    builder.AddAttribute(4, "Style", TooltipStyle);
+                }
+                builder.CloseComponent();
             });
             
             // Use chart tooltip with offset to prevent flickering

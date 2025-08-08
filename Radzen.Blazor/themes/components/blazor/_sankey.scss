@@ -13,6 +13,7 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
     overflow: hidden;
     border-radius: var(--rz-border-radius);
     height: 300px; // Default height like rz-chart
+    color: $sankey-label-color; // Set color for currentColor inheritance
     
     svg {
         display: block;
@@ -45,14 +46,15 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
         }
     }
     
-    // Ensure text uses theme colors
-    text {
+    // Ensure text within sankey diagram uses theme colors
+    & svg text {
         fill: $sankey-label-color;
     }
     
-    .rz-sankey-node-label {
+    text.rz-sankey-node-label {
         font-size: $sankey-label-font-size;
         fill: $sankey-label-color !important;
+        stroke: none !important;
         font-weight: normal;
         pointer-events: none;
         user-select: none;

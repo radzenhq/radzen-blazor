@@ -13,11 +13,75 @@
         @if (Width.HasValue && Height.HasValue && ComputedNodes != null && ComputedLinks != null)
         {
             <svg style="width: 100%; height: 100%; overflow: hidden;" viewBox="@($"0 0 {Width.Value.ToInvariantString()} {Height.Value.ToInvariantString()}")" preserveAspectRatio="xMidYMid meet">
-                <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
-                        @foreach (var link in ComputedLinks)
+                @if (Animated)
+                {
+                    <defs>
+                        <!-- Directional flow animation styles -->
+                        <style>
+                            @@keyframes pulse-subtle {
+                                0%, 100% { opacity: 0.1; }
+                                50% { opacity: 0.3; }
+                            }
+                        </style>
+                        
+                        <!-- Directional gradients for each link using link colors -->
+                        @for (int i = 0; i < ComputedLinks.Count; i++)
                         {
+                            var link = ComputedLinks[i];
+                            var linkFill = GetLinkFill(link);
+                            
+                            // Extract base color from link or use default
+                            var baseColor = "currentColor";
+                            if (!string.IsNullOrEmpty(linkFill) && linkFill.StartsWith("#"))
+                            {
+                                // Remove alpha channel if present
+                                baseColor = linkFill.Length > 7 ? linkFill.Substring(0, 7) : linkFill;
+                            }
+                            else if (link.SourceNode != null)
+                            {
+                                // Use CSS variable for color scheme
+                                baseColor = $"var(--rz-series-{link.SourceNode.ColorIndex})";
+                            }
+                            
+                            <!-- Moving gradient pulse using link's color -->
+                            <linearGradient id="flow-gradient-@GetId()-@i" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="transparent" stop-opacity="0">
+                                    <animate attributeName="offset" values="-0.15;1.0" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="1%" stop-color="@baseColor" stop-opacity="0.1">
+                                    <animate attributeName="offset" values="-0.14;1.01" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="3%" stop-color="@baseColor" stop-opacity="0.2">
+                                    <animate attributeName="offset" values="-0.12;1.03" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="5%" stop-color="@baseColor" stop-opacity="0.3">
+                                    <animate attributeName="offset" values="-0.10;1.05" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="7%" stop-color="@baseColor" stop-opacity="0.4">
+                                    <animate attributeName="offset" values="-0.08;1.07" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="9%" stop-color="@baseColor" stop-opacity="0.5">
+                                    <animate attributeName="offset" values="-0.06;1.09" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <!-- Brightest point -->
+                                <stop offset="10%" stop-color="@baseColor" stop-opacity="0.6">
+                                    <animate attributeName="offset" values="-0.05;1.10" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <!-- Sharp cutoff -->
+                                <stop offset="10.5%" stop-color="transparent" stop-opacity="0">
+                                    <animate attributeName="offset" values="-0.045;1.105" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                            </linearGradient>
+                        }
+                    </defs>
+                }
+                <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
+                        @for (int linkIndex = 0; linkIndex < ComputedLinks.Count; linkIndex++)
+                        {
+                            var link = ComputedLinks[linkIndex];
                             var linkClass = "rz-sankey-link";
                             var linkFill = GetLinkFill(link);
+                            var currentLinkIndex = linkIndex;
                             
                             // If no explicit fill and source node uses color scheme, use color scheme for link too
                             if (string.IsNullOrEmpty(linkFill) && link.SourceNode != null)
@@ -58,6 +122,28 @@
                                   style="cursor: pointer; pointer-events: painted;"
                                   @onmouseover="@(args => ShowLinkTooltip(args, link))"
                                   @onmouseout="@(args => HideTooltip())" />
+                            
+                            @if (Animated)
+                            {
+                                var flowGradientId = $"flow-gradient-{GetId()}-{linkIndex}";
+                                var delay = (link.SourceNode?.Layer ?? 0) * 0.5; // Delay based on layer position
+                                
+                                <!-- Gradient flowing left to right -->
+                                <path d="@link.Path" 
+                                      fill="url(#@flowGradientId)" 
+                                      fill-opacity="0.7"
+                                      stroke="none"
+                                      style="pointer-events: none; mix-blend-mode: screen;" />
+                                
+                                <!-- Static subtle highlight on the path -->
+                                <path d="@link.Path" 
+                                      fill="none" 
+                                      stroke="rgba(255, 255, 255, 0.15)" 
+                                      stroke-width="1"
+                                      stroke-linecap="round"
+                                      stroke-dasharray="6 14"
+                                      style="pointer-events: none; mix-blend-mode: overlay; animation: pulse-subtle 3s ease-in-out infinite; animation-delay: @($"{delay}s");" />
+                            }
                         }
                         
                         @foreach (var node in ComputedNodes)
@@ -93,6 +179,7 @@
                                 <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
                                                                TextAnchor="@textAnchor"
                                                                Class="rz-sankey-node-label"
+                                                               Fill="currentColor"
                                                                Value="@node.Label">
                                 </Radzen.Blazor.Rendering.Text>
                             }

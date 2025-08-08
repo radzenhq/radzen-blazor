@@ -1,6 +1,11 @@
 @using Radzen.Blazor
 @using System.Collections.Generic
 
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    This example demonstrates the comprehensive configuration options available for the Sankey Diagram component. 
+    Experiment with different color schemes, node alignments, dimensions, and tooltip formatting options to customize the visualization for your needs.
+</RadzenText>
+
 <div class="rz-p-0 rz-p-md-12">
     <RadzenCard Variant="Variant.Outlined" class="rz-mb-4">
         <RadzenStack Gap="1rem">
@@ -52,6 +57,32 @@
                         <RadzenLabel Text="Show labels" Component="ShowLabels" />
                     </RadzenStack>
                 </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenCheckBox @bind-Value="@animated" Name="Animated" />
+                        <RadzenLabel Text="Animate flow" Component="Animated" />
+                    </RadzenStack>
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenCheckBox @bind-Value="@formatAsCurrency" Name="FormatAsCurrency" />
+                        <RadzenLabel Text="Format values as currency" Component="FormatAsCurrency" />
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenCheckBox @bind-Value="@customTooltipText" Name="CustomTooltipText" />
+                        <RadzenLabel Text="Custom tooltip text" Component="CustomTooltipText" />
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="4">
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                        <RadzenCheckBox @bind-Value="@customTooltipStyle" Name="CustomTooltipStyle" />
+                        <RadzenLabel Text="Custom tooltip style" Component="CustomTooltipStyle" />
+                    </RadzenStack>
+                </RadzenColumn>
             </RadzenRow>
         </RadzenStack>
     </RadzenCard>
@@ -68,7 +99,14 @@
                          ColorScheme="@colorScheme"
                          NodeAlignment="@nodeAlignment"
                          NodeWidth="@nodeWidth" 
-                         NodePadding="@nodePadding">
+                         NodePadding="@nodePadding"
+                         ValueFormatter="@valueFormatter"
+                         ValueText="@(customTooltipText ? "⚡ Total Energy" : "Value")"
+                         IncomingText="@(customTooltipText ? "➡️ Energy Input" : "Incoming")"
+                         OutgoingText="@(customTooltipText ? "⬅️ Energy Output" : "Outgoing")"
+                         FlowText="@(customTooltipText ? "🔄 Energy Flow" : "Flow")"
+                         TooltipStyle="@tooltipStyle"
+                         Animated="@animated">
     </RadzenSankeyDiagram>
 </div>
 
@@ -88,9 +126,21 @@
     private bool showLabels = true;
     private double nodeWidth = 24;
     private double nodePadding = 8;
+    private bool formatAsCurrency = false;
+    private bool customTooltipText = false;
+    private bool customTooltipStyle = false;
+    private bool animated = true;
     
     private IEnumerable<ColorScheme> colorSchemes = Enum.GetValues(typeof(ColorScheme)).Cast<ColorScheme>();
     private IEnumerable<SankeyAlignment> nodeAlignments = Enum.GetValues(typeof(SankeyAlignment)).Cast<SankeyAlignment>();
+    
+    private Func<double, string> valueFormatter => formatAsCurrency 
+        ? (value => $"${value:N0}K") 
+        : (value => $"{value:N0} MW");
+    
+    private string tooltipStyle => customTooltipStyle 
+        ? "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 12px 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-weight: 500;" 
+        : null;
     
     private List<FlowData> flows = new List<FlowData>
     {
