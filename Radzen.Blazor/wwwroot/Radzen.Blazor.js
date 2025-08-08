@@ -1757,8 +1757,8 @@ window.Radzen = {
     delete ref.mouseEnterHandler;
     ref.removeEventListener('mousemove', ref.mouseMoveHandler);
     delete ref.mouseMoveHandler;
-    ref.removeEventListener('click', ref.clickHandler);
-    delete ref.clickHandler;
+    ref.removeEventListener('click', ref.clickListener);
+    delete ref.clickListener;
     this.destroyResizable(ref);
   },
   destroyGauge: function (ref) {
@@ -1935,14 +1935,35 @@ window.Radzen = {
           e.preventDefault();
         }
 
+        // Remove resize handles from all images
+        Radzen.removeImageResizeHandles(ref);
+
         for (var img of ref.querySelectorAll('img.rz-state-selected')) {
           img.classList.remove('rz-state-selected');
         }
-
+        
+        // Handle image clicks (including linked images)
         if (e.target.matches('img')) {
+          e.preventDefault();
           e.target.classList.add('rz-state-selected');
+          Radzen.addImageResizeHandles(e.target, ref, instance);
+          
+          // Create a range that selects only the image element, not the wrapper
           var range = document.createRange();
           range.selectNode(e.target);
+          getSelection().removeAllRanges();
+          getSelection().addRange(range);
+        }
+        // Handle link clicks that contain images
+        else if (e.target.matches('a') && e.target.querySelector('img')) {
+          e.preventDefault();
+          var img = e.target.querySelector('img');
+          img.classList.add('rz-state-selected');
+          Radzen.addImageResizeHandles(img, ref, instance);
+          
+          // Create a range that selects only the image element, not the wrapper
+          var range = document.createRange();
+          range.selectNode(img);
           getSelection().removeAllRanges();
           getSelection().addRange(range);
         }
@@ -1954,6 +1975,8 @@ window.Radzen = {
         instance.invokeMethodAsync('OnSelectionChange');
       }
     };
+    
+
     ref.pasteListener = function (e) {
       var item = e.clipboardData.items[0];
 
@@ -2023,6 +2046,9 @@ window.Radzen = {
     ref.addEventListener('keydown', ref.keydownListener);
     ref.addEventListener('click', ref.clickListener);
     document.addEventListener('selectionchange', ref.selectionChangeListener);
+    
+
+    
     document.execCommand('styleWithCSS', false, true);
   },
   saveSelection: function (ref) {
@@ -2066,6 +2092,17 @@ window.Radzen = {
 
     if (img && selector == 'img') {
       target = img;
+    } else if (img && selector == 'a') {
+      // If we have a selected image and we're looking for 'a' tags, 
+      // check if the image is inside a link or if we should create a link around it
+      var linkElement = img.closest('a');
+      if (linkElement) {
+        target = linkElement;
+      } else {
+        // If no link exists, we'll create one around the image
+        // For now, return empty attributes so the link dialog can work
+        target = img;
+      }
     } else if (target) {
       if (target.nodeType == 3) {
         target = target.parentElement;
@@ -2082,7 +2119,9 @@ window.Radzen = {
 
     return attributes.reduce(function (result, name) {
       if (target) {
-        result[name] = name == 'innerText' ? target[name] : target.getAttribute(name);
+        var value = name == 'innerText' ? target[name] : target.getAttribute(name);
+        // Ensure all values are strings for JSON serialization
+        result[name] = value != null ? String(value) : null;
       }
       return result;
     }, { innerText: selection.toString(), innerHTML: innerHTML });
@@ -2094,6 +2133,9 @@ window.Radzen = {
       ref.removeEventListener('keydown', ref.keydownListener);
       ref.removeEventListener('click', ref.clickListener);
       document.removeEventListener('selectionchange', ref.selectionChangeListener);
+      
+      // Remove image resize handles
+      Radzen.removeImageResizeHandles(ref);
     }
   },
   startDrag: function (ref, instance, handler) {
@@ -2576,5 +2618,261 @@ window.Radzen = {
     unregisterScrollListener: function (element) {
       document.removeEventListener('scroll', element.scrollHandler, true);
       window.removeEventListener('resize', element.scrollHandler, true);
+    },
+    addImageResizeHandles: function (img, container, instance) {
+      // Remove existing handles first
+      Radzen.removeImageResizeHandles(container);
+      
+      // Check if the image is inside a link
+      var link = img.closest('a');
+      var targetElement = link || img;
+      
+      // Create container for the image and handles
+      var wrapper = document.createElement('div');
+      wrapper.className = 'rz-image-resize-container';
+      wrapper.style.position = 'relative';
+      wrapper.style.display = 'inline-block';
+      
+      // Preserve the original display style of the target element
+      var originalDisplay = window.getComputedStyle(targetElement).display;
+      if (originalDisplay === 'block' || originalDisplay === 'flex' || originalDisplay === 'grid') {
+        wrapper.style.display = originalDisplay;
+      }
+      
+      // Insert wrapper before the target element
+      targetElement.parentNode.insertBefore(wrapper, targetElement);
+      wrapper.appendChild(targetElement);
+      
+      // Ensure the image is selected (not the wrapper)
+      var range = document.createRange();
+      range.selectNode(img);
+      getSelection().removeAllRanges();
+      getSelection().addRange(range);
+      
+      // Create resize handles
+      var handles = ['nw', 'ne', 'sw', 'se'];
+      var resizeData = {
+        img: img,
+        wrapper: wrapper,
+        editorContainer: container, // Store reference to the editor container
+        startX: 0,
+        startY: 0,
+        startWidth: 0,
+        startHeight: 0,
+        aspectRatio: 0
+      };
+      
+      handles.forEach(function(position) {
+        var handle = document.createElement('div');
+        handle.className = 'rz-image-resize-handle rz-resize-' + position;
+        handle.setAttribute('data-position', position);
+        
+        // Add inline styles to ensure visibility
+        handle.style.position = 'absolute';
+        handle.style.width = '12px';
+        handle.style.height = '12px';
+        handle.style.backgroundColor = '#007bff';
+        handle.style.border = '2px solid #ffffff';
+        handle.style.borderRadius = '50%';
+        handle.style.cursor = 'pointer';
+        handle.style.zIndex = '1000';
+        handle.style.pointerEvents = 'all';
+        handle.style.boxShadow = '0 2px 4px rgba(0,0,0,0.2)';
+        
+        // Position the handle
+        if (position === 'nw') {
+          handle.style.top = '-6px';
+          handle.style.left = '-6px';
+          handle.style.cursor = 'nw-resize';
+        } else if (position === 'ne') {
+          handle.style.top = '-6px';
+          handle.style.right = '-6px';
+          handle.style.cursor = 'ne-resize';
+        } else if (position === 'sw') {
+          handle.style.bottom = '-6px';
+          handle.style.left = '-6px';
+          handle.style.cursor = 'sw-resize';
+        } else if (position === 'se') {
+          handle.style.bottom = '-6px';
+          handle.style.right = '-6px';
+          handle.style.cursor = 'se-resize';
+        }
+        
+        wrapper.appendChild(handle);
+        
+        handle.addEventListener('pointerdown', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          Radzen.startImageResize(e, resizeData, instance);
+        });
+      });
+    },
+    removeImageResizeHandles: function (container) {
+      var wrappers = container.querySelectorAll('.rz-image-resize-container');
+      wrappers.forEach(function(wrapper) {
+        // Move the first child (which should be the target element) back to its original position
+        if (wrapper.firstChild) {
+          wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+          wrapper.parentNode.removeChild(wrapper);
+        }
+      });
+    },
+    startImageResize: function (e, data, instance) {
+      var rect = data.img.getBoundingClientRect();
+      data.startX = e.clientX;
+      data.startY = e.clientY;
+      data.startWidth = rect.width;
+      data.startHeight = rect.height;
+      data.aspectRatio = rect.width / rect.height;
+      
+      // Store references to the event handlers so we can remove them later
+      data.pointerMoveHandler = function(e) {
+        Radzen.resizeImage(e, data, instance);
+      };
+      
+      data.pointerUpHandler = function() {
+        document.removeEventListener('pointermove', data.pointerMoveHandler);
+        document.removeEventListener('pointerup', data.pointerUpHandler);
+        Radzen.finishImageResize(data, instance);
+      };
+      
+      // Add event listeners
+      document.addEventListener('pointermove', data.pointerMoveHandler);
+      document.addEventListener('pointerup', data.pointerUpHandler);
+    },
+    resizeImage: function (e, data, instance) {
+      var deltaX = e.clientX - data.startX;
+      var deltaY = e.clientY - data.startY;
+      
+      // Calculate new dimensions based on the resize handle position
+      var newWidth = data.startWidth + deltaX;
+      var newHeight = data.startHeight + deltaY;
+      
+      // Maintain aspect ratio
+      if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        newHeight = newWidth / data.aspectRatio;
+      } else {
+        newWidth = newHeight * data.aspectRatio;
+      }
+      
+      // Apply minimum size constraints
+      newWidth = Math.max(20, newWidth);
+      newHeight = Math.max(20, newHeight);
+      
+      // Update image dimensions
+      data.img.style.width = newWidth + 'px';
+      data.img.style.height = newHeight + 'px';
+    },
+    finishImageResize: function (data, instance) {
+      // Get the computed dimensions in pixels
+      var computedWidth = data.img.clientWidth;
+      var computedHeight = data.img.clientHeight;
+      
+      // Update the image attributes to match the computed dimensions
+      data.img.setAttribute('width', computedWidth);
+      data.img.setAttribute('height', computedHeight);
+      
+      // Keep the style attributes for visual consistency
+      data.img.style.width = computedWidth + 'px';
+      data.img.style.height = computedHeight + 'px';
+      
+      // Remove resize handles before notifying Blazor
+      Radzen.removeImageResizeHandles(data.editorContainer);
+      
+      // Notify Blazor about the HTML change
+      var editorContainer = data.editorContainer;
+      if (editorContainer && editorContainer.inputListener) {
+        editorContainer.inputListener();
+      }
+      
+      // Notify the Blazor component about the image resize event
+      if (instance) {
+        instance.invokeMethodAsync('OnImageResize', {
+          src: data.img.src,
+          width: String(computedWidth),
+          height: String(computedHeight)
+        });
+      }
+    },
+
+  removeImageResizeHandlesForLink: function (container) {
+    // Remove all resize handles and wrappers, leaving just the images
+    var wrappers = container.querySelectorAll('.rz-image-resize-container');
+    wrappers.forEach(function(wrapper) {
+      if (wrapper.firstChild) {
+        wrapper.parentNode.insertBefore(wrapper.firstChild, wrapper);
+        wrapper.parentNode.removeChild(wrapper);
+      }
+    });
+  },
+  hasSelectedImage: function (ref) {
+    var img = ref.querySelector('img.rz-state-selected');
+    return img !== null;
+  },
+  unlinkSelectedImage: function (ref) {
+    var img = ref.querySelector('img.rz-state-selected');
+    if (img) {
+      var link = img.closest('a');
+      if (link) {
+        // Move the image out of the link
+        link.parentNode.insertBefore(img, link);
+        link.parentNode.removeChild(link);
+      }
+      
+      // Remove the selected class
+      img.classList.remove('rz-state-selected');
+      
+      // Find the editor container and trigger change event
+      var editorContainer = document.querySelector('.rz-html-editor-content');
+      if (editorContainer && editorContainer.inputListener) {
+        editorContainer.inputListener();
+      }
     }
+  },
+
+  wrapSelectedImageWithLink: function (href, blank) {
+    // Find the editor container
+    var editorContainer = document.querySelector('.rz-html-editor-content');
+    if (!editorContainer) {
+      return;
+    }
+    
+    // Look for selected image in the editor
+    var img = editorContainer.querySelector('img.rz-state-selected');
+    if (!img) {
+      return;
+    }
+    
+    // If image is already inside a link, update link
+    var link = img.closest('a');
+    if (link) {
+      link.setAttribute('href', href);
+      if (blank) {
+        link.setAttribute('target', '_blank');
+      } else {
+        link.removeAttribute('target');
+      }
+      return;
+    }
+    
+    // Create link and wrap the image
+    var a = document.createElement('a');
+    a.setAttribute('href', href);
+    if (blank) {
+      a.setAttribute('target', '_blank');
+    }
+    
+    // Insert link before image and move image inside
+    img.parentNode.insertBefore(a, img);
+    a.appendChild(img);
+    
+    // Remove the selected class
+    img.classList.remove('rz-state-selected');
+    
+    // Trigger change event to notify Blazor
+    if (editorContainer.inputListener) {
+      editorContainer.inputListener();
+    }
+  }
 };
+
