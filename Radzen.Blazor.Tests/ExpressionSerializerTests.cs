@@ -312,5 +312,12 @@ namespace Radzen.Blazor.Tests
             Expression<Func<TestEntity, bool>> expr = e => e.Age > 18 && e.Tags.Contains("Member") || e.Address.City == "London";
             Assert.Equal("e => (((e.Age > 18) && e.Tags.Contains(\"Member\")) || (e.Address.City == \"London\"))", _serializer.Serialize(expr));
         }
+
+        [Fact]
+        public void Serializes_NotContains()
+        {
+            Expression<Func<TestEntity, bool>> expr = e => !e.Tags.Contains("Member");
+            Assert.Equal("e => (!(e.Tags.Contains(\"Member\")))", _serializer.Serialize(expr));
+        }
     }
 }
