@@ -1,0 +1,34 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenSankeyDiagram TItem="FlowData"
+                       Data="@flows" 
+                       SourceProperty="Source"
+                       TargetProperty="Target"
+                       ValueProperty="Value">
+    </RadzenSankeyDiagram>
+</div>
+
+@code {
+    public class FlowData
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public double Value { get; set; }
+    }
+    
+    private List<FlowData> flows = new List<FlowData>
+    {
+        new FlowData { Source = "A", Target = "C", Value = 10 },
+        new FlowData { Source = "A", Target = "D", Value = 15 },
+        new FlowData { Source = "B", Target = "C", Value = 20 },
+        new FlowData { Source = "B", Target = "D", Value = 25 },
+        new FlowData { Source = "C", Target = "E", Value = 15 },
+        new FlowData { Source = "C", Target = "F", Value = 10 },
+        new FlowData { Source = "C", Target = "G", Value = 5 },
+        new FlowData { Source = "D", Target = "E", Value = 20 },
+        new FlowData { Source = "D", Target = "F", Value = 15 },
+        new FlowData { Source = "D", Target = "G", Value = 5 }
+    };
+}
