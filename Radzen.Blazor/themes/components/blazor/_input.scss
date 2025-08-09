@@ -66,13 +66,15 @@ $input-transition: var(--rz-transition-all), width 0, height 0 !default;
   }
 }
 
-input {
-  color: var(--rz-input-value-color);
-  font-size: var(--rz-input-font-size);
+@layer radzen {
+  input {
+    color: var(--rz-input-value-color);
+    font-size: var(--rz-input-font-size);
 
-  &::placeholder {
-    color: var(--rz-input-placeholder-color);
-  }
+    &::placeholder {
+      color: var(--rz-input-placeholder-color);
+    }
+  }  
 }
 
 %input-base {
