@@ -3,6 +3,7 @@ using Radzen.Blazor;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -291,7 +292,9 @@ namespace Radzen
                 {
                     if (member.Type.IsArray)
                     {
-                        member = Expression.ArrayIndex(member, Expression.Constant(index));
+                        member = Expression.ArrayIndex( member, Expression.Constant(index));
+                        member = DbNullConverter(expression.Type, member, type);
+
                     }
                     else if (member.Type.IsGenericType &&
                              (member.Type.GetGenericTypeDefinition() == typeof(List<>) ||
@@ -332,16 +335,76 @@ namespace Radzen
                     member;
         }
 
+        internal static Expression DbNullConverter(Type itemType, Expression input, Type outType)
+        {
+            outType = outType ?? input.Type;
+            var underlyingType = Nullable.GetUnderlyingType(outType) ?? outType;
+
+            //If this is regular type, return the input, converted if necessary
+            if (itemType != typeof(DataRow))
+            {
+                return outType == input.Type ? input : Expression.Convert(input, outType);
+            }
+
+            //Need a non-nullable conversion to explicit ValueType
+            //if (underlyingType == outType && (outType == typeof(object) || outType.IsValueType))
+            if (underlyingType == outType && outType != typeof(object) && outType.IsValueType)
+            {
+                return outType == input.Type ? input : Expression.Convert(input, outType);
+            }
+
+            //Leaving all object->object and nullable type conversions
+            //Handle object[] where object[n]==DBNull.Value
+            var isDbNull = Expression.Equal(input, Expression.Constant(DBNull.Value, typeof(object)));
+            var nullValue = Expression.Constant(null, outType);
+
+            //Converter for non-null values, input->underlying->output
+            //outType must be nullable or !ValueType
+            Expression nonNullConversion = Expression.Convert(
+                Expression.Convert(input, underlyingType),
+                outType);
+
+            return Expression.Condition(isDbNull, nullValue, nonNullConversion);
+        }
+        /// <summary>
+        /// Handles similar issue to above, for nullable enumerators when managed as IQueryable
+        /// </summary>
+        /// <typeparam name="T">If not DataRow, returns the selected Property cast as object</typeparam>
+        /// <param name="query">IQueryable incoming</param>
+        /// <param name="property">Name of the property</param>
+        /// <param name="propertyType">To cast</param>
+        /// <returns></returns>
+        internal static IQueryable ItemPropertyNullableEnum(this IQueryable query, string property, Type propertyType)
+        {
+            if (query.ElementType == typeof(DataRow) && (Nullable.GetUnderlyingType(propertyType)?.IsEnum ?? false))
+            {
+                return query.Select(property).Cast<object>().AsEnumerable()
+                    .Select(val => val == null || val is DBNull
+                            ? null
+                            : Enum.ToObject(Nullable.GetUnderlyingType(propertyType), Convert.ToInt32(val))
+                    )
+                    .AsQueryable();
+            }
+            return query.Select(property);
+        }
+
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)
         {
             Type valueType = filter.FilterValue != null ? filter.FilterValue.GetType() : null;
+            //When parameter is DataRow.ItemArray[n] we need type to be set so the resulting object can be cast to correct type
+            //Necessary when the filter.Property is nullable but filter.FilterValue is not passed as nullable
+            if (parameter.Type == typeof(DataRow))
+                valueType = type ?? valueType;
+            Type propertyType = IsEnumerable(valueType) && valueType.GenericTypeArguments.Length == 1 ?
+                valueType.GenericTypeArguments.First() : valueType;
+
             var isEnumerable = valueType != null && IsEnumerable(valueType) && valueType != typeof(string);
 
             Type secondValueType = filter.SecondFilterValue != null ? filter.SecondFilterValue.GetType() : null;
 
-            Expression p = GetNestedPropertyExpression(parameter, filter.Property, type);
+            Expression p = GetNestedPropertyExpression(parameter, filter.Property ?? filter.FilterProperty, propertyType);
 
-            Expression property = GetNestedPropertyExpression(parameter, !isEnumerable && !IsEnumerable(p.Type) ? filter.FilterProperty ?? filter.Property : filter.Property, type);
+            Expression property = GetNestedPropertyExpression(parameter, !isEnumerable && !IsEnumerable(p.Type) ? filter.FilterProperty ?? filter.Property : filter.Property, propertyType);
 
             Type collectionItemType = IsEnumerable(property.Type) && property.Type.IsGenericType ? property.Type.GetGenericArguments()[0] : null;
 
@@ -386,7 +449,7 @@ namespace Radzen
                 FilterOperator.GreaterThanOrEquals => Expression.GreaterThanOrEqual(notNullCheck(property), constant),
                 FilterOperator.Contains => isEnumerable ?
                     Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), new Type[] { property.Type }, constant, notNullCheck(property)) :
-                         isEnumerableProperty ? 
+                         isEnumerableProperty ?
                             Expression.Call(typeof(Enumerable), nameof(Enumerable.Contains), new Type[] { collectionItemType }, notNullCheck(property), constant) :
                                 Expression.Call(notNullCheck(property), typeof(string).GetMethod("Contains", new[] { typeof(string) }), constant),
                 FilterOperator.In => isEnumerable &&

@@ -3139,7 +3139,11 @@ namespace Radzen
             {
                 var arg = Expression.Parameter(typeof(TItem));
 
-                return Expression.Lambda<Func<TItem, TValue>>(QueryableExtension.GetNestedPropertyExpression(arg, propertyName, type), arg).Compile();
+                var output = QueryableExtension.GetNestedPropertyExpression(arg, propertyName, type);
+                //Manage when Func<TItem, Object> is required but also need a type argument, i.e. for Enum in DataRow
+                output = output.Type == typeof(TValue) ? output : Expression.Convert(output, typeof(TValue));
+                
+                return Expression.Lambda<Func<TItem, TValue>>(output, arg).Compile();
             }
             else
             {
