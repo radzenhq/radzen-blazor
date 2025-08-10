@@ -242,8 +242,24 @@ else
             if(!string.IsNullOrEmpty(loadDataArgs.Filter))
             {
                 query = (Column.Grid.childData.Any() ? Column.Grid.GetSelfRefView(Column.Grid.Data.AsQueryable(), "") :
-                    Column.Grid.Data.AsQueryable()).Where<TItem>(Column.Grid.allColumns.Where(c => c != Column))
-                    .Where(property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive);
+                    Column.Grid.Data.AsQueryable()).Where<TItem>(Column.Grid.allColumns.Where(c => c != Column));
+
+                if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
+                {
+                    query = QueryableExtension.Where(query, new FilterDescriptor[] {
+                        new FilterDescriptor()
+                        {
+                            Property = Column.Property,
+                            FilterProperty = Column.FilterProperty,
+                            FilterValue = loadDataArgs.Filter,
+                            FilterOperator = FilterOperator.Contains
+                        } },
+                            LogicalFilterOperator.Or, FilterCaseSensitivity.CaseInsensitive);
+                }
+                else
+                {
+                    query = query.Where(property, loadDataArgs.Filter, StringFilterOperator.Contains, FilterCaseSensitivity.CaseInsensitive);
+                }
             }
             else
             {
