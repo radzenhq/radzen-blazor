@@ -1,10 +1,12 @@
 // Variables
-$sankey-node-stroke: var(--rz-base-400) !default;
-$sankey-node-stroke-width: 1px !default;
-$sankey-link-opacity: 0.5 !default;
-$sankey-link-hover-opacity: 0.7 !default;
-$sankey-label-font-size: var(--rz-body-font-size) !default;
-$sankey-label-color: var(--rz-text-secondary-color) !default;
+$rz-sankey-node-stroke-width: 0 !default;
+$rz-sankey-link-stroke-width: 0 !default;
+$rz-sankey-link-opacity: 0.5 !default;
+$rz-sankey-link-hover-opacity: 0.7 !default;
+$rz-sankey-label-font-size: 0.875rem !default;
+$rz-sankey-label-color: var(--rz-text-color) !default;
+$rz-sankey-label-stroke: var(--rz-body-background-color) !default;
+$rz-sankey-label-stroke-width: 2px !default;
 
 // Component styles
 .rz-sankey-diagram {
@@ -13,7 +15,7 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
     overflow: hidden;
     border-radius: var(--rz-border-radius);
     height: 300px; // Default height like rz-chart
-    color: $sankey-label-color; // Set color for currentColor inheritance
+    color: var(--rz-sankey-label-color); // Set color for currentColor inheritance
     
     svg {
         display: block;
@@ -23,11 +25,14 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
     
     .rz-sankey-link {
         cursor: pointer;
-        opacity: $sankey-link-opacity;
+        pointer-events: painted;
+        fill-opacity: 0.8;
+        opacity: var(--rz-sankey-link-opacity);
+        stroke-width: var(--rz-sankey-link-stroke-width);
         transition: opacity 0.2s;
         
         &:hover {
-            opacity: $sankey-link-hover-opacity;
+            opacity: var(--rz-sankey-link-hover-opacity);
         }
     }
     
@@ -35,45 +40,30 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
         cursor: pointer;
         
         rect {
-            stroke: $sankey-node-stroke;
-            stroke-width: $sankey-node-stroke-width;
-            transition: opacity 0.2s, stroke-width 0.2s;
+            stroke-width: var(--rz-sankey-node-stroke-width);
+            transition: opacity 0.2s;
         }
         
         &:hover rect {
             opacity: 0.9;
-            stroke-width: 2px;
         }
     }
     
     // Ensure text within sankey diagram uses theme colors
     & svg text {
-        fill: $sankey-label-color;
+        fill: var(--rz-sankey-label-color);
     }
     
     text.rz-sankey-node-label {
-        font-size: $sankey-label-font-size;
-        fill: $sankey-label-color !important;
-        stroke: none !important;
+        font-size: var(--rz-sankey-label-font-size);
+        fill: var(--rz-sankey-label-color);
+        stroke: var(--rz-sankey-label-stroke);
+        stroke-width: var(--rz-sankey-label-stroke-width);
+        stroke-linejoin: round;
+        paint-order: stroke;
         font-weight: normal;
         pointer-events: none;
         user-select: none;
-    }
-    
-    // Color scheme support - Pastel (default)
-    &.rz-scheme-pastel {
-        @for $i from 0 through 23 {
-            .rz-series-item-#{$i} {
-                rect {
-                    fill: var(--rz-series-#{$i + 1});
-                }
-                
-                &.rz-sankey-link {
-                    fill: var(--rz-series-#{$i + 1});
-                    opacity: $sankey-link-opacity;
-                }
-            }
-        }
     }
     
     // Palette color scheme
@@ -82,13 +72,9 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
         
         @for $i from 0 through 7 {
             .rz-series-item-#{$i} {
+                &.rz-sankey-link,
                 rect {
                     fill: nth($palette-colors, $i + 1);
-                }
-                
-                &.rz-sankey-link {
-                    fill: nth($palette-colors, $i + 1);
-                    opacity: $sankey-link-opacity;
                 }
             }
         }
@@ -96,13 +82,9 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
         // Repeat colors for items beyond 8
         @for $i from 8 through 23 {
             .rz-series-item-#{$i} {
+                &.rz-sankey-link,
                 rect {
                     fill: nth($palette-colors, ($i % 8) + 1);
-                }
-                
-                &.rz-sankey-link {
-                    fill: nth($palette-colors, ($i % 8) + 1);
-                    opacity: $sankey-link-opacity;
                 }
             }
         }
@@ -114,13 +96,9 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
         
         @for $i from 0 through 8 {
             .rz-series-item-#{$i} {
+                &.rz-sankey-link,
                 rect {
                     fill: nth($mono-colors, $i + 1);
-                }
-                
-                &.rz-sankey-link {
-                    fill: nth($mono-colors, $i + 1);
-                    opacity: $sankey-link-opacity;
                 }
             }
         }
@@ -128,13 +106,9 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
         // Repeat colors for items beyond 9
         @for $i from 9 through 23 {
             .rz-series-item-#{$i} {
+                &.rz-sankey-link,
                 rect {
                     fill: nth($mono-colors, ($i % 9) + 1);
-                }
-                
-                &.rz-sankey-link {
-                    fill: nth($mono-colors, ($i % 9) + 1);
-                    opacity: $sankey-link-opacity;
                 }
             }
         }
@@ -146,13 +120,9 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
         
         @for $i from 0 through 14 {
             .rz-series-item-#{$i} {
+                &.rz-sankey-link,
                 rect {
                     fill: nth($divergent-colors, $i + 1);
-                }
-                
-                &.rz-sankey-link {
-                    fill: nth($divergent-colors, $i + 1);
-                    opacity: $sankey-link-opacity;
                 }
             }
         }
@@ -160,13 +130,9 @@ $sankey-label-color: var(--rz-text-secondary-color) !default;
         // Repeat colors for items beyond 15
         @for $i from 15 through 23 {
             .rz-series-item-#{$i} {
+                &.rz-sankey-link,
                 rect {
                     fill: nth($divergent-colors, ($i % 15) + 1);
-                }
-                
-                &.rz-sankey-link {
-                    fill: nth($divergent-colors, ($i % 15) + 1);
-                    opacity: $sankey-link-opacity;
                 }
             }
         }

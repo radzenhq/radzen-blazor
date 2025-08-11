@@ -115,11 +115,8 @@
                             }
                             
                             <path d="@link.Path" 
-                                  fill="@linkFill" 
-                                  fill-opacity="0.8"
-                                  stroke="none" 
+                                  fill="@linkFill"
                                   class="@linkClass"
-                                  style="cursor: pointer; pointer-events: painted;"
                                   @onmouseover="@(args => ShowLinkTooltip(args, link))"
                                   @onmouseout="@(args => HideTooltip())" />
                             
@@ -132,16 +129,11 @@
                                 <path d="@link.Path" 
                                       fill="url(#@flowGradientId)" 
                                       fill-opacity="0.7"
-                                      stroke="none"
                                       style="pointer-events: none; mix-blend-mode: screen;" />
                                 
                                 <!-- Static subtle highlight on the path -->
                                 <path d="@link.Path" 
                                       fill="none" 
-                                      stroke="rgba(255, 255, 255, 0.15)" 
-                                      stroke-width="1"
-                                      stroke-linecap="round"
-                                      stroke-dasharray="6 14"
                                       style="pointer-events: none; mix-blend-mode: overlay; animation: pulse-subtle 3s ease-in-out infinite; animation-delay: @($"{delay}s");" />
                             }
                         }
@@ -159,7 +151,6 @@
                                       width="@node.Width.ToInvariantString()" 
                                       height="@node.Height.ToInvariantString()"
                                       fill="@nodeFill"
-                                      stroke-width="1"
                                       style="cursor: pointer; pointer-events: all;"
                                       @onmouseover="@(args => ShowNodeTooltip(args, node))"
                                       @onmouseout="@(args => HideTooltip())" />
@@ -179,7 +170,6 @@
                                 <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
                                                                TextAnchor="@textAnchor"
                                                                Class="rz-sankey-node-label"
-                                                               Fill="currentColor"
                                                                Value="@node.Label">
                                 </Radzen.Blazor.Rendering.Text>
                             }
