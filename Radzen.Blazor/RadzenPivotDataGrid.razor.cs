@@ -49,6 +49,7 @@ namespace Radzen.Blazor
             public int RowSpan { get; set; } = 1;
             public bool IsCollapsed { get; set; }
             public string PathKey { get; set; }
+            public bool HasChildren { get; set; }
         }
 
         /// <summary>
@@ -233,7 +234,8 @@ namespace Radzen.Blazor
                     Level = level - 1,
                     Width = node.Width,
                     IsCollapsed = node.IsCollapsed,
-                    PathKey = node.PathKey
+                    PathKey = node.PathKey,
+                    HasChildren = level < maxLevel
                 };
 
                 if (node.Children.Count == 0)
@@ -415,29 +417,29 @@ namespace Radzen.Blazor
                         builder.AddAttribute(5, "style", $"inset-inline-start: {colIndex * 140}px");
                         
                         // Check if this is a drill down row header
-                        if (AllowDrillDown && !string.IsNullOrEmpty(rowHeaderCell.PathKey))
+                        if (AllowDrillDown && !string.IsNullOrEmpty(rowHeaderCell.PathKey) && rowHeaderCell.HasChildren)
                         {
                             builder.OpenElement(6, "div");
                             builder.AddAttribute(7, "class", "rz-pivot-drill-down-header");
-                            
+
                             builder.OpenElement(8, "span");
                             builder.AddAttribute(9, "class", $"notranslate rz-tree-toggler rzi rzi-caret-{(rowHeaderCell.IsCollapsed ? "right" : "down")}");
                             builder.AddAttribute(10, "onclick", EventCallback.Factory.Create(this, () => ToggleRowDrillDown(rowHeaderCell.PathKey)));
                             builder.AddAttribute(11, "style", "margin-inline-start:0");
                             builder.CloseElement();
-                            
+
                             builder.OpenElement(13, "span");
                             builder.AddAttribute(14, "class", "rz-pivot-header-text");
                             builder.AddContent(15, rowHeaderCell.Title);
                             builder.CloseElement();
-                            
+
                             builder.CloseElement();
                         }
                         else
                         {
                             builder.AddContent(6, rowHeaderCell.Title);
                         }
-                        
+
                         builder.CloseElement();
 
                         // Track this rowspan for future rows
@@ -853,12 +855,13 @@ namespace Radzen.Blazor
             {
                 foreach (var child in node.Children)
                 {
-                    var cell = new RowHeaderCell { 
-                        Value = node.Value, 
-                        Title = child.Title, 
+                    var cell = new RowHeaderCell {
+                        Value = node.Value,
+                        Title = child.Title,
                         RowSpan = GetLeafCount(child),
                         IsCollapsed = child.IsCollapsed,
-                        PathKey = child.PathKey
+                        PathKey = child.PathKey,
+                        HasChildren = child.Level < pivotRows.Count
                     };
                     var newPrefix = new List<RowHeaderCell>(prefix) { cell };
                     
@@ -987,6 +990,7 @@ namespace Radzen.Blazor
             public string Width { get; set; }
             public bool IsCollapsed { get; set; }
             public string PathKey { get; set; }
+            public bool HasChildren { get; set; }
         }
 
         private class ColumnHeaderNode
@@ -1000,6 +1004,7 @@ namespace Radzen.Blazor
             public string Width { get; set; }
             public bool IsCollapsed { get; set; }
             public string PathKey { get; set; }
+            public bool HasChildren { get; set; }
         }
 
         private class RowHeaderNode
@@ -1011,6 +1016,7 @@ namespace Radzen.Blazor
             public int Level { get; set; }
             public bool IsCollapsed { get; set; }
             public string PathKey { get; set; }
+            public bool HasChildren { get; set; }
         }
 
         private class PivotBodyRow

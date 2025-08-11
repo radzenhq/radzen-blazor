@@ -76,7 +76,7 @@
                                             colspan="@(cell.ColSpan * pivotAggregates.Count)" 
                                             rowspan="@cell.RowSpan"
                                             style="@(!string.IsNullOrEmpty(cell.Width) ? $"width: {cell.Width};" : "")">
-                                            @if (AllowDrillDown && !string.IsNullOrEmpty(cell.PathKey))
+                                            @if (AllowDrillDown && !string.IsNullOrEmpty(cell.PathKey) && cell.HasChildren)
                                             {
                                                 <div class="rz-pivot-drill-down-header">
                                                     <span @onclick="@(() => ToggleColumnDrillDown(cell.PathKey))"
