@@ -607,16 +607,21 @@ namespace Radzen.Blazor
                 return Enumerable.Empty<TItem>().AsQueryable();
 
             var items = PagedView;
-            
-            // Filter items based on row header values
+
+            // Filter items based on row header values. Ignore padded row header cells (they have null PathKey).
             for (int i = 0; i < pivotRow.RowHeaderCells.Count && i < pivotRows.Count; i++)
             {
-                var rowHeaderValue = pivotRow.RowHeaderCells[i].Title;
+                var cell = pivotRow.RowHeaderCells[i];
+                if (cell.PathKey == null)
+                {
+                    continue; // Skip padding cells added to align depths
+                }
+
+                var rowHeaderValue = cell.Title;
                 var rowProperty = pivotRows[i].Property;
-                
                 items = items.Where($@"i => i.{rowProperty} == ""{rowHeaderValue}""");
             }
-            
+
             return items;
         }
 
