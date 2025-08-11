@@ -164,8 +164,29 @@
                             {
                                 var isLeftSide = node.Layer == 0;
                                 var isRightSide = node.Layer == (ComputedNodes.Max(n => n.Layer));
-                                var textX = isLeftSide ? Math.Max(5, node.X - 5) : (isRightSide ? Math.Min(Width.Value - MarginLeft - MarginRight - 5, node.X + node.Width + 5) : node.X + node.Width / 2);
-                                var textAnchor = isLeftSide ? (node.X < 10 ? "start" : "end") : (isRightSide ? "start" : "middle");
+                                var labelPadding = 10;
+                                
+                                // Calculate text position and anchor based on node position
+                                double textX;
+                                string textAnchor;
+                                
+                                if (isLeftSide)
+                                {
+                                    textX = Math.Max(labelPadding, node.X - labelPadding);
+                                    textAnchor = node.X - labelPadding < labelPadding ? "start" : "end";
+                                }
+                                else if (isRightSide)
+                                {
+                                    var rightPosition = node.X + node.Width + labelPadding;
+                                    var maxX = Width.Value - MarginLeft - MarginRight - labelPadding;
+                                    textX = Math.Min(maxX, rightPosition);
+                                    textAnchor = rightPosition > maxX ? "end" : "start";
+                                }
+                                else // Middle nodes
+                                {
+                                    textX = node.X + node.Width / 2;
+                                    textAnchor = "middle";
+                                }
                                 
                                 <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
                                                                TextAnchor="@textAnchor"
