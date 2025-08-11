@@ -15,15 +15,7 @@
             <svg style="width: 100%; height: 100%; overflow: hidden;" viewBox="@($"0 0 {Width.Value.ToInvariantString()} {Height.Value.ToInvariantString()}")" preserveAspectRatio="xMidYMid meet">
                 @if (Animated)
                 {
-                    <defs>
-                        <!-- Directional flow animation styles -->
-                        <style>
-                            @@keyframes pulse-subtle {
-                                0%, 100% { opacity: 0.1; }
-                                50% { opacity: 0.3; }
-                            }
-                        </style>
-                        
+                    <defs>                       
                         <!-- Directional gradients for each link using link colors -->
                         @for (int i = 0; i < ComputedLinks.Count; i++)
                         {
@@ -44,7 +36,7 @@
                             }
                             
                             <!-- Moving gradient pulse using link's color -->
-                            <linearGradient id="flow-gradient-@GetId()-@i" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <linearGradient id="rz-flow-gradient-@GetId()-@i" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" stop-color="transparent" stop-opacity="0">
                                     <animate attributeName="offset" values="-0.15;1.0" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
                                 </stop>
@@ -122,19 +114,18 @@
                             
                             @if (Animated)
                             {
-                                var flowGradientId = $"flow-gradient-{GetId()}-{linkIndex}";
+                                var flowGradientId = $"rz-flow-gradient-{GetId()}-{linkIndex}";
                                 var delay = (link.SourceNode?.Layer ?? 0) * 0.5; // Delay based on layer position
                                 
                                 <!-- Gradient flowing left to right -->
                                 <path d="@link.Path" 
                                       fill="url(#@flowGradientId)" 
-                                      fill-opacity="0.7"
-                                      style="pointer-events: none; mix-blend-mode: screen;" />
+                                      class="rz-flow-gradient" />
                                 
                                 <!-- Static subtle highlight on the path -->
                                 <path d="@link.Path" 
-                                      fill="none" 
-                                      style="pointer-events: none; mix-blend-mode: overlay; animation: pulse-subtle 3s ease-in-out infinite; animation-delay: @($"{delay}s");" />
+                                      class="rz-flow-highlight"
+                                      style="animation-delay: @($"{delay}s");" />
                             }
                         }
                         
@@ -190,7 +181,7 @@
                                 
                                 <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
                                                                TextAnchor="@textAnchor"
-                                                               Class="rz-sankey-node-label"
+                                                               class="rz-sankey-node-label"
                                                                Value="@node.Label">
                                 </Radzen.Blazor.Rendering.Text>
                             }

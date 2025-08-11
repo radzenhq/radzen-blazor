@@ -15,7 +15,7 @@ $rz-sankey-label-stroke-width: 2px !default;
     overflow: hidden;
     border-radius: var(--rz-border-radius);
     height: 300px; // Default height like rz-chart
-    color: var(--rz-sankey-label-color); // Set color for currentColor inheritance
+    color: var(--rz-sankey-label-color);
     
     svg {
         display: block;
@@ -137,4 +137,18 @@ $rz-sankey-label-stroke-width: 2px !default;
             }
         }
     }
+}
+
+// Animation gradient and highlight
+.rz-flow-gradient {
+    fill-opacity: 0.7;
+    pointer-events: none; 
+    mix-blend-mode: screen;
+}
+
+.rz-flow-highlight {
+    fill: none;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    animation: rz-pulse-subtle 3s ease-in-out infinite;
 }
