@@ -138,9 +138,9 @@ public class ExpressionSerializer : ExpressionVisitor
     {
         if (node.NodeType == ExpressionType.Not)
         {
-            _sb.Append("(!");
+            _sb.Append("(!(");
             Visit(node.Operand);
-            _sb.Append(")");
+            _sb.Append("))");
         }
         else if (node.NodeType == ExpressionType.Convert) 
         {
