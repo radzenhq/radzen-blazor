@@ -24,6 +24,15 @@
   animation: var(--rz-expander-transition) rz-close;
 }
 
+@keyframes rz-pulse {
+  0%, 100% { 
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 @keyframes rz-pulse-subtle {
   0%, 100% { 
     opacity: 0.1; 
@@ -31,8 +40,4 @@
   50% { 
     opacity: 1; 
   }
-}
-@keyframes rz-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
 }
