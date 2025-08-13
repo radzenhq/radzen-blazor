@@ -420,6 +420,14 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
+                            Name = "DataTable data",
+                            Path = "datagrid-datatable",
+                            Title = "Blazor DataGrid Component - DataTable Data | Free UI Components by Radzen",
+                            Description = "Blazor Data Grid supports DataTable sources.",
+                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "datatable" }
+                        },
+                        new Example
+                        {
                             Name = "Real-time data",
                             Path = "datagrid-realtime",
                             Title = "Blazor DataGrid Component - Real-time Data | Free UI Components by Radzen",

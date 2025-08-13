@@ -1,0 +1,140 @@
+﻿@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+@using Microsoft.EntityFrameworkCore
+@using System.Data
+@using System.Reflection
+
+@inherits DbContextPage
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees
+                FilterCaseSensitivity="FilterCaseSensitivity.Default" FilterMode="FilterMode.Simple" AllowColumnPicking="true">
+    <Columns>
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.EmployeeID))"
+                              Type="@colType(nameof(Employee.EmployeeID))"
+                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.EmployeeID))"
+                              Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn HeaderTooltip="Sort based on Last Name"
+                              Title="Photo" Frozen="true"
+                              Sortable="true" SortProperty="@colProperty(nameof(Employee.LastName))"
+                              Filterable="false" FilterProperty="@colProperty(nameof(Employee.LastName))" FilterMode="FilterMode.Simple"
+                              Type="@colType(nameof(Employee.LastName))"
+                              Width="100px" TextAlign="TextAlign.Center">
+            <Template Context="data">
+                <RadzenImage Path="@(data["Photo"] as string)" class="rz-gravatar" AlternateText="@(data["FirstName"] + " " + data["LastName"])" />
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.FirstName))"
+                              Type="@colType(nameof(Employee.FirstName))"
+                              Title="First Name" Frozen="true" Width="160px"
+                              FilterProperty="@colProperty(nameof(Employee.FirstName))"
+                              FilterMode="FilterMode.SimpleWithMenu" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.LastName))"
+                              Type="@colType(nameof(Employee.LastName))"
+                              Title="Last Name" Width="160px"
+                              FilterMode="FilterMode.CheckBoxList" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Title))"
+                              Type="@colType(nameof(Employee.Title))"
+                              Title="Job Title" Width="200px"
+                              FilterMode="FilterMode.CheckBoxList" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.TitleOfCourtesy))"
+                              Type="@colType(nameof(Employee.TitleOfCourtesy))"
+                              Title="Title" Width="120px"
+                              FilterMode="FilterMode.SimpleWithMenu" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.BirthDate))"
+                              Type="@colType(nameof(Employee.BirthDate))"
+                              Title="Birth Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.HireDate))"
+                              Type="@colType(nameof(Employee.HireDate))"
+                              Title="Hire Date" FormatString="{0:d}" Width="160px"
+                              FilterMode="FilterMode.CheckBoxList" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Address))"
+                              Type="@colType(nameof(Employee.Address))"
+                              Title="Address" Width="200px" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.City))"
+                              Type="@colType(nameof(Employee.City))"
+                              Title="City" Width="160px" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Region))"
+                              Type="@colType(nameof(Employee.Region))"
+                              Title="Region" Width="160px" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.PostalCode))"
+                              Type="@colType(nameof(Employee.PostalCode))"
+                              Title="Postal Code" Width="160px" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Country))"
+                              Type="@colType(nameof(Employee.Country))"
+                              Title="Country" Width="160px" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.HomePhone))"
+                              Type="@colType(nameof(Employee.HomePhone))"
+                              Title="Home Phone" Width="160px" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Extension))"
+                              Type="@colType(nameof(Employee.Extension))"
+                              Title="Extension" Width="160px" />
+        <RadzenDataGridColumn Property="@colProperty(nameof(Employee.Notes))"
+                              Type="@colType(nameof(Employee.Notes))"
+                              Title="Notes" Width="300px" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    DataTable employeesTable;
+    IEnumerable<DataRow> employees;
+    IList<DataRow> selectedEmployees;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        employeesTable = GetDataTable(dbContext.Employees);
+
+        var idCol = employeesTable.Columns[nameof(Employee.EmployeeID)];
+
+        employees = employeesTable.AsEnumerable();
+
+        selectedEmployees = new List<DataRow>() { employees.FirstOrDefault() };
+    }
+
+    private DataTable GetDataTable<T>(IEnumerable<T> employees)
+    {
+        DataTable dataTable = new DataTable(typeof(T).Name);
+
+        PropertyInfo[] properties = typeof(T).GetProperties();
+        foreach (PropertyInfo property in properties)
+        {
+            DataColumn col = new(property.Name, Nullable.GetUnderlyingType(property.PropertyType) ?? property.PropertyType);
+            col.AllowDBNull = Nullable.GetUnderlyingType(property.PropertyType) != null || !property.PropertyType.IsValueType;
+            dataTable.Columns.Add(col);
+        }
+        foreach (T item in employees)
+        {
+            DataRow row = dataTable.NewRow();
+            foreach (PropertyInfo property in properties)
+            {
+                row[property.Name] = property.GetValue(item, null) ?? DBNull.Value;
+            }
+            dataTable.Rows.Add(row);
+        }
+
+        return dataTable;
+    }
+
+    private string colProperty(string colName)
+    {
+        if (employeesTable == null || !employeesTable.Columns.Contains(colName))
+        {
+            return string.Empty; // Default type if the table is not initialized
+        }
+        return PropertyAccess.GetDynamicPropertyExpression(colName, colType(colName));
+    }
+    private Type colType(string colName)
+    {
+        if (employeesTable == null || !employeesTable.Columns.Contains(colName))
+        {
+            return typeof(string); // Default type if the table is not initialized
+        }
+        return DataColType(employeesTable.Columns[colName]);
+    }
+
+    private Type DataColType(DataColumn dataCol) => dataCol.AllowDBNull && dataCol.DataType.IsValueType
+        ? typeof(Nullable<>).MakeGenericType(dataCol.DataType)
+        : dataCol.DataType;
+}
