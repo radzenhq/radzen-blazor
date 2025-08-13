@@ -1,0 +1,193 @@
+@using Microsoft.JSInterop
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@using System.Linq
+@inject TooltipService tooltipService
+
+@typeparam TItem
+@inherits RadzenComponent
+
+@if (Visible)
+{
+    <div @ref="Element" @attributes="@Attributes" class="@GetCssClass()" style="@Style" id="@GetId()">
+        @if (Width.HasValue && Height.HasValue && ComputedNodes != null && ComputedLinks != null)
+        {
+            <svg style="width: 100%; height: 100%; overflow: hidden;" viewBox="@($"0 0 {Width.Value.ToInvariantString()} {Height.Value.ToInvariantString()}")" preserveAspectRatio="xMidYMid meet">
+                @if (Animated)
+                {
+                    <defs>                       
+                        <!-- Directional gradients for each link using link colors -->
+                        @for (int i = 0; i < ComputedLinks.Count; i++)
+                        {
+                            var link = ComputedLinks[i];
+                            var linkFill = GetLinkFill(link);
+                            
+                            // Extract base color from link or use default
+                            var baseColor = "currentColor";
+                            if (!string.IsNullOrEmpty(linkFill) && linkFill.StartsWith("#"))
+                            {
+                                // Remove alpha channel if present
+                                baseColor = linkFill.Length > 7 ? linkFill.Substring(0, 7) : linkFill;
+                            }
+                            else if (link.SourceNode != null)
+                            {
+                                // Use CSS variable for color scheme
+                                baseColor = $"var(--rz-series-{link.SourceNode.ColorIndex})";
+                            }
+                            
+                            <!-- Moving gradient pulse using link's color -->
+                            <linearGradient id="rz-flow-gradient-@GetId()-@i" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="transparent" stop-opacity="0">
+                                    <animate attributeName="offset" values="-0.15;1.0" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="1%" stop-color="@baseColor" stop-opacity="0.1">
+                                    <animate attributeName="offset" values="-0.14;1.01" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="3%" stop-color="@baseColor" stop-opacity="0.2">
+                                    <animate attributeName="offset" values="-0.12;1.03" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="5%" stop-color="@baseColor" stop-opacity="0.3">
+                                    <animate attributeName="offset" values="-0.10;1.05" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="7%" stop-color="@baseColor" stop-opacity="0.4">
+                                    <animate attributeName="offset" values="-0.08;1.07" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <stop offset="9%" stop-color="@baseColor" stop-opacity="0.5">
+                                    <animate attributeName="offset" values="-0.06;1.09" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <!-- Brightest point -->
+                                <stop offset="10%" stop-color="@baseColor" stop-opacity="0.6">
+                                    <animate attributeName="offset" values="-0.05;1.10" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                                <!-- Sharp cutoff -->
+                                <stop offset="10.5%" stop-color="transparent" stop-opacity="0">
+                                    <animate attributeName="offset" values="-0.045;1.105" dur="3s" begin="@($"{i * 0.2}s")" repeatCount="indefinite" />
+                                </stop>
+                            </linearGradient>
+                        }
+                    </defs>
+                }
+                <g transform="@($"translate({MarginLeft.ToInvariantString()}, {MarginTop.ToInvariantString()})")">
+                        @for (int linkIndex = 0; linkIndex < ComputedLinks.Count; linkIndex++)
+                        {
+                            var link = ComputedLinks[linkIndex];
+                            var linkClass = "rz-sankey-link";
+                            var linkFill = GetLinkFill(link);
+                            var currentLinkIndex = linkIndex;
+                            
+                            // If no explicit fill and source node uses color scheme, use color scheme for link too
+                            if (string.IsNullOrEmpty(linkFill) && link.SourceNode != null)
+                            {
+                                var nodeFill = GetNodeFill(link.SourceNode);
+                                if (string.IsNullOrEmpty(nodeFill))
+                                {
+                                    // Source node uses color scheme
+                                    linkClass = $"rz-sankey-link rz-series-item-{link.SourceNode.ColorIndex}";
+                                    linkFill = null; // Let CSS handle it
+                                }
+                                else
+                                {
+                                    // Source node has explicit fill
+                                    linkFill = nodeFill;
+                                    // Add transparency if not already present
+                                    if (linkFill != null && linkFill.Length == 7 && linkFill.StartsWith("#"))
+                                    {
+                                        linkFill = linkFill + "80"; // Add 50% transparency
+                                    }
+                                }
+                            }
+                            else if (!string.IsNullOrEmpty(linkFill))
+                            {
+                                // Link has explicit fill
+                                // Add transparency if not already present
+                                if (linkFill.Length == 7 && linkFill.StartsWith("#"))
+                                {
+                                    linkFill = linkFill + "80"; // Add 50% transparency
+                                }
+                            }
+                            
+                            <path d="@link.Path" 
+                                  fill="@linkFill"
+                                  class="@linkClass"
+                                  @onmouseover="@(args => ShowLinkTooltip(args, link))"
+                                  @onmouseout="@(args => HideTooltip())" />
+                            
+                            @if (Animated)
+                            {
+                                var flowGradientId = $"rz-flow-gradient-{GetId()}-{linkIndex}";
+                                var delay = (link.SourceNode?.Layer ?? 0) * 0.5; // Delay based on layer position
+                                
+                                <!-- Gradient flowing left to right -->
+                                <path d="@link.Path" 
+                                      fill="url(#@flowGradientId)" 
+                                      class="rz-flow-gradient" />
+                                
+                                <!-- Static subtle highlight on the path -->
+                                <path d="@link.Path" 
+                                      class="rz-flow-highlight"
+                                      style="animation-delay: @($"{delay}s");" />
+                            }
+                        }
+                        
+                        @foreach (var node in ComputedNodes)
+                        {
+                            var nodeFill = GetNodeFill(node);
+                            var nodeClass = string.IsNullOrEmpty(nodeFill) 
+                                ? $"rz-sankey-node rz-series-item-{node.ColorIndex}" 
+                                : "rz-sankey-node";
+                            
+                            <g class="@nodeClass">
+                                <rect x="@node.X.ToInvariantString()" 
+                                      y="@node.Y.ToInvariantString()" 
+                                      width="@node.Width.ToInvariantString()" 
+                                      height="@node.Height.ToInvariantString()"
+                                      fill="@nodeFill"
+                                      style="cursor: pointer; pointer-events: all;"
+                                      @onmouseover="@(args => ShowNodeTooltip(args, node))"
+                                      @onmouseout="@(args => HideTooltip())" />
+                            </g>
+                        }
+                        
+                        @* Render labels separately to avoid style inheritance *@
+                        @foreach (var node in ComputedNodes)
+                        {
+                            @if (!string.IsNullOrEmpty(node.Label))
+                            {
+                                var isLeftSide = node.Layer == 0;
+                                var isRightSide = node.Layer == (ComputedNodes.Max(n => n.Layer));
+                                var labelPadding = 10;
+                                
+                                // Calculate text position and anchor based on node position
+                                double textX;
+                                string textAnchor;
+                                
+                                if (isLeftSide)
+                                {
+                                    textX = Math.Max(labelPadding, node.X - labelPadding);
+                                    textAnchor = node.X - labelPadding < labelPadding ? "start" : "end";
+                                }
+                                else if (isRightSide)
+                                {
+                                    var rightPosition = node.X + node.Width + labelPadding;
+                                    var maxX = Width.Value - MarginLeft - MarginRight - labelPadding;
+                                    textX = Math.Min(maxX, rightPosition);
+                                    textAnchor = rightPosition > maxX ? "end" : "start";
+                                }
+                                else // Middle nodes
+                                {
+                                    textX = node.X + node.Width / 2;
+                                    textAnchor = "middle";
+                                }
+                                
+                                <Radzen.Blazor.Rendering.Text Position="@(new Point { X = textX, Y = node.Y + node.Height / 2 })"
+                                                               TextAnchor="@textAnchor"
+                                                               class="rz-sankey-node-label"
+                                                               Value="@node.Label">
+                                </Radzen.Blazor.Rendering.Text>
+                            }
+                        }
+                </g>
+            </svg>
+        }
+    </div>
+}

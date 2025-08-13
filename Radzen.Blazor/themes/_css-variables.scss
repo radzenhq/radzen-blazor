@@ -920,6 +920,16 @@
   --rz-rating-ban-icon: #{$rating-ban-icon};
   --rz-rating-ban-icon-color: #{$rating-ban-icon-color};
 
+  /* Sankey Diagram */
+  --rz-sankey-node-stroke-width: #{$rz-sankey-node-stroke-width};
+  --rz-sankey-link-stroke-width: #{$rz-sankey-link-stroke-width};
+  --rz-sankey-link-opacity: #{$rz-sankey-link-opacity};
+  --rz-sankey-link-hover-opacity: #{$rz-sankey-link-hover-opacity};
+  --rz-sankey-label-font-size: #{$rz-sankey-label-font-size};
+  --rz-sankey-label-color: #{$rz-sankey-label-color};
+  --rz-sankey-label-stroke: #{$rz-sankey-label-stroke};
+  --rz-sankey-label-stroke-width: #{$rz-sankey-label-stroke-width};
+
   /* Scheduler */
   --rz-scheduler-border: #{$scheduler-border};
   --rz-scheduler-border-color: #{$scheduler-border-color};

@@ -1,0 +1,237 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenAlert AlertStyle="AlertStyle.Base" Icon="info" Variant="Variant.Flat" AllowClose="false">
+        This example demonstrates the comprehensive configuration options available for the Sankey Diagram component. 
+        Experiment with different color schemes, node alignments, dimensions, and tooltip formatting options to customize the visualization for your needs.
+    </RadzenAlert>
+    <RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
+        <RadzenStack Gap="2rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text="Color scheme:" Component="ColorScheme" />
+                    <RadzenDropDown @bind-Value="@colorScheme" Data="@colorSchemes" Name="ColorScheme"
+                                    Change="@(args => useCustomColors = false)">
+                        <Template Context="scheme">
+                            @Enum.GetName(typeof(ColorScheme), scheme)
+                        </Template>
+                    </RadzenDropDown>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text="Node alignment:" Component="NodeAlignment" />
+                    <RadzenDropDown @bind-Value="@nodeAlignment" Data="@nodeAlignments" Name="NodeAlignment">
+                        <Template Context="alignment">
+                            @Enum.GetName(typeof(SankeyAlignment), alignment)
+                        </Template>
+                    </RadzenDropDown>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text="Node width:" Component="NodeWidth" />
+                    <RadzenNumeric @bind-Value="@nodeWidth" Min="10" Max="50" Name="NodeWidth" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text="Node padding:" Component="NodePadding" />
+                    <RadzenNumeric @bind-Value="@nodePadding" Min="2" Max="20" Name="NodePadding" />
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="1.5rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@useCustomColors" Name="CustomColors" />
+                    <RadzenLabel Text="Use custom colors" Component="CustomColors" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@showLabels" Name="ShowLabels" />
+                    <RadzenLabel Text="Show labels" Component="ShowLabels" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@animated" Name="Animated" />
+                    <RadzenLabel Text="Animate flow" Component="Animated" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@formatAsCurrency" Name="FormatAsCurrency" />
+                    <RadzenLabel Text="Format values as currency" Component="FormatAsCurrency" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@customTooltipText" Name="CustomTooltipText" />
+                    <RadzenLabel Text="Custom tooltip text" Component="CustomTooltipText" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@customTooltipStyle" Name="CustomTooltipStyle" />
+                    <RadzenLabel Text="Custom tooltip style" Component="CustomTooltipStyle" />
+                </RadzenStack>
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenSankeyDiagram TItem="FlowData"
+                         Data="@flows" 
+                         SourceProperty="Source"
+                         TargetProperty="Target"
+                         ValueProperty="Value"
+                         SourceLabelProperty="@(showLabels ? "SourceLabel" : null)"
+                         TargetLabelProperty="@(showLabels ? "TargetLabel" : null)"
+                         NodeFills="@(useCustomColors ? customNodeColors : null)"
+                         LinkFills="@(useCustomColors ? customLinkColors : null)"
+                         ColorScheme="@colorScheme"
+                         NodeAlignment="@nodeAlignment"
+                         NodeWidth="@nodeWidth" 
+                         NodePadding="@nodePadding"
+                         ValueFormatter="@valueFormatter"
+                         ValueText="@(customTooltipText ? "⚡ Total Energy" : "Value")"
+                         IncomingText="@(customTooltipText ? "➡️ Energy Input" : "Incoming")"
+                         OutgoingText="@(customTooltipText ? "⬅️ Energy Output" : "Outgoing")"
+                         FlowText="@(customTooltipText ? "🔄 Energy Flow" : "Flow")"
+                         TooltipStyle="@tooltipStyle"
+                         Animated="@animated">
+    </RadzenSankeyDiagram>
+</div>
+
+@code {
+    public class FlowData
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public double Value { get; set; }
+        public string SourceLabel { get; set; }
+        public string TargetLabel { get; set; }
+    }
+    
+    private ColorScheme colorScheme = ColorScheme.Pastel;
+    private SankeyAlignment nodeAlignment = SankeyAlignment.Justify;
+    private bool useCustomColors = true;
+    private bool showLabels = true;
+    private double nodeWidth = 24;
+    private double nodePadding = 8;
+    private bool formatAsCurrency = false;
+    private bool customTooltipText = false;
+    private bool customTooltipStyle = false;
+    private bool animated = true;
+    
+    private IEnumerable<ColorScheme> colorSchemes = Enum.GetValues(typeof(ColorScheme)).Cast<ColorScheme>();
+    private IEnumerable<SankeyAlignment> nodeAlignments = Enum.GetValues(typeof(SankeyAlignment)).Cast<SankeyAlignment>();
+    
+    private Func<double, string> valueFormatter => formatAsCurrency 
+        ? (value => $"${value:N0}K") 
+        : (value => $"{value:N0} MW");
+    
+    private string tooltipStyle => customTooltipStyle 
+        ? "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 12px 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-weight: 500;" 
+        : null;
+    
+    private List<FlowData> flows = new List<FlowData>
+    {
+        // Energy flow data with additional intermediate layer
+        // Layer 1: Sources -> Layer 2: Carriers -> Layer 3: Distribution -> Layer 4: End Use
+        
+        // Sources to Carriers
+        new FlowData { Source = "coal", SourceLabel = "Coal", Target = "electricity", TargetLabel = "Electricity", Value = 12500 },
+        new FlowData { Source = "coal", SourceLabel = "Coal", Target = "heat", TargetLabel = "Heat", Value = 3500 },
+        new FlowData { Source = "gas", SourceLabel = "Natural Gas", Target = "electricity", TargetLabel = "Electricity", Value = 9800 },
+        new FlowData { Source = "gas", SourceLabel = "Natural Gas", Target = "heat", TargetLabel = "Heat", Value = 6200 },
+        new FlowData { Source = "gas", SourceLabel = "Natural Gas", Target = "directuse", TargetLabel = "Direct Use", Value = 3850 },
+        new FlowData { Source = "nuclear", SourceLabel = "Nuclear", Target = "electricity", TargetLabel = "Electricity", Value = 2750 },
+        new FlowData { Source = "hydro", SourceLabel = "Hydro", Target = "electricity", TargetLabel = "Electricity", Value = 4200 },
+        new FlowData { Source = "wind", SourceLabel = "Wind", Target = "electricity", TargetLabel = "Electricity", Value = 1800 },
+        new FlowData { Source = "solar", SourceLabel = "Solar", Target = "electricity", TargetLabel = "Electricity", Value = 1200 },
+        new FlowData { Source = "biomass", SourceLabel = "Biomass", Target = "electricity", TargetLabel = "Electricity", Value = 650 },
+        new FlowData { Source = "biomass", SourceLabel = "Biomass", Target = "heat", TargetLabel = "Heat", Value = 850 },
+        
+        // Carriers to Distribution Networks
+        new FlowData { Source = "electricity", SourceLabel = "Electricity", Target = "grid", TargetLabel = "Power Grid", Value = 28950 },
+        new FlowData { Source = "electricity", SourceLabel = "Electricity", Target = "storage", TargetLabel = "Storage", Value = 3350 },
+        new FlowData { Source = "heat", SourceLabel = "Heat", Target = "districtheating", TargetLabel = "District Heating", Value = 9550 },
+        new FlowData { Source = "heat", SourceLabel = "Heat", Target = "localheat", TargetLabel = "Local Heating", Value = 2000 },
+        new FlowData { Source = "directuse", SourceLabel = "Direct Use", Target = "pipeline", TargetLabel = "Gas Pipeline", Value = 3850 },
+        
+        // Distribution to End Users
+        new FlowData { Source = "grid", SourceLabel = "Power Grid", Target = "residential", TargetLabel = "Residential", Value = 6800 },
+        new FlowData { Source = "grid", SourceLabel = "Power Grid", Target = "commercial", TargetLabel = "Commercial", Value = 7200 },
+        new FlowData { Source = "grid", SourceLabel = "Power Grid", Target = "industrial", TargetLabel = "Industrial", Value = 12500 },
+        new FlowData { Source = "grid", SourceLabel = "Power Grid", Target = "losses", TargetLabel = "Losses", Value = 2450 },
+        new FlowData { Source = "storage", SourceLabel = "Storage", Target = "industrial", TargetLabel = "Industrial", Value = 2000 },
+        new FlowData { Source = "storage", SourceLabel = "Storage", Target = "transport", TargetLabel = "Transport", Value = 450 },
+        new FlowData { Source = "storage", SourceLabel = "Storage", Target = "losses", TargetLabel = "Losses", Value = 900 },
+        new FlowData { Source = "districtheating", SourceLabel = "District Heating", Target = "residential", TargetLabel = "Residential", Value = 4200 },
+        new FlowData { Source = "districtheating", SourceLabel = "District Heating", Target = "commercial", TargetLabel = "Commercial", Value = 2800 },
+        new FlowData { Source = "districtheating", SourceLabel = "District Heating", Target = "industrial", TargetLabel = "Industrial", Value = 2000 },
+        new FlowData { Source = "districtheating", SourceLabel = "District Heating", Target = "losses", TargetLabel = "Losses", Value = 550 },
+        new FlowData { Source = "localheat", SourceLabel = "Local Heating", Target = "industrial", TargetLabel = "Industrial", Value = 1200 },
+        new FlowData { Source = "localheat", SourceLabel = "Local Heating", Target = "transport", TargetLabel = "Transport", Value = 350 },
+        new FlowData { Source = "localheat", SourceLabel = "Local Heating", Target = "losses", TargetLabel = "Losses", Value = 450 },
+        new FlowData { Source = "pipeline", SourceLabel = "Gas Pipeline", Target = "transport", TargetLabel = "Transport", Value = 3050 },
+        new FlowData { Source = "pipeline", SourceLabel = "Gas Pipeline", Target = "industrial", TargetLabel = "Industrial", Value = 500 },
+        new FlowData { Source = "pipeline", SourceLabel = "Gas Pipeline", Target = "losses", TargetLabel = "Losses", Value = 300 }
+    };
+    
+    // Custom color schemes for different elements
+    private List<string> customNodeColors = new List<string>
+    {
+        "#525252", // Coal - Dark gray
+        "#3B82F6", // Natural Gas - Blue  
+        "#F59E0B", // Nuclear - Amber
+        "#10B981", // Hydro - Emerald
+        "#22C55E", // Wind - Green
+        "#EAB308", // Solar - Yellow
+        "#A855F7", // Biomass - Purple
+        "#8B5CF6", // Electricity - Violet
+        "#EC4899", // Heat - Pink
+        "#9333EA", // Direct Use - Purple
+        "#06B6D4", // Power Grid - Cyan
+        "#0EA5E9", // Storage - Sky
+        "#F97316", // District Heating - Orange
+        "#FB923C", // Local Heating - Light Orange
+        "#6366F1", // Gas Pipeline - Indigo
+        "#67E8F9", // Residential - Light Cyan
+        "#818CF8", // Commercial - Light Indigo
+        "#14B8A6", // Industrial - Teal
+        "#84CC16", // Transport - Lime
+        "#EF4444"  // Losses - Red
+    };
+    
+    private List<string> customLinkColors = new List<string>
+    {
+        // Source to Carrier links
+        "#52525280", // Coal to electricity
+        "#52525280", // Coal to heat
+        "#3B82F680", // Gas to electricity
+        "#3B82F680", // Gas to heat
+        "#3B82F680", // Gas to direct use
+        "#F59E0B80", // Nuclear to electricity
+        "#10B98180", // Hydro to electricity
+        "#22C55E80", // Wind to electricity
+        "#EAB30880", // Solar to electricity
+        "#A855F780", // Biomass to electricity
+        "#A855F780", // Biomass to heat
+        
+        // Carrier to Distribution links
+        "#8B5CF680", // Electricity to grid
+        "#8B5CF680", // Electricity to storage
+        "#EC489980", // Heat to district heating
+        "#EC489980", // Heat to local heat
+        "#9333EA80", // Direct use to pipeline
+        
+        // Distribution to End User links
+        "#06B6D480", // Grid to residential
+        "#06B6D480", // Grid to commercial
+        "#06B6D480", // Grid to industrial
+        "#06B6D480", // Grid to losses
+        "#0EA5E980", // Storage to industrial
+        "#0EA5E980", // Storage to transport
+        "#0EA5E980", // Storage to losses
+        "#F9731680", // District heating to residential
+        "#F9731680", // District heating to commercial
+        "#F9731680", // District heating to industrial
+        "#F9731680", // District heating to losses
+        "#FB923C80", // Local heat to industrial
+        "#FB923C80", // Local heat to transport
+        "#FB923C80", // Local heat to losses
+        "#6366F180", // Pipeline to transport
+        "#6366F180", // Pipeline to industrial
+        "#6366F180"  // Pipeline to losses
+    };
+}

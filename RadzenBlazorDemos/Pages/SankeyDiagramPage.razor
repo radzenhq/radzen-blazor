@@ -1,0 +1,60 @@
+@page "/sankey-diagram"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Sankey Diagram
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" class="rz-pb-4">
+    The Radzen Blazor Sankey Diagram component visualizes flow and relationships between nodes in a system. Perfect for showing how values flow from one set of entities to another, such as energy distribution, budget allocation, or process workflows.
+</RadzenText>
+
+<RadzenText Anchor="sankey-diagram#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Basic Usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    RadzenSankeyDiagram requires four essential properties to display your data:
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>Data</code> - specifies the data source containing flow information.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>SourceProperty</code> - the name of the property that provides the source node identifier.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <code>TargetProperty</code> - the name of the property that provides the target node identifier.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <code>ValueProperty</code> - the name of the property that provides the flow value between nodes.
+</RadzenText>
+
+<RadzenExample ComponentName="SankeyDiagram" Example="SankeyDiagramBasic">
+    <SankeyDiagramBasic />
+</RadzenExample>
+
+<RadzenText Anchor="sankey-diagram#configuration" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Configuration Options
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    The Sankey Diagram component offers extensive customization options to match your visualization needs:
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Color Schemes</strong> - Choose from built-in color schemes or define custom colors for nodes and links.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Node Alignment</strong> - Control how nodes are positioned vertically with options like Justify, Left, Right, and Center.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Node Dimensions</strong> - Adjust node width and padding to optimize the layout for your data.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Labels</strong> - Display custom labels for nodes using <code>SourceLabelProperty</code> and <code>TargetLabelProperty</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
+    <strong>Tooltip Customization</strong> - Format values with <code>ValueFormatter</code>, customize tooltip labels with <code>ValueText</code>, <code>IncomingText</code>, <code>OutgoingText</code>, and <code>FlowText</code> for internationalization support, and apply custom CSS styles with <code>TooltipStyle</code>.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    <strong>Animations</strong> - Toggle flow animations on or off with the <code>Animated</code> property to visualize data movement through the diagram.
+</RadzenText>
+
+<RadzenExample ComponentName="SankeyDiagram" Example="SankeyDiagramConfiguration">
+    <SankeyDiagramConfiguration />
+</RadzenExample>

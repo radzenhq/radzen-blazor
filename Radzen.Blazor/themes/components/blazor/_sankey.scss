@@ -1,0 +1,154 @@
+// Variables
+$rz-sankey-node-stroke-width: 0 !default;
+$rz-sankey-link-stroke-width: 0 !default;
+$rz-sankey-link-opacity: 0.5 !default;
+$rz-sankey-link-hover-opacity: 0.7 !default;
+$rz-sankey-label-font-size: 0.875rem !default;
+$rz-sankey-label-color: var(--rz-text-color) !default;
+$rz-sankey-label-stroke: var(--rz-body-background-color) !default;
+$rz-sankey-label-stroke-width: 2px !default;
+
+// Component styles
+.rz-sankey-diagram {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--rz-border-radius);
+    height: 300px; // Default height like rz-chart
+    color: var(--rz-sankey-label-color);
+    
+    svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .rz-sankey-link {
+        cursor: pointer;
+        pointer-events: painted;
+        fill-opacity: 0.8;
+        opacity: var(--rz-sankey-link-opacity);
+        stroke-width: var(--rz-sankey-link-stroke-width);
+        transition: opacity 0.2s;
+        
+        &:hover {
+            opacity: var(--rz-sankey-link-hover-opacity);
+        }
+    }
+    
+    .rz-sankey-node {
+        cursor: pointer;
+        
+        rect {
+            stroke-width: var(--rz-sankey-node-stroke-width);
+            transition: opacity 0.2s;
+        }
+        
+        &:hover rect {
+            opacity: 0.9;
+        }
+    }
+    
+    // Ensure text within sankey diagram uses theme colors
+    & svg text {
+        fill: var(--rz-sankey-label-color);
+    }
+    
+    text.rz-sankey-node-label {
+        font-size: var(--rz-sankey-label-font-size);
+        fill: var(--rz-sankey-label-color);
+        stroke: var(--rz-sankey-label-stroke);
+        stroke-width: var(--rz-sankey-label-stroke-width);
+        stroke-linejoin: round;
+        paint-order: stroke;
+        font-weight: normal;
+        pointer-events: none;
+        user-select: none;
+    }
+    
+    // Palette color scheme
+    &.rz-scheme-palette {
+        $palette-colors: #003f5c, #2f4b7c, #665191, #a05195, #d45087, #f95d6a, #ff7c43, #ffa600;
+        
+        @for $i from 0 through 7 {
+            .rz-series-item-#{$i} {
+                &.rz-sankey-link,
+                rect {
+                    fill: nth($palette-colors, $i + 1);
+                }
+            }
+        }
+        
+        // Repeat colors for items beyond 8
+        @for $i from 8 through 23 {
+            .rz-series-item-#{$i} {
+                &.rz-sankey-link,
+                rect {
+                    fill: nth($palette-colors, ($i % 8) + 1);
+                }
+            }
+        }
+    }
+    
+    // Monochrome color scheme
+    &.rz-scheme-monochrome {
+        $mono-colors: #004c6d, #255e7e, #3d708f, #5383a1, #6996b3, #7faac6, #94bed9, #abd2ec, #c1e7ff;
+        
+        @for $i from 0 through 8 {
+            .rz-series-item-#{$i} {
+                &.rz-sankey-link,
+                rect {
+                    fill: nth($mono-colors, $i + 1);
+                }
+            }
+        }
+        
+        // Repeat colors for items beyond 9
+        @for $i from 9 through 23 {
+            .rz-series-item-#{$i} {
+                &.rz-sankey-link,
+                rect {
+                    fill: nth($mono-colors, ($i % 9) + 1);
+                }
+            }
+        }
+    }
+    
+    // Divergent color scheme
+    &.rz-scheme-divergent {
+        $divergent-colors: #00876c, #469f76, #70b77e, #98ce86, #c1e48e, #eaf898, #ffffad, #fed693, #fcaa78, #f77b5f, #ed4a46, #d92632, #c31e28, #aa1620, #8b0e1a;
+        
+        @for $i from 0 through 14 {
+            .rz-series-item-#{$i} {
+                &.rz-sankey-link,
+                rect {
+                    fill: nth($divergent-colors, $i + 1);
+                }
+            }
+        }
+        
+        // Repeat colors for items beyond 15
+        @for $i from 15 through 23 {
+            .rz-series-item-#{$i} {
+                &.rz-sankey-link,
+                rect {
+                    fill: nth($divergent-colors, ($i % 15) + 1);
+                }
+            }
+        }
+    }
+}
+
+// Animation gradient and highlight
+.rz-flow-gradient {
+    fill-opacity: 0.7;
+    pointer-events: none; 
+    mix-blend-mode: screen;
+}
+
+.rz-flow-highlight {
+    fill: none;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    animation: rz-pulse-subtle 3s ease-in-out infinite;
+}
