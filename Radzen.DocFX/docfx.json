@@ -3,7 +3,7 @@
     {
       "src": [
         {
-          "files": ["**/bin/Release/net9.0/Radzen.Blazor.dll"],
+          "files": ["**/bin/**/Radzen.Blazor.dll"],
           "src": "../Radzen.Blazor/"
         }
       ],
