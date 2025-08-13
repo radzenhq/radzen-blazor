@@ -299,6 +299,17 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <inheritdoc />
+        protected override async Task HandleKeyPress(KeyboardEventArgs args, bool isFilter, bool? shouldSelectOnChange = null)
+        {
+            if (!ReadOnly)
+            {
+                await base.HandleKeyPress(args, isFilter, shouldSelectOnChange);
+            }
+
+            await Task.CompletedTask;
+        }
+
         /// <summary>
         /// Called when item is selected.
         /// </summary>
