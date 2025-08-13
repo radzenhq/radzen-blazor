@@ -1,0 +1,70 @@
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Text="Chat Controls" />
+            <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                <RadzenButton Text="Add Welcome" 
+                              Icon="add"
+                              Click="@(() => basicChat?.AddMessage("Hello! How can I help you today?", false))"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Add User Message" 
+                              Icon="person_add"
+                              Click="@(() => basicChat?.AddMessage("This is a test message from the user.", true))"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Clear Chat" 
+                              Icon="delete_history"
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="@(() => basicChat?.ClearChat())"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Send Test" 
+                              Icon="send" 
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@(() => basicChat?.SendMessage("What is Blazor?"))"
+                              Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenAIChat @ref="basicChat" 
+                Title="AI Assistant" 
+                Placeholder="Ask me anything..."
+                Style="height: 500px;"
+                MessageAdded="@OnMessageAdded"
+                MessageSent="@OnMessageSent"
+                ResponseReceived="@OnResponseReceived"
+                ChatCleared="@OnChatCleared"
+                />
+</RadzenStack>
+
+<EventConsole @ref="console" Style="min-height: 230px;" />
+
+@code {
+    RadzenAIChat basicChat;
+    EventConsole console;
+
+    void OnMessageAdded(Radzen.Blazor.ChatMessage message)
+    {
+        console.Log($"Message added: {(message.IsUser ? "User" : "Assistant")} - {message.Content.Substring(0, Math.Min(50, message.Content.Length))}...", 
+                   message.IsUser ? AlertStyle.Info : AlertStyle.Success);
+    }
+
+    void OnMessageSent(string message)
+    {
+        console.Log($"Message sent: {message}", AlertStyle.Info);
+    }
+
+    void OnResponseReceived(string response)
+    {
+        console.Log($"AI Response received: {response.Substring(0, Math.Min(50, response.Length))}...", AlertStyle.Success);
+    }
+
+    void OnChatCleared()
+    {
+        console.Log("Chat cleared", AlertStyle.Warning);
+    }
+} 

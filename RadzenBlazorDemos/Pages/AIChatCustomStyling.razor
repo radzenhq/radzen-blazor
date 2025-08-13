@@ -1,0 +1,40 @@
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="1rem">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="8px">
+                <RadzenLabel Text="Show Clear Button" />
+                <RadzenSwitch @bind-Value="showClearButton" />
+            </RadzenStack>
+            
+            <RadzenStack Orientation="Orientation.Vertical" Gap="8px">
+                <RadzenLabel Text="Disabled" />
+                <RadzenSwitch @bind-Value="isDisabled" />
+            </RadzenStack>
+            
+            <RadzenStack Orientation="Orientation.Vertical" Gap="8px">
+                <RadzenLabel Text="Read Only" />
+                <RadzenSwitch @bind-Value="isReadOnly" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenAIChat @ref="customChat" 
+                Title="Custom Assistant" 
+                Placeholder="Type your message here..."
+                EmptyMessage="Welcome! Start chatting with me."
+                ShowClearButton="@showClearButton"
+                Disabled="@isDisabled"
+                ReadOnly="@isReadOnly"
+                Style="height: 400px; border: 2px solid var(--rz-primary);"
+                />
+</RadzenStack>
+
+@code {
+    RadzenAIChat customChat;
+    
+    private bool showClearButton = true;
+    private bool isDisabled = false;
+    private bool isReadOnly = false;
+} 
