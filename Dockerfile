@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1
-FROM mono:latest
+FROM mono:latest-bullseye
 
 ENV DOCFX_VER 2.58.4
 
