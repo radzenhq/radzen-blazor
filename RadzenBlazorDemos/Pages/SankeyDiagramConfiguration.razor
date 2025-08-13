@@ -1,92 +1,73 @@
 @using Radzen.Blazor
 @using System.Collections.Generic
 
-<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-4">
-    This example demonstrates the comprehensive configuration options available for the Sankey Diagram component. 
-    Experiment with different color schemes, node alignments, dimensions, and tooltip formatting options to customize the visualization for your needs.
-</RadzenText>
-
 <div class="rz-p-0 rz-p-md-12">
-    <RadzenCard Variant="Variant.Outlined" class="rz-mb-4">
-        <RadzenStack Gap="1rem">
-            <RadzenRow AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenLabel Text="Color scheme:" Component="ColorScheme" />
-                        <RadzenDropDown @bind-Value="@colorScheme" Data="@colorSchemes" Style="width: 200px;" Name="ColorScheme"
-                                        Change="@(args => useCustomColors = false)">
-                            <Template Context="scheme">
-                                @Enum.GetName(typeof(ColorScheme), scheme)
-                            </Template>
-                        </RadzenDropDown>
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenLabel Text="Node alignment:" Component="NodeAlignment" />
-                        <RadzenDropDown @bind-Value="@nodeAlignment" Data="@nodeAlignments" Style="width: 200px;" Name="NodeAlignment">
-                            <Template Context="alignment">
-                                @Enum.GetName(typeof(SankeyAlignment), alignment)
-                            </Template>
-                        </RadzenDropDown>
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenCheckBox @bind-Value="@useCustomColors" Name="CustomColors" />
-                        <RadzenLabel Text="Use custom colors" Component="CustomColors" />
-                    </RadzenStack>
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenLabel Text="Node width:" Component="NodeWidth" />
-                        <RadzenNumeric @bind-Value="@nodeWidth" Min="10" Max="50" Style="width: 100px;" Name="NodeWidth" />
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenLabel Text="Node padding:" Component="NodePadding" />
-                        <RadzenNumeric @bind-Value="@nodePadding" Min="2" Max="20" Style="width: 100px;" Name="NodePadding" />
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenCheckBox @bind-Value="@showLabels" Name="ShowLabels" />
-                        <RadzenLabel Text="Show labels" Component="ShowLabels" />
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenCheckBox @bind-Value="@animated" Name="Animated" />
-                        <RadzenLabel Text="Animate flow" Component="Animated" />
-                    </RadzenStack>
-                </RadzenColumn>
-            </RadzenRow>
-            <RadzenRow AlignItems="AlignItems.Center" Gap="0.5rem">
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenCheckBox @bind-Value="@formatAsCurrency" Name="FormatAsCurrency" />
-                        <RadzenLabel Text="Format values as currency" Component="FormatAsCurrency" />
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenCheckBox @bind-Value="@customTooltipText" Name="CustomTooltipText" />
-                        <RadzenLabel Text="Custom tooltip text" Component="CustomTooltipText" />
-                    </RadzenStack>
-                </RadzenColumn>
-                <RadzenColumn Size="12" SizeMD="4">
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                        <RadzenCheckBox @bind-Value="@customTooltipStyle" Name="CustomTooltipStyle" />
-                        <RadzenLabel Text="Custom tooltip style" Component="CustomTooltipStyle" />
-                    </RadzenStack>
-                </RadzenColumn>
-            </RadzenRow>
+    <RadzenAlert AlertStyle="AlertStyle.Base" Icon="info" Variant="Variant.Flat" AllowClose="false">
+        This example demonstrates the comprehensive configuration options available for the Sankey Diagram component. 
+        Experiment with different color schemes, node alignments, dimensions, and tooltip formatting options to customize the visualization for your needs.
+    </RadzenAlert>
+    <RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
+        <RadzenStack Gap="2rem">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="1rem">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text="Color scheme:" Component="ColorScheme" />
+                    <RadzenDropDown @bind-Value="@colorScheme" Data="@colorSchemes" Name="ColorScheme"
+                                    Change="@(args => useCustomColors = false)">
+                        <Template Context="scheme">
+                            @Enum.GetName(typeof(ColorScheme), scheme)
+                        </Template>
+                    </RadzenDropDown>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text="Node alignment:" Component="NodeAlignment" />
+                    <RadzenDropDown @bind-Value="@nodeAlignment" Data="@nodeAlignments" Name="NodeAlignment">
+                        <Template Context="alignment">
+                            @Enum.GetName(typeof(SankeyAlignment), alignment)
+                        </Template>
+                    </RadzenDropDown>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text="Node width:" Component="NodeWidth" />
+                    <RadzenNumeric @bind-Value="@nodeWidth" Min="10" Max="50" Name="NodeWidth" />
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                    <RadzenLabel Text="Node padding:" Component="NodePadding" />
+                    <RadzenNumeric @bind-Value="@nodePadding" Min="2" Max="20" Name="NodePadding" />
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Start" Wrap="FlexWrap.Wrap" Gap="1.5rem">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@useCustomColors" Name="CustomColors" />
+                    <RadzenLabel Text="Use custom colors" Component="CustomColors" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@showLabels" Name="ShowLabels" />
+                    <RadzenLabel Text="Show labels" Component="ShowLabels" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@animated" Name="Animated" />
+                    <RadzenLabel Text="Animate flow" Component="Animated" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@formatAsCurrency" Name="FormatAsCurrency" />
+                    <RadzenLabel Text="Format values as currency" Component="FormatAsCurrency" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@customTooltipText" Name="CustomTooltipText" />
+                    <RadzenLabel Text="Custom tooltip text" Component="CustomTooltipText" />
+                </RadzenStack>
+
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    <RadzenCheckBox @bind-Value="@customTooltipStyle" Name="CustomTooltipStyle" />
+                    <RadzenLabel Text="Custom tooltip style" Component="CustomTooltipStyle" />
+                </RadzenStack>
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
-    
     <RadzenSankeyDiagram TItem="FlowData"
                          Data="@flows" 
                          SourceProperty="Source"
