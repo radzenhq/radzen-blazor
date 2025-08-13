@@ -412,14 +412,6 @@ namespace RadzenBlazorDemos
                         },
                         new Example
                         {
-                            Name = "DataTable Source",
-                            Path = "datagrid-datatable",
-                            Title = "Blazor DataGrid Component - from DataTable | Free UI Components by Radzen",
-                            Description = "Blazor Data Grid supports data-binding to DataTable.",
-                            Tags = new [] { "datagrid", "bind", "load", "data", "loaddata", "datatable", "service", "rest" }
-                        },
-                        new Example
-                        {
                             Name = "Dynamic data",
                             Path = "datagrid-dynamic",
                             Title = "Blazor DataGrid Component - Dynamic Data | Free UI Components by Radzen",

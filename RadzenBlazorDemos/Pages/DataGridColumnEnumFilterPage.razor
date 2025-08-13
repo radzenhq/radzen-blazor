@@ -4,34 +4,9 @@
     DataGrid Enum Column Filter
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    This page demonstrates how to use enums in the DataGrid column filter.<br />
-    Select Source of Data: Standard POCO Data Model or System.Data.DataTable
+    This page demonstrates how to use enums in the DataGrid column filter.
 </RadzenText>
-<div class="rz-p-12 rz-text-align-center">
-    <RadzenRadioButtonList @bind-Value=@value TValue="int">
-        <Items>
-            <RadzenRadioButtonListItem Text="POCO Data Model" Value="0" />
-            <RadzenRadioButtonListItem Text="Syste Data DataTable" Value="1" />
-        </Items>
-    </RadzenRadioButtonList>
-</div>
-@* <RadzenRadioButtonList @bind-Value="@DataSource" TValue="int">
-    <RadzenRadioButtonListItem Text="Data Model" Value="0" />
-    <RadzenRadioButtonListItem Text="Table" Value="1" />
-</RadzenRadioButtonList> *@
 
 <RadzenExample ComponentName="DataGrid" Example="DataGridColumnEnumFilter">
-    @switch (value)
-    {
-        case 1:
-            <DataGridColumnEnumFilterTable />
-            break;
-        default:
-            <DataGridColumnEnumFilter />
-            break;
-    }
+    <DataGridColumnEnumFilter />
 </RadzenExample>
-
-@code {
-    int value { get; set; } = 0;
-}

@@ -3,11 +3,8 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -148,11 +145,11 @@ namespace Radzen.Blazor
 
                 if (canSetFilterPropertyType)
                 {
-                    if (Type == null || PropertyAccess.GetPropertyType(typeof(TItem), GetFilterProperty()) == null)
+                    if (Type == null)
                     {
                         var fp = GetFilterProperty();
                         var pt = !string.IsNullOrEmpty(fp) ?
-                                PropertyAccess.GetPropertyType(typeof(TItem), fp) ?? Type : typeof(object);
+                                PropertyAccess.GetPropertyType(typeof(TItem), fp) : typeof(object);
 
                         _filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt);
                     }
@@ -169,27 +166,21 @@ namespace Radzen.Blazor
 
                 if (!string.IsNullOrEmpty(property))
                 {
-                    _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property) ?? Type;
+                    _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
                 }
 
-                //Altered logic so that for columns of array<object>[n] filterPropertyType to match (Type)array<object>[n] values in column
-                if (!string.IsNullOrEmpty(property) && (Type == null || PropertyAccess.GetPropertyType(typeof(TItem), property) == null) && !canSetFilterPropertyType)
+                if (!string.IsNullOrEmpty(property) && Type == null && !canSetFilterPropertyType)
                 {
-                    _filterPropertyType = Type ?? _propertyType;
+                    _filterPropertyType = _propertyType;
                 }
 
                 if (_filterPropertyType == null)
                 {
                     _filterPropertyType = Type;
                 }
-                else if (!string.IsNullOrEmpty(Property))
+                else if(!string.IsNullOrEmpty(Property))
                 {
-                    //Send the Enum Type to Getter otherwise it is interpreted and displayed as an int
-                    propertyValueGetter =
-                        Type != null && (Nullable.GetUnderlyingType(Type) ?? Type).IsEnum
-                        ? PropertyAccess.Getter<TItem, object>(Property, Type)
-                        : PropertyAccess.Getter<TItem, object>(Property);
-
+                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
                 }
 
                 if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null && _filterOperator == null)
@@ -198,7 +189,7 @@ namespace Radzen.Blazor
                 }
             }
         }
-
+        
         int? orderIndex;
 
         /// <summary>
@@ -1132,7 +1123,7 @@ namespace Radzen.Blazor
 
             if (isFirst)
             {
-                filterValue = CanSetCurrentValue(value) ? value :
+                filterValue = CanSetCurrentValue(value) ? value : 
                     GetFilterOperator() == FilterOperator.IsEmpty  || GetFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
             }
             else
@@ -1241,7 +1232,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The filter operator.</value>
         [Parameter]
-        public FilterOperator FilterOperator
+        public FilterOperator FilterOperator 
         {
             get
             {
