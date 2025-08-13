@@ -399,8 +399,24 @@ namespace Radzen.Blazor
                 return;
             }
 
-            var files = Multiple ? args.GetMultipleFiles(MaxFileCount).Select(f => new FileInfo(f))
-                : new FileInfo[] { new FileInfo (args.File) };
+            IEnumerable<FileInfo> files = Enumerable.Empty<FileInfo>();
+
+            if (Multiple)
+            {
+                try
+                {
+                    files = args.GetMultipleFiles(MaxFileCount).Select(f => new FileInfo(f));
+                }
+                catch
+                {
+                    await Error.InvokeAsync(new UploadErrorEventArgs() { Message = $"Maximum number of files exceeded. Maximum allowed is {MaxFileCount}." });
+                    return;
+                }
+            }
+            else
+            {
+                files = new FileInfo[] { new FileInfo(args.File) };
+            }
 
             this.files = files.Select(f => new PreviewFileInfo(f.Source) { Name = f.Name, Size = f.Size }).ToList();
 
