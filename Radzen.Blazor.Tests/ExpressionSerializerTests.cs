@@ -131,7 +131,7 @@ namespace Radzen.Blazor.Tests
         public void Serializes_ArrayNotContainsValue()
         {
             Expression<Func<TestEntity, bool>> expr = e => !e.Scores.Contains(100);
-            Assert.Equal("e => (!e.Scores.Contains(100))", _serializer.Serialize(expr));
+            Assert.Equal("e => (!(e.Scores.Contains(100)))", _serializer.Serialize(expr));
         }
 
         [Fact]
