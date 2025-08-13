@@ -59,13 +59,13 @@ namespace Radzen.Blazor
         private ElementReference inputElement;
         private ElementReference messagesContainer;
         private CancellationTokenSource cts = new();
-        private string? currentSessionId;
+        private string currentSessionId;
 
         /// <summary>
         /// Gets or sets the session ID for maintaining conversation memory. If null, a new session will be created.
         /// </summary>
         [Parameter]
-        public string? SessionId { get; set; }
+        public string SessionId { get; set; }
 
         /// <summary>
         /// Event callback that is invoked when a session ID is created or retrieved.
@@ -166,7 +166,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the current session ID.
         /// </summary>
-        public string? GetSessionId() => currentSessionId;
+        public string GetSessionId() => currentSessionId;
 
         /// <summary>
         /// Adds a message to the chat.
@@ -242,7 +242,7 @@ namespace Radzen.Blazor
         /// <param name="systemPrompt">Optional system prompt to override the configured system prompt.</param>
         /// <param name="temperature">Optional temperature to override the configured temperature.</param>
         /// <param name="maxTokens">Optional maximum tokens to override the configured max tokens.</param>
-        public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null)
+        public async Task SendMessage(string content, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
                 return;
@@ -330,7 +330,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private async Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null)
+        private async Task GetAIResponse(string userInput, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null)
         {
             if (string.IsNullOrWhiteSpace(userInput))
                 return;
@@ -377,6 +377,7 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <inheritdoc />
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
@@ -389,6 +390,7 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <inheritdoc />
         protected override async Task OnParametersSetAsync()
         {
             await base.OnParametersSetAsync();

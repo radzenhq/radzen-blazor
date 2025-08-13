@@ -134,14 +134,14 @@ public interface IAIChatService
     /// <param name="temperature">Optional temperature to override the configured temperature.</param>
     /// <param name="maxTokens">Optional maximum tokens to override the configured max tokens.</param>
     /// <returns>An async enumerable that yields streaming response chunks from the AI model.</returns>
-    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null);
+    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string sessionId = null, CancellationToken cancellationToken = default, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null);
 
     /// <summary>
     /// Gets or creates a conversation session.
     /// </summary>
     /// <param name="sessionId">The session ID. If null, a new session will be created.</param>
     /// <returns>The conversation session.</returns>
-    ConversationSession GetOrCreateSession(string? sessionId = null);
+    ConversationSession GetOrCreateSession(string sessionId = null);
 
     /// <summary>
     /// Clears the conversation history for a specific session.
@@ -232,7 +232,7 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
     public AIChatServiceOptions Options => options.Value;
 
     /// <inheritdoc />
-    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null)
+    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string sessionId = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null)
     {
         if (string.IsNullOrWhiteSpace(userInput))
         {
@@ -320,7 +320,7 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
     }
 
     /// <inheritdoc />
-    public ConversationSession GetOrCreateSession(string? sessionId = null)
+    public ConversationSession GetOrCreateSession(string sessionId = null)
     {
         lock (_sessionsLock)
         {
