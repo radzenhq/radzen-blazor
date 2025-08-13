@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -178,8 +179,13 @@ namespace Radzen.Blazor
                 {
                     _filterPropertyType = Type;
                 }
-                
-                if(!string.IsNullOrEmpty(Property))
+                else if (!string.IsNullOrEmpty(Property))
+                {
+                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
+                }
+
+                if (!string.IsNullOrEmpty(Property) && (typeof(TItem).IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(typeof(TItem).GetGenericTypeDefinition()) ||
+                    typeof(IDictionary).IsAssignableFrom(typeof(TItem)) || typeof(System.Data.DataRow).IsAssignableFrom(typeof(TItem))))
                 {
                     propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
                 }
