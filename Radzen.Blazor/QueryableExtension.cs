@@ -369,6 +369,7 @@ namespace Radzen
         /// <summary>
         /// Handles similar issue to above, for nullable enumerators when managed as IQueryable
         /// </summary>
+        /// <typeparam name="T">If not DataRow, returns the selected Property cast as object</typeparam>
         /// <param name="query">IQueryable incoming</param>
         /// <param name="property">Name of the property</param>
         /// <param name="propertyType">To cast</param>
