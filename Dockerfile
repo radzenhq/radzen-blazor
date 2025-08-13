@@ -29,4 +29,3 @@ ENV ASPNETCORE_URLS http://*:5000
 WORKDIR /app/RadzenBlazorDemos.Host/out
 
 ENTRYPOINT ["dotnet", "RadzenBlazorDemos.Host.dll"]
-
