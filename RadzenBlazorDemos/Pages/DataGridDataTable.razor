@@ -11,15 +11,15 @@
                 FilterCaseSensitivity="FilterCaseSensitivity.Default" FilterMode="FilterMode.Simple" AllowColumnPicking="true">
     <Columns>
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.EmployeeID))"
-                              Type="@colType(nameof(Employee.EmployeeID))"
-                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.EmployeeID))"
+                              Type="@colType(nameof(Employee.FirstName))"
+                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.FirstName))"
                               Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
         <RadzenDataGridColumn HeaderTooltip="Sort based on Last Name"
                               Title="Photo" Frozen="true"
                               Sortable="true" SortProperty="@colProperty(nameof(Employee.LastName))"
-                              Filterable="false" FilterProperty="@colProperty(nameof(Employee.LastName))" FilterMode="FilterMode.Simple"
+                              Filterable="true" FilterProperty="@colProperty(nameof(Employee.LastName))" FilterMode="FilterMode.Simple"
                               Type="@colType(nameof(Employee.LastName))"
-                              Width="100px" TextAlign="TextAlign.Center">
+                              Width="80px" TextAlign="TextAlign.Center">
             <Template Context="data">
                 <RadzenImage Path="@(data["Photo"] as string)" class="rz-gravatar" AlternateText="@(data["FirstName"] + " " + data["LastName"])" />
             </Template>
@@ -28,7 +28,7 @@
                               Property="@colProperty(nameof(Employee.FirstName))"
                               Type="@colType(nameof(Employee.FirstName))"
                               Title="First Name" Frozen="true" Width="160px"
-                              FilterProperty="@colProperty(nameof(Employee.FirstName))"
+                              FilterProperty="@colProperty(nameof(Employee.LastName))"
                               FilterMode="FilterMode.SimpleWithMenu" />
         <RadzenDataGridColumn Property="@colProperty(nameof(Employee.LastName))"
                               Type="@colType(nameof(Employee.LastName))"
