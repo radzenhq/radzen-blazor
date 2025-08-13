@@ -3,7 +3,7 @@
     {
       "src": [
         {
-          "files": ["Radzen.Blazor.csproj"],
+          "files": ["**/bin/Release/net9.0/Radzen.Blazor.dll"],
           "src": "../Radzen.Blazor/"
         }
       ],
@@ -14,7 +14,7 @@
     }
   ],
   "build": {
-    "sitemap":{
+    "sitemap": {
       "baseUrl": "https://blazor.radzen.com/docs"
     },
     "content": [
