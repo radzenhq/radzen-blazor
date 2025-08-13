@@ -8,7 +8,6 @@ COPY Radzen.DocFX /app/DocFX
 COPY RadzenBlazorDemos /app/RadzenBlazorDemos
 COPY RadzenBlazorDemos.Host /app/RadzenBlazorDemos.Host
 WORKDIR /app
-RUN docfx DocFX/docfx.json
 
 FROM mcr.microsoft.com/dotnet/sdk:9.0
 
