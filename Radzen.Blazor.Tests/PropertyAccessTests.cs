@@ -113,5 +113,43 @@ namespace Radzen.Blazor.Tests
         {
             public List<string> Values { get; set; }
         }
+
+        [Fact]
+        public void GetProperty_Should_Resolve_DescriptionProperty()
+        {
+            var descriptionProperty = PropertyAccess.GetProperty(typeof(ISimpleInterface), nameof(ISimpleInterface.Description));
+
+            Assert.NotNull(descriptionProperty);
+        }
+
+        [Fact]
+        public void GetProperty_Should_Resolve_NameProperty()
+        {
+            var nameProperty = PropertyAccess.GetProperty(typeof(ISimpleInterface), nameof(ISimpleInterface.Name));
+
+            Assert.NotNull(nameProperty);
+        }
+
+        [Fact]
+        public void GetProperty_Should_Resolve_IdProperty()
+        {
+            var idProperty = PropertyAccess.GetProperty(typeof(ISimpleInterface), nameof(ISimpleBaseInterface.Id));
+            Assert.NotNull(idProperty);
+        }
+
+        interface ISimpleInterface : ISimpleNestedInterface
+        {
+            string Description { get; set; }
+        }
+
+        interface ISimpleNestedInterface : ISimpleBaseInterface
+        {
+            string Name { get; set; }
+        }
+
+        interface ISimpleBaseInterface
+        {
+            int Id { get; set; }
+        }
     }
 }
