@@ -293,6 +293,7 @@ namespace Radzen
             services.AddScoped<TooltipService>();
             services.AddScoped<ContextMenuService>();
             services.AddScoped<ThemeService>();
+            services.AddAIChatService();
 
             return services;
         }
