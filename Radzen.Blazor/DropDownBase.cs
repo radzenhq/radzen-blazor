@@ -394,7 +394,7 @@ namespace Radzen
             await SearchTextChanged.InvokeAsync(searchText);
             await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, "");
 
-            internalValue = default(T);
+            internalValue = collectionAssignment.GetCleared();
             selectedItem = null;
 
             selectedItems.Clear();
@@ -1405,6 +1405,11 @@ namespace Radzen
                     await ValueChanged.InvokeAsync(object.Equals(selectedItems, null) ? default(T) : (T)selectedItems);
                 }
             }
+
+            public virtual T GetCleared()
+            {
+                return default(T);
+            }
         }
 
         private class ReferenceGenericCollectionAssignment : DefaultCollectionAssignment
@@ -1448,6 +1453,16 @@ namespace Radzen
                 }
 
                 await ValueChanged.InvokeAsync(originalCollection);
+            }
+
+            public override T GetCleared()
+            {
+                if (canHandle)
+                {
+                    clearMethod.Invoke(originalCollection, null);
+                    return originalCollection;
+                }
+                return base.GetCleared();
             }
         }
     }

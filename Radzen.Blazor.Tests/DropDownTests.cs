@@ -537,6 +537,40 @@ namespace Radzen.Blazor.Tests
             Assert.Contains(1, capturedValue);
         }
 
+        [Fact]
+        public void DropDown_Reset_PreservesCollectionInstanceButClears()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var originalHashSet = new HashSet<int> { 1, 2 }; // Pre-populate
+            var capturedValues = new List<HashSet<int>>();
+
+            var component = DropDownWithReferenceCollection<HashSet<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, originalHashSet);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<HashSet<int>>(this, value => capturedValues.Add(value)));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            // Verify initial state - collection should have 2 items
+            Assert.Equal(2, originalHashSet.Count);
+            Assert.Contains(1, originalHashSet);
+            Assert.Contains(2, originalHashSet);
+
+            // Call Reset (public method that calls ClearAll internally)
+            component.InvokeAsync(() => component.Instance.Reset());
+            component.Render();
+
+            // Verify the same HashSet instance is preserved
+            Assert.Single(capturedValues);
+            Assert.Same(originalHashSet, capturedValues[0]);
+            
+            // Verify the collection is now cleared
+            Assert.Empty(originalHashSet);
+        }
+
         class ReferenceCollectionDropDown<T> : Radzen.Blazor.RadzenDropDown<T>
         {
             protected override void OnInitialized()
