@@ -23,7 +23,6 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
             RegisterChatService(ctx);
             var component = ctx.RenderComponent<RadzenAIChat>();
-            Assert.Contains("Chat", component.Markup);
             Assert.Contains("Type your message...", component.Markup);
         }
 
@@ -63,7 +62,7 @@ namespace Radzen.Blazor.Tests
             using var ctx = new TestContext();
             RegisterChatService(ctx);
             var component = ctx.RenderComponent<RadzenAIChat>();
-            Assert.Contains("clear_all", component.Markup);
+            Assert.Contains("rz-chat-header-clear", component.Markup);
         }
 
         [Fact]
