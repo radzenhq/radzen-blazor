@@ -328,28 +328,7 @@ namespace Radzen
                 internalValue = selectedItems.AsQueryable().Cast(type);
             }
 
-            if (typeof(IList).IsAssignableFrom(typeof(T)))
-            {
-                var list = (IList)Activator.CreateInstance(typeof(T));
-                foreach (var i in (IEnumerable)internalValue)
-                {
-                    list.Add(i);
-                }
-                await ValueChanged.InvokeAsync((T)(object)list);
-            }
-            else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
-            {
-                var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(T).GetGenericArguments()[0]));
-                foreach (var i in (IEnumerable)internalValue)
-                {
-                    list.Add(i);
-                }
-                await ValueChanged.InvokeAsync((T)(object)list);
-            }
-            else
-            {
-                await ValueChanged.InvokeAsync((T)internalValue);
-            }
+            await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(internalValue);
 

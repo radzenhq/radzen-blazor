@@ -571,6 +571,42 @@ namespace Radzen.Blazor.Tests
             Assert.Empty(originalHashSet);
         }
 
+        [Fact]
+        public void DropDown_SelectAll_PreservesCollectionInstanceAndPopulates()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var originalHashSet = new HashSet<int>(); // Start empty
+            var capturedValues = new List<HashSet<int>>();
+
+            var component = DropDownWithReferenceCollection<HashSet<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.AllowSelectAll, true);
+                parameters.Add(p => p.Value, originalHashSet);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<HashSet<int>>(this, value => capturedValues.Add(value)));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            // Verify initial state - collection should be empty
+            Assert.Empty(originalHashSet);
+
+            // Find and click the "Select All" checkbox
+            var selectAllCheckBox = component.Find(".rz-multiselect-header input[type='checkbox']");
+            selectAllCheckBox.Click();
+            component.Render();
+
+            // Verify the same HashSet instance is preserved
+            Assert.Single(capturedValues);
+            Assert.Same(originalHashSet, capturedValues[0]);
+            
+            // Verify the collection now contains both items
+            Assert.Equal(2, originalHashSet.Count);
+            Assert.Contains(1, originalHashSet);
+            Assert.Contains(2, originalHashSet);
+        }
+
         class ReferenceCollectionDropDown<T> : Radzen.Blazor.RadzenDropDown<T>
         {
             protected override void OnInitialized()
