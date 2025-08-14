@@ -1187,7 +1187,14 @@ namespace Radzen
             {
                 if (ValueChanged.HasDelegate)
                 {
-                    await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
+                    if (Multiple)
+                    {
+                        await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
+                    }
+                    else
+                    {
+                        await ValueChanged.InvokeAsync((T)internalValue);
+                    }
                 }
 
                 if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
@@ -1304,7 +1311,6 @@ namespace Radzen
                         {
                             selectedItems = values.Cast<object>().ToHashSet(ItemComparer);
                         }
-
                     }
                 }
             }
