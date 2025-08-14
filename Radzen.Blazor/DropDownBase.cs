@@ -1129,6 +1129,7 @@ namespace Radzen
         }
 
         internal object internalValue;
+        private DefaultCollectionAssignment collectionAssignment = new();
 
         /// <summary>
         /// Selects the item.
@@ -1198,42 +1199,7 @@ namespace Radzen
             {
                 if (ValueChanged.HasDelegate)
                 {
-                    if (typeof(IList).IsAssignableFrom(typeof(T)))
-                    {
-                        if (object.Equals(internalValue, null))
-                        {
-                            await ValueChanged.InvokeAsync(default(T));
-                        }
-                        else
-                        {
-                            var list = (IList)Activator.CreateInstance(typeof(T));
-                            foreach (var i in (IEnumerable)internalValue)
-                            {
-                                list.Add(i);
-                            }
-                            await ValueChanged.InvokeAsync((T)(object)list);
-                        }
-                    }
-                    else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
-                    {
-                        if (object.Equals(internalValue, null))
-                        {
-                            await ValueChanged.InvokeAsync(default(T));
-                        }
-                        else
-                        {
-                            var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(T).GetGenericArguments()[0]));
-                            foreach (var i in (IEnumerable)internalValue)
-                            {
-                                list.Add(i);
-                            }
-                            await ValueChanged.InvokeAsync((T)(object)list);
-                        }
-                    }
-                    else
-                    {
-                        await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
-                    }
+                    await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
                 }
 
                 if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
@@ -1386,6 +1352,50 @@ namespace Radzen
             base.Dispose();
 
             keys.Clear();
+        }
+        
+        private class DefaultCollectionAssignment
+        {
+            public virtual async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> ValueChanged)
+            {
+                if (typeof(IList).IsAssignableFrom(typeof(T)))
+                {
+                    if (object.Equals(selectedItems, null))
+                    {
+                        await ValueChanged.InvokeAsync(default(T));
+                    }
+                    else
+                    {
+                        var list = (IList)Activator.CreateInstance(typeof(T));
+                        foreach (var i in (IEnumerable)selectedItems)
+                        {
+                            list.Add(i);
+                        }
+                        await ValueChanged.InvokeAsync((T)(object)list);
+                    }
+                }
+                else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
+                {
+                    if (object.Equals(selectedItems, null))
+                    {
+                        await ValueChanged.InvokeAsync(default(T));
+                    }
+                    else
+                    {
+
+                            var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(T).GetGenericArguments()[0]));
+                            foreach (var i in (IEnumerable)selectedItems)
+                            {
+                                list.Add(i);
+                            }
+                            await ValueChanged.InvokeAsync((T)(object)list);
+                    }
+                }
+                else
+                {
+                    await ValueChanged.InvokeAsync(object.Equals(selectedItems, null) ? default(T) : (T)selectedItems);
+                }
+            }
         }
     }
 }
