@@ -1403,6 +1403,7 @@ namespace Radzen
             private readonly bool canHandle;
             private readonly System.Reflection.MethodInfo clearMethod;
             private readonly System.Reflection.MethodInfo addMethod;
+            private readonly System.Reflection.MethodInfo removeMethod;
 
             public ReferenceGenericCollectionAssignment(T originalCollection)
             {
@@ -1420,7 +1421,8 @@ namespace Radzen
                         {
                             clearMethod = actualType.GetMethod("Clear");
                             addMethod = actualType.GetMethod("Add");
-                            canHandle = clearMethod != null && addMethod != null;
+                            removeMethod = typeof(T).GetMethod("Remove");
+                            canHandle = true;
                         }
                     }
                 }
@@ -1435,10 +1437,17 @@ namespace Radzen
                     return;
                 }
 
-                clearMethod.Invoke(originalCollection, null);
-                foreach (var i in selectedItems)
+                var currentItems = selectedItems.Cast<object>().ToHashSet();
+                var existingItems = ((IEnumerable)originalCollection).Cast<object>().ToHashSet();
+                foreach (var i in currentItems)
                 {
-                    addMethod.Invoke(originalCollection, [i]);
+                    if (!existingItems.Contains(i))
+                        addMethod.Invoke(originalCollection, [i]);
+                }
+                foreach (var i in existingItems)
+                {
+                    if (!currentItems.Contains(i))
+                        removeMethod.Invoke(originalCollection, [i]);
                 }
 
                 await ValueChanged.InvokeAsync(originalCollection);
