@@ -1401,17 +1401,21 @@ namespace Radzen
             public ReferenceGenericCollectionAssignment(T originalCollection)
             {
                 this.originalCollection = originalCollection;
-                // Pre-calculate if we can handle this type and get method info
-                if (typeof(T).IsGenericType && !typeof(T).IsArray)
+                // Pre-calculate if we can handle this instance and get method info
+                if (originalCollection != null)
                 {
-                    var elementType = typeof(T).GetGenericArguments()[0];
-                    var genericCollectionType = typeof(ICollection<>).MakeGenericType(elementType);
-
-                    if (genericCollectionType.IsAssignableFrom(typeof(T)))
+                    var actualType = originalCollection.GetType();
+                    if (actualType.IsGenericType && !actualType.IsArray)
                     {
-                        clearMethod = typeof(T).GetMethod("Clear");
-                        addMethod = typeof(T).GetMethod("Add");
-                        canHandle = clearMethod != null && addMethod != null;
+                        var elementType = actualType.GetGenericArguments()[0];
+                        var genericCollectionType = typeof(ICollection<>).MakeGenericType(elementType);
+
+                        if (genericCollectionType.IsAssignableFrom(actualType))
+                        {
+                            clearMethod = actualType.GetMethod("Clear");
+                            addMethod = actualType.GetMethod("Add");
+                            canHandle = clearMethod != null && addMethod != null;
+                        }
                     }
                 }
             }
