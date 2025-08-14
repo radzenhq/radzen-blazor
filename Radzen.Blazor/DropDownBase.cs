@@ -961,6 +961,10 @@ namespace Radzen
             if (valueChanged)
             {
                 internalValue = parameters.GetValueOrDefault<object>(nameof(Value));
+                if (PreserveCollectionOnSelection)
+                {
+                    collectionAssignment = new ReferenceGenericCollectionAssignment((T)internalValue);
+                }
             }
             
             var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
@@ -1129,6 +1133,11 @@ namespace Radzen
         }
 
         internal object internalValue;
+        
+        /// <summary>
+        /// Will add/remove selected items from a bound ICollection&lt;T&gt;, instead of replacing it.
+        /// </summary>
+        protected bool PreserveCollectionOnSelection = false;
         private DefaultCollectionAssignment collectionAssignment = new();
 
         /// <summary>
@@ -1395,6 +1404,50 @@ namespace Radzen
                 {
                     await ValueChanged.InvokeAsync(object.Equals(selectedItems, null) ? default(T) : (T)selectedItems);
                 }
+            }
+        }
+
+        private class ReferenceGenericCollectionAssignment : DefaultCollectionAssignment
+        {
+            private readonly T originalCollection;
+            private readonly bool canHandle;
+            private readonly System.Reflection.MethodInfo clearMethod;
+            private readonly System.Reflection.MethodInfo addMethod;
+
+            public ReferenceGenericCollectionAssignment(T originalCollection)
+            {
+                this.originalCollection = originalCollection;
+                // Pre-calculate if we can handle this type and get method info
+                if (typeof(T).IsGenericType && !typeof(T).IsArray)
+                {
+                    var elementType = typeof(T).GetGenericArguments()[0];
+                    var genericCollectionType = typeof(ICollection<>).MakeGenericType(elementType);
+
+                    if (genericCollectionType.IsAssignableFrom(typeof(T)))
+                    {
+                        clearMethod = typeof(T).GetMethod("Clear");
+                        addMethod = typeof(T).GetMethod("Add");
+                        canHandle = clearMethod != null && addMethod != null;
+                    }
+                }
+            }
+
+            public override async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> ValueChanged)
+            {
+                if (!canHandle)
+                {
+                    // Fallback to default behavior when we can't handle the type
+                    await base.MakeAssignment(selectedItems, ValueChanged);
+                    return;
+                }
+
+                clearMethod.Invoke(originalCollection, null);
+                foreach (var i in selectedItems)
+                {
+                    addMethod.Invoke(originalCollection, [i]);
+                }
+
+                await ValueChanged.InvokeAsync(originalCollection);
             }
         }
     }

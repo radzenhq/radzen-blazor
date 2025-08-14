@@ -2,7 +2,9 @@ using AngleSharp.Dom;
 using Bunit;
 using Microsoft.AspNetCore.Components;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -43,6 +45,7 @@ namespace Radzen.Blazor.Tests
 
             return component;
         }
+
 
         [Fact]
         public async Task Dropdown_SelectItem_Method_Should_Not_Throw()
@@ -325,6 +328,251 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(expectedAriaCheckedValue, selectAllCheckBox.GetAttribute("aria-checked"));
         }
 
+        [Fact]
+        public void DropDown_ReferenceGenericCollectionAssignment_HashSet_ReferencesInstance()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var originalHashSet = new HashSet<int>();
+            var capturedValue = (HashSet<int>)null;
+
+            var component = DropDownWithReferenceCollection<HashSet<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, originalHashSet);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<HashSet<int>>(this, value => capturedValue = value));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var items = component.FindAll(".rz-multiselect-item");
+            
+            // Select first item
+            items[0].Click();
+            component.Render();
+
+            // Verify the same HashSet instance is Referenced
+            Assert.Same(originalHashSet, capturedValue);
+            
+            // Verify the item was added correctly
+            Assert.Single(originalHashSet);
+            Assert.Contains(1, originalHashSet);
+        }
+
+        [Fact]
+        public void DropDown_ReferenceGenericCollectionAssignment_HashSet_MultipleSelections()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var originalHashSet = new HashSet<int> { 2 }; // Pre-populate with Item 2
+            var capturedValues = new List<HashSet<int>>();
+
+            var component = DropDownWithReferenceCollection<HashSet<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, originalHashSet);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<HashSet<int>>(this, value => capturedValues.Add(value)));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var items = component.FindAll(".rz-multiselect-item");
+            
+            // Select first item (should add to existing collection)
+            items[0].Click();
+            component.Render();
+
+            // Verify the same HashSet instance is Referenced
+            Assert.Single(capturedValues);
+            Assert.Same(originalHashSet, capturedValues[0]);
+            
+            // Verify both items are now in the collection
+            Assert.Equal(2, originalHashSet.Count);
+            Assert.Contains(1, originalHashSet);
+            Assert.Contains(2, originalHashSet);
+
+            // Deselect second item (should remove from collection)
+            items = component.FindAll(".rz-multiselect-item"); // Re-find items after render
+            items[1].Click();
+            component.Render();
+
+            // Verify the same HashSet instance is still Referenced
+            Assert.Equal(2, capturedValues.Count);
+            Assert.Same(originalHashSet, capturedValues[1]);
+            
+            // Verify only first item remains
+            Assert.Single(originalHashSet);
+            Assert.Contains(1, originalHashSet);
+            Assert.DoesNotContain(2, originalHashSet);
+        }
+
+        [Fact]
+        public void DropDown_ReferenceGenericCollectionAssignment_SortedSet_ReferencesInstance()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var originalSortedSet = new SortedSet<int>();
+            var capturedValue = (SortedSet<int>)null;
+
+            var component = DropDownWithReferenceCollection<SortedSet<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, originalSortedSet);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<SortedSet<int>>(this, value => capturedValue = value));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var items = component.FindAll(".rz-multiselect-item");
+            
+            // Select both items
+            items[0].Click();
+            component.Render();
+            items = component.FindAll(".rz-multiselect-item"); // Re-find items after first click
+            items[1].Click();
+            component.Render();
+
+            // Verify the same SortedSet instance is Referenced
+            Assert.Same(originalSortedSet, capturedValue);
+            
+            // Verify items are sorted correctly
+            Assert.Equal(2, originalSortedSet.Count);
+            var sortedItems = originalSortedSet.ToList();
+            Assert.Equal(1, sortedItems[0]);
+            Assert.Equal(2, sortedItems[1]);
+        }
+
+        [Fact]
+        public void DropDown_ReferenceGenericCollectionAssignment_CustomCollection_ReferencesInstance()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var originalCollection = new CustomCollection<int>();
+            var capturedValue = (CustomCollection<int>)null;
+
+            var component = DropDownWithReferenceCollection<CustomCollection<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, originalCollection);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<CustomCollection<int>>(this, value => capturedValue = value));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var items = component.FindAll(".rz-multiselect-item");
+            
+            // Select first item
+            items[0].Click();
+            component.Render();
+
+            // Verify the same custom collection instance is Referenced
+            Assert.Same(originalCollection, capturedValue);
+            
+            // Verify the item was added correctly
+            Assert.Single(originalCollection);
+            Assert.Contains(1, originalCollection);
+        }
+
+
+        [Fact]
+        public void DropDown_ReferenceGenericCollectionAssignment_List_ReferencesInstance()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var originalList = new List<int>();
+            var capturedValue = (List<int>)null;
+
+            var component = DropDownWithReferenceCollection<List<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, originalList);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<List<int>>(this, value => capturedValue = value));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var items = component.FindAll(".rz-multiselect-item");
+            
+            // Select first item
+            items[0].Click();
+            component.Render();
+
+            // For List<T>, it should now Reference the instance since we removed the IList exclusion
+            // Arrays are now excluded instead
+            Assert.Same(originalList, capturedValue);
+            
+            // And the content should be correct
+            Assert.Single(capturedValue);
+            Assert.Contains(1, capturedValue);
+        }
+
+        [Fact]
+        public void DropDown_ReferenceGenericCollectionAssignment_DisabledByDefault()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var originalList = new List<int>();
+            var capturedValue = (List<int>)null;
+
+            var component = DropDown<List<int>>(ctx, parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Value, originalList);
+                parameters.Add(p => p.ValueChanged, EventCallback.Factory.Create<List<int>>(this, value => capturedValue = value));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+            });
+
+            var items = component.FindAll(".rz-multiselect-item");
+            
+            // Select first item
+            items[0].Click();
+            component.Render();
+
+            // When ReferenceCollectionOnSelection is false (default), a new instance should be created
+            Assert.NotSame(originalList, capturedValue);
+            
+            // But the content should still be correct
+            Assert.Single(capturedValue);
+            Assert.Contains(1, capturedValue);
+        }
+
+        class ReferenceCollectionDropDown<T> : Radzen.Blazor.RadzenDropDown<T>
+        {
+            protected override void OnInitialized()
+            {
+                PreserveCollectionOnSelection = true;
+                base.OnInitialized();
+            }
+        }
+
+        private static IRenderedComponent<ReferenceCollectionDropDown<T>> DropDownWithReferenceCollection<T>(TestContext ctx, Action<ComponentParameterCollectionBuilder<ReferenceCollectionDropDown<T>>> configure = null)
+        {
+            var data = new[] {
+                new DataItem { Text = "Item 1", Id = 1 },
+                new DataItem { Text = "Item 2", Id = 2 },
+            };
+
+            var component = ctx.RenderComponent<ReferenceCollectionDropDown<T>>();
+
+            component.SetParametersAndRender(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+
+                if (configure != null)
+                {
+                    configure.Invoke(parameters);
+                }
+                else
+                {
+                    parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                }
+            });
+
+            return component;
+        }
+
         class DataItemComparer : IEqualityComparer<DataItem>, IEqualityComparer<object>
         {
             public bool Equals(DataItem x, DataItem y)
@@ -351,6 +599,22 @@ namespace Radzen.Blazor.Tests
                 return GetHashCode((DataItem)obj);
 
             }
+        }
+
+        class CustomCollection<T> : ICollection<T>
+        {
+            private readonly List<T> _items = new();
+
+            public int Count => _items.Count;
+            public bool IsReadOnly => false;
+
+            public void Add(T item) => _items.Add(item);
+            public void Clear() => _items.Clear();
+            public bool Contains(T item) => _items.Contains(item);
+            public void CopyTo(T[] array, int arrayIndex) => _items.CopyTo(array, arrayIndex);
+            public bool Remove(T item) => _items.Remove(item);
+            public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }
