@@ -27,7 +27,7 @@
             }
         }
 
-        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline-container " : "rz-datepicker-popup-container ")}")">
+        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle Close=@OnClose class="@($"{(Inline ? "rz-datepicker-inline-container " : "rz-datepicker-popup-container ")}")">
                 <div class="rz-calendar" @onkeydown="@OnPopupKeyDown">
                     @if (!TimeOnly)
                     {

@@ -203,7 +203,7 @@ namespace Radzen.Blazor
                 Close();
             }
 
-            if(Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value)
+            if (Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value)
             {
                 return;
             }
@@ -466,7 +466,7 @@ namespace Radzen.Blazor
                         }
                         else if (value is TimeOnly timeOnly)
                         {
-                            DateTimeValue = new DateTime(1,1,0001, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
+                            DateTimeValue = new DateTime(1, 1, 0001, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
                         }
 #endif
                         else
@@ -997,6 +997,14 @@ namespace Radzen.Blazor
                 }
             }
         }
+        /// <summary>
+        /// Called when popup is closed.
+        /// </summary>
+        [JSInvokable]
+        public async Task OnClose()
+        {
+            await OnChange();
+        }
 
         async Task OnChange()
         {
@@ -1139,7 +1147,7 @@ namespace Radzen.Blazor
 
             if (Visible && !Disabled && !ReadOnly && !Inline && PopupRenderMode == PopupRenderMode.Initial)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createDatePicker", Element, PopupID);
+                await JSRuntime.InvokeVoidAsync("Radzen.createDatePicker", Element, PopupID, Reference, nameof(OnClose));
             }
         }
 
@@ -1273,7 +1281,7 @@ namespace Radzen.Blazor
         async Task OnPopupKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
-            if(key == "Escape")
+            if (key == "Escape")
             {
                 preventKeyPress = false;
 
@@ -1362,7 +1370,7 @@ namespace Radzen.Blazor
                 catch
                 { }
             }
-            
+
         }
     }
 }

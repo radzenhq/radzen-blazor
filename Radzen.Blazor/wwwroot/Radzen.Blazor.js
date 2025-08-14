@@ -1041,11 +1041,11 @@ window.Radzen = {
           input.onclick = null;
       }
   },
-  createDatePicker(el, popupId) {
+  createDatePicker(el, popupId, instance, callback) {
       if(!el) return;
       var handler = function (e, condition) {
           if (condition) {
-              Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, null, null, true, false);
+              Radzen.togglePopup(e.currentTarget.parentNode, popupId, false, instance, callback, true, false);
           }
       };
 
