@@ -1350,13 +1350,13 @@ namespace Radzen
         
         private class DefaultCollectionAssignment
         {
-            public virtual async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> ValueChanged)
+            public virtual async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> valueChanged)
             {
                 if (typeof(IList).IsAssignableFrom(typeof(T)))
                 {
                     if (object.Equals(selectedItems, null))
                     {
-                        await ValueChanged.InvokeAsync(default(T));
+                        await valueChanged.InvokeAsync(default(T));
                     }
                     else
                     {
@@ -1365,14 +1365,14 @@ namespace Radzen
                         {
                             list.Add(i);
                         }
-                        await ValueChanged.InvokeAsync((T)(object)list);
+                        await valueChanged.InvokeAsync((T)(object)list);
                     }
                 }
                 else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
                 {
                     if (object.Equals(selectedItems, null))
                     {
-                        await ValueChanged.InvokeAsync(default(T));
+                        await valueChanged.InvokeAsync(default(T));
                     }
                     else
                     {
@@ -1382,12 +1382,12 @@ namespace Radzen
                             {
                                 list.Add(i);
                             }
-                            await ValueChanged.InvokeAsync((T)(object)list);
+                            await valueChanged.InvokeAsync((T)(object)list);
                     }
                 }
                 else
                 {
-                    await ValueChanged.InvokeAsync(object.Equals(selectedItems, null) ? default(T) : (T)selectedItems);
+                    await valueChanged.InvokeAsync(object.Equals(selectedItems, null) ? default(T) : (T)selectedItems);
                 }
             }
 
@@ -1428,12 +1428,12 @@ namespace Radzen
                 }
             }
 
-            public override async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> ValueChanged)
+            public override async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> valueChanged)
             {
                 if (!canHandle)
                 {
                     // Fallback to default behavior when we can't handle the type
-                    await base.MakeAssignment(selectedItems, ValueChanged);
+                    await base.MakeAssignment(selectedItems, valueChanged);
                     return;
                 }
 
@@ -1450,7 +1450,7 @@ namespace Radzen
                         removeMethod.Invoke(originalCollection, [i]);
                 }
 
-                await ValueChanged.InvokeAsync(originalCollection);
+                await valueChanged.InvokeAsync(originalCollection);
             }
 
             public override T GetCleared()
