@@ -318,7 +318,8 @@ namespace Radzen
 
             if (!string.IsNullOrEmpty(ValueProperty))
             {
-                System.Reflection.PropertyInfo pi = PropertyAccess.GetElementType(Data.GetType()).GetProperty(ValueProperty);
+                var elementType = PropertyAccess.GetElementType(Data.GetType());
+                System.Reflection.PropertyInfo pi = PropertyAccess.GetProperty(elementType, ValueProperty);
                 internalValue = selectedItems.Select(i => GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
             }
             else
@@ -1167,7 +1168,8 @@ namespace Radzen
 
                 if (!string.IsNullOrEmpty(ValueProperty))
                 {
-                    System.Reflection.PropertyInfo pi = PropertyAccess.GetElementType(Data.GetType()).GetProperty(ValueProperty);
+                    var elementType = PropertyAccess.GetElementType(Data.GetType());
+                    System.Reflection.PropertyInfo pi = PropertyAccess.GetProperty(elementType, ValueProperty);
                     internalValue = selectedItems.Select(i => GetItemOrValueFromProperty(i, ValueProperty)).AsQueryable().Cast(pi.PropertyType);
                 }
                 else

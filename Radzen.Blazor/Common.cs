@@ -3499,6 +3499,32 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Gets the property by its name. If the type is an interface, it will search through all interfaces implemented by the type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="property">The property.</param>
+        /// <returns>PropertyInfo.</returns>
+        public static PropertyInfo GetProperty(Type type, string property)
+        {
+            if (type.IsInterface)
+            {
+                var interfaces = type.GetInterfaces();
+
+                foreach (var @interface in interfaces)
+                {
+                    var propertyInfo = @interface.GetProperty(property);
+
+                    if (propertyInfo != null)
+                    {
+                        return propertyInfo;
+                    }
+                }
+            }
+
+            return type.GetProperty(property);
+        }
+
+        /// <summary>
         /// Gets the dynamic property expression when binding to IDictionary.
         /// </summary>
         /// <param name="name">The property name.</param>
