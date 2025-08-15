@@ -29,116 +29,118 @@ $input-disabled-placeholder-color: var(--rz-text-disabled-color) !default;
 $input-disabled-opacity: 1 !default;
 $input-transition: var(--rz-transition-all), width 0, height 0 !default;
 
-%input-hover {
-  box-shadow: var(--rz-input-hover-shadow);
-  background-color: var(--rz-input-hover-background-color);
-  border: var(--rz-input-hover-border);
-  border-block-end: var(--rz-input-hover-border-block-end);
-}
+@layer radzen {
+  %input-hover {
+    box-shadow: var(--rz-input-hover-shadow);
+    background-color: var(--rz-input-hover-background-color);
+    border: var(--rz-input-hover-border);
+    border-block-end: var(--rz-input-hover-border-block-end);
+  }
 
-%input-focus {
-  box-shadow: var(--rz-input-focus-shadow);
-  background-color: var(--rz-input-focus-background-color);
-  border: var(--rz-input-focus-border);
-  border-block-end: var(--rz-input-focus-border-block-end);
-  outline: var(--rz-input-focus-outline);
-  outline-offset: var(--rz-input-focus-outline-offset);
-}
+  %input-focus {
+    box-shadow: var(--rz-input-focus-shadow);
+    background-color: var(--rz-input-focus-background-color);
+    border: var(--rz-input-focus-border);
+    border-block-end: var(--rz-input-focus-border-block-end);
+    outline: var(--rz-input-focus-outline);
+    outline-offset: var(--rz-input-focus-outline-offset);
+  }
 
-%input-disabled {
-  :not(.rz-form-field-content) > & {
-    color: var(--rz-input-disabled-color);
-    box-shadow: var(--rz-input-disabled-shadow);
-    background-color: var(--rz-input-disabled-background-color);
-    border: var(--rz-input-disabled-border);
-    border-block-end: var(--rz-input-disabled-border-block-end);
-    opacity: var(--rz-input-disabled-opacity);
+  %input-disabled {
+    :not(.rz-form-field-content) > & {
+      color: var(--rz-input-disabled-color);
+      box-shadow: var(--rz-input-disabled-shadow);
+      background-color: var(--rz-input-disabled-background-color);
+      border: var(--rz-input-disabled-border);
+      border-block-end: var(--rz-input-disabled-border-block-end);
+      opacity: var(--rz-input-disabled-opacity);
+
+      &::placeholder {
+        color: var(--rz-input-disabled-placeholder-color);
+      }
+
+      .rz-inputtext {
+        background-color: var(--rz-input-disabled-background-color);
+        color: var(--rz-input-disabled-color);
+        border: none;
+      }
+    }
+  }
+
+  input {
+    color: var(--rz-input-value-color);
+    font-size: var(--rz-input-font-size);
 
     &::placeholder {
-      color: var(--rz-input-disabled-placeholder-color);
-    }
-
-    .rz-inputtext {
-      background-color: var(--rz-input-disabled-background-color);
-      color: var(--rz-input-disabled-color);
-      border: none;
+      color: var(--rz-input-placeholder-color);
     }
   }
-}
 
-input {
-  color: var(--rz-input-value-color);
-  font-size: var(--rz-input-font-size);
-
-  &::placeholder {
-    color: var(--rz-input-placeholder-color);
+  %input-base {
+    @extend %input-no-padding;
+    padding-block: var(--rz-input-padding-block);
+    padding-inline: var(--rz-input-padding-inline);
   }
-}
 
-%input-base {
-  @extend %input-no-padding;
-  padding-block: var(--rz-input-padding-block);
-  padding-inline: var(--rz-input-padding-inline);
-}
+  %input-no-padding {
+    box-sizing: border-box;
+    border: var(--rz-input-border);
+    border-block-end: var(--rz-input-border-block-end);
+    border-radius: var(--rz-input-border-radius);
+    box-shadow: var(--rz-input-shadow);
+    background-color: var(--rz-input-background-color);
+  }
 
-%input-no-padding {
-  box-sizing: border-box;
-  border: var(--rz-input-border);
-  border-block-end: var(--rz-input-border-block-end);
-  border-radius: var(--rz-input-border-radius);
-  box-shadow: var(--rz-input-shadow);
-  background-color: var(--rz-input-background-color);
-}
+  %input {
+    height: var(--rz-input-height);
+    line-height: var(--rz-input-line-height);
+    color: var(--rz-input-value-color);
+    font-family: inherit;
+    font-size: var(--rz-input-font-size);
+    transition: var(--rz-input-transition);
+    &:not(.invalid) {
+      outline: none;
+    }
 
-%input {
-  height: var(--rz-input-height);
-  line-height: var(--rz-input-line-height);
-  color: var(--rz-input-value-color);
-  font-family: inherit;
-  font-size: var(--rz-input-font-size);
-  transition: var(--rz-input-transition);
-  &:not(.invalid) {
+    @extend %input-base;
+
+    &:not(:disabled):not(.rz-state-disabled) {
+      &:hover {
+        @extend %input-hover;
+      }
+
+      &:focus {
+        @extend %input-focus;
+      }
+    }
+
+    &:disabled {
+      @extend %input-disabled;
+    }
+  }
+
+  %input-blank {
+    box-shadow: none;
+    background-color: transparent;
+    --rz-input-hover-background-color: transparent;
+    --rz-input-focus-background-color: transparent;
     outline: none;
-  }
+    border: none;
+    &:not(:disabled):not(.rz-state-disabled) {
+      &:hover {
+        border: none;
+        box-shadow: none;
+      }
 
-  @extend %input-base;
+      &:focus {
+        border: none;
+        box-shadow: none;
+      }
 
-  &:not(:disabled):not(.rz-state-disabled) {
-    &:hover {
-      @extend %input-hover;
-    }
-
-    &:focus {
-      @extend %input-focus;
-    }
-  }
-
-  &:disabled {
-    @extend %input-disabled;
-  }
-}
-
-%input-blank {
-  box-shadow: none;
-  background-color: transparent;
-  --rz-input-hover-background-color: transparent;
-  --rz-input-focus-background-color: transparent;
-  outline: none;
-  border: none;
-  &:not(:disabled):not(.rz-state-disabled) {
-    &:hover {
-      border: none;
-      box-shadow: none;
-    }
-
-    &:focus {
-      border: none;
-      box-shadow: none;
-    }
-
-    &:focus-within {
-      border: none;
-      box-shadow: none;
+      &:focus-within {
+        border: none;
+        box-shadow: none;
+      }
     }
   }
 }
