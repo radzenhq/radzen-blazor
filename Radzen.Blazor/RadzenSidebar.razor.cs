@@ -36,6 +36,13 @@ namespace Radzen.Blazor
         [CascadingParameter]
         public RadzenLayout Layout { get; set; }
 
+        /// <summary>
+        /// Gets or sets the maximum width, in pixels, at which the component switches to a responsive layout.
+        /// </summary>
+        [Parameter]
+        public string ResponsiveMaxWidth { get; set; } = "768px";
+        private string Query => $"(max-width: {ResponsiveMaxWidth})";
+
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
