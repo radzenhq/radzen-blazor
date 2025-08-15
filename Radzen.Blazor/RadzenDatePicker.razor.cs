@@ -457,22 +457,24 @@ namespace Radzen.Blazor
                     {
                         if (value is DateTime dateTime && dateTime != default(DateTime))
                         {
-                            DateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
+                            _dateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
                         }
 #if NET6_0_OR_GREATER
                         else if (value is DateOnly dateOnly)
                         {
-                            DateTimeValue = dateOnly.ToDateTime(System.TimeOnly.MinValue, Kind);
+                            _dateTimeValue = dateOnly.ToDateTime(System.TimeOnly.MinValue, Kind);
                         }
                         else if (value is TimeOnly timeOnly)
                         {
-                            DateTimeValue = new DateTime(1,1,0001, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
+                            _dateTimeValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
                         }
 #endif
                         else
                         {
-                            DateTimeValue = null;
+                            _dateTimeValue = null;
                         }
+
+                        _value = ConvertToTValue(_dateTimeValue);
                     }
                 }
             }
