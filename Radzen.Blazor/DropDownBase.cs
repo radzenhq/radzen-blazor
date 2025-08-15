@@ -329,28 +329,7 @@ namespace Radzen
                 internalValue = selectedItems.AsQueryable().Cast(type);
             }
 
-            if (typeof(IList).IsAssignableFrom(typeof(T)))
-            {
-                var list = (IList)Activator.CreateInstance(typeof(T));
-                foreach (var i in (IEnumerable)internalValue)
-                {
-                    list.Add(i);
-                }
-                await ValueChanged.InvokeAsync((T)(object)list);
-            }
-            else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
-            {
-                var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(T).GetGenericArguments()[0]));
-                foreach (var i in (IEnumerable)internalValue)
-                {
-                    list.Add(i);
-                }
-                await ValueChanged.InvokeAsync((T)(object)list);
-            }
-            else
-            {
-                await ValueChanged.InvokeAsync((T)internalValue);
-            }
+            await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(internalValue);
 
@@ -395,7 +374,7 @@ namespace Radzen
             await SearchTextChanged.InvokeAsync(searchText);
             await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, "");
 
-            internalValue = default(T);
+            internalValue = collectionAssignment.GetCleared();
             selectedItem = null;
 
             selectedItems.Clear();
@@ -962,6 +941,10 @@ namespace Radzen
             if (valueChanged)
             {
                 internalValue = parameters.GetValueOrDefault<object>(nameof(Value));
+                if (PreserveCollectionOnSelection)
+                {
+                    collectionAssignment = new ReferenceGenericCollectionAssignment((T)internalValue);
+                }
             }
             
             var pageSize = parameters.GetValueOrDefault<int>(nameof(PageSize));
@@ -1130,6 +1113,12 @@ namespace Radzen
         }
 
         internal object internalValue;
+        
+        /// <summary>
+        /// Will add/remove selected items from a bound ICollection&lt;T&gt;, instead of replacing it.
+        /// </summary>
+        protected bool PreserveCollectionOnSelection = false;
+        private DefaultCollectionAssignment collectionAssignment = new();
 
         /// <summary>
         /// Selects the item.
@@ -1200,41 +1189,13 @@ namespace Radzen
             {
                 if (ValueChanged.HasDelegate)
                 {
-                    if (typeof(IList).IsAssignableFrom(typeof(T)))
+                    if (Multiple)
                     {
-                        if (object.Equals(internalValue, null))
-                        {
-                            await ValueChanged.InvokeAsync(default(T));
-                        }
-                        else
-                        {
-                            var list = (IList)Activator.CreateInstance(typeof(T));
-                            foreach (var i in (IEnumerable)internalValue)
-                            {
-                                list.Add(i);
-                            }
-                            await ValueChanged.InvokeAsync((T)(object)list);
-                        }
-                    }
-                    else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
-                    {
-                        if (object.Equals(internalValue, null))
-                        {
-                            await ValueChanged.InvokeAsync(default(T));
-                        }
-                        else
-                        {
-                            var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(T).GetGenericArguments()[0]));
-                            foreach (var i in (IEnumerable)internalValue)
-                            {
-                                list.Add(i);
-                            }
-                            await ValueChanged.InvokeAsync((T)(object)list);
-                        }
+                        await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
                     }
                     else
                     {
-                        await ValueChanged.InvokeAsync(object.Equals(internalValue, null) ? default(T) : (T)internalValue);
+                        await ValueChanged.InvokeAsync((T)internalValue);
                     }
                 }
 
@@ -1352,7 +1313,6 @@ namespace Radzen
                         {
                             selectedItems = values.Cast<object>().ToHashSet(ItemComparer);
                         }
-
                     }
                 }
             }
@@ -1388,6 +1348,122 @@ namespace Radzen
             base.Dispose();
 
             keys.Clear();
+        }
+        
+        private class DefaultCollectionAssignment
+        {
+            public virtual async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> valueChanged)
+            {
+                if (typeof(IList).IsAssignableFrom(typeof(T)))
+                {
+                    if (object.Equals(selectedItems, null))
+                    {
+                        await valueChanged.InvokeAsync(default(T));
+                    }
+                    else
+                    {
+                        var list = (IList)Activator.CreateInstance(typeof(T));
+                        foreach (var i in (IEnumerable)selectedItems)
+                        {
+                            list.Add(i);
+                        }
+                        await valueChanged.InvokeAsync((T)(object)list);
+                    }
+                }
+                else if (typeof(T).IsGenericType && typeof(ICollection<>).MakeGenericType(typeof(T).GetGenericArguments()[0]).IsAssignableFrom(typeof(T)))
+                {
+                    if (object.Equals(selectedItems, null))
+                    {
+                        await valueChanged.InvokeAsync(default(T));
+                    }
+                    else
+                    {
+
+                            var list = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(typeof(T).GetGenericArguments()[0]));
+                            foreach (var i in (IEnumerable)selectedItems)
+                            {
+                                list.Add(i);
+                            }
+                            await valueChanged.InvokeAsync((T)(object)list);
+                    }
+                }
+                else
+                {
+                    await valueChanged.InvokeAsync(object.Equals(selectedItems, null) ? default(T) : (T)selectedItems);
+                }
+            }
+
+            public virtual T GetCleared()
+            {
+                return default(T);
+            }
+        }
+
+        private class ReferenceGenericCollectionAssignment : DefaultCollectionAssignment
+        {
+            private readonly T originalCollection;
+            private readonly bool canHandle;
+            private readonly System.Reflection.MethodInfo clearMethod;
+            private readonly System.Reflection.MethodInfo addMethod;
+            private readonly System.Reflection.MethodInfo removeMethod;
+
+            public ReferenceGenericCollectionAssignment(T originalCollection)
+            {
+                this.originalCollection = originalCollection;
+                // Pre-calculate if we can handle this instance and get method info
+                if (originalCollection != null)
+                {
+                    var actualType = originalCollection.GetType();
+                    if (actualType.IsGenericType && !actualType.IsArray)
+                    {
+                        var elementType = actualType.GetGenericArguments()[0];
+                        var genericCollectionType = typeof(ICollection<>).MakeGenericType(elementType);
+
+                        if (genericCollectionType.IsAssignableFrom(actualType))
+                        {
+                            clearMethod = actualType.GetMethod("Clear");
+                            addMethod = actualType.GetMethod("Add");
+                            removeMethod = typeof(T).GetMethod("Remove");
+                            canHandle = true;
+                        }
+                    }
+                }
+            }
+
+            public override async Task MakeAssignment(IEnumerable selectedItems, EventCallback<T> valueChanged)
+            {
+                if (!canHandle)
+                {
+                    // Fallback to default behavior when we can't handle the type
+                    await base.MakeAssignment(selectedItems, valueChanged);
+                    return;
+                }
+
+                var currentItems = selectedItems.Cast<object>().ToHashSet();
+                var existingItems = ((IEnumerable)originalCollection).Cast<object>().ToHashSet();
+                foreach (var i in currentItems)
+                {
+                    if (!existingItems.Contains(i))
+                        addMethod.Invoke(originalCollection, [i]);
+                }
+                foreach (var i in existingItems)
+                {
+                    if (!currentItems.Contains(i))
+                        removeMethod.Invoke(originalCollection, [i]);
+                }
+
+                await valueChanged.InvokeAsync(originalCollection);
+            }
+
+            public override T GetCleared()
+            {
+                if (canHandle)
+                {
+                    clearMethod.Invoke(originalCollection, null);
+                    return originalCollection;
+                }
+                return base.GetCleared();
+            }
         }
     }
 }
