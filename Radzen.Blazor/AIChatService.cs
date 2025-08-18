@@ -221,7 +221,7 @@ public class AIChatServiceOptions
 /// <summary>
 /// Service for interacting with AI chat models to get completions with conversation memory.
 /// </summary>
-public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions> options) : IAIChatService
+public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServiceOptions> options) : IAIChatService
 {
     private readonly Dictionary<string, ConversationSession> _sessions = new();
     private readonly object _sessionsLock = new();
@@ -276,6 +276,7 @@ public class AIChatService(HttpClient httpClient, IOptions<AIChatServiceOptions>
             }
         }
 
+        var httpClient = serviceProvider.GetRequiredService<HttpClient>();
         var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
         if (!response.IsSuccessStatusCode)
