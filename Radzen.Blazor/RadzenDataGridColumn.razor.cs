@@ -1209,7 +1209,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Sets to default column filter values and operators.
         /// </summary>
-        public void ClearFilters()
+        public virtual void ClearFilters()
         {
             var fo = FilterOperator == FilterOperator.Custom
                 ? FilterOperator.Custom
