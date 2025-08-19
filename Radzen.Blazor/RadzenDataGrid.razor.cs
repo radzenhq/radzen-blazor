@@ -3474,7 +3474,7 @@ namespace Radzen.Blazor
                             }
 
                             // Width
-                            if (gridColumn.GetWidth() != column.Width)
+                            if (gridColumn.GetWidth() != column.Width && !string.IsNullOrEmpty(column.Width))
                             {
                                 gridColumn.SetWidth(column.Width);
                                 shouldUpdateState = true;
