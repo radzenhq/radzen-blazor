@@ -28,6 +28,14 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
+            Name = "AI",
+            Path = "/ai",
+            Title = "AI and Radzen Blazor",
+            Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",
+            Icon = "\uefac"
+        },
+        new Example
+        {
             Name = "Support",
             Path = "/support",
             Title = "Support | Free UI Components by Radzen",
