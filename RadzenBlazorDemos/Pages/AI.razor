@@ -9,30 +9,71 @@
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     AI Features and Integration
 </RadzenText>
-
-<RadzenMarkdown AutoLinkHeadingDepth="3">
-Radzen.Blazor includes built-in AI capabilities, and we also provide an external integration package that can assist you directly in your IDE.
-
-### RadzenAIChat
-
-**RadzenAIChat** is a Blazor-native chat component that integrates with any OpenAI-compatible service (OpenAI, Azure OpenAI, local servers, or third-party providers).
-
-- Works with any OpenAI API-compatible endpoint
-- Supports streaming, theming, message history, and extensibility
-- Ideal for embedding AI assistants directly into your Blazor apps
-- **Demo:** [RadzenAIChat live demo](https://blazor.radzen.com/aichat)
-
-### Radzen.Mcp
-
-**Radzen.Mcp** is a standalone NuGet package that provides a **Model Context Protocol (MCP)** server for Radzen.Blazor related questions.
-It works with editors such as VS Code, Visual Studio, Cursor, and other MCP-capable IDEs.
-
-- Get component usage help directly inside your development environment
-- Ask about properties, patterns, and best practices without leaving your IDE
-- **NuGet:** [Radzen.Mcp package](https://www.nuget.org/packages/Radzen.Mcp)
-
-### More Resources
-
-- [RadzenAIChat Demo](/aichat)
-- [Radzen.Mcp on NuGet](https://www.nuget.org/packages/Radzen.Mcp)
-</RadzenMarkdown>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Radzen.Blazor includes built-in AI capabilities, and we also provide an external integration package that can assist you directly in your IDE.
+</RadzenText>
+<RadzenStack Gap="3rem">
+<RadzenRow AlignItems="AlignItems.Center" class="rz-my-6">
+    <RadzenColumn Size="12" SizeLG="6" Order="2">
+        <RadzenStack Gap="1.5rem" AlignItems="AlignItems.Start">
+            <RadzenText TextStyle="TextStyle.DisplayH3" Text="RadzenAIChat" TagName="TagName.H2"></RadzenText>
+            <RadzenText>
+                <strong>RadzenAIChat</strong> is a Blazor-native chat component that integrates with any OpenAI-compatible service (OpenAI, Azure OpenAI, local servers, or third-party providers).
+            </RadzenText>
+            <RadzenStack Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="task_alt" />
+                    <RadzenText>Works with any OpenAI API-compatible endpoint</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="task_alt" />
+                    <RadzenText>Supports streaming, theming, message history, and extensibility</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="task_alt" />
+                    <RadzenText>Ideal for embedding AI assistants directly into your Blazor apps</RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenLink Text="RadzenAIChat live demo" Path="/aichat" class="rz-button rz-button-lg rz-variant-outlined rz-primary rz-shade-default rz-w-auto rz-w-lg-100 rz-text-align-center rz-my-4" Style="--rz-link-hover-text-decoration: none;"></RadzenLink>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="5" SizeXL="4" Order="1" class="rz-text-align-center">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-success-lighter rz-color-black rz-p-12 rz-w-fit-content rz-max-w-100" Style="min-width: 10vh; border-radius: 50%; margin: 0 auto;">
+            <RadzenIcon Icon="chat" Style="font-size: 10vh; font-weight: 300;" class="rz-m-12" />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+<RadzenRow AlignItems="AlignItems.Center" class="rz-my-6" ID="special-offer">
+    <RadzenColumn Size="12" SizeLG="6" Order="2">
+        <RadzenStack Gap="1.5rem" AlignItems="AlignItems.Start">
+            <RadzenText TextStyle="TextStyle.DisplayH3" Text="Radzen.Mcp" TagName="TagName.H2"></RadzenText>
+            <RadzenText>
+                <strong>Radzen.Mcp</strong> is a standalone NuGet package that provides a <strong>Model Context Protocol (MCP)</strong> server for Radzen.Blazor related questions.
+            </RadzenText>
+            <RadzenText>
+                It works with editors such as VS Code, Visual Studio, Cursor, and other MCP-capable IDEs.
+            </RadzenText>
+            <RadzenStack Gap="1rem">
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="task_alt" />
+                    <RadzenText>Get component usage help directly inside your development environment</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="task_alt" />
+                    <RadzenText>Ask about properties, patterns, and best practices without leaving your IDE</RadzenText>
+                </RadzenStack>
+                <RadzenStack Orientation="Orientation.Horizontal">
+                    <RadzenIcon Icon="task_alt" />
+                    <RadzenText><strong>NuGet:</strong> <RadzenLink Text="Radzen.Mcp package" Path="https://www.nuget.org/packages/Radzen.Mcp"></RadzenLink></RadzenText>
+                </RadzenStack>
+            </RadzenStack>
+            <RadzenLink Text="Radzen.Mcp on NuGet" Path="https://www.nuget.org/packages/Radzen.Mcp" class="rz-button rz-button-lg rz-variant-outlined rz-primary rz-shade-default rz-w-auto rz-w-lg-100 rz-text-align-center rz-my-4" Style="--rz-link-hover-text-decoration: none;"></RadzenLink>
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="5" SizeXL="4" Order="1" class="rz-text-align-center">
+        <RadzenCard Variant="Variant.Flat" class="rz-background-color-primary-lighter rz-p-12 rz-w-fit-content rz-max-w-100" Style="min-width: 10vh; border-radius: 50%; margin: 0 auto;">
+            <RadzenImage Path="images/mcp.svg" Style="width: 10vh;" class="rz-m-12" AlternateText="Model Context Protocol (MCP)" />
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+</RadzenStack>
