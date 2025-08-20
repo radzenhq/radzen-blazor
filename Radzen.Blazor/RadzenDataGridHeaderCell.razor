@@ -226,11 +226,12 @@ else
 
         if (Column.Grid.LoadColumnFilterData.HasDelegate)
         {
-            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Column = Column, Filter = loadDataArgs.Filter, Skip = loadDataArgs.Skip, Top = loadDataArgs.Top };
+            var args = new DataGridLoadColumnFilterDataEventArgs<TItem>() { Property = property, Column = Column, Filter = loadDataArgs.Filter, Skip = loadDataArgs.Skip, Top = loadDataArgs.Top };
 
             await Column.Grid.LoadColumnFilterData.InvokeAsync(args);
 
-            filterValues = args.Data.AsQueryable().Select(property).Distinct();
+            filterValues = !string.IsNullOrEmpty(args.Property) ? 
+                args.Data.AsQueryable().Select(property).Distinct() : args.Data;
             filterValuesCount = args.Count;
         }
         else if(!string.IsNullOrEmpty(property) && (filterValues == null || this.loadDataArgsString != loadDataArgsString) && Column.Grid.Data != null)
