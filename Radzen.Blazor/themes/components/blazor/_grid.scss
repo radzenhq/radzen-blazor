@@ -679,7 +679,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
           &:after {
             z-index: -2;
-            background-color: var(--rz-grid-frozen-cell-background-color);
           }
         }
 
@@ -687,7 +686,6 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
         &.rz-frozen-cell-right-inner {
           &:before {
             z-index: -2;
-            background-color: var(--rz-grid-frozen-cell-background-color);
           }
 
           &:after {
@@ -697,8 +695,12 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       }
 
       &.rz-state-highlight {
-        > td {
+        > td:not(.rz-frozen-cell) {
           background-color: var(--rz-grid-selected-background-color);
+        }
+
+        > td {
+          background-color: var(--rz-grid-background-color);
 
           &.rz-frozen-cell-left,
           &.rz-frozen-cell-left-inner {
@@ -725,9 +727,13 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
       }
 
       &.rz-state-focused {
-        > td {
+        > td:not(.rz-frozen-cell) {
           background-color: var(--rz-grid-cell-focus-background-color);
           color: var(--rz-grid-cell-focus-color);
+        }
+
+        > td {
+          background-color: var(--rz-grid-background-color);
 
           &.rz-frozen-cell-left,
           &.rz-frozen-cell-left-inner {
@@ -766,9 +772,13 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 
       &:hover {
         &:not(.rz-state-highlight) {
-          > td {
+          > td:not(.rz-frozen-cell) {
             background-color: var(--rz-grid-hover-background-color);
+          }
 
+          > td {
+            background-color: var(--rz-grid-background-color);
+            
             &.rz-frozen-cell-left,
             &.rz-frozen-cell-left-inner {
               &:before {
