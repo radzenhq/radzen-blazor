@@ -32,7 +32,9 @@ namespace RadzenBlazorDemos
             Path = "/ai",
             Title = "AI and Radzen Blazor",
             Description = "Learn now how to integrate AI with the Radzen Blazor Components library.",
-            Icon = "\uefac"
+            Icon = "\uefac",
+            Tags = new [] { "chat", "ai", "conversation", "message", "streaming", "mcp", "nuget" },
+            New = true
         },
         new Example
         {
@@ -1441,6 +1443,15 @@ namespace RadzenBlazorDemos
             Children = new[] {
                 new Example
                 {
+                    Name = "AIChat",
+                    Path = "aichat",
+                    New = true,
+                    Description = "A modern chat component with AI integration that provides a conversational interface similar to popular chat applications.",
+                    Icon = "\ue0b7",
+                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Get and Set the value of AutoComplete", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of AutoComplete using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Get the selected item of AutoComplete", Anchor = "#get-selected" }, new () { Text = "Define AutoComplete placeholder", Anchor = "#placeholder" }, new () { Text = "Define AutoComplete template", Anchor = "#template" }, new () { Text = "Change AutoComplete filter operator, case sensitivity and delay", Anchor = "#filter-operator" }, new () { Text = "Load data on-demand in AutoComplete and apply custom filter and sort", Anchor = "#load-on-demand" }, new () { Text = "AutoComplete with a List of Strings", Anchor = "#list-of-strings" }, new () { Text = "Multiline AutoComplete", Anchor = "#multiline" }, new () { Text = "Open on Focus", Anchor = "#open-on-focus" }, new () { Text = "Disabled AutoComplete", Anchor = "#disabled-autocomplete" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "AutoComplete",
                     Path = "autocomplete",
@@ -1743,15 +1754,6 @@ namespace RadzenBlazorDemos
                     Description = "Demonstration and configuration of the Radzen Blazor TextArea component.",
                     Icon = "\ue167",
                     Tags = new [] { "input", "form", "edit" }
-                },
-                new Example
-                {
-                    Name = "AIChat",
-                    Path = "aichat",
-                    New = true,
-                    Description = "A modern chat component with AI integration that provides a conversational interface similar to popular chat applications.",
-                    Icon = "\ue0b7",
-                    Tags = new [] { "chat", "ai", "conversation", "message", "streaming" }
                 },
                 new Example
                 {
