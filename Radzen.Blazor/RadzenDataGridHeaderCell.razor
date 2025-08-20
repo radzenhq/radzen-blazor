@@ -465,7 +465,8 @@ else
 
     string getColumnPopupID()
     {
-        var fiterProperty = Column.GetFilterProperty();
+        var fiterProperty = Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty) ? 
+            $"{Column.Property}{Column.GetFilterProperty()}" : Column.GetFilterProperty();
 
         return $"{Grid.PopupID}{(string.IsNullOrEmpty(fiterProperty) ? Grid.allColumns.IndexOf(Column).ToString() : fiterProperty)}";
     }
