@@ -242,7 +242,10 @@ else
             if(!string.IsNullOrEmpty(loadDataArgs.Filter))
             {
                 query = (Column.Grid.childData.Any() ? Column.Grid.GetSelfRefView(Column.Grid.Data.AsQueryable(), "") :
-                    Column.Grid.Data.AsQueryable()).Where<TItem>(Column.Grid.allColumns.Where(c => c != Column));
+                            Column.Grid.Data.AsQueryable())
+                            .Where<TItem>(Column.AlwaysShowAllCheckBoxListData ? 
+                                Enumerable.Empty<RadzenDataGridColumn<TItem>>() : 
+                                    Column.Grid.allColumns.Where(c => c != Column));
 
                 if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))
                 {
@@ -264,7 +267,9 @@ else
             else
             {
                 query = (Column.Grid.childData.Any() ? Column.Grid.GetSelfRefView(Column.Grid.Data.AsQueryable(), "") :
-                    Column.Grid.Data.AsQueryable()).Where<TItem>(Column.Grid.allColumns.Where(c => c != Column));
+                    Column.Grid.Data.AsQueryable()).Where<TItem>(Column.AlwaysShowAllCheckBoxListData ?
+                                Enumerable.Empty<RadzenDataGridColumn<TItem>>() :
+                                    Column.Grid.allColumns.Where(c => c != Column));
             }
 
             if (Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty))

@@ -52,6 +52,12 @@ namespace Radzen.Blazor
         public bool AllowCheckBoxListVirtualization { get; set; } = true;
 
         /// <summary>
+        /// Specifies whether the CheckBoxList filter should always show all data, ignoring filtering from other columns. Set to <c>false</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool AlwaysShowAllCheckBoxListData { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets the column filter mode.
         /// </summary>
         /// <value>The column filter mode.</value>
