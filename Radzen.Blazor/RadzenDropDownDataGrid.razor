@@ -122,7 +122,7 @@
                     }
                     else
                     {
-                    <div class="rz-lookup-search">
+                        <div class="rz-lookup-search rz-align-items-center">
                         @RenderFilter()
                         @if (ShowSearch)
                         {
@@ -202,7 +202,10 @@
                 <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@SearchTextPlaceholder"
                         @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" style="@(ShowSearch ? "" : "margin-right:0px;")"
                         @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => { searchText = $"{args}"; SearchTextChanged.InvokeAsync(searchText);}) />
-            </text>
+    <RadzenIcon Icon="cancel"
+                Visible="@(!string.IsNullOrWhiteSpace(searchText))"
+                @onclick="@ClearSearch" title="Clear search text" Style="position: absolute; right: 70px;cursor: pointer;" />
+</text>
         };
 #else
         return __builder => {
@@ -213,5 +216,13 @@
             </text>
         };
 #endif
+    }
+    private async Task ClearSearch(MouseEventArgs args)
+    {
+        searchText = null;
+        if (grid != null)
+        {
+            await grid.Reload();
+        }
     }
 }
