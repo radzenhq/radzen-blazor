@@ -203,8 +203,8 @@
                         @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" style="@(ShowSearch ? "" : "margin-right:0px;")"
                         @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => { searchText = $"{args}"; SearchTextChanged.InvokeAsync(searchText);}) />
     <RadzenIcon Icon="cancel"
-                Visible="@(!string.IsNullOrWhiteSpace(searchText))"
-                @onclick="@ClearSearch" title="Clear search text" Style="position: absolute; right: 70px;cursor: pointer;" />
+                Visible="@(!string.IsNullOrWhiteSpace(searchText))" class="cancel-icon"
+                @onclick="@ClearSearch" title="Clear search text" Style="position: absolute; cursor: pointer;" />
 </text>
         };
 #else

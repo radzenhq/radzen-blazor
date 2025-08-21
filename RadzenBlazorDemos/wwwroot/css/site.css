@@ -626,3 +626,18 @@ svg.illustration {
     width: 100%;
     height: 100%;
 }
+.cancel-icon {
+    right: 70px;
+}
+
+.rz-lookup-search-input {
+    padding-right: 2rem !important;
+}
+
+*[dir=rtl] .cancel-icon {
+    right: 19rem;
+}
+
+*[dir=rtl] .rz-lookup-search-input {
+    padding-left: 2rem;
+}
