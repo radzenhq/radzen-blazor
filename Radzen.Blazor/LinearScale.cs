@@ -62,10 +62,19 @@ namespace Radzen.Blazor
             var start = Input.Start;
             var end = Input.End;
 
+
             if (start == end)
             {
-                start = 0;
-                end += NiceNumber(end / ticks, false);
+                if (end < 0)
+                {
+                    start += NiceNumber(end / ticks, false);
+                    end = 0;
+                }
+                else
+                {
+                    start = 0;
+                    end += NiceNumber(end / ticks, false);
+                }
             }
 
             if (Round && end < 0)
