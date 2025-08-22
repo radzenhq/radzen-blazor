@@ -4009,9 +4009,9 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Skeleton shape types.
+    /// Skeleton shape variants.
     /// </summary>
-    public enum SkeletonType
+    public enum SkeletonVariant
     {
         /// <summary>
         /// Text skeleton shape.
@@ -4024,11 +4024,7 @@ namespace Radzen
         /// <summary>
         /// Rectangular skeleton shape.
         /// </summary>
-        Rectangular,
-        /// <summary>
-        /// Rounded skeleton shape.
-        /// </summary>
-        Rounded
+        Rectangular
     }
 
     /// <summary>

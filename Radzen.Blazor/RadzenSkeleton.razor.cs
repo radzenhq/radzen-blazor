@@ -8,7 +8,7 @@ namespace Radzen.Blazor
     /// </summary>
     /// <example>
     /// <code>
-    /// &lt;RadzenSkeleton Type="SkeletonType.Text" Animation="SkeletonAnimation.Wave" Style="width: 200px; height: 20px;" /&gt;
+    /// &lt;RadzenSkeleton Variant="SkeletonVariant.Text" Animation="SkeletonAnimation.Wave" Style="width: 200px; height: 20px;" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenSkeleton : RadzenComponent
@@ -18,7 +18,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The type.</value>
         [Parameter]
-        public SkeletonType Type { get; set; } = SkeletonType.Text;
+        public SkeletonVariant Variant { get; set; } = SkeletonVariant.Text;
 
         /// <summary>
         /// Gets or sets the animation type for the skeleton.
@@ -31,7 +31,7 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return ClassList.Create("rz-skeleton")
-                           .Add($"rz-skeleton-{Type.ToString().ToLowerInvariant()}")
+                           .Add($"rz-skeleton-{Variant.ToString().ToLowerInvariant()}")
                            .Add($"rz-skeleton-{Animation.ToString().ToLowerInvariant()}", Animation != SkeletonAnimation.None)
                            .ToString();
         }

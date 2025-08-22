@@ -194,6 +194,17 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Text Size", Anchor = "#text-size" }, new () { Text = "Animations", Anchor = "#animations" }, new () { Text = "Complex Example", Anchor = "#complex-example" }, new () { Text = "DataGrid Loading", Anchor = "#datagrid-loading" } ],
+                    Name = "Skeleton",
+                    Title = "Blazor Skeleton Component | Free UI Components by Radzen",
+                    Description = "RadzenSkeleton component displays loading placeholders with various shapes and animations.",
+                    Path = "skeleton",
+                    Icon = "\uf486",
+                    Tags = new [] { "skeleton", "load", "loading", "placeholder", "animation", "wave", "pulse", "text", "circular", "rectangular", "rounded" },
+                    New = true
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Margin CSS classes", Anchor = "#margin-css-classes" }, new () { Text = "Padding CSS classes", Anchor = "#padding-css-classes" }, new () { Text = "Sizes", Anchor = "#sizes" }, new () { Text = "Responsive spacing", Anchor = "#responsive-spacing" } ],
                     Name = "Spacing",
                     Title = "Blazor Spacing Utilities | Free UI Components by Radzen",
@@ -201,16 +212,6 @@ namespace RadzenBlazorDemos
                     Path = "spacing",
                     Icon = "\uf773",
                     Tags = new [] { "spacing", "margin", "padding", "gutter", "gap", "utility", "css", "var"}
-                },
-                new Example
-                {
-                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Animation Types", Anchor = "#animation-types" }, new () { Text = "Complex Example", Anchor = "#complex-example" }, new () { Text = "DataGrid Loading", Anchor = "#datagrid-loading" } ],
-                    Name = "Skeleton",
-                    Title = "Blazor Skeleton Component | Free UI Components by Radzen",
-                    Description = "RadzenSkeleton component displays loading placeholders with various animation types.",
-                    Path = "skeleton",
-                    Icon = "\ue9df",
-                    Tags = new [] { "skeleton", "loading", "placeholder", "animation", "wave", "pulse", "text", "circular", "rectangular", "rounded" }
                 }
             }
         },

@@ -1,0 +1,28 @@
+@using Radzen
+
+<RadzenRow Gap="2rem" class="rz-p-12">
+    <RadzenColumn Size="12" SizeMD="4"> 
+        <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+            <RadzenText TextStyle="TextStyle.H6">None (Default)</RadzenText>
+            <RadzenSkeleton Style="width: 100%;" />
+            <RadzenSkeleton Style="width: 100%;" />
+            <RadzenSkeleton Style="width: 60%;" />
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4"> 
+        <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+            <RadzenText TextStyle="TextStyle.H6">Wave Animation</RadzenText>
+            <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 100%;" />
+            <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 100%;" />
+            <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 60%;" />
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="6" SizeMD="4">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+            <RadzenText TextStyle="TextStyle.H6">Pulse Animation</RadzenText>
+            <RadzenSkeleton Animation="SkeletonAnimation.Pulse" Style="width: 100%;" />
+            <RadzenSkeleton Animation="SkeletonAnimation.Pulse" Style="width: 100%;" />
+            <RadzenSkeleton Animation="SkeletonAnimation.Pulse" Style="width: 60%;" />
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>

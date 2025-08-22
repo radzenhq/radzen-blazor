@@ -1073,6 +1073,12 @@
   --rz-sidebar-background-color: #{$sidebar-background-color};
   --rz-sidebar-color: #{$sidebar-color};
 
+  /* Skeleton */
+  --rz-skeleton-background-color: #{$skeleton-background-color};
+  --rz-skeleton-animation-color: #{$skeleton-animation-color};
+  --rz-skeleton-border-radius: #{$skeleton-border-radius};
+  --rz-skeleton-animation-duration: #{$skeleton-animation-duration};
+
   /* Slider */
   --rz-slider-background-color: #{$slider-background-color};
   --rz-slider-border: #{$slider-border};

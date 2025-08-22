@@ -9,34 +9,41 @@
     Skeleton
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    RadzenSkeleton component displays loading placeholders with various shape types and animations.
-</RadzenText>
-
-<RadzenText TextStyle="TextStyle.Body1" class="rz-my-6">
     The <code>RadzenSkeleton</code> component is used to display loading placeholders while content is being loaded. 
-    It supports different shape types (Text, Circular, Rectangular, Rounded) and animation types (Wave, Pulse) that can be combined independently.
+    It supports different shapes and animation types that can be combined independently.
 </RadzenText>
 
-<RadzenText Anchor="skeleton#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+<RadzenText Anchor="skeleton#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Basic Usage
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    Use the <code>Type</code> property to specify the skeleton animation type and <code>Style</code> to control dimensions.
+    Use the <code>Variant</code> property to specify the skeleton shape and <code>Style</code> to control dimensions. The component supports three shape variants - Text, Circular, and Rectangular.
 </RadzenText>
 
 <RadzenExample Example="SkeletonBasic">
     <SkeletonBasic />
 </RadzenExample>
 
-<RadzenText Anchor="skeleton#animation-types" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
-    Shape Types and Animations
+
+<RadzenText Anchor="skeleton#text-size" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Text size
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    The component supports four shape types (Text, Circular, Rectangular, Rounded) and three animation types (None, Wave, Pulse) that can be combined independently.
+    The height value of the default Text variant is a function of the parent's element font-size.
+</RadzenText>
+<RadzenExample Example="SkeletonTextSize">
+    <SkeletonTextSize />
+</RadzenExample>
+
+<RadzenText Anchor="skeleton#animations" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Animations
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The component has three animation types (None, Wave, Pulse).
 </RadzenText>
 
 <RadzenExample Example="SkeletonTypes">
-    <SkeletonTypes />
+    <SkeletonAnimations />
 </RadzenExample>
 
 <RadzenText Anchor="skeleton#complex-example" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">

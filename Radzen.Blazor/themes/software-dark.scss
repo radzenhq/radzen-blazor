@@ -439,5 +439,9 @@ $rz-toc-link-hover-color: var(--rz-text-color) !default;
 $rz-toc-link-selected-color: var(--rz-text-title-color) !default;
 $rz-toc-horizontal-link-selected-color: var(--rz-text-title-color) !default;
 
+// Skeleton
+$skeleton-background-color: var(--rz-base-600) !default;
+$skeleton-animation-color: var(--rz-base-700) !default;
+
 @import 'fonts';
 @import 'components';
