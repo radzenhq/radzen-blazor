@@ -1,4 +1,4 @@
 ﻿@using Radzen.Blazor.Rendering
 
-<div class="rz-colorpicker-item" style="background-color: @Background" @onmousedown:preventDefault @onclick=@OnClick
+<div class="rz-colorpicker-item @(isSelected ? "selected" : "")" style="background-color: @Background" @onmousedown:preventDefault @onclick=@OnClick
      tabindex="@(ColorPicker.Disabled ? -1 : 0)" @onkeypress="@(args => OnKeyPress(args, OnClick()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation></div>

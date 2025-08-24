@@ -11,6 +11,7 @@ $colorpicker-items-gap: 0.5rem !default;
 $colorpicker-item-size: 1.25rem !default;
 $colorpicker-item-border-radius: var(--rz-border-radius) !default;
 $colorpicker-item-shadow: rgba(0, 0, 0, 0.15) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.25) 0px 0px 4px inset !default;
+$colorpicker-item-selected-transform: scale(1.25) !default;
 $colorpicker-handle-size: 12px !default;
 $colorpicker-handle-border: 2px solid var(--rz-white) !default;
 $colorpicker-handle-shadow: var(--rz-white) 0px 0px 0px 1px, rgba(0, 0, 0, 0.3) 0px 0px 1px 1px inset, rgba(0, 0, 0, 0.4) 0px 0px 1px 2px !default;
@@ -286,6 +287,7 @@ button.rz-colorpicker-trigger {
   border-radius: var(--rz-colorpicker-item-border-radius);
   box-shadow: var(--rz-colorpicker-item-shadow);
   cursor: pointer;
+  transition: transform var(--rz-transition);
 
   &:focus {
     outline: var(--rz-outline-normal);
@@ -294,5 +296,9 @@ button.rz-colorpicker-trigger {
   &:focus-visible {
     outline: var(--rz-colorpicker-focus-outline);
     outline-offset: var(--rz-colorpicker-focus-outline-offset);
+  }
+
+  &.selected {
+    transform: var(--rz-colorpicker-item-selected-transform);
   }
 }
