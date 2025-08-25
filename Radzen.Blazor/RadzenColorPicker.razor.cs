@@ -96,6 +96,8 @@ namespace Radzen.Blazor
 
         Popup Popup { get; set; }
 
+        internal event EventHandler<string> SelectedColorChanged;
+
         string AlphaGradientStart
         {
             get
@@ -194,6 +196,8 @@ namespace Radzen.Blazor
 
         async Task TriggerChange()
         {
+            SelectedColorChanged.Invoke(this, Color);
+
             if (!ShowButton)
             {
                 await OnChanged();
@@ -407,6 +411,7 @@ namespace Radzen.Blazor
             if (value != Color)
             {
                 Color = value;
+                SelectedColorChanged?.Invoke(this, Color);
 
                 var hsv = RGB.Parse(Color).ToHSV();
                 SaturationHandleLeft = hsv.Saturation;

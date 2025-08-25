@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
+using System;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -8,7 +9,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenColorPickerItem component.
     /// </summary>
-    public partial class RadzenColorPickerItem
+    public partial class RadzenColorPickerItem : IDisposable
     {
         /// <summary>
         /// Gets or sets the value.
@@ -33,6 +34,37 @@ namespace Radzen.Blazor
         /// <value>The color picker.</value>
         [CascadingParameter]
         public RadzenColorPicker ColorPicker { get; set; }
+
+        private bool isSelected;
+
+        /// <inheritdoc/>
+        protected override Task OnInitializedAsync()
+        {
+            ColorPicker.SelectedColorChanged += ColorPickerColorChanged;
+            isSelected = ColorPicker.Value == Background;
+            return base.OnInitializedAsync();
+        }
+
+        /// <summary>
+        /// Detaches events from <see cref="ColorPicker" />.
+        /// </summary>
+        public virtual void Dispose()
+        {
+            if (ColorPicker != null)
+            {
+                ColorPicker.SelectedColorChanged -= ColorPickerColorChanged;
+            }
+        }
+
+        private void ColorPickerColorChanged(object colorPicker, string newValue)
+        {
+            var shouldBeSelected = newValue == Background;
+            if (isSelected != shouldBeSelected)
+            {
+                isSelected = shouldBeSelected;
+                StateHasChanged();
+            }
+        }
 
         async Task OnClick()
         {
