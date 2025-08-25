@@ -491,11 +491,19 @@ namespace Radzen.Blazor
                             builder.AddAttribute(14, "style", $"inset-inline-end: {(pivotAggregates.Count - 1 - pivotAggregates.IndexOf(aggregate)) * 120}px");
                             
                             // Calculate row total for this specific aggregate
-                            var rowTotal = GetAggregateValue(GetRowItems(pivotRow), aggregate);
+                            var items = GetRowItems(pivotRow);
+                            var rowTotal = GetAggregateValue(items, aggregate);
 
                             if (aggregate.RowTotalTemplate != null)
                             {
-                                builder.AddContent(15, aggregate.RowTotalTemplate(rowTotal));
+                                var context = new RadzenPivotAggreateContext<TItem>()
+                                {
+                                    View = items,
+                                    Aggregate = aggregate,
+                                    Value = rowTotal
+                                };
+
+                                builder.AddContent(15, aggregate.RowTotalTemplate(context));
                             }
                             else
                             {
@@ -581,7 +589,14 @@ namespace Radzen.Blazor
 
                         if (aggregate.RowTotalTemplate != null)
                         {
-                            builder.AddContent(seq++, aggregate.RowTotalTemplate(total));
+                            var context = new RadzenPivotAggreateContext<TItem>() 
+                            { 
+                                View = View,
+                                Aggregate = aggregate, 
+                                Value= total
+                            };
+
+                            builder.AddContent(seq++, aggregate.RowTotalTemplate(context));
                         }
                         else
                         {
@@ -703,7 +718,7 @@ namespace Radzen.Blazor
         /// <param name="items">The items to aggregate.</param>
         /// <param name="aggregate">The aggregate configuration.</param>
         /// <returns>The aggregated value.</returns>
-        private object GetAggregateValue(IQueryable<TItem> items, RadzenPivotAggregate<TItem> aggregate)
+        public object GetAggregateValue(IQueryable<TItem> items, RadzenPivotAggregate<TItem> aggregate)
         {
             if (items == null || !items.Any())
                 return null;

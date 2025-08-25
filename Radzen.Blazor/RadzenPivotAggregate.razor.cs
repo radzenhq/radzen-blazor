@@ -50,7 +50,7 @@ namespace Radzen.Blazor
         /// Gets or sets the column total template rendered in the column footer.
         /// </summary>
         [Parameter]
-        public RenderFragment<object> RowTotalTemplate { get; set; }
+        public RenderFragment<RadzenPivotAggreateContext<TItem>> RowTotalTemplate { get; set; }
 
         /// <summary>
         /// Formats a value using the FormatString and FormatProvider.

@@ -1228,6 +1228,14 @@ namespace RadzenBlazorDemos
                             Title = "Blazor Pivot DataGrid Component - Columns and rows chooser | Free UI Components by Radzen",
                             Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
                             Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
+                        },
+                        new Example
+                        {
+                            Name = "LoadData",
+                            Path = "/pivot-data-grid-load-data",
+                            Title = "Blazor Pivot DataGrid custom data-binding via the LoadData event.",
+                            Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
+                            Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
                         }
                     }
                 }

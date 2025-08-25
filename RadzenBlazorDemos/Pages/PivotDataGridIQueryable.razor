@@ -47,7 +47,7 @@
                 Total: @(context ?? 0)
             </ColumnTotalTemplate>
             <RowTotalTemplate>
-                Total: @(context ?? 0)
+                Total: @(context.Value ?? 0)
             </RowTotalTemplate>
         </RadzenPivotAggregate>
         <RadzenPivotAggregate TItem="SalesData" Property="UnitPrice" Title="Average Unit Price"
