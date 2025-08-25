@@ -1,0 +1,69 @@
+@using Radzen
+
+<div class="rz-p-12">
+    <RadzenRow Gap="2rem">
+        <RadzenColumn Size="4">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-8">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center">
+                        <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: 50px; height: 50px;" />
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenSkeleton Style="width: 120px; height: 16px;" />
+                            <RadzenSkeleton Style="width: 80px; height: 14px;" />
+                        </RadzenStack>
+                    </RadzenStack>
+                    
+                    <RadzenSkeleton Style="width: 100%; height: 14px;" />
+                    <RadzenSkeleton Style="width: 90%; height: 14px;" />
+                    <RadzenSkeleton Style="width: 70%; height: 14px;" />
+                    
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" class="rz-mt-6">
+                        <RadzenSkeleton Style="width: 80px; height: 32px;" />
+                        <RadzenSkeleton Style="width: 80px; height: 32px;" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        
+        <RadzenColumn Size="4">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-8">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                    <RadzenSkeleton Variant="SkeletonVariant.Rectangular" Style="width: 100%; height: 80px;" />
+                    
+                    <RadzenSkeleton Style="width: 100%; height: 16px;" />
+                    <RadzenSkeleton Style="width: 80%; height: 14px;" />
+                    <RadzenSkeleton Style="width: 60%; height: 14px;" />
+                    
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" class="rz-mt-6">
+                        <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: 24px; height: 24px;" />
+                        <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: 24px; height: 24px;" />
+                        <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: 24px; height: 24px;" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+        
+        <RadzenColumn Size="4">
+            <RadzenCard Variant="Variant.Outlined" class="rz-p-8">
+                <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center">
+                        <RadzenSkeleton Style="width: 60px; height: 60px;" />
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenSkeleton Style="width: 100px; height: 16px;" />
+                            <RadzenSkeleton Style="width: 60px; height: 14px;" />
+                        </RadzenStack>
+                    </RadzenStack>
+                    
+                    <RadzenSkeleton Style="width: 100%; height: 14px;" />
+                    <RadzenSkeleton Style="width: 85%; height: 14px;" />
+                    <RadzenSkeleton Style="width: 75%; height: 14px;" />
+                    
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" class="rz-mt-6">
+                        <RadzenSkeleton Variant="SkeletonVariant.Rectangular" Style="width: 100px; height: 32px;" />
+                        <RadzenSkeleton Variant="SkeletonVariant.Rectangular" Style="width: 60px; height: 32px;" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenCard>
+        </RadzenColumn>
+    </RadzenRow>
+</div> 

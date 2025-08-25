@@ -1,0 +1,26 @@
+@using Radzen
+
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" Gap="3rem" Wrap="FlexWrap.Wrap" class="rz-py-12 rz-px-6 rz-mx-auto" Style="max-width: 800px;">
+    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenText TextStyle="TextStyle.H6">Text (Default)</RadzenText>
+        <RadzenSkeleton /> <!-- Default Skeleton. Equivalent to Variant="SkeletonVariant.Text" -->
+        <RadzenSkeleton Style="height: 2rem;" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenText TextStyle="TextStyle.H6">Circular</RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" >
+            <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: 1rem; height: 1rem" />
+            <RadzenSkeleton Variant="SkeletonVariant.Circular" />
+            <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: 4rem; height: 4rem" />
+        </RadzenStack>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical" AlignItems="AlignItems.Center" Gap="1rem">
+        <RadzenText TextStyle="TextStyle.H6">Rectangular</RadzenText>
+        
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+            <RadzenSkeleton Variant="SkeletonVariant.Rectangular" />
+            <RadzenSkeleton Variant="SkeletonVariant.Rectangular" Style="width: 4rem; height: 4rem" />
+            <RadzenSkeleton Variant="SkeletonVariant.Rectangular" Style="width: 2rem; height: 4rem" />
+        </RadzenStack>
+    </RadzenStack>
+</RadzenStack>

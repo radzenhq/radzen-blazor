@@ -798,6 +798,10 @@ $rz-chat-avatar-font-weight: 700 !default;
 $rz-chat-message-time-padding: 0 !default;
 $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
 
+// Skeleton
+$skeleton-background-color: var(--rz-base-600) !default;
+$skeleton-animation-color: var(--rz-base-500) !default;
+
 @import 'fonts';
 @import 'components';
 

@@ -430,5 +430,9 @@ $splitter-bar-hover-opacity: 0.8 !default;
 $form-field-filled-background-color: var(--rz-base-700) !default;
 $form-field-filled-hover-background-color: var(--rz-base-700) !default;
 
+// Skeleton
+$skeleton-background-color: var(--rz-base-600) !default;
+$skeleton-animation-color: var(--rz-base-700) !default;
+
 @import 'fonts';
 @import 'components';

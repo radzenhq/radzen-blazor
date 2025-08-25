@@ -1,0 +1,199 @@
+@using RadzenBlazorDemos.Data
+@using RadzenBlazorDemos.Models.Northwind
+
+@inherits DbContextPage
+
+<style>
+    .rz-datatable-loading-content {
+        position: initial !important;
+        left: initial !important;
+        top: initial !important;
+        transform: initial !important;
+    }
+</style>
+
+<div class="rz-p-12">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+        <RadzenText TextStyle="TextStyle.H6">DataGrid with Skeleton Loading</RadzenText>
+        
+        <RadzenButton Text="Toggle Loading" Click="@ToggleLoading" Style="margin-bottom: 20px;" />
+        
+        @if (isLoading)
+        {
+            @RenderLoading()
+        }
+        else
+        {
+            <RadzenDataGrid Style="height: 360px" @ref="grid" Count="@count" Data="@employees" LoadData="@LoadData"
+                            AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="5" IsLoading="@isLoadingGrid"
+                           PagerHorizontalAlign="HorizontalAlign.Center" ColumnWidth="200px">
+                <Columns>
+                    <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+                    <RadzenDataGridColumn Title="Photo" Frozen="true" Sortable="false" Filterable="false" Width="80px" TextAlign="TextAlign.Center" >
+                        <Template Context="data">
+                            <RadzenImage Path="@data.Photo" class="rz-gravatar" AlternateText="@(data.FirstName + " " + data.LastName)" />
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true" Width="160px"/>
+                    <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="160px"/>
+                    <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" Width="200px"/>
+                    <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title" Width="120px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Address)" Title="Address" Width="200px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Region)" Title="Region" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.PostalCode)" Title="Postal Code" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.HomePhone)" Title="Home Phone" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Extension)" Title="Extension" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Employee.Notes)" Title="Notes" Width="300px" />
+                </Columns>
+                <LoadingTemplate>
+                    @RenderLoading()
+                </LoadingTemplate>
+            </RadzenDataGrid>
+        }
+    </RadzenStack>
+</div>
+
+@code {
+    RadzenDataGrid<Employee> grid;
+    int count;
+    IEnumerable<Employee> employees;
+    bool isLoading = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        // Start with loading state
+        isLoading = true;
+        await Task.Delay(2000); // Simulate loading delay
+        await LoadData(new LoadDataArgs { Skip = 0, Top = 5 });
+        isLoading = false;
+    }
+
+    async Task ToggleLoading()
+    {
+        isLoading = !isLoading;
+        if (isLoading)
+        {
+            await Task.Delay(2000); // Simulate loading delay
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    bool isLoadingGrid = false;
+
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoadingGrid = true;
+
+        employees = Enumerable.Empty<Employee>();
+
+        await Task.Yield();
+
+        var query = dbContext.Employees.AsQueryable();
+
+        if (!string.IsNullOrEmpty(args.Filter))
+        {
+            query = query.Where(grid.ColumnsCollection);
+        }
+
+        if (!string.IsNullOrEmpty(args.OrderBy))
+        {
+            query = query.OrderBy(args.OrderBy);
+        }
+
+        await Task.Delay(2000); // Simulate loading delay
+
+        count = await Task.FromResult(query.Count());
+        employees = await Task.FromResult(query.Skip(args.Skip.Value).Take(args.Top.Value).ToList());
+    
+        isLoadingGrid = false;
+    }
+
+    internal RenderFragment RenderLoading()
+    {
+        return __builder =>
+        {
+            <text>
+                <!-- Skeleton loading state -->
+                <RadzenTable Style="height: 360px">
+                    <RadzenTableHeader>
+                        <RadzenTableHeaderRow>
+                            <RadzenTableHeaderCell Style="width: 300px;">
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" class="rz-p-0">
+                                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="1.5rem">
+                                        <RadzenSkeleton Style="width: 1rem;" />
+                                        <RadzenSkeleton Style="width: var(--rz-gravatar-width);" />
+                                        <RadzenSkeleton Style="width: 2rem;" />
+                                    </RadzenStack>
+                                    <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: 1.25rem; height: 1.25rem" />
+                                </RadzenStack>
+                            </RadzenTableHeaderCell>
+                        @for (int i = 0; i < 6; i++)
+                        {
+                            <RadzenTableHeaderCell Style="width: 160px;">
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center" class="rz-p-0">
+                                    <RadzenSkeleton Style="width: 50%;" />
+                                    <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: 1.25rem; height: 1.25rem" />
+                                </RadzenStack>
+                            </RadzenTableHeaderCell>
+                        }
+                        </RadzenTableHeaderRow>
+                    </RadzenTableHeader>
+                    <RadzenTableBody>
+                    <!-- Table rows skeleton -->
+                    @for (int i = 0; i < 5; i++)
+                    {
+                        <RadzenTableRow>
+                            <RadzenTableCell>
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" AlignItems="AlignItems.Center" Gap="1.5rem">
+                                    <RadzenSkeleton Style="width: 1rem;" />
+                                    <RadzenSkeleton Variant="SkeletonVariant.Circular" Style="width: var(--rz-gravatar-width); height: var(--rz-gravatar-height);" />
+                                    <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 1.5rem; flex: 1;" />
+                                </RadzenStack>
+                            </RadzenTableCell>
+                            <RadzenTableCell>
+                                <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 50%;" />
+                            </RadzenTableCell>
+                            <RadzenTableCell>
+                                <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 90%;" />
+                            </RadzenTableCell>
+                            <RadzenTableCell>
+                                <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 20%;" />
+                            </RadzenTableCell>
+                            <RadzenTableCell>
+                                <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 70%;" />
+                            </RadzenTableCell>
+                            <RadzenTableCell>
+                                <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 80%;" />
+                            </RadzenTableCell>
+                            <RadzenTableCell>
+                                <RadzenSkeleton Animation="SkeletonAnimation.Wave" Style="width: 80%;" />
+                            </RadzenTableCell>
+                        </RadzenTableRow>
+                    }
+                    </RadzenTableBody>
+                    <RadzenTableBody>
+                    <!-- Pager -->
+                        <RadzenTableRow>
+                            <RadzenTableCell colspan="7">
+                                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" class="rz-p-5">
+                                    <RadzenSkeleton Style="width: 1.5rem; height: 1.5rem" />
+                                    <RadzenSkeleton Style="width: 1.5rem; height: 1.5rem" />
+                                    <RadzenSkeleton Style="width: 1.5rem; height: 1.5rem" />
+                                    <RadzenSkeleton Style="width: 1.5rem; height: 1.5rem" />
+                                    <RadzenSkeleton Style="width: 1.5rem; height: 1.5rem" />
+                                </RadzenStack>
+                            </RadzenTableCell>
+                        </RadzenTableRow>
+                    </RadzenTableBody>
+                </RadzenTable>
+            </text>
+        };
+    }
+} 

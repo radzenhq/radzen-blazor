@@ -1,0 +1,42 @@
+// Skeleton component variables
+$skeleton-background-color: var(--rz-base-300) !default;
+$skeleton-animation-color: var(--rz-base-200) !default;
+$skeleton-border-radius: var(--rz-border-radius) !default;
+$skeleton-animation-duration: 1.5s !default;
+
+// Base skeleton styles
+.rz-skeleton {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--rz-skeleton-background-color);
+  border-radius: var(--rz-skeleton-border-radius);
+}
+
+// Shape types
+.rz-skeleton.rz-skeleton-text {
+  width: 10rem;
+  height: .75em;
+}
+.rz-skeleton.rz-skeleton-circular {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+.rz-skeleton.rz-skeleton-rectangular {
+  width: 3rem;
+  height: 2rem;
+  border-radius: 0;
+}
+
+// Animations
+.rz-skeleton.rz-skeleton-wave {
+  background: linear-gradient(90deg, var(--rz-skeleton-background-color) 25%, var(--rz-skeleton-animation-color) 50%, var(--rz-skeleton-background-color) 75%);
+  background-size: 200% 100%;
+  animation: rz-wave var(--rz-skeleton-animation-duration) infinite;
+}
+
+.rz-skeleton.rz-skeleton-pulse {
+  animation: rz-pulse var(--rz-skeleton-animation-duration) infinite;
+}
+
