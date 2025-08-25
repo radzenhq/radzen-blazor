@@ -365,7 +365,7 @@ namespace Radzen
             var constant = Expression.Constant(caseInsensitive ?
                 $"{filter.FilterValue}".ToLowerInvariant() :
                     isEnum && !isEnumerable && filter.FilterValue != null ? Enum.ToObject(Nullable.GetUnderlyingType(property.Type) ?? property.Type, filter.FilterValue) : filter.FilterValue,
-                    !isEnum && isEnumerable ? valueType : isEnumerableProperty ? valueType: property.Type);
+                    !isEnum && isEnumerable ? valueType : isEnumerableProperty ? collectionItemType ?? valueType : property.Type);
 
             if (caseInsensitive && !isEnumerable)
             {
