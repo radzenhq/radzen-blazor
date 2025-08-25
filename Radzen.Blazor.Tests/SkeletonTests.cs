@@ -28,24 +28,23 @@ namespace Radzen.Blazor.Tests
 
             var component = ctx.RenderComponent<RadzenSkeleton>();
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Type, SkeletonType.Circular));
+            component.SetParametersAndRender(parameters => parameters.Add(p => p.Variant, SkeletonVariant.Circular));
 
             Assert.Contains("rz-skeleton", component.Markup);
             Assert.Contains("rz-skeleton-circular", component.Markup);
         }
 
         [Theory]
-        [InlineData(SkeletonType.Text, "rz-skeleton-text")]
-        [InlineData(SkeletonType.Circular, "rz-skeleton-circular")]
-        [InlineData(SkeletonType.Rectangular, "rz-skeleton-rectangular")]
-        [InlineData(SkeletonType.Rounded, "rz-skeleton-rounded")]
-        public void Skeleton_Renders_AllTypes(SkeletonType type, string expectedClass)
+        [InlineData(SkeletonVariant.Text, "rz-skeleton-text")]
+        [InlineData(SkeletonVariant.Circular, "rz-skeleton-circular")]
+        [InlineData(SkeletonVariant.Rectangular, "rz-skeleton-rectangular")]
+        public void Skeleton_Renders_AllTypes(SkeletonVariant type, string expectedClass)
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
 
-            var component = ctx.RenderComponent<RadzenSkeleton>(parameters => parameters.Add(p => p.Type, type));
+            var component = ctx.RenderComponent<RadzenSkeleton>(parameters => parameters.Add(p => p.Variant, type));
 
             Assert.Contains("rz-skeleton", component.Markup);
             Assert.Contains(expectedClass, component.Markup);
