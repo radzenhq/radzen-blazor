@@ -237,6 +237,8 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnInitialized()
         {
+            base.OnInitialized();
+
             expanded = Expanded;
 
             selected = Selected;
