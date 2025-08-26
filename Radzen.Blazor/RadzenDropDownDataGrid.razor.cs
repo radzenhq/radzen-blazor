@@ -505,14 +505,14 @@ namespace Radzen.Blazor
                             foreach (string word in words)
                             {
                                 query = query.Where(grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
-                                    .Select(c => new FilterDescriptor() { Property = c.GetFilterProperty(), FilterValue = word, FilterOperator = filterOperator }), 
+                                    .Select(c => new FilterDescriptor() { Property = c.GetFilterProperty(), FilterValue = word, FilterOperator = filterOperator, Type = c.Type }), 
                                         LogicalFilterOperator.Or, FilterCaseSensitivity);
                             }
                         }
                         else
                         {
                             query = query.Where(grid.ColumnsCollection.Where(c => c.Filterable && IsColumnFilterPropertyTypeString(c))
-                                .Select(c => new FilterDescriptor() { Property = c.GetFilterProperty(), FilterValue = searchText, FilterOperator = filterOperator }), 
+                                .Select(c => new FilterDescriptor() { Property = c.GetFilterProperty(), FilterValue = searchText, FilterOperator = filterOperator, Type = c.Type }), 
                                     LogicalFilterOperator.Or, FilterCaseSensitivity);
                         }
                     }
