@@ -2704,7 +2704,7 @@ namespace Radzen
         /// Gets or sets filter property used to limit and distinct values, if not set, args.Data are used as values.
         /// </summary>
         /// <value>The filter property.</value>
-        public string Property { get; internal set; }
+        public string Property { get; set; }
 
         /// <summary>
         /// Gets the column.
