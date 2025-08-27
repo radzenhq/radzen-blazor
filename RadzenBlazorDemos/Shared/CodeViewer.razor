@@ -21,9 +21,21 @@
     else
     {
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+        @if (ComponentName == "Dialog")
+        {
+            <a target="blank" class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-default rz-text-truncate rz-text-capitalize" href="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenDialog.razor" title=@($"View RadzenDialog component source code in new tab") >
+                <RadzenIcon Icon="open_in_new" /> @($"RadzenDialog") Source
+            </a>
+            <a target="blank" class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-default rz-text-truncate rz-text-capitalize" href="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/DialogService.cs" title=@($"View DialogService source code in new tab") >
+                <RadzenIcon Icon="open_in_new" /> @($"DialogService") Source
+            </a>
+        }
+
+        else {
             <a target="blank" class="rz-button rz-button-xs rz-variant-text rz-base rz-shade-default rz-text-truncate rz-text-capitalize" href="@ComponentSourceHref" title=@($"View Radzen{ComponentName} component source code in new tab") >
                 <RadzenIcon Icon="open_in_new" /> @($"Radzen{ComponentName}") Source
             </a>
+        }
         </RadzenStack>
     }
     </RadzenColumn>
