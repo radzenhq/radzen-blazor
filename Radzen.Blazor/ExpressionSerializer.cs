@@ -179,17 +179,20 @@ public class ExpressionSerializer : ExpressionVisitor
         return node;
     }
 
-    private string FormatValue(object value)
+    internal static string FormatValue(object value)
     {
         if (value == null)
             return "null";
 
         return value switch
         {
-            string str => $"\"{str}\"",
+            string s when s == string.Empty => @"""""",
+            null => "null",
+            string s => @$"""{s.Replace("\"", "\\\"")}""",
             char c => $"'{c}'",
             bool b => b.ToString().ToLowerInvariant(),
             DateTime dt => FormatDateTime(dt),
+            DateTimeOffset dto => $"DateTime.Parse(\"{dto.UtcDateTime:yyyy-MM-ddTHH:mm:ss.fffZ}\")",
             DateOnly dateOnly => $"DateOnly.Parse(\"{dateOnly.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
             TimeOnly timeOnly => $"TimeOnly.Parse(\"{timeOnly.ToString("HH:mm:ss", CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture)",
             Guid guid => $"Guid.Parse(\"{guid.ToString("D", CultureInfo.InvariantCulture)}\")",
@@ -200,7 +203,7 @@ public class ExpressionSerializer : ExpressionVisitor
         };
     }
 
-    private string FormatDateTime(DateTime dateTime)
+    private static string FormatDateTime(DateTime dateTime)
     {
         var finalDate = dateTime.TimeOfDay == TimeSpan.Zero ? dateTime.Date : dateTime;
         var dateFormat = dateTime.TimeOfDay == TimeSpan.Zero ? "yyyy-MM-dd" : "yyyy-MM-ddTHH:mm:ss.fffZ";
@@ -208,7 +211,7 @@ public class ExpressionSerializer : ExpressionVisitor
         return $"DateTime.SpecifyKind(DateTime.Parse(\"{finalDate.ToString(dateFormat, CultureInfo.InvariantCulture)}\", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind), DateTimeKind.{Enum.GetName(finalDate.Kind)})";
     }
 
-    private string FormatEnumerable(IEnumerable enumerable)
+    private static string FormatEnumerable(IEnumerable enumerable)
     {
         var arrayType = enumerable.AsQueryable().ElementType;
         

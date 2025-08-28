@@ -30,20 +30,7 @@ namespace System.Linq.Dynamic.Core
                         if (index >= parameters.Length)
                             throw new InvalidOperationException($"No parameter provided for {match.Value}");
 
-                        object param = parameters[index];
-                        return param switch
-                        {
-                            string s when s == string.Empty => @"""""",
-                            null => "null",
-                            string s => @$"""{s.Replace("\"", "\\\"")}""",
-                            bool b => b.ToString().ToLower(),
-                            Guid g => $"Guid.Parse(\"{g}\")",
-                            DateTime dt => $"DateTime.Parse(\"{dt:yyyy-MM-ddTHH:mm:ss.fffZ}\")",
-                            DateTimeOffset dto => $"DateTime.Parse(\"{dto.UtcDateTime:yyyy-MM-ddTHH:mm:ss.fffZ}\")",
-                            DateOnly d => $"DateOnly.Parse(\"{d:yyyy-MM-dd}\")",
-                            TimeOnly t => $"TimeOnly.Parse(\"{t:HH:mm:ss}\")",
-                            _ => param.ToString()
-                        };
+                        return ExpressionSerializer.FormatValue(parameters[index]);
                     });
                 }
 
