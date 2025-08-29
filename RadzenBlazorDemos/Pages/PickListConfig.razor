@@ -75,11 +75,15 @@
                 Allow move all items from target to source
                 <RadzenSwitch @bind-Value="@allowMoveTargetToSource" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "Allow move all items" }})" />
             </RadzenStack>
+            <RadzenStack Orientation="Orientation.Vertical" Gap="4px">
+                Move filtered items only on move all
+                <RadzenSwitch @bind-Value="@moveFilteredItemsOnlyOnMoveAll" Style="margin-top: 4px;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "allow filtering" } })" />
+            </RadzenStack>
         </RadzenStack>
     </RadzenCard>
     <RadzenCard>
         <RadzenPickList AllowMoveAll="@allowMoveAll" AllowMoveAllSourceToTarget="@allowMoveSourceToTarget" AllowMoveAllTargetToSource="@allowMoveTargetToSource" @bind-Source="@Source" @bind-Target="@Target" Style="height:500px; width:100%;" Orientation="@orientation"
-            TextProperty="@nameof(Customer.CompanyName)" AllowFiltering="@allowFilter" Multiple="@multiple" ShowHeader="@showHeader" Disabled="@disabled"
+            TextProperty="@nameof(Customer.CompanyName)" AllowFiltering="@allowFilter" MoveFilteredItemsOnlyOnMoveAll="@moveFilteredItemsOnlyOnMoveAll" Multiple="@multiple" ShowHeader="@showHeader" Disabled="@disabled"
             ButtonGap="@gap" ButtonJustifyContent="@justifyContent" ButtonStyle="@style" ButtonSize="@size" ButtonShade="@shade" ButtonVariant="@variant"
             AllowSelectAll="@allowSelectAll"
             ItemRender="OnItemRender">
@@ -106,6 +110,7 @@
 
     string gap = "12px";
     bool allowFilter = true;
+    bool moveFilteredItemsOnlyOnMoveAll = false;
     bool multiple = false;
     bool allowSelectAll = true;
     bool showHeader = true;

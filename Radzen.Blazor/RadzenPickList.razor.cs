@@ -36,6 +36,13 @@ namespace Radzen.Blazor
         public bool AllowMoveAllTargetToSource { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether to move all or only avaialable after filter items.
+        /// </summary>
+        /// <value><c>true</c> if c allowed to move filtered items only; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool MoveFilteredItemsOnlyOnMoveAll { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether multiple selection is allowed.
         /// </summary>
         /// <value><c>true</c> if multiple selection is allowed; otherwise, <c>false</c>.</value>
@@ -376,6 +383,8 @@ namespace Radzen.Blazor
             return Multiple ? (selectedTargetItems as IEnumerable)?.Cast<TItem>() : [(TItem)selectedTargetItems];
         }
 
+        RadzenListBox<object> sourceListBox;
+        RadzenListBox<object> targetListBox;
         private async Task Update(bool sourceToTarget, IEnumerable<TItem> items)
         {
             if (sourceToTarget)
@@ -387,8 +396,8 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    target = (target ?? Enumerable.Empty<TItem>()).Concat(source);
-                    source = null;
+                    target = (target ?? Enumerable.Empty<TItem>()).Concat(MoveFilteredItemsOnlyOnMoveAll ? sourceListBox.GetView().Cast<TItem>() : source);
+                    source = MoveFilteredItemsOnlyOnMoveAll ? source.Except(sourceListBox.GetView().Cast<TItem>()) : null;
                 }
             }
             else
@@ -400,8 +409,8 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    source = (source ?? Enumerable.Empty<TItem>()).Concat(target);
-                    target = null;
+                    source = (source ?? Enumerable.Empty<TItem>()).Concat(MoveFilteredItemsOnlyOnMoveAll ? targetListBox.GetView().Cast<TItem>() : target);
+                    target = MoveFilteredItemsOnlyOnMoveAll ? target.Except(targetListBox.GetView().Cast<TItem>()) : null;
                 }
             }
 
@@ -414,7 +423,7 @@ namespace Radzen.Blazor
             selectedSourceItems = null;
             selectedTargetItems = null;
 
-            if (items == null)
+            if (items == null && !MoveFilteredItemsOnlyOnMoveAll)
             {
                 sourceSearchText = null;
                 targetSearchText = null;

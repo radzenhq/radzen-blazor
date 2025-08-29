@@ -3476,10 +3476,8 @@ namespace Radzen.Blazor
 
                     foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
                     {
-                        // Property is not unique when using sub property filering.
-                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault() ??
+                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault() ?? 
                             allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault();
-
                         if (gridColumn != null)
                         {
                             // Sorting
@@ -3493,10 +3491,8 @@ namespace Radzen.Blazor
 
                     foreach (var column in settings.Columns)
                     {
-                        // Property is not unique when using sub property filering.
-                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault() ??
-                                         allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault();
-
+                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault() ?? 
+                            allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault();
                         if (gridColumn != null)
                         {
                             // Visibility
