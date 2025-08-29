@@ -196,7 +196,10 @@ namespace Radzen.Blazor
 
         async Task TriggerChange()
         {
-            SelectedColorChanged.Invoke(this, Color);
+            if (SelectedColorChanged != null)
+            {
+                SelectedColorChanged.Invoke(this, Color);
+            }
 
             if (!ShowButton)
             {
