@@ -3424,6 +3424,35 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Override this method to customize how filter values are serialized back typed from the settings.
+        /// </summary>
+        /// <param name="gridColumn">Grid colum to set.</param>
+        /// <param name="columnSettings">Setting of the column.</param>
+        /// <param name="isFirst">Handle first or second filter value.</param>
+        /// <returns></returns>
+        public virtual bool SetColumnFilterValueFromSettings(RadzenDataGridColumn<TItem> gridColumn, DataGridColumnSettings columnSettings, bool isFirst)
+        {
+            var filterPropertyType = gridColumn.FilterPropertyType;
+
+            // Fix nested property settings load issue
+            // GetFilterValue reads settings as list only if the filterProperty type is IEnumerable and the settings value is JsonElement array.
+            if ( columnSettings.FilterValue is JsonElement jsonElement && jsonElement.ValueKind != JsonValueKind.Array
+                && !typeof(string).IsAssignableFrom(gridColumn.FilterPropertyType) && (typeof(IEnumerable<>).IsAssignableFrom(gridColumn.FilterPropertyType) || typeof(IEnumerable).IsAssignableFrom(gridColumn.FilterPropertyType)))
+            {
+                filterPropertyType = PropertyAccess.GetElementType(gridColumn.FilterPropertyType);
+            }
+
+            if (!AreObjectsEqual(isFirst ? gridColumn.GetFilterValue() : gridColumn.GetSecondFilterValue(),
+                GetFilterValue(isFirst ? columnSettings.FilterValue : columnSettings.SecondFilterValue, filterPropertyType)))
+            {
+                gridColumn.SetFilterValue(GetFilterValue(isFirst ? columnSettings.FilterValue : columnSettings.SecondFilterValue, filterPropertyType), isFirst);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Load DataGrid settings saved from the GetSettings() method.
         /// This internal method handles the actual loading or updating of the DataGrid settings.
         /// </summary>
@@ -3447,8 +3476,10 @@ namespace Radzen.Blazor
 
                     foreach (var column in settings.Columns.OrderBy(c => c.SortIndex))
                     {
-                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
-                                allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
+                        // Property is not unique when using sub property filering.
+                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault() ??
+                            allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault();
+
                         if (gridColumn != null)
                         {
                             // Sorting
@@ -3462,8 +3493,10 @@ namespace Radzen.Blazor
 
                     foreach (var column in settings.Columns)
                     {
-                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault() ??
-                                allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault();
+                        // Property is not unique when using sub property filering.
+                        var gridColumn = allColumns.Where(c => !string.IsNullOrEmpty(column.UniqueID) && c.UniqueID == column.UniqueID).FirstOrDefault() ??
+                                         allColumns.Where(c => !string.IsNullOrEmpty(column.Property) && c.Property == column.Property).FirstOrDefault();
+
                         if (gridColumn != null)
                         {
                             // Visibility
@@ -3488,23 +3521,16 @@ namespace Radzen.Blazor
                             }
 
                             // Filtering
-                            if (!AreObjectsEqual(gridColumn.GetFilterValue(), GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType)))
-                            {
-                                gridColumn.SetFilterValue(GetFilterValue(column.FilterValue, gridColumn.FilterPropertyType));
-                                shouldUpdateState = true;
-                            }
-
+                            SetColumnFilterValueFromSettings(gridColumn, column, true);
+                            
                             if (gridColumn.GetFilterOperator() != column.FilterOperator)
                             {
                                 gridColumn.SetFilterOperator(column.FilterOperator);
                                 shouldUpdateState = true;
                             }
 
-                            if (!AreObjectsEqual(gridColumn.GetSecondFilterValue(), GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType)))
-                            {
-                                gridColumn.SetFilterValue(GetFilterValue(column.SecondFilterValue, gridColumn.FilterPropertyType), false);
-                                shouldUpdateState = true;
-                            }
+                            // 2nd filter value
+                            SetColumnFilterValueFromSettings(gridColumn, column, false);
 
                             if (gridColumn.GetSecondFilterOperator() != column.SecondFilterOperator)
                             {
