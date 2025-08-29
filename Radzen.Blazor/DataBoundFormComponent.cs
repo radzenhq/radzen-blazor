@@ -275,6 +275,8 @@ namespace Radzen
             }
         }
 
+        internal IEnumerable GetView() => View;
+
         /// <summary>
         /// Gets or sets the edit context.
         /// </summary>

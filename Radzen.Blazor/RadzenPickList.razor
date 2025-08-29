@@ -11,7 +11,7 @@
                 {
                     @SourceHeader
                 }
-                <RadzenListBox @bind-Value=@selectedSourceItems Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
+                <RadzenListBox @ref=sourceListBox @bind-Value=@selectedSourceItems Data="@source" Multiple="@Multiple" @bind-SearchText=@sourceSearchText
                     FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                     TextProperty="@TextProperty" DisabledProperty="@DisabledProperty" AllowFiltering=@AllowFiltering ItemRender="@OnSourceItemRender"
                     Template=@ListBoxTemplate Placeholder="@(SourcePlaceholder ?? Placeholder)" SelectAllText="@SelectAllText"  AllowSelectAll="@AllowSelectAll"
@@ -33,7 +33,7 @@
                 {
                     @TargetHeader
                 }
-                <RadzenListBox @bind-Value=@selectedTargetItems Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
+                <RadzenListBox @ref=targetListBox @bind-Value=@selectedTargetItems Data="@target" Multiple="@Multiple" @bind-SearchText=@targetSearchText
                     FilterAsYouType=true FilterCaseSensitivity=FilterCaseSensitivity.CaseInsensitive
                     TextProperty="@TextProperty" DisabledProperty="@DisabledProperty" AllowFiltering=@AllowFiltering ItemRender="@OnTargetItemRender"
                     Template=@ListBoxTemplate Placeholder="@(TargetPlaceholder ?? Placeholder)" SelectAllText="@SelectAllText" AllowSelectAll="@AllowSelectAll"
