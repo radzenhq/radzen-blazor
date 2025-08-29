@@ -16,7 +16,7 @@
 <RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
 <RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings-loaddata", true))" Text="Reload" Style="margin-bottom: 16px" />
 <RadzenDataGrid @ref=grid @bind-Settings="@Settings" LoadSettings="@LoadSettings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" 
-                AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true" FilterMode="FilterMode.SimpleWithMenu"
+                AllowSorting="true" AllowMultiColumnSorting="true" ShowMultiColumnSortingIndex="true"
                 AllowColumnResize="true" AllowColumnReorder="true" ColumnWidth="200px"
                 FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                 Data="@employees" IsLoading=@isLoading Count="@count" LoadData=@LoadData
