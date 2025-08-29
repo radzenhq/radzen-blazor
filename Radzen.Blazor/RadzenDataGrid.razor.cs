@@ -3429,7 +3429,7 @@ namespace Radzen.Blazor
         /// <param name="gridColumn">Grid colum to set.</param>
         /// <param name="columnSettings">Setting of the column.</param>
         /// <param name="isFirst">Handle first or second filter value.</param>
-        /// <returns></returns>
+        /// <returns>Returns true if state should update.</returns>
         public virtual bool SetColumnFilterValueFromSettings(RadzenDataGridColumn<TItem> gridColumn, DataGridColumnSettings columnSettings, bool isFirst)
         {
             var filterPropertyType = gridColumn.FilterPropertyType;
@@ -3521,8 +3521,9 @@ namespace Radzen.Blazor
                             }
 
                             // Filtering
-                            SetColumnFilterValueFromSettings(gridColumn, column, true);
-                            
+                            if( SetColumnFilterValueFromSettings(gridColumn, column, true))
+                                shouldUpdateState = true;
+
                             if (gridColumn.GetFilterOperator() != column.FilterOperator)
                             {
                                 gridColumn.SetFilterOperator(column.FilterOperator);
@@ -3530,7 +3531,8 @@ namespace Radzen.Blazor
                             }
 
                             // 2nd filter value
-                            SetColumnFilterValueFromSettings(gridColumn, column, false);
+                            if( SetColumnFilterValueFromSettings(gridColumn, column, false))
+                                shouldUpdateState = true;
 
                             if (gridColumn.GetSecondFilterOperator() != column.SecondFilterOperator)
                             {
