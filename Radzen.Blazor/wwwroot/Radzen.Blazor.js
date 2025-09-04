@@ -2070,7 +2070,11 @@ window.Radzen = {
       if (target.nodeType == 3) {
         target = target.parentElement;
       } else {
-        target = target.childNodes[selection.focusOffset];
+        if (img) {
+          target = target.childNodes[range.startOffset]
+        } else {
+          target = target.childNodes[selection.focusOffset];
+        }
         if (target) {
           innerHTML = target.outerHTML;
         }
