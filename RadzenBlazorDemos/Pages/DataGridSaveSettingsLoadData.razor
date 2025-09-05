@@ -33,6 +33,17 @@
         <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" />
         <RadzenDataGridColumn Property="@nameof(Employee.City)" Title="City" />
         <RadzenDataGridColumn Property="@nameof(Employee.Country)" Title="Country" />
+
+        <RadzenDataGridColumn Property="Orders" FilterProperty="ShipCity" Title="Order ship city" Type="typeof(ICollection<Order>)" Sortable="false">
+            <Template>
+                @(string.Join(',', context.Orders.Select(od => od.ShipCity)))
+            </Template>
+        </RadzenDataGridColumn>
+        <RadzenDataGridColumn Property="Orders" FilterProperty="ShipPostalCode" Title="Order ShipPostalCode" Type="typeof(ICollection<Order>)" Sortable="false">
+            <Template>
+                @(string.Join(',', context.Orders.Select(od => od.ShipPostalCode)))
+            </Template>
+        </RadzenDataGridColumn>
     </Columns>
 </RadzenDataGrid>
 
@@ -55,7 +66,7 @@
 
         await Task.Yield();
 
-        var query = dbContext.Employees.AsQueryable();
+        var query = dbContext.Employees.Include("Orders").AsQueryable();
 
         if (!string.IsNullOrEmpty(args.Filter))
         {

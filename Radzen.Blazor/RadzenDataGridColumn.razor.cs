@@ -200,6 +200,11 @@ namespace Radzen.Blazor
                 {
                     SetFilterOperator(FilterOperator.Contains);
                 }
+
+                if (!string.IsNullOrEmpty(Property) && !string.IsNullOrEmpty(FilterProperty))
+                    UniqueID ??= $"{Property}.{FilterProperty}"; // To be sure the column uniqueID is unique even when filtering on sub property.
+                else
+                    UniqueID ??= Property ?? FilterProperty;
             }
         }
         
