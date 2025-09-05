@@ -1,0 +1,71 @@
+<RadzenCard class="w-100 mb-3" Style="padding: 0.75rem;">
+    <RadzenTabs>
+        <Tabs>
+            <RadzenTabsItem Text="Chart Options">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0.25rem">
+                        <RadzenText TextStyle="TextStyle.Caption">Grid Shape</RadzenText>
+                        <RadzenSelectBar @bind-Value="gridShape" TValue="SpiderChartGridShape" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                            <Items>
+                                <RadzenSelectBarItem Text="Polygon" Value="SpiderChartGridShape.Polygon" />
+                                <RadzenSelectBarItem Text="Circle" Value="SpiderChartGridShape.Circular" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenStack>
+
+                    <RadzenStack Gap="0.25rem">
+                        <RadzenText TextStyle="TextStyle.Caption">Color Scheme</RadzenText>
+                        <RadzenSelectBar @bind-Value="colorScheme" TValue="ColorScheme" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                            <Items>
+                                <RadzenSelectBarItem Text="Pastel" Value="ColorScheme.Pastel" />
+                                <RadzenSelectBarItem Text="Palette" Value="ColorScheme.Palette" />
+                                <RadzenSelectBarItem Text="Mono" Value="ColorScheme.Monochrome" />
+                                <RadzenSelectBarItem Text="Divergent" Value="ColorScheme.Divergent" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenStack>
+
+                </RadzenStack>
+            </RadzenTabsItem>
+            
+            
+            <RadzenTabsItem Text="Display">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0.25rem">
+                        <RadzenText TextStyle="TextStyle.Caption">Value Format</RadzenText>
+                        <RadzenSelectBar @bind-Value="valueFormat" TValue="string" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                            <Items>
+                                <RadzenSelectBarItem Text="Percent" Value="@("percent")" />
+                                <RadzenSelectBarItem Text="Number" Value="@("number")" />
+                                <RadzenSelectBarItem Text="Score" Value="@("score")" />
+                                <RadzenSelectBarItem Text="Currency" Value="@("currency")" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenStack>
+                    
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenSwitch @bind-Value="showLegend" Name="showLegend" Change="@(() => StateHasChanged())" />
+                        <RadzenLabel Text="Show Legend" Component="showLegend" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenSpiderChart TItem="PerformanceData" 
+                   Data="@performanceData" 
+                   CategoryProperty="@nameof(PerformanceData.Metric)" 
+                   ValueProperty="@nameof(PerformanceData.Score)"
+                   SeriesProperty="@nameof(PerformanceData.Department)"
+                   GridShape="@gridShape"
+                   ColorScheme="@colorScheme"
+                   ShowLegend="@showLegend"
+                   ValueFormatter="@GetValueFormatter()"
+                   Style="width: 100%; height: 500px;">
+</RadzenSpiderChart>
+
+@code {
+    // Configuration options
+
+}
