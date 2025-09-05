@@ -1,0 +1,168 @@
+@using Radzen.Blazor
+
+<RadzenCard class="w-100 mb-3" Style="padding: 0.75rem;margin-bottom:1rem;">
+    <RadzenTabs>
+        <Tabs>
+            <RadzenTabsItem Text="Chart Options">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0.25rem">
+                        <RadzenText TextStyle="TextStyle.Caption">Grid Shape</RadzenText>
+                        <RadzenSelectBar @bind-Value="gridShape" TValue="Radzen.Blazor.SpiderChartGridShape" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                            <Items>
+                                <RadzenSelectBarItem Text="Polygon" Value="Radzen.Blazor.SpiderChartGridShape.Polygon" />
+                                <RadzenSelectBarItem Text="Circle" Value="Radzen.Blazor.SpiderChartGridShape.Circular" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenStack>
+
+                    <RadzenStack Gap="0.25rem">
+                        <RadzenText TextStyle="TextStyle.Caption">Color Scheme</RadzenText>
+                        <RadzenSelectBar @bind-Value="colorScheme" TValue="ColorScheme" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                            <Items>
+                                <RadzenSelectBarItem Text="Pastel" Value="ColorScheme.Pastel" />
+                                <RadzenSelectBarItem Text="Palette" Value="ColorScheme.Palette" />
+                                <RadzenSelectBarItem Text="Mono" Value="ColorScheme.Monochrome" />
+                                <RadzenSelectBarItem Text="Divergent" Value="ColorScheme.Divergent" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenStack>
+
+                    <RadzenStack Gap="0.25rem">
+                        <RadzenText TextStyle="TextStyle.Caption">Legend Position</RadzenText>
+                        <RadzenSelectBar @bind-Value="legendPosition" TValue="LegendPosition" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                            <Items>
+                                <RadzenSelectBarItem Text="Right" Value="LegendPosition.Right" />
+                                <RadzenSelectBarItem Text="Left" Value="LegendPosition.Left" />
+                                <RadzenSelectBarItem Text="Top" Value="LegendPosition.Top" />
+                                <RadzenSelectBarItem Text="Bottom" Value="LegendPosition.Bottom" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenStack>
+
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenSwitch @bind-Value="legendVisible" Name="legendVisible" Change="@(() => StateHasChanged())" />
+                        <RadzenLabel Text="Show Legend" Component="legendVisible" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenTabsItem>
+            
+            <RadzenTabsItem Text="Display">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
+                    <RadzenStack Gap="0.25rem">
+                        <RadzenText TextStyle="TextStyle.Caption">Value Format</RadzenText>
+                        <RadzenSelectBar @bind-Value="valueFormat" TValue="string" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                            <Items>
+                                <RadzenSelectBarItem Text="Percent" Value="@("percent")" />
+                                <RadzenSelectBarItem Text="Number" Value="@("number")" />
+                                <RadzenSelectBarItem Text="Score" Value="@("score")" />
+                                <RadzenSelectBarItem Text="Currency" Value="@("currency")" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </RadzenStack>
+                    
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+                        <RadzenSwitch @bind-Value="showMarkers" Name="showMarkers" Change="@(() => StateHasChanged())" />
+                        <RadzenLabel Text="Show Markers" Component="showMarkers" />
+                    </RadzenStack>
+                </RadzenStack>
+            </RadzenTabsItem>
+        </Tabs>
+    </RadzenTabs>
+</RadzenCard>
+
+<RadzenSpiderChart TItem="EmployeePerformance" GridShape="@gridShape"
+                   ColorScheme="@colorScheme"
+                   ShowMarkers="@showMarkers"
+                   Style="width: 100%; height: 500px;">
+    <RadzenSpiderLegend Position="@legendPosition" Visible="@legendVisible" />
+    <RadzenSpiderSeries TItem="EmployeePerformance" 
+                        Data="@GetNancyData()" 
+                        CategoryProperty="@nameof(EmployeePerformance.Metric)" 
+                        ValueProperty="@nameof(EmployeePerformance.Score)"
+                        Title="Nancy Davolio"
+                        ValueFormatter="@GetValueFormatter()" />
+    <RadzenSpiderSeries TItem="EmployeePerformance" 
+                        Data="@GetAndrewData()" 
+                        CategoryProperty="@nameof(EmployeePerformance.Metric)" 
+                        ValueProperty="@nameof(EmployeePerformance.Score)"
+                        Title="Andrew Fuller"
+                        ValueFormatter="@GetValueFormatter()" />
+    <RadzenSpiderSeries TItem="EmployeePerformance" 
+                        Data="@GetJanetData()" 
+                        CategoryProperty="@nameof(EmployeePerformance.Metric)" 
+                        ValueProperty="@nameof(EmployeePerformance.Score)"
+                        Title="Janet Leverling"
+                        ValueFormatter="@GetValueFormatter()" />
+</RadzenSpiderChart>
+
+@code {
+    Radzen.Blazor.SpiderChartGridShape gridShape = Radzen.Blazor.SpiderChartGridShape.Polygon;
+    ColorScheme colorScheme = ColorScheme.Palette;
+    bool showMarkers = true;
+    string valueFormat = "percent";
+    LegendPosition legendPosition = LegendPosition.Right;
+    bool legendVisible = true;
+    
+    Func<double, string> GetValueFormatter()
+    {
+        return valueFormat switch
+        {
+            "percent" => (value) => $"{value:F0}%",
+            "number" => (value) => value.ToString("F1"),
+            "score" => (value) => $"{value:F0}/100",
+            "currency" => (value) => $"${value:F0}",
+            _ => (value) => value.ToString("F1")
+        };
+    }
+
+    class EmployeePerformance
+    {
+        public string Metric { get; set; }
+        public double Score { get; set; }
+    }
+
+    IEnumerable<EmployeePerformance> GetNancyData()
+    {
+        return new EmployeePerformance[]
+        {
+            new EmployeePerformance { Metric = "Sales", Score = 95 },
+            new EmployeePerformance { Metric = "Customer Relations", Score = 88 },
+            new EmployeePerformance { Metric = "Teamwork", Score = 92 },
+            new EmployeePerformance { Metric = "Efficiency", Score = 90 },
+            new EmployeePerformance { Metric = "Innovation", Score = 94 },
+            new EmployeePerformance { Metric = "Leadership", Score = 87 },
+            new EmployeePerformance { Metric = "Communication", Score = 85 },
+            new EmployeePerformance { Metric = "Technical Skills", Score = 82 }
+        };
+    }
+
+    IEnumerable<EmployeePerformance> GetAndrewData()
+    {
+        return new EmployeePerformance[]
+        {
+            new EmployeePerformance { Metric = "Sales", Score = 78 },
+            new EmployeePerformance { Metric = "Customer Relations", Score = 72 },
+            new EmployeePerformance { Metric = "Teamwork", Score = 88 },
+            new EmployeePerformance { Metric = "Efficiency", Score = 85 },
+            new EmployeePerformance { Metric = "Innovation", Score = 91 },
+            new EmployeePerformance { Metric = "Leadership", Score = 93 },
+            new EmployeePerformance { Metric = "Communication", Score = 80 },
+            new EmployeePerformance { Metric = "Technical Skills", Score = 76 }
+        };
+    }
+
+    IEnumerable<EmployeePerformance> GetJanetData()
+    {
+        return new EmployeePerformance[]
+        {
+            new EmployeePerformance { Metric = "Sales", Score = 82 },
+            new EmployeePerformance { Metric = "Customer Relations", Score = 75 },
+            new EmployeePerformance { Metric = "Teamwork", Score = 95 },
+            new EmployeePerformance { Metric = "Efficiency", Score = 93 },
+            new EmployeePerformance { Metric = "Innovation", Score = 89 },
+            new EmployeePerformance { Metric = "Leadership", Score = 84 },
+            new EmployeePerformance { Metric = "Communication", Score = 92 },
+            new EmployeePerformance { Metric = "Technical Skills", Score = 88 }
+        };
+    }
+}

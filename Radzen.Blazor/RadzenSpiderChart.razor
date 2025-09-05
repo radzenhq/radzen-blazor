@@ -1,0 +1,144 @@
+@typeparam TItem
+@inherits RadzenComponent
+@using Radzen.Blazor.Rendering
+
+@if (Visible)
+{
+<CascadingValue Value="@this">
+@ChildContent
+</CascadingValue>
+
+<CascadingValue Value="@this" IsFixed="true">
+    <div @ref="@Element" class="@GetComponentCssClass() rz-scheme-@(ColorScheme.ToString().ToLower()) @GetCssClass()" style="@Style" @attributes="Attributes">
+        @{
+            var wrapperClass = $"rz-spider-chart-wrapper {(Legend?.Visible == true ? $"rz-spider-legend-{Legend.Position}".ToLowerInvariant() : "")}".Trim();
+        }
+
+        <div class="@wrapperClass" @onmouseleave="OnChartMouseLeave">
+            @if (Width != null && Height != null && Series?.Any() == true)
+            {
+                <svg viewBox="0 0 @Width @Height">
+                        <g class="rz-spider-chart-grid">
+                        @* Diagonal lines first (bottom layer) *@
+                        @foreach (var category in GetAllCategories())
+                        {
+                            var index = GetCategoryIndex(category);
+                            var (x1, y1) = GetPoint(index, MinValue);
+                            var (x2, y2) = GetPoint(index, MaxValue);
+                            <line x1="@x1" y1="@y1" x2="@x2" y2="@y2"
+                                  stroke="var(--rz-text-secondary-color, #999)"
+                                  stroke-width="1"
+                                  opacity="0.5"
+                                  class="rz-spider-chart-grid-line" />
+                        }
+
+                        @* Grid shapes second (top layer) *@
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            @if (GridShape == SpiderChartGridShape.Circular)
+                            {
+                                var centerX = Width.Value / 2;
+                                var centerY = Height.Value / 2;
+                                var radius = Math.Min(centerX, centerY) * 0.8 * (i / 5.0);
+                                <circle cx="@centerX" cy="@centerY" r="@radius"
+                                        fill="none"
+                                        stroke="var(--rz-border-color, #e0e0e0)"
+                                        stroke-width="1"
+                                        opacity="0.7"
+                                        class="rz-spider-chart-grid-circle" />
+                            }
+                            else
+                            {
+                                <path d="@GetGridPath(i / 5.0)"
+                                      fill="none"
+                                      stroke="var(--rz-border-color, #e0e0e0)"
+                                      stroke-width="1"
+                                      opacity="0.7"
+                                      class="rz-spider-chart-grid-polygon" />
+                            }
+                        }
+                    </g>
+
+                    <g class="rz-spider-chart-areas">
+                        @foreach (var series in VisibleSeries)
+                        {
+                            var path = GetSeriesPath(series);
+                            var isHovered = HoveredSeries == series;
+                            var shouldShow = !IsLegendHover || HoveredSeries == null || HoveredSeries == series;
+                            var localSeries = series;
+                            
+                            <path d="@path" 
+                                  class="rz-spider-chart-area rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
+                                  data-stroke-width="@series.StrokeWidth"
+                                  fill-opacity="0.3"
+                                  @onclick="@(args => OnSeriesClick(localSeries, args))"
+                                  @onmouseenter="@(args => { OnAreaMouseEnter((MouseEventArgs)args, localSeries); })"
+                                  @onmouseleave="OnAreaMouseLeave" />
+                        }
+                    </g>
+
+                    @if (ShowMarkers)
+                    {
+                        @* First layer: Render all visible markers *@
+                        <g class="rz-spider-chart-markers">
+                            @foreach (var series in VisibleSeries)
+                            {
+                                @if (series.MarkersVisible)
+                                {
+                                    var isHovered = series == HoveredSeries;
+                                    var shouldShow = !IsLegendHover || HoveredSeries == null || HoveredSeries == series;
+                                    @foreach (var category in GetAllCategories())
+                                    {
+                                        var value = GetSeriesValue(series, category);
+                                        var index = GetCategoryIndex(category);
+                                        var (x, y) = GetPoint(index, value);
+                                        
+                                        <circle cx="@x" cy="@y" r="@series.MarkerSize" 
+                                                class="rz-spider-chart-marker rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
+                                                pointer-events="none" />
+                                    }
+                                }
+                            }
+                        </g>
+                        
+                        @* Second layer: Interactive hit areas rendered AFTER visual markers so they're on top *@
+                        <g class="rz-spider-chart-hit-areas">
+                            @foreach (var series in VisibleSeries)
+                            {
+                                @if (series.MarkersVisible)
+                                {
+                                    @foreach (var category in GetAllCategories())
+                                    {
+                                        var value = GetSeriesValue(series, category);
+                                        var index = GetCategoryIndex(category);
+                                        var (x, y) = GetPoint(index, value);
+                                        var localSeries = series;
+                                        var localCategory = category;
+                                        var localValue = value;
+                                        
+                                        <circle cx="@x" cy="@y" r="10" 
+                                                fill="transparent"
+                                                stroke="transparent"
+                                                class="rz-spider-chart-hit-area"
+                                                @onmouseenter="@(args => OnMarkerMouseEnter((MouseEventArgs)args, localSeries, localCategory, localValue))"
+                                                @onmouseleave="OnMarkerMouseLeave" />
+                                    }
+                                }
+                            }
+                        </g>
+                    }
+
+                    <g class="rz-spider-chart-labels">
+                        @RenderLabels()
+                    </g>
+                </svg>
+            @if (Legend?.Visible == true)
+            {
+             <SpiderLegend TItem="TItem" />
+            }
+           }
+
+        </div>
+    </div>
+</CascadingValue>
+}
