@@ -66,7 +66,7 @@ public partial class CellEditor : ComponentBase, IDisposable
         if (Sheet.Selection.Cell != CellRef.Invalid)
         {
             var cell = Sheet.Cells[Sheet.Selection.Cell];
-            Sheet.Editor.StartEdit(cell.Address, Sheet.Editor.Mode == EditMode.Formula ? Sheet.Editor.Value : cell.GetValue(), EditMode.Cell);
+            Sheet.Editor.StartEdit(cell.Address, Sheet.Editor.Mode != EditMode.None ? Sheet.Editor.Value : cell.GetValue(), EditMode.Cell);
         }
     }
 
