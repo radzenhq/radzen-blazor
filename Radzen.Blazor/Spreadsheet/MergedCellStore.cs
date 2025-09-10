@@ -67,6 +67,11 @@ public class MergedCellStore(Sheet sheet)
     }
 
     /// <summary>
+    /// Gets the start cell of the merged range that contains the specified cell address, or returns the address itself if no merged range is found.
+    /// </summary>
+    public CellRef GetMergedRangeStartOrSelf(CellRef address) => GetMergedRangeOrSelf(address).Start;
+
+    /// <summary>
     /// Gets a list of merged ranges that overlap with the specified range.
     /// </summary>
     public List<RangeRef> GetOverlappingRanges(RangeRef range) => [.. data.Where(range.Overlaps)];
