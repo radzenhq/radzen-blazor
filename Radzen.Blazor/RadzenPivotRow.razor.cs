@@ -13,6 +13,8 @@ namespace Radzen.Blazor
         /// </summary>
         protected override void OnInitialized()
         {
+            base.OnInitialized();
+
             if (PivotGrid != null)
             {
                 PivotGrid.AddPivotRow(this);

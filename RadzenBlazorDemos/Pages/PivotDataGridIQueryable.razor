@@ -9,23 +9,32 @@
 <p>This example shows sales data from Northwind database grouped by Category/Product (rows) and Ship Country/Order Year (columns) with aggregated values.</p>
 
 <RadzenCard Variant="Variant.Outlined" class="rz-my-4">
-    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin:1rem">
         <RadzenSwitch @bind-Value=@showColumnsTotals Name="ShowColumnsTotals" TValue="bool" />
         <RadzenLabel Text="Show columns totals" Component="ShowColumnsTotals" />
         <RadzenSwitch @bind-Value=@showRowsTotals Name="ShowRowsTotals" TValue="bool" />
         <RadzenLabel Text="Show rows totals" Component="ShowRowsTotals" />
         <RadzenSwitch @bind-Value=@allowDrillDown Name="AllowDrillDown" TValue="bool" />
         <RadzenLabel Text="Allow drill-down" Component="AllowDrillDown" />
+        <RadzenSwitch @bind-Value=@allowSorting Name="AllowSorting" TValue="bool" />
+        <RadzenLabel Text="Allow sorting" Component="AllowSorting" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin:1rem">
+        <RadzenSwitch @bind-Value=@allowFiltering Name="AllowFiltering" TValue="bool" />
+        <RadzenLabel Text="Allow filtering" Component="AllowFiltering" />
+        <RadzenDropDown @bind-Value="@filterMode" Visible="@allowFiltering" TextProperty="Text" Name="FilterMode" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(FilterMode)).Cast<FilterMode>().Select(t => new { Text = $"{t}", Value = t }))" />
         <RadzenSwitch @bind-Value=@allowPaging Name="AllowPaging" TValue="bool" />
         <RadzenLabel Text="AllowPaging" Component="AllowPaging" />
-        <RadzenDropDown @bind-Value="@pagerPosition" Visible="@allowPaging" TextProperty="Text" Name="PagerPosition" ValueProperty="Value" 
-                Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
+        <RadzenDropDown @bind-Value="@pagerPosition" Visible="@allowPaging" TextProperty="Text" Name="PagerPosition" ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
     </RadzenStack>
 </RadzenCard>
 
 <RadzenPivotDataGrid Data=@salesData TItem="SalesData" Style="height:500px"
         AllowPaging="@allowPaging" PagerPosition="@pagerPosition" PageSize="20"
         ShowColumnsTotals="@showColumnsTotals" ShowRowsTotals="@showRowsTotals" AllowDrillDown="@allowDrillDown"
+        AllowSorting="@allowSorting" AllowFiltering="@allowFiltering" FilterMode="@filterMode"
         GridLines="Radzen.DataGridGridLines.Default" AllowAlternatingRows="true">
     <Columns>
         <RadzenPivotColumn TItem="SalesData" Property="OrderYear" Title="Order Year" Width="150px" />
@@ -72,6 +81,9 @@
     bool allowDrillDown;
     bool showColumnsTotals;
     bool showRowsTotals;
+    bool allowSorting = true;
+    bool allowFiltering = true;
+    FilterMode filterMode = FilterMode.Advanced;
     bool allowPaging = true;
     PagerPosition pagerPosition = PagerPosition.Bottom;
 

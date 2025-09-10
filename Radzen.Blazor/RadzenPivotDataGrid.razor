@@ -1,6 +1,8 @@
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Forms
 @using Radzen
+@using Radzen.Blazor.Rendering
+@using System.Collections
 @typeparam TItem
 @inherits PagedDataBoundComponent<TItem>
 
@@ -63,16 +65,61 @@
                                             Math.Min(CachedPivotRows.Select(r => r.RowHeaderCells.Count).Max(), pivotRows.Count) : pivotRows.Count;
                                         @for (int i = 0; i < rowHeaderCellsCount; i++)
                                         {
-                                            <th class="rz-pivot-row-header @GetFrozenRowHeaderClass(i)"
+                                            var row = pivotRows[i];
+                                            var isSortable = AllowSorting && row?.Sortable == true;
+                                            var isFilterable = AllowFiltering && row?.Filterable == true;
+                                            var sortOrder = row?.GetSortOrder();
+                                            var hasActiveFilter = row?.HasActiveFilter() == true;
+                                            
+                                            <th class="rz-pivot-row-header @GetFrozenRowHeaderClass(i) @(isSortable ? "rz-sortable-column" : "")"
                                                 rowspan="@(pivotColumns.Count + 1)"
                                                 style="inset-inline-start: @(i * 140)px">
-                                                @pivotRows[i].GetTitle()
+                                                <div class="rz-pivot-header-content-wrapper">
+                                                    <div @onclick="@(isSortable ? (() => OnRowSort(new EventArgs(), row)) : (Action)null)"
+                                                         @onkeydown="@(isSortable ? OnSortKeyPressed : (Func<KeyboardEventArgs, Task>)null)"
+                                                         class="rz-pivot-header-content @(isSortable ? "rz-sortable" : "")"
+                                                         tabindex="@(isSortable ? "0" : null)"
+                                                         role="@(isSortable ? "button" : null)"
+                                                         aria-label="@(isSortable ? $"Sort by {row.GetTitle()}" : null)">
+                                                        <span class="rz-pivot-header-text">@row.GetTitle()</span>
+                                                        @if (isSortable)
+                                                        {
+                                                            @if (sortOrder == SortOrder.Ascending)
+                                                            {
+                                                                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
+                                                            }
+                                                            else if (sortOrder == SortOrder.Descending)
+                                                            {
+                                                                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
+                                                            }
+                                                        }
+                                                    </div>
+                                                    @if (isFilterable)
+                                                    {
+                                                        <i @ref="FilterIconRef[row]" @onclick:stopPropagation="true" 
+                                                           @onmousedown="@(() => ToggleFilter(row))"
+                                                           class="@GetFilterIconCss(row)"
+                                                           title="Filter">
+                                                            @FilterIcon
+                                                        </i>
+                                                    }
+                                                </div>
                                             </th>
                                         }
                                     }
                                     @foreach (var cell in GetColumnHeaderCells(headerRow))
                                     {
-                                        <th class="rz-pivot-column-header" 
+                                        var column = GetColumnForHeaderCell(cell);
+                                        var isSortable = AllowSorting && column?.Sortable == true;
+                                        var isFilterable = AllowFiltering && column?.Filterable == true;
+                                        var sortOrder = column?.GetSortOrder();
+                                        var hasActiveFilter = column?.HasActiveFilter() == true;
+                                        
+                                        <th class="rz-pivot-column-header @(isSortable ? "rz-sortable-column" : "")" 
                                             colspan="@(cell.ColSpan * pivotAggregates.Count)" 
                                             rowspan="@cell.RowSpan"
                                             style="@(!string.IsNullOrEmpty(cell.Width) ? $"width: {cell.Width};" : "")">
@@ -86,7 +133,40 @@
                                             }
                                             else
                                             {
-                                                @cell.Title
+                                                <div class="rz-pivot-header-content-wrapper">
+                                                    <div @onclick="@(isSortable ? (() => OnColumnSort(new EventArgs(), column)) : (Action)null)"
+                                                         @onkeydown="@(isSortable ? OnSortKeyPressed : (Func<KeyboardEventArgs, Task>)null)"
+                                                         class="rz-pivot-header-content @(isSortable ? "rz-sortable" : "")"
+                                                         tabindex="@(isSortable ? "0" : null)"
+                                                         role="@(isSortable ? "button" : null)"
+                                                         aria-label="@(isSortable ? $"Sort by {cell.Title}" : null)">
+                                                        <span class="rz-pivot-header-text">@cell.Title</span>
+                                                        @if (isSortable)
+                                                        {
+                                                            @if (sortOrder == SortOrder.Ascending)
+                                                            {
+                                                                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-asc"></span>
+                                                            }
+                                                            else if (sortOrder == SortOrder.Descending)
+                                                            {
+                                                                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort rzi-sort-desc"></span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="notranslate rz-sortable-column-icon rzi-grid-sort rzi-sort"></span>
+                                                            }
+                                                        }
+                                                    </div>
+                                                    @if (isFilterable)
+                                                    {
+                                                        <i @ref="FilterIconRef[column]" @onclick:stopPropagation="true" 
+                                                           @onmousedown="@(() => ToggleFilter(column))"
+                                                           class="@GetFilterIconCss(column)"
+                                                           title="Filter">
+                                                            @FilterIcon
+                                                        </i>
+                                                    }
+                                                </div>
                                             }
                                         </th>
                                     }
@@ -160,4 +240,112 @@
                          PrevPageLabel="@PrevPageLabel" NextPageLabel="@NextPageLabel" />
         }
     </div>
+
+    <!-- Filter Popup -->
+    @if (AllowFiltering && _currentFilterField != null)
+    {
+        <Popup @ref="_filterPopup" id="@($"pivot-filter-{_currentFilterField.Property}")" class="rz-overlaypanel"
+               style="display:none;min-width:250px;" @onkeydown="OnFilterPopupKeyPressed">
+            <div class="rz-overlaypanel-content">
+                @if (_currentFilterField.FilterTemplate != null)
+                {
+                    @_currentFilterField.FilterTemplate(_currentFilterField)
+                }
+                else
+                {
+                    <form id="@($"pivot-filter-{_currentFilterField.Property}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
+                        @if (GetEffectiveFilterMode(_currentFilterField) == FilterMode.Advanced)
+                        {
+                            <span class="rz-grid-filter-label">@FilterText</span>
+                            <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", FilterOperatorAriaLabel + GetFilterOperatorText(_currentFilterField.GetSecondFilterOperator()) }})"
+                                           @onclick:preventDefault="true" Data="@(GetFilterOperators(_currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@_currentFilterField.GetFilterOperator()" Change="@(args => SetFilterOperator(_currentFilterField, (FilterOperator)args))" />
+                            @if (_currentFilterField.FilterValueTemplate != null)
+                            {
+                                @_currentFilterField.FilterValueTemplate(_currentFilterField)
+                            }
+                            else if (PropertyAccess.IsNullableEnum(GetFilterPropertyType(_currentFilterField)) || PropertyAccess.IsEnum(GetFilterPropertyType(_currentFilterField)))
+                            {
+                                <RadzenDropDown Disabled="@(!CanSetFilterValue(_currentFilterField))" AllowClear="false" AllowFiltering="false" TValue="@object"
+                                               Value="@_currentFilterField.GetFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(_currentFilterField)) ?? GetFilterPropertyType(_currentFilterField), EnumFilterTranslationFunc)"
+                                               Change="@(args => SetFilterValue(_currentFilterField, args))"
+                                               InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + FilterValueAriaLabel + _currentFilterField.GetFilterValue() }})" />
+                            }
+                            else if (PropertyAccess.IsNumeric(GetFilterPropertyType(_currentFilterField)))
+                            {
+                                @DrawNumericFilter(_currentFilterField, false)
+                            }
+                            else if (PropertyAccess.IsDate(GetFilterPropertyType(_currentFilterField)))
+                            {
+                                <RadzenDatePicker Disabled="@(!CanSetFilterValue(_currentFilterField))" TValue="@object" ShowTime="@ShowTimeForDateTimeFilter(_currentFilterField)" ShowTimeOkButton="true" DateFormat="@GetFilterDateFormat(_currentFilterField)"
+                                                 Value="@_currentFilterField.GetFilterValue()" Change="@(args => SetFilterValue(_currentFilterField, PropertyAccess.IsDateOnly(GetFilterPropertyType(_currentFilterField)) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value))" AllowInput="@AllowFilterDateInput"
+                                                 InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + FilterValueAriaLabel + _currentFilterField.GetFilterValue() }})" />
+                            }
+                            else if (GetFilterPropertyType(_currentFilterField) == typeof(bool) || GetFilterPropertyType(_currentFilterField) == typeof(bool?))
+                            {
+                                <RadzenCheckBox Disabled="@(!CanSetFilterValue(_currentFilterField))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + FilterValueAriaLabel + _currentFilterField.GetFilterValue() }})" TriState="true" TValue="@object" Value="@_currentFilterField.GetFilterValue()" Change="@(args => { SetFilterValue(_currentFilterField, null); SetFilterValue(_currentFilterField, args);  })" />
+                            }
+                            else
+                            {
+                                <RadzenTextBox Disabled="@(!CanSetFilterValue(_currentFilterField))" id="@($"pivot-filter-{_currentFilterField.Property}-sf")" aria-label="@(_currentFilterField.GetTitle() + FilterValueAriaLabel + _currentFilterField.GetFilterValue())" Value="@($"{_currentFilterField.GetFilterValue()}")" Change="@(args => SetFilterValue(_currentFilterField, args))" />
+                            }
+
+                            <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + LogicalOperatorAriaLabel + (_currentFilterField.GetLogicalFilterOperator() == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText) }})"
+                                           Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator?" Value="@_currentFilterField.GetLogicalFilterOperator()" Change="@(args => SetLogicalFilterOperator(_currentFilterField, (LogicalFilterOperator)args))" />
+
+                            <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SecondFilterOperatorAriaLabel + GetFilterOperatorText(_currentFilterField.GetSecondFilterOperator()) }})" @onclick:preventDefault="true" Data="@(GetFilterOperators(_currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@_currentFilterField.GetSecondFilterOperator()" Change="@(args => SetSecondFilterOperator(_currentFilterField, (FilterOperator)args))" />
+                            @if (_currentFilterField.SecondFilterValueTemplate != null)
+                            {
+                                @_currentFilterField.SecondFilterValueTemplate(_currentFilterField)
+                            }
+                            else if (PropertyAccess.IsNullableEnum(GetFilterPropertyType(_currentFilterField)) || PropertyAccess.IsEnum(GetFilterPropertyType(_currentFilterField)))
+                            {
+                                <RadzenDropDown Disabled="@(!CanSetFilterValue(_currentFilterField, false))" AllowClear="false" AllowFiltering="false" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + SecondFilterValueAriaLabel }})"
+                                               Value="@_currentFilterField.GetSecondFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(_currentFilterField)) ?? GetFilterPropertyType(_currentFilterField), EnumFilterTranslationFunc)"
+                                               Change="@(args => SetFilterValue(_currentFilterField, args, false))" />
+                            }
+                            else if (PropertyAccess.IsNumeric(GetFilterPropertyType(_currentFilterField)))
+                            {
+                                @DrawNumericFilter(_currentFilterField, false, false)
+                            }
+                            else if (PropertyAccess.IsDate(GetFilterPropertyType(_currentFilterField)))
+                            {
+                                <RadzenDatePicker Disabled="@(!CanSetFilterValue(_currentFilterField, false))" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + SecondFilterValueAriaLabel + _currentFilterField.GetSecondFilterValue() }})"
+                                                 ShowTime="@ShowTimeForDateTimeFilter(_currentFilterField)" ShowTimeOkButton="true" DateFormat="@GetFilterDateFormat(_currentFilterField)"
+                                                 Value="@_currentFilterField.GetSecondFilterValue()" Change="@(args => SetFilterValue(_currentFilterField, PropertyAccess.IsDateOnly(GetFilterPropertyType(_currentFilterField)) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value, false))" AllowInput="@AllowFilterDateInput" />
+                            }
+                            else if (GetFilterPropertyType(_currentFilterField) == typeof(bool) || GetFilterPropertyType(_currentFilterField) == typeof(bool?))
+                            {
+                                <RadzenCheckBox Disabled="@(!CanSetFilterValue(_currentFilterField, false))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + SecondFilterValueAriaLabel + _currentFilterField.GetSecondFilterValue() }})" TriState="true" TValue="@object" Value="@_currentFilterField.GetSecondFilterValue()" Change="@(args => { SetFilterValue(_currentFilterField, args, false);  })" />
+                            }
+                            else
+                            {
+                                <RadzenTextBox Disabled="@(!CanSetFilterValue(_currentFilterField, false))" id="@($"pivot-filter-{_currentFilterField.Property}-sf2")" aria-label="@(_currentFilterField.GetTitle() + SecondFilterValueAriaLabel + _currentFilterField.GetSecondFilterValue())" Value="@($"{_currentFilterField.GetSecondFilterValue()}")" Change="@(args => SetFilterValue(_currentFilterField, args, false))" />
+                            }
+                        }
+                        else
+                        {
+                            @if (_currentFilterField.FilterValueTemplate != null)
+                            {
+                                @_currentFilterField.FilterValueTemplate(_currentFilterField)
+                            }
+                            else
+                            {
+                                <RadzenProgressBarCircular Style="position:absolute;width:100%;" Visible="@_isLoadingFilterValues" Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+                                <RadzenListBox AllowVirtualization="@_currentFilterField.AllowCheckBoxListVirtualization" AllowClear="true" Multiple="true" Style="height: 300px"
+                                              TValue="IEnumerable" Value="@(_currentFilterField.GetFilterValue() as IEnumerable)" Change="@ListBoxChange"
+                                              Data="@_filterValues" Count="@_filterValuesCount" LoadData="@LoadFilterValues"
+                                              TextProperty="@_currentFilterField.TextProperty" ValueProperty="@_currentFilterField.ValueProperty"
+                                              FilterCaseSensitivity="@FilterCaseSensitivity" FilterOperator="@StringFilterOperator.Contains" />
+                            }
+                        }
+
+                        <div class="rz-grid-filter-buttons">
+                            <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="@ApplyText" class="rz-button-sm" />
+                            <RadzenButton ButtonStyle="ButtonStyle.Light" Text="@ClearText" Click="@ClearFilter" class="rz-button-sm" />
+                        </div>
+                    </form>
+                }
+            </div>
+        </Popup>
+    }
 } 

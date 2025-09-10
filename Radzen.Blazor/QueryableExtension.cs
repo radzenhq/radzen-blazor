@@ -1102,7 +1102,8 @@ namespace Radzen
             Func<CompositeFilterDescriptor, bool> canFilter = (c) =>
                (!(c.FilterValue == null || c.FilterValue as string == string.Empty)
                 || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
-                || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
+                || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty
+                || c.Filters.Any())
                && c.Property != null;
 
             if (filters.Where(canFilter).Any())

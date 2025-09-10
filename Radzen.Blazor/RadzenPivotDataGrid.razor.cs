@@ -8,10 +8,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Data.Common;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text.Json;
 using System.Threading.Tasks;
-using System.Linq.Dynamic.Core;
 
 namespace Radzen.Blazor
 {
@@ -112,6 +113,239 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AllowDrillDown { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether sorting is enabled.
+        /// </summary>
+        [Parameter]
+        public bool AllowSorting { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether filtering is enabled.
+        /// </summary>
+        [Parameter]
+        public bool AllowFiltering { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the filter mode.
+        /// </summary>
+        [Parameter]
+        public FilterMode FilterMode { get; set; } = FilterMode.Advanced;
+
+        /// <summary>
+        /// Gets or sets the filter case sensitivity.
+        /// </summary>
+        [Parameter]
+        public FilterCaseSensitivity FilterCaseSensitivity { get; set; } = FilterCaseSensitivity.Default;
+
+        /// <summary>
+        /// Gets or sets the logical filter operator.
+        /// </summary>
+        [Parameter]
+        public LogicalFilterOperator LogicalFilterOperator { get; set; } = LogicalFilterOperator.And;
+
+        /// <summary>
+        /// Gets or set the filter icon to use.
+        /// </summary>
+        [Parameter]
+        public string FilterIcon { get; set; } = "filter_alt";
+
+        /// <summary>
+        /// Gets or sets the filter text.
+        /// </summary>
+        [Parameter]
+        public string FilterText { get; set; } = "Filter";
+
+        /// <summary>
+        /// Gets or sets the enum filter select text.
+        /// </summary>
+        [Parameter]
+        public string EnumFilterSelectText { get; set; } = "Select...";
+
+        /// <summary>
+        /// Gets or sets the apply text.
+        /// </summary>
+        [Parameter]
+        public string ApplyText { get; set; } = "Apply";
+
+        /// <summary>
+        /// Gets or sets the clear text.
+        /// </summary>
+        [Parameter]
+        public string ClearText { get; set; } = "Clear";
+
+        /// <summary>
+        /// Gets or sets the filter operator aria label.
+        /// </summary>
+        [Parameter]
+        public string FilterOperatorAriaLabel { get; set; } = "Filter operator";
+
+        /// <summary>
+        /// Gets or sets the filter value aria label.
+        /// </summary>
+        [Parameter]
+        public string FilterValueAriaLabel { get; set; } = "Filter value";
+
+        /// <summary>
+        /// Gets or sets the second filter operator aria label.
+        /// </summary>
+        [Parameter]
+        public string SecondFilterOperatorAriaLabel { get; set; } = "Second filter operator";
+
+        /// <summary>
+        /// Gets or sets the second filter value aria label.
+        /// </summary>
+        [Parameter]
+        public string SecondFilterValueAriaLabel { get; set; } = "Second filter value";
+
+        /// <summary>
+        /// Gets or sets the logical operator aria label.
+        /// </summary>
+        [Parameter]
+        public string LogicalOperatorAriaLabel { get; set; } = "Logical operator";
+
+        /// <summary>
+        /// Gets or sets the and operator text.
+        /// </summary>
+        [Parameter]
+        public string AndOperatorText { get; set; } = "And";
+
+        /// <summary>
+        /// Gets or sets the or operator text.
+        /// </summary>
+        [Parameter]
+        public string OrOperatorText { get; set; } = "Or";
+
+        /// <summary>
+        /// Gets or sets the equals text.
+        /// </summary>
+        /// <value>The equals text.</value>
+        [Parameter]
+        public string EqualsText { get; set; } = "Equals";
+
+        /// <summary>
+        /// Gets or sets the not equals text.
+        /// </summary>
+        /// <value>The not equals text.</value>
+        [Parameter]
+        public string NotEqualsText { get; set; } = "Not equals";
+
+        /// <summary>
+        /// Gets or sets the less than text.
+        /// </summary>
+        /// <value>The less than text.</value>
+        [Parameter]
+        public string LessThanText { get; set; } = "Less than";
+
+        /// <summary>
+        /// Gets or sets the less than or equals text.
+        /// </summary>
+        /// <value>The less than or equals text.</value>
+        [Parameter]
+        public string LessThanOrEqualsText { get; set; } = "Less than or equals";
+
+        /// <summary>
+        /// Gets or sets the greater than text.
+        /// </summary>
+        /// <value>The greater than text.</value>
+        [Parameter]
+        public string GreaterThanText { get; set; } = "Greater than";
+
+        /// <summary>
+        /// Gets or sets the greater than or equals text.
+        /// </summary>
+        /// <value>The greater than or equals text.</value>
+        [Parameter]
+        public string GreaterThanOrEqualsText { get; set; } = "Greater than or equals";
+
+        /// <summary>
+        /// Gets or sets the ends with text.
+        /// </summary>
+        /// <value>The ends with text.</value>
+        [Parameter]
+        public string EndsWithText { get; set; } = "Ends with";
+
+        /// <summary>
+        /// Gets or sets the contains text.
+        /// </summary>
+        /// <value>The contains text.</value>
+        [Parameter]
+        public string ContainsText { get; set; } = "Contains";
+
+        /// <summary>
+        /// Gets or sets the does not contain text.
+        /// </summary>
+        /// <value>The does not contain text.</value>
+        [Parameter]
+        public string DoesNotContainText { get; set; } = "Does not contain";
+
+        /// <summary>
+        /// Gets or sets the in operator text.
+        /// </summary>
+        /// <value>The in operator text.</value>
+        [Parameter]
+        public string InText { get; set; } = "In";
+
+        /// <summary>
+        /// Gets or sets the not in operator text.
+        /// </summary>
+        /// <value>The not in operator text.</value>
+        [Parameter]
+        public string NotInText { get; set; } = "Not in";
+
+        /// <summary>
+        /// Gets or sets the starts with text.
+        /// </summary>
+        /// <value>The starts with text.</value>
+        [Parameter]
+        public string StartsWithText { get; set; } = "Starts with";
+
+        /// <summary>
+        /// Gets or sets the not null text.
+        /// </summary>
+        /// <value>The not null text.</value>
+        [Parameter]
+        public string IsNotNullText { get; set; } = "Is not null";
+
+        /// <summary>
+        /// Gets or sets the is null text.
+        /// </summary>
+        /// <value>The null text.</value>
+        [Parameter]
+        public string IsNullText { get; set; } = "Is null";
+
+        /// <summary>
+        /// Gets or sets the is empty text.
+        /// </summary>
+        /// <value>The empty text.</value>
+        [Parameter]
+        public string IsEmptyText { get; set; } = "Is empty";
+
+        /// <summary>
+        /// Gets or sets the is not empty text.
+        /// </summary>
+        /// <value>The not empty text.</value>
+        [Parameter]
+        public string IsNotEmptyText { get; set; } = "Is not empty";
+
+        /// <summary>
+        /// Gets or sets the custom filter operator text.
+        /// </summary>
+        /// <value>The custom filter operator text.</value>
+        [Parameter]
+        public string CustomText { get; set; } = "Custom";
+
+        /// <summary>
+        /// Gets or sets the enum filter translation function.
+        /// </summary>
+        [Parameter]
+        public Func<object, string> EnumFilterTranslationFunc { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether to allow filter date input.
+        /// </summary>
+        [Parameter]
+        public bool AllowFilterDateInput { get; set; } = true;
+
         readonly List<RadzenPivotColumn<TItem>> pivotColumns = new List<RadzenPivotColumn<TItem>>();
         
         readonly List<RadzenPivotRow<TItem>> pivotRows = new List<RadzenPivotRow<TItem>>();
@@ -125,6 +359,13 @@ namespace Radzen.Blazor
         private List<List<ColumnHeaderCell>> _columnHeaderRows;
         private List<PivotBodyRow> _cachedPivotRows;
         private List<List<object>> _cachedColumnLeaves;
+
+        // Filter functionality
+        private RadzenPivotField<TItem> _currentFilterField;
+        private Popup _filterPopup;
+        private IEnumerable _filterValues;
+        private int _filterValuesCount;
+        private bool _isLoadingFilterValues;
 
         /// <summary>
         /// Gets the cached column header rows.
@@ -1083,6 +1324,618 @@ namespace Radzen.Blazor
                         PathKey = null
                     });
                 }
+            }
+        }
+
+        /// <summary>
+        /// Handles column header click for sorting.
+        /// </summary>
+        internal async Task OnColumnSort(EventArgs args, RadzenPivotColumn<TItem> column)
+        {
+            if (AllowSorting && column.Sortable)
+            {
+                // Toggle sort order: None -> Ascending -> Descending -> None
+                if (column.GetSortOrder() == null)
+                {
+                    column.SetSortOrderInternal(SortOrder.Ascending);
+                }
+                else if (column.GetSortOrder() == SortOrder.Ascending)
+                {
+                    column.SetSortOrderInternal(SortOrder.Descending);
+                }
+                else
+                {
+                    column.SetSortOrderInternal(null);
+                }
+
+                // Clear other column sorts if single column sorting
+                if (column.GetSortOrder() != null)
+                {
+                    foreach (var col in pivotColumns.Where(c => c != column))
+                    {
+                        col.SetSortOrderInternal(null);
+                    }
+                }
+
+                await Reload();
+            }
+        }
+
+        /// <summary>
+        /// Handles row header click for sorting.
+        /// </summary>
+        internal async Task OnRowSort(EventArgs args, RadzenPivotRow<TItem> row)
+        {
+            if (AllowSorting && row.Sortable)
+            {
+                // Toggle sort order: None -> Ascending -> Descending -> None
+                if (row.GetSortOrder() == null)
+                {
+                    row.SetSortOrderInternal(SortOrder.Ascending);
+                }
+                else if (row.GetSortOrder() == SortOrder.Ascending)
+                {
+                    row.SetSortOrderInternal(SortOrder.Descending);
+                }
+                else
+                {
+                    row.SetSortOrderInternal(null);
+                }
+
+                // Clear other row sorts if single row sorting
+                if (row.GetSortOrder() != null)
+                {
+                    foreach (var r in pivotRows.Where(r => r != row))
+                    {
+                        r.SetSortOrderInternal(null);
+                    }
+                }
+
+                await Reload();
+            }
+        }
+
+        /// <summary>
+        /// Gets the column for a header cell.
+        /// </summary>
+        private RadzenPivotColumn<TItem> GetColumnForHeaderCell(ColumnHeaderCell cell)
+        {
+            if (cell.Level < pivotColumns.Count)
+            {
+                return pivotColumns[cell.Level];
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Handles keyboard events for sorting.
+        /// </summary>
+        private async Task OnSortKeyPressed(KeyboardEventArgs args)
+        {
+            var key = args.Code ?? args.Key;
+            if (key == "Enter" || key == " ")
+            {
+                // The actual sorting will be handled by the onclick event
+                // This is just for keyboard accessibility
+            }
+        }
+
+        /// <summary>
+        /// Gets the filter icon CSS class for a field.
+        /// </summary>
+        private string GetFilterIconCss(RadzenPivotField<TItem> field)
+        {
+            var additionalStyle = field?.HasActiveFilter() == true ? "rz-grid-filter-active" : "";
+            return $"notranslate rzi rz-grid-filter-icon {additionalStyle}";
+        }
+
+        /// <summary>
+        /// Gets or sets the current filter icon reference.
+        /// </summary>
+        private Dictionary<RadzenPivotField<TItem>, ElementReference> FilterIconRef = new();
+
+        /// <summary>
+        /// Toggles the filter popup for a field.
+        /// </summary>
+        private async Task ToggleFilter(RadzenPivotField<TItem> field)
+        {
+            if (field == null || !AllowFiltering || !field.Filterable)
+                return;
+
+            _currentFilterField = field;
+            StateHasChanged();
+
+            await Task.Yield();
+
+            if (_filterPopup != null)
+            {
+                await _filterPopup.ToggleAsync(FilterIconRef[field]);
+            }
+        }
+
+        /// <summary>
+        /// Gets the effective filter mode for a field.
+        /// </summary>
+        private FilterMode GetEffectiveFilterMode(RadzenPivotField<TItem> field)
+        {
+            return field.FilterMode ?? FilterMode;
+        }
+
+        /// <summary>
+        /// Gets the filter property type for a field.
+        /// </summary>
+        private Type GetFilterPropertyType(RadzenPivotField<TItem> field)
+        {
+            if (field == null || string.IsNullOrEmpty(field.Property))
+                return typeof(string);
+
+            return PropertyAccess.GetPropertyType(typeof(TItem), field.Property) ?? typeof(string);
+        }
+
+        /// <summary>
+        /// Gets the filter operators for a field.
+        /// </summary>
+        private IEnumerable<FilterOperator> GetFilterOperators(RadzenPivotField<TItem> field)
+        {
+            var propertyType = GetFilterPropertyType(field);
+            var operators = new List<FilterOperator>();
+
+            if (PropertyAccess.IsNumeric(propertyType))
+            {
+                operators.AddRange(new[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.LessThan, FilterOperator.LessThanOrEquals, FilterOperator.GreaterThan, FilterOperator.GreaterThanOrEquals, FilterOperator.IsNull, FilterOperator.IsNotNull });
+            }
+            else if (PropertyAccess.IsDate(propertyType))
+            {
+                operators.AddRange(new[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.LessThan, FilterOperator.LessThanOrEquals, FilterOperator.GreaterThan, FilterOperator.GreaterThanOrEquals, FilterOperator.IsNull, FilterOperator.IsNotNull });
+            }
+            else if (propertyType == typeof(bool) || propertyType == typeof(bool?))
+            {
+                operators.AddRange(new[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.IsNull, FilterOperator.IsNotNull });
+            }
+            else if (PropertyAccess.IsNullableEnum(propertyType) || PropertyAccess.IsEnum(propertyType))
+            {
+                operators.AddRange(new[] { FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.In, FilterOperator.NotIn, FilterOperator.IsNull, FilterOperator.IsNotNull });
+            }
+            else
+            {
+                operators.AddRange(new[] { FilterOperator.Contains, FilterOperator.DoesNotContain, FilterOperator.StartsWith, FilterOperator.EndsWith, FilterOperator.Equals, FilterOperator.NotEquals, FilterOperator.In, FilterOperator.NotIn, FilterOperator.IsNull, FilterOperator.IsNotNull });
+            }
+
+            return operators;
+        }
+
+        /// <summary>
+        /// Gets the filter operator text.
+        /// </summary>
+        public string GetFilterOperatorText(FilterOperator? filterOperator)
+        {
+            switch (filterOperator)
+            {
+                case FilterOperator.Custom:
+                    return CustomText;
+                case FilterOperator.Contains:
+                    return ContainsText;
+                case FilterOperator.DoesNotContain:
+                    return DoesNotContainText;
+                case FilterOperator.EndsWith:
+                    return EndsWithText;
+                case FilterOperator.Equals:
+                    return EqualsText;
+                case FilterOperator.GreaterThan:
+                    return GreaterThanText;
+                case FilterOperator.GreaterThanOrEquals:
+                    return GreaterThanOrEqualsText;
+                case FilterOperator.LessThan:
+                    return LessThanText;
+                case FilterOperator.LessThanOrEquals:
+                    return LessThanOrEqualsText;
+                case FilterOperator.StartsWith:
+                    return StartsWithText;
+                case FilterOperator.NotEquals:
+                    return NotEqualsText;
+                case FilterOperator.IsNull:
+                    return IsNullText;
+                case FilterOperator.IsEmpty:
+                    return IsEmptyText;
+                case FilterOperator.IsNotNull:
+                    return IsNotNullText;
+                case FilterOperator.IsNotEmpty:
+                    return IsNotEmptyText;
+                default:
+                    return $"{filterOperator}";
+            }
+        }
+
+        /// <summary>
+        /// Checks if a field can set filter value.
+        /// </summary>
+        private bool CanSetFilterValue(RadzenPivotField<TItem> field, bool isFirst = true)
+        {
+            if (field == null)
+                return false;
+
+            var filterOperator = isFirst ? field.GetFilterOperator() : field.GetSecondFilterOperator();
+            return filterOperator != FilterOperator.IsNull && filterOperator != FilterOperator.IsNotNull;
+        }
+
+        /// <summary>
+        /// Sets the filter operator for a field.
+        /// </summary>
+        private void SetFilterOperator(RadzenPivotField<TItem> field, FilterOperator filterOperator)
+        {
+            if (field != null)
+            {
+                field.SetFilterOperatorInternal(filterOperator);
+                StateHasChanged();
+            }
+        }
+
+        /// <summary>
+        /// Sets the second filter operator for a field.
+        /// </summary>
+        private void SetSecondFilterOperator(RadzenPivotField<TItem> field, FilterOperator filterOperator)
+        {
+            if (field != null)
+            {
+                field.SetSecondFilterOperatorInternal(filterOperator);
+                StateHasChanged();
+            }
+        }
+
+        /// <summary>
+        /// Sets the logical filter operator for a field.
+        /// </summary>
+        private void SetLogicalFilterOperator(RadzenPivotField<TItem> field, LogicalFilterOperator logicalOperator)
+        {
+            if (field != null)
+            {
+                field.SetLogicalFilterOperatorInternal(logicalOperator);
+                StateHasChanged();
+            }
+        }
+
+        /// <summary>
+        /// Sets the filter value for a field.
+        /// </summary>
+        private void SetFilterValue(RadzenPivotField<TItem> field, object value, bool isFirst = true)
+        {
+            if (field != null)
+            {
+                if (isFirst)
+                {
+                    field.SetFilterValueInternal(value);
+                }
+                else
+                {
+                    field.SetSecondFilterValueInternal(value);
+                }
+                StateHasChanged();
+            }
+        }
+
+        /// <summary>
+        /// Applies the current filter.
+        /// </summary>
+        private async Task ApplyFilter()
+        {
+            if (_currentFilterField != null)
+            {
+                // Trigger filter change event
+                await OnFilterChanged();
+                
+                if (_filterPopup != null)
+                {
+                    await _filterPopup.CloseAsync(FilterIconRef[_currentFilterField]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Clears the current filter.
+        /// </summary>
+        private async Task ClearFilter()
+        {
+            if (_currentFilterField != null)
+            {
+                _currentFilterField.ClearFilterValues();
+                StateHasChanged();
+                
+                // Trigger filter change event
+                await OnFilterChanged();
+                
+                if (_filterPopup != null)
+                {
+                    await _filterPopup.CloseAsync(FilterIconRef[_currentFilterField]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles filter popup key pressed events.
+        /// </summary>
+        private async Task OnFilterPopupKeyPressed(KeyboardEventArgs args)
+        {
+            var key = args.Code ?? args.Key;
+            if (key == "Escape")
+            {
+                if (_filterPopup != null && _currentFilterField != null)
+                {
+                    await _filterPopup.CloseAsync(FilterIconRef[_currentFilterField]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads filter values for checkbox list mode.
+        /// </summary>
+        private async Task LoadFilterValues(LoadDataArgs loadDataArgs)
+        {
+            _isLoadingFilterValues = true;
+            StateHasChanged();
+
+            await Task.Yield();
+
+            if (_currentFilterField != null && Data != null)
+            {
+                var property = _currentFilterField.GetFilterProperty();
+                var propertyType = GetFilterPropertyType(_currentFilterField);
+
+                var distinctValues = Data
+                    .AsQueryable()
+                    .Select(property)
+                    .Distinct();
+
+                _filterValues = distinctValues;
+                _filterValuesCount = distinctValues.Cast<object>().Count();
+            }
+
+            _isLoadingFilterValues = false;
+            StateHasChanged();
+        }
+
+        /// <summary>
+        /// Handles list box change for checkbox list mode.
+        /// </summary>
+        private void ListBoxChange(object value)
+        {
+            if (_currentFilterField != null)
+            {
+                SetFilterValue(_currentFilterField, value);
+            }
+        }
+
+        /// <summary>
+        /// Handles filter change events.
+        /// </summary>
+        private async Task OnFilterChanged()
+        {
+            await InvokeAsync(Reload);
+        }
+
+        /// <summary>
+        /// Draws numeric filter UI.
+        /// </summary>
+        private RenderFragment DrawNumericFilter(RadzenPivotField<TItem> field, bool force = true, bool isFirst = true)
+        {
+            return builder =>
+            {
+                var type = GetFilterPropertyType(field);
+
+                var numericType = typeof(RadzenNumeric<>).MakeGenericType(type);
+
+                builder.OpenComponent(0, numericType);
+
+                builder.AddAttribute(1, "Value", isFirst ? field.GetFilterValue() : field.GetSecondFilterValue());
+                builder.AddAttribute(2, "ShowUpDown", field.ShowUpDownForNumericFilter());
+                builder.AddAttribute(3, "Style", "width:100%");
+                builder.AddAttribute(4, "InputAttributes", new Dictionary<string, object>() { { "aria-label", field.Title + $"{(!isFirst ? " second " : " ")}filter value " + (isFirst ? field.GetFilterValue() : field.GetSecondFilterValue()) } });
+                builder.AddAttribute(5, "id", getFilterInputId(field) + (isFirst ? "f" : "s"));
+
+                Action<object> action;
+                if (force)
+                {
+                    action = args => InvokeAsync(() => OnFilterChanged());
+                }
+                else
+                {
+                    action = args => { field.SetFilterValue(args, isFirst); };
+                }
+
+                var eventCallbackGenericCreate = typeof(NumericFilterEventCallback).GetMethod("Create").MakeGenericMethod(type);
+                var eventCallbackGenericAction = typeof(NumericFilterEventCallback).GetMethod("Action").MakeGenericMethod(type);
+
+                builder.AddAttribute(3, "Change", eventCallbackGenericCreate.Invoke(this,
+                    new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action }) }));
+
+                builder.AddAttribute(4, "Disabled", !field.CanSetFilterValue());
+
+                builder.CloseComponent();
+            };
+        }
+
+        internal string getFilterInputId(RadzenPivotField<TItem> field)
+        {
+            return string.Join("", $"{UniqueID}".Split('.')) + field.GetFilterProperty();
+        }
+
+        internal class NumericFilterEventCallback
+        {
+            public static EventCallback<T> Create<T>(object receiver, Action<T> action)
+            {
+                return EventCallback.Factory.Create<T>(receiver, action);
+            }
+
+            public static Action<T> Action<T>(Action<object> action)
+            {
+                return args => action(args);
+            }
+        }
+
+        /// <summary>
+        /// Checks if field should show time for datetime filter.
+        /// </summary>
+        private bool ShowTimeForDateTimeFilter(RadzenPivotField<TItem> field)
+        {
+            var propertyType = GetFilterPropertyType(field);
+            return PropertyAccess.IsDate(propertyType) && !PropertyAccess.IsDateOnly(propertyType);
+        }
+
+        /// <summary>
+        /// Gets the filter date format for a field.
+        /// </summary>
+        private string GetFilterDateFormat(RadzenPivotField<TItem> field)
+        {
+            var propertyType = GetFilterPropertyType(field);
+            if (PropertyAccess.IsDateOnly(propertyType))
+                return "yyyy-MM-dd";
+            else if (PropertyAccess.IsDate(propertyType))
+                return "yyyy-MM-dd HH:mm";
+            else
+                return "yyyy-MM-dd";
+        }
+
+        /// <summary>
+        /// Gets the order by string for sorting.
+        /// </summary>
+        internal string GetOrderBy()
+        {
+            var sortExpressions = new List<string>();
+
+            // Add column sorts
+            foreach (var column in pivotColumns.Where(c => c.GetSortOrder() != null))
+            {
+                var property = column.Property;
+                if (!string.IsNullOrEmpty(property))
+                {
+                    var sortOrder = column.GetSortOrder() == SortOrder.Ascending ? "asc" : "desc";
+                    sortExpressions.Add($"{property} {sortOrder}");
+                }
+            }
+
+            // Add row sorts
+            foreach (var row in pivotRows.Where(r => r.GetSortOrder() != null))
+            {
+                var property = row.Property;
+                if (!string.IsNullOrEmpty(property))
+                {
+                    var sortOrder = row.GetSortOrder() == SortOrder.Ascending ? "asc" : "desc";
+                    sortExpressions.Add($"{property} {sortOrder}");
+                }
+            }
+
+            return string.Join(",", sortExpressions);
+        }
+
+        /// <summary>
+        /// Gets the filter string for filtering.
+        /// </summary>
+        internal List<CompositeFilterDescriptor> GetFilters()
+        {
+            var filterExpressions = new List<CompositeFilterDescriptor>();
+
+            // Add column filters
+            foreach (var column in pivotColumns.Where(c => c.HasActiveFilter()))
+            {
+                var property = column.GetFilterProperty();
+                if (!string.IsNullOrEmpty(property))
+                {
+                    var filterValue = column.GetFilterValue();
+                    var secondFilterValue = column.GetSecondFilterValue();
+                    var filterOperator = column.GetFilterOperator();
+                    var secondFilterOperator = column.GetSecondFilterOperator();
+                    var logicalOperator = column.GetLogicalFilterOperator();
+
+                    var innerFilterExpressions = new List<CompositeFilterDescriptor>();
+
+                    var filterExpression = BuildFilterExpression(property, filterValue, filterOperator);
+                    innerFilterExpressions.Add(filterExpression);
+
+                    if (secondFilterValue != null)
+                    {
+                        var secondFilterExpression = BuildFilterExpression(property, secondFilterValue, secondFilterOperator);
+                        innerFilterExpressions.Add(secondFilterExpression);
+                    }
+
+                    filterExpressions.Add(new CompositeFilterDescriptor() 
+                    { 
+                        Property = property,
+                        Filters = innerFilterExpressions,  
+                        LogicalFilterOperator = logicalOperator
+                    });
+                }
+            }
+
+            // Add row filters
+            foreach (var row in pivotRows.Where(r => r.HasActiveFilter()))
+            {
+                var property = row.GetFilterProperty();
+                if (!string.IsNullOrEmpty(property))
+                {
+                    var filterValue = row.GetFilterValue();
+                    var secondFilterValue = row.GetSecondFilterValue();
+                    var filterOperator = row.GetFilterOperator();
+                    var secondFilterOperator = row.GetSecondFilterOperator();
+                    var logicalOperator = row.GetLogicalFilterOperator();
+
+                    var innerFilterExpressions = new List<CompositeFilterDescriptor>();
+
+                    var filterExpression = BuildFilterExpression(property, filterValue, filterOperator);
+                    innerFilterExpressions.Add(filterExpression);
+
+                    if (secondFilterValue != null)
+                    {
+                        var secondFilterExpression = BuildFilterExpression(property, secondFilterValue, secondFilterOperator);
+                        innerFilterExpressions.Add(secondFilterExpression);
+                    }
+
+                    filterExpressions.Add(new CompositeFilterDescriptor()
+                    {
+                        Property = property,
+                        Filters = innerFilterExpressions,
+                        LogicalFilterOperator = logicalOperator
+                    });
+                }
+            }
+
+            return filterExpressions;
+        }
+
+        /// <summary>
+        /// Builds a filter expression for a property and value.
+        /// </summary>
+        private CompositeFilterDescriptor BuildFilterExpression(string property, object value, FilterOperator filterOperator)
+        {
+            return new CompositeFilterDescriptor
+            {
+                Property = property,
+                FilterValue = value,
+                FilterOperator = filterOperator
+            };
+        }
+
+        /// <summary>
+        /// Override the View property to apply sorting and filtering.
+        /// </summary>
+        public override IQueryable<TItem> View
+        {
+            get
+            {
+                var baseView = base.View;
+
+                var filters = GetFilters();
+                var orderBy = GetOrderBy();
+                
+                if (filters.Any())
+                {
+                    baseView = baseView.Where(filters, LogicalFilterOperator, FilterCaseSensitivity);
+                }
+
+                if (!string.IsNullOrEmpty(orderBy))
+                {
+                    baseView = baseView.OrderBy(orderBy);
+                }
+
+                return baseView;
             }
         }
     }
