@@ -627,14 +627,18 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnCellDoubleClickAsync(CellEventArgs args)
     {
-        var address = new CellRef(args.Row, args.Column);
-        var cell = Sheet?.Cells[address];
-
-        if (cell != null)
+        if (Sheet != null)
         {
-            await ScrollToAsync(address);
+            var address = Sheet.MergedCells.GetMergedRangeStartOrSelf(new CellRef(args.Row, args.Column));
 
-            Sheet?.Editor.StartEdit(address, cell.GetValue());
+            var cell = Sheet.Cells[address];
+
+            if (cell != null)
+            {
+                await ScrollToAsync(address);
+
+                Sheet.Editor.StartEdit(address, cell.GetValue());
+            }
         }
     }
 
