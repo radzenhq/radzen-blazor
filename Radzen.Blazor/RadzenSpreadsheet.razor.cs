@@ -274,9 +274,9 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
                 if (!valid && Sheet.Editor.Cell is not null)
                 {
-                    string error = string.Join("\n", Sheet.Editor.Cell.ValidationErrors);
+                    var error = string.Join(Environment.NewLine, Sheet.Editor.Cell.ValidationErrors);
 
-                    await JSRuntime.InvokeVoidAsync("alert", error);
+                    await DialogService.Alert(error, "Invalid Value");
 
                     command.Unexecute();
 
