@@ -37,12 +37,12 @@ public class CellMenuToggleEventArgs
     /// Gets or sets the element reference of the toggle button.
     /// </summary>
     public ElementReference Element { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the row index of the cell.
     /// </summary>
     public int Row { get; set; }
-    
+
     /// <summary>
     /// Gets or sets the column index of the cell.
     /// </summary>
@@ -89,7 +89,7 @@ public partial class CellView : CellBase, IDisposable
 
     private Cell cell = default!;
 
-    private bool ShowCellMenu()
+    private bool ShouldShowCellMenu()
     {
         if (Sheet?.Tables != null)
         {
@@ -98,7 +98,10 @@ public partial class CellView : CellBase, IDisposable
                 if (Column >= table.Range.Start.Column &&
                     Column <= table.Range.End.Column)
                 {
-                    return Row == table.Start.Row && table.ShowFilterButton;
+                    if (Row == table.Start.Row && table.ShowFilterButton)
+                    {
+                        return ShouldShowMenuForMergedCell();
+                    }
                 }
             }
         }
@@ -107,11 +110,37 @@ public partial class CellView : CellBase, IDisposable
         {
             if (Column >= Sheet.AutoFilter.Range.Start.Column && Column <= Sheet.AutoFilter.Range.End.Column)
             {
-                return Row == Sheet.AutoFilter.Start.Row;
+                if (Row == Sheet.AutoFilter.Start.Row)
+                {
+                    return ShouldShowMenuForMergedCell();
+                }
             }
         }
 
         return false;
+    }
+
+    private bool ShouldShowMenuForMergedCell()
+    {
+        // Check if the current cell is part of a merged range
+        var mergedRange = Sheet.MergedCells.GetMergedRange(new CellRef(Row, Column));
+
+        if (mergedRange == RangeRef.Invalid)
+        {
+            // Not a merged cell, show the menu
+            return true;
+        }
+
+        // If the merged range overlaps with frozen columns, we need to check which split region this cell belongs to
+        if (mergedRange.Start.Column < Sheet.Columns.Frozen && mergedRange.End.Column >= Sheet.Columns.Frozen)
+        {
+            // The merged range is split horizontally by frozen columns
+            // Only show the menu for the region that is after the frozen columns
+            return Column >= Sheet.Columns.Frozen;
+        }
+
+        // If the merged range doesn't overlap with frozen columns, show the menu
+        return true;
     }
 
     /// <inheritdoc/>
@@ -162,7 +191,7 @@ public partial class CellView : CellBase, IDisposable
                 cell.Changed += OnCellChanged;
             }
 
-            showCellMenu = ShowCellMenu();
+            showCellMenu = ShouldShowCellMenu();
         }
 
         if (Sheet != null)
@@ -179,7 +208,7 @@ public partial class CellView : CellBase, IDisposable
 
     private void OnAutoFilterChanged()
     {
-        var show = ShowCellMenu();
+        var show = ShouldShowCellMenu();
         if (showCellMenu != show)
         {
             showCellMenu = show;
@@ -204,7 +233,7 @@ public partial class CellView : CellBase, IDisposable
         {
             cell.Changed -= OnCellChanged;
         }
-        
+
         if (Sheet != null)
         {
             Sheet.AutoFilterChanged -= OnAutoFilterChanged;
