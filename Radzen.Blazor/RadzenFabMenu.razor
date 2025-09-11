@@ -1,0 +1,27 @@
+@inherits RadzenComponent
+
+<div class="rz-fabmenu" @ref="Element" @onclick:stopPropagation style="@Style">
+    <RadzenToggleButton @ref="FabButton"
+                        Value="@IsOpen"
+                        ValueChanged="OnToggleChanged"
+                        Click="OnFabClick"
+                        Icon="@Icon"
+                        ToggleIcon="@ToggleIcon"
+                        ButtonStyle="@ButtonStyle"
+                        Size="@Size"
+                        Variant="@Variant"
+                        Shade="@Shade"
+                        Disabled="@Disabled"
+                        class="@ButtonClass"
+                        style="@ButtonStyleCss">
+    </RadzenToggleButton>
+
+    @if (IsOpen)
+    {
+        <CascadingValue Value="this">
+            <RadzenStack Orientation="@GetStackOrientation()" AlignItems="@GetStackAlignment()" Gap="@Gap" class="@GetStackClasses()" style="@ComputedItemsStyle">
+                @ChildContent
+            </RadzenStack>
+        </CascadingValue>
+    }
+</div> 
