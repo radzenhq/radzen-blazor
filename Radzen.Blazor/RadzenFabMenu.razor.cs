@@ -62,6 +62,13 @@ namespace Radzen.Blazor
 		[Parameter]
 		public ButtonStyle ButtonStyle { get; set; } = ButtonStyle.Primary;
 
+        /// <summary>
+        /// Gets or sets the button toggled style.
+        /// </summary>
+        /// <value>The button toggled style.</value>
+        [Parameter]
+        public ButtonStyle ToggleButtonStyle { get; set; } = ButtonStyle.Base;
+
 		/// <summary>
 		/// Gets or sets the size.
 		/// </summary>
@@ -82,6 +89,13 @@ namespace Radzen.Blazor
 		/// <value>The shade.</value>
 		[Parameter]
 		public Shade Shade { get; set; } = Shade.Default;
+
+		/// <summary>
+        /// Gets or sets the button toggled shade.
+        /// </summary>
+        /// <value>The button toggled shade.</value>
+        [Parameter]
+        public Shade ToggleShade { get; set; } = Shade.Default;
 
 		/// <summary>
 		/// Gets or sets a value indicating whether this <see cref="RadzenFabMenu"/> is disabled.

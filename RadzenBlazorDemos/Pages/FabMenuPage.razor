@@ -1,7 +1,7 @@
 @page "/fab-menu"
 <style>
     .example-tabs .rz-layout {
-        height: 300px;
+        height: 350px;
     }
 </style>
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
@@ -32,7 +32,16 @@
     Expand direction
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    
+    The <code>Direction</code> property of the RadzenFabMenu component controls the direction in which the menu items expand from the FAB. This property accepts values from the <code>FabMenuDirection</code> enum and determines both the visual layout and positioning of the menu items. By default, the menu items expand upward arranged vertically (bottom to top) and right-aligned with the FAB.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.Div" class="rz-mb-8">
+Choose appropriate direction:
+  <ul>
+    <li><strong>Top</strong> - Most common, good for primary actions</li>
+    <li><strong>Bottom</strong> - Good when FAB is at the top of the screen</li>
+    <li><strong>Left/Right</strong> - Good for horizontal layouts or when space is limited vertically</li>
+    <li><strong>Start/End</strong> - Use for international applications with <strong>RTL support</strong></li>
+  </ul>
 </RadzenText>
 <RadzenExample ComponentName="fabmenu" Example="FabMenuDirection" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFabMenu.razor.cs">
     <FabMenuDirection />
