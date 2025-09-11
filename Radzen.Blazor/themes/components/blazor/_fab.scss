@@ -4,7 +4,7 @@ $fab-inset-inline-start: auto !default;
 $fab-inset-inline-end: 1.5rem !default;
 $fab-zindex: 1000 !default;
 $fab-border-radius: var(--rz-border-radius-4) !default;
-$fab-active-border-radius: var(--rz-border-radius-10) !default;
+$fab-active-border-radius: calc(2 * var(--rz-border-radius)) !default;
 $fab-shadow: var(--rz-shadow-4) !default;
 $fab-hover-shadow: var(--rz-shadow-6) !default;
 $fab-active-shadow: var(--rz-shadow-6) !default;
