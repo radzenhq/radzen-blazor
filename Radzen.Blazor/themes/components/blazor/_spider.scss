@@ -1,0 +1,76 @@
+// Spider Chart Variables
+$rz-spider-label-font-size: 0.875rem !default;
+$rz-spider-label-color: var(--rz-text-color) !default;
+
+.rz-spider-chart {
+    position: relative;
+    display: block;
+    height: 100%;
+    width: 100%;
+
+    svg {
+        overflow: visible;
+    }
+
+    .rz-spider-chart-label {
+        font-size: $rz-spider-label-font-size;
+        fill: $rz-spider-label-color;
+        user-select: none;
+    }
+
+    .rz-spider-chart-legend {
+        background: var(--rz-base-background-color);
+        border-left: 1px solid var(--rz-border-lighter);
+        
+        .rz-spider-chart-legend-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--rz-text-title-color);
+        }
+
+        .rz-spider-chart-legend-item {
+            transition: opacity 0.2s;
+            
+            &:hover {
+                opacity: 0.8;
+            }
+
+            &.rz-state-inactive {
+                opacity: 0.5;
+            }
+        }
+    }
+
+    @for $i from 0 through 50 {
+        .rz-series-#{$i} {
+            fill: var(--rz-series-#{$i});
+            stroke: var(--rz-series-#{$i});
+            background-color: var(--rz-series-#{$i});
+            color: var(--rz-series-#{$i});
+        }
+    }
+    &.rz-animate {
+        path {
+            stroke-dasharray: 1000;
+            stroke-dashoffset: 1000;
+            animation: spider-draw 1s ease-out forwards;
+        }
+
+        circle {
+            opacity: 0;
+            animation: spider-fade-in 0.3s ease-out 0.8s forwards;
+        }
+    }
+}
+
+@keyframes spider-draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes spider-fade-in {
+    to {
+        opacity: 1;
+    }
+}

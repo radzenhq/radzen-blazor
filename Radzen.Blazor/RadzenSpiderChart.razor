@@ -1,0 +1,206 @@
+@typeparam TItem
+@inherits RadzenComponent
+
+<div @ref="@Element" class="@GetComponentCssClass() rz-scheme-@(ColorScheme.ToString().ToLower()) @GetCssClass()" style="@Style" @attributes="Attributes">
+    @if (Width != null && Height != null && Series?.Any() == true)
+    {
+        <div style="display: flex; height: 100%;" @onmouseleave="@OnChartMouseLeave">
+            <svg style="flex: 1; overflow: visible;" viewBox="0 0 @Width @Height">
+                <g class="rz-spider-chart-grid">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        @if (GridShape == SpiderChartGridShape.Circular)
+                        {
+                            var centerX = Width.Value / 2;
+                            var centerY = Height.Value / 2;
+                            var radius = Math.Min(centerX, centerY) * 0.8 * (i / 5.0);
+                            <circle cx="@centerX" cy="@centerY" r="@radius"
+                                    fill="none" 
+                                    stroke="#e0e0e0" 
+                                    stroke-width="1" 
+                                    opacity="0.7" />
+                        }
+                        else
+                        {
+                            <path d="@GetGridPath(i / 5.0)" 
+                                  fill="none" 
+                                  stroke="#e0e0e0" 
+                                  stroke-width="1" 
+                                  opacity="0.7" />
+                        }
+                    }
+                    
+                    @for (int i = 0; i < Categories.Count; i++)
+                    {
+                        var (x1, y1) = GetPoint(i, MinValue);
+                        var (x2, y2) = GetPoint(i, MaxValue);
+                        <line x1="@x1" y1="@y1" x2="@x2" y2="@y2" 
+                              stroke="#999" 
+                              stroke-width="1" 
+                              opacity="0.5" />
+                    }
+                </g>
+
+                <g class="rz-spider-chart-areas">
+                    @foreach (var series in Series.Where(s => !HiddenSeries.Contains(s.Name)))
+                    {
+                        var path = GetSeriesPath(series);
+                        var isHovered = HoveredSeries == series;
+                        var shouldShow = !IsLegendHover || HoveredSeries == null || HoveredSeries == series;
+                        var localSeries = series;
+                        
+                        <path d="@path" 
+                              class="rz-series-@(series.ColorIndex)"
+                              fill="none"
+                              stroke-width="@(isHovered && IsLegendHover ? 12 : 8)"
+                              stroke-linejoin="round"
+                              stroke-linecap="round"
+                              opacity="@(shouldShow ? (isHovered && IsLegendHover ? "1" : (IsLegendHover ? "0.4" : "0.5")) : "0")"
+                              @onclick="@(args => OnSeriesClick(localSeries, args))"
+                              style="cursor: pointer; transition: stroke-width 0.2s, opacity 0.2s;"
+                              @onmouseenter="@(args => { OnAreaMouseEnter((MouseEventArgs)args, localSeries); })"
+                              @onmouseleave="@OnAreaMouseLeave" />
+                    }
+                </g>
+
+                <g class="rz-spider-chart-markers">
+                    @foreach (var series in Series.Where(s => !HiddenSeries.Contains(s.Name)).OrderBy(s => s == HoveredSeries ? 1 : 0))
+                    {
+                        var isHovered = series == HoveredSeries;
+                        var shouldShow = !IsLegendHover || HoveredSeries == null || HoveredSeries == series;
+                        @for (int i = 0; i < Categories.Count; i++)
+                        {
+                            var category = Categories[i];
+                            var value = series.Data.ContainsKey(category) ? series.Data[category] : 0;
+                            var (x, y) = GetPoint(i, value);
+                            var localSeries = series;
+                            var localCategory = category;
+                            var localValue = value;
+                            
+                            <circle cx="@x" cy="@y" r="@(isHovered && IsLegendHover ? 5 : 4)" 
+                                    class="rz-series-@(series.ColorIndex)"
+                                    stroke="white"
+                                    stroke-width="2"
+                                    opacity="@(shouldShow ? (IsLegendHover ? "1" : "1") : "0")"
+                                    style="cursor: pointer; transition: r 0.2s, opacity 0.2s; pointer-events: all;"
+                                    @onmouseenter="@(args => { OnMarkerMouseEnter((MouseEventArgs)args, localSeries, localCategory, localValue); })"
+                                    @onmouseleave="@(OnMarkerMouseLeave)" />
+                        }
+                    }
+                </g>
+
+                <g class="rz-spider-chart-labels">
+                    @for (int i = 0; i < Categories.Count; i++)
+                    {
+                        var (x, y) = GetLabelPoint(i);
+                        var category = Categories[i];
+                        var anchor = GetLabelAnchor(i);
+                        var baseline = GetLabelBaseline(i);
+                        var xStr = x.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                        var yStr = y.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                        
+                        @((MarkupString)$"<text x=\"{xStr}\" y=\"{yStr}\" text-anchor=\"{anchor}\" dominant-baseline=\"{baseline}\" class=\"rz-spider-chart-label\" style=\"fill: var(--rz-text-color); pointer-events: none;\">{category}</text>")
+                    }
+                </g>
+            </svg>
+
+            @if (ShowLegend && Series?.Any() == true)
+            {
+                <div style="display: flex; gap: 16px; margin-left: 16px;">
+                    <div class="rz-spider-chart-info" style="width: 180px; display: flex; flex-direction: column;">
+                        @if (Series.Count > 1)
+                        {
+                            <div style="height: 31px; padding: 8px 12px 4px 12px; display: flex; align-items: center;">
+                                <div style="font-weight: 600; font-size: 13px; color: var(--rz-text-title-color);">Details</div>
+                            </div>
+                        }
+                        @if (Series.Count > 2)
+                        {
+                            <div style="height: 32px; padding: 0 12px;"></div>
+                        }
+                        <div style="flex: 1; padding: 0 12px 12px 12px; overflow-y: auto;">
+                            @if (HoveredSeries != null)
+                            {
+                                <div style="opacity: 1; transition: opacity 0.3s;">
+                                    <div class="rz-series-@(HoveredSeries.ColorIndex)" style="font-weight: 600; font-size: 14px; margin-bottom: 12px; color: inherit;">
+                                        @(HoveredSeries.Name ?? "Series")
+                                    </div>
+                                    @foreach (var category in Categories)
+                                    {
+                                        var value = HoveredSeries.Data.ContainsKey(category) ? HoveredSeries.Data[category] : 0;
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 12px;">
+                                            <span style="color: var(--rz-text-secondary-color);">@category</span>
+                                            <span style="font-weight: 500;">@FormatValue(value)</span>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div style="opacity: 0.5; font-size: 12px; color: var(--rz-text-secondary-color); text-align: center; padding: 20px 0;">
+                                    Hover over a series to see details
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="rz-chart-legend" style="width: 160px; padding: 8px 12px; display: flex; flex-direction: column; gap: 4px;">
+                        @if (Series.Count > 1)
+                    {
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div style="font-weight: 600; font-size: 13px;">@LegendTitleText</div>
+                            <div style="display: flex; gap: 2px;">
+                                <button type="button" @onclick="SelectAllSeries" 
+                                        class="rz-button rz-button-xs rz-variant-text"
+                                        style="padding: 1px 4px; font-size: 10px; min-width: unset;">
+                                    All
+                                </button>
+                                <button type="button" @onclick="DeselectAllSeries" 
+                                        class="rz-button rz-button-xs rz-variant-text"
+                                        style="padding: 1px 4px; font-size: 10px; min-width: unset;">
+                                    None
+                                </button>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (Series.Count > 2)
+                    {
+                        <input type="text" placeholder="Filter..." 
+                               value="@legendFilter"
+                               @oninput="@((ChangeEventArgs e) => { legendFilter = e.Value?.ToString() ?? ""; StateHasChanged(); })"
+                               class="rz-textbox" style="width: 100%; font-size: 11px; padding: 2px 4px; height: 24px;" />
+                    }
+                    
+                    <div style="max-height: 400px; overflow-y: auto; overflow-x: hidden;">
+                        @{
+                            var filteredSeries = string.IsNullOrWhiteSpace(legendFilter) 
+                                ? Series 
+                                : Series.Where(s => s.Name.Contains(legendFilter, StringComparison.OrdinalIgnoreCase)).ToList();
+                        }
+                        @foreach (var series in filteredSeries)
+                        {
+                            var isHidden = HiddenSeries.Contains(series.Name);
+                            var isHovered = HoveredSeries == series;
+                            var shouldShow = HoveredSeries == null || HoveredSeries == series;
+                            var localSeries = series;
+                            <div class="rz-chart-legend-item" 
+                                 style="cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 3px 2px; border-radius: 2px; user-select: none; opacity: @(isHidden ? "0.3" : (shouldShow ? "1" : "0.2")); transition: opacity 0.2s;"
+                                 @onmouseenter="@(() => OnLegendItemMouseEnter(localSeries, isHidden))"
+                                 @onmouseleave="@(OnLegendItemMouseLeave)">
+                                <input type="checkbox" checked="@(!isHidden)" 
+                                       @onchange="@((ChangeEventArgs e) => { OnLegendCheckboxChange(localSeries, (bool)(e.Value ?? true)); })"
+                                       @onclick:stopPropagation="true"
+                                       style="cursor: pointer; margin: 0; width: 12px; height: 12px;" />
+                                <div class="rz-series-@(localSeries.ColorIndex)" style="width: 12px; height: 12px; border-radius: 2px;"></div>
+                                <span @onclick="@(() => OnLegendClick(localSeries))" 
+                                      style="flex: 1; font-size: 12px; line-height: 1.2;">@localSeries.Name</span>
+                            </div>
+                        }
+                    </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
