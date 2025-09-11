@@ -128,7 +128,16 @@
                                                 <div class="rz-pivot-drill-down-header">
                                                     <span @onclick="@(() => ToggleColumnDrillDown(cell.PathKey))"
                                                         class="notranslate rz-tree-toggler rzi rzi-caret-@(cell.IsCollapsed ? "right" : "down")" style="margin-inline-start:0"></span>
-                                                    <span class="rz-pivot-header-text">@cell.Title</span>
+                                                    <span class="rz-pivot-header-text">
+                                                    @if (cell.HeaderTemplate != null)
+                                                    {
+                                                        @cell.HeaderTemplate(cell.Group)
+                                                    }
+                                                    else
+                                                    {
+                                                        @cell.Title
+                                                    }
+                                                    </span>
                                                 </div>
                                             }
                                             else
@@ -140,7 +149,16 @@
                                                          tabindex="@(isSortable ? "0" : null)"
                                                          role="@(isSortable ? "button" : null)"
                                                          aria-label="@(isSortable ? $"Sort by {cell.Title}" : null)">
-                                                        <span class="rz-pivot-header-text">@cell.Title</span>
+                                                        <span class="rz-pivot-header-text">
+                                                        @if (cell.HeaderTemplate != null)
+                                                        {
+                                                            @cell.HeaderTemplate(cell.Group)
+                                                        }
+                                                        else
+                                                        {
+                                                            @cell.Title
+                                                        }
+                                                        </span>
                                                         @if (isSortable)
                                                         {
                                                             @if (sortOrder == SortOrder.Ascending)
@@ -177,7 +195,14 @@
                                             <th class="rz-pivot-total-header @GetFrozenTotalHeaderClass()" 
                                                 rowspan="@(pivotColumns.Count + 1)"
                                                 style="inset-inline-end: @((pivotAggregates.Count - 1 - pivotAggregates.IndexOf(aggregate)) * 120)px">
-                                                @aggregate.GetTitle()
+                                                @if (aggregate.HeaderTemplate != null)
+                                                {
+                                                    @aggregate.HeaderTemplate
+                                                }
+                                                else
+                                                {
+                                                    @aggregate.GetTitle()
+                                                }
                                             </th>
                                         }
                                     }
@@ -189,7 +214,14 @@
                                     foreach (var aggregate in pivotAggregates)
                                     {
                                         <th class="rz-pivot-aggregate-header">
-                                            @aggregate.GetTitle()
+                                            @if (aggregate.HeaderTemplate != null)
+                                            {
+                                                @aggregate.HeaderTemplate
+                                            }
+                                            else
+                                            {
+                                                @aggregate.GetTitle()
+                                            }
                                         </th>
                                     }
                                 }

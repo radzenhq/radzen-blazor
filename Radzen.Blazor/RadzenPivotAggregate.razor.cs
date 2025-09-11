@@ -53,6 +53,13 @@ namespace Radzen.Blazor
         public RenderFragment<RadzenPivotAggreateContext<TItem>> RowTotalTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the header template.
+        /// </summary>
+        /// <value>The header template.</value>
+        [Parameter]
+        public RenderFragment HeaderTemplate { get; set; }
+
+        /// <summary>
         /// Formats a value using the FormatString and FormatProvider.
         /// </summary>
         public string FormatValue(object value)

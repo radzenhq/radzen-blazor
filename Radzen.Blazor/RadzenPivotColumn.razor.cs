@@ -35,5 +35,12 @@ namespace Radzen.Blazor
         {
             PivotGrid?.RemovePivotColumn(this);
         }
+
+        /// <summary>
+        /// Gets or sets the header template.
+        /// </summary>
+        /// <value>The header template.</value>
+        [Parameter]
+        public RenderFragment<GroupResult> HeaderTemplate { get; set; }
     }
 } 

@@ -37,8 +37,16 @@
         AllowSorting="@allowSorting" AllowFiltering="@allowFiltering" FilterMode="@filterMode"
         GridLines="Radzen.DataGridGridLines.Default" AllowAlternatingRows="true">
     <Columns>
-        <RadzenPivotColumn TItem="SalesData" Property="OrderYear" Title="Order Year" Width="150px" />
-        <RadzenPivotColumn TItem="SalesData" Property="ShipCountry" Title="Ship Country" Width="150px" />
+        <RadzenPivotColumn TItem="SalesData" Property="OrderYear" Title="Order Year" Width="150px">
+            <HeaderTemplate>
+                Year: @context.Key
+            </HeaderTemplate>
+        </RadzenPivotColumn>
+        <RadzenPivotColumn TItem="SalesData" Property="ShipCountry" Title="Ship Country" Width="150px">
+            <HeaderTemplate>
+                Country: @context.Key
+            </HeaderTemplate>
+        </RadzenPivotColumn>
     </Columns>
     <Rows>
         <RadzenPivotRow TItem="SalesData" Property="CategoryName" Title="Product Category" />
@@ -49,6 +57,9 @@
                             Aggregate="AggregateFunction.Sum" FormatString="{0:C}" />
         <RadzenPivotAggregate TItem="SalesData" Property="Quantity" Title="Quantity Sold"
                             Aggregate="AggregateFunction.Sum">
+            <HeaderTemplate>
+                Total Quantity
+            </HeaderTemplate>
             <Template>
                 Qty: @(context ?? 0)
             </Template>

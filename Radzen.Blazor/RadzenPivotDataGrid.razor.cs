@@ -443,7 +443,9 @@ namespace Radzen.Blazor
                     Level = level + 1,
                     Width = col.Width,
                     IsCollapsed = isCollapsed,
-                    PathKey = pathKey
+                    PathKey = pathKey,
+                    HeaderTemplate = col.HeaderTemplate,
+                    Group = group
                 };
 
                 if (!isCollapsed)
@@ -476,7 +478,9 @@ namespace Radzen.Blazor
                     Width = node.Width,
                     IsCollapsed = node.IsCollapsed,
                     PathKey = node.PathKey,
-                    HasChildren = level < maxLevel
+                    HasChildren = level < maxLevel,
+                    HeaderTemplate = node.HeaderTemplate,
+                    Group = node.Group
                 };
 
                 if (node.Children.Count == 0)
@@ -1253,6 +1257,8 @@ namespace Radzen.Blazor
             public bool IsCollapsed { get; set; }
             public string PathKey { get; set; }
             public bool HasChildren { get; set; }
+            public RenderFragment<GroupResult> HeaderTemplate { get; set; }
+            public GroupResult Group { get; set; }
         }
 
         private class ColumnHeaderNode
@@ -1267,6 +1273,8 @@ namespace Radzen.Blazor
             public bool IsCollapsed { get; set; }
             public string PathKey { get; set; }
             public bool HasChildren { get; set; }
+            public RenderFragment<GroupResult> HeaderTemplate { get; set; }
+            public GroupResult Group { get; set; }
         }
 
         private class RowHeaderNode
