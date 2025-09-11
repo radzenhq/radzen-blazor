@@ -441,5 +441,9 @@ $form-field-filled-hover-background-color: var(--rz-base-700) !default;
 $skeleton-background-color: var(--rz-base-600) !default;
 $skeleton-animation-color: var(--rz-base-500) !default;
 
+// FAB
+$fab-border-radius: 0 !default;
+$fab-active-border-radius: 0 !default;
+
 @import 'fonts';
 @import 'components';

@@ -1,0 +1,134 @@
+$fab-inset-block-start: auto !default;
+$fab-inset-block-end: 1.5rem !default;
+$fab-inset-inline-start: auto !default;
+$fab-inset-inline-end: 1.5rem !default;
+$fab-zindex: 1000 !default;
+$fab-border-radius: var(--rz-border-radius-4) !default;
+$fab-active-border-radius: var(--rz-border-radius-10) !default;
+$fab-shadow: var(--rz-shadow-4) !default;
+$fab-hover-shadow: var(--rz-shadow-6) !default;
+$fabmenu-offset: 0.5rem !default;
+
+/* RadzenFab */
+.rz-fab {
+  position: absolute;
+  inset-block-start: var(--rz-fab-inset-block-start);
+  inset-block-end: var(--rz-fab-inset-block-end);
+  inset-inline-start: var(--rz-fab-inset-inline-start);
+  inset-inline-end: var(--rz-fab-inset-inline-end);
+  z-index: var(--rz-fab-zindex);
+  border-radius: var(--rz-fab-border-radius);
+  box-shadow: var(--rz-fab-shadow);
+  transition: transform var(--rz-transition); 
+
+  &:not(.rz-state-disabled) {
+    &:not(:active) {
+      @include rz-hover-state {
+        box-shadow: var(--rz-fab-hover-shadow);
+      }
+    }
+
+    &:active {
+      transform: scale(1.1);
+      transition: transform var(--rz-transition); 
+    }
+  }
+}
+
+/* RadzenFabMenu */
+.rz-fabmenu {
+  position: absolute;
+  inset-block-start: var(--rz-fab-inset-block-start);
+  inset-block-end: var(--rz-fab-inset-block-end);
+  inset-inline-start: var(--rz-fab-inset-inline-start);
+  inset-inline-end: var(--rz-fab-inset-inline-end);
+  z-index: 1000;
+  
+
+  & > .rz-toggle-button {
+    border-radius: var(--rz-fab-border-radius);
+    box-shadow: var(--rz-fab-shadow);
+    transition: transform var(--rz-transition), border-radius var(--rz-transition);
+
+    &:not(.rz-state-disabled) {
+      &:not(:active) {
+        @include rz-hover-state {
+          box-shadow: var(--rz-fab-hover-shadow);
+        }
+      }
+
+      &:active {
+        transform: scale(1.1);
+        transition: transform var(--rz-transition), border-radius var(--rz-transition); 
+      }
+
+      &.rz-state-active {
+        border-radius: var(--rz-fab-active-border-radius);
+        transition: transform var(--rz-transition), border-radius var(--rz-transition); 
+      }
+    }
+  }
+}
+
+@keyframes rz-fab-expand {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.rz-fabmenu-items {
+  position: absolute;
+  
+  .rz-button { 
+    opacity: 0; 
+    transform: scale(0); 
+  }
+  &.rz-open {
+    .rz-button { 
+      animation: rz-fab-expand 0.25s ease forwards; 
+    }
+
+    // Staggered delays — extend as needed
+    .rz-button:nth-child(1) { animation-delay: 0.05s; }
+    .rz-button:nth-child(2) { animation-delay: 0.15s; }
+    .rz-button:nth-child(3) { animation-delay: 0.25s; }
+    .rz-button:nth-child(4) { animation-delay: 0.35s; }
+    .rz-button:nth-child(5) { animation-delay: 0.45s; }
+    .rz-button:nth-child(6) { animation-delay: 0.55s; }
+  }
+
+  // Direction-specific positioning
+  &.rz-fabmenu-direction-top {
+    inset-block-end: calc(100% + var(--rz-fabmenu-offset));
+    inset-inline-end: 0;
+  }
+
+  &.rz-fabmenu-direction-bottom {
+    inset-block-start: calc(100% + var(--rz-fabmenu-offset));
+    inset-inline-end: 0;
+  }
+
+  &.rz-fabmenu-direction-left {
+    right: calc(100% + var(--rz-fabmenu-offset));
+    inset-block-end: 0;
+  }
+
+  &.rz-fabmenu-direction-right {
+    left: calc(100% + var(--rz-fabmenu-offset));
+    inset-block-end: 0;
+  }
+  &.rz-fabmenu-direction-start {
+    inset-inline-end: calc(100% + var(--rz-fabmenu-offset));
+    inset-block-end: 0;
+  }
+
+  &.rz-fabmenu-direction-end {
+    inset-inline-start: calc(100% + var(--rz-fabmenu-offset));
+    inset-block-end: 0;
+  }
+} 

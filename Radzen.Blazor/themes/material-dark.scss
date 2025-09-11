@@ -1565,5 +1565,8 @@ $rz-toc-horizontal-link-selected-indicator-inset-inline: 0 !default;
 $skeleton-background-color: var(--rz-base-400) !default;
 $skeleton-animation-color: var(--rz-base-300) !default;
 
+// FAB
+$fab-border-radius: var(--rz-border-radius-10) !default;
+
 @import 'fonts';
 @import 'components';

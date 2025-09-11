@@ -2630,3 +2630,28 @@ window.Radzen = {
       };
     }
 };
+
+Radzen.radzenFabMenu = Radzen.radzenFabMenu || {};
+
+Radzen.radzenFabMenu.registerOutsideClick = function(element, dotnet){
+  if(!element) return;
+  if(element.__rzOutsideClickHandler){
+    document.removeEventListener('click', element.__rzOutsideClickHandler);
+    delete element.__rzOutsideClickHandler;
+  }
+  const handler = function(e){
+    if(!element.contains(e.target)){
+      dotnet.invokeMethodAsync('CloseAsync');
+    }
+  };
+  element.__rzOutsideClickHandler = handler;
+  document.addEventListener('click', handler);
+};
+Radzen.radzenFabMenu.unregisterOutsideClick = function(element){
+  if(!element) return;
+  const handler = element.__rzOutsideClickHandler;
+  if(handler){
+    document.removeEventListener('click', handler);
+    delete element.__rzOutsideClickHandler;
+  }
+};
