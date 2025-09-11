@@ -98,7 +98,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The size.</value>
         [Parameter]
-        public ButtonSize Size { get; set; } = ButtonSize.Medium;
+        public virtual ButtonSize Size { get; set; } = ButtonSize.Medium;
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenButton"/> is disabled.
