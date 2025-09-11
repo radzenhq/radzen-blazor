@@ -84,14 +84,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The variant of the button.</value>
         [Parameter]
-        public Variant Variant { get; set; } = Variant.Filled;
+        public virtual Variant Variant { get; set; } = Variant.Filled;
 
         /// <summary>
         /// Gets or sets the color shade of the button.
         /// </summary>
         /// <value>The color shade of the button.</value>
         [Parameter]
-        public Shade Shade { get; set; } = Shade.Default;
+        public virtual Shade Shade { get; set; } = Shade.Default;
 
         /// <summary>
         /// Gets or sets the size.
