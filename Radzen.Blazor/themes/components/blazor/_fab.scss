@@ -7,6 +7,7 @@ $fab-border-radius: var(--rz-border-radius-4) !default;
 $fab-active-border-radius: var(--rz-border-radius-10) !default;
 $fab-shadow: var(--rz-shadow-4) !default;
 $fab-hover-shadow: var(--rz-shadow-6) !default;
+$fab-active-shadow: var(--rz-shadow-6) !default;
 $fabmenu-offset: 0.5rem !default;
 
 /* RadzenFab */
@@ -30,6 +31,7 @@ $fabmenu-offset: 0.5rem !default;
 
     &:active {
       transform: scale(1.1);
+      box-shadow: var(--rz-fab-active-shadow);
       transition: transform var(--rz-transition); 
     }
   }
@@ -59,6 +61,7 @@ $fabmenu-offset: 0.5rem !default;
 
       &:active {
         transform: scale(1.1);
+        box-shadow: var(--rz-fab-active-shadow);
         transition: transform var(--rz-transition), border-radius var(--rz-transition); 
       }
 

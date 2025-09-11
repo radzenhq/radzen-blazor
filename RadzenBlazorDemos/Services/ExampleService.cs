@@ -1604,11 +1604,11 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "FAB position", Anchor = "#position" }, new () { Text = "Multiple FABs", Anchor = "#multiple-fabs" }, new () { Text = "Busy FAB", Anchor = "#busy-fab" } ],
+                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB menu with icon only buttons", Anchor = "#icons" }, new () { Text = "Expand direction", Anchor = "#direction" } ],
                     Name = "FabMenu",
                     Path = "fab-menu",
                     Description = "Demonstration and configuration of the Radzen Blazor FabMenu component.",
-                    Icon = "\ue147",
+                    Icon = "\ue091",
                     New = true,
                     Tags = new [] { "fab", "menu", "button", "floating", "action" }
                 },
