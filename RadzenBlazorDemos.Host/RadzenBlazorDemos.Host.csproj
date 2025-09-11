@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ErrorOnDuplicatePublishOutputFiles>False</ErrorOnDuplicatePublishOutputFiles>
     <UserSecretsId>d4f5f92a-c1c5-47b2-bb94-becc7f09133c</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\RadzenBlazorDemos\RadzenBlazorDemos.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.*-*" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.*-*" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.*-*" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="2.20.0" />
   </ItemGroup>
