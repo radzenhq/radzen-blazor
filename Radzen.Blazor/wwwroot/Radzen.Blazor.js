@@ -2011,7 +2011,7 @@ window.Radzen = {
       } else if (paste) {
         e.preventDefault();
         var data = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
-
+        data = Radzen.extractHTMLFragment(data);
         instance.invokeMethodAsync('OnPaste', data)
           .then(function (html) {
             document.execCommand("insertHTML", false, html);
@@ -2580,5 +2580,20 @@ window.Radzen = {
     unregisterScrollListener: function (element) {
       document.removeEventListener('scroll', element.scrollHandler, true);
       window.removeEventListener('resize', element.scrollHandler, true);
+    },
+    extractHTMLFragment: function (html) {
+        const startMarker = "<!--StartFragment-->";
+        const endMarker = "<!--EndFragment-->";
+
+        const startIndex = html.indexOf(startMarker);
+        const endIndex = html.indexOf(endMarker);
+
+        if (startIndex === -1 || endIndex === -1 || endIndex <= startIndex) {
+            // no fragment found
+            return html;
+        }
+
+        // get the fragment
+        return html.substring(startIndex + startMarker.length, endIndex).trim();
     }
 };
