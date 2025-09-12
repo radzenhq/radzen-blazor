@@ -181,11 +181,11 @@ public partial class RadzenFabMenu : RadzenComponent
 
 		if (isOpen)
 		{
-			JSRuntime.InvokeVoid("Radzen.radzenFabMenu.registerOutsideClick", Element, Reference);
+			JSRuntime.InvokeVoid("Radzen.registerFabMenu", Element, Reference);
 		}
 		else
 		{
-			JSRuntime.InvokeVoid("Radzen.radzenFabMenu.unregisterOutsideClick", Element);
+			JSRuntime.InvokeVoid("Radzen.unregisterFabMenu", Element);
 		}
 	}
 
@@ -246,7 +246,7 @@ public partial class RadzenFabMenu : RadzenComponent
 		{
 			if (IsOpen)
 			{
-				JSRuntime.InvokeVoid("Radzen.radzenFabMenu.unregisterOutsideClick", Element);
+				JSRuntime.InvokeVoid("Radzen.unregisterFabMenu", Element);
 			}
 		}
 		catch { }
