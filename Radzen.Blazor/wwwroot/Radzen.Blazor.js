@@ -2579,9 +2579,7 @@ window.Radzen = {
     }
 };
 
-Radzen.radzenFabMenu = Radzen.radzenFabMenu || {};
-
-Radzen.radzenFabMenu.registerOutsideClick = function(element, dotnet){
+Radzen.registerFabMenu = function(element, dotnet){
   if(!element) return;
   if(element.__rzOutsideClickHandler){
     document.removeEventListener('click', element.__rzOutsideClickHandler);
@@ -2595,7 +2593,7 @@ Radzen.radzenFabMenu.registerOutsideClick = function(element, dotnet){
   element.__rzOutsideClickHandler = handler;
   document.addEventListener('click', handler);
 };
-Radzen.radzenFabMenu.unregisterOutsideClick = function(element){
+Radzen.unregisterFabMenu = function(element){
   if(!element) return;
   const handler = element.__rzOutsideClickHandler;
   if(handler){
