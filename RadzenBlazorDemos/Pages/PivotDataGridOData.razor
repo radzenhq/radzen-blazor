@@ -71,7 +71,11 @@
 
     async Task LoadData(LoadDataArgs args)
     {
-        var result = await GetOrderDetails(top: args.Top, skip: args.Skip, expand: "NorthwindOrder,NorthwindProduct($expand=Category)", count: true);
+        var result = await GetOrderDetails(top: args.Top, skip: args.Skip, 
+            orderby: GetODataSubProperties(args.OrderBy), 
+            filter: GetODataSubProperties(args.Filter),
+            expand: "NorthwindOrder,NorthwindProduct($expand=Category)", 
+            count: true);
 
         salesData = result.Value.Select(od => new SalesData
             {
@@ -84,7 +88,7 @@
                 Quantity = od.Quantity,
                 Discount = od.Discount,
                 TotalAmount = (od.UnitPrice ?? 0) * (od.Quantity ?? 0) * (double)(1 - (od.Discount ?? 0))
-            });
+            }).AsODataEnumerable();
 
         count = result.Count;
     }
@@ -101,13 +105,23 @@
         return await response.ReadAsync<ODataServiceResult<Order_Detail>>();
     }
 
+    string GetODataSubProperties(string value)
+    {
+        return value?
+        .Replace("CategoryName", "NorthwindProduct/Category/CategoryName")?
+        .Replace("ProductName", "NorthwindProduct/ProductName")?
+        .Replace("OrderYear", "NorthwindOrder/OrderYear")?
+        .Replace("OrderMonth", "NorthwindOrder/OrderMonth")?
+        .Replace("ShipCountry", "NorthwindOrder/ShipCountry");
+    }
+
     bool allowDrillDown;
     bool showColumnsTotals;
     bool showRowsTotals;
     bool allowPaging = true;
     PagerPosition pagerPosition = PagerPosition.Bottom;
 
-    private IEnumerable<SalesData> salesData;
+    private ODataEnumerable<SalesData> salesData;
 
     public class SalesData
     {

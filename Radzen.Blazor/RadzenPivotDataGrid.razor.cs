@@ -534,8 +534,61 @@ namespace Radzen.Blazor
             _columnHeaderRows = null;
             _cachedPivotRows = null;
             _cachedColumnLeaves = null;
-            await base.Reload();
+            _view = null;
+
+            if (Data != null && !LoadData.HasDelegate)
+            {
+                Count = View.Count();
+            }
+
+            await InvokeLoadData(skip, PageSize);
+
+            CalculatePager();
+
             StateHasChanged();
+        }
+
+        bool? isOData;
+
+        internal bool IsOData()
+        {
+            if (isOData == null && Data != null)
+            {
+                isOData = typeof(ODataEnumerable<TItem>).IsAssignableFrom(Data.GetType());
+            }
+
+            return isOData != null ? isOData.Value : false;
+        }
+
+        internal async Task InvokeLoadData(int start, int top)
+        {
+            if (LoadData.HasDelegate)
+            {
+                var filters = GetFilters();
+                var sorts = GetOrderBy();
+
+                await LoadData.InvokeAsync(new Radzen.LoadDataArgs()
+                {
+                    Skip = start,
+                    Top = top,
+                    OrderBy = sorts.Item1,
+                    GetFilter = () => IsOData() ? filters.ToODataFilterString<TItem>() : filters.ToFilterString<TItem>(),
+                    Filters = filters.Concat(filters.SelectManyRecursive(f => f.Filters ?? Enumerable.Empty<CompositeFilterDescriptor>()))
+                        .Where(f => f.FilterValue != null
+                            || f.FilterOperator == FilterOperator.IsNotNull || f.FilterOperator == FilterOperator.IsNull
+                            || f.FilterOperator == FilterOperator.IsEmpty | f.FilterOperator == FilterOperator.IsNotEmpty)
+                        .Select(f => new FilterDescriptor() 
+                        { 
+                            Property = f.Property,
+                            FilterProperty = f.FilterProperty,
+                            FilterOperator = f.FilterOperator ?? FilterOperator.Equals,
+                            FilterValue = f.FilterValue,
+                            LogicalFilterOperator = f.LogicalFilterOperator,
+                            Type = f.Type
+                        }),
+                    Sorts = sorts.Item2
+                });
+            }
         }
 
         internal void AddPivotColumn(RadzenPivotColumn<TItem> column)
@@ -1805,9 +1858,10 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the order by string for sorting.
         /// </summary>
-        internal string GetOrderBy()
+        internal Tuple<string, IEnumerable<SortDescriptor>> GetOrderBy()
         {
             var sortExpressions = new List<string>();
+            var sortDescriptors = new List<SortDescriptor>();
 
             // Add column sorts
             foreach (var column in pivotColumns.Where(c => c.GetSortOrder() != null))
@@ -1817,6 +1871,7 @@ namespace Radzen.Blazor
                 {
                     var sortOrder = column.GetSortOrder() == SortOrder.Ascending ? "asc" : "desc";
                     sortExpressions.Add($"{property} {sortOrder}");
+                    sortDescriptors.Add(new SortDescriptor { Property = property, SortOrder = column.GetSortOrder() });
                 }
             }
 
@@ -1828,10 +1883,11 @@ namespace Radzen.Blazor
                 {
                     var sortOrder = row.GetSortOrder() == SortOrder.Ascending ? "asc" : "desc";
                     sortExpressions.Add($"{property} {sortOrder}");
+                    sortDescriptors.Add(new SortDescriptor { Property = property, SortOrder = row.GetSortOrder() });
                 }
             }
 
-            return string.Join(",", sortExpressions);
+            return new Tuple<string, IEnumerable<SortDescriptor>>(string.Join(",", sortExpressions), sortDescriptors);
         }
 
         /// <summary>
@@ -1938,9 +1994,9 @@ namespace Radzen.Blazor
                     baseView = baseView.Where(filters, LogicalFilterOperator, FilterCaseSensitivity);
                 }
 
-                if (!string.IsNullOrEmpty(orderBy))
+                if (!string.IsNullOrEmpty(orderBy.Item1))
                 {
-                    baseView = baseView.OrderBy(orderBy);
+                    baseView = baseView.OrderBy(orderBy.Item1);
                 }
 
                 return baseView;
