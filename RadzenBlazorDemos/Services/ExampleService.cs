@@ -1594,7 +1594,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB position", Anchor = "#position" }, new () { Text = "Multiple FABs", Anchor = "#multiple-fabs" }, new () { Text = "Busy FAB", Anchor = "#busy-fab" } ],
+                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB position", Anchor = "#position" }, new () { Text = "Multiple FABs", Anchor = "#multiple-fabs" }, new () { Text = "Busy FAB", Anchor = "#busy-fab" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Fab",
                     Path = "fab",
                     Description = "Demonstration and configuration of the Radzen Blazor Fab component.",
@@ -1604,7 +1604,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB menu with icon only buttons", Anchor = "#icons" }, new () { Text = "Expand direction", Anchor = "#direction" } ],
+                    Toc = [ new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "FAB menu with icon only buttons", Anchor = "#icons" }, new () { Text = "Expand direction", Anchor = "#direction" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "FabMenu",
                     Path = "fab-menu",
                     Description = "Demonstration and configuration of the Radzen Blazor FabMenu component.",
