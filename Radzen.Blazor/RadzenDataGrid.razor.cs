@@ -2183,7 +2183,15 @@ namespace Radzen.Blazor
 
             if (Data != null && !LoadData.HasDelegate)
             {
+#if NET10_0_OR_GREATER
+                var count = View.Count();
+                if (count != Count)
+                {
+                    Count = count;
+                }
+#else
                 Count = 1;
+#endif
             }
 
             if (AllowVirtualization)
