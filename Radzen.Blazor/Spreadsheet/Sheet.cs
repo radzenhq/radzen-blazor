@@ -175,7 +175,8 @@ public partial class Sheet
 
         isEvaluating = true;
         var visitor = new FormulaEvaluator(this);
-        cell.Value = visitor.Evaluate(node);
+        var eval = visitor.Evaluate(node);
+        cell.Data = eval;
         isEvaluating = false;
 
         cell.OnChanged();
