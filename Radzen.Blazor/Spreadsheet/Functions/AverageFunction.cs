@@ -7,42 +7,39 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class AverageFunction : FormulaFunction
 {
-    public override object? Evaluate(List<object?> arguments)
+    public override CellData Evaluate(List<CellData> arguments)
     {
         if (arguments.Count == 0)
         {
-            error = CellError.Div0;
-            return error;
+            return CellData.FromError(CellError.Div0);
         }
 
-        double sum = 0d;
-        int count = 0;
-        foreach (var v in arguments)
+        var sum = 0d;
+        var count = 0;
+
+        foreach (var argument in arguments)
         {
-            if (TryGetError(v, out var e))
+            if (argument.IsError)
             {
-                error = e;
-                return e;
+                return argument;
             }
 
-            if (v is null)
+            if (argument.IsEmpty || argument.Type != CellDataType.Number)
             {
                 continue;
             }
 
-            if (IsNumeric(v))
-            {
-                sum += ToDouble(v);
-                count++;
-            }
+            var value = argument.GetValueOrDefault<double>();
+
+            sum += value;
+            count++;
         }
 
         if (count == 0)
         {
-            error = CellError.Div0;
-            return error;
+            return CellData.FromError(CellError.Div0);
         }
 
-        return sum / count;
+        return CellData.FromNumber(sum / count);
     }
 }
