@@ -80,7 +80,8 @@ public partial class Sheet
 
     private readonly Dictionary<string, FormulaFunction> formulaFunctions = new () {
         ["SUM"] = new SumFunction(),
-        ["IF"] = new IfFunction()
+        ["IF"] = new IfFunction(),
+        ["AND"] = new AndFunction()
     };
 
     /// <summary>
