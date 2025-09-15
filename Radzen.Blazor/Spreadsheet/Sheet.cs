@@ -149,10 +149,7 @@ public partial class Sheet
     /// <returns>The formula function or an ErrorFunction if not found.</returns>
     public FormulaFunction GetFormulaFunction(string functionName)
     {
-        var upperName = functionName.ToUpperInvariant();
-        return formulaFunctions.TryGetValue(upperName, out var function)
-            ? function
-            : new ErrorFunction(functionName);
+        return formulaFunctions.TryGetValue(functionName.ToUpperInvariant(), out var function) ? function : new ErrorFunction();
     }
 
     /// <summary>

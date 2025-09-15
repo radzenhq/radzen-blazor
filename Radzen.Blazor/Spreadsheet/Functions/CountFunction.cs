@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 #nullable enable
 
@@ -8,87 +7,44 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class CountFunction : FormulaFunction
 {
-    public override Expression Evaluate(List<Expression> arguments)
+    public override object? Evaluate(List<object?> arguments)
     {
-        var expressions = new List<Expression>();
-
-        foreach (var arg in arguments)
+        if (arguments.Count == 0)
         {
-            if (arg is RangeExpression rangeExpr)
-            {
-                expressions.AddRange(rangeExpr.Expressions);
-            }
-            else
-            {
-                expressions.Add(arg);
-            }
+            return 0d;
         }
 
-        if (expressions.Count == 0)
+        double count = 0d;
+        foreach (var v in arguments)
         {
-            return Expression.Constant(0);
-        }
-
-        // Count only numeric values, dates, logical values, and text representations of numbers
-        var countExpressions = new List<Expression>();
-
-        foreach (var expr in expressions)
-        {
-            if (TryGetError(expr, out error))
-            {
-                // Error values are not counted - skip them
-                continue;
-            }
-
-            // Skip null values (empty cells)
-            if (IsNullValue(expr))
+            if (TryGetError(v, out _))
             {
                 continue;
             }
 
-            // Count numeric types (including dates which are typically stored as numbers)
-            if (IsNumericType(expr.Type))
+            if (v is null)
             {
-                countExpressions.Add(Expression.Constant(1));
+                continue;
             }
-            // Count boolean values (logical values are counted in Excel)
-            else if (expr.Type == typeof(bool))
+
+            if (IsNumeric(v))
             {
-                countExpressions.Add(Expression.Constant(1));
+                count += 1d;
             }
-            // For string values, check if they represent numbers at runtime
-            else if (expr.Type == typeof(string))
+            else if (v is bool)
             {
-                var isNumericString = Expression.Call(
-                    typeof(CountFunction),
-                    nameof(IsNumericString),
-                    null,
-                    expr
-                );
-
-                var conditionalCount = Expression.Condition(
-                    isNumericString,
-                    Expression.Constant(1),
-                    Expression.Constant(0)
-                );
-
-                countExpressions.Add(conditionalCount);
+                count += 1d;
+            }
+            else if (v is string s)
+            {
+                if (IsNumericString(s))
+                {
+                    count += 1d;
+                }
             }
         }
 
-        // Sum all the count expressions
-        if (countExpressions.Count == 0)
-        {
-            return Expression.Constant(0);
-        }
-
-        Expression? sum = countExpressions[0];
-        for (int i = 1; i < countExpressions.Count; i++)
-        {
-            sum = Expression.Add(sum, countExpressions[i]);
-        }
-
-        return sum!;
+        return count;
     }
 
     private static bool IsNumericString(string value)
@@ -96,15 +52,12 @@ class CountFunction : FormulaFunction
         if (string.IsNullOrEmpty(value))
             return false;
 
-        // Try to parse as double first (covers most numeric formats)
         if (double.TryParse(value, out _))
             return true;
 
-        // Try to parse as decimal (for more precision)
         if (decimal.TryParse(value, out _))
             return true;
 
-        // Try to parse as int
         if (int.TryParse(value, out _))
             return true;
 

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 #nullable enable
 
@@ -13,42 +12,34 @@ class IfErrorFunction : FormulaFunction
 {
     public override bool CanHandleErrors => true;
 
-    public override Expression Evaluate(List<Expression> arguments)
+    public override object? Evaluate(List<object?> arguments)
     {
         if (arguments.Count != 2)
         {
             error = CellError.Value;
-            return Expression.Constant(CellError.Value);
+            return error;
         }
 
         var value = arguments[0];
         var valueIfError = arguments[1];
 
-        // Check if the first argument (value) is an error
-        if (TryGetError(value, out var valueError))
+        if (TryGetError(value, out _))
         {
-            // If value is an error, return the valueIfError
-            // But first check if valueIfError itself is an error
-            if (TryGetError(valueIfError, out var valueIfErrorError))
+            if (TryGetError(valueIfError, out var e))
             {
-                error = valueIfErrorError;
-                return Expression.Constant(valueIfErrorError);
+                error = e;
+                return e;
             }
 
-            // Convert valueIfError to string if it's an empty cell (null)
-            var resultValue = IsNullValue(valueIfError) ? Expression.Constant("") : valueIfError;
-            return resultValue;
+            return valueIfError is null ? "" : valueIfError;
         }
 
-        // Check if the second argument (valueIfError) is an error
         if (TryGetError(valueIfError, out var secondArgError))
         {
             error = secondArgError;
-            return Expression.Constant(secondArgError);
+            return secondArgError;
         }
-        // If value is not an error, return the value itself
-        // Convert to string if it's an empty cell (null) to match Excel behavior
-        var result = IsNullValue(value) ? Expression.Constant("") : value;
-        return result;
+
+        return value is null ? "" : value;
     }
 }

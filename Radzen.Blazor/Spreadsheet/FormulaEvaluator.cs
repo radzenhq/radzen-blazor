@@ -1,17 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
-
-class RangeExpression(List<Expression> expressions) : Expression
-{
-    public List<Expression> Expressions { get; } = expressions;
-    public override ExpressionType NodeType => ExpressionType.Extension;
-    public override Type Type => typeof(void); // Not used directly
-}
 
 /// <summary>
 /// Represents errors that can occur during formula evaluation in a spreadsheet.
@@ -51,118 +43,72 @@ public enum CellError
 class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 {
     private readonly Sheet sheet = sheet;
-    private Expression? expression;
+    private object? value;
     private CellError? error;
     private readonly HashSet<Cell> evaluationStack = [];
 
     public void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
     {
-        expression = numberLiteralSyntaxNode.Token.ToConstantExpression();
+        value = TokenToObject(numberLiteralSyntaxNode.Token);
     }
 
     public void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode)
     {
-        expression = Expression.Constant(stringLiteralSyntaxNode.Token.Value);
+        value = stringLiteralSyntaxNode.Token.Value;
     }
 
-    private static Expression ConvertIfNeeded(Expression expression, Type targetType)
+    private static bool IsNumeric(object? v) => ValueHelpers.IsNumeric(v);
+
+    private static double ToDouble(object v) => ValueHelpers.ToDouble(v);
+
+    private static object? TokenToObject(FormulaToken token)
     {
-        if (expression is not LambdaExpression)
+        return token.ValueKind switch
         {
-            return expression.Type == targetType ? expression : Expression.Convert(expression, targetType);
-        }
-
-        return expression;
-    }
-
-    private static bool IsNumericType(Type type)
-    {
-        return type == typeof(int) || type == typeof(uint) ||
-               type == typeof(long) || type == typeof(ulong) ||
-               type == typeof(float) || type == typeof(double) ||
-               type == typeof(short) || type == typeof(ushort) ||
-               type == typeof(decimal);
-    }
-
-    private static bool IsNullValue(Expression expr)
-    {
-        if (expr is ConstantExpression constantExpr)
-        {
-            return constantExpr.Value == null;
-        }
-        return false;
-    }
-
-    private static bool TryGetError(Expression expr, out CellError? error)
-    {
-        if (expr is ConstantExpression constantExpr && constantExpr.Value is CellError cellError)
-        {
-            error = cellError;
-            return true;
-        }
-
-        error = null;
-
-        return false;
-    }
-
-    private static Type GetResultType(Type left, Type right)
-    {
-        if (left == typeof(double) || right == typeof(double))
-        {
-            return typeof(double);
-        }
-
-        if (left == typeof(float) || right == typeof(float))
-        {
-            return typeof(float);
-        }
-
-        if (left == typeof(decimal) || right == typeof(decimal))
-        {
-            return typeof(decimal);
-        }
-
-        if (left == typeof(ulong) || right == typeof(ulong))
-        {
-            return typeof(ulong);
-        }
-
-        if (left == typeof(long) || right == typeof(long))
-        {
-            return typeof(long);
-        }
-
-        return left == typeof(uint) || right == typeof(uint) ? typeof(uint) : typeof(int);
+            ValueKind.Null => null,
+            ValueKind.String => token.Value,
+            ValueKind.True => true,
+            ValueKind.False => false,
+            ValueKind.Int => (double)token.IntValue,
+            ValueKind.UInt => (double)token.UintValue,
+            ValueKind.Long => (double)token.LongValue,
+            ValueKind.ULong => (double)token.UlongValue,
+            ValueKind.Float => (double)token.FloatValue,
+            ValueKind.Double => token.DoubleValue,
+            ValueKind.Decimal => (double)token.DecimalValue,
+            _ => throw new InvalidOperationException($"Unsupported value kind: {token.ValueKind}")
+        };
     }
 
     public void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
     {
         binaryExpressionSyntaxNode.Left.Accept(this);
-        var left = expression!;
+        var left = value;
         binaryExpressionSyntaxNode.Right.Accept(this);
-        var right = expression!;
+        var right = value;
 
-        if (TryGetError(left, out error))
+        if (left is CellError le)
         {
-            expression = Expression.Constant(error);
+            error = le;
+            value = le;
             return;
         }
 
-        if (TryGetError(right, out error))
+        if (right is CellError re)
         {
-            expression = Expression.Constant(error);
+            error = re;
+            value = re;
             return;
         }
 
-        if (IsNullValue(left))
+        if (left is null)
         {
-            left = Expression.Constant(0d);
+            left = 0d;
         }
 
-        if (IsNullValue(right))
+        if (right is null)
         {
-            right = Expression.Constant(0d);
+            right = 0d;
         }
 
         // For comparison operators, we don't need both sides to be numeric
@@ -171,94 +117,86 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             BinaryOperator.LessThan or BinaryOperator.LessThanOrEqual or
             BinaryOperator.GreaterThan or BinaryOperator.GreaterThanOrEqual;
 
-        if (!isComparisonOperator && (!IsNumericType(left.Type) || !IsNumericType(right.Type)))
+        if (!isComparisonOperator && (!IsNumeric(left) || !IsNumeric(right)))
         {
             error = CellError.Value;
-            expression = Expression.Constant(CellError.Value);
+            value = CellError.Value;
             return;
         }
 
         if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Divide)
         {
-            // Check if right operand is a constant expression
-            if (right is ConstantExpression constantRight)
+            var rv = right;
+            if (rv is double dv && dv == 0d || rv is int i && i == 0 || rv is float f && f == 0f || rv is decimal m && m == 0m)
             {
-                var rightValue = constantRight.Value;
-
-                if (Equals(rightValue, 0d) || Equals(rightValue, 0) || Equals(rightValue, 0f) || Equals(rightValue, 0m))
-                {
-                    error = CellError.Div0;
-                    expression = Expression.Constant(CellError.Div0);
-                    return;
-                }
+                error = CellError.Div0;
+                value = CellError.Div0;
+                return;
             }
         }
 
         if (isComparisonOperator)
         {
-            // For comparison operators, we need to ensure both sides are the same type
-            // Try to convert to a common type if possible
-            if (left.Type != right.Type)
+            switch (binaryExpressionSyntaxNode.Operator)
             {
-                // Try to convert both to double for numeric comparisons
-                if (IsNumericType(left.Type) && IsNumericType(right.Type))
-                {
-                    left = ConvertIfNeeded(left, typeof(double));
-                    right = ConvertIfNeeded(right, typeof(double));
-                }
-                // For string comparisons, convert both to string
-                else if (left.Type == typeof(string) || right.Type == typeof(string))
-                {
-                    left = ConvertIfNeeded(left, typeof(string));
-                    right = ConvertIfNeeded(right, typeof(string));
-                }
+                case BinaryOperator.Equals:
+                    value = Equals(left, right);
+                    return;
+                case BinaryOperator.NotEquals:
+                    value = !Equals(left, right);
+                    return;
+                case BinaryOperator.LessThan:
+                    if (ValueHelpers.TryCompare(left, right, out var lt, out var cmpErr)) { value = lt < 0; return; }
+                    error = cmpErr; value = cmpErr; return;
+                case BinaryOperator.LessThanOrEqual:
+                    if (ValueHelpers.TryCompare(left, right, out var lte, out var cmpErr2)) { value = lte <= 0; return; }
+                    error = cmpErr2; value = cmpErr2; return;
+                case BinaryOperator.GreaterThan:
+                    if (ValueHelpers.TryCompare(left, right, out var gt, out var cmpErr3)) { value = gt > 0; return; }
+                    error = cmpErr3; value = cmpErr3; return;
+                case BinaryOperator.GreaterThanOrEqual:
+                    if (ValueHelpers.TryCompare(left, right, out var gte, out var cmpErr4)) { value = gte >= 0; return; }
+                    error = cmpErr4; value = cmpErr4; return;
             }
         }
         else
         {
-            var resultType = GetResultType(left.Type, right.Type);
-            left = ConvertIfNeeded(left, resultType);
-            right = ConvertIfNeeded(right, resultType);
+            var l = ToDouble(left!);
+            var r = ToDouble(right!);
+            switch (binaryExpressionSyntaxNode.Operator)
+            {
+                case BinaryOperator.Plus: value = l + r; return;
+                case BinaryOperator.Minus: value = l - r; return;
+                case BinaryOperator.Multiply: value = l * r; return;
+                case BinaryOperator.Divide: value = l / r; return;
+            }
         }
 
-        expression = binaryExpressionSyntaxNode.Operator switch
-        {
-            BinaryOperator.Plus => Expression.Add(left, right),
-            BinaryOperator.Minus => Expression.Subtract(left, right),
-            BinaryOperator.Multiply => Expression.Multiply(left, right),
-            BinaryOperator.Divide => Expression.Divide(left, right),
-            BinaryOperator.Equals => Expression.Equal(left, right),
-            BinaryOperator.NotEquals => Expression.NotEqual(left, right),
-            BinaryOperator.LessThan => Expression.LessThan(left, right),
-            BinaryOperator.LessThanOrEqual => Expression.LessThanOrEqual(left, right),
-            BinaryOperator.GreaterThan => Expression.GreaterThan(left, right),
-            BinaryOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(left, right),
-            _ => throw new InvalidOperationException($"Unsupported operator: {binaryExpressionSyntaxNode.Operator}")
-        };
+        throw new InvalidOperationException($"Unsupported operator: {binaryExpressionSyntaxNode.Operator}");
     }
 
-    private Expression? EvaluateCell(Cell cell)
+    private object? EvaluateCell(Cell cell)
     {
         if (!evaluationStack.Add(cell))
         {
             error = CellError.Circular;
-            return Expression.Constant(CellError.Circular);
+            return CellError.Circular;
         }
 
-        Expression? result;
+        object? result;
         if (cell.FormulaSyntaxNode != null)
         {
             cell.FormulaSyntaxNode.Accept(this);
-            result = expression;
+            result = value;
         }
         else if (cell.ValueType == CellValueType.Error && cell.Value is CellError cellError)
         {
             error = cellError;
-            result = Expression.Constant(cellError);
+            result = cellError;
         }
         else
         {
-            result = Expression.Constant(cell.Value);
+            result = cell.Value;
         }
         evaluationStack.Remove(cell);
         return result;
@@ -271,11 +209,11 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         if (!sheet.Cells.TryGet(address.Row, address.Column, out var cell))
         {
             error = CellError.Ref;
-            expression = Expression.Constant(CellError.Ref);
+            value = CellError.Ref;
             return;
         }
 
-        expression = EvaluateCell(cell);
+        value = EvaluateCell(cell);
     }
 
     public object? Evaluate(FormulaSyntaxNode node)
@@ -288,14 +226,13 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             return error;
         }
 
-        var lambda = Expression.Lambda(expression!);
-        return lambda.Compile().DynamicInvoke();
+        return value;
     }
 
 
     public void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
     {
-        var arguments = new List<Expression>();
+        var arguments = new List<object?>();
 
         // Get the function to check if it can handle errors
         var function = sheet.GetFormulaFunction(functionSyntaxNode.Name);
@@ -311,18 +248,18 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
                 return;
             }
 
-            if (expression is RangeExpression rangeExpr)
+            if (value is List<object?> list)
             {
-                arguments.AddRange(rangeExpr.Expressions);
+                arguments.AddRange(list);
             }
             else
             {
-                arguments.Add(expression!);
+                arguments.Add(value);
             }
         }
 
         // Call the function with the arguments
-        expression = function.Evaluate(arguments);
+        value = function.Evaluate(arguments);
         error = function.Error;
     }
 
@@ -334,11 +271,11 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         if (start.Row > end.Row || (start.Row == end.Row && start.Column > end.Column))
         {
             error = CellError.Value;
-            expression = Expression.Constant(CellError.Value);
+            value = CellError.Value;
             return;
         }
 
-        var cells = new List<Expression>();
+        var cells = new List<object?>();
         for (var row = start.Row; row <= end.Row; row++)
         {
             for (var column = start.Column; column <= end.Column; column++)
@@ -346,19 +283,19 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
                 if (!sheet.Cells.TryGet(row, column, out var cell))
                 {
                     error = CellError.Ref;
-                    expression = Expression.Constant(CellError.Ref);
+                    value = CellError.Ref;
                     return;
                 }
 
-                var cellExpression = EvaluateCell(cell);
+                var cellValue = EvaluateCell(cell);
                 if (error != null)
                 {
                     return;
                 }
-                cells.Add(cellExpression!);
+                cells.Add(cellValue);
             }
         }
 
-        expression = new RangeExpression(cells);
+        value = cells;
     }
 }
