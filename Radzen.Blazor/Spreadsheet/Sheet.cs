@@ -82,7 +82,8 @@ public partial class Sheet
         ["SUM"] = new SumFunction(),
         ["IF"] = new IfFunction(),
         ["AND"] = new AndFunction(),
-        ["OR"] = new OrFunction()
+        ["OR"] = new OrFunction(),
+        ["NOT"] = new NotFunction()
     };
 
     /// <summary>
