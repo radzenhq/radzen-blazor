@@ -378,4 +378,28 @@ public class FormulaEvaluationTests
 
         Assert.Equal("True", sheet.Cells["A2"].Value);
     }
+
+    [Fact]
+    public void ShouldReturnNameErrorForUnknownFunctionUppercase()
+    {
+        sheet.Cells["A1"].Formula = "=UNKNOWNFUNCTION(1,2,3)";
+
+        Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void ShouldReturnNameErrorForUnknownFunctionWithMixedCase()
+    {
+        sheet.Cells["A1"].Formula = "=UnknownFunction(1,2,3)";
+
+        Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void ShouldReturnNameErrorForUnknownFunctionWithLowercase()
+    {
+        sheet.Cells["A1"].Formula = "=unknownfunction(1,2,3)";
+
+        Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
+    }
 }
