@@ -353,6 +353,22 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         shortcuts.Add("Shift+ArrowLeft", _ => ExtendSelectionAsync(0, -1));
         shortcuts.Add("Shift+ArrowRight", _ => ExtendSelectionAsync(0, 1));
         shortcuts.Add("Ctrl+C", _ => CopySelectionAsync());
+        shortcuts.Add("Ctrl+Z", _ => UndoAsync());
+        shortcuts.Add("Ctrl+Shift+Z", _ => RedoAsync());
+    }
+
+    private Task UndoAsync()
+    {
+        Sheet?.Commands.Undo();
+
+        return Task.CompletedTask;
+    }
+
+    private Task RedoAsync()
+    {
+        Sheet?.Commands.Redo();
+
+        return Task.CompletedTask;
     }
 
     private async Task CopySelectionAsync()
