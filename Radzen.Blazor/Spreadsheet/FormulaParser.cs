@@ -6,6 +6,7 @@ namespace Radzen.Blazor.Spreadsheet;
 internal interface IFormulaSyntaxNodeVisitor
 {
     void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode);
+    void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode);
     void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode);
     void VisitCell(CellSyntaxNode cellSyntaxNode);
     void VisitFunction(FunctionSyntaxNode functionSyntaxNode);
@@ -23,6 +24,12 @@ internal enum BinaryOperator
     Minus,
     Multiply,
     Divide,
+    Equals,
+    NotEquals,
+    LessThan,
+    LessThanOrEqual,
+    GreaterThan,
+    GreaterThanOrEqual,
 }
 
 static class FormulaTokenTypeExtensions
@@ -35,6 +42,12 @@ static class FormulaTokenTypeExtensions
             FormulaTokenType.Minus => BinaryOperator.Minus,
             FormulaTokenType.Star => BinaryOperator.Multiply,
             FormulaTokenType.Slash => BinaryOperator.Divide,
+            FormulaTokenType.Equals => BinaryOperator.Equals,
+            FormulaTokenType.EqualsGreaterThan => BinaryOperator.NotEquals,
+            FormulaTokenType.LessThan => BinaryOperator.LessThan,
+            FormulaTokenType.LessThanOrEqual => BinaryOperator.LessThanOrEqual,
+            FormulaTokenType.GreaterThan => BinaryOperator.GreaterThan,
+            FormulaTokenType.GreaterThanOrEqual => BinaryOperator.GreaterThanOrEqual,
             _ => throw new ArgumentOutOfRangeException(nameof(tokenType), tokenType, null)
         };
     }
@@ -59,6 +72,16 @@ internal class NumberLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode
     public override void Accept(IFormulaSyntaxNodeVisitor visitor)
     {
         visitor.VisitNumberLiteral(this);
+    }
+}
+
+internal class StringLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode
+{
+    public FormulaToken Token { get; } = token;
+
+    public override void Accept(IFormulaSyntaxNodeVisitor visitor)
+    {
+        visitor.VisitStringLiteral(this);
     }
 }
 
@@ -123,6 +146,29 @@ internal class FormulaParser
 
     private FormulaSyntaxNode ParseExpression()
     {
+        var left = ParseComparison();
+
+        return left;
+    }
+
+    private FormulaSyntaxNode ParseComparison()
+    {
+        var left = ParseArithmetic();
+
+        while (Peek().Type is FormulaTokenType.Equals or FormulaTokenType.EqualsGreaterThan or
+               FormulaTokenType.LessThan or FormulaTokenType.LessThanOrEqual or
+               FormulaTokenType.GreaterThan or FormulaTokenType.GreaterThanOrEqual)
+        {
+            var token = tokens[position];
+            Advance(1);
+            left = new BinaryExpressionSyntaxNode(left, ParseArithmetic(), token.Type.ToBinaryOperator());
+        }
+
+        return left;
+    }
+
+    private FormulaSyntaxNode ParseArithmetic()
+    {
         var left = ParseTerm();
 
         while (Peek().Type is FormulaTokenType.Plus or FormulaTokenType.Minus)
@@ -181,6 +227,12 @@ internal class FormulaParser
             return start;
         }
 
+        if (token.Type == FormulaTokenType.StringLiteral)
+        {
+            Advance(1);
+            return new StringLiteralSyntaxNode(token);
+        }
+
         return ParseNumberLiteral();
     }
 
@@ -195,7 +247,7 @@ internal class FormulaParser
         if (Peek().Type != FormulaTokenType.CloseParen)
         {
             arguments.Add(ParseExpression());
-            
+
             while (Peek().Type == FormulaTokenType.Comma)
             {
                 Advance(1);

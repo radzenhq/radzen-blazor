@@ -60,6 +60,11 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         expression = numberLiteralSyntaxNode.Token.ToConstantExpression();
     }
 
+    public void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode)
+    {
+        expression = Expression.Constant(stringLiteralSyntaxNode.Token.Value);
+    }
+
     private static Expression ConvertIfNeeded(Expression expression, Type targetType)
     {
         if (expression is not LambdaExpression)
@@ -160,7 +165,13 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             right = Expression.Constant(0d);
         }
 
-        if (!IsNumericType(left.Type) || !IsNumericType(right.Type))
+        // For comparison operators, we don't need both sides to be numeric
+        var isComparisonOperator = binaryExpressionSyntaxNode.Operator is
+            BinaryOperator.Equals or BinaryOperator.NotEquals or
+            BinaryOperator.LessThan or BinaryOperator.LessThanOrEqual or
+            BinaryOperator.GreaterThan or BinaryOperator.GreaterThanOrEqual;
+
+        if (!isComparisonOperator && (!IsNumericType(left.Type) || !IsNumericType(right.Type)))
         {
             error = CellError.Value;
             expression = Expression.Constant(CellError.Value);
@@ -179,9 +190,32 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             }
         }
 
-        var resultType = GetResultType(left.Type, right.Type);
-        left = ConvertIfNeeded(left, resultType);
-        right = ConvertIfNeeded(right, resultType);
+        if (isComparisonOperator)
+        {
+            // For comparison operators, we need to ensure both sides are the same type
+            // Try to convert to a common type if possible
+            if (left.Type != right.Type)
+            {
+                // Try to convert both to double for numeric comparisons
+                if (IsNumericType(left.Type) && IsNumericType(right.Type))
+                {
+                    left = ConvertIfNeeded(left, typeof(double));
+                    right = ConvertIfNeeded(right, typeof(double));
+                }
+                // For string comparisons, convert both to string
+                else if (left.Type == typeof(string) || right.Type == typeof(string))
+                {
+                    left = ConvertIfNeeded(left, typeof(string));
+                    right = ConvertIfNeeded(right, typeof(string));
+                }
+            }
+        }
+        else
+        {
+            var resultType = GetResultType(left.Type, right.Type);
+            left = ConvertIfNeeded(left, resultType);
+            right = ConvertIfNeeded(right, resultType);
+        }
 
         expression = binaryExpressionSyntaxNode.Operator switch
         {
@@ -189,6 +223,12 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             BinaryOperator.Minus => Expression.Subtract(left, right),
             BinaryOperator.Multiply => Expression.Multiply(left, right),
             BinaryOperator.Divide => Expression.Divide(left, right),
+            BinaryOperator.Equals => Expression.Equal(left, right),
+            BinaryOperator.NotEquals => Expression.NotEqual(left, right),
+            BinaryOperator.LessThan => Expression.LessThan(left, right),
+            BinaryOperator.LessThanOrEqual => Expression.LessThanOrEqual(left, right),
+            BinaryOperator.GreaterThan => Expression.GreaterThan(left, right),
+            BinaryOperator.GreaterThanOrEqual => Expression.GreaterThanOrEqual(left, right),
             _ => throw new InvalidOperationException($"Unsupported operator: {binaryExpressionSyntaxNode.Operator}")
         };
     }
@@ -238,7 +278,7 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
     {
         error = null;
         node.Accept(this);
-        
+
         if (error != null)
         {
             return error;
@@ -280,7 +320,7 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             }
 
             var addend = IsNullValue(arg) ? Expression.Constant(0) : arg;
-            
+
             if (sum == null)
             {
                 sum = addend;
@@ -295,6 +335,148 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         }
 
         return sum!;
+    }
+
+    private Expression If(List<Expression> arguments)
+    {
+        if (arguments.Count < 2 || arguments.Count > 3)
+        {
+            error = CellError.Value;
+            return Expression.Constant(CellError.Value);
+        }
+
+        var condition = arguments[0];
+        var trueValue = arguments[1];
+        var falseValue = arguments.Count == 3 ? arguments[2] : Expression.Constant(false);
+
+        // Check for errors in any argument
+        if (TryGetError(condition, out error))
+        {
+            return Expression.Constant(error);
+        }
+
+        if (TryGetError(trueValue, out error))
+        {
+            return Expression.Constant(error);
+        }
+
+        if (TryGetError(falseValue, out error))
+        {
+            return Expression.Constant(error);
+        }
+
+        // Convert condition to boolean following Excel semantics using expression tree
+        var booleanCondition = ConvertToBooleanExpression(condition);
+
+        // Ensure trueValue and falseValue have compatible types
+        var (compatibleTrueValue, compatibleFalseValue) = EnsureCompatibleTypes(trueValue, falseValue);
+
+        // Use Expression.Condition to create a proper conditional expression
+        return Expression.Condition(booleanCondition, compatibleTrueValue, compatibleFalseValue);
+    }
+
+    private Expression ConvertToBooleanExpression(Expression condition)
+    {
+        // Handle different types and convert to boolean following Excel semantics
+        if (condition.Type == typeof(bool))
+        {
+            return condition;
+        }
+
+        if (condition.Type == typeof(double))
+        {
+            return Expression.NotEqual(condition, Expression.Constant(0.0));
+        }
+
+        if (condition.Type == typeof(int))
+        {
+            return Expression.NotEqual(condition, Expression.Constant(0));
+        }
+
+        if (condition.Type == typeof(string))
+        {
+            return Expression.NotEqual(
+                Expression.Call(typeof(string), nameof(string.IsNullOrEmpty), null, condition),
+                Expression.Constant(true)
+            );
+        }
+
+        // For other numeric types, convert to double first
+        if (IsNumericType(condition.Type))
+        {
+            return Expression.NotEqual(ConvertIfNeeded(condition, typeof(double)), Expression.Constant(0.0));
+        }
+
+        // For null values, return false
+        if (IsNullValue(condition))
+        {
+            return Expression.Constant(false);
+        }
+
+        return Expression.NotEqual(Expression.Convert(condition, typeof(double)), Expression.Constant(0.0));
+    }
+
+    private Expression ConvertToStringExpression(Expression expression)
+    {
+        if (expression.Type == typeof(string))
+        {
+            return expression;
+        }
+
+        if (expression.Type == typeof(bool))
+        {
+            return Expression.Condition(
+                expression,
+                Expression.Constant("True"),
+                Expression.Constant("False")
+            );
+        }
+
+        // For other types, use ToString()
+        return Expression.Call(expression, "ToString", null);
+    }
+
+    private (Expression trueValue, Expression falseValue) EnsureCompatibleTypes(Expression trueValue, Expression falseValue)
+    {
+        // If types are already compatible, return as-is
+        if (trueValue.Type == falseValue.Type)
+        {
+            return (trueValue, falseValue);
+        }
+
+        // If one is a string, convert both to string
+        // But if falseValue is the default boolean false, keep it as boolean
+        if ((trueValue.Type == typeof(string) || falseValue.Type == typeof(string)) &&
+            !(falseValue is ConstantExpression constantFalse && constantFalse.Value is bool boolVal && !boolVal))
+        {
+            var stringTrueValue = ConvertToStringExpression(trueValue);
+            var stringFalseValue = ConvertToStringExpression(falseValue);
+            return (stringTrueValue, stringFalseValue);
+        }
+
+        // If one is boolean and the other is not string, convert the non-boolean to boolean
+        if ((trueValue.Type == typeof(bool) && falseValue.Type != typeof(string)) ||
+            (falseValue.Type == typeof(bool) && trueValue.Type != typeof(string)))
+        {
+            var boolTrueValue = ConvertToBooleanExpression(trueValue);
+            var boolFalseValue = ConvertToBooleanExpression(falseValue);
+            return (boolTrueValue, boolFalseValue);
+        }
+
+        // If both are numeric, convert to the common numeric type
+        if (IsNumericType(trueValue.Type) && IsNumericType(falseValue.Type))
+        {
+            var commonType = GetResultType(trueValue.Type, falseValue.Type);
+            var convertedTrueValue = ConvertIfNeeded(trueValue, commonType);
+            var convertedFalseValue = ConvertIfNeeded(falseValue, commonType);
+            return (convertedTrueValue, convertedFalseValue);
+        }
+
+
+        // Default: convert both to object
+        var objectTrueValue = ConvertIfNeeded(trueValue, typeof(object));
+        var objectFalseValue = ConvertIfNeeded(falseValue, typeof(object));
+        return (objectTrueValue, objectFalseValue);
     }
 
     public void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
@@ -324,6 +506,10 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         {
             case "SUM":
                 expression = Sum(arguments);
+                break;
+
+            case "IF":
+                expression = If(arguments);
                 break;
 
             default:
