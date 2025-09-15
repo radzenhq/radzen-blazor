@@ -78,6 +78,16 @@ public partial class Sheet
     /// </summary>
     public IReadOnlySet<int> FilteredColumns => filteredColumns;
 
+    private readonly Dictionary<string, FormulaFunction> formulaFunctions = new () {
+        ["SUM"] = new SumFunction(),
+        ["IF"] = new IfFunction()
+    };
+
+    /// <summary>
+    /// Gets the dictionary of available formula functions.
+    /// </summary>
+    public IReadOnlyDictionary<string, FormulaFunction> FormulaFunctions => formulaFunctions;
+
     private Workbook? workbook;
 
     /// <summary>
@@ -122,6 +132,20 @@ public partial class Sheet
         Cells = new CellStore(this);
         Commands = new();
         Validation = new();
+    }
+
+
+    /// <summary>
+    /// Gets a formula function by name, or returns an ErrorFunction if the function is not found.
+    /// </summary>
+    /// <param name="functionName">The name of the function to retrieve.</param>
+    /// <returns>The formula function or an ErrorFunction if not found.</returns>
+    public FormulaFunction GetFormulaFunction(string functionName)
+    {
+        var upperName = functionName.ToUpperInvariant();
+        return formulaFunctions.TryGetValue(upperName, out var function)
+            ? function
+            : new ErrorFunction(functionName);
     }
 
     /// <summary>
@@ -294,8 +318,8 @@ public partial class Sheet
             };
         }
 
-        var topLeftRange = Rows.Frozen > 0 && Columns.Frozen > 0 
-            ? new RangeRef(new CellRef(0, 0), new CellRef(Rows.Frozen - 1, Columns.Frozen - 1)) 
+        var topLeftRange = Rows.Frozen > 0 && Columns.Frozen > 0
+            ? new RangeRef(new CellRef(0, 0), new CellRef(Rows.Frozen - 1, Columns.Frozen - 1))
             : RangeRef.Invalid;
 
         if (range.Overlaps(topLeftRange))
@@ -312,8 +336,8 @@ public partial class Sheet
             };
         }
 
-        var topRightRange = Rows.Frozen > 0 
-            ? new RangeRef(new CellRef(0, Columns.Frozen), new CellRef(Rows.Frozen - 1, ColumnCount - 1)) 
+        var topRightRange = Rows.Frozen > 0
+            ? new RangeRef(new CellRef(0, Columns.Frozen), new CellRef(Rows.Frozen - 1, ColumnCount - 1))
             : RangeRef.Invalid;
 
         if (range.Overlaps(topRightRange))
@@ -330,8 +354,8 @@ public partial class Sheet
             };
         }
 
-        var bottomLeftRange = Columns.Frozen > 0 
-            ? new RangeRef(new CellRef(Rows.Frozen, 0), new CellRef(RowCount - 1, Columns.Frozen - 1)) 
+        var bottomLeftRange = Columns.Frozen > 0
+            ? new RangeRef(new CellRef(Rows.Frozen, 0), new CellRef(RowCount - 1, Columns.Frozen - 1))
             : RangeRef.Invalid;
 
         if (range.Overlaps(bottomLeftRange))
