@@ -288,196 +288,6 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         return lambda.Compile().DynamicInvoke();
     }
 
-    private Expression Sum(List<Expression> arguments)
-    {
-        var expressions = new List<Expression>();
-
-        foreach (var arg in arguments)
-        {
-            if (arg is RangeExpression rangeExpr)
-            {
-                expressions.AddRange(rangeExpr.Expressions);
-            }
-            else
-            {
-                expressions.Add(arg);
-            }
-        }
-
-        if (expressions.Count == 0)
-        {
-            error = CellError.Value;
-            return Expression.Constant(CellError.Value);
-        }
-
-        Expression? sum = null;
-
-        foreach (var arg in expressions)
-        {
-            if (TryGetError(arg, out error))
-            {
-                return Expression.Constant(error);
-            }
-
-            var addend = IsNullValue(arg) ? Expression.Constant(0) : arg;
-
-            if (sum == null)
-            {
-                sum = addend;
-            }
-            else
-            {
-                var resultType = GetResultType(sum.Type, addend.Type);
-                sum = ConvertIfNeeded(sum, resultType);
-                addend = ConvertIfNeeded(addend, resultType);
-                sum = Expression.Add(sum, addend);
-            }
-        }
-
-        return sum!;
-    }
-
-    private Expression If(List<Expression> arguments)
-    {
-        if (arguments.Count < 2 || arguments.Count > 3)
-        {
-            error = CellError.Value;
-            return Expression.Constant(CellError.Value);
-        }
-
-        var condition = arguments[0];
-        var trueValue = arguments[1];
-        var falseValue = arguments.Count == 3 ? arguments[2] : Expression.Constant(false);
-
-        // Check for errors in any argument
-        if (TryGetError(condition, out error))
-        {
-            return Expression.Constant(error);
-        }
-
-        if (TryGetError(trueValue, out error))
-        {
-            return Expression.Constant(error);
-        }
-
-        if (TryGetError(falseValue, out error))
-        {
-            return Expression.Constant(error);
-        }
-
-        // Convert condition to boolean following Excel semantics using expression tree
-        var booleanCondition = ConvertToBooleanExpression(condition);
-
-        // Ensure trueValue and falseValue have compatible types
-        var (compatibleTrueValue, compatibleFalseValue) = EnsureCompatibleTypes(trueValue, falseValue);
-
-        // Use Expression.Condition to create a proper conditional expression
-        return Expression.Condition(booleanCondition, compatibleTrueValue, compatibleFalseValue);
-    }
-
-    private Expression ConvertToBooleanExpression(Expression condition)
-    {
-        // Handle different types and convert to boolean following Excel semantics
-        if (condition.Type == typeof(bool))
-        {
-            return condition;
-        }
-
-        if (condition.Type == typeof(double))
-        {
-            return Expression.NotEqual(condition, Expression.Constant(0.0));
-        }
-
-        if (condition.Type == typeof(int))
-        {
-            return Expression.NotEqual(condition, Expression.Constant(0));
-        }
-
-        if (condition.Type == typeof(string))
-        {
-            return Expression.NotEqual(
-                Expression.Call(typeof(string), nameof(string.IsNullOrEmpty), null, condition),
-                Expression.Constant(true)
-            );
-        }
-
-        // For other numeric types, convert to double first
-        if (IsNumericType(condition.Type))
-        {
-            return Expression.NotEqual(ConvertIfNeeded(condition, typeof(double)), Expression.Constant(0.0));
-        }
-
-        // For null values, return false
-        if (IsNullValue(condition))
-        {
-            return Expression.Constant(false);
-        }
-
-        return Expression.NotEqual(Expression.Convert(condition, typeof(double)), Expression.Constant(0.0));
-    }
-
-    private Expression ConvertToStringExpression(Expression expression)
-    {
-        if (expression.Type == typeof(string))
-        {
-            return expression;
-        }
-
-        if (expression.Type == typeof(bool))
-        {
-            return Expression.Condition(
-                expression,
-                Expression.Constant("True"),
-                Expression.Constant("False")
-            );
-        }
-
-        // For other types, use ToString()
-        return Expression.Call(expression, "ToString", null);
-    }
-
-    private (Expression trueValue, Expression falseValue) EnsureCompatibleTypes(Expression trueValue, Expression falseValue)
-    {
-        // If types are already compatible, return as-is
-        if (trueValue.Type == falseValue.Type)
-        {
-            return (trueValue, falseValue);
-        }
-
-        // If one is a string, convert both to string
-        // But if falseValue is the default boolean false, keep it as boolean
-        if ((trueValue.Type == typeof(string) || falseValue.Type == typeof(string)) &&
-            !(falseValue is ConstantExpression constantFalse && constantFalse.Value is bool boolVal && !boolVal))
-        {
-            var stringTrueValue = ConvertToStringExpression(trueValue);
-            var stringFalseValue = ConvertToStringExpression(falseValue);
-            return (stringTrueValue, stringFalseValue);
-        }
-
-        // If one is boolean and the other is not string, convert the non-boolean to boolean
-        if ((trueValue.Type == typeof(bool) && falseValue.Type != typeof(string)) ||
-            (falseValue.Type == typeof(bool) && trueValue.Type != typeof(string)))
-        {
-            var boolTrueValue = ConvertToBooleanExpression(trueValue);
-            var boolFalseValue = ConvertToBooleanExpression(falseValue);
-            return (boolTrueValue, boolFalseValue);
-        }
-
-        // If both are numeric, convert to the common numeric type
-        if (IsNumericType(trueValue.Type) && IsNumericType(falseValue.Type))
-        {
-            var commonType = GetResultType(trueValue.Type, falseValue.Type);
-            var convertedTrueValue = ConvertIfNeeded(trueValue, commonType);
-            var convertedFalseValue = ConvertIfNeeded(falseValue, commonType);
-            return (convertedTrueValue, convertedFalseValue);
-        }
-
-
-        // Default: convert both to object
-        var objectTrueValue = ConvertIfNeeded(trueValue, typeof(object));
-        var objectFalseValue = ConvertIfNeeded(falseValue, typeof(object));
-        return (objectTrueValue, objectFalseValue);
-    }
 
     public void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
     {
@@ -502,21 +312,22 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             }
         }
 
-        switch (functionSyntaxNode.Name.ToUpperInvariant())
+        FormulaFunction? function = functionSyntaxNode.Name.ToUpperInvariant() switch
         {
-            case "SUM":
-                expression = Sum(arguments);
-                break;
+            "SUM" => new SumFunction(),
+            "IF" => new IfFunction(),
+            _ => null
+        };
 
-            case "IF":
-                expression = If(arguments);
-                break;
-
-            default:
-                error = CellError.Name;
-                expression = Expression.Constant(CellError.Name);
-                break;
+        if (function == null)
+        {
+            error = CellError.Name;
+            expression = Expression.Constant(CellError.Name);
+            return;
         }
+
+        expression = function.Evaluate(arguments);
+        error = function.Error;
     }
 
     public void VisitRange(RangeSyntaxNode rangeSyntaxNode)
