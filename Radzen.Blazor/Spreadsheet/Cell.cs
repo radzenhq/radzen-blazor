@@ -1,33 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
-
-/// <summary>
-/// Represents the type of value contained in a cell.
-/// </summary>
-public enum CellValueType
-{
-    /// <summary>
-    /// The cell contains a numeric value.
-    /// </summary>
-    Number,
-    /// <summary>
-    /// The cell contains a string value.
-    /// </summary>
-    String,
-    /// <summary>
-    /// The cell contains an error value.
-    /// </summary>
-    Error,
-    /// <summary>
-    /// The cell is empty.
-    /// </summary>
-    Empty
-}
 
 /// <summary>
 /// Represents a cell in a spreadsheet.
@@ -38,9 +14,6 @@ public class Cell
     /// Gets the sheet that contains this cell.
     /// </summary>
     public Sheet Sheet { get; private set; }
-
-    private object? value;
-    private CellValueType valueType = CellValueType.Empty;
 
     private Format? format;
 
@@ -83,9 +56,8 @@ public class Cell
 
     public Cell Clone() => new(Sheet, Address)
     {
-        value = value,
-        valueType = valueType,
-        Formula = formula
+        Data = new CellData(Value),
+        Formula = Formula
     };
 
     /// <summary>
@@ -93,8 +65,7 @@ public class Cell
     /// </summary>
     public void CopyFrom(Cell other)
     {
-        value = other.value;
-        valueType = other.valueType;
+        Data = other.Data;
         Formula = other.Formula;
         format = other.format;
 
@@ -107,14 +78,20 @@ public class Cell
     }
 
     /// <summary>
+    /// Gets the current value and its type as a CellData object.
+    /// </summary>
+    public CellData Data { get; internal set; } = new CellData(null);
+
+
+    /// <summary>
     /// Gets or sets the value of the cell.
     /// </summary>
     public object? Value
     {
-        get => value;
+        get => Data.Value;
         set
         {
-            AssignValue(value);
+            Data = new CellData(value);
 
             Sheet.OnCellValueChanged(this);
         }
@@ -130,12 +107,12 @@ public class Cell
             return Formula;
         }
 
-        return value switch
+        return Value switch
         {
             null => null,
             CellError error => error.ToString(),
             string str => str,
-            _ => value.ToString()
+            _ => Value.ToString()
         };
     }
 
@@ -144,12 +121,12 @@ public class Cell
     /// </summary>
     public string? GetValueAsString()
     {
-        return value switch
+        return Value switch
         {
             null => null,
             CellError error => error.ToString(),
             string str => str,
-            _ => value.ToString()
+            _ => Value.ToString()
         };
     }
 
@@ -187,7 +164,7 @@ public class Cell
     /// <summary>
     /// Gets the type of value contained in the cell.
     /// </summary>
-    public CellValueType ValueType => valueType;
+    public CellDataType ValueType => Data.Type;
 
     internal FormulaSyntaxNode? FormulaSyntaxNode { get; private set; }
 
@@ -235,50 +212,5 @@ public class Cell
     {
         Address = address;
         Sheet = sheet;
-    }
-
-    internal static bool TryParse(string value, out object? parsedValue)
-    {
-        if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var number))
-        {
-            parsedValue = number;
-            return true;
-        }
-
-        parsedValue = value;
-        return false;
-    }
-
-    private void AssignValue(object? value)
-    {
-        this.value = value;
-
-        switch (value)
-        {
-            case null:
-                valueType = CellValueType.Empty;
-                break;
-            case CellError:
-                valueType = CellValueType.Error;
-                break;
-            case string str:
-                if (TryParse(str, out var number))
-                {
-                    this.value = number;
-                    valueType = CellValueType.Number;
-                }
-                else
-                {
-                    valueType = CellValueType.String;
-                }
-                break;
-            case int or short or uint or ushort or byte or double or float or decimal or long or ulong:
-                this.value = Convert.ToDouble(value);
-                valueType = CellValueType.Number;
-                break;
-            default:
-                valueType = CellValueType.String;
-                break;
-        }
     }
 }
