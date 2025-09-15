@@ -84,6 +84,7 @@ public partial class Sheet
         ["COUNT"] = new CountFunction(),
         ["COUNTA"] = new CountAllFunction(),
         ["IF"] = new IfFunction(),
+        ["IFERROR"] = new IfErrorFunction(),
         ["AND"] = new AndFunction(),
         ["OR"] = new OrFunction(),
         ["NOT"] = new NotFunction()
