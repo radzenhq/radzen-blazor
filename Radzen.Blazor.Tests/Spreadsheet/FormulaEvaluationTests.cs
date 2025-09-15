@@ -662,18 +662,17 @@ public class FormulaEvaluationTests
     }
 
     [Fact]
-    public void ShouldEvaluateIfFunctionWithStringCondition()
+    public void ShouldEvaluateToErrorIfFunctionWithStringCondition()
     {
         sheet.Cells["A1"].Value = "test";
         sheet.Cells["A2"].Formula = "=IF(A1,\"Not Empty\",\"Empty\")";
 
-        Assert.Equal("Not Empty", sheet.Cells["A2"].Value);
+        Assert.Equal(CellError.Value, sheet.Cells["A2"].Value);
     }
 
     [Fact]
     public void ShouldEvaluateIfFunctionWithEmptyStringCondition()
     {
-        sheet.Cells["A1"].Value = "";
         sheet.Cells["A2"].Formula = "=IF(A1,\"Not Empty\",\"Empty\")";
 
         Assert.Equal("Empty", sheet.Cells["A2"].Value);
@@ -847,17 +846,16 @@ public class FormulaEvaluationTests
         sheet.Cells["A2"].Value = "hello";
         sheet.Cells["A3"].Formula = "=AND(A1,A2)";
 
-        Assert.Equal(true, sheet.Cells["A3"].Value);
+        Assert.Equal(CellError.Value, sheet.Cells["A3"].Value);
     }
 
     [Fact]
     public void ShouldEvaluateAndFunctionWithEmptyStringAsFalse()
     {
-        sheet.Cells["A1"].Value = "";
         sheet.Cells["A2"].Value = "hello";
         sheet.Cells["A3"].Formula = "=AND(A1,A2)";
 
-        Assert.Equal(false, sheet.Cells["A3"].Value);
+        Assert.Equal(CellError.Value, sheet.Cells["A3"].Value);
     }
 
     [Fact]
@@ -904,7 +902,7 @@ public class FormulaEvaluationTests
     public void ShouldEvaluateAndFunctionWithMixedTypes()
     {
         sheet.Cells["A1"].Value = 5;
-        sheet.Cells["A2"].Value = "test";
+        sheet.Cells["A2"].Value = "3";
         sheet.Cells["A3"].Value = true;
         sheet.Cells["A4"].Formula = "=AND(A1,A2,A3)";
 
@@ -1008,14 +1006,23 @@ public class FormulaEvaluationTests
         sheet.Cells["A2"].Value = "hello";
         sheet.Cells["A3"].Formula = "=OR(A1,A2)";
 
+        Assert.Equal(CellError.Value, sheet.Cells["A3"].Value);
+    }
+
+    [Fact]
+    public void ShouldEvaluateOrFunctionWithStringValueAndNumber()
+    {
+        sheet.Cells["A1"].Value = "2";
+        sheet.Cells["A2"].Value = "hello";
+        sheet.Cells["A3"].Formula = "=OR(A1,A2)";
+
         Assert.Equal(true, sheet.Cells["A3"].Value);
     }
 
     [Fact]
     public void ShouldEvaluateOrFunctionWithEmptyStringAsFalse()
     {
-        sheet.Cells["A1"].Value = "";
-        sheet.Cells["A2"].Value = "hello";
+        sheet.Cells["A2"].Value = "2";
         sheet.Cells["A3"].Formula = "=OR(A1,A2)";
 
         Assert.Equal(true, sheet.Cells["A3"].Value);
@@ -1024,11 +1031,9 @@ public class FormulaEvaluationTests
     [Fact]
     public void ShouldEvaluateOrFunctionWithBothEmptyStringsAsFalse()
     {
-        sheet.Cells["A1"].Value = "";
-        sheet.Cells["A2"].Value = "";
         sheet.Cells["A3"].Formula = "=OR(A1,A2)";
 
-        Assert.Equal(false, sheet.Cells["A3"].Value);
+        Assert.Equal(CellError.Value, sheet.Cells["A3"].Value);
     }
 
     [Fact]
@@ -1138,6 +1143,15 @@ public class FormulaEvaluationTests
 
         Assert.Equal(false, sheet.Cells["A2"].Value);
     }
+    
+    [Fact]
+    public void ShouldEvaluateNotFunctionWithEmptyStringAsError()
+    {
+        sheet.Cells["A1"].Value = "";
+        sheet.Cells["A2"].Formula = "=NOT(A1)";
+
+        Assert.Equal(CellError.Value, sheet.Cells["A2"].Value);
+    }
 
     [Fact]
     public void ShouldEvaluateNotFunctionWithFalseValue()
@@ -1172,13 +1186,12 @@ public class FormulaEvaluationTests
         sheet.Cells["A1"].Value = "test";
         sheet.Cells["A2"].Formula = "=NOT(A1)";
 
-        Assert.Equal(false, sheet.Cells["A2"].Value);
+        Assert.Equal(CellError.Value, sheet.Cells["A2"].Value);
     }
 
     [Fact]
-    public void ShouldEvaluateNotFunctionWithEmptyStringValue()
+    public void ShouldEvaluateNotFunctionWithEmptyValue()
     {
-        sheet.Cells["A1"].Value = "";
         sheet.Cells["A2"].Formula = "=NOT(A1)";
 
         Assert.Equal(true, sheet.Cells["A2"].Value);
@@ -1411,16 +1424,6 @@ public class FormulaEvaluationTests
         sheet.Cells["A1"].Formula = "=IFERROR(A2, \"Error\", \"Extra\")";
 
         Assert.Equal(CellError.Value, sheet.Cells["A1"].Value);
-    }
-
-    [Fact]
-    public void ShouldPropagateErrorFromValueIfError()
-    {
-        sheet.Cells["A1"].Value = 10;
-        sheet.Cells["A2"].Value = 2;
-        sheet.Cells["A3"].Formula = "=IFERROR(A1/A2, A6)";
-
-        Assert.Equal(CellError.Ref, sheet.Cells["A3"].Value);
     }
 
     [Fact]

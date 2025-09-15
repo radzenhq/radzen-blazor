@@ -7,60 +7,30 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class CountFunction : FormulaFunction
 {
-    public override object? Evaluate(List<object?> arguments)
+    public override CellData Evaluate(List<CellData> arguments)
     {
         if (arguments.Count == 0)
         {
-            return 0d;
+            return CellData.FromNumber(0);
         }
 
-        double count = 0d;
-        foreach (var v in arguments)
+        var count = 0d;
+
+        foreach (var argument in arguments)
         {
-            if (TryGetError(v, out _))
+            if (argument.IsError || argument.IsEmpty)
             {
                 continue;
             }
 
-            if (v is null)
-            {
-                continue;
-            }
+            var value = argument.GetValueOrDefault<double?>();
 
-            if (IsNumeric(v))
+            if (value is not null)
             {
-                count += 1d;
-            }
-            else if (v is bool)
-            {
-                count += 1d;
-            }
-            else if (v is string s)
-            {
-                if (IsNumericString(s))
-                {
-                    count += 1d;
-                }
+                count++;
             }
         }
 
-        return count;
-    }
-
-    private static bool IsNumericString(string value)
-    {
-        if (string.IsNullOrEmpty(value))
-            return false;
-
-        if (double.TryParse(value, out _))
-            return true;
-
-        if (decimal.TryParse(value, out _))
-            return true;
-
-        if (int.TryParse(value, out _))
-            return true;
-
-        return false;
+        return CellData.FromNumber(count);
     }
 }
