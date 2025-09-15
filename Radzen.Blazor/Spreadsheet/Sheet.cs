@@ -81,7 +81,8 @@ public partial class Sheet
     private readonly Dictionary<string, FormulaFunction> formulaFunctions = new () {
         ["SUM"] = new SumFunction(),
         ["IF"] = new IfFunction(),
-        ["AND"] = new AndFunction()
+        ["AND"] = new AndFunction(),
+        ["OR"] = new OrFunction()
     };
 
     /// <summary>
