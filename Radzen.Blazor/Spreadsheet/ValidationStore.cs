@@ -33,7 +33,7 @@ public class NumberValidator : ICellVaidator
     /// <inheritdoc/>
     public bool Validate(Cell cell)
     {
-        return cell.ValueType == CellValueType.Number || cell.ValueType == CellValueType.Empty;
+        return cell.ValueType == CellDataType.Number || cell.ValueType == CellDataType.Empty;
     }
 }
 

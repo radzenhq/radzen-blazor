@@ -44,71 +44,61 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 {
     private readonly Sheet sheet = sheet;
     private object? value;
-    private CellError? error;
     private readonly HashSet<Cell> evaluationStack = [];
 
     public void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
     {
-        value = TokenToObject(numberLiteralSyntaxNode.Token);
+        var token = numberLiteralSyntaxNode.Token;
+
+        value = token.ValueKind switch
+        {
+            ValueKind.Int => CellData.FromNumber(token.IntValue),
+            ValueKind.UInt => CellData.FromNumber(token.UintValue),
+            ValueKind.Long => CellData.FromNumber(token.LongValue),
+            ValueKind.ULong => CellData.FromNumber(token.UlongValue),
+            ValueKind.Float => CellData.FromNumber(token.FloatValue),
+            ValueKind.Double => CellData.FromNumber(token.DoubleValue),
+            ValueKind.Decimal => CellData.FromNumber((double)token.DecimalValue),
+            _ => throw new InvalidOperationException($"Unsupported value kind: {token.ValueKind}")
+        };
     }
 
     public void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode)
     {
-        value = stringLiteralSyntaxNode.Token.Value;
-    }
-
-    private static bool IsNumeric(object? v) => ValueHelpers.IsNumeric(v);
-
-    private static double ToDouble(object v) => ValueHelpers.ToDouble(v);
-
-    private static object? TokenToObject(FormulaToken token)
-    {
-        return token.ValueKind switch
+        if (stringLiteralSyntaxNode.Token.Value is not null)
         {
-            ValueKind.Null => null,
-            ValueKind.String => token.Value,
-            ValueKind.True => true,
-            ValueKind.False => false,
-            ValueKind.Int => (double)token.IntValue,
-            ValueKind.UInt => (double)token.UintValue,
-            ValueKind.Long => (double)token.LongValue,
-            ValueKind.ULong => (double)token.UlongValue,
-            ValueKind.Float => (double)token.FloatValue,
-            ValueKind.Double => token.DoubleValue,
-            ValueKind.Decimal => (double)token.DecimalValue,
-            _ => throw new InvalidOperationException($"Unsupported value kind: {token.ValueKind}")
-        };
+            value = CellData.FromString(stringLiteralSyntaxNode.Token.Value);
+        }
     }
 
     public void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
     {
         binaryExpressionSyntaxNode.Left.Accept(this);
-        var left = value;
+        var left = (CellData)value!;
         binaryExpressionSyntaxNode.Right.Accept(this);
-        var right = value;
+        var right = (CellData)value!;
 
-        if (left is CellError le)
+        if (left.IsError)
         {
-            error = le;
-            value = le;
+            value = left;
             return;
         }
 
-        if (right is CellError re)
+        if (right.IsError)
         {
-            error = re;
-            value = re;
+            value = right;
             return;
         }
 
-        if (left is null)
+        // Treat empty values as zero for arithmetic
+        if (left.IsEmpty)
         {
-            left = 0d;
+            left = CellData.FromNumber(0d);
         }
 
-        if (right is null)
+        if (right.IsEmpty)
         {
-            right = 0d;
+            right = CellData.FromNumber(0d);
         }
 
         // For comparison operators, we don't need both sides to be numeric
@@ -117,20 +107,19 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             BinaryOperator.LessThan or BinaryOperator.LessThanOrEqual or
             BinaryOperator.GreaterThan or BinaryOperator.GreaterThanOrEqual;
 
-        if (!isComparisonOperator && (!IsNumeric(left) || !IsNumeric(right)))
+        if (!isComparisonOperator && (left.Type != CellDataType.Number || right.Type != CellDataType.Number))
         {
-            error = CellError.Value;
-            value = CellError.Value;
+            value = CellData.FromError(CellError.Value);
             return;
         }
 
         if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Divide)
         {
-            var rv = right;
-            if (rv is double dv && dv == 0d || rv is int i && i == 0 || rv is float f && f == 0f || rv is decimal m && m == 0m)
+            var rnum = right.GetValueOrDefault<double>();
+
+            if (Math.Abs(rnum) == 0d)
             {
-                error = CellError.Div0;
-                value = CellError.Div0;
+                value = CellData.FromError(CellError.Div0);
                 return;
             }
         }
@@ -140,63 +129,57 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             switch (binaryExpressionSyntaxNode.Operator)
             {
                 case BinaryOperator.Equals:
-                    value = Equals(left, right);
+                    value = CellData.FromBoolean(left.IsEqualTo(right));
                     return;
                 case BinaryOperator.NotEquals:
-                    value = !Equals(left, right);
+                    value = CellData.FromBoolean(!left.IsEqualTo(right));
                     return;
                 case BinaryOperator.LessThan:
-                    if (ValueHelpers.TryCompare(left, right, out var lt, out var cmpErr)) { value = lt < 0; return; }
-                    error = cmpErr; value = cmpErr; return;
+                    value = CellData.FromBoolean(left.IsLessThan(right));
+                    return;
                 case BinaryOperator.LessThanOrEqual:
-                    if (ValueHelpers.TryCompare(left, right, out var lte, out var cmpErr2)) { value = lte <= 0; return; }
-                    error = cmpErr2; value = cmpErr2; return;
+                    value = CellData.FromBoolean(left.IsLessThanOrEqualTo(right));
+                    return;
                 case BinaryOperator.GreaterThan:
-                    if (ValueHelpers.TryCompare(left, right, out var gt, out var cmpErr3)) { value = gt > 0; return; }
-                    error = cmpErr3; value = cmpErr3; return;
+                    value = CellData.FromBoolean(left.IsGreaterThan(right));
+                    return;
                 case BinaryOperator.GreaterThanOrEqual:
-                    if (ValueHelpers.TryCompare(left, right, out var gte, out var cmpErr4)) { value = gte >= 0; return; }
-                    error = cmpErr4; value = cmpErr4; return;
+                    value = CellData.FromBoolean(left.IsGreaterThanOrEqualTo(right));
+                    return;
             }
         }
         else
         {
-            var l = ToDouble(left!);
-            var r = ToDouble(right!);
+            var l = left.GetValueOrDefault<double>();
+            var r = right.GetValueOrDefault<double>();
             switch (binaryExpressionSyntaxNode.Operator)
             {
-                case BinaryOperator.Plus: value = l + r; return;
-                case BinaryOperator.Minus: value = l - r; return;
-                case BinaryOperator.Multiply: value = l * r; return;
-                case BinaryOperator.Divide: value = l / r; return;
+                case BinaryOperator.Plus: value = CellData.FromNumber(l + r); return;
+                case BinaryOperator.Minus: value = CellData.FromNumber(l - r); return;
+                case BinaryOperator.Multiply: value = CellData.FromNumber(l * r); return;
+                case BinaryOperator.Divide: value = CellData.FromNumber(l / r); return;
             }
         }
 
         throw new InvalidOperationException($"Unsupported operator: {binaryExpressionSyntaxNode.Operator}");
     }
 
-    private object? EvaluateCell(Cell cell)
+    private CellData EvaluateCell(Cell cell)
     {
         if (!evaluationStack.Add(cell))
         {
-            error = CellError.Circular;
-            return CellError.Circular;
+            return CellData.FromError(CellError.Circular);
         }
 
-        object? result;
+        CellData result;
         if (cell.FormulaSyntaxNode != null)
         {
             cell.FormulaSyntaxNode.Accept(this);
-            result = value;
-        }
-        else if (cell.ValueType == CellValueType.Error && cell.Value is CellError cellError)
-        {
-            error = cellError;
-            result = cellError;
+            result = (CellData)value!;
         }
         else
         {
-            result = cell.Value;
+            result = cell.Data;
         }
         evaluationStack.Remove(cell);
         return result;
@@ -208,59 +191,51 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 
         if (!sheet.Cells.TryGet(address.Row, address.Column, out var cell))
         {
-            error = CellError.Ref;
-            value = CellError.Ref;
+            value = CellData.FromError(CellError.Ref);
             return;
         }
 
         value = EvaluateCell(cell);
     }
 
-    public object? Evaluate(FormulaSyntaxNode node)
+    public CellData Evaluate(FormulaSyntaxNode node)
     {
-        error = null;
         node.Accept(this);
 
-        if (error != null)
-        {
-            return error;
-        }
-
-        return value;
+        return (CellData)value!;
     }
 
 
     public void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
     {
-        var arguments = new List<object?>();
+        var arguments = new List<CellData>();
 
         // Get the function to check if it can handle errors
         var function = sheet.GetFormulaFunction(functionSyntaxNode.Name);
-        var canHandleErrors = function.CanHandleErrors;
 
         foreach (var argument in functionSyntaxNode.Arguments)
         {
             argument.Accept(this);
 
+            var hasError = value is CellData cellData && cellData.IsError;
+
             // Only short-circuit on errors if the function cannot handle them
-            if (error != null && !canHandleErrors)
+            if (hasError && !function.CanHandleErrors)
             {
                 return;
             }
 
-            if (value is List<object?> list)
+            if (value is List<CellData> list)
             {
                 arguments.AddRange(list);
             }
             else
             {
-                arguments.Add(value);
+                arguments.Add((CellData)value!);
             }
         }
 
-        // Call the function with the arguments
         value = function.Evaluate(arguments);
-        error = function.Error;
     }
 
     public void VisitRange(RangeSyntaxNode rangeSyntaxNode)
@@ -270,28 +245,29 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 
         if (start.Row > end.Row || (start.Row == end.Row && start.Column > end.Column))
         {
-            error = CellError.Value;
-            value = CellError.Value;
+            value = CellData.FromError(CellError.Value);
             return;
         }
 
-        var cells = new List<object?>();
+        var cells = new List<CellData>();
+
         for (var row = start.Row; row <= end.Row; row++)
         {
             for (var column = start.Column; column <= end.Column; column++)
             {
                 if (!sheet.Cells.TryGet(row, column, out var cell))
                 {
-                    error = CellError.Ref;
-                    value = CellError.Ref;
+                    value = CellData.FromError(CellError.Ref);
                     return;
                 }
 
                 var cellValue = EvaluateCell(cell);
-                if (error != null)
+
+                if (cellValue.IsError)
                 {
                     return;
                 }
+
                 cells.Add(cellValue);
             }
         }

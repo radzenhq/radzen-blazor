@@ -1,42 +1,43 @@
-using System;
 using System.Collections.Generic;
 
 #nullable enable
 
 namespace Radzen.Blazor.Spreadsheet;
+
 class IfFunction : FormulaFunction
 {
-    public override object? Evaluate(List<object?> arguments)
+    public override CellData Evaluate(List<CellData> arguments)
     {
         if (arguments.Count < 2 || arguments.Count > 3)
         {
-            error = CellError.Value;
-            return error;
+            return CellData.FromError(CellError.Value);
         }
 
         var condition = arguments[0];
+
+        if (condition.IsError)
+        {
+            return condition;
+        }
+
         var trueValue = arguments[1];
-        var falseValue = arguments.Count == 3 ? arguments[2] : false;
 
-        if (TryGetError(condition, out var e1))
+        var falseValue = arguments.Count == 3 ? arguments[2] : CellData.FromBoolean(false);
+
+        if (condition.IsEmpty)
         {
-            error = e1;
-            return e1;
+            return falseValue;
         }
 
-        if (TryGetError(trueValue, out var e2))
-        {
-            error = e2;
-            return e2;
-        }
+        var value = condition.GetValueOrDefault<bool?>();
 
-        if (TryGetError(falseValue, out var e3))
+        if (value is null)
         {
-            error = e3;
-            return e3;
+            return CellData.FromError(CellError.Value);
         }
-
-        var cond = ConvertToBoolean(condition);
-        return cond ? trueValue : falseValue;
+        else
+        {
+            return value.Value ? trueValue : falseValue;
+        }
     }
 }
