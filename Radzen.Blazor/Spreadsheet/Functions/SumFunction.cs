@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 #nullable enable
 
@@ -8,52 +7,31 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class SumFunction : FormulaFunction
 {
-    public override Expression Evaluate(List<Expression> arguments)
+    public override object? Evaluate(List<object?> arguments)
     {
-        var expressions = new List<Expression>();
-
-        foreach (var arg in arguments)
-        {
-            if (arg is RangeExpression rangeExpr)
-            {
-                expressions.AddRange(rangeExpr.Expressions);
-            }
-            else
-            {
-                expressions.Add(arg);
-            }
-        }
-
-        if (expressions.Count == 0)
+        if (arguments.Count == 0)
         {
             error = CellError.Value;
-            return Expression.Constant(CellError.Value);
+            return error;
         }
 
-        Expression? sum = null;
-
-        foreach (var arg in expressions)
+        double sum = 0d;
+        foreach (var v in arguments)
         {
-            if (TryGetError(arg, out error))
+            if (TryGetError(v, out var e))
             {
-                return Expression.Constant(error);
+                error = e;
+                return e;
             }
 
-            var addend = IsNullValue(arg) ? Expression.Constant(0) : arg;
+            if (v is null)
+            {
+                continue;
+            }
 
-            if (sum == null)
-            {
-                sum = addend;
-            }
-            else
-            {
-                var resultType = GetResultType(sum.Type, addend.Type);
-                sum = ConvertIfNeeded(sum, resultType);
-                addend = ConvertIfNeeded(addend, resultType);
-                sum = Expression.Add(sum, addend);
-            }
+            sum += ToDouble(v);
         }
 
-        return sum!;
+        return sum;
     }
 }
