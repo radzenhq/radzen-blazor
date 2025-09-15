@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 #nullable enable
@@ -7,31 +6,32 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class SumFunction : FormulaFunction
 {
-    public override object? Evaluate(List<object?> arguments)
+    public override CellData Evaluate(List<CellData> arguments)
     {
         if (arguments.Count == 0)
         {
-            error = CellError.Value;
-            return error;
+            return CellData.FromError(CellError.Value);
         }
 
-        double sum = 0d;
-        foreach (var v in arguments)
+        var sum = 0d;
+
+        foreach (var argument in arguments)
         {
-            if (TryGetError(v, out var e))
+            if (argument.IsError)
             {
-                error = e;
-                return e;
+                return argument;
             }
 
-            if (v is null)
+            if (argument.IsEmpty || argument.Type != CellDataType.Number)
             {
                 continue;
             }
 
-            sum += ToDouble(v);
+            var value = argument.GetValueOrDefault<double>();
+
+            sum += value;
         }
 
-        return sum;
+        return CellData.FromNumber(sum);
     }
 }

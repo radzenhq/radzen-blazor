@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 
 #nullable enable
@@ -7,34 +6,44 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class AndFunction : FormulaFunction
 {
-    public override object? Evaluate(List<object?> arguments)
+    public override CellData Evaluate(List<CellData> arguments)
     {
         if (arguments.Count == 0)
         {
-            error = CellError.Value;
-            return error;
+            return CellData.FromError(CellError.Value);
         }
 
-        if (arguments.Count == 0)
-        {
-            error = CellError.Value;
-            return error;
-        }
+        bool? result = null;
 
-        foreach (var v in arguments)
+        foreach (var argument in arguments)
         {
-            if (TryGetError(v, out var e))
+            if (argument.IsError)
             {
-                error = e;
-                return e;
+                return argument;
             }
 
-            if (!ConvertToBoolean(v))
+            if (argument.IsEmpty)
             {
-                return false;
+                continue;
             }
+
+            var value = argument.GetValueOrDefault<bool?>();
+
+            if (value is null && result is null)
+            {
+                continue;
+            }
+
+            result ??= true;
+
+            result &= value;
         }
 
-        return true;
+        if (result is null)
+        {
+            return CellData.FromError(CellError.Value);
+        }
+
+        return CellData.FromBoolean(result.Value);
     }
 }

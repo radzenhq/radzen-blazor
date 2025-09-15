@@ -102,7 +102,7 @@ public partial class CellMenu : ComponentBase
             {
                 if (value is string str)
                 {
-                    Cell.TryParse(str, out var parsedValue);
+                    CellData.TryConvertFromString(str, out var parsedValue, out _);
                     selectedFilterValues.Add(parsedValue);
                 }
                 else
