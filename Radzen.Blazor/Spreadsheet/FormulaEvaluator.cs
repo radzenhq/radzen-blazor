@@ -180,13 +180,17 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 
         if (binaryExpressionSyntaxNode.Operator == BinaryOperator.Divide)
         {
-            var rightValue = ((ConstantExpression)right).Value;
-
-            if (Equals(rightValue, 0d))
+            // Check if right operand is a constant expression
+            if (right is ConstantExpression constantRight)
             {
-                error = CellError.Div0;
-                expression = Expression.Constant(CellError.Div0);
-                return;
+                var rightValue = constantRight.Value;
+
+                if (Equals(rightValue, 0d) || Equals(rightValue, 0) || Equals(rightValue, 0f) || Equals(rightValue, 0m))
+                {
+                    error = CellError.Div0;
+                    expression = Expression.Constant(CellError.Div0);
+                    return;
+                }
             }
         }
 
@@ -293,11 +297,16 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
     {
         var arguments = new List<Expression>();
 
+        // Get the function to check if it can handle errors
+        var function = sheet.GetFormulaFunction(functionSyntaxNode.Name);
+        var canHandleErrors = function.CanHandleErrors;
+
         foreach (var argument in functionSyntaxNode.Arguments)
         {
             argument.Accept(this);
 
-            if (error != null)
+            // Only short-circuit on errors if the function cannot handle them
+            if (error != null && !canHandleErrors)
             {
                 return;
             }
@@ -312,7 +321,7 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             }
         }
 
-        var function = sheet.GetFormulaFunction(functionSyntaxNode.Name);
+        // Call the function with the arguments
         expression = function.Evaluate(arguments);
         error = function.Error;
     }
