@@ -1,47 +1,42 @@
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 
 #nullable enable
 
 namespace Radzen.Blazor.Spreadsheet;
 class IfFunction : FormulaFunction
 {
-    public override Expression Evaluate(List<Expression> arguments)
+    public override object? Evaluate(List<object?> arguments)
     {
         if (arguments.Count < 2 || arguments.Count > 3)
         {
             error = CellError.Value;
-            return Expression.Constant(CellError.Value);
+            return error;
         }
 
         var condition = arguments[0];
         var trueValue = arguments[1];
-        var falseValue = arguments.Count == 3 ? arguments[2] : Expression.Constant(false);
+        var falseValue = arguments.Count == 3 ? arguments[2] : false;
 
-        // Check for errors in any argument
-        if (TryGetError(condition, out error))
+        if (TryGetError(condition, out var e1))
         {
-            return Expression.Constant(error);
+            error = e1;
+            return e1;
         }
 
-        if (TryGetError(trueValue, out error))
+        if (TryGetError(trueValue, out var e2))
         {
-            return Expression.Constant(error);
+            error = e2;
+            return e2;
         }
 
-        if (TryGetError(falseValue, out error))
+        if (TryGetError(falseValue, out var e3))
         {
-            return Expression.Constant(error);
+            error = e3;
+            return e3;
         }
 
-        // Convert condition to boolean following Excel semantics using expression tree
-        var booleanCondition = ConvertToBooleanExpression(condition);
-
-        // Ensure trueValue and falseValue have compatible types
-        var (compatibleTrueValue, compatibleFalseValue) = EnsureCompatibleTypes(trueValue, falseValue);
-
-        // Use Expression.Condition to create a proper conditional expression
-        return Expression.Condition(booleanCondition, compatibleTrueValue, compatibleFalseValue);
+        var cond = ConvertToBoolean(condition);
+        return cond ? trueValue : falseValue;
     }
 }
