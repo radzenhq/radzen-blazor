@@ -312,20 +312,7 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
             }
         }
 
-        FormulaFunction? function = functionSyntaxNode.Name.ToUpperInvariant() switch
-        {
-            "SUM" => new SumFunction(),
-            "IF" => new IfFunction(),
-            _ => null
-        };
-
-        if (function == null)
-        {
-            error = CellError.Name;
-            expression = Expression.Constant(CellError.Name);
-            return;
-        }
-
+        var function = sheet.GetFormulaFunction(functionSyntaxNode.Name);
         expression = function.Evaluate(arguments);
         error = function.Error;
     }
