@@ -20,6 +20,12 @@ public abstract class FormulaFunction
     public CellError? Error => error;
 
     /// <summary>
+    /// Gets a value indicating whether this function can handle error arguments.
+    /// Functions that return true will receive error expressions as arguments instead of having evaluation short-circuited.
+    /// </summary>
+    public virtual bool CanHandleErrors => false;
+
+    /// <summary>
     /// Evaluates the function with the given arguments.
     /// </summary>
     /// <param name="arguments">The function arguments as expressions.</param>
