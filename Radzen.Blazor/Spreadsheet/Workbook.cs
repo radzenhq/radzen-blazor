@@ -603,12 +603,12 @@ public class Workbook
         {
             switch (cell.ValueType)
             {
-                case CellValueType.Number:
+                case CellDataType.Number:
                     cellElement.Add(new XAttribute("t", "n"));
                     cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), cell.GetValue()));
                     break;
 
-                case CellValueType.String:
+                case CellDataType.String:
                     var strValue = cell.GetValue() ?? string.Empty;
                     if (!sharedStrings.TryGetValue(strValue, out var index))
                     {
@@ -623,12 +623,12 @@ public class Workbook
                     cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), index));
                     break;
 
-                case CellValueType.Error:
+                case CellDataType.Error:
                     cellElement.Add(new XAttribute("t", "e"));
                     cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), cell.GetValue()));
                     break;
 
-                case CellValueType.Empty:
+                case CellDataType.Empty:
                     break;
             }
         }
