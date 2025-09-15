@@ -82,6 +82,7 @@ public partial class Sheet
         ["SUM"] = new SumFunction(),
         ["AVERAGE"] = new AverageFunction(),
         ["COUNT"] = new CountFunction(),
+        ["COUNTA"] = new CountAllFunction(),
         ["IF"] = new IfFunction(),
         ["AND"] = new AndFunction(),
         ["OR"] = new OrFunction(),
