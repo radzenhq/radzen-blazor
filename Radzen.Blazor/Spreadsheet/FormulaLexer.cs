@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -47,15 +48,29 @@ internal enum FormulaTokenType
     NumericLiteral,
     StringLiteral,
     CellIdentifier,
+    Whitespace,
 }
 
-internal class FormulaToken(FormulaTokenType type)
+internal enum FormulaTokenTriviaKind
+{
+    None,
+    Whitespace,
+    EndOfLine,
+}
+
+internal class FormulaTokenTrivia(FormulaTokenTriviaKind kind, string text)
+{
+    public FormulaTokenTriviaKind Kind { get; } = kind;
+    public string Text { get; } = text;
+}
+
+internal class FormulaToken(FormulaTokenType type, string  value)
 {
     public FormulaTokenType Type { get; } = type;
 
     public ValueKind ValueKind { get; set; } = ValueKind.None;
 
-    public string? Value { get; set; }
+    public string Value { get; set; } = value;
     public float FloatValue { get; set; }
     public double DoubleValue { get; set; }
     public decimal DecimalValue { get; set; }
@@ -64,6 +79,9 @@ internal class FormulaToken(FormulaTokenType type)
     public long LongValue { get; set; }
     public ulong UlongValue { get; set; }
     public CellRef AddressValue { get; set; }
+
+    public List<FormulaTokenTrivia> LeadingTrivia { get; } = new();
+    public List<FormulaTokenTrivia> TrailingTrivia { get; } = new();
 
     public ConstantExpression ToConstantExpression()
     {
@@ -100,27 +118,83 @@ internal class FormulaLexer(string expression)
     {
         while (position < expression.Length)
         {
-            ScanTrivia();
+            // Capture leading trivia (whitespace before the token)
+            var leadingTrivia = ScanTrivia();
 
             var token = ScanToken();
 
             if (token.Type == FormulaTokenType.None)
             {
+                // If we have leading trivia but no token, create a whitespace token
+                if (leadingTrivia.Count > 0)
+                {
+                    var whitespaceText = string.Join("", leadingTrivia.Select(t => t.Text));
+                    var whitespaceToken = new FormulaToken(FormulaTokenType.Whitespace, whitespaceText);
+                    whitespaceToken.LeadingTrivia.AddRange(leadingTrivia);
+                    yield return whitespaceToken;
+                }
                 yield break;
             }
+
+            // Add leading trivia to the token
+            token.LeadingTrivia.AddRange(leadingTrivia);
+
+            // Capture trailing trivia (whitespace after the token)
+            var trailingTrivia = ScanTrivia();
+            token.TrailingTrivia.AddRange(trailingTrivia);
 
             yield return token;
         }
 
-        yield return new FormulaToken(FormulaTokenType.None);
+        yield return new FormulaToken(FormulaTokenType.None, string.Empty);
     }
 
-    private void ScanTrivia()
+    private List<FormulaTokenTrivia> ScanTrivia()
     {
+        var trivia = new List<FormulaTokenTrivia>();
+        var whitespaceBuffer = new StringBuilder();
+
         while (char.IsWhiteSpace(Peek()))
         {
-            Advance(1);
+            var ch = Peek();
+
+            if (ch == '\r' && Peek(1) == '\n')
+            {
+                // Windows line ending - flush any accumulated whitespace first
+                if (whitespaceBuffer.Length > 0)
+                {
+                    trivia.Add(new FormulaTokenTrivia(FormulaTokenTriviaKind.Whitespace, whitespaceBuffer.ToString()));
+                    whitespaceBuffer.Clear();
+                }
+                Advance(2);
+                trivia.Add(new FormulaTokenTrivia(FormulaTokenTriviaKind.EndOfLine, "\r\n"));
+            }
+            else if (ch == '\n')
+            {
+                // Unix line ending - flush any accumulated whitespace first
+                if (whitespaceBuffer.Length > 0)
+                {
+                    trivia.Add(new FormulaTokenTrivia(FormulaTokenTriviaKind.Whitespace, whitespaceBuffer.ToString()));
+                    whitespaceBuffer.Clear();
+                }
+                Advance(1);
+                trivia.Add(new FormulaTokenTrivia(FormulaTokenTriviaKind.EndOfLine, "\n"));
+            }
+            else
+            {
+                // Regular whitespace - accumulate
+                whitespaceBuffer.Append(ch);
+                Advance(1);
+            }
         }
+
+        // Flush any remaining whitespace
+        if (whitespaceBuffer.Length > 0)
+        {
+            trivia.Add(new FormulaTokenTrivia(FormulaTokenTriviaKind.Whitespace, whitespaceBuffer.ToString()));
+        }
+
+        return trivia;
     }
 
     private char Peek(int offset = 0)
@@ -162,54 +236,54 @@ internal class FormulaLexer(string expression)
                 if (TryAdvance('>'))
                 {
                     Advance(1);
-                    return new FormulaToken(FormulaTokenType.EqualsGreaterThan);
+                    return new FormulaToken(FormulaTokenType.EqualsGreaterThan, ">=");
                 }
 
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.Equals);
+                return new FormulaToken(FormulaTokenType.Equals, "=");
             case '>':
                 if (TryAdvance('='))
                 {
                     Advance(1);
-                    return new FormulaToken(FormulaTokenType.GreaterThanOrEqual);
+                    return new FormulaToken(FormulaTokenType.GreaterThanOrEqual, ">=");
                 }
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.GreaterThan);
+                return new FormulaToken(FormulaTokenType.GreaterThan, ">");
             case '<':
                 if (TryAdvance('='))
                 {
                     Advance(1);
-                    return new FormulaToken(FormulaTokenType.LessThanOrEqual);
+                    return new FormulaToken(FormulaTokenType.LessThanOrEqual, "<=");
                 }
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.LessThan);
+                return new FormulaToken(FormulaTokenType.LessThan, "<");
             case '+':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.Plus);
+                return new FormulaToken(FormulaTokenType.Plus, "+");
             case '-':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.Minus);
+                return new FormulaToken(FormulaTokenType.Minus, "-");
             case '*':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.Star);
+                return new FormulaToken(FormulaTokenType.Star, "*");
             case '/':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.Slash);
+                return new FormulaToken(FormulaTokenType.Slash, "/");
             case '.':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.Dot);
+                return new FormulaToken(FormulaTokenType.Dot, ".");
             case '(':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.OpenParen);
+                return new FormulaToken(FormulaTokenType.OpenParen, "(");
             case ')':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.CloseParen);
+                return new FormulaToken(FormulaTokenType.CloseParen, ")");
             case ',':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.Comma);
+                return new FormulaToken(FormulaTokenType.Comma, ",");
             case ':':
                 Advance(1);
-                return new FormulaToken(FormulaTokenType.Colon);
+                return new FormulaToken(FormulaTokenType.Colon, ":");
             case >= '0' and <= '9':
                 return ScanNumericLiteral();
             case '_':
@@ -218,7 +292,7 @@ internal class FormulaLexer(string expression)
 
         }
 
-        return new FormulaToken(FormulaTokenType.None);
+        return new FormulaToken(FormulaTokenType.None, string.Empty);
     }
 
     private FormulaToken ScanStringLiteral()
@@ -241,7 +315,7 @@ internal class FormulaLexer(string expression)
                     break;
                 case '"':
                     Advance(1);
-                    return new FormulaToken(FormulaTokenType.StringLiteral) { Value = buffer.ToString() };
+                    return new FormulaToken(FormulaTokenType.StringLiteral, buffer.ToString());
                 default:
                     buffer.Append(ch);
                     Advance(1);
@@ -309,7 +383,7 @@ internal class FormulaLexer(string expression)
             var digit = Peek();
 
             int digitValue;
-            
+
             if (digit >= '0' && digit <= '9')
             {
                 digitValue = digit - '0';
@@ -480,7 +554,7 @@ internal class FormulaLexer(string expression)
             break;
         }
 
-        var value = new FormulaToken(FormulaTokenType.NumericLiteral);
+        var value = new FormulaToken(FormulaTokenType.NumericLiteral, string.Empty);
 
         var valueKind = ValueKind.None;
 
@@ -577,6 +651,8 @@ internal class FormulaLexer(string expression)
                 }
             break;
         }
+
+        value.Value = buffer.ToString();
 
         return value;
     }
@@ -695,13 +771,12 @@ internal class FormulaLexer(string expression)
     {
         if (hasLetters && hasNumbers && CellRef.TryParse(value, out var cellIndex))
         {
-            return new FormulaToken(FormulaTokenType.CellIdentifier)
+            return new FormulaToken(FormulaTokenType.CellIdentifier, value)
             {
-                Value = value,
                 AddressValue = cellIndex
             };
         }
 
-        return new FormulaToken(FormulaTokenType.Identifier) { Value = value };
+        return new FormulaToken(FormulaTokenType.Identifier, value);
     }
 }
