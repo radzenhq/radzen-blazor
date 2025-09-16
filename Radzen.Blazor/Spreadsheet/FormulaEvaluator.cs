@@ -208,34 +208,121 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 
     public void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
     {
-        var arguments = new List<CellData>();
-
         // Get the function to check if it can handle errors
         var function = sheet.GetFormulaFunction(functionSyntaxNode.Name);
 
-        foreach (var argument in functionSyntaxNode.Arguments)
+        // Process arguments according to parameter definitions
+        var functionArguments = ProcessArguments(function, functionSyntaxNode.Arguments);
+        
+        if (functionArguments == null)
         {
-            argument.Accept(this);
+            return; // Error already set in ProcessArguments
+        }
 
-            var hasError = value is CellData cellData && cellData.IsError;
+        value = function.Evaluate(functionArguments);
+    }
 
-            // Only short-circuit on errors if the function cannot handle them
-            if (hasError && !function.CanHandleErrors)
+    private FunctionArguments? ProcessArguments(FormulaFunction function, List<FormulaSyntaxNode> argumentNodes)
+    {
+        var parameterDefinitions = function.Parameters;
+        var functionArguments = new FunctionArguments();
+        var argumentIndex = 0;
+
+        for (int paramIndex = 0; paramIndex < parameterDefinitions.Length; paramIndex++)
+        {
+            var paramDef = parameterDefinitions[paramIndex];
+            
+            // Check if we have enough arguments for required parameters
+            // But only if this is not a repeating parameter (repeating parameters can handle empty lists)
+            if (paramDef.IsRequired && 
+                paramDef.Type != ParameterType.Sequence && 
+                argumentIndex >= argumentNodes.Count)
             {
-                return;
+                value = CellData.FromError(CellError.Value);
+                return null;
             }
 
-            if (value is List<CellData> list)
+            // Handle repeating single parameters
+            if (paramDef.Type == ParameterType.Sequence)
             {
-                arguments.AddRange(list);
+                // Collect all remaining arguments for repeating single parameters
+                var allArguments = new List<CellData>();
+                while (argumentIndex < argumentNodes.Count)
+                {
+                    var argument = ProcessArgument(argumentNodes[argumentIndex], function);
+                    if (argument == null)
+                    {
+                        return null; // Error already set
+                    }
+                    allArguments.AddRange(argument);
+                    argumentIndex++;
+                }
+                functionArguments.Set(paramDef.Name, allArguments);
             }
             else
             {
-                arguments.Add((CellData)value!);
+                // Handle single parameter
+                if (argumentIndex < argumentNodes.Count)
+                {
+                    var argument = ProcessArgument(argumentNodes[argumentIndex], function);
+                    if (argument == null)
+                    {
+                        return null; // Error already set
+                    }
+                    
+                    // Set the argument based on parameter type
+                    if (paramDef.Type == ParameterType.Collection)
+                    {
+                        // For collections, pass the list directly
+                        functionArguments.Set(paramDef.Name, argument);
+                    }
+                    else
+                    {
+                        // For single values, pass the first item
+                        functionArguments.Set(paramDef.Name, argument[0]);
+                    }
+                    argumentIndex++;
+                }
+                else if (!paramDef.IsRequired)
+                {
+                    // Optional parameter not provided - skip it
+                    continue;
+                }
             }
         }
 
-        value = function.Evaluate(arguments);
+        // Check if we have too many arguments
+        // But only if this is not an ErrorFunction (ErrorFunction can handle any number of arguments)
+        if (argumentIndex < argumentNodes.Count && function is not ErrorFunction)
+        {
+            value = CellData.FromError(CellError.Value);
+            return null;
+        }
+
+        return functionArguments;
+    }
+
+    private List<CellData>? ProcessArgument(FormulaSyntaxNode argumentNode, FormulaFunction function)
+    {
+        argumentNode.Accept(this);
+
+        var hasError = value is CellData cellData && cellData.IsError;
+
+        // Only short-circuit on errors if the function cannot handle them
+        if (hasError && !function.CanHandleErrors)
+        {
+            return null;
+        }
+
+        // Convert the evaluated value to a list of CellData
+        if (value is List<CellData> list)
+        {
+            return list;
+        }
+        else
+        {
+            return [(CellData)value!];
+        }
     }
 
     public void VisitRange(RangeSyntaxNode rangeSyntaxNode)

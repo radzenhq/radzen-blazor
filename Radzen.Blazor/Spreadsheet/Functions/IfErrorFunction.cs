@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 #nullable enable
 
 namespace Radzen.Blazor.Spreadsheet;
@@ -8,15 +6,26 @@ class IfErrorFunction : FormulaFunction
 {
     public override bool CanHandleErrors => true;
 
-    public override CellData Evaluate(List<CellData> arguments)
+    public override FunctionParameter[] Parameters =>
+    [
+            new("value", ParameterType.Single, isRequired: true),
+            new("value_if_error", ParameterType.Single, isRequired: true)
+    ];
+
+    public override CellData Evaluate(FunctionArguments arguments)
     {
-        if (arguments.Count != 2)
+        var value = arguments.GetSingle("value");
+
+        if (value == null)
         {
-            return new CellData(CellError.Value);
+            return CellData.FromError(CellError.Value);
         }
 
-        var value = arguments[0];
-        var valueIfError = arguments[1];
+        var valueIfError = arguments.GetSingle("value_if_error");
+        if (valueIfError == null)
+        {
+            return CellData.FromError(CellError.Value);
+        }
 
         if (value.IsError)
         {

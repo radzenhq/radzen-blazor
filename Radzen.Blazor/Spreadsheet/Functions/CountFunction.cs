@@ -1,22 +1,26 @@
-using System;
-using System.Collections.Generic;
-
 #nullable enable
 
 namespace Radzen.Blazor.Spreadsheet;
 
 class CountFunction : FormulaFunction
 {
-    public override CellData Evaluate(List<CellData> arguments)
+    public override FunctionParameter[] Parameters =>
+    [
+        new ("value", ParameterType.Sequence, isRequired: true)
+    ];
+
+    public override CellData Evaluate(FunctionArguments arguments)
     {
-        if (arguments.Count == 0)
+        var values = arguments.GetSequence("value");
+
+        if (values == null || values.Count == 0)
         {
             return CellData.FromNumber(0);
         }
 
         var count = 0d;
 
-        foreach (var argument in arguments)
+        foreach (var argument in values)
         {
             if (argument.IsError || argument.IsEmpty)
             {
