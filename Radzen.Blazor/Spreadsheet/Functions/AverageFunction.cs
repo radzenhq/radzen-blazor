@@ -1,15 +1,19 @@
-using System;
-using System.Collections.Generic;
-
 #nullable enable
 
 namespace Radzen.Blazor.Spreadsheet;
 
 class AverageFunction : FormulaFunction
 {
-    public override CellData Evaluate(List<CellData> arguments)
+    public override FunctionParameter[] Parameters =>
+    [
+        new ("number", ParameterType.Sequence, isRequired: true)
+    ];
+
+    public override CellData Evaluate(FunctionArguments arguments)
     {
-        if (arguments.Count == 0)
+        var numbers = arguments.GetSequence("number");
+
+        if (numbers == null || numbers.Count == 0)
         {
             return CellData.FromError(CellError.Div0);
         }
@@ -17,7 +21,7 @@ class AverageFunction : FormulaFunction
         var sum = 0d;
         var count = 0;
 
-        foreach (var argument in arguments)
+        foreach (var argument in numbers)
         {
             if (argument.IsError)
             {

@@ -1,37 +1,40 @@
-using System.Collections.Generic;
-
 #nullable enable
 
 namespace Radzen.Blazor.Spreadsheet;
 
 class NotFunction : FormulaFunction
 {
-    public override CellData Evaluate(List<CellData> arguments)
+    public override FunctionParameter[] Parameters =>
+    [
+        new("value", ParameterType.Single, isRequired: true)
+    ];
+
+    public override CellData Evaluate(FunctionArguments arguments)
     {
-        if (arguments.Count != 1)
+        var value = arguments.GetSingle("value");
+
+        if (value == null)
         {
             return CellData.FromError(CellError.Value);
         }
 
-        var argument = arguments[0];
-
-        if (argument.IsError)
+        if (value.IsError)
         {
-            return argument;
+            return value;
         }
 
-        if (argument.IsEmpty)
+        if (value.IsEmpty)
         {
             return CellData.FromBoolean(true);
         }
 
-        var value = argument.GetValueOrDefault<bool?>();
+        var boolValue = value.GetValueOrDefault<bool?>();
 
-        if (value is null)
+        if (boolValue is null)
         {
             return CellData.FromError(CellError.Value);
         }
 
-        return CellData.FromBoolean(!value.Value);
+        return CellData.FromBoolean(!boolValue.Value);
     }
 }
