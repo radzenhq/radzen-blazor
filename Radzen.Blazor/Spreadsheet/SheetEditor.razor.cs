@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -119,6 +118,94 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
     public async Task OnFocusAsync()
     {
         await Focus.InvokeAsync();
+    }
+
+
+    private List<HighlightToken> GetHighlightTokens(string? text)
+    {
+        if (string.IsNullOrEmpty(text) || !text.StartsWith("="))
+        {
+            return [new() { Text = text, Class = "rz-default-highlight" }];
+        }
+
+        try
+        {
+            var tokens = FormulaLexer.Scan(text);
+            var highlightTokens = new List<HighlightToken>();
+            int refCount = 0;
+
+            foreach (var token in tokens)
+            {
+                foreach (var trivia in token.LeadingTrivia)
+                {
+                    highlightTokens.Add(new (){ Text = trivia.Text, Class = "rz-default-highlight" });
+                }
+
+                // Add the main token (skip whitespace-only tokens as they're handled by trivia)
+                if (token.Type != FormulaTokenType.Whitespace)
+                {
+                    var highlightToken = new HighlightToken
+                    {
+                        Text = token.Type == FormulaTokenType.CellIdentifier ? token.AddressValue.ToString() : token.Value,
+                        Class = GetTokenClassName(token.Type),
+                        Style = GetTokenStyle(token.Type, refCount)
+                    };
+
+                    if (token.Type == FormulaTokenType.CellIdentifier)
+                    {
+                        refCount++;
+                    }
+
+                    highlightTokens.Add(highlightToken);
+                }
+
+                foreach (var trivia in token.TrailingTrivia)
+                {
+                    highlightTokens.Add(new () { Text = trivia.Text, Class = "rz-default-highlight" });
+                }
+            }
+
+            return highlightTokens;
+        }
+        catch
+        {
+            return [new() { Text = text, Class = "rz-default-highlight"} ];
+        }
+    }
+
+    private static string GetTokenClassName(FormulaTokenType tokenType)
+    {
+        return tokenType switch
+        {
+            FormulaTokenType.NumericLiteral => "rz-number-highlight",
+            FormulaTokenType.StringLiteral => "rz-string-highlight",
+            FormulaTokenType.CellIdentifier => "rz-cell-highlight",
+            FormulaTokenType.Identifier => "rz-function-highlight",
+            FormulaTokenType.Plus or FormulaTokenType.Minus or FormulaTokenType.Star or FormulaTokenType.Slash
+                or FormulaTokenType.Equals or FormulaTokenType.EqualsGreaterThan or FormulaTokenType.LessThan
+                or FormulaTokenType.LessThanOrEqual or FormulaTokenType.GreaterThan or FormulaTokenType.GreaterThanOrEqual
+                or FormulaTokenType.OpenParen or FormulaTokenType.CloseParen or FormulaTokenType.Comma or FormulaTokenType.Colon => "rz-operator-highlight",
+            _ => "rz-default-highlight"
+        };
+    }
+
+    private static string? GetTokenStyle(FormulaTokenType tokenType, int refCount)
+    {
+        if (tokenType == FormulaTokenType.CellIdentifier)
+        {
+            var colorIndex = (refCount % 5) + 1;
+            return $"color:var(--rz-highlight-color-{colorIndex})";
+        }
+
+        return null;
+    }
+
+
+    class HighlightToken
+    {
+        public string? Text { get; set; }
+        public string? Class { get; set; }
+        public string? Style { get; set; }
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
