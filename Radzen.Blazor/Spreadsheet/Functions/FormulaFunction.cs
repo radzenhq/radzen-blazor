@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 #nullable enable
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -15,9 +13,15 @@ public abstract class FormulaFunction
     public virtual bool CanHandleErrors => false;
 
     /// <summary>
+    /// Gets the parameter definitions for this function.
+    /// </summary>
+    /// <returns>An array of parameter definitions describing the function's parameters.</returns>
+    public abstract FunctionParameter[] Parameters { get; }
+
+    /// <summary>
     /// Evaluates the function with the given arguments.
     /// </summary>
-    /// <param name="arguments">The function arguments as CellData values.</param>
+    /// <param name="arguments">The function arguments organized by parameter name.</param>
     /// <returns>The result value wrapped in CellData.</returns>
-    public abstract CellData Evaluate(List<CellData> arguments);
+    public abstract CellData Evaluate(FunctionArguments arguments);
 }
