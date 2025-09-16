@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -408,4 +409,152 @@ public class CellData : IComparable, IComparable<CellData>
     /// Creates a CellData instance for an error value.
     /// </summary>
     public static CellData FromError(CellError error) => new(error, CellDataType.Error);
+
+    /// <summary>
+    /// Checks if this cell data matches the specified criteria.
+    /// </summary>
+    /// <param name="criteria">The criteria to match against</param>
+    /// <returns>True if this cell matches the criteria, false otherwise</returns>
+    public bool MatchesCriteria(CellData criteria)
+    {
+        // Handle error criteria
+        if (criteria.IsError)
+        {
+            return false;
+        }
+
+        // Handle empty criteria - only matches empty cells
+        if (criteria.IsEmpty)
+        {
+            return IsEmpty;
+        }
+
+        // Handle string criteria with wildcards
+        if (criteria.Type == CellDataType.String)
+        {
+            var criteriaString = criteria.GetValueOrDefault<string>() ?? "";
+            var cellString = ToString() ?? "";
+
+            // Check for wildcard patterns
+            if (criteriaString.Contains('*') || criteriaString.Contains('?'))
+            {
+                return MatchesWildcardPattern(cellString, criteriaString);
+            }
+
+            // Check for comparison expressions
+            if (IsComparisonExpression(criteriaString))
+            {
+                return EvaluateComparisonExpression(criteriaString);
+            }
+        }
+
+        // Default comparison
+        return IsEqualTo(criteria);
+    }
+
+    private static bool IsComparisonExpression(string criteria)
+    {
+        return criteria.StartsWith(">") || criteria.StartsWith("<") || 
+               criteria.StartsWith(">=") || criteria.StartsWith("<=") ||
+               criteria.StartsWith("<>") || criteria.StartsWith("!=");
+    }
+
+    private bool EvaluateComparisonExpression(string criteria)
+    {
+        if (IsEmpty)
+        {
+            return false;
+        }
+
+        // Extract the operator and value
+        string operatorStr;
+        string valueStr;
+
+        if (criteria.StartsWith(">="))
+        {
+            operatorStr = ">=";
+            valueStr = criteria[2..].Trim();
+        }
+        else if (criteria.StartsWith("<="))
+        {
+            operatorStr = "<=";
+            valueStr = criteria[2..].Trim();
+        }
+        else if (criteria.StartsWith("<>") || criteria.StartsWith("!="))
+        {
+            operatorStr = "<>";
+            valueStr = criteria[2..].Trim();
+        }
+        else if (criteria.StartsWith(">"))
+        {
+            operatorStr = ">";
+            valueStr = criteria[1..].Trim();
+        }
+        else if (criteria.StartsWith("<"))
+        {
+            operatorStr = "<";
+            valueStr = criteria[1..].Trim();
+        }
+        else
+        {
+            return false;
+        }
+
+        // Parse the value
+        if (!double.TryParse(valueStr, out var numericValue))
+        {
+            return false;
+        }
+
+        // Convert cell data to number for comparison
+        double cellValue;
+        if (Type == CellDataType.Number)
+        {
+            cellValue = GetValueOrDefault<double>();
+        }
+        else if (Type == CellDataType.Date)
+        {
+            cellValue = GetValueOrDefault<DateTime>().ToNumber();
+        }
+        else
+        {
+            return false;
+        }
+
+        // Perform the comparison
+        return operatorStr switch
+        {
+            ">" => cellValue > numericValue,
+            "<" => cellValue < numericValue,
+            ">=" => cellValue >= numericValue,
+            "<=" => cellValue <= numericValue,
+            "<>" or "!=" => cellValue != numericValue,
+            _ => false
+        };
+    }
+
+    private static bool MatchesWildcardPattern(string text, string pattern)
+    {
+        // Handle tilde escape sequences first - convert ~* to literal * and ~? to literal ?
+        var processedPattern = pattern.Replace("~*", "LITERAL_ASTERISK")  // Use a temporary marker
+                                     .Replace("~?", "LITERAL_QUESTION");  // Use a temporary marker
+
+        // Escape special regex characters except * and ?
+        var escapedPattern = Regex.Escape(processedPattern)
+            .Replace("\\*", ".*")
+            .Replace("\\?", ".");
+
+        // Restore the escaped wildcards as literal characters
+        escapedPattern = escapedPattern.Replace("LITERAL_ASTERISK", "\\*")
+                                     .Replace("LITERAL_QUESTION", "\\?");
+
+        try
+        {
+            return Regex.IsMatch(text, "^" + escapedPattern + "$", RegexOptions.IgnoreCase);
+        }
+        catch
+        {
+            return false;
+        }
+    }
 }
