@@ -6,12 +6,12 @@ class NotFunction : FormulaFunction
 {
     public override FunctionParameter[] Parameters =>
     [
-        new("value", ParameterType.Single, isRequired: true)
+        new("logical", ParameterType.Single, isRequired: true)
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var value = arguments.GetSingle("value");
+        var value = arguments.GetSingle("logical");
 
         if (value == null)
         {

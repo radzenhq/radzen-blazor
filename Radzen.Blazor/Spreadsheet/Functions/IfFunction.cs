@@ -6,40 +6,40 @@ class IfFunction : FormulaFunction
 {
     public override FunctionParameter[] Parameters =>
     [
-        new("condition", ParameterType.Single, isRequired: true),
-        new("true_value", ParameterType.Single, isRequired: true),
-        new("false_value", ParameterType.Single, isRequired: false)
+        new("logical_test", ParameterType.Single, isRequired: true),
+        new("value_if_true", ParameterType.Single, isRequired: true),
+        new("value_if_false", ParameterType.Single, isRequired: false)
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var condition = arguments.GetSingle("condition");
+        var logicalTest = arguments.GetSingle("logical_test");
 
-        if (condition == null)
+        if (logicalTest == null)
         {
             return CellData.FromError(CellError.Value);
         }
 
-        if (condition.IsError)
+        if (logicalTest.IsError)
         {
-            return condition;
+            return logicalTest;
         }
 
-        var trueValue = arguments.GetSingle("true_value");
+        var trueValue = arguments.GetSingle("value_if_true");
 
         if (trueValue == null)
         {
             return CellData.FromError(CellError.Value);
         }
 
-        var falseValue = arguments.GetSingle("false_value") ?? CellData.FromBoolean(false);
+        var falseValue = arguments.GetSingle("value_if_false") ?? CellData.FromBoolean(false);
 
-        if (condition.IsEmpty)
+        if (logicalTest.IsEmpty)
         {
             return falseValue;
         }
 
-        var value = condition.GetValueOrDefault<bool?>();
+        var value = logicalTest.GetValueOrDefault<bool?>();
 
         if (value is null)
         {
