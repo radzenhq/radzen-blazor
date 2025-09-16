@@ -80,6 +80,7 @@ public partial class Sheet
 
     private readonly Dictionary<string, FormulaFunction> formulaFunctions = new () {
         ["SUM"] = new SumFunction(),
+        ["SUMIF"] = new SumIfFunction(),
         ["AVERAGE"] = new AverageFunction(),
         ["COUNT"] = new CountFunction(),
         ["COUNTA"] = new CountAllFunction(),

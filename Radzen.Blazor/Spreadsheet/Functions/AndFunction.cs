@@ -1,21 +1,26 @@
-using System.Collections.Generic;
-
 #nullable enable
 
 namespace Radzen.Blazor.Spreadsheet;
 
 class AndFunction : FormulaFunction
 {
-    public override CellData Evaluate(List<CellData> arguments)
+    public override FunctionParameter[] Parameters =>
+    [
+        new ("logical", ParameterType.Sequence, isRequired: true)
+    ];
+
+    public override CellData Evaluate(FunctionArguments arguments)
     {
-        if (arguments.Count == 0)
+        var logicals = arguments.GetSequence("logical");
+
+        if (logicals == null || logicals.Count == 0)
         {
             return CellData.FromError(CellError.Value);
         }
 
         bool? result = null;
 
-        foreach (var argument in arguments)
+        foreach (var argument in logicals)
         {
             if (argument.IsError)
             {
