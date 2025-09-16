@@ -216,7 +216,7 @@ class Spreadsheet {
   }
 }
 
-class ContentEditable {
+class SheetEditor {
   constructor(options) {
     this.element = options.element;
     this.element.innerText = options.value;
@@ -2898,7 +2898,7 @@ window.Radzen = {
       document.removeEventListener('scroll', element.scrollHandler, true);
       window.removeEventListener('resize', element.scrollHandler, true);
     },
-    createContentEditable: (options) => new ContentEditable(options),
+    createSheetEditor: (options) => new SheetEditor(options),
     downloadFile: async function (fileName, contentStreamReference) {
       const arrayBuffer = await contentStreamReference.arrayBuffer();
       const blob = new Blob([arrayBuffer]);
