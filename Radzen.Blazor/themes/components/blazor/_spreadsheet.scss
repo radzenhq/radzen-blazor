@@ -153,12 +153,13 @@
     z-index: 1;
 }
 
-.rz-spreadsheet-cell-editor .rz-spreadsheet-editor-input {
+.rz-spreadsheet-cell-editor .rz-spreadsheet-editor {
     outline: none;
     border: 2px solid #258cfb;
 }
 
-.rz-spreadsheet-editor-input {
+.rz-spreadsheet-editor {
+    position: relative;
     border: none;
     font-size: 0.8rem;
     min-width: fit-content;
@@ -167,7 +168,56 @@
     background-color: #fff;
 }
 
-.rz-spreadsheet-formula-editor .rz-spreadsheet-editor-input {
+.rz-spreadsheet-editor-input {
+    color: transparent;
+    caret-color: var(--rz-text-selection-background-color);
+}
+
+.rz-spreadsheet-editor-highlight {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.rz-number-highlight {
+    color: #098658;
+    font-weight: 500;
+}
+
+.rz-string-highlight {
+    color: #a31515;
+}
+
+.rz-cell-highlight {
+    font-weight: 500;
+}
+
+.rz-function-highlight {
+    color: #795e26;
+    font-weight: 500;
+}
+
+.rz-operator-highlight {
+    color: #000000;
+    font-weight: 500;
+}
+
+.rz-default-highlight {
+    color: #000000;
+}
+
+/* Cell reference colors */
+:root {
+    --rz-highlight-color-1: #FF6B6B;
+    --rz-highlight-color-2: #4ECDC4;
+    --rz-highlight-color-3: #45B7D1;
+    --rz-highlight-color-4: #96CEB4;
+    --rz-highlight-color-5: #FFEAA7;
+}
+
+.rz-spreadsheet-formula-editor .rz-spreadsheet-editor-input,
+.rz-spreadsheet-formula-editor .rz-spreadsheet-editor-highlight {
     padding: 0.2rem 0.2rem;
 }
 
