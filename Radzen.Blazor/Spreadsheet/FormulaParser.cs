@@ -295,7 +295,7 @@ internal class FormulaParser
     {
         if (position + offset >= tokens.Count)
         {
-            return new FormulaToken(FormulaTokenType.None);
+            return new FormulaToken(FormulaTokenType.None, string.Empty);
         }
 
         return tokens[position + offset];
