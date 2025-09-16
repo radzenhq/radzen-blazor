@@ -11,7 +11,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents a content editable element in a spreadsheet.
 /// </summary>
-public partial class ContentEditable : ComponentBase, IAsyncDisposable
+public partial class SheetEditor : ComponentBase, IAsyncDisposable
 {
     /// <summary>
     /// Gets or sets the value of the content editable element.
@@ -55,7 +55,7 @@ public partial class ContentEditable : ComponentBase, IAsyncDisposable
 
     private IJSObjectReference? jsRef;
 
-    private DotNetObjectReference<ContentEditable>? dotNetRef;
+    private DotNetObjectReference<SheetEditor>? dotNetRef;
 
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -64,7 +64,7 @@ public partial class ContentEditable : ComponentBase, IAsyncDisposable
         {
             dotNetRef = DotNetObjectReference.Create(this);
 
-            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createContentEditable", new { element, value, AutoFocus, dotNetRef });
+            jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSheetEditor", new { element, value, AutoFocus, dotNetRef });
         }
     }
 
