@@ -1,3 +1,13 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime;
-<div class="rz-spreadsheet-editor-input" @attributes=@Attributes spellcheck="false" @ref=@element contenteditable></div>
+<div class="rz-spreadsheet-editor" @attributes=@Attributes>
+    <div class="rz-spreadsheet-editor-input" spellcheck="false" @ref=@element contenteditable></div>
+    <div class="rz-spreadsheet-editor-highlight">
+        @foreach (var token in GetHighlightTokens(value))
+        {
+            <span class="@token.Class" style="@token.Style">
+                @token.Text
+            </span>
+        }
+    </div>
+</div>
