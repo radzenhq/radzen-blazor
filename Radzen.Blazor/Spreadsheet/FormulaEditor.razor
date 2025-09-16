@@ -1,8 +1,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor.Spreadsheet
 
 <div class="rz-spreadsheet-formula-editor">
-    <ContentEditable class="rz-spreadsheet-editor-input" tabindex="-1" @bind-Value=@Sheet.Editor.Value 
-        Focus=@(this.AsNonRenderingEventHandler(OnFocus))
+    <SheetEditor tabindex="-1" @bind-Value=@Sheet.Editor.Value Focus=@(this.AsNonRenderingEventHandler(OnFocus))
         Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync)) />
 </div>

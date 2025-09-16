@@ -1,15 +1,12 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
+@using Radzen.Blazor.Spreadsheet
 @inject Microsoft.JSInterop.IJSRuntime JSRuntime
 
 @if (Sheet.Editor.Mode != EditMode.None)
 {
 <div class=@className style=@cellStyle>
-    <ContentEditable class="rz-spreadsheet-editor-input" 
-            @bind-Value=@Sheet.Editor.Value 
-            AutoFocus=@(Sheet.Editor.Mode == EditMode.Cell)
-            Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
-            Focus=@(this.AsNonRenderingEventHandler(OnFocus))
-     />
+    <SheetEditor @bind-Value=@Sheet.Editor.Value AutoFocus=@(Sheet.Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
+            Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
 </div>
 }
