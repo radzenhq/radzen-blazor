@@ -1,4 +1,5 @@
 @using Microsoft.JSInterop
+@using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime;
 <div class="rz-spreadsheet-editor" @attributes=@Attributes>
     <div class="rz-spreadsheet-editor-input" spellcheck="false" @ref=@element contenteditable></div>
@@ -11,3 +12,44 @@
         }
     </div>
 </div>
+<Popup @ref=@popup class="rz-spreadsheet-highlight-popup" Close="OnPopupClose">
+@if (functionHint != null)
+{
+    <span style="font-weight: @(functionHint.ArgumentIndex == -1 ? "bold" : "normal")">@functionHint.Function.Name</span>
+    <span>(</span>
+
+    @for (var i = 0; i < functionHint.Function.Parameters.Length; i++)
+    {
+        var paramDefinition = functionHint.Function.Parameters[i];
+        <span style="font-weight: @(i == functionHint.ArgumentIndex ? "bold" : "normal")">@paramDefinition.Name</span>
+        @if (i < functionHint.Function.Parameters.Length - 1)
+        {
+            <span>, </span>
+        }
+    }
+    @if (functionHint.Function.Parameters.Length > 0 && functionHint.Function.Parameters.Last().Type == ParameterType.Sequence)
+    {
+        <span>,</span>
+        <span
+            style="font-weight: @(functionHint.ArgumentIndex >= functionHint.Function.Parameters.Length ? "bold" : "normal")">[@functionHint.Function.Parameters.Last().Name...]</span>
+    }
+    <span>)</span>
+}
+
+@if (functions.Count > 0)
+    {
+        <ul class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
+            @for (int i = 0; i < functions.Count; i++)
+            {
+                if (i == selectedIndex)
+                {
+                    <li class="rz-autocomplete-item rz-state-highlight" role="option">@(functions[i])</li>
+                }
+                else
+                {
+                    <li class="rz-autocomplete-item" role="option">@(functions[i])</li>
+                }
+            }
+        </ul>
+    }
+</Popup>

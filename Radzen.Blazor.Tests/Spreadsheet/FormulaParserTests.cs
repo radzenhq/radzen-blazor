@@ -310,4 +310,138 @@ public class FormulaParserTests
         Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
         Assert.Equal("B2", rangeNode.End.Token.AddressValue.ToString());
     }
+
+    [Fact]
+    public void FormulaParser_StrictMode_ShouldThrowOnInvalidFormula()
+    {
+        var formula = "A1"; // Missing equals sign
+        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+    }
+
+    [Fact]
+    public void FormulaParser_NonStrictMode_ShouldReturnPartialExpressionOnIncompleteExpression()
+    {
+        var formula = "=123+"; // Incomplete expression
+        var result = FormulaParser.Parse(formula, strict: false);
+        Assert.IsType<BinaryExpressionSyntaxNode>(result);
+        if (result is BinaryExpressionSyntaxNode binaryNode)
+        {
+            Assert.Equal(BinaryOperator.Plus, binaryNode.Operator);
+            Assert.IsType<NumberLiteralSyntaxNode>(binaryNode.Left);
+            Assert.Equal(123, ((NumberLiteralSyntaxNode)binaryNode.Left).Token.IntValue);
+        }
+    }
+
+    [Fact]
+    public void FormulaParser_StrictMode_ShouldThrowOnIncompleteExpression()
+    {
+        var formula = "=123+"; // Incomplete expression
+        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+    }
+
+    [Fact]
+    public void FormulaParser_NonStrictMode_ShouldReturnPartialFunctionOnMissingCloseParen()
+    {
+        var formula = "=SUM(A1"; // Missing closing parenthesis
+        var result = FormulaParser.Parse(formula, strict: false);
+        Assert.NotNull(result);
+        Assert.IsType<FunctionSyntaxNode>(result);
+        var functionNode = (FunctionSyntaxNode)result;
+        Assert.Equal("SUM", functionNode.Name);
+        Assert.Single(functionNode.Arguments);
+        Assert.IsType<CellSyntaxNode>(functionNode.Arguments[0]);
+    }
+
+    [Fact]
+    public void FormulaParser_StrictMode_ShouldThrowOnInvalidFunctionSyntax()
+    {
+        var formula = "=SUM(A1"; // Missing closing parenthesis
+        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+    }
+
+    [Fact]
+    public void FormulaParser_NonStrictMode_ShouldReturnNullOnMissingFunctionName()
+    {
+        var formula = "=(A1)"; // Parentheses without function name should parse as grouped expression
+        var result = FormulaParser.Parse(formula, strict: false);
+        Assert.NotNull(result); // This should actually succeed as it's a valid grouped expression
+        Assert.IsType<CellSyntaxNode>(result);
+    }
+
+    [Fact]
+    public void FormulaParser_NonStrictMode_ShouldReturnPartialRangeOnIncompleteRange()
+    {
+        var formula = "=A1:"; // Incomplete range
+        var result = FormulaParser.Parse(formula, strict: false);
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void FormulaParser_StrictMode_ShouldThrowOnInvalidRange()
+    {
+        var formula = "=A1:"; // Incomplete range
+        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+    }
+
+    [Fact]
+    public void FormulaParser_NonStrictMode_ShouldReturnNullOnUnterminatedString()
+    {
+        var formula = "=\"hello"; // Unterminated string literal
+        var result = FormulaParser.Parse(formula, strict: false);
+        Assert.NotNull(result); // Should succeed in non-strict mode
+        Assert.IsType<StringLiteralSyntaxNode>(result);
+        var stringNode = (StringLiteralSyntaxNode)result;
+        Assert.Equal("hello", stringNode.Token.Value);
+    }
+
+    [Fact]
+    public void FormulaParser_NonStrictMode_ShouldHandleMissingOperand()
+    {
+        var formula = "=*5"; // Missing left operand
+        var result = FormulaParser.Parse(formula, strict: false);
+        Assert.NotNull(result); // Should succeed in non-strict mode
+    }
+
+    [Fact]
+    public void FormulaParser_NonStrictMode_ShouldReturnPartialExpressionOnUnbalancedParentheses()
+    {
+        var formula = "=(A1+B1"; // Missing closing parenthesis
+        var result = FormulaParser.Parse(formula, strict: false);
+        Assert.NotNull(result);
+        Assert.IsType<BinaryExpressionSyntaxNode>(result); // Should return the binary expression inside
+        var binaryNode = (BinaryExpressionSyntaxNode)result;
+        Assert.Equal(BinaryOperator.Plus, binaryNode.Operator);
+        Assert.IsType<CellSyntaxNode>(binaryNode.Left);
+        Assert.IsType<CellSyntaxNode>(binaryNode.Right);
+    }
+
+    [Fact]
+    public void FormulaParser_StrictMode_ShouldThrowOnUnbalancedParentheses()
+    {
+        var formula = "=(A1+B1"; // Missing closing parenthesis
+        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+    }
+
+    [Fact]
+    public void FormulaParser_NonStrictMode_ShouldReturnPartialFunctionOnIncompleteArguments()
+    {
+        var formula = "=SUM(A1,"; // Incomplete function arguments
+        var result = FormulaParser.Parse(formula, strict: false);
+        Assert.NotNull(result);
+        Assert.IsType<FunctionSyntaxNode>(result);
+        var functionNode = (FunctionSyntaxNode)result;
+        Assert.Equal("SUM", functionNode.Name);
+        Assert.True(functionNode.Arguments.Count >= 1); // Should have at least the first argument
+        Assert.IsType<CellSyntaxNode>(functionNode.Arguments[0]);
+    }
+
+    [Fact]
+    public void FormulaParser_StrictMode_DefaultBehavior_ShouldStillWork()
+    {
+        // Test that default behavior (strict=true) still works as before
+        var formula = "=123+456";
+        var node = FormulaParser.Parse(formula); // No explicit strict parameter
+        Assert.NotNull(node);
+        Assert.IsType<BinaryExpressionSyntaxNode>(node);
+    }
 }

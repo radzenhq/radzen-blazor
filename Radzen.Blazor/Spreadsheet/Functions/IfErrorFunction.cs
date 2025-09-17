@@ -4,6 +4,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class IfErrorFunction : FormulaFunction
 {
+    public override string Name => "IFERROR";
+
     public override bool CanHandleErrors => true;
 
     public override FunctionParameter[] Parameters =>
