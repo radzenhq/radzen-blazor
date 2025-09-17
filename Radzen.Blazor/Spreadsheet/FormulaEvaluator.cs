@@ -209,7 +209,7 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
     public void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
     {
         // Get the function to check if it can handle errors
-        var function = sheet.GetFormulaFunction(functionSyntaxNode.Name);
+        var function = sheet.FunctionRegistry.Get(functionSyntaxNode.Name);
 
         // Process arguments according to parameter definitions
         var functionArguments = ProcessArguments(function, functionSyntaxNode.Arguments);

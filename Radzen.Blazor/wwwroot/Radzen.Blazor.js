@@ -225,17 +225,42 @@ class SheetEditor {
     this.element.addEventListener('keydown', this.onKeyDown);
     this.element.addEventListener('blur', this.onBlur);
     this.element.addEventListener('focus', this.onFocus);
+    document.addEventListener('selectionchange', this.onSelectionChange);
     if (options.autoFocus) {
       this.focus();
     }
   }
 
+  onSelectionChange = (e) => {
+    const selection = getSelection();
+    const inside = selection.focusNode.parentElement == this.element || selection.focusNode == this.element;
+    let caretPosition = -1;
+
+    if (inside && selection.isCollapsed)
+    {
+      caretPosition = selection.focusOffset;
+    }
+
+    this.dotNetRef.invokeMethodAsync('OnSelectionChangeAsync', caretPosition);
+  };
+
   onInput = (e) => {
     this.dotNetRef.invokeMethodAsync('OnInputAsync', e.target.innerText);
   };
 
-  setValue = (value) => {
+  setValue = (value, moveCaretTo) => {
     this.element.innerText = value;
+    if (moveCaretTo != null) {
+      const range = document.createRange();
+      const el = this.element.childNodes[0];
+      range.selectNodeContents(el)
+      range.setStart(el, 0);
+      range.setEnd(el, moveCaretTo);
+      range.collapse(false);
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
   };
 
   onKeyDown = (e) => {
@@ -263,8 +288,15 @@ class SheetEditor {
       const selection = getSelection();
       selection.removeAllRanges();
       selection.addRange(range);
-    } else if (e.key != 'Tab' && e.key != 'Enter' && e.key != 'Escape') {
-      e.stopPropagation();
+    } else {
+       const popup = document.querySelector('.rz-spreadsheet-highlight-popup .rz-state-highlight') != null;
+       if (popup && (e.key == 'Tab' || e.key == 'ArrowUp' || e.key == 'ArrowDown')) {
+         e.stopPropagation();
+         e.preventDefault();
+         this.dotNetRef.invokeMethodAsync('OnKeyDownAsync', { key: e.key });
+       } else if (e.key != 'Enter' && e.key != 'Escape' && e.key != 'Tab') {
+         e.stopPropagation();
+       }
     }
   };
 
@@ -296,6 +328,7 @@ class SheetEditor {
     this.element.removeEventListener('keydown', this.onKeyDown);
     this.element.removeEventListener('blur', this.onBlur);
     this.element.removeEventListener('focus', this.onFocus);
+    document.removeEventListener('selectionchange', this.onSelectionChange);
   }
 }
 
