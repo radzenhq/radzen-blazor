@@ -4,6 +4,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class AndFunction : FormulaFunction
 {
+    public override string Name => "AND";
+
     public override FunctionParameter[] Parameters =>
     [
         new ("logical", ParameterType.Sequence, isRequired: true)
