@@ -5,8 +5,12 @@ using Microsoft.AspNetCore.Components.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace Radzen.Blazor.Tests
 {
@@ -837,6 +841,153 @@ namespace Radzen.Blazor.Tests
             Assert.True(raised);
             Assert.True(newArgs.Skip == 20);
             Assert.True(newArgs.Top == 20);
+        }
+
+        // Filter tests
+
+        /// <summary>
+        /// Utility class for testing.
+        /// </summary>
+        /// <remarks>
+        /// Tests that involves filtering on <see cref="RadzenDataGrid{TItem}"/> requires the generic parameter to be a specific type.
+        /// They do not work using <c>object</c> or <c>dynamic</c>.
+        /// </remarks>
+        /// <param name="Name"></param>
+        /// <param name="Roles"></param>
+        private sealed record User(string Name, IEnumerable<Role> Roles);
+        /// <summary>
+        /// Utility class for testing.
+        /// </summary>
+        /// <remarks>
+        /// Tests that involves filtering on <see cref="RadzenDataGrid{TItem}"/> requires the generic parameter to be a specific type.
+        /// They do not work using <c>object</c> or <c>dynamic</c>.
+        /// </remarks>
+        /// <param name="Id"></param>
+        /// <param name="Description"></param>
+        private sealed record Role(int Id, string Description);
+
+        [Fact]
+        public async Task DataGrid_FilterBySubProperties_ReturnsDataFiltered()
+        {
+            // Arrange
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            Role admin = new(0, "Admin");
+            Role guest = new(1, "Guest");
+            User moe = new("Moe", [admin]);
+            User tom = new("Tom", [admin, guest]);
+            User sam = new("Sam", [guest]);
+
+            User[] data = [moe, tom, sam];
+
+            var component = ctx.RenderComponent<RadzenDataGrid<User>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.FilterMode, FilterMode.CheckBoxList);
+                parameters.Add(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<User>));
+                    builder.AddAttribute(1, "Property", "Name");
+                    builder.AddAttribute(2, "Title", "User");
+                    builder.CloseComponent();
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<User>));
+                    builder.AddAttribute(1, "Property", "Roles");
+                    builder.AddAttribute(2, "FilterProperty", "Id");
+                    builder.AddAttribute(3, "Type", typeof(IEnumerable<Role>));
+                    builder.AddAttribute(4, "Title", "Roles");
+                    builder.CloseComponent();
+                });
+            });
+
+            // Act
+            await component.InvokeAsync(() => component
+                .Instance
+                .ColumnsCollection
+                .First(c => c.Property == "Roles")
+                .SetFilterValueAsync(new[] { 1 })
+            );
+
+            component.Render();
+
+            var filteredData = await component.InvokeAsync(component.Instance.View.ToArray);
+
+            // Assert
+            Assert.DoesNotContain(moe, filteredData);
+            Assert.Contains(sam, filteredData);
+            Assert.Contains(tom, filteredData);
+        }
+
+        [Fact]
+        public async Task DataGrid_LoadFilterSettingsFromJson_ReturnsDataFiltered()
+        {
+            // Arrange
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            Role admin = new(0, "Admin");
+            Role guest = new(1, "Guest");
+            User moe = new("Moe", [admin]);
+            User tom = new("Tom", [admin, guest]);
+            User sam = new("Sam", [guest]);
+
+            User[] data = [moe, tom, sam];
+
+            string settings = string.Empty;
+
+            var component = ctx.RenderComponent<RadzenDataGrid<User>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.FilterMode, FilterMode.CheckBoxList);
+                parameters.Add(p => p.LoadSettings, OnLoadSettings);
+                parameters.Add(p => p.SettingsChanged, OnSettingsChanged);
+                parameters.Add(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<User>));
+                    builder.AddAttribute(1, "Property", "Name");
+                    builder.AddAttribute(2, "Title", "User");
+                    builder.CloseComponent();
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<User>));
+                    builder.AddAttribute(1, "Property", "Roles");
+                    builder.AddAttribute(2, "FilterProperty", "Id");
+                    builder.AddAttribute(3, "Type", typeof(IEnumerable<Role>));
+                    builder.AddAttribute(4, "Title", "Roles");
+                    builder.CloseComponent();
+                });
+            });
+
+            void OnSettingsChanged(DataGridSettings args)
+            {
+                settings = JsonSerializer.Serialize(args);
+            }
+
+            void OnLoadSettings(DataGridLoadSettingsEventArgs args)
+            {
+                if (string.IsNullOrEmpty(settings)) return;
+
+                args.Settings = JsonSerializer.Deserialize<DataGridSettings>(settings);
+            }
+
+            // Act
+            await component.InvokeAsync(() => component
+                .Instance
+                .ColumnsCollection
+                .First(c => c.Property == "Roles")
+                .SetFilterValueAsync(new[] { 1 })
+            );
+
+            component.Render();
+
+            var filteredData = await component.InvokeAsync(component.Instance.View.ToArray);
+
+            // Assert
+            Assert.DoesNotContain(moe, filteredData);
+            Assert.Contains(sam, filteredData);
+            Assert.Contains(tom, filteredData);
         }
     }
 }
