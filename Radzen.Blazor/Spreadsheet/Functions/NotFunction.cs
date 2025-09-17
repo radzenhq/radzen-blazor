@@ -4,6 +4,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class NotFunction : FormulaFunction
 {
+    public override string Name => "NOT";
+
     public override FunctionParameter[] Parameters =>
     [
         new("logical", ParameterType.Single, isRequired: true)

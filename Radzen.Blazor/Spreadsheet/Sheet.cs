@@ -78,24 +78,11 @@ public partial class Sheet
     /// </summary>
     public IReadOnlySet<int> FilteredColumns => filteredColumns;
 
-    private readonly Dictionary<string, FormulaFunction> formulaFunctions = new () {
-        ["SUM"] = new SumFunction(),
-        ["SUMIF"] = new SumIfFunction(),
-        ["AVERAGE"] = new AverageFunction(),
-        ["COUNT"] = new CountFunction(),
-        ["COUNTA"] = new CountAllFunction(),
-        ["IF"] = new IfFunction(),
-        ["IFERROR"] = new IfErrorFunction(),
-        ["AND"] = new AndFunction(),
-        ["OR"] = new OrFunction(),
-        ["NOT"] = new NotFunction()
-    };
-
     /// <summary>
-    /// Gets the dictionary of available formula functions.
+    /// Gets the registry of formula functions available in the sheet.
     /// </summary>
-    public IReadOnlyDictionary<string, FormulaFunction> FormulaFunctions => formulaFunctions;
-
+    public FunctionRegistry FunctionRegistry { get; } = new();
+   
     private Workbook? workbook;
 
     /// <summary>
@@ -140,17 +127,6 @@ public partial class Sheet
         Cells = new CellStore(this);
         Commands = new();
         Validation = new();
-    }
-
-
-    /// <summary>
-    /// Gets a formula function by name, or returns an ErrorFunction if the function is not found.
-    /// </summary>
-    /// <param name="functionName">The name of the function to retrieve.</param>
-    /// <returns>The formula function or an ErrorFunction if not found.</returns>
-    public FormulaFunction GetFormulaFunction(string functionName)
-    {
-        return formulaFunctions.TryGetValue(functionName.ToUpperInvariant(), out var function) ? function : new ErrorFunction();
     }
 
     /// <summary>

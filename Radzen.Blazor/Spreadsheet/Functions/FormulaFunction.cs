@@ -24,4 +24,9 @@ public abstract class FormulaFunction
     /// <param name="arguments">The function arguments organized by parameter name.</param>
     /// <returns>The result value wrapped in CellData.</returns>
     public abstract CellData Evaluate(FunctionArguments arguments);
+
+    /// <summary>
+    /// Gets the name of the function.
+    /// </summary>
+    public abstract string Name { get; }
 }

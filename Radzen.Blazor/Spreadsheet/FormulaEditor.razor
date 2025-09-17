@@ -4,5 +4,5 @@
 
 <div class="rz-spreadsheet-formula-editor">
     <SheetEditor tabindex="-1" @bind-Value=@Sheet.Editor.Value Focus=@(this.AsNonRenderingEventHandler(OnFocus))
-        Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync)) />
+        Sheet=@Sheet Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync)) />
 </div>

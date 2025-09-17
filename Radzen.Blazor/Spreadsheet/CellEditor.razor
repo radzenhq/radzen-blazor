@@ -7,6 +7,6 @@
 {
 <div class=@className style=@cellStyle>
     <SheetEditor @bind-Value=@Sheet.Editor.Value AutoFocus=@(Sheet.Editor.Mode == EditMode.Cell) Blur=@(this.AsNonRenderingEventHandler(OnBlurAsync))
-            Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
+        Sheet=@Sheet Focus=@(this.AsNonRenderingEventHandler(OnFocus)) />
 </div>
 }
