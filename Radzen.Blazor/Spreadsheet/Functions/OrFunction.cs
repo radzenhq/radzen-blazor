@@ -4,6 +4,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class OrFunction : FormulaFunction
 {
+    public override string Name => "OR";
+
     public override FunctionParameter[] Parameters =>
     [
         new ("logical", ParameterType.Sequence, isRequired: true)

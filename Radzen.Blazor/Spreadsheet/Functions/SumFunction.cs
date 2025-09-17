@@ -4,6 +4,7 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class SumFunction : FormulaFunction
 {
+    public override string Name => "SUM";
     public override FunctionParameter[] Parameters =>
     [
         new ("number", ParameterType.Sequence, isRequired: true)

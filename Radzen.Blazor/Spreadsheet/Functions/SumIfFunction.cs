@@ -6,6 +6,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class SumIfFunction : FormulaFunction
 {
+    public override string Name => "SUMIF";
+
     public override FunctionParameter[] Parameters =>
     [
         new("range", ParameterType.Collection, isRequired: true),

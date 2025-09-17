@@ -83,6 +83,11 @@ internal class FormulaToken(FormulaTokenType type, string  value)
     public List<FormulaTokenTrivia> LeadingTrivia { get; } = new();
     public List<FormulaTokenTrivia> TrailingTrivia { get; } = new();
 
+    // The inclusive start index and exclusive end index of the token
+    // including its leading and trailing trivia within the original expression.
+    public int Start { get; set; }
+    public int End { get; set; }
+
     public ConstantExpression ToConstantExpression()
     {
         return ValueKind switch
@@ -103,13 +108,13 @@ internal class FormulaToken(FormulaTokenType type, string  value)
     }
 }
 
-internal class FormulaLexer(string expression)
+internal class FormulaLexer(string expression, bool strict = true)
 {
     private int position = 0;
 
-    public static List<FormulaToken> Scan(string expression)
+    public static List<FormulaToken> Scan(string expression, bool strict = true)
     {
-        var lexer = new FormulaLexer(expression);
+        var lexer = new FormulaLexer(expression, strict);
 
         return [.. lexer.Scan()];
     }
@@ -119,6 +124,7 @@ internal class FormulaLexer(string expression)
         while (position < expression.Length)
         {
             // Capture leading trivia (whitespace before the token)
+            var tokenStart = position;
             var leadingTrivia = ScanTrivia();
 
             var token = ScanToken();
@@ -131,6 +137,8 @@ internal class FormulaLexer(string expression)
                     var whitespaceText = string.Join("", leadingTrivia.Select(t => t.Text));
                     var whitespaceToken = new FormulaToken(FormulaTokenType.Whitespace, whitespaceText);
                     whitespaceToken.LeadingTrivia.AddRange(leadingTrivia);
+                    whitespaceToken.Start = tokenStart;
+                    whitespaceToken.End = position;
                     yield return whitespaceToken;
                 }
                 yield break;
@@ -143,10 +151,20 @@ internal class FormulaLexer(string expression)
             var trailingTrivia = ScanTrivia();
             token.TrailingTrivia.AddRange(trailingTrivia);
 
+            // Set token span including leading and trailing trivia
+            token.Start = tokenStart;
+            token.End = position;
+
             yield return token;
         }
 
-        yield return new FormulaToken(FormulaTokenType.None, string.Empty);
+        // End token to mark completion
+        var endToken = new FormulaToken(FormulaTokenType.None, string.Empty)
+        {
+            Start = position,
+            End = position
+        };
+        yield return endToken;
     }
 
     private List<FormulaTokenTrivia> ScanTrivia()
@@ -308,7 +326,12 @@ internal class FormulaLexer(string expression)
             switch (ch)
             {
                 case '\0':
-                    throw new InvalidOperationException($"Unexpected end of string literal at position {position}.");
+                    if (strict)
+                    {
+                        throw new InvalidOperationException($"Unexpected end of string literal at position {position}.");
+                    }
+                    // In non-strict mode, return the unclosed string as is
+                    return new FormulaToken(FormulaTokenType.StringLiteral, buffer.ToString());
                 case '\\':
                     Advance(1);
                     buffer.Append(ScanEscapeSequence());
