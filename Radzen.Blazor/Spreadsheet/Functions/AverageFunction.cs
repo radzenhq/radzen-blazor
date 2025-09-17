@@ -4,6 +4,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class AverageFunction : FormulaFunction
 {
+    public override string Name => "AVERAGE";
+
     public override FunctionParameter[] Parameters =>
     [
         new ("number", ParameterType.Sequence, isRequired: true)
