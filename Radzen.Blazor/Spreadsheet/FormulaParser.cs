@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor.Spreadsheet;
+#nullable enable
 
 internal interface IFormulaSyntaxNodeVisitor
 {
@@ -13,9 +14,86 @@ internal interface IFormulaSyntaxNodeVisitor
     void VisitRange(RangeSyntaxNode rangeSyntaxNode);
 }
 
-internal abstract class FormulaSyntaxNode
+internal abstract class FormulaSyntaxNode(FormulaToken token)
 {
+    public FormulaToken Token { get; } = token;
+
     public abstract void Accept(IFormulaSyntaxNodeVisitor visitor);
+
+    public List<FormulaSyntaxNode> Find(Func<FormulaSyntaxNode, bool> predicate)
+    {
+        var results = new List<FormulaSyntaxNode>();
+
+        if (predicate(this))
+        {
+            results.Add(this);
+        }
+
+        var visitor = new FindVisitor(predicate, results);
+
+        Accept(visitor);
+
+        return results;
+    }
+}
+
+abstract class FormulaSyntaxNodeVisitorBase : IFormulaSyntaxNodeVisitor
+{
+    public virtual void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
+    {
+        Visit(numberLiteralSyntaxNode);
+    }
+
+    public virtual void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode)
+    {
+        Visit(stringLiteralSyntaxNode);
+    }
+
+    public virtual void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
+    {
+        binaryExpressionSyntaxNode.Left.Accept(this);
+        binaryExpressionSyntaxNode.Right.Accept(this);
+
+        Visit(binaryExpressionSyntaxNode);
+    }
+
+    public virtual void VisitCell(CellSyntaxNode cellSyntaxNode)
+    {
+        Visit(cellSyntaxNode);
+    }
+
+    public virtual void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
+    {
+        foreach (var argument in functionSyntaxNode.Arguments)
+        {
+            argument.Accept(this);
+        }
+
+        Visit(functionSyntaxNode);
+    }
+
+    public virtual void VisitRange(RangeSyntaxNode rangeSyntaxNode)
+    {
+        rangeSyntaxNode.Start.Accept(this);
+        rangeSyntaxNode.End.Accept(this);
+
+        Visit(rangeSyntaxNode);
+    }
+
+    protected virtual void Visit(FormulaSyntaxNode node)
+    {
+    }
+}
+
+internal class FindVisitor(Func<FormulaSyntaxNode, bool> predicate, List<FormulaSyntaxNode> results) : FormulaSyntaxNodeVisitorBase
+{
+    protected override void Visit(FormulaSyntaxNode node)
+    {
+        if (predicate(node))
+        {
+            results.Add(node);
+        }
+    }
 }
 
 internal enum BinaryOperator
@@ -53,7 +131,7 @@ static class FormulaTokenTypeExtensions
     }
 }
 
-internal class BinaryExpressionSyntaxNode(FormulaSyntaxNode left, FormulaSyntaxNode right, BinaryOperator @operator) : FormulaSyntaxNode
+internal class BinaryExpressionSyntaxNode(FormulaToken token, FormulaSyntaxNode left, FormulaSyntaxNode right, BinaryOperator @operator) : FormulaSyntaxNode(token) 
 {
     public FormulaSyntaxNode Left { get; } = left;
     public BinaryOperator Operator { get; } = @operator;
@@ -65,48 +143,85 @@ internal class BinaryExpressionSyntaxNode(FormulaSyntaxNode left, FormulaSyntaxN
     }
 }
 
-internal class NumberLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode
+internal class NumberLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode(token)
 {
-    public FormulaToken Token { get; } = token;
-
     public override void Accept(IFormulaSyntaxNodeVisitor visitor)
     {
         visitor.VisitNumberLiteral(this);
     }
 }
 
-internal class StringLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode
+internal class StringLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode(token)
 {
-    public FormulaToken Token { get; } = token;
-
     public override void Accept(IFormulaSyntaxNodeVisitor visitor)
     {
         visitor.VisitStringLiteral(this);
     }
 }
 
-internal class FunctionSyntaxNode(string name, List<FormulaSyntaxNode> arguments) : FormulaSyntaxNode
+internal class FunctionSyntaxNode(FormulaToken token, FormulaToken openParenToken, FormulaToken closeParenToken, List<FormulaSyntaxNode> arguments) : FormulaSyntaxNode(token)
 {
-    public string Name { get; } = name;
+    public string Name { get; } = token.Value;
+
+    public FormulaToken OpenParenToken => openParenToken;
+
+    public FormulaToken CloseParenToken => closeParenToken;
+
     public List<FormulaSyntaxNode> Arguments { get; } = arguments;
 
     public override void Accept(IFormulaSyntaxNodeVisitor visitor)
     {
         visitor.VisitFunction(this);
     }
+
+    public bool IsInside(int position)
+    {
+        return position > Token.Start && position <= CloseParenToken.Start;
+    }
+
+    public int GetArgumentIndexAtPosition(int position)
+    {
+        if (position > CloseParenToken.Start)
+        {
+            return -1;
+        }
+
+        if (position < OpenParenToken.Start)
+        {
+            return -1;
+        }
+
+        if (Arguments.Count == 0)
+        {
+            return -1;
+        }
+
+        if (position < Arguments[0].Token.Start)
+        {
+            return -1;
+        }
+
+        for (int i = Arguments.Count - 1; i >= 0; i--)
+        {
+            if (position >= Arguments[i].Token.Start)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
 }
 
-internal class CellSyntaxNode(FormulaToken token) : FormulaSyntaxNode
+internal class CellSyntaxNode(FormulaToken token) : FormulaSyntaxNode(token)
 {
-    public FormulaToken Token { get; } = token;
-
     public override void Accept(IFormulaSyntaxNodeVisitor visitor)
     {
         visitor.VisitCell(this);
     }
 }
 
-internal class RangeSyntaxNode(CellSyntaxNode start, CellSyntaxNode end) : FormulaSyntaxNode
+internal class RangeSyntaxNode(FormulaToken token, CellSyntaxNode start, CellSyntaxNode end) : FormulaSyntaxNode(token)
 {
     public CellSyntaxNode Start { get; } = start;
     public CellSyntaxNode End { get; } = end;
@@ -121,15 +236,27 @@ internal class FormulaParser
 {
     private int position = 0;
     private readonly List<FormulaToken> tokens;
+    private readonly bool strict;
 
-    private FormulaParser(string expression)
+    private FormulaParser(string expression, bool strict = true) : this(FormulaLexer.Scan(expression, strict), strict)
     {
-        tokens = FormulaLexer.Scan(expression);
     }
 
-    public static FormulaSyntaxNode Parse(string expression)
+    private FormulaParser(List<FormulaToken> tokens, bool strict = true)
     {
-        var parser = new FormulaParser(expression);
+        this.tokens = tokens;
+        this.strict = strict;
+    }
+
+    public static FormulaSyntaxNode Parse(List<FormulaToken> tokens, bool strict = true)
+    {
+        var parser = new FormulaParser(tokens, strict);
+        return parser.Parse();
+    }
+
+    public static FormulaSyntaxNode Parse(string expression, bool strict = true)
+    {
+        var parser = new FormulaParser(expression, strict);
         return parser.Parse();
     }
 
@@ -161,7 +288,7 @@ internal class FormulaParser
         {
             var token = tokens[position];
             Advance(1);
-            left = new BinaryExpressionSyntaxNode(left, ParseArithmetic(), token.Type.ToBinaryOperator());
+            left = new BinaryExpressionSyntaxNode(token, left, ParseArithmetic(), token.Type.ToBinaryOperator());
         }
 
         return left;
@@ -175,7 +302,7 @@ internal class FormulaParser
         {
             var token = tokens[position];
             Advance(1);
-            left = new BinaryExpressionSyntaxNode(left, ParseTerm(), token.Type.ToBinaryOperator());
+            left = new BinaryExpressionSyntaxNode(token, left, ParseTerm(), token.Type.ToBinaryOperator());
         }
 
         return left;
@@ -189,7 +316,7 @@ internal class FormulaParser
         {
             var token = Peek();
             Advance(1);
-            left = new BinaryExpressionSyntaxNode(left, ParseFactor(), token.Type.ToBinaryOperator());
+            left = new BinaryExpressionSyntaxNode(token, left, ParseFactor(), token.Type.ToBinaryOperator());
         }
 
         return left;
@@ -221,7 +348,7 @@ internal class FormulaParser
             {
                 Advance(1);
                 var endToken = Expect(FormulaTokenType.CellIdentifier);
-                return new RangeSyntaxNode(start, new CellSyntaxNode(endToken));
+                return new RangeSyntaxNode(token, start, new CellSyntaxNode(endToken));
             }
 
             return start;
@@ -239,8 +366,8 @@ internal class FormulaParser
     private FormulaSyntaxNode ParseFunctionCall()
     {
         var token = Expect(FormulaTokenType.Identifier);
-        var name = token.Value!;
-        Expect(FormulaTokenType.OpenParen);
+
+        var openParenToken = Expect(FormulaTokenType.OpenParen);
 
         var arguments = new List<FormulaSyntaxNode>();
 
@@ -255,9 +382,9 @@ internal class FormulaParser
             }
         }
 
-        Expect(FormulaTokenType.CloseParen);
+        var closeParenToken = Expect(FormulaTokenType.CloseParen);
 
-        return new FunctionSyntaxNode(name, arguments);
+        return new FunctionSyntaxNode(token, openParenToken, closeParenToken, arguments);
     }
 
     private FormulaSyntaxNode ParseNumberLiteral()
@@ -269,21 +396,20 @@ internal class FormulaParser
 
     FormulaToken Expect(FormulaTokenType type)
     {
-        if (position >= tokens.Count)
+        var token = Peek();
+
+        if (token.Type == type)
         {
-            throw new InvalidOperationException($"Unexpected end of expression. Expected token: {type}");
+            Advance(1);
+            return token;
         }
 
-        var token = tokens[position];
-
-        if (token.Type != type)
+        if (strict)
         {
             throw new InvalidOperationException($"Unexpected token: {token.Type}. Expected: {type}");
         }
 
-        position++;
-
-        return token;
+        return new FormulaToken(type, string.Empty) { Start = token.Start, End = token.End };
     }
 
     private void Advance(int count)
@@ -295,7 +421,7 @@ internal class FormulaParser
     {
         if (position + offset >= tokens.Count)
         {
-            return new FormulaToken(FormulaTokenType.None, string.Empty);
+            return tokens[^1];
         }
 
         return tokens[position + offset];

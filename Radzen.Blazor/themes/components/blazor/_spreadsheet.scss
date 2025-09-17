@@ -154,8 +154,11 @@
 }
 
 .rz-spreadsheet-cell-editor .rz-spreadsheet-editor {
-    outline: none;
     border: 2px solid #258cfb;
+}
+
+.rz-spreadsheet-cell-editor .rz-spreadsheet-editor-input {
+    outline: none;
 }
 
 .rz-spreadsheet-editor {
@@ -205,6 +208,15 @@
 
 .rz-default-highlight {
     color: #000000;
+}
+
+.rz-spreadsheet-highlight-popup {
+    display: none;
+    position: absolute;
+    @extend %dropdown-panel;
+    width: 300px;
+    overflow: auto;
+    box-sizing: content-box;
 }
 
 /* Cell reference colors */

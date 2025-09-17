@@ -4,6 +4,8 @@ namespace Radzen.Blazor.Spreadsheet;
 
 class CountFunction : FormulaFunction
 {
+    public override string Name => "COUNT";
+
     public override FunctionParameter[] Parameters =>
     [
         new ("value", ParameterType.Sequence, isRequired: true)
