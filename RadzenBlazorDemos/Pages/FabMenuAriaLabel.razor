@@ -1,4 +1,3 @@
-@using Radzen
 @inject NotificationService NotificationService
 
 <RadzenLayout style="position: relative; grid-template-areas: 'rz-header rz-header' 'rz-sidebar rz-body'">
@@ -10,10 +9,14 @@
     </RadzenHeader>
 
     <!-- Place RadzenFabMenu component first or after the Header in RadzenLayout. -->
-    <RadzenFabMenu Direction="Radzen.FabMenuDirection.Top">
-        <RadzenFabMenuItem Text="Folder" Icon="folder" Click=@(args => OnClick("New Folder.")) />
-        <RadzenFabMenuItem Text="Message" Icon="chat" Click=@(args => OnClick("New Message.")) />
-        <RadzenFabMenuItem Text="Article" Icon="article" Click=@(args => OnClick("New Article.")) />
+    <RadzenFabMenu IsOpen="@menuOpen" 
+                   IsOpenChanged="@OnMenuOpenChanged"
+                   Icon="add" 
+                   ToggleIcon="close"
+                   AriaLabel="@(menuOpen ? "Close menu" : "Open menu")">
+        <RadzenFabMenuItem Text="File" Icon="add" Click="@(args => OnMenuItemClick("New File"))" />
+        <RadzenFabMenuItem Text="Upload" Icon="upload" Click="@(args => OnMenuItemClick("Upload"))" />
+        <RadzenFabMenuItem Text="Settings" Icon="settings" Click="@(args => OnMenuItemClick("Settings"))" />
     </RadzenFabMenu>
 
     <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" style="position: absolute; z-index: 3">
@@ -38,9 +41,21 @@
 
 @code {
     bool sidebarExpanded = false;
+    
+    private bool menuOpen = false;
 
-    private void OnClick(string text)
+    private void ToggleMenu() => menuOpen = !menuOpen;
+
+    private void OnMenuOpenChanged(bool isOpen)
     {
-        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "RadzenFAB Clicked", Detail = text });
+        menuOpen = isOpen;
+        NotificationService.Notify(NotificationSeverity.Info, "Menu", 
+            $"Menu is now {(isOpen ? "open" : "closed")}. Aria-label: \"{(isOpen ? "Close menu" : "Open menu")}\"");
     }
+
+    private void OnMenuItemClick(string itemName)
+    {
+        NotificationService.Notify(NotificationSeverity.Success, "Menu Item Clicked", $"You clicked: {itemName}");
+    }
+
 }
