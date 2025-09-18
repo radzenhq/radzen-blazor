@@ -9,7 +9,7 @@ namespace Radzen.Blazor;
 /// </summary>
 /// <example>
 /// <code>
-/// &lt;RadzenFabMenu Icon="add" ToggleIcon="close"&gt;
+/// &lt;RadzenFabMenu Icon="add" ToggleIcon="close" AriaLabel="Open menu"&gt;
 ///     &lt;RadzenFabMenuItem Text="Folder" Icon="folder" Click=@(args => Console.WriteLine("Folder clicked")) /&gt;
 ///     &lt;RadzenFabMenuItem Text="Chat" Icon="chat" Click=@(args => Console.WriteLine("Chat clicked")) /&gt;
 /// &lt;/RadzenFabMenu&gt;
@@ -116,6 +116,13 @@ public partial class RadzenFabMenu : RadzenComponent
 	/// <value>The button style CSS.</value>
 	[Parameter]
 	public string ButtonStyleCss { get; set; }
+
+	/// <summary>
+	/// Gets or sets the aria-label for the toggle button.
+	/// </summary>
+	/// <value>The aria-label for the toggle button.</value>
+	[Parameter]
+	public string AriaLabel { get; set; }
 
 	/// <summary>
 	/// Gets or sets the gap.

@@ -5,7 +5,8 @@
     <button @ref="@Element" style="@Style" disabled="@IsDisabled"
             type="@Enum.GetName(typeof(ButtonType), ButtonType).ToLower()"
             @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-            @onclick="@OnClick" tabindex="@(Disabled ? "-1" : $"{TabIndex}")">
+            @onclick="@OnClick" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+            aria-label="@AriaLabel">
         <div class="rz-helper-hidden-accessible">
             <input type="checkbox" name="@Name" id="@Name" checked="@Value" value="@(Value.ToString().ToLower())" tabindex="-1" aria-checked="@(Value.ToString().ToLowerInvariant())" @attributes=@InputAttributes>
         </div>

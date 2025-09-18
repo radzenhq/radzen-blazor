@@ -299,5 +299,12 @@ namespace Radzen.Blazor
         /// <value>The ToggleButton shade.</value>
         [Parameter]
         public Shade ToggleShade { get; set; } = Shade.Darker;
+
+        /// <summary>
+        /// Gets or sets the aria-label attribute.
+        /// </summary>
+        /// <value>The aria-label attribute.</value>
+        [Parameter]
+        public string AriaLabel { get; set; }
     }
 }
