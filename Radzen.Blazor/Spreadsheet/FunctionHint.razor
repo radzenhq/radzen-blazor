@@ -1,0 +1,27 @@
+@using Radzen.Blazor.Spreadsheet
+
+<span class="@(ArgumentIndex == -1 ? "rz-function-hint-name-active" : "rz-function-hint-name")">@Function.Name</span>
+<span>(</span>
+
+@for (var i = 0; i < Function.Parameters.Length; i++)
+{
+    var paramDefinition = Function.Parameters[i];
+    <span class="@(i == ArgumentIndex ? "rz-function-hint-parameter-active" : "rz-function-hint-parameter")">@paramDefinition.Name</span>
+    @if (i < Function.Parameters.Length - 1)
+    {
+        <span>, </span>
+    }
+}
+@if (Function.Parameters.Length > 0 && Function.Parameters.Last().Type == ParameterType.Sequence)
+{
+    <span>,</span>
+    <span class="@(ArgumentIndex >= Function.Parameters.Length ? "rz-function-hint-parameter-active" : "rz-function-hint-parameter")">[@Function.Parameters.Last().Name...]</span>
+}
+<span>)</span>
+@code {
+    [Parameter] 
+    public int ArgumentIndex { get; set; }
+
+    [Parameter] 
+    public FormulaFunction Function { get; set; }
+}
