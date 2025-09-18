@@ -16,31 +16,31 @@ internal class FunctionHintData(FormulaFunction function, int argumentIndex)
 /// <summary>
 /// Registry for spreadsheet formula functions.
 /// </summary>
-public class FunctionRegistry
+public class FunctionStore
 {
     private readonly Dictionary<string, FormulaFunction> functions = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FunctionRegistry"/> class and registers built-in functions.
+    /// Initializes a new instance of the <see cref="FunctionStore"/> class and registers built-in functions.
     /// </summary>
-    public FunctionRegistry()
+    public FunctionStore()
     {
-        Register<SumFunction>();
-        Register<SumIfFunction>();
-        Register<AverageFunction>();
-        Register<CountFunction>();
-        Register<CountAllFunction>();
-        Register<IfFunction>();
-        Register<IfErrorFunction>();
-        Register<AndFunction>();
-        Register<OrFunction>();
-        Register<NotFunction>();
+        Add<SumFunction>();
+        Add<SumIfFunction>();
+        Add<AverageFunction>();
+        Add<CountFunction>();
+        Add<CountAllFunction>();
+        Add<IfFunction>();
+        Add<IfErrorFunction>();
+        Add<AndFunction>();
+        Add<OrFunction>();
+        Add<NotFunction>();
     }
 
     /// <summary>
     /// Registers a new formula function of type T.
     /// </summary>
-    public void Register<T>() where T : FormulaFunction, new()
+    public void Add<T>() where T : FormulaFunction, new()
     {
         var function = new T();
 
@@ -76,7 +76,8 @@ public class FunctionRegistry
 
     internal FunctionHintData? CreateFunctionHint(string text, int position)
     {
-        var root = FormulaParser.Parse(text, strict: false);
+        var syntaxTree = FormulaParser.Parse(text);
+        var root = syntaxTree.Root;
 
         var candidates = root.Find(node =>
         {
