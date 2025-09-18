@@ -59,9 +59,9 @@ internal class CellDependencyGraph
             return;
         }
 
-        var node = FormulaParser.Parse(cell.Formula);
+        var tree = FormulaParser.Parse(cell.Formula);
         var visitor = new DependencyVisitor(cell.Sheet);
-        node.Accept(visitor);
+        tree.Root.Accept(visitor);
 
         if (dependencies.TryGetValue(cell, out var oldDependencies))
         {

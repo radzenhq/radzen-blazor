@@ -14,6 +14,18 @@ internal interface IFormulaSyntaxNodeVisitor
     void VisitRange(RangeSyntaxNode rangeSyntaxNode);
 }
 
+internal class FormulaSyntaxTree(FormulaSyntaxNode root, List<string> errors)
+{
+    public FormulaSyntaxNode Root { get; } = root;
+
+    public List<FormulaSyntaxNode> Find(Func<FormulaSyntaxNode, bool> predicate)
+    {
+        return Root.Find(predicate);
+    }
+
+    public IReadOnlyList<string> Errors => errors;
+}
+
 internal abstract class FormulaSyntaxNode(FormulaToken token)
 {
     public FormulaToken Token { get; } = token;
@@ -236,39 +248,38 @@ internal class FormulaParser
 {
     private int position = 0;
     private readonly List<FormulaToken> tokens;
-    private readonly bool strict;
+    private readonly List<string> errors = [];
 
-    private FormulaParser(string expression, bool strict = true) : this(FormulaLexer.Scan(expression, strict), strict)
+    private FormulaParser(string expression) : this(FormulaLexer.Scan(expression, false))
     {
     }
 
-    private FormulaParser(List<FormulaToken> tokens, bool strict = true)
+    private FormulaParser(List<FormulaToken> tokens)
     {
         this.tokens = tokens;
-        this.strict = strict;
     }
 
-    public static FormulaSyntaxNode Parse(List<FormulaToken> tokens, bool strict = true)
+    public static FormulaSyntaxTree Parse(List<FormulaToken> tokens)
     {
-        var parser = new FormulaParser(tokens, strict);
+        var parser = new FormulaParser(tokens);
         return parser.Parse();
     }
 
-    public static FormulaSyntaxNode Parse(string expression, bool strict = true)
+    public static FormulaSyntaxTree Parse(string expression)
     {
-        var parser = new FormulaParser(expression, strict);
+        var parser = new FormulaParser(expression);
         return parser.Parse();
     }
 
-    private FormulaSyntaxNode Parse()
+    private FormulaSyntaxTree Parse()
     {
         Expect(FormulaTokenType.Equals);
 
         var node = ParseExpression();
-
+        
         Expect(FormulaTokenType.None);
 
-        return node;
+        return new FormulaSyntaxTree(node, errors);
     }
 
     private FormulaSyntaxNode ParseExpression()
@@ -404,11 +415,7 @@ internal class FormulaParser
             return token;
         }
 
-        if (strict)
-        {
-            throw new InvalidOperationException($"Unexpected token: {token.Type}. Expected: {type}");
-        }
-
+        errors.Add($"Unexpected token: {token.Type}. Expected: {type}");
         return new FormulaToken(type, string.Empty) { Start = token.Start, End = token.End };
     }
 

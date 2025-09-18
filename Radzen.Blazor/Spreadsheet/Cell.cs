@@ -137,20 +137,13 @@ public class Cell
     /// </summary>
     public void SetValue(string? value)
     {
-        if (value?.StartsWith('=') == true)
+        if (value?.StartsWith('=') == true && value != "=")
         {
             Formula = value;
         }
         else
         {
-            if (double.TryParse(value, out var number))
-            {
-                Value = number;
-            }
-            else
-            {
-                Value = value;
-            }
+            Value = value;
         }
     }
 
@@ -166,7 +159,7 @@ public class Cell
     /// </summary>
     public CellDataType ValueType => Data.Type;
 
-    internal FormulaSyntaxNode? FormulaSyntaxNode { get; private set; }
+    internal FormulaSyntaxTree? FormulaSyntaxTree { get; private set; }
 
     private string? formula;
 
@@ -179,7 +172,7 @@ public class Cell
         set
         {
             formula = value;
-            FormulaSyntaxNode = value != null ? FormulaParser.Parse(value) : null;
+            FormulaSyntaxTree = value != null ? FormulaParser.Parse(value) : null;
             Sheet.OnCellFormulaChanged(this);
         }
     }
