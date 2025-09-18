@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 
 public class FunctionRegistryTests
 {
-    private readonly FunctionRegistry functionRegistry = new();
+    private readonly FunctionStore functionRegistry = new();
 
     [Theory]
     [InlineData(2, -1)]

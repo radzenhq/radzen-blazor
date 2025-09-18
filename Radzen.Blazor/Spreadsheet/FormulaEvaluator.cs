@@ -172,9 +172,9 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         }
 
         CellData result;
-        if (cell.FormulaSyntaxNode != null)
+        if (cell.FormulaSyntaxTree != null)
         {
-            cell.FormulaSyntaxNode.Accept(this);
+            cell.FormulaSyntaxTree.Root.Accept(this);
             result = (CellData)value!;
         }
         else

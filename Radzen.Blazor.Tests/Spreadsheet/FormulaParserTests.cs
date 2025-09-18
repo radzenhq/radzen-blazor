@@ -9,17 +9,19 @@ public class FormulaParserTests
     public void FormulaParser_ShouldRequireEqualsAtStart()
     {
         var formula = "A1";
-        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula));
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+        Assert.Contains("Unexpected token", syntaxTree.Errors[0]);
     }
 
     [Fact]
-
     public void FormulaParser_ShouldParseNumberLiteral()
     {
         var formula = "=123";
-        var node = FormulaParser.Parse(formula);
-        Assert.IsType<NumberLiteralSyntaxNode>(node);
-        var numberNode = (NumberLiteralSyntaxNode)node;
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        Assert.IsType<NumberLiteralSyntaxNode>(syntaxTree.Root);
+        var numberNode = (NumberLiteralSyntaxNode)syntaxTree.Root;
         Assert.Equal(123, numberNode.Token.IntValue);
     }
 
@@ -27,9 +29,10 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseAdditionOfTwoNumberLiterals()
     {
         var formula = "=123+456";
-        var node = FormulaParser.Parse(formula);
-        Assert.IsType<BinaryExpressionSyntaxNode>(node);
-        var binaryNode = (BinaryExpressionSyntaxNode)node;
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        Assert.IsType<BinaryExpressionSyntaxNode>(syntaxTree.Root);
+        var binaryNode = (BinaryExpressionSyntaxNode)syntaxTree.Root;
         Assert.Equal(BinaryOperator.Plus, binaryNode.Operator);
         Assert.IsType<NumberLiteralSyntaxNode>(binaryNode.Left);
         Assert.IsType<NumberLiteralSyntaxNode>(binaryNode.Right);
@@ -41,7 +44,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseAdditionOfMultipleNumberLiterals()
     {
         var formula = "=123+456+789";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
         var binaryNode = (BinaryExpressionSyntaxNode)node;
         Assert.Equal(BinaryOperator.Plus, binaryNode.Operator);
@@ -57,7 +62,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseSubtractionOfTwoNumberLiterals()
     {
         var formula = "=123-456";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
         var binaryNode = (BinaryExpressionSyntaxNode)node;
         Assert.Equal(BinaryOperator.Minus, binaryNode.Operator);
@@ -71,7 +78,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseSubtractionOfMultipleNumberLiterals()
     {
         var formula = "=123-456-789";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
         var binaryNode = (BinaryExpressionSyntaxNode)node;
         Assert.Equal(BinaryOperator.Minus, binaryNode.Operator);
@@ -87,7 +96,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseMultiplicationOfTwoNumberLiterals()
     {
         var formula = "=123*456";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
         var binaryNode = (BinaryExpressionSyntaxNode)node;
         Assert.Equal(BinaryOperator.Multiply, binaryNode.Operator);
@@ -101,7 +112,9 @@ public class FormulaParserTests
     public void FormulaParse_MultiplicationPrecedence()
     {
         var formula = "=123+456*789";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
         var binaryNode = (BinaryExpressionSyntaxNode)node;
         Assert.Equal(BinaryOperator.Plus, binaryNode.Operator);
@@ -117,7 +130,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseDivisionOfTwoNumberLiterals()
     {
         var formula = "=123/456";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
         var binaryNode = (BinaryExpressionSyntaxNode)node;
         Assert.Equal(BinaryOperator.Divide, binaryNode.Operator);
@@ -131,7 +146,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseParentheses()
     {
         var formula = "=(123+456)*789";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
         var binaryNode = (BinaryExpressionSyntaxNode)node;
         Assert.Equal(BinaryOperator.Multiply, binaryNode.Operator);
@@ -148,7 +165,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseNestedParentheses()
     {
         var formula = "=((123+456)*789)/101112";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
         var binaryNode = (BinaryExpressionSyntaxNode)node;
         Assert.Equal(BinaryOperator.Divide, binaryNode.Operator);
@@ -168,7 +187,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseCellIndentifer()
     {
         var formula = "=A1";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<CellSyntaxNode>(node);
         var cellIdentifierNode = (CellSyntaxNode)node;
         Assert.Equal("A1", cellIdentifierNode.Token.AddressValue.ToString());
@@ -178,7 +199,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseFunction()
     {
         var formula = "=SUM(A1,1)";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<FunctionSyntaxNode>(node);
         var functionNode = (FunctionSyntaxNode)node;
         Assert.Equal("SUM", functionNode.Name);
@@ -196,7 +219,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseNestedFunctions()
     {
         var formula = "=SUM(A1,MAX(B1,C1))";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<FunctionSyntaxNode>(node);
         var functionNode = (FunctionSyntaxNode)node;
         Assert.Equal("SUM", functionNode.Name);
@@ -223,7 +248,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseFunctionWithNoArguments()
     {
         var formula = "=SUM()";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<FunctionSyntaxNode>(node);
         var functionNode = (FunctionSyntaxNode)node;
         Assert.Equal("SUM", functionNode.Name);
@@ -234,7 +261,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseCellRange()
     {
         var formula = "=A1:A2";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
         Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
@@ -245,7 +274,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldParseCellRangeInFunction()
     {
         var formula = "=SUM(A1:A2)";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<FunctionSyntaxNode>(node);
         var functionNode = (FunctionSyntaxNode)node;
         Assert.Equal("SUM", functionNode.Name);
@@ -260,7 +291,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldHandleInvalidRange()
     {
         var formula = "=A2:A1";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
         Assert.Equal("A2", rangeNode.Start.Token.AddressValue.ToString());
@@ -271,7 +304,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldHandleSingleCellRange()
     {
         var formula = "=A1:A1";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
         Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
@@ -282,7 +317,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldHandleMultiColumnRange()
     {
         var formula = "=A1:B1";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
         Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
@@ -293,7 +330,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldHandleMultiRowRange()
     {
         var formula = "=A1:A2";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
         Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
@@ -304,7 +343,9 @@ public class FormulaParserTests
     public void FormulaParser_ShouldHandleMultiCellRange()
     {
         var formula = "=A1:B2";
-        var node = FormulaParser.Parse(formula);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
         Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
@@ -312,19 +353,22 @@ public class FormulaParserTests
     }
 
     [Fact]
-    public void FormulaParser_StrictMode_ShouldThrowOnInvalidFormula()
+    public void FormulaParser_ShouldAddErrorOnInvalidFormula()
     {
         var formula = "A1"; // Missing equals sign
-        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+        Assert.Contains("Unexpected token", syntaxTree.Errors[0]);
     }
 
     [Fact]
-    public void FormulaParser_NonStrictMode_ShouldReturnPartialExpressionOnIncompleteExpression()
+    public void FormulaParser_ShouldReturnPartialExpressionOnIncompleteExpression()
     {
         var formula = "=123+"; // Incomplete expression
-        var result = FormulaParser.Parse(formula, strict: false);
-        Assert.IsType<BinaryExpressionSyntaxNode>(result);
-        if (result is BinaryExpressionSyntaxNode binaryNode)
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+        Assert.IsType<BinaryExpressionSyntaxNode>(syntaxTree.Root);
+        if (syntaxTree.Root is BinaryExpressionSyntaxNode binaryNode)
         {
             Assert.Equal(BinaryOperator.Plus, binaryNode.Operator);
             Assert.IsType<NumberLiteralSyntaxNode>(binaryNode.Left);
@@ -333,114 +377,122 @@ public class FormulaParserTests
     }
 
     [Fact]
-    public void FormulaParser_StrictMode_ShouldThrowOnIncompleteExpression()
+    public void FormulaParser_ShouldAddErrorOnIncompleteExpression()
     {
         var formula = "=123+"; // Incomplete expression
-        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
     }
 
     [Fact]
-    public void FormulaParser_NonStrictMode_ShouldReturnPartialFunctionOnMissingCloseParen()
+    public void FormulaParser_ShouldReturnPartialFunctionOnMissingCloseParen()
     {
         var formula = "=SUM(A1"; // Missing closing parenthesis
-        var result = FormulaParser.Parse(formula, strict: false);
-        Assert.NotNull(result);
-        Assert.IsType<FunctionSyntaxNode>(result);
-        var functionNode = (FunctionSyntaxNode)result;
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+        Assert.IsType<FunctionSyntaxNode>(syntaxTree.Root);
+        var functionNode = (FunctionSyntaxNode)syntaxTree.Root;
         Assert.Equal("SUM", functionNode.Name);
         Assert.Single(functionNode.Arguments);
         Assert.IsType<CellSyntaxNode>(functionNode.Arguments[0]);
     }
 
     [Fact]
-    public void FormulaParser_StrictMode_ShouldThrowOnInvalidFunctionSyntax()
+    public void FormulaParser_ShouldAddErrorOnInvalidFunctionSyntax()
     {
         var formula = "=SUM(A1"; // Missing closing parenthesis
-        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
     }
 
     [Fact]
-    public void FormulaParser_NonStrictMode_ShouldReturnNullOnMissingFunctionName()
+    public void FormulaParser_ShouldParseGroupedExpression()
     {
         var formula = "=(A1)"; // Parentheses without function name should parse as grouped expression
-        var result = FormulaParser.Parse(formula, strict: false);
-        Assert.NotNull(result); // This should actually succeed as it's a valid grouped expression
-        Assert.IsType<CellSyntaxNode>(result);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors); // This should actually succeed as it's a valid grouped expression
+        Assert.IsType<CellSyntaxNode>(syntaxTree.Root);
     }
 
     [Fact]
-    public void FormulaParser_NonStrictMode_ShouldReturnPartialRangeOnIncompleteRange()
+    public void FormulaParser_ShouldReturnPartialRangeOnIncompleteRange()
     {
         var formula = "=A1:"; // Incomplete range
-        var result = FormulaParser.Parse(formula, strict: false);
-        Assert.NotNull(result);
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+        Assert.NotNull(syntaxTree.Root);
     }
 
     [Fact]
-    public void FormulaParser_StrictMode_ShouldThrowOnInvalidRange()
+    public void FormulaParser_ShouldAddErrorOnInvalidRange()
     {
         var formula = "=A1:"; // Incomplete range
-        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
     }
 
     [Fact]
-    public void FormulaParser_NonStrictMode_ShouldReturnNullOnUnterminatedString()
+    public void FormulaParser_ShouldHandleUnterminatedString()
     {
         var formula = "=\"hello"; // Unterminated string literal
-        var result = FormulaParser.Parse(formula, strict: false);
-        Assert.NotNull(result); // Should succeed in non-strict mode
-        Assert.IsType<StringLiteralSyntaxNode>(result);
-        var stringNode = (StringLiteralSyntaxNode)result;
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors); // Should succeed as lexer handles unterminated strings
+        Assert.IsType<StringLiteralSyntaxNode>(syntaxTree.Root);
+        var stringNode = (StringLiteralSyntaxNode)syntaxTree.Root;
         Assert.Equal("hello", stringNode.Token.Value);
     }
 
     [Fact]
-    public void FormulaParser_NonStrictMode_ShouldHandleMissingOperand()
+    public void FormulaParser_ShouldHandleMissingOperand()
     {
         var formula = "=*5"; // Missing left operand
-        var result = FormulaParser.Parse(formula, strict: false);
-        Assert.NotNull(result); // Should succeed in non-strict mode
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors); // Should have errors
+        Assert.NotNull(syntaxTree.Root);
     }
 
     [Fact]
-    public void FormulaParser_NonStrictMode_ShouldReturnPartialExpressionOnUnbalancedParentheses()
+    public void FormulaParser_ShouldReturnPartialExpressionOnUnbalancedParentheses()
     {
         var formula = "=(A1+B1"; // Missing closing parenthesis
-        var result = FormulaParser.Parse(formula, strict: false);
-        Assert.NotNull(result);
-        Assert.IsType<BinaryExpressionSyntaxNode>(result); // Should return the binary expression inside
-        var binaryNode = (BinaryExpressionSyntaxNode)result;
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+        Assert.IsType<BinaryExpressionSyntaxNode>(syntaxTree.Root); // Should return the binary expression inside
+        var binaryNode = (BinaryExpressionSyntaxNode)syntaxTree.Root;
         Assert.Equal(BinaryOperator.Plus, binaryNode.Operator);
         Assert.IsType<CellSyntaxNode>(binaryNode.Left);
         Assert.IsType<CellSyntaxNode>(binaryNode.Right);
     }
 
     [Fact]
-    public void FormulaParser_StrictMode_ShouldThrowOnUnbalancedParentheses()
+    public void FormulaParser_ShouldAddErrorOnUnbalancedParentheses()
     {
         var formula = "=(A1+B1"; // Missing closing parenthesis
-        Assert.Throws<InvalidOperationException>(() => FormulaParser.Parse(formula, strict: true));
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
     }
 
     [Fact]
-    public void FormulaParser_NonStrictMode_ShouldReturnPartialFunctionOnIncompleteArguments()
+    public void FormulaParser_ShouldReturnPartialFunctionOnIncompleteArguments()
     {
         var formula = "=SUM(A1,"; // Incomplete function arguments
-        var result = FormulaParser.Parse(formula, strict: false);
-        Assert.NotNull(result);
-        Assert.IsType<FunctionSyntaxNode>(result);
-        var functionNode = (FunctionSyntaxNode)result;
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+        Assert.IsType<FunctionSyntaxNode>(syntaxTree.Root);
+        var functionNode = (FunctionSyntaxNode)syntaxTree.Root;
         Assert.Equal("SUM", functionNode.Name);
         Assert.True(functionNode.Arguments.Count >= 1); // Should have at least the first argument
         Assert.IsType<CellSyntaxNode>(functionNode.Arguments[0]);
     }
 
     [Fact]
-    public void FormulaParser_StrictMode_DefaultBehavior_ShouldStillWork()
+    public void FormulaParser_DefaultBehavior_ShouldStillWork()
     {
-        // Test that default behavior (strict=true) still works as before
+        // Test that default behavior still works as before
         var formula = "=123+456";
-        var node = FormulaParser.Parse(formula); // No explicit strict parameter
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
         Assert.NotNull(node);
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
     }
