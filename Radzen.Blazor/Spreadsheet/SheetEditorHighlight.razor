@@ -1,0 +1,8 @@
+@using Radzen.Blazor.Rendering
+
+<div class="rz-spreadsheet-editor-highlight">
+    @foreach (var token in GetHighlightTokens())
+    {
+        <span class=@token.Class style=@token.Style>@token.Text</span>
+    }
+</div>
