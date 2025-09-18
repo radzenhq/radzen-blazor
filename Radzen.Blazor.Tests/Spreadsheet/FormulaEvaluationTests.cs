@@ -57,6 +57,35 @@ public class FormulaEvaluationTests
     }
 
     [Fact]
+    public void ShouldSetCellValueToErrorNameIfInvalidFunctionIsUsedInFormula()
+    {
+        sheet.Cells["A1"].Formula = "=INVALID_FUNCTION()";
+        sheet.Cells["A2"].Value = "test";
+
+        Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
+    }
+
+    [Theory]
+    [InlineData("=SUM(")]
+    [InlineData("=SUM(A2,")]
+    [InlineData("=SUM(A2:A2")]
+    public void ShouldSetCellValueToErrorNameIfIncompleteFunctionIsUsedInFormula(string formula)
+    {
+        sheet.Cells["A1"].Formula = formula;
+        sheet.Cells["A2"].Value = "test";
+
+        Assert.Equal(CellError.Name, sheet.Cells["A1"].Value);
+    }
+
+    [Fact]
+    public void ShouldSetCellValueToEqualsIfOnlyEqualsIsSetAsFormula()
+    {
+        sheet.Cells["A1"].SetValue("=");
+
+        Assert.Equal("=", sheet.Cells["A1"].Value);
+    }
+
+    [Fact]
     public void ShouldEvaluateFormulaWhenDependencyIsChanged()
     {
         sheet.Cells["A1"].Formula = "=A2+1";

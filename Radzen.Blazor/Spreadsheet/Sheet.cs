@@ -81,7 +81,7 @@ public partial class Sheet
     /// <summary>
     /// Gets the registry of formula functions available in the sheet.
     /// </summary>
-    public FunctionRegistry FunctionRegistry { get; } = new();
+    public FunctionStore FunctionRegistry { get; } = new();
    
     private Workbook? workbook;
 
@@ -143,18 +143,25 @@ public partial class Sheet
 
     private void EvaluateFormula(Cell cell)
     {
-        var node = cell.FormulaSyntaxNode;
+        var tree = cell.FormulaSyntaxTree;
 
-        if (node == null)
+        if (tree == null)
         {
             return;
         }
 
-        isEvaluating = true;
-        var visitor = new FormulaEvaluator(this);
-        var eval = visitor.Evaluate(node);
-        cell.Data = eval;
-        isEvaluating = false;
+        if (tree.Errors.Count > 0)
+        {
+            cell.Data = CellData.FromError(CellError.Name);
+        }
+        else
+        {
+            isEvaluating = true;
+            var visitor = new FormulaEvaluator(this);
+            var eval = visitor.Evaluate(tree.Root);
+            cell.Data = eval;
+            isEvaluating = false;
+        }
 
         cell.OnChanged();
     }
