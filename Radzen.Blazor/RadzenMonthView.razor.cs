@@ -48,7 +48,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Scheduler.CurrentDate.Date.StartOfMonth().StartOfWeek();
+                return Scheduler.CurrentDate.Date.StartOfMonth().StartOfWeek(Scheduler.Culture);
             }
         }
 
@@ -57,7 +57,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Scheduler.CurrentDate.Date.EndOfMonth().EndOfWeek().AddDays(1);
+                return Scheduler.CurrentDate.Date.EndOfMonth().EndOfWeek(Scheduler.Culture).AddDays(1);
             }
         }
 

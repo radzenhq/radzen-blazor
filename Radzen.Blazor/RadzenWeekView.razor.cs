@@ -60,7 +60,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Scheduler.CurrentDate.Date.StartOfWeek();
+                return Scheduler.CurrentDate.Date.StartOfWeek(Scheduler.Culture);
             }
         }
 
@@ -69,7 +69,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StartDate.EndOfWeek().AddDays(1);
+                return StartDate.EndOfWeek(Scheduler.Culture).AddDays(1);
             }
         }
 
@@ -78,7 +78,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return $"{StartDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)} - {StartDate.EndOfWeek().ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)}";
+                return $"{StartDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)} - {StartDate.EndOfWeek(Scheduler.Culture).ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)}";
             }
         }
 

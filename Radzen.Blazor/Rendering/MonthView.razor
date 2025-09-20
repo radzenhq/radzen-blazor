@@ -7,7 +7,7 @@
 
 <div class="rz-view rz-month-view">
     <div class="rz-view-header">
-        @for (var date = StartDate; date <= StartDate.EndOfWeek(); date = date.AddDays(1))
+        @for (var date = StartDate; date <= StartDate.EndOfWeek(Scheduler.Culture); date = date.AddDays(1))
         {
             <div class="rz-slot-header">
                 @date.ToString("ddd", Scheduler.Culture)
