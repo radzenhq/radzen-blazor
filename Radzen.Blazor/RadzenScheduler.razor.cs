@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -651,12 +652,6 @@ namespace Radzen.Blazor
                                .Select(item => new AppointmentData { Start = startGetter(item), End = endGetter(item), Text = textGetter(item), Data = item });
 
             return appointments;
-        }
-
-        class Rect
-        {
-            public double Width { get; set; }
-            public double Height { get; set; }
         }
 
         /// <inheritdoc />
