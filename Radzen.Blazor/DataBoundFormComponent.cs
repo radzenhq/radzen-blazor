@@ -307,7 +307,7 @@ namespace Radzen
             // check for changes before setting the properties through the base call
             var dataChanged = parameters.DidParameterChange(nameof(Data), Data);
             var disabledChanged = parameters.DidParameterChange(nameof(Disabled), Disabled);
-            
+
             // allow the base class to process parameters and set the properties
             // after this call the parameters object should be considered stale
             await base.SetParametersAsync(parameters);
@@ -318,9 +318,11 @@ namespace Radzen
                 await OnDataChanged();
             }
 
-            if (EditContext != null && ValueExpression != null && FieldIdentifier.Model != EditContext.Model)
+            if (EditContext != null && (ValueExpression != null || ValueChanged.HasDelegate) && FieldIdentifier.Model != EditContext.Model)
             {
-                FieldIdentifier = FieldIdentifier.Create(ValueExpression);
+                FieldIdentifier = ValueExpression != null
+                    ? FieldIdentifier.Create(ValueExpression)
+                    : FieldIdentifier.Create(() => Value);
                 EditContext.OnValidationStateChanged -= ValidationStateChanged;
                 EditContext.OnValidationStateChanged += ValidationStateChanged;
             }
