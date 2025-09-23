@@ -38,12 +38,9 @@ These instructions assume the new application layout which uses rendering modes 
                 Open the <code>App.razor</code> file of your application. Add this code within the <code>&lt;head&gt;</code> element:
             </RadzenText>
 <pre class="rz-p-4">
-<code>&lt;RadzenTheme Theme="material" @@rendermode="InteractiveAuto" /&gt;
+<code>&lt;RadzenTheme Theme="material" /&gt;
 </code>
 </pre>
-            <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
-                Set the <code>@@rendermode</code> attribute to the render mode of your application e.g. <code>InteractiveServer</code>, <code>InteractiveWebAssembly</code> or <code>InteractiveAuto</code>.
-            </RadzenAlert>
             @IncludeJavaScript(("App.razor", CurrentVersion))
             @UseComponent(CurrentVersion)
             <RadzenText Anchor="@($"get-started/{CurrentVersion}#additional")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">6. Use Dialog, Notification, ContextMenu and Tooltip components</RadzenText>
