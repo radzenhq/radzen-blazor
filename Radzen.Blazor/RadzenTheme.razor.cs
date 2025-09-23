@@ -36,32 +36,13 @@ namespace Radzen.Blazor
 
         private bool wcag;
 
-        private static readonly string? Version = typeof(RadzenTheme).Assembly.GetName().Version?.ToString();
+        private string Href => ThemeService.Href;
 
-        private string Href => $"{Path}/{theme}-base.css?v={Version}";
+        private string WcagHref => ThemeService.WcagHref;
 
-        private string WcagHref => $"{Path}/{theme}-wcag.css?v={Version}";
-
-        private string Path => Embedded ? $"_content/Radzen.Blazor/css" : "css";
-
-        private string IconFontPath => Embedded ? $"_content/Radzen.Blazor/fonts" : "fonts";
+        private string IconFontPath => ThemeService.Embedded ? $"_content/Radzen.Blazor/fonts" : "fonts";
 
         private string IconFontHref => $"{IconFontPath}/MaterialSymbolsOutlined.woff2";
-
-        private bool Embedded => theme switch
-        {
-            "material" => true,
-            "material-dark" => true,
-            "standard" => true,
-            "standard-dark" => true,
-            "humanistic" => true,
-            "humanistic-dark" => true,
-            "software" => true,
-            "software-dark" => true,
-            "default" => true,
-            "dark" => true,
-            _ => false
-        };
 
         private PersistingComponentStateSubscription? persistingSubscription;
 
