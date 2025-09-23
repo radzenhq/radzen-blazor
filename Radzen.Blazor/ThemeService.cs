@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.JSInterop;
 using System;
 using System.Collections;
@@ -367,13 +369,31 @@ namespace Radzen
     /// <summary>
     /// Service for theme registration and management.
     /// </summary>
-    public class ThemeService(IJSRuntime jsRuntime)
+    public class ThemeService(IJSRuntime jsRuntime, IServiceProvider serviceProvider)
     {
 
+        private string theme;
         /// <summary>
         /// Gets the current theme.
         /// </summary>
-        public string Theme { get; private set; }
+        public string Theme
+        {
+            get
+            {
+                if (theme == null)
+                {
+                    var persistentComponentState = serviceProvider.GetService<PersistentComponentState>();
+
+                    if (persistentComponentState?.TryTakeFromJson(nameof(Theme), out string persistedTheme) == true)
+                    {
+                        theme = persistedTheme;
+                    }
+                }
+                return theme;
+            }
+
+            private set => theme = value;
+        }
 
         /// <summary>
         /// Specify if the theme colors should meet WCAG contrast requirements.
