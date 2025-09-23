@@ -2592,5 +2592,16 @@ window.Radzen = {
     unregisterScrollListener: function (element) {
       document.removeEventListener('scroll', element.scrollHandler, true);
       window.removeEventListener('resize', element.scrollHandler, true);
+    },
+    setTheme: function (href, wcagHref) {
+      const theme = document.getElementById('radzen-theme-link');
+      if (theme && theme.href != href) {
+        theme.href = href;
+      }
+
+      const wcagTheme = document.getElementById('radzen-wcag-theme-link');
+      if (wcagTheme && wcagTheme.href != wcagHref) {
+        wcagTheme.href = wcagHref;
+      }
     }
 };
