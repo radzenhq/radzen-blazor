@@ -162,8 +162,8 @@ body {
 .cta-button.primary {
     font-weight: 600;
     color: #ffffff !important;
-    border-color: #FF504D;
-    background: #FF504D;
+    border-color: var(--rz-primary); /*#FF504D*/
+    background: var(--rz-primary); /*#FF504D*/
 }
 
 .cta-button:hover {

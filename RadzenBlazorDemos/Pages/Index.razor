@@ -78,16 +78,8 @@
       </RadzenColumn>
     </RadzenRow>
 
-      <RadzenRow ID="components" Gap="1rem" class="rz-w-100 rz-mx-auto" Style="max-width: 1440px;">
+    <RadzenRow ID="components" Gap="1rem" class="rz-w-100 rz-mx-auto rz-mt-12 rz-pt-12" Style="max-width: 1440px;">
       <RadzenColumn Size="12">
-            <RadzenAlert AlertStyle="AlertStyle.Dark" Icon="mode_heat" Size="AlertSize.Large" Variant="Variant.Flat" class="rz-my-lg-12 promo-alert">
-              <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mb-3 rz-color-on-base-darker"><strong>NEW: Radzen Blazor for Visual Studio</strong></RadzenText>
-              <RadzenText TextStyle="TextStyle.Body1" class="rz-color-on-base-darker">The extension brings Radzen’s rich feature set and productivity tools directly into the familiar Visual Studio 2022 environment. Connect to data, design, code seamlessly, and work faster within Visual Studio. <RadzenLink Path="https://www.radzen.com/blazor-visual-studio" target="_blank" Style="color: #FFB9FF !important;">Learn More ↗</RadzenLink></RadzenText>
-              <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" AlignItems="AlignItems.Center" class="rz-mt-6">
-                <RadzenButton Text="See in Action" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Medium" Click=@(args => ShowVideoDialog("https://www.youtube.com/embed/VUwy-BX3eCM?&rel=0")) />
-              </RadzenStack>
-            </RadzenAlert>
-
             <RadzenToc Orientation="Orientation.Horizontal" Selector=".radzen-blazor" Style="position: sticky; top: 2rem; z-index: 1;" class="rz-display-none rz-display-md-flex">
                 <RadzenTocItem Text="UI Components" Selector="#get-started"></RadzenTocItem>
                 <RadzenTocItem Selector="#blocks">
