@@ -2599,9 +2599,21 @@ window.Radzen = {
         theme.href = href;
       }
 
-      const wcagTheme = document.getElementById('radzen-wcag-theme-link');
-      if (wcagTheme && wcagTheme.href != wcagHref) {
+      let wcagTheme = document.getElementById('radzen-wcag-theme-link');
+
+      if (!wcagTheme && wcagHref) {
+        wcagTheme = document.createElement('link');
+        wcagTheme.id = 'radzen-wcag-theme-link';
+        wcagTheme.rel = 'stylesheet';
         wcagTheme.href = wcagHref;
+        theme.parentNode.insertBefore(wcagTheme, theme.nextSibling);
+      } else if (wcagTheme && wcagTheme.href != wcagHref) {
+        if (!wcagHref) {
+          wcagTheme.parentNode.removeChild(wcagTheme);
+          return;
+        } else {
+          wcagTheme.href = wcagHref;
+        }
       }
     }
 };

@@ -455,7 +455,7 @@ namespace Radzen
 
                 try
                 {
-                    jsRuntime.InvokeVoid("Radzen.setTheme", Href, WcagHref);
+                    jsRuntime.InvokeVoid("Radzen.setTheme", Href, Wcag == true ? WcagHref : null);
                 }
                 catch (Exception)
                 {
