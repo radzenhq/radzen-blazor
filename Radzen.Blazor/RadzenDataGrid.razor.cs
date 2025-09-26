@@ -3436,36 +3436,16 @@ namespace Radzen.Blazor
 
             // Fix nested property settings load issue
             // GetFilterValue reads settings as list only if the filterProperty type is IEnumerable and the settings value is JsonElement array.
-            if (columnSettings.FilterValue is JsonElement { ValueKind: not JsonValueKind.Array }
-                && !typeof(string).IsAssignableFrom(gridColumn.FilterPropertyType)
-                && typeof(IEnumerable).IsAssignableFrom(gridColumn.FilterPropertyType))
+            if ( columnSettings.FilterValue is JsonElement jsonElement && jsonElement.ValueKind != JsonValueKind.Array
+                && !typeof(string).IsAssignableFrom(gridColumn.FilterPropertyType) && (typeof(IEnumerable<>).IsAssignableFrom(gridColumn.FilterPropertyType) || typeof(IEnumerable).IsAssignableFrom(gridColumn.FilterPropertyType)))
             {
                 filterPropertyType = PropertyAccess.GetElementType(gridColumn.FilterPropertyType);
             }
-            else if (columnSettings.FilterValue is JsonElement { ValueKind: JsonValueKind.Array }
-                && !typeof(string).IsAssignableFrom(gridColumn.FilterPropertyType)
-                && typeof(IEnumerable).IsAssignableFrom(gridColumn.FilterPropertyType)
-                && gridColumn.FilterProperty != gridColumn.Property)
+
+            if (!AreObjectsEqual(isFirst ? gridColumn.GetFilterValue() : gridColumn.GetSecondFilterValue(),
+                GetFilterValue(isFirst ? columnSettings.FilterValue : columnSettings.SecondFilterValue, filterPropertyType)))
             {
-                var subPropertyFilterType = PropertyAccess
-                    .GetElementType(gridColumn.FilterPropertyType)
-                    .GetProperty(gridColumn.GetFilterProperty())!
-                    .PropertyType;
-
-                filterPropertyType = typeof(IEnumerable<>).MakeGenericType(subPropertyFilterType);
-            }
-
-            var columnFilterValue = isFirst
-                ? gridColumn.GetFilterValue()
-                : gridColumn.GetSecondFilterValue();
-
-            var columnSettingsFilterValue = isFirst
-                ? GetFilterValue(columnSettings.FilterValue, filterPropertyType)
-                : GetFilterValue(columnSettings.SecondFilterValue, filterPropertyType);
-
-            if (!AreObjectsEqual(columnFilterValue, columnSettingsFilterValue))
-            {
-                gridColumn.SetFilterValue(columnSettingsFilterValue, isFirst);
+                gridColumn.SetFilterValue(GetFilterValue(isFirst ? columnSettings.FilterValue : columnSettings.SecondFilterValue, filterPropertyType), isFirst);
                 return true;
             }
 
