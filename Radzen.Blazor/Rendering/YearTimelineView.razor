@@ -35,7 +35,7 @@
         int curYear = startyear + (offSetMonth <= month ? 1 : 0);
         realstart = new DateTime(curYear, offSetMonth, 1);
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
-        date = realstart.StartOfMonth().StartOfWeek();
+        date = realstart.StartOfMonth().StartOfWeek(Scheduler.Culture);
         var startMonth = realstart;
 
         <div class="rz-month @(month == CurrentMonth ? "rz-state-focused" : "")">

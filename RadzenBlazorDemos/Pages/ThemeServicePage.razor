@@ -32,6 +32,9 @@ The Radzen.Blazor library provides a built-in service that persists the current 
 
     [Inject]
     private ThemeService ThemeService { get; set; }
+    
+    [Inject]
+    private IOptions&lt;CookieThemeServiceOptions&gt; Options { get; set; }
 
     protected override void OnInitialized()
     {
@@ -44,6 +47,10 @@ The Radzen.Blazor library provides a built-in service that persists the current 
             if (!string.IsNullOrEmpty(theme))
             {
                 ThemeService.SetTheme(theme, false);
+            }
+            else
+            {
+                HttpContext.Response.Cookies.Append("MyApplicationTheme", "material" , new CookieOptions { Secure = Options.Value.IsSecure, Expires = DateTimeOffset.Now.Add(Options.Value.Duration) });    
             }
         }
     }

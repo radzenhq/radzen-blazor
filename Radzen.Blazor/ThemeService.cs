@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -366,12 +369,31 @@ namespace Radzen
     /// <summary>
     /// Service for theme registration and management.
     /// </summary>
-    public class ThemeService
+    public class ThemeService(IJSRuntime jsRuntime, IServiceProvider serviceProvider)
     {
+
+        private string theme;
         /// <summary>
         /// Gets the current theme.
         /// </summary>
-        public string Theme { get; private set; }
+        public string Theme
+        {
+            get
+            {
+                if (theme == null)
+                {
+                    var persistentComponentState = serviceProvider.GetService<PersistentComponentState>();
+
+                    if (persistentComponentState?.TryTakeFromJson(nameof(Theme), out string persistedTheme) == true)
+                    {
+                        theme = persistedTheme;
+                    }
+                }
+                return theme;
+            }
+
+            private set => theme = value;
+        }
 
         /// <summary>
         /// Specify if the theme colors should meet WCAG contrast requirements.
@@ -430,8 +452,38 @@ namespace Radzen
             if (requiresChange && options.TriggerChange)
             {
                 ThemeChanged?.Invoke();
+
+                try
+                {
+                    jsRuntime.InvokeVoid("Radzen.setTheme", Href, Wcag == true ? WcagHref : null);
+                }
+                catch (Exception)
+                {
+                }
             }
         }
+        private static readonly string Version = typeof(ThemeService).Assembly.GetName().Version?.ToString();
+
+        internal string Href => $"{Path}/{Theme}-base.css?v={Version}";
+
+        internal string WcagHref => $"{Path}/{Theme}-wcag.css?v={Version}";
+
+        private string Path => Embedded ? $"_content/Radzen.Blazor/css" : "css";
+
+        internal bool Embedded => Theme switch
+        {
+            "material" => true,
+            "material-dark" => true,
+            "standard" => true,
+            "standard-dark" => true,
+            "humanistic" => true,
+            "humanistic-dark" => true,
+            "software" => true,
+            "software-dark" => true,
+            "default" => true,
+            "dark" => true,
+            _ => false
+        };
 
         /// <summary>
         /// Enables or disables WCAG contrast requirements.

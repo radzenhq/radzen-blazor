@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
@@ -75,34 +74,16 @@ namespace Radzen.Blazor
         [Parameter]
         public ColorScheme ColorScheme { get; set; } = ColorScheme.Pastel;
 
-        /// <summary>
-        /// Gets the actual width of the chart.
-        /// </summary>
         private double? Width { get; set; }
 
-        /// <summary>
-        /// Gets the actual height of the chart.
-        /// </summary>
         private double? Height { get; set; }
 
-        /// <summary>
-        /// Gets or sets the left margin.
-        /// </summary>
         private double MarginLeft { get; set; } = 80;
 
-        /// <summary>
-        /// Gets or sets the top margin.
-        /// </summary>
         private double MarginTop { get; set; } = 10;
 
-        /// <summary>
-        /// Gets or sets the right margin.
-        /// </summary>
         private double MarginRight { get; set; } = 80;
 
-        /// <summary>
-        /// Gets or sets the bottom margin.
-        /// </summary>
         private double MarginBottom { get; set; } = 10;
 
         /// <summary>
@@ -192,15 +173,6 @@ namespace Radzen.Blazor
             var colorScheme = ColorScheme.ToString().ToLower();
             return $"rz-sankey-diagram rz-scheme-{colorScheme}";
         }
-
-        /// <inheritdoc />
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-            
-            // Don't compute layout here - wait for JavaScript to provide dimensions
-        }
-
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -396,6 +368,14 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <summary>
+        /// Causes the component to re-render. Use it when <see cref="Data" /> has changed.
+        /// </summary>
+        public void Reload()
+        {
+            ComputeLayout();
+        }
+
         private void ComputeLayout()
         {
             if (Data == null || !Width.HasValue || !Height.HasValue || Width <= 0 || Height <= 0)
@@ -425,37 +405,37 @@ namespace Radzen.Blazor
                 // Extract nodes and links from data
                 var nodeMap = new Dictionary<string, SankeyNode>();
                 var sankeyLinks = new List<SankeyLink>();
-                
+
                 foreach (var item in Data)
                 {
                     var source = sourceGetter(item);
                     var target = targetGetter(item);
                     var value = valueGetter(item);
-                    
+
                     // Get labels if label getters are available
                     var sourceLabel = sourceLabelGetter != null ? sourceLabelGetter(item) : source;
                     var targetLabel = targetLabelGetter != null ? targetLabelGetter(item) : target;
-                    
+
                     // Create or update source node
                     if (!nodeMap.ContainsKey(source))
                     {
-                        nodeMap[source] = new SankeyNode 
-                        { 
+                        nodeMap[source] = new SankeyNode
+                        {
                             Id = source,
                             Label = sourceLabel
                         };
                     }
-                    
+
                     // Create or update target node
                     if (!nodeMap.ContainsKey(target))
                     {
-                        nodeMap[target] = new SankeyNode 
-                        { 
+                        nodeMap[target] = new SankeyNode
+                        {
                             Id = target,
                             Label = targetLabel
                         };
                     }
-                    
+
                     // Create link
                     sankeyLinks.Add(new SankeyLink
                     {
@@ -464,16 +444,16 @@ namespace Radzen.Blazor
                         Value = value
                     });
                 }
-                
+
                 var sankeyNodes = nodeMap.Values.ToList();
 
                 var layoutWidth = Width.Value - MarginLeft - MarginRight;
                 var layoutHeight = Height.Value - MarginTop - MarginBottom;
-                
+
                 // Ensure positive dimensions
                 layoutWidth = Math.Max(100, layoutWidth);
                 layoutHeight = Math.Max(100, layoutHeight);
-                
+
                 var layout = new SankeyLayout
                 {
                     Width = layoutWidth,
@@ -486,14 +466,14 @@ namespace Radzen.Blazor
                 };
 
                 (ComputedNodes, ComputedLinks) = layout.Compute(sankeyNodes, sankeyLinks);
-                
+
                 // Assign colors to nodes
                 if (ComputedNodes != null)
                 {
                     for (int i = 0; i < ComputedNodes.Count; i++)
                     {
                         var node = ComputedNodes[i];
-                        
+
                         // Use explicit color if provided, otherwise use color scheme
                         if (NodeFills != null && i < NodeFills.Count)
                         {
@@ -513,9 +493,6 @@ namespace Radzen.Blazor
             }
         }
 
-        /// <summary>
-        /// Gets the fill color for a node.
-        /// </summary>
         internal string GetNodeFill(ComputedSankeyNode node)
         {
             if (NodeFills != null)
@@ -529,9 +506,6 @@ namespace Radzen.Blazor
             return null;
         }
 
-        /// <summary>
-        /// Gets the fill color for a link.
-        /// </summary>
         internal string GetLinkFill(ComputedSankeyLink link)
         {
             if (LinkFills != null)
@@ -545,9 +519,6 @@ namespace Radzen.Blazor
             return null;
         }
 
-        /// <summary>
-        /// Shows tooltip for a node.
-        /// </summary>
         private void ShowNodeTooltip(MouseEventArgs args, ComputedSankeyNode node)
         {
             if (TooltipService == null) return;
@@ -621,9 +592,6 @@ namespace Radzen.Blazor
             TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, _ => tooltip, new ChartTooltipOptions());
         }
 
-        /// <summary>
-        /// Shows tooltip for a link.
-        /// </summary>
         private void ShowLinkTooltip(MouseEventArgs args, ComputedSankeyLink link)
         {
             if (TooltipService == null) return;
@@ -638,7 +606,7 @@ namespace Radzen.Blazor
             
             var tooltip = new RenderFragment(builder =>
             {
-                builder.OpenComponent<Rendering.ChartTooltip>(0);
+                builder.OpenComponent<ChartTooltip>(0);
                 builder.AddAttribute(1, "Title", $"{sourceLabel} → {targetLabel}");
                 builder.AddAttribute(2, "Label", FlowText);
                 builder.AddAttribute(3, "Value", valueStr);
@@ -653,9 +621,6 @@ namespace Radzen.Blazor
             TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, _ => tooltip, new ChartTooltipOptions());
         }
         
-        /// <summary>
-        /// Hides the tooltip.
-        /// </summary>
         private void HideTooltip()
         {
             currentTooltipNode = null;
@@ -683,12 +648,6 @@ namespace Radzen.Blazor
             }
 
             base.Dispose();
-        }
-
-        class Rect
-        {
-            public double Width { get; set; }
-            public double Height { get; set; }
         }
     }
 }

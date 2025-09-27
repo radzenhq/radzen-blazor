@@ -61,7 +61,24 @@
 
     string GetODataExpand(string property)
     {
-        var properties = property.Split("/");
-        return properties.Count() > 1 ? $"{string.Join("/", properties.Take(properties.Length - 1))}($select={properties.LastOrDefault()})" : null;
+        var parts = property.Split('.');
+        if (parts.Length <= 1)
+            return null;
+
+        parts = parts.Take(parts.Length - 1).ToArray();
+
+        string result = "";
+        for (int i = 0; i < parts.Length; i++)
+        {
+            if (i == 0)
+                result += $"$expand={parts[i]}";
+            else
+                result += $"($expand={parts[i]}";
+        }
+
+        for (int i = 1; i < parts.Length; i++)
+            result += ")";
+
+        return result;
     }
 }

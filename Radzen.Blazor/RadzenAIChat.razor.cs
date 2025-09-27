@@ -395,7 +395,7 @@ namespace Radzen.Blazor
             await base.OnParametersSetAsync();
             
             // Update session ID if it changed
-            if (SessionId != currentSessionId)
+            if (!string.IsNullOrEmpty(SessionId) && SessionId != currentSessionId)
             {
                 currentSessionId = SessionId ?? Guid.NewGuid().ToString();
                 await SessionIdChanged.InvokeAsync(currentSessionId);

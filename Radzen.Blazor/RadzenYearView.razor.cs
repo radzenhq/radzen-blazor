@@ -60,14 +60,14 @@ namespace Radzen.Blazor
             {
                 if (StartMonth == Month.January)
                 {
-                    var d = new DateTime(Scheduler.CurrentDate.Date.Year, 1, 1).StartOfWeek();
-                    if (d.DayOfWeek == DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek) d.AddDays(-7);
+                    var d = new DateTime(Scheduler.CurrentDate.Date.Year, 1, 1).StartOfWeek(Scheduler.Culture);
+                    if (d.DayOfWeek == Scheduler.Culture.DateTimeFormat.FirstDayOfWeek) d.AddDays(-7);
                     return d;
                 }
                 else
                 {
-                    var d = new DateTime(Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Month < (int)StartMonth + 1 ? -1 : 0), (int)StartMonth + 1, 1).StartOfWeek();
-                    if (d.DayOfWeek == DateTimeFormatInfo.CurrentInfo.FirstDayOfWeek) d.AddDays(-7);
+                    var d = new DateTime(Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Month < (int)StartMonth + 1 ? -1 : 0), (int)StartMonth + 1, 1).StartOfWeek(Scheduler.Culture);
+                    if (d.DayOfWeek == Scheduler.Culture.DateTimeFormat.FirstDayOfWeek) d.AddDays(-7);
                     return d;
                 }
             }
@@ -79,7 +79,7 @@ namespace Radzen.Blazor
             get
             {
                 var realFirstYear = StartDate.AddDays(7);
-                var d = StartDate.AddDays(DateTime.IsLeapYear(realFirstYear.Year) || DateTime.IsLeapYear(realFirstYear.Year + 1) ? 366 : 365).EndOfWeek();
+                var d = StartDate.AddDays(DateTime.IsLeapYear(realFirstYear.Year) || DateTime.IsLeapYear(realFirstYear.Year + 1) ? 366 : 365).EndOfWeek(Scheduler.Culture);
                 return d;
             }
         }

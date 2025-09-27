@@ -23,7 +23,7 @@
         int curYear = year + (offSetMonth <= month ? 1 : 0);
         realstart = new DateTime(curYear, offSetMonth, 1);
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
-        date = realstart.StartOfMonth().StartOfWeek();
+        date = realstart.StartOfMonth().StartOfWeek(Scheduler.Culture);
         var currentDate = date;
         var currentMonth = month;
         var startMonth = realstart;
@@ -39,7 +39,7 @@
             </div>
 
             <div class="rz-view-header">
-                @for (var dateheader = StartDate; dateheader <= StartDate.EndOfWeek(); dateheader = dateheader.AddDays(1))
+                @for (var dateheader = StartDate; dateheader <= StartDate.EndOfWeek(Scheduler.Culture); dateheader = dateheader.AddDays(1))
                 {
                     <div class="rz-slot-header">
                         @dateheader.ToString("ddd", Scheduler.Culture).Substring(0,1)
