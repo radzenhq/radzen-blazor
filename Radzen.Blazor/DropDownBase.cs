@@ -821,12 +821,9 @@ namespace Radzen
                     {
                         await virtualize.RefreshDataAsync();
                     }
-                    await InvokeAsync(() => { StateHasChanged(); });
                 }
-                else
-                {
-                    await InvokeAsync(() => { StateHasChanged(); });
-                }
+
+                await InvokeAsync(() => { StateHasChanged(); });
             }
             else
             {
@@ -838,13 +835,15 @@ namespace Radzen
                     }
                     else
                     {
-                        await LoadData.InvokeAsync(await GetLoadDataArgs());
+                        var args = await GetLoadDataArgs();
+                        await InvokeAsync(() => LoadData.InvokeAsync(args));
                     }
                     await InvokeAsync(() => { StateHasChanged(); });
                 }
                 else
                 {
-                    await LoadData.InvokeAsync(await GetLoadDataArgs());
+                    var args = await GetLoadDataArgs();
+                    await InvokeAsync(() => LoadData.InvokeAsync(args));
                 }
             }
 
@@ -852,7 +851,7 @@ namespace Radzen
                 selectedIndex = -1;
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
-            await SearchTextChanged.InvokeAsync(SearchText);
+            await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
         }
 
         /// <summary>
