@@ -152,7 +152,7 @@
                             <input id="@SearchID" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" class="rz-inputtext" role="textbox" type="text"
                                    onclick="Radzen.preventDefaultAndStopPropagation(event)" aria-label="@SearchAriaLabel"
                                    @ref="@search" @oninput=@(args => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);})
-                                   @onchange="@((args) => OnFilter(args))" @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" autocomplete="@FilterAutoCompleteType" />
+                                   @onkeydown="@((args) => OnFilterKeyPress(args))" value="@searchText" autocomplete="@FilterAutoCompleteType" />
                             <span class="notranslate rz-multiselect-filter-icon rzi rzi-search"></span>
                         </div>
                     }
@@ -192,7 +192,7 @@
             <text>
                 <div class="rz-dropdown-filter-container">
                     <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext" autocomplete="@FilterAutoCompleteType" aria-autocomplete="none" type="text"
-                           @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress"
+                           @onkeydown="@OnFilterKeyPress"
                            @bind:event="oninput" @bind:get="searchText" @bind:set="@(args => { searchText = $"{args}"; SearchTextChanged.InvokeAsync(searchText);})" />
                     <span class="notranslate rz-dropdown-filter-icon rzi rzi-search"></span>
                 </div>
@@ -203,7 +203,7 @@
             <text>
                 <div class="rz-dropdown-filter-container">
                     <input aria-label="@SearchAriaLabel" id="@SearchID" @ref="@search" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" placeholder="@FilterPlaceholder" class="rz-dropdown-filter rz-inputtext" autocomplete="@FilterAutoCompleteType" aria-autocomplete="none" type="text"
-                           @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@searchText"
+                           @onkeydown="@OnFilterKeyPress" value="@searchText"
                            @oninput="@((ChangeEventArgs args) => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);})" />
                     <span class="notranslate rz-dropdown-filter-icon rzi rzi-search"></span>
                 </div>
