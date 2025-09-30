@@ -194,3 +194,93 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
 *[dir="rtl"] .rz-chat-send-btn {
     transform: scaleX(-1);
 }
+
+// Multi-user chat styles
+.rz-chat-users {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.rz-chat-user-avatar {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background-color: var(--rz-base);
+    color: var(--rz-on-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 2px solid var(--rz-base-background-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.rz-chat-user-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.rz-chat-user-initials {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.rz-chat-user-more {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background-color: var(--rz-base-light);
+    color: var(--rz-on-base-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: 2px solid var(--rz-base-background-color);
+}
+
+.rz-chat-message-user {
+    align-self: flex-start;
+}
+
+.rz-chat-message-user-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--rz-text-secondary-color);
+    margin-bottom: 0.125rem;
+}
+
+.rz-chat-avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--rz-chat-avatar-border-radius);
+}
+
+// Online status indicator
+.rz-chat-user-avatar::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    width: 0.5rem;
+    height: 0.5rem;
+    background-color: var(--rz-success);
+    border: 2px solid var(--rz-base-background-color);
+    border-radius: 50%;
+    display: none;
+}
+
+.rz-chat-user-avatar.online::after {
+    display: block;
+}
+
+.rz-chat-user-avatar.offline::after {
+    background-color: var(--rz-text-disabled-color);
+    display: block;
+}

@@ -1463,6 +1463,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Chat",
+                    Path = "chat",
+                    New = true,
+                    Description = "A modern chat component for multi-participant conversations with support for distinct user identities and real-time messaging.",
+                    Icon = "\uefd1",
+                    Tags = new [] { "chat", "conversation", "message", "users", "team", "group" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Get and Set the value of AutoComplete", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of AutoComplete using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Get the selected item of AutoComplete", Anchor = "#get-selected" }, new () { Text = "Define AutoComplete placeholder", Anchor = "#placeholder" }, new () { Text = "Define AutoComplete template", Anchor = "#template" }, new () { Text = "Change AutoComplete filter operator, case sensitivity and delay", Anchor = "#filter-operator" }, new () { Text = "Load data on-demand in AutoComplete and apply custom filter and sort", Anchor = "#load-on-demand" }, new () { Text = "AutoComplete with a List of Strings", Anchor = "#list-of-strings" }, new () { Text = "Multiline AutoComplete", Anchor = "#multiline" }, new () { Text = "Open on Focus", Anchor = "#open-on-focus" }, new () { Text = "Disabled AutoComplete", Anchor = "#disabled-autocomplete" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "AutoComplete",
                     Path = "autocomplete",

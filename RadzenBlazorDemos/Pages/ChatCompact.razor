@@ -1,0 +1,97 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle1">Compact Chat</RadzenText>
+            <RadzenChat Title="Team Chat" 
+                        CurrentUserId="@currentUserId"
+                        Users="@users" 
+                        Messages="@messages"
+                        MessagesChanged="@OnMessagesChanged"
+                        ShowUsers="true"
+                        ShowUserNames="false"
+                        ShowClearButton="false"
+                        MaxVisibleUsers="3"
+                        Placeholder="Quick message..."
+                        EmptyMessage="Start typing..."
+                        Style="height: 300px;" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle1">Minimal Chat</RadzenText>
+            <RadzenChat Title="" 
+                        CurrentUserId="@currentUserId"
+                        Users="@users" 
+                        Messages="@messages"
+                        MessagesChanged="@OnMessagesChanged"
+                        ShowUsers="false"
+                        ShowUserNames="false"
+                        ShowClearButton="false"
+                        Placeholder="Type here..."
+                        EmptyMessage=""
+                        Style="height: 250px;" />
+        </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle1">Compact Chat Features</RadzenText>
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenText TextStyle="TextStyle.H6">Space-Saving Options</RadzenText>
+                    <ul>
+                        <li>Reduced height for sidebar implementations</li>
+                        <li>Hide participant names to save vertical space</li>
+                        <li>Limit visible users in header</li>
+                        <li>Remove optional UI elements (clear button, title)</li>
+                    </ul>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenText TextStyle="TextStyle.H6">Use Cases</RadzenText>
+                    <ul>
+                        <li>Sidebar chat panels</li>
+                        <li>Mobile-responsive layouts</li>
+                        <li>Embedded chat widgets</li>
+                        <li>Minimal notification systems</li>
+                    </ul>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private string currentUserId = "user1";
+    private List<ChatUser> users = new();
+    private List<ChatMessage> messages = new();
+
+    protected override void OnInitialized()
+    {
+        // Initialize users
+        users.AddRange(new[]
+        {
+            new ChatUser { Id = "user1", Name = "John", Color = "#1976d2" },
+            new ChatUser { Id = "user2", Name = "Jane", Color = "#388e3c" },
+            new ChatUser { Id = "user3", Name = "Bob", Color = "#f57c00" },
+            new ChatUser { Id = "user4", Name = "Alice", Color = "#7b1fa2" }
+        });
+
+        // Add some sample messages
+        messages.AddRange(new[]
+        {
+            new ChatMessage { Content = "Quick update: Project is on track! ✅", UserId = "user1", Timestamp = DateTime.Now.AddMinutes(-30) },
+            new ChatMessage { Content = "Great news! 🎉", UserId = "user2", Timestamp = DateTime.Now.AddMinutes(-29) },
+            new ChatMessage { Content = "Thanks for the update", UserId = "user3", Timestamp = DateTime.Now.AddMinutes(-28) },
+            new ChatMessage { Content = "Perfect timing for the demo", UserId = "user4", Timestamp = DateTime.Now.AddMinutes(-27) }
+        });
+    }
+
+    private void OnMessagesChanged(IEnumerable<ChatMessage> newMessages)
+    {
+        messages = newMessages.ToList();
+        StateHasChanged();
+    }
+}

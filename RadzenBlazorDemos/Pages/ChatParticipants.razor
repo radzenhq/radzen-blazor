@@ -1,0 +1,172 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenChat Title="Multi-User Chat" 
+                    CurrentUserId="@currentUserId"
+                    Users="@users" 
+                    Messages="@messages"
+                    MessagesChanged="@OnMessagesChanged"
+                    MessageAdded="@OnMessageAdded"
+                    UserAdded="@OnUserAdded"
+                    UserRemoved="@OnUserRemoved"
+                    ShowUsers="true"
+                    ShowUserNames="true"
+                    MaxVisibleUsers="4"
+                    class="rz-h-100" />
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenRow>
+            <RadzenColumn Size="12" SizeLG="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">User Management</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                        <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                            <RadzenButton Text="Add User" Icon="person_add" ButtonStyle="ButtonStyle.Primary" Click="@OnAddUser" Variant="Variant.Flat" />
+                            <RadzenButton Text="Remove Last" Icon="person_remove" ButtonStyle="ButtonStyle.Danger" Click="@OnRemoveUser" Variant="Variant.Flat" />
+                            <RadzenButton Text="Add Sample Messages" Icon="message" ButtonStyle="ButtonStyle.Success" Click="@OnAddSampleMessages" Variant="Variant.Flat" />
+                        </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                            <RadzenLabel Style="white-space: nowrap;">Current User:</RadzenLabel>
+                            <RadzenDropDown TValue="string" Data="@users" TextProperty="Name" ValueProperty="Id" @bind-Value="@currentUserId" Placeholder="Select current user" Style="flex: 1; min-width: 200px;" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">User List</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        @foreach (var participant in users)
+                        {
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-2 rz-border-bottom">
+                                <div class="rz-chat-participant-avatar" style="width: 2rem; height: 2rem;">
+                                    <span class="rz-chat-participant-initials">@participant.GetInitials()</span>
+                                </div>
+                                <RadzenText TextStyle="TextStyle.Body2">@participant.Name</RadzenText>
+                                <RadzenBadge Text="@(participant.IsOnline ? "Online" : "Offline")" 
+                                           BadgeStyle="@(participant.IsOnline ? BadgeStyle.Success : BadgeStyle.Light)" />
+                                @if (participant.Id == currentUserId)
+                                {
+                                    <RadzenBadge Text="You" BadgeStyle="BadgeStyle.Primary" />
+                                }
+                            </RadzenStack>
+                        }
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenColumn>
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle1">Multi-User Features</RadzenText>
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenText TextStyle="TextStyle.H6">User Management</RadzenText>
+                    <ul>
+                        <li>Add and remove users dynamically</li>
+                        <li>Each participant has a unique identity and avatar</li>
+                        <li>Online/offline status tracking</li>
+                        <li>User list displayed in chat header</li>
+                    </ul>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenText TextStyle="TextStyle.H6">Message Features</RadzenText>
+                    <ul>
+                        <li>Messages are aligned based on sender (user vs users)</li>
+                        <li>User names shown above messages</li>
+                        <li>Avatar initials generated from participant names</li>
+                        <li>Message timestamps for all users</li>
+                    </ul>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private string currentUserId = "user1";
+    private List<ChatUser> users = new();
+    private List<ChatMessage> messages = new();
+    private Random random = new();
+
+    protected override void OnInitialized()
+    {
+        // Initialize users
+        users.AddRange(new[]
+        {
+            new ChatUser { Id = "user1", Name = "John Doe", Color = "#1976d2", IsOnline = true },
+            new ChatUser { Id = "user2", Name = "Jane Smith", Color = "#388e3c", IsOnline = true },
+            new ChatUser { Id = "user3", Name = "Bob Johnson", Color = "#f57c00", IsOnline = false },
+            new ChatUser { Id = "user4", Name = "Alice Brown", Color = "#7b1fa2", IsOnline = true }
+        });
+
+        OnAddSampleMessages();
+    }
+
+    private void OnAddUser()
+    {
+        var names = new[] { "Emma Davis", "Michael Garcia", "Sarah Martinez", "David Rodriguez", "Lisa Anderson" };
+        var colors = new[] { "#1976d2", "#388e3c", "#f57c00", "#7b1fa2", "#d32f2f", "#0288d1", "#689f38", "#ffa000" };
+        
+        var newUser = new ChatUser
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = names[random.Next(names.Length)],
+            Color = colors[random.Next(colors.Length)],
+            IsOnline = random.Next(2) == 1
+        };
+        
+        users.Add(newUser);
+        StateHasChanged();
+    }
+
+    private void OnRemoveUser()
+    {
+        if (users.Count > 1)
+        {
+            users.RemoveAt(users.Count - 1);
+            StateHasChanged();
+        }
+    }
+
+    private void OnAddSampleMessages()
+    {
+        var sampleMessages = new[]
+        {
+            new ChatMessage { Content = "Hello team! 👋", UserId = "user1", Timestamp = DateTime.Now.AddMinutes(-30) },
+            new ChatMessage { Content = "Hi John! Ready for our sprint planning?", UserId = "user2", Timestamp = DateTime.Now.AddMinutes(-29) },
+            new ChatMessage { Content = "Absolutely! I've prepared the user stories.", UserId = "user3", Timestamp = DateTime.Now.AddMinutes(-28) },
+            new ChatMessage { Content = "Perfect! Let's get started. 🚀", UserId = "user4", Timestamp = DateTime.Now.AddMinutes(-27) }
+        };
+        
+        messages.AddRange(sampleMessages);
+        StateHasChanged();
+    }
+
+    private void OnMessageAdded(ChatMessage message)
+    {
+        // Message is already added to the messages list by the component
+        StateHasChanged();
+    }
+
+    private void OnUserAdded(ChatUser participant)
+    {
+        // User is already added to the users list
+        StateHasChanged();
+    }
+
+    private void OnUserRemoved(ChatUser participant)
+    {
+        // User is already removed from the users list
+        StateHasChanged();
+    }
+
+    private void OnMessagesChanged(IEnumerable<ChatMessage> newMessages)
+    {
+        messages = newMessages.ToList();
+        StateHasChanged();
+    }
+}

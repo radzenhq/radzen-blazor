@@ -1,0 +1,137 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Text="Event Testing Controls" />
+            <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                <RadzenButton Text="Send Message" 
+                              Icon="send"
+                              Click="@(() => eventsChat?.SendMessage("Testing message events!"))"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Add User" 
+                              Icon="person_add"
+                              Click="@OnAddUser"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Remove User" 
+                              Icon="person_remove"
+                              Click="@OnRemoveUser"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Clear Chat" 
+                              Icon="delete_history"
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="@(() => eventsChat?.ClearChat())"
+                              Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenChat @ref="eventsChat" 
+                Title="Events Demo" 
+                CurrentUserId="@currentUserId"
+                Users="@users"
+                Messages="@messages"
+                MessagesChanged="@OnMessagesChanged"
+                Placeholder="Type a message to test events..."
+                Style="height: 500px;"
+                MessageAdded="@OnMessageAdded"
+                MessageSent="@OnMessageSent"
+                UserAdded="@OnUserAdded"
+                UserRemoved="@OnUserRemoved"
+                ChatCleared="@OnChatCleared"
+                />
+</RadzenStack>
+
+<EventConsole @ref="console" Style="min-height: 300px;" />
+
+@code {
+    RadzenChat eventsChat;
+    EventConsole console;
+    
+    private string currentUserId = "user1";
+    private List<ChatUser> users = new();
+    private List<ChatMessage> messages = new();
+    private Random random = new();
+
+    protected override void OnInitialized()
+    {
+        // Initialize users
+        users.AddRange(new[]
+        {
+            new ChatUser { Id = "user1", Name = "John Doe", Color = "#1976d2" },
+            new ChatUser { Id = "user2", Name = "Jane Smith", Color = "#388e3c" },
+            new ChatUser { Id = "user3", Name = "Bob Johnson", Color = "#f57c00" }
+        });
+
+        // Add some sample messages
+        messages.AddRange(new[]
+        {
+            new ChatMessage { Content = "Welcome to the events demo! 🎉", UserId = "user1", Timestamp = DateTime.Now.AddMinutes(-30) },
+            new ChatMessage { Content = "This chat demonstrates all the available events.", UserId = "user2", Timestamp = DateTime.Now.AddMinutes(-29) },
+            new ChatMessage { Content = "Try the buttons above to see events in action!", UserId = "user3", Timestamp = DateTime.Now.AddMinutes(-28) }
+        });
+    }
+
+    private void OnAddUser()
+    {
+        var names = new[] { "Emma Davis", "Michael Garcia", "Sarah Martinez", "David Rodriguez", "Lisa Anderson" };
+        var colors = new[] { "#1976d2", "#388e3c", "#f57c00", "#7b1fa2", "#d32f2f", "#0288d1", "#689f38", "#ffa000" };
+        
+        var newUser = new ChatUser
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = names[random.Next(names.Length)],
+            Color = colors[random.Next(colors.Length)]
+        };
+        
+        users.Add(newUser);
+        StateHasChanged();
+    }
+
+    private void OnRemoveUser()
+    {
+        if (users.Count > 1)
+        {
+            users.RemoveAt(users.Count - 1);
+            StateHasChanged();
+        }
+    }
+
+    void OnMessageAdded(ChatMessage message)
+    {
+        var participant = users.FirstOrDefault(p => p.Id == message.UserId);
+        var participantName = participant?.Name ?? "Unknown";
+        console.Log($"MessageAdded: {participantName} - {message.Content.Substring(0, Math.Min(50, message.Content.Length))}...", 
+                   message.UserId == currentUserId ? AlertStyle.Info : AlertStyle.Success);
+    }
+
+    void OnMessageSent(ChatMessage message)
+    {
+        console.Log($"MessageSent: {message.Content}", AlertStyle.Info);
+    }
+
+    void OnUserAdded(ChatUser participant)
+    {
+        console.Log($"UserAdded: {participant.Name} (ID: {participant.Id})", AlertStyle.Success);
+    }
+
+    void OnUserRemoved(ChatUser participant)
+    {
+        console.Log($"UserRemoved: {participant.Name} (ID: {participant.Id})", AlertStyle.Warning);
+    }
+
+    void OnChatCleared()
+    {
+        console.Log("ChatCleared: All messages have been removed", AlertStyle.Warning);
+    }
+
+    void OnMessagesChanged(IEnumerable<ChatMessage> newMessages)
+    {
+        messages = newMessages.ToList();
+        StateHasChanged();
+    }
+}

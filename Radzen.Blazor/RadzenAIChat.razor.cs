@@ -11,37 +11,6 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Represents a chat message in the RadzenAIChat component.
-    /// </summary>
-    public class ChatMessage
-    {
-        /// <summary>
-        /// Gets or sets the unique identifier for the message.
-        /// </summary>
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-
-        /// <summary>
-        /// Gets or sets the content of the message.
-        /// </summary>
-        public string Content { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Gets or sets whether this message is from the user.
-        /// </summary>
-        public bool IsUser { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp when the message was created.
-        /// </summary>
-        public DateTime Timestamp { get; set; } = DateTime.Now;
-
-        /// <summary>
-        /// Gets or sets whether this message is currently streaming.
-        /// </summary>
-        public bool IsStreaming { get; set; }
-    }
-
-    /// <summary>
     /// RadzenAIChat component that provides a modern chat interface with AI integration and conversation memory.
     /// </summary>
     /// <example>
@@ -178,6 +147,7 @@ namespace Radzen.Blazor
             var message = new ChatMessage
             {
                 Content = content,
+                UserId = isUser ? "user" : "system",
                 IsUser = isUser,
                 Timestamp = DateTime.Now
             };
@@ -275,8 +245,7 @@ namespace Radzen.Blazor
             // Add messages from session history
             foreach (var message in session.Messages)
             {
-                var isUser = message.Role.Equals("user", StringComparison.OrdinalIgnoreCase);
-                AddMessage(message.Content, isUser);
+                AddMessage(message.Content, message.IsUser);
             }
             
             await InvokeAsync(StateHasChanged);
