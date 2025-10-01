@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
 
 namespace Radzen.Blazor.Markdown;
 
@@ -18,14 +21,44 @@ class BlazorMarkdownRendererOptions
     public IEnumerable<string>? AllowedHtmlAttributes { get; set; }
 }
 
+class RadzenAnchor : ComponentBase
+{
+    [Inject]
+    IJSRuntime JSRuntime { get; set; } = null!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IReadOnlyDictionary<string, object>? Attributes { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected override void BuildRenderTree(RenderTreeBuilder builder)
+    {
+        builder.OpenElement(1, "a");
+        builder.AddMultipleAttributes(2, Attributes);
+        builder.AddEventPreventDefaultAttribute(3, "onclick", true);
+        builder.AddAttribute(4, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, OnClick));
+        builder.AddContent(5, ChildContent);
+        builder.CloseElement();
+    }
+
+    private async Task OnClick()
+    {
+        if (Attributes?.TryGetValue("href", out var href) == true)
+        {
+            await JSRuntime.InvokeVoidAsync("eval", $"document.querySelector('{href}').scrollIntoView()");
+        }
+    }
+}
+
 class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
 {
     public const string Outlet = "<!--rz-outlet-{0}-->";
-    private static readonly Regex OutletRegex = new (@"<!--rz-outlet-(\d+)-->");
+    private static readonly Regex OutletRegex = new(@"<!--rz-outlet-(\d+)-->");
     private static readonly Regex HtmlTagRegex = new(@"<(\w+)((?:\s+[^>]*)?)\/?>");
     private static readonly Regex HtmlClosingTagRegex = new(@"</(\w+)>");
     private static readonly Regex AttributeRegex = new(@"(\w+)(?:\s*=\s*(?:([""'])(.*?)\2|([^\s>]+)))?");
-    private readonly HtmlSanitizer sanitizer = new (options.AllowedHtmlTags, options.AllowedHtmlAttributes);
+    private readonly HtmlSanitizer sanitizer = new(options.AllowedHtmlTags, options.AllowedHtmlAttributes);
 
     public override void VisitHeading(Heading heading)
     {
@@ -184,21 +217,36 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
 
     public override void VisitLink(Link link)
     {
-        builder.OpenComponent<RadzenLink>(0);
-
-        if (!HtmlSanitizer.IsDangerousUrl(link.Destination))
+        if (link.Destination.StartsWith("#"))
         {
-            builder.AddAttribute(1, nameof(RadzenLink.Path), link.Destination);
+            builder.OpenComponent<RadzenAnchor>(0);
+            builder.AddAttribute(0, "href", link.Destination);
+            if (!string.IsNullOrEmpty(link.Title))
+            {
+                builder.AddAttribute(1, "title", link.Title);
+            }
+            builder.AddAttribute(2, "class", "rz-link");
+            builder.AddAttribute(3, nameof(RadzenAnchor.ChildContent), RenderChildren(link.Children));
+            builder.CloseComponent();
+        }
+        else
+        {
+            builder.OpenComponent<RadzenLink>(0);
+
+            if (!HtmlSanitizer.IsDangerousUrl(link.Destination))
+            {
+                builder.AddAttribute(1, nameof(RadzenLink.Path), link.Destination);
+            }
+
+            builder.AddAttribute(2, nameof(RadzenLink.ChildContent), RenderChildren(link.Children));
+
+            if (!string.IsNullOrEmpty(link.Title))
+            {
+                builder.AddAttribute(3, "title", link.Title);
+            }
+            builder.CloseComponent();
         }
 
-        builder.AddAttribute(2, nameof(RadzenLink.ChildContent), RenderChildren(link.Children));
-
-        if (!string.IsNullOrEmpty(link.Title))
-        {
-            builder.AddAttribute(3, "title", link.Title);
-        }
-
-        builder.CloseComponent();
     }
 
     public override void VisitImage(Image image)
@@ -209,7 +257,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         {
             builder.AddAttribute(1, nameof(RadzenImage.Path), image.Destination);
         }
-        
+
         if (!string.IsNullOrEmpty(image.Title))
         {
             builder.AddAttribute(2, nameof(RadzenImage.AlternateText), image.Title);

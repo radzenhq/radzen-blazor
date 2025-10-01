@@ -821,15 +821,14 @@ namespace Radzen
                     {
                         await virtualize.RefreshDataAsync();
                     }
-                    await InvokeAsync(() => { StateHasChanged(); });
                 }
-                else
-                {
-                    await InvokeAsync(() => { StateHasChanged(); });
-                }
+
+                await InvokeAsync(() => { StateHasChanged(); });
             }
             else
             {
+                var args = await GetLoadDataArgs();
+
                 if (IsVirtualizationAllowed())
                 {
                     if (virtualize != null)
@@ -838,13 +837,13 @@ namespace Radzen
                     }
                     else
                     {
-                        await LoadData.InvokeAsync(await GetLoadDataArgs());
+                        await InvokeAsync(() => LoadData.InvokeAsync(args));
                     }
                     await InvokeAsync(() => { StateHasChanged(); });
                 }
                 else
                 {
-                    await LoadData.InvokeAsync(await GetLoadDataArgs());
+                    await InvokeAsync(() => LoadData.InvokeAsync(args));
                 }
             }
 
@@ -852,7 +851,7 @@ namespace Radzen
                 selectedIndex = -1;
 
             await JSRuntime.InvokeAsync<string>("Radzen.repositionPopup", Element, PopupID);
-            await SearchTextChanged.InvokeAsync(SearchText);
+            await InvokeAsync(() => SearchTextChanged.InvokeAsync(SearchText));
         }
 
         /// <summary>
@@ -881,7 +880,10 @@ namespace Radzen
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected virtual async System.Threading.Tasks.Task OnFilter(ChangeEventArgs args)
         {
-            await DebounceFilter();
+            if (!FilterAsYouType)
+            {
+                await DebounceFilter();
+            }
         }
 
         /// <summary>
