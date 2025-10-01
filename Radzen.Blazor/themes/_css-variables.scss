@@ -454,6 +454,19 @@
   --rz-fieldset-toggle-focus-outline: #{$fieldset-toggle-focus-outline};
   --rz-fieldset-toggle-focus-outline-offset: #{$fieldset-toggle-focus-outline-offset};
 
+  /* Fab */
+  --rz-fab-inset-block-start: #{$fab-inset-block-start};
+  --rz-fab-inset-block-end: #{$fab-inset-block-end};
+  --rz-fab-inset-inline-start: #{$fab-inset-inline-start};
+  --rz-fab-inset-inline-end: #{$fab-inset-inline-end};
+  --rz-fab-zindex: #{$fab-zindex};
+  --rz-fab-border-radius: #{$fab-border-radius};
+  --rz-fab-active-border-radius: #{$fab-active-border-radius};
+  --rz-fab-shadow: #{$fab-shadow};
+  --rz-fab-hover-shadow: #{$fab-hover-shadow};
+  --rz-fab-active-shadow: #{$fab-active-shadow};
+  --rz-fabmenu-offset: #{$fabmenu-offset};
+  
   /* Footer */
   --rz-footer-padding: #{$footer-padding};
   --rz-footer-background-color: #{$footer-background-color};

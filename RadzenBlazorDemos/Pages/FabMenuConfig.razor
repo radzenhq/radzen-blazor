@@ -1,0 +1,46 @@
+@using Radzen
+@inject NotificationService NotificationService
+
+<RadzenLayout style="position: relative; grid-template-areas: 'rz-header rz-header' 'rz-sidebar rz-body'">
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            <RadzenLabel Text="Header" />
+        </RadzenStack>
+    </RadzenHeader>
+
+    <!-- Place RadzenFabMenu component first or after the Header in RadzenLayout. -->
+    <RadzenFabMenu Direction="Radzen.FabMenuDirection.Top">
+        <RadzenFabMenuItem Text="Folder" Icon="folder" Click=@(args => OnClick("New Folder.")) />
+        <RadzenFabMenuItem Text="Message" Icon="chat" Click=@(args => OnClick("New Message.")) />
+        <RadzenFabMenuItem Text="Article" Icon="article" Click=@(args => OnClick("New Article.")) />
+    </RadzenFabMenu>
+
+    <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" style="position: absolute; z-index: 3">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Home" Icon="home" />
+            <RadzenPanelMenuItem Text="Users" Icon="account_box" />
+        </RadzenPanelMenu>
+        <div class="rz-p-4">
+            Sidebar
+        </div>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="rz-p-4">
+            Body
+        </div>
+    </RadzenBody>
+    @if (sidebarExpanded)
+    {
+    <div @onclick="@(() => sidebarExpanded = false)" class="rz-dialog-mask" style="position: absolute; z-index: 2"></div>
+    }
+</RadzenLayout>
+
+@code {
+    bool sidebarExpanded = false;
+
+    private void OnClick(string text)
+    {
+        NotificationService.Notify(new NotificationMessage { Severity = NotificationSeverity.Info, Summary = "RadzenFAB Clicked", Detail = text });
+    }
+}

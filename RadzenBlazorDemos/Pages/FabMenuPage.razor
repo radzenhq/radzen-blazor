@@ -1,0 +1,80 @@
+@page "/fab-menu"
+<style>
+    .example-tabs .rz-layout {
+        height: 350px;
+    }
+</style>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    FAB Menu 
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    <strong>RadzenFabMenu</strong> provides quick access to multiple actions, expanding from a single floating action button to reduce clutter and improve discoverability.
+</RadzenText>
+
+<RadzenText Anchor="fab-menu#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Basic Usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    A FAB menu can contain <strong>2–6 items</strong>, which should be closely related and grouped under a single primary action (e.g., Add).
+</RadzenText>
+<RadzenExample ComponentName="fabmenu" Example="FabMenuConfig" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFabMenu.razor.cs">
+    <FabMenuConfig />
+</RadzenExample>
+
+<RadzenText Anchor="fab-menu#icons" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    FAB menu with icon only buttons
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    
+</RadzenText>
+<RadzenExample ComponentName="fabmenu" Example="FabMenuIcons" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFabMenu.razor.cs">
+    <FabMenuIcons />
+</RadzenExample>
+
+<RadzenText Anchor="fab-menu#direction" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Expand Direction
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <code>Direction</code> property of the RadzenFabMenu component controls the direction in which the menu items expand from the FAB. This property accepts values from the <code>FabMenuDirection</code> enum and determines both the visual layout and positioning of the menu items. By default, the menu items expand upward arranged vertically (bottom to top) and right-aligned with the FAB.
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" TagName="TagName.Div" class="rz-mb-8">
+Choose appropriate direction:
+  <ul>
+    <li><strong>Top</strong> - Most common, good for primary actions</li>
+    <li><strong>Bottom</strong> - Good when FAB is at the top of the screen</li>
+    <li><strong>Left/Right</strong> - Good for horizontal layouts or when space is limited vertically</li>
+    <li><strong>Start/End</strong> - Use for international applications with <strong>RTL support</strong></li>
+  </ul>
+</RadzenText>
+<RadzenExample ComponentName="fabmenu" Example="FabMenuDirection" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFabMenu.razor.cs">
+    <FabMenuDirection />
+</RadzenExample>
+
+<RadzenText Anchor="fab-menu#direction" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Accessibility
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    You can use the <code>AriaLabel</code> parameter in RadzenFabMenu components:
+</RadzenText>
+<RadzenExample ComponentName="fabmenu" Example="FabMenuAriaLabel" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFabMenu.razor.cs">
+    <FabMenuAriaLabel />
+</RadzenExample>
+
+<RadzenText Anchor="fab-menu#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor FAB Menu component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a FAB Menu." },
+        new KeyboardShortcut { Key = "Enter or Space on FAB Menu toggle button", Action = "Click and expand/collapse menu items." },
+        new KeyboardShortcut { Key = "Tab in expanded FAB Menu", Action = "Navigate to a FAB Menu item." },
+        new KeyboardShortcut { Key = "Enter or Space on FAB Menu item", Action = "Click the focused FAB Menu item." }
+    };
+}

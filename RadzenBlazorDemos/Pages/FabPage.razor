@@ -1,0 +1,67 @@
+@page "/fab"
+<style>
+    .example-tabs .rz-layout {
+        height: 300px;
+    }
+</style>
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    FAB - Floating Action Button
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    <strong>RadzenFab</strong> (Floating Action Button) helps highlight your app’s most important action. Always visible and easy to customize, it keeps key functionality just a tap or click away.
+</RadzenText>
+
+<RadzenText Anchor="fab#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-8">
+    Basic Usage
+</RadzenText>
+<RadzenExample ComponentName="fab" Example="FabConfig" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFab.razor.cs">
+    <FabConfig />
+</RadzenExample>
+
+<RadzenText Anchor="fab#position" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    FAB Position
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use custom CSS properties to position the button on the screen. Feel free to change the position as you see fit e.g. <code>Style="position: fixed;"</code>.
+</RadzenText>
+<RadzenExample ComponentName="fab" Example="FabPosition" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFab.razor.cs">
+    <FabPosition />
+</RadzenExample>
+
+<RadzenText Anchor="fab#multiple-fabs" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Multiple FABs 
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Two FABs may be used when both actions are distinct and equally important.
+</RadzenText>
+<RadzenExample ComponentName="fab" Example="FabPosition" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFab.razor.cs">
+    <FabMultiple />
+</RadzenExample>
+
+<RadzenText Anchor="fab#busy-fab" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Busy FAB
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>IsBusy="true"</code> to show the busy indicator.
+</RadzenText>
+<RadzenExample ComponentName="fab" Example="FabBusy" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenFab.razor.cs">
+    <FabBusy />
+</RadzenExample>
+
+<RadzenText Anchor="fab#keyboard-navigation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Keyboard Navigation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The following keys or key combinations provide a way for users to navigate and interact with Radzen Blazor FAB component.
+</RadzenText>
+
+<KeyboardNavigationDataGrid Data="@shortcuts" />
+
+@code {
+    public List<KeyboardShortcut> shortcuts = new()
+    {
+        new KeyboardShortcut { Key = "Tab", Action = "Navigate to a FAB." },
+        new KeyboardShortcut { Key = "Enter", Action = "Click the focused FAB." },
+        new KeyboardShortcut { Key = "Space", Action = "Click the focused FAB." }
+    };
+}

@@ -1,0 +1,61 @@
+@inject NotificationService NotificationService
+
+<RadzenLayout style="position: relative; grid-template-areas: 'rz-header rz-header' 'rz-sidebar rz-body'">
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
+            <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
+            <RadzenLabel Text="Header" />
+        </RadzenStack>
+    </RadzenHeader>
+
+    <!-- Place RadzenFabMenu component first or after the Header in RadzenLayout. -->
+    <RadzenFabMenu IsOpen="@menuOpen" 
+                   IsOpenChanged="@OnMenuOpenChanged"
+                   Icon="add" 
+                   ToggleIcon="close"
+                   AriaLabel="@(menuOpen ? "Close menu" : "Open menu")">
+        <RadzenFabMenuItem Text="File" Icon="add" Click="@(args => OnMenuItemClick("New File"))" />
+        <RadzenFabMenuItem Text="Upload" Icon="upload" Click="@(args => OnMenuItemClick("Upload"))" />
+        <RadzenFabMenuItem Text="Settings" Icon="settings" Click="@(args => OnMenuItemClick("Settings"))" />
+    </RadzenFabMenu>
+
+    <RadzenSidebar Responsive="false" @bind-Expanded="@sidebarExpanded" style="position: absolute; z-index: 3">
+        <RadzenPanelMenu>
+            <RadzenPanelMenuItem Text="Home" Icon="home" />
+            <RadzenPanelMenuItem Text="Users" Icon="account_box" />
+        </RadzenPanelMenu>
+        <div class="rz-p-4">
+            Sidebar
+        </div>
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="rz-p-4">
+            Body
+        </div>
+    </RadzenBody>
+    @if (sidebarExpanded)
+    {
+    <div @onclick="@(() => sidebarExpanded = false)" class="rz-dialog-mask" style="position: absolute; z-index: 2"></div>
+    }
+</RadzenLayout>
+
+@code {
+    bool sidebarExpanded = false;
+    
+    private bool menuOpen = false;
+
+    private void ToggleMenu() => menuOpen = !menuOpen;
+
+    private void OnMenuOpenChanged(bool isOpen)
+    {
+        menuOpen = isOpen;
+        NotificationService.Notify(NotificationSeverity.Info, "Menu", 
+            $"Menu is now {(isOpen ? "open" : "closed")}. Aria-label: \"{(isOpen ? "Close menu" : "Open menu")}\"");
+    }
+
+    private void OnMenuItemClick(string itemName)
+    {
+        NotificationService.Notify(NotificationSeverity.Success, "Menu Item Clicked", $"You clicked: {itemName}");
+    }
+
+}
