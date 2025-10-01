@@ -24,10 +24,8 @@
                             </Items>
                         </RadzenSelectBar>
                     </RadzenStack>
-
                 </RadzenStack>
             </RadzenTabsItem>
-            
             
             <RadzenTabsItem Text="Display">
                 <RadzenStack Orientation="Orientation.Horizontal" Gap="2rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
@@ -44,8 +42,8 @@
                     </RadzenStack>
                     
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
-                        <RadzenSwitch @bind-Value="showLegend" Name="showLegend" Change="@(() => StateHasChanged())" />
-                        <RadzenLabel Text="Show Legend" Component="showLegend" />
+                        <RadzenSwitch @bind-Value="showMarkers" Name="showMarkers" Change="@(() => StateHasChanged())" />
+                        <RadzenLabel Text="Show Markers" Component="showMarkers" />
                     </RadzenStack>
                 </RadzenStack>
             </RadzenTabsItem>
@@ -53,19 +51,96 @@
     </RadzenTabs>
 </RadzenCard>
 
-<RadzenSpiderChart TItem="PerformanceData" 
-                   Data="@performanceData" 
-                   CategoryProperty="@nameof(PerformanceData.Metric)" 
-                   ValueProperty="@nameof(PerformanceData.Score)"
-                   SeriesProperty="@nameof(PerformanceData.Department)"
-                   GridShape="@gridShape"
+<RadzenSpiderChart TItem="EmployeePerformance" GridShape="@gridShape"
                    ColorScheme="@colorScheme"
-                   ShowLegend="@showLegend"
-                   ValueFormatter="@GetValueFormatter()"
+                   ShowMarkers="@showMarkers"
                    Style="width: 100%; height: 500px;">
+    <RadzenSpiderSeries TItem="EmployeePerformance" 
+                        Data="@GetNancyData()" 
+                        CategoryProperty="@nameof(EmployeePerformance.Metric)" 
+                        ValueProperty="@nameof(EmployeePerformance.Score)"
+                        Title="Nancy Davolio"
+                        ValueFormatter="@GetValueFormatter()" />
+    <RadzenSpiderSeries TItem="EmployeePerformance" 
+                        Data="@GetAndrewData()" 
+                        CategoryProperty="@nameof(EmployeePerformance.Metric)" 
+                        ValueProperty="@nameof(EmployeePerformance.Score)"
+                        Title="Andrew Fuller"
+                        ValueFormatter="@GetValueFormatter()" />
+    <RadzenSpiderSeries TItem="EmployeePerformance" 
+                        Data="@GetJanetData()" 
+                        CategoryProperty="@nameof(EmployeePerformance.Metric)" 
+                        ValueProperty="@nameof(EmployeePerformance.Score)"
+                        Title="Janet Leverling"
+                        ValueFormatter="@GetValueFormatter()" />
 </RadzenSpiderChart>
 
 @code {
-    // Configuration options
+    SpiderChartGridShape gridShape = SpiderChartGridShape.Polygon;
+    ColorScheme colorScheme = ColorScheme.Palette;
+    bool showMarkers = true;
+    string valueFormat = "percent";
+    
+    Func<double, string> GetValueFormatter()
+    {
+        return valueFormat switch
+        {
+            "percent" => (value) => $"{value:F0}%",
+            "number" => (value) => value.ToString("F1"),
+            "score" => (value) => $"{value:F0}/100",
+            "currency" => (value) => $"${value:F0}",
+            _ => (value) => value.ToString("F1")
+        };
+    }
 
+    class EmployeePerformance
+    {
+        public string Metric { get; set; }
+        public double Score { get; set; }
+    }
+
+    IEnumerable<EmployeePerformance> GetNancyData()
+    {
+        return new EmployeePerformance[]
+        {
+            new EmployeePerformance { Metric = "Sales", Score = 95 },
+            new EmployeePerformance { Metric = "Customer Relations", Score = 88 },
+            new EmployeePerformance { Metric = "Teamwork", Score = 92 },
+            new EmployeePerformance { Metric = "Efficiency", Score = 90 },
+            new EmployeePerformance { Metric = "Innovation", Score = 94 },
+            new EmployeePerformance { Metric = "Leadership", Score = 87 },
+            new EmployeePerformance { Metric = "Communication", Score = 85 },
+            new EmployeePerformance { Metric = "Technical Skills", Score = 82 }
+        };
+    }
+
+    IEnumerable<EmployeePerformance> GetAndrewData()
+    {
+        return new EmployeePerformance[]
+        {
+            new EmployeePerformance { Metric = "Sales", Score = 78 },
+            new EmployeePerformance { Metric = "Customer Relations", Score = 72 },
+            new EmployeePerformance { Metric = "Teamwork", Score = 88 },
+            new EmployeePerformance { Metric = "Efficiency", Score = 85 },
+            new EmployeePerformance { Metric = "Innovation", Score = 91 },
+            new EmployeePerformance { Metric = "Leadership", Score = 93 },
+            new EmployeePerformance { Metric = "Communication", Score = 80 },
+            new EmployeePerformance { Metric = "Technical Skills", Score = 76 }
+        };
+    }
+
+    IEnumerable<EmployeePerformance> GetJanetData()
+    {
+        return new EmployeePerformance[]
+        {
+            new EmployeePerformance { Metric = "Sales", Score = 82 },
+            new EmployeePerformance { Metric = "Customer Relations", Score = 75 },
+            new EmployeePerformance { Metric = "Teamwork", Score = 95 },
+            new EmployeePerformance { Metric = "Efficiency", Score = 93 },
+            new EmployeePerformance { Metric = "Innovation", Score = 89 },
+            new EmployeePerformance { Metric = "Leadership", Score = 84 },
+            new EmployeePerformance { Metric = "Communication", Score = 92 },
+            new EmployeePerformance { Metric = "Technical Skills", Score = 88 }
+        };
+    }
 }

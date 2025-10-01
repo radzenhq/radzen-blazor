@@ -1,50 +1,313 @@
-// Spider Chart Variables
-$rz-spider-label-font-size: 0.875rem !default;
-$rz-spider-label-color: var(--rz-text-color) !default;
-
 .rz-spider-chart {
-    position: relative;
+    position: relative !important;
     display: block;
     height: 100%;
     width: 100%;
 
-    svg {
-        overflow: visible;
+    // Grid elements styling moved to specific classes below
+
+    // Chart wrapper with flexbox layout
+    .rz-spider-chart-wrapper {
+        display: flex !important;
+        height: 100%;
+        align-items: center;
+        flex-direction: row !important;
+
+        // SVG chart takes remaining space
+        > svg {
+            flex: 1 1 auto;
+            overflow: visible;
+            min-width: 0;
+        }
+
+        // Legend panel beside chart
+        > .rz-spider-legend {
+            flex: 0 0 auto;
+            min-width: 200px;
+            max-width: 300px;
+            max-height: 100%;
+            overflow-y: auto;
+            padding: 0.75rem;
+            margin-left: 1rem;
+            background: var(--rz-base-background-color);
+            border-left: 1px solid var(--rz-border-lighter-color, var(--rz-border-color));
+        }
+
+        // Legend positioning variations
+        &.rz-spider-legend-right {
+            flex-direction: row;
+
+            > .rz-spider-legend {
+                margin-left: 1rem;
+                margin-right: 0;
+            }
+        }
+
+        &.rz-spider-legend-left {
+            flex-direction: row-reverse;
+
+            > .rz-spider-legend {
+                margin-left: 0;
+                margin-right: 1rem;
+                border-left: none;
+                border-right: 1px solid var(--rz-border-lighter-color, var(--rz-border-color));
+            }
+        }
+        
+        &.rz-spider-legend-top {
+            flex-direction: column-reverse;
+
+            > .rz-spider-legend {
+                margin-left: 0;
+                margin-bottom: 1rem;
+                width: auto;
+                max-width: 100%;
+
+                .rz-legend-items {
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                }
+            }
+        }
+
+        &.rz-spider-legend-bottom {
+            flex-direction: column;
+
+            > .rz-spider-legend {
+                margin-left: 0;
+                margin-top: 1rem;
+                width: auto;
+                max-width: 100%;
+
+                .rz-legend-items {
+                    flex-direction: row;
+                    flex-wrap: wrap;
+                    gap: 1rem;
+                }
+            }
+        }
+    }
+    
+    .rz-spider-chart-hit-area {
+        cursor: pointer;
+    }
+
+    .rz-spider-chart-grid-polygon {
+        fill: none;
+        stroke: var(--rz-border-color);
+        stroke-width: 1;
+        opacity: 0.7;
+    }
+
+    .rz-spider-chart-grid-circle {
+        fill: none;
+        stroke: var(--rz-border-color);
+        stroke-width: 1;
+        opacity: 0.7;
+    }
+
+    .rz-spider-chart-grid-line {
+        stroke: var(--rz-text-secondary-color);
+        stroke-width: 1;
+        opacity: 0.5;
     }
 
     .rz-spider-chart-label {
-        font-size: $rz-spider-label-font-size;
-        fill: $rz-spider-label-color;
+        font-size: 0.875rem;
+        fill: var(--rz-text-color) !important;
         user-select: none;
+        pointer-events: none;
     }
 
-    .rz-spider-chart-legend {
-        background: var(--rz-base-background-color);
-        border-left: 1px solid var(--rz-border-lighter);
-        
-        .rz-spider-chart-legend-title {
+    .rz-spider-chart-info-panel {
+        display: flex;
+        gap: 1rem;
+        margin-left: 1rem;
+    }
+
+    .rz-spider-chart-details {
+        width: 180px;
+        display: flex;
+        flex-direction: column;
+
+        .rz-spider-chart-details-header {
+            height: 31px;
+            padding: 8px 12px 4px 12px;
+            display: flex;
+            align-items: center;
             font-weight: 600;
-            margin-bottom: 12px;
+            font-size: 13px;
             color: var(--rz-text-title-color);
         }
 
-        .rz-spider-chart-legend-item {
-            transition: opacity 0.2s;
-            
-            &:hover {
-                opacity: 0.8;
+        .rz-spider-chart-details-content {
+            flex: 1;
+            padding: 0 12px 12px 12px;
+            overflow-y: auto;
+        }
+
+        .rz-spider-chart-details-series-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+            color: inherit;
+        }
+
+        .rz-spider-chart-details-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            font-size: 12px;
+
+            .rz-spider-chart-details-category {
+                color: var(--rz-text-secondary-color);
             }
 
-            &.rz-state-inactive {
-                opacity: 0.5;
+            .rz-spider-chart-details-value {
+                font-weight: 500;
+            }
+        }
+
+        .rz-spider-chart-details-placeholder {
+            opacity: 0.5;
+            font-size: 12px;
+            color: var(--rz-text-secondary-color);
+            text-align: center;
+            padding: 20px 0;
+        }
+    }
+
+
+    .rz-spider-chart-area {
+        cursor: pointer;
+        transition: stroke-width 0.3s ease-in-out, opacity 0.3s ease-in-out, fill-opacity 0.3s ease-in-out;
+        fill-opacity: 0.3 !important;
+        stroke-linejoin: round;
+        stroke-linecap: round;
+        stroke-opacity: 1;
+        
+        &[data-stroke-width="1"] { stroke-width: 1; }
+        &[data-stroke-width="2"] { stroke-width: 2; }
+        &[data-stroke-width="3"] { stroke-width: 3; }
+        &[data-stroke-width="4"] { stroke-width: 4; }
+        
+        &.rz-state-hover {
+            fill-opacity: 0.5 !important;
+            stroke-opacity: 1;
+            
+            &[data-stroke-width="1"] { stroke-width: 1.5; }
+            &[data-stroke-width="2"] { stroke-width: 3; }
+            &[data-stroke-width="3"] { stroke-width: 4.5; }
+            &[data-stroke-width="4"] { stroke-width: 6; }
+        }
+        
+        &.rz-state-hidden {
+            opacity: 0;
+        }
+    }
+
+    .rz-spider-chart-marker {
+        cursor: pointer;
+        transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        pointer-events: all;
+        stroke: white;
+        stroke-width: 2;
+        
+        &.rz-state-hover {
+            transform: scale(1.25);
+            transform-origin: center;
+        }
+        
+        &.rz-state-hidden {
+            opacity: 0;
+        }
+    }
+
+    // Spider legend styles
+    .rz-spider-legend {
+        display: flex;
+        flex-direction: column;
+
+        .rz-legend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--rz-border-color);
+        }
+
+        .rz-legend-title {
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: var(--rz-text-title-color);
+        }
+
+        .rz-legend-actions {
+            display: flex;
+            gap: 0.25rem;
+
+            .rz-button {
+                padding: 0.125rem 0.5rem;
+                font-size: 0.75rem;
+                min-height: unset;
+                line-height: 1.2;
+            }
+        }
+
+        .rz-legend-items {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            width: max-content;
+        }
+
+        .rz-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem;
+            cursor: pointer;
+            border-radius: var(--rz-border-radius);
+            transition: background-color 0.2s;
+            white-space: nowrap;
+
+            &:hover {
+                background-color: var(--rz-base-200);
+            }
+
+            &:focus {
+                outline: 2px solid var(--rz-primary);
+                outline-offset: -2px;
+            }
+
+            svg {
+                flex-shrink: 0;
+            }
+
+            .rz-legend-item-text {
+                font-size: 0.875rem;
+                color: var(--rz-text-color);
+                user-select: none;
             }
         }
     }
 
     @for $i from 0 through 50 {
-        .rz-series-#{$i} {
+        .rz-spider-chart-area.rz-series-#{$i} {
             fill: var(--rz-series-#{$i});
             stroke: var(--rz-series-#{$i});
+        }
+        
+        .rz-spider-chart-marker.rz-series-#{$i} {
+            fill: var(--rz-series-#{$i});
+            stroke: var(--rz-series-#{$i});
+        }
+        
+        // For legend items
+        .rz-legend-item .rz-series-#{$i} {
+            fill: var(--rz-series-#{$i});
             background-color: var(--rz-series-#{$i});
             color: var(--rz-series-#{$i});
         }

@@ -1,228 +1,129 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
-using Radzen.Blazor.Rendering;
 
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSpiderChart component.
+    /// RadzenSpiderChart component displays multi-dimensional data in a spider web format.
     /// </summary>
-    /// <typeparam name="TItem">The type of data item.</typeparam>
+    /// <typeparam name="TItem">The type of the data item.</typeparam>
     public partial class RadzenSpiderChart<TItem> : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the tooltip service.
-        /// </summary>
-        [Inject]
-        public TooltipService TooltipService { get; set; }
-
-        /// <summary>
-        /// Gets or sets the data.
+        /// Gets or sets child content containing RadzenSpiderSeries components.
         /// </summary>
         [Parameter]
-        public IEnumerable<TItem> Data { get; set; }
+        public RenderFragment ChildContent { get; set; }
 
         /// <summary>
-        /// Specifies the property of <typeparamref name="TItem" /> which provides the category/axis name.
-        /// </summary>
-        [Parameter]
-        public string CategoryProperty { get; set; }
-
-        /// <summary>
-        /// Specifies the property of <typeparamref name="TItem" /> which provides the value.
-        /// </summary>
-        [Parameter]
-        public string ValueProperty { get; set; }
-
-        /// <summary>
-        /// Specifies the property of <typeparamref name="TItem" /> which provides the series name.
-        /// </summary>
-        [Parameter]
-        public string SeriesProperty { get; set; }
-
-
-        /// <summary>
-        /// Gets or sets the grid shape.
+        /// Gets or sets the grid shape of the chart.
         /// </summary>
         [Parameter]
         public SpiderChartGridShape GridShape { get; set; } = SpiderChartGridShape.Polygon;
 
         /// <summary>
-        /// Gets or sets the color scheme.
+        /// Gets or sets the color scheme of the chart.
         /// </summary>
         [Parameter]
         public ColorScheme ColorScheme { get; set; } = ColorScheme.Palette;
 
-        /// <summary>
-        /// Gets or sets whether to show the legend.
-        /// </summary>
-        [Parameter]
-        public bool ShowLegend { get; set; } = false;
 
         /// <summary>
-        /// A callback that will be invoked when the user clicks on a series.
+        /// Gets or sets whether markers are visible.
         /// </summary>
         [Parameter]
-        public EventCallback<SeriesClickEventArgs> SeriesClick { get; set; }
+        public bool ShowMarkers { get; set; } = true;
 
         /// <summary>
-        /// A callback that will be invoked when the user clicks on a legend.
+        /// Gets or sets whether tooltips are shown.
         /// </summary>
         [Parameter]
-        public EventCallback<LegendClickEventArgs> LegendClick { get; set; }
+        public bool ShowTooltip { get; set; } = true;
+
 
         /// <summary>
-        /// Gets or sets the value formatter.
+        /// Event callback for when a series is clicked.
         /// </summary>
         [Parameter]
-        public Func<double, string> ValueFormatter { get; set; }
+        public EventCallback<RadzenSpiderSeries<TItem>> SeriesClick { get; set; }
 
-        /// <summary>
-        /// Gets or sets the format string for values.
-        /// </summary>
-        [Parameter]
-        public string FormatString { get; set; } = "F0";
 
-        /// <summary>
-        /// Gets or sets the legend title text.
-        /// </summary>
-        [Parameter]
-        public string LegendTitleText { get; set; } = "Series";
-
-        /// <summary>
-        /// Gets or sets the legend filter placeholder text.
-        /// </summary>
-        [Parameter]
-        public string LegendFilterPlaceholder { get; set; } = "Filter series...";
-
-        /// <summary>
-        /// Gets or sets the select all text.
-        /// </summary>
-        [Parameter]
-        public string LegendSelectAllText { get; set; } = "All";
-
-        /// <summary>
-        /// Gets or sets the deselect all text.
-        /// </summary>
-        [Parameter]
-        public string LegendDeselectAllText { get; set; } = "None";
+        [Inject]
+        private TooltipService TooltipService { get; set; }
 
         private double? Width { get; set; }
         private double? Height { get; set; }
-        private List<SpiderChartSeries> Series { get; set; } = new();
-        private List<string> Categories { get; set; } = new();
-        private double MaxValue { get; set; } = 100;
+        
+        /// <summary>
+        /// Gets the series collection.
+        /// </summary>
+        internal List<RadzenSpiderSeries<TItem>> Series { get; } = new();
+        
+        private RadzenSpiderSeries<TItem> HoveredSeries { get; set; }
+        private string HoveredCategory { get; set; }
+        private bool IsLegendHover { get; set; }
+        private double? TooltipX { get; set; }
+        private double? TooltipY { get; set; }
         private double MinValue { get; set; } = 0;
-        private HashSet<string> HiddenSeries { get; set; } = new();
-        private SpiderChartSeries HoveredSeries { get; set; }
-        private bool IsLegendHover { get; set; } = false;
-        private string legendFilter = "";
-
-        /// <inheritdoc />
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await base.OnAfterRenderAsync(firstRender);
-
-            if (firstRender)
-            {
-                await GetDimensions();
-            }
-        }
+        private double MaxValue { get; set; } = 100;
 
         /// <summary>
-        /// Gets the dimensions of the chart element.
+        /// Gets the visible series.
         /// </summary>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        private async Task GetDimensions()
+        internal IEnumerable<RadzenSpiderSeries<TItem>> VisibleSeries => Series.Where(s => s.IsVisible);
+
+        /// <summary>
+        /// Adds a series to the chart.
+        /// </summary>
+        internal void AddSeries(RadzenSpiderSeries<TItem> series)
         {
-            var rect = await JSRuntime.InvokeAsync<Rendering.Rect>("Radzen.createResizable", Element, Reference);
-            
-            if (!Width.HasValue && rect.Width > 0)
+            if (!Series.Contains(series))
             {
-                Width = ShowLegend ? rect.Width - 380 : rect.Width;
-            }
-            
-            if (!Height.HasValue && rect.Height > 0)
-            {
-                Height = rect.Height;
-            }
-            
-            if (Width.HasValue && Height.HasValue)
-            {
+                series.Index = Series.Count;
+                Series.Add(series);
+                UpdateMinMax();
                 StateHasChanged();
             }
         }
 
         /// <summary>
-        /// Called when the chart is resized.
+        /// Removes a series from the chart.
         /// </summary>
-        [JSInvokable]
-        public void Resize(double width, double height)
+        internal void RemoveSeries(RadzenSpiderSeries<TItem> series)
         {
-            Width = ShowLegend ? width - 380 : width;
-            Height = height;
-            StateHasChanged();
-        }
-
-        /// <inheritdoc />
-        protected override void OnParametersSet()
-        {
-            base.OnParametersSet();
-            ProcessData();
+            if (Series.Contains(series))
+            {
+                Series.Remove(series);
+                UpdateMinMax();
+                StateHasChanged();
+            }
         }
 
         /// <summary>
-        /// Processes the data and creates series and categories.
+        /// Updates the min and max values based on all series data.
         /// </summary>
-        private void ProcessData()
+        private void UpdateMinMax()
         {
-            if (Data == null || string.IsNullOrEmpty(CategoryProperty) || 
-                string.IsNullOrEmpty(ValueProperty)) return;
-
-            Series.Clear();
-            Categories.Clear();
-
-            var categoryGetter = PropertyAccess.Getter<TItem, string>(CategoryProperty);
-            var valueGetter = PropertyAccess.Getter<TItem, double>(ValueProperty);
-            var seriesGetter = string.IsNullOrEmpty(SeriesProperty) ? null : 
-                               PropertyAccess.Getter<TItem, string>(SeriesProperty);
-
-            var grouped = seriesGetter != null
-                ? Data.GroupBy(item => seriesGetter(item))
-                : new[] { Data.GroupBy(_ => "Series").First() };
-
             var allValues = new List<double>();
-
-            foreach (var group in grouped)
+            
+            foreach (var series in Series)
             {
-                var seriesData = new Dictionary<string, double>();
-                
-                foreach (var item in group)
+                if (series.Data != null && !string.IsNullOrEmpty(series.ValueProperty))
                 {
-                    var category = categoryGetter(item);
-                    var value = valueGetter(item);
-                    
-                    if (!Categories.Contains(category))
-                        Categories.Add(category);
-                    
-                    seriesData[category] = value;
-                    allValues.Add(value);
+                    var valueGetter = PropertyAccess.Getter<TItem, double>(series.ValueProperty);
+                    foreach (var item in series.Data)
+                    {
+                        allValues.Add(valueGetter(item));
+                    }
                 }
-
-                Series.Add(new SpiderChartSeries
-                {
-                    Name = group.Key ?? "Series",
-                    Data = seriesData,
-                    ColorIndex = Series.Count
-                });
             }
-
+            
             if (allValues.Any())
             {
                 MinValue = Math.Min(0, allValues.Min());
@@ -230,225 +131,352 @@ namespace Radzen.Blazor
             }
         }
 
-
         /// <summary>
-        /// Gets the x,y coordinates for a point on the chart.
+        /// Gets all unique categories from all series.
         /// </summary>
-        /// <param name="axisIndex">The index of the axis/category.</param>
-        /// <param name="value">The value at that point.</param>
-        /// <returns>A tuple containing the x and y coordinates.</returns>
-        private (double x, double y) GetPoint(int axisIndex, double value)
+        private List<string> GetAllCategories()
         {
-            if (Width == null || Height == null) return (0, 0);
-
-            var centerX = Width.Value / 2;
-            var centerY = Height.Value / 2;
-            var radius = Math.Min(centerX, centerY) * 0.8;
-
-            var angle = (Math.PI * 2 * axisIndex / Categories.Count) - Math.PI / 2;
-            var normalizedValue = (value - MinValue) / (MaxValue - MinValue);
-            var r = radius * normalizedValue;
-
-            return (centerX + r * Math.Cos(angle), centerY + r * Math.Sin(angle));
-        }
-
-        /// <summary>
-        /// Gets the x,y coordinates for a category label.
-        /// </summary>
-        /// <param name="axisIndex">The index of the axis/category.</param>
-        /// <returns>A tuple containing the x and y coordinates for the label.</returns>
-        private (double x, double y) GetLabelPoint(int axisIndex)
-        {
-            if (Width == null || Height == null) return (0, 0);
-
-            var centerX = Width.Value / 2;
-            var centerY = Height.Value / 2;
-            var radius = Math.Min(centerX, centerY) * 0.8;
+            var categories = new HashSet<string>();
             
-            var angle = (Math.PI * 2 * axisIndex / Categories.Count) - Math.PI / 2;
-            var labelDistance = radius * 1.1;
-            var x = centerX + labelDistance * Math.Cos(angle);
-            var y = centerY + labelDistance * Math.Sin(angle);
-            
-            return (x, y);
-        }
-
-        /// <summary>
-        /// Gets the text anchor alignment for a category label.
-        /// </summary>
-        /// <param name="axisIndex">The index of the axis/category.</param>
-        /// <returns>The text-anchor value ("start", "middle", or "end").</returns>
-        private string GetLabelAnchor(int axisIndex)
-        {
-            var angle = (Math.PI * 2 * axisIndex / Categories.Count) - Math.PI / 2;
-            var x = Math.Cos(angle);
-            var threshold = 0.1;
-            
-            if (x > threshold)
-                return "start";
-            else if (x < -threshold)
-                return "end";
-            else
-                return "middle";
-        }
-
-        /// <summary>
-        /// Gets the dominant baseline for a category label.
-        /// </summary>
-        /// <param name="axisIndex">The index of the axis/category.</param>
-        /// <returns>The dominant-baseline value.</returns>
-        private string GetLabelBaseline(int axisIndex)
-        {
-            var angle = (Math.PI * 2 * axisIndex / Categories.Count) - Math.PI / 2;
-            var y = Math.Sin(angle);
-            var threshold = 0.1;
-            
-            if (y < -threshold)
-                return "text-after-edge";
-            else if (y > threshold)
-                return "text-before-edge";
-            else
-                return "middle";
-        }
-
-        /// <summary>
-        /// Gets the SVG path string for a series.
-        /// </summary>
-        /// <param name="series">The series to generate the path for.</param>
-        /// <returns>An SVG path string.</returns>
-        private string GetSeriesPath(SpiderChartSeries series)
-        {
-            var points = new List<string>();
-            
-            for (int i = 0; i < Categories.Count; i++)
+            foreach (var series in Series)
             {
-                var category = Categories[i];
-                var value = series.Data.ContainsKey(category) ? series.Data[category] : 0;
-                var (x, y) = GetPoint(i, value);
-                
-                var xStr = x.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-                var yStr = y.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-                
-                points.Add(i == 0 ? $"M{xStr},{yStr}" : $"L{xStr},{yStr}");
-            }
-
-            if (points.Any())
-                points.Add("Z");
-
-            return string.Join(" ", points);
-        }
-
-        /// <summary>
-        /// Gets the SVG path string for a grid level.
-        /// </summary>
-        /// <param name="level">The level between 0 and 1.</param>
-        /// <returns>An SVG path string for the grid.</returns>
-        private string GetGridPath(double level)
-        {
-            var points = new List<string>();
-            
-            for (int i = 0; i < Categories.Count; i++)
-            {
-                var (x, y) = GetPoint(i, MinValue + level * (MaxValue - MinValue));
-                var xStr = x.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-                var yStr = y.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
-                points.Add(i == 0 ? $"M{xStr},{yStr}" : $"L{xStr},{yStr}");
-            }
-
-            if (points.Any())
-                points.Add("Z");
-
-            return string.Join(" ", points);
-        }
-
-        /// <summary>
-        /// Handles the series click event.
-        /// </summary>
-        /// <param name="series">The series that was clicked.</param>
-        /// <param name="args">The mouse event arguments.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        private async Task OnSeriesClick(SpiderChartSeries series, MouseEventArgs args)
-        {
-            await SeriesClick.InvokeAsync(new SeriesClickEventArgs
-            {
-                Title = series.Name,
-                Data = series.Data.Values.ToArray()
-            });
-        }
-
-        /// <summary>
-        /// Handles the legend item click event.
-        /// </summary>
-        /// <param name="series">The series whose legend item was clicked.</param>
-        /// <returns>A task that represents the asynchronous operation.</returns>
-        private async Task OnLegendClick(SpiderChartSeries series)
-        {
-            if (HiddenSeries.Contains(series.Name))
-                HiddenSeries.Remove(series.Name);
-            else
-                HiddenSeries.Add(series.Name);
-
-            if (LegendClick.HasDelegate)
-            {
-                await LegendClick.InvokeAsync(new LegendClickEventArgs
+                if (series.Data != null && !string.IsNullOrEmpty(series.CategoryProperty))
                 {
-                    Title = series.Name,
-                    Data = series.Data.Values.ToArray()
-                });
+                    var categoryGetter = PropertyAccess.Getter<TItem, string>(series.CategoryProperty);
+                    foreach (var item in series.Data)
+                    {
+                        var category = categoryGetter(item);
+                        if (!string.IsNullOrEmpty(category))
+                        {
+                            categories.Add(category);
+                        }
+                    }
+                }
+            }
+            
+            return categories.ToList();
+        }
+
+        /// <summary>
+        /// Gets the index of a category.
+        /// </summary>
+        private int GetCategoryIndex(string category)
+        {
+            var categories = GetAllCategories();
+            return categories.IndexOf(category);
+        }
+
+
+        /// <summary>
+        /// Gets the value for a series at a specific category.
+        /// </summary>
+        private double GetSeriesValue(RadzenSpiderSeries<TItem> series, string category)
+        {
+            if (series.Data == null || string.IsNullOrEmpty(series.CategoryProperty) || string.IsNullOrEmpty(series.ValueProperty))
+            {
+                return 0;
             }
 
+            var categoryGetter = PropertyAccess.Getter<TItem, string>(series.CategoryProperty);
+            var valueGetter = PropertyAccess.Getter<TItem, double>(series.ValueProperty);
+
+            var item = series.Data.FirstOrDefault(d => categoryGetter(d) == category);
+            return item != null ? valueGetter(item) : 0;
+        }
+
+        /// <summary>
+        /// Formats a value for display.
+        /// </summary>
+        private string FormatValue(RadzenSpiderSeries<TItem> series, double value)
+        {
+            if (series.ValueFormatter != null)
+            {
+                return series.ValueFormatter(value);
+            }
+
+            if (!string.IsNullOrEmpty(series.FormatString))
+            {
+                return value.ToString(series.FormatString);
+            }
+
+            return value.ToString("F1");
+        }
+
+        /// <summary>
+        /// Gets the grid path for a specific scale.
+        /// </summary>
+        private string GetGridPath(double scale)
+        {
+            var categories = GetAllCategories();
+            var points = new List<string>();
+            
+            for (int i = 0; i < categories.Count; i++)
+            {
+                var (x, y) = GetPoint(i, MaxValue * scale);
+                points.Add($"{x:F2},{y:F2}");
+            }
+            
+            return $"M{string.Join(" L", points)} Z";
+        }
+
+        /// <summary>
+        /// Gets the series path for rendering.
+        /// </summary>
+        private string GetSeriesPath(RadzenSpiderSeries<TItem> series)
+        {
+            var categories = GetAllCategories();
+            var points = new List<string>();
+            
+            foreach (var category in categories)
+            {
+                var value = GetSeriesValue(series, category);
+                var index = GetCategoryIndex(category);
+                var (x, y) = GetPoint(index, value);
+                points.Add($"{x:F2},{y:F2}");
+            }
+            
+            return points.Count > 0 ? $"M{string.Join(" L", points)} Z" : "";
+        }
+
+        /// <summary>
+        /// Calculates the point position for a given index and value.
+        /// </summary>
+        private (double x, double y) GetPoint(int index, double value)
+        {
+            if (!Width.HasValue || !Height.HasValue)
+            {
+                return (0, 0);
+            }
+
+            var categories = GetAllCategories();
+            if (categories.Count == 0)
+            {
+                return (Width.Value / 2, Height.Value / 2);
+            }
+
+            var angleStep = 2 * Math.PI / categories.Count;
+            var angle = index * angleStep - Math.PI / 2;
+            var normalizedValue = (value - MinValue) / (MaxValue - MinValue);
+            var centerX = Width.Value / 2;
+            var centerY = Height.Value / 2;
+            var maxRadius = Math.Min(centerX, centerY) * 0.8;
+            var radius = maxRadius * normalizedValue;
+            
+            return (centerX + radius * Math.Cos(angle), centerY + radius * Math.Sin(angle));
+        }
+
+        /// <summary>
+        /// Gets the label position for a category.
+        /// </summary>
+        private (double x, double y) GetLabelPoint(int index)
+        {
+            if (!Width.HasValue || !Height.HasValue)
+            {
+                return (0, 0);
+            }
+
+            var categories = GetAllCategories();
+            if (categories.Count == 0)
+            {
+                return (Width.Value / 2, Height.Value / 2);
+            }
+
+            var angleStep = 2 * Math.PI / categories.Count;
+            var angle = index * angleStep - Math.PI / 2;
+            var centerX = Width.Value / 2;
+            var centerY = Height.Value / 2;
+            var maxRadius = Math.Min(centerX, centerY) * 0.8;
+            var labelRadius = maxRadius * 1.15; // Back to original distance
+            
+            return (centerX + labelRadius * Math.Cos(angle), centerY + labelRadius * Math.Sin(angle));
+        }
+
+        /// <summary>
+        /// Gets the text anchor for a label based on its position.
+        /// </summary>
+        private string GetLabelAnchor(int index)
+        {
+            var categories = GetAllCategories();
+            if (categories.Count == 0) return "middle";
+            
+            var angleStep = 2 * Math.PI / categories.Count;
+            var angle = index * angleStep - Math.PI / 2;
+            
+            // More precise anchoring based on position
+            var x = Math.Cos(angle);
+            var y = Math.Sin(angle);
+            
+            // Top and bottom positions
+            if (Math.Abs(x) < 0.1)
+            {
+                return "middle";
+            }
+            // Right side
+            else if (x > 0.1)
+            {
+                return "start";
+            }
+            // Left side
+            else
+            {
+                return "end";
+            }
+        }
+
+        /// <summary>
+        /// Gets the baseline for a label based on its position.
+        /// </summary>
+        private string GetLabelBaseline(int index)
+        {
+            var categories = GetAllCategories();
+            if (categories.Count == 0) return "middle";
+            
+            var angleStep = 2 * Math.PI / categories.Count;
+            var angle = index * angleStep - Math.PI / 2;
+            
+            var y = Math.Sin(angle);
+            
+            // Top position
+            if (y < -0.7)
+            {
+                return "auto";
+            }
+            // Bottom position
+            else if (y > 0.7)
+            {
+                return "hanging";
+            }
+            // Sides
+            else
+            {
+                return "middle";
+            }
+        }
+
+        /// <summary>
+        /// Renders the category labels.
+        /// </summary>
+        private RenderFragment RenderLabels() => builder =>
+        {
+            var categories = GetAllCategories();
+            
+            for (int i = 0; i < categories.Count; i++)
+            {
+                var (x, y) = GetLabelPoint(i);
+                var category = categories[i];
+                var anchor = GetLabelAnchor(i);
+                var baseline = GetLabelBaseline(i);
+                var xStr = x.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                var yStr = y.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
+                
+                builder.OpenElement(0, "text");
+                builder.AddAttribute(1, "x", xStr);
+                builder.AddAttribute(2, "y", yStr);
+                builder.AddAttribute(3, "text-anchor", anchor);
+                builder.AddAttribute(4, "dominant-baseline", baseline);
+                builder.AddAttribute(5, "fill", "var(--rz-text-color)");
+                builder.AddAttribute(6, "class", "rz-spider-chart-label");
+                builder.AddContent(7, category);
+                builder.CloseElement();
+            }
+        };
+
+
+        /// <summary>
+        /// Gets the style for the tooltip.
+        /// </summary>
+        private string GetTooltipStyle()
+        {
+            if (!TooltipX.HasValue || !TooltipY.HasValue)
+            {
+                return "display: none;";
+            }
+
+            return $"position: absolute; left: {TooltipX}px; top: {TooltipY}px; z-index: 1000; pointer-events: none;";
+        }
+
+        /// <summary>
+        /// Handles series click events.
+        /// </summary>
+        private async Task OnSeriesClick(RadzenSpiderSeries<TItem> series, MouseEventArgs args)
+        {
+            await SeriesClick.InvokeAsync(series);
+        }
+
+        /// <summary>
+        /// Handles area mouse enter events.
+        /// </summary>
+        private void OnAreaMouseEnter(MouseEventArgs args, RadzenSpiderSeries<TItem> series)
+        {
+            HoveredSeries = series;
             StateHasChanged();
         }
 
         /// <summary>
-        /// Handles the legend checkbox change event.
+        /// Handles area mouse leave events.
         /// </summary>
-        /// <param name="series">The series whose checkbox was changed.</param>
-        /// <param name="isChecked">Whether the checkbox is now checked.</param>
-        private void OnLegendCheckboxChange(SpiderChartSeries series, bool isChecked)
+        private void OnAreaMouseLeave()
         {
-            if (isChecked && HiddenSeries.Contains(series.Name))
+            if (!IsLegendHover)
             {
-                HiddenSeries.Remove(series.Name);
+                HoveredSeries = null;
+                StateHasChanged();
             }
-            else if (!isChecked && !HiddenSeries.Contains(series.Name))
-            {
-                HiddenSeries.Add(series.Name);
-            }
-            
-            StateHasChanged();
         }
 
+        
+        private RadzenSpiderSeries<TItem> currentTooltipSeries;
+        private string currentTooltipCategory;
+        
         /// <summary>
-        /// Shows a tooltip for a data point.
+        /// Handles marker mouse enter events.
         /// </summary>
-        /// <param name="args">The mouse event arguments.</param>
-        /// <param name="series">The series of the data point.</param>
-        /// <param name="category">The category of the data point.</param>
-        /// <param name="value">The value of the data point.</param>
-        private void ShowTooltip(MouseEventArgs args, SpiderChartSeries series, string category, double value)
+        private void OnMarkerMouseEnter(MouseEventArgs args, RadzenSpiderSeries<TItem> series, string category, double value)
         {
-            if (TooltipService == null || series == null) return;
+            HoveredSeries = series;
+            ShowMarkerTooltip(args, series, category, value);
+        }
+        
+        
+        /// <summary>
+        /// Handles marker mouse leave events.
+        /// </summary>
+        private void OnMarkerMouseLeave()
+        {
+            HoveredSeries = null;
+            HideTooltip();
+        }
+        
+        /// <summary>
+        /// Shows tooltip for a marker.
+        /// </summary>
+        private void ShowMarkerTooltip(MouseEventArgs args, RadzenSpiderSeries<TItem> series, string category, double value)
+        {
+            if (!this.ShowTooltip || TooltipService == null)
+                return;
             
-            if (currentTooltipSeries == series && currentTooltipCategory == category) return;
+            // Prevent duplicate tooltips
+            if (currentTooltipSeries == series && currentTooltipCategory == category) 
+                return;
+            
             currentTooltipSeries = series;
             currentTooltipCategory = category;
             
-            var tooltip = new RenderFragment(builder =>
+            var valueStr = FormatValue(series, value);
+
+            // Open tooltip using TooltipService
+            TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, tooltipService => builder =>
             {
                 builder.OpenComponent<Rendering.ChartTooltip>(0);
-                builder.AddAttribute(1, "Title", series.Name ?? "Series");
+                builder.AddAttribute(1, "Title", series.Title ?? "Series");
                 builder.AddAttribute(2, "Label", category ?? "");
-                builder.AddAttribute(3, "Value", FormatValue(value));
-                builder.AddAttribute(4, "Class", $"rz-series-{series.ColorIndex}-tooltip");
+                builder.AddAttribute(3, "Value", valueStr);
                 builder.CloseComponent();
-            });
-            
-            TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, _ => tooltip, new ChartTooltipOptions());
+            }, new ChartTooltipOptions());
         }
-
+        
         /// <summary>
-        /// Hides the current tooltip.
+        /// Hides the tooltip.
         /// </summary>
         private void HideTooltip()
         {
@@ -456,239 +484,150 @@ namespace Radzen.Blazor
             currentTooltipCategory = null;
             TooltipService?.Close();
         }
+
         
-        private SpiderChartSeries currentTooltipSeries;
-        private string currentTooltipCategory;
-
         /// <summary>
-        /// Handles the mouse enter event for a marker.
-        /// </summary>
-        /// <param name="args">The mouse event arguments.</param>
-        /// <param name="series">The series of the marker.</param>
-        /// <param name="category">The category of the marker.</param>
-        /// <param name="value">The value of the marker.</param>
-        private void OnMarkerMouseEnter(MouseEventArgs args, SpiderChartSeries series, string category, double value)
-        {
-            if (HoveredSeries != series)
-            {
-                HoveredSeries = series;
-                IsLegendHover = false;
-                StateHasChanged();
-            }
-            ShowTooltip(args, series, category, value);
-        }
-
-        /// <summary>
-        /// Handles the mouse leave event for a marker.
-        /// </summary>
-        private void OnMarkerMouseLeave()
-        {
-            if (HoveredSeries != null && !IsLegendHover)
-            {
-                HoveredSeries = null;
-                StateHasChanged();
-            }
-            HideTooltip();
-        }
-
-        /// <summary>
-        /// Handles the mouse enter event for an area.
-        /// </summary>
-        /// <param name="args">The mouse event arguments.</param>
-        /// <param name="series">The series of the area.</param>
-        private void OnAreaMouseEnter(MouseEventArgs args, SpiderChartSeries series)
-        {
-            if (HoveredSeries != series)
-            {
-                HoveredSeries = series;
-                IsLegendHover = false;
-                StateHasChanged();
-            }
-        }
-
-        /// <summary>
-        /// Handles the mouse leave event for an area.
-        /// </summary>
-        private void OnAreaMouseLeave()
-        {
-            if (HoveredSeries != null && !IsLegendHover)
-            {
-                HoveredSeries = null;
-                StateHasChanged();
-            }
-        }
-
-
-        /// <summary>
-        /// Handles the mouse enter event for a legend item.
-        /// </summary>
-        /// <param name="series">The series of the legend item.</param>
-        /// <param name="isHidden">Whether the series is currently hidden.</param>
-        private void OnLegendItemMouseEnter(SpiderChartSeries series, bool isHidden)
-        {
-            if (!isHidden)
-            {
-                HoveredSeries = series;
-                IsLegendHover = true;
-                StateHasChanged();
-            }
-        }
-
-        /// <summary>
-        /// Handles the mouse leave event for a legend item.
-        /// </summary>
-        private void OnLegendItemMouseLeave()
-        {
-            if (HoveredSeries != null && IsLegendHover)
-            {
-                HoveredSeries = null;
-                IsLegendHover = false;
-                StateHasChanged();
-            }
-        }
-
-        /// <summary>
-        /// Handles the mouse leave event for the entire chart.
+        /// Handles chart mouse leave events.
         /// </summary>
         private void OnChartMouseLeave()
         {
-            if (HoveredSeries != null || IsLegendHover)
+            HoveredSeries = null;
+            HoveredCategory = null;
+            TooltipX = null;
+            TooltipY = null;
+            IsLegendHover = false;
+            StateHasChanged();
+        }
+
+
+        /// <summary>
+        /// Refreshes the chart.
+        /// </summary>
+        internal async Task Refresh()
+        {
+            // Force all series to update to ensure legend items re-render
+            foreach (var series in Series)
             {
-                HoveredSeries = null;
-                IsLegendHover = false;
-                HideTooltip();
+                series.ForceUpdate();
+            }
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+
+        /// <summary>
+        /// Highlights a series on hover.
+        /// </summary>
+        internal void HighlightSeries(RadzenSpiderSeries<TItem> series)
+        {
+            HoveredSeries = series;
+            IsLegendHover = true;
+            InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Clears series highlight.
+        /// </summary>
+        internal void ClearHighlight()
+        {
+            HoveredSeries = null;
+            IsLegendHover = false;
+            InvokeAsync(StateHasChanged);
+        }
+
+
+
+        /// <inheritdoc />
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            
+            if (firstRender || !Width.HasValue || !Height.HasValue)
+            {
+                var rect = await JSRuntime.InvokeAsync<Rendering.Rect>("Radzen.createResizable", Element, Reference);
+                
+                if (!Width.HasValue && rect.Width > 0)
+                {
+                    Width = rect.Width;
+                }
+                else if (!Width.HasValue)
+                {
+                    // Fallback if JavaScript sizing fails
+                    Width = 800;
+                }
+
+                if (!Height.HasValue && rect.Height > 0)
+                {
+                    Height = rect.Height;
+                }
+                else if (!Height.HasValue)
+                {
+                    // Fallback if JavaScript sizing fails
+                    Height = 500;
+                }
+                
+                // Legend width handled by flexbox layout
+                
                 StateHasChanged();
             }
         }
 
         /// <summary>
-        /// Shows a tooltip displaying all values for a series.
+        /// Gets the calculated width for the legend.
         /// </summary>
-        /// <param name="args">The mouse event arguments.</param>
-        /// <param name="series">The series to show values for.</param>
-        private void ShowAreaTooltip(MouseEventArgs args, SpiderChartSeries series)
+        private double GetLegendWidth()
         {
-            if (TooltipService == null || series == null) return;
-            
-            var tooltip = new RenderFragment(builder =>
+            if (!Series.Any())
             {
-                builder.OpenElement(0, "div");
-                builder.AddAttribute(1, "class", "rz-chart-tooltip-content");
-                builder.AddAttribute(2, "class", $"rz-series-{series.ColorIndex}-tooltip");
-                builder.AddAttribute(3, "style", "background: var(--rz-base-background-color); padding: 8px; border-radius: 4px; min-width: 150px; border-width: 2px; border-style: solid;");
-                
-                builder.OpenElement(4, "div");
-                builder.AddAttribute(5, "class", $"rz-series-{series.ColorIndex}");
-                builder.AddAttribute(6, "style", "font-weight: bold; margin-bottom: 8px; font-size: 14px; color: inherit;");
-                builder.AddContent(7, series.Name ?? "Series");
-                builder.CloseElement();
-                
-                var index = 8;
-                foreach (var category in Categories)
-                {
-                    var value = series.Data.ContainsKey(category) ? series.Data[category] : 0;
-                    
-                    builder.OpenElement(index++, "div");
-                    builder.AddAttribute(index++, "style", "display: flex; justify-content: space-between; gap: 12px; padding: 2px 0; font-size: 12px;");
-                    
-                    builder.OpenElement(index++, "span");
-                    builder.AddAttribute(index++, "style", "color: var(--rz-text-secondary-color);");
-                    builder.AddContent(index++, category);
-                    builder.CloseElement();
-                    
-                    builder.OpenElement(index++, "span");
-                    builder.AddAttribute(index++, "style", "font-weight: 600;");
-                    builder.AddContent(index++, FormatValue(value));
-                    builder.CloseElement();
-                    
-                    builder.CloseElement();
-                }
-                
-                builder.CloseElement();
-            });
-            
-            TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, _ => tooltip, new ChartTooltipOptions());
+                return 0;
+            }
+
+            var maxLegendWidth = Series.Select(s => s.MeasureLegend()).DefaultIfEmpty(0).Max();
+            return Math.Min(maxLegendWidth + 60, 250);
         }
+
 
         /// <summary>
-        /// Formats a value for display.
+        /// Called by JavaScript when the chart is resized.
         /// </summary>
-        /// <param name="value">The value to format.</param>
-        /// <returns>The formatted value string.</returns>
-        private string FormatValue(double value)
+        [JSInvokable]
+        public void Resize(double width, double height)
         {
-            if (ValueFormatter != null)
-                return ValueFormatter(value);
+            bool stateHasChanged = false;
             
-            return value.ToString(FormatString ?? "F0");
-        }
-
-        /// <summary>
-        /// Gets the filtered series based on the legend filter.
-        /// </summary>
-        /// <returns>The filtered series collection.</returns>
-        private IEnumerable<SpiderChartSeries> GetFilteredSeries()
-        {
-            if (string.IsNullOrWhiteSpace(legendFilter))
-                return Series;
+            if (Width != width)
+            {
+                Width = width;
+                stateHasChanged = true;
+            }
             
-            return Series.Where(s => s.Name.Contains(legendFilter, StringComparison.OrdinalIgnoreCase));
+            if (Height != height)
+            {
+                Height = height;
+                stateHasChanged = true;
+            }
+            
+            // Legend width handled by flexbox layout
+            
+            if (stateHasChanged)
+            {
+                StateHasChanged();
+            }
         }
-
+        
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
             return "rz-spider-chart";
         }
-
+        
         /// <summary>
-        /// Selects all series (makes them visible).
+        /// Gets the CSS class for legend position.
         /// </summary>
-        private void SelectAllSeries()
+        private string GetLegendPositionClass()
         {
-            HiddenSeries.Clear();
-            StateHasChanged();
+            return "rz-spider-legend-right";
         }
-
-        /// <summary>
-        /// Deselects all series (hides them).
-        /// </summary>
-        private void DeselectAllSeries()
-        {
-            HiddenSeries.Clear();
-            foreach (var series in Series)
-            {
-                HiddenSeries.Add(series.Name);
-            }
-            StateHasChanged();
-        }
-
-        /// <summary>
-        /// Represents a series in the spider chart.
-        /// </summary>
-        private class SpiderChartSeries
-        {
-            /// <summary>
-            /// Gets or sets the name of the series.
-            /// </summary>
-            public string Name { get; set; }
-            
-            /// <summary>
-            /// Gets or sets the data points for the series, keyed by category.
-            /// </summary>
-            public Dictionary<string, double> Data { get; set; }
-            
-            /// <summary>
-            /// Gets or sets the color of the series.
-            /// </summary>
-            public string Color { get; set; }
-            
-            /// <summary>
-            /// Gets or sets the color index for CSS class generation.
-            /// </summary>
-            public int ColorIndex { get; set; }
-        }
-
     }
 
     /// <summary>
@@ -700,10 +639,10 @@ namespace Radzen.Blazor
         /// Polygon grid shape.
         /// </summary>
         Polygon,
+        
         /// <summary>
         /// Circular grid shape.
         /// </summary>
         Circular
     }
-
 }
