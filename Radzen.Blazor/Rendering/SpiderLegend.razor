@@ -1,0 +1,56 @@
+@namespace Radzen.Blazor.Rendering
+@using Radzen.Blazor
+@typeparam TItem
+
+@if (Chart != null && Chart.Series.Any())
+{
+    <div class="@Class">
+        <div class="rz-legend-header">
+            <span class="rz-legend-title">Legend</span>
+            <div class="rz-legend-actions">
+                <button class="rz-button rz-button-sm" @onclick="ShowAll" title="Show All">
+                    <span class="rz-button-text">All</span>
+                </button>
+                <button class="rz-button rz-button-sm" @onclick="HideAll" title="Hide All">
+                    <span class="rz-button-text">None</span>
+                </button>
+            </div>
+        </div>
+        <div class="rz-legend-items">
+        @foreach (var series in Chart.Series)
+        {
+            @series.RenderLegendItem()
+        }
+        </div>
+    </div>
+}
+@code {
+    [CascadingParameter]
+    public RadzenSpiderChart<TItem> Chart { get; set; }
+
+    string Class => "rz-spider-legend";
+
+    async Task ShowAll()
+    {
+        if (Chart != null)
+        {
+            foreach (var series in Chart.Series)
+            {
+                series.IsVisible = true;
+            }
+            await Chart.Refresh();
+        }
+    }
+
+    async Task HideAll()
+    {
+        if (Chart != null)
+        {
+            foreach (var series in Chart.Series)
+            {
+                series.IsVisible = false;
+            }
+            await Chart.Refresh();
+        }
+    }
+}
