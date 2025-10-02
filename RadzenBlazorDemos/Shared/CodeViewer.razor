@@ -1,6 +1,9 @@
 @using System.Text.RegularExpressions;
+@using System.IO;
+@using System.Net.Http;
 @inject IJSRuntime JSRuntime
 @inject CompilerService Compiler
+@inject HttpClient Http
 
 <RadzenRow class="rz-p-2" Gap="0.5rem" Style="border-bottom: var(--rz-border-disabled);">
     <RadzenColumn>
@@ -73,7 +76,7 @@
 
     string ComponentSourceHref => ComponentSource ?? $"https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/Radzen{ComponentName}.razor.cs";
 
-    string PageSourceHref => $"https://raw.githubusercontent.com/radzenhq/radzen-blazor/master/RadzenBlazorDemos/Pages/{PageName}";
+    string PageSourceHref => Path.ChangeExtension(PageName != null && PageName.StartsWith("/") ? PageName : $"/demos/Pages/{PageName}", ".txt");
     protected override async Task OnParametersSetAsync()
     {
         language = PageName == null ? "razor" :  PageName.EndsWith(".razor") ? "razor" : "csharp";
@@ -92,9 +95,7 @@
 
     async Task<string> Fetch()
     {
-        using var http = new HttpClient();
-
-        return await http.GetStringAsync(PageSourceHref);
+        return await Http.GetStringAsync(PageSourceHref);
     }
 
     string Clean(string source)
@@ -117,6 +118,8 @@
 
         await OnValueChanged(source);
     }
+
+    
 
     bool isBusy;
 

@@ -25,4 +25,21 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
   </ItemGroup>
+  <Target Name="CopyDemoPagesToWwwroot" AfterTargets="Build;Publish">
+    <ItemGroup>
+      <DemoPagesRazor Include="Pages\**\*.razor" />
+      <DemoPagesCs Include="Pages\**\*.cs" />
+      <DemoModelsCs Include="Models\**\*.cs" />
+      <DemoServicesCs Include="Services\**\*.cs" />
+      <DemoSharedRazor Include="Shared\**\*.razor" />
+      <DemoHostControllersCs Include="..\RadzenBlazorDemos.Host\Controllers\**\*.cs" />
+    </ItemGroup>
+    <MakeDir Directories="$(ProjectDir)wwwroot\demos" />
+    <Copy SourceFiles="@(DemoPagesRazor)" DestinationFiles="@(DemoPagesRazor->'$(ProjectDir)wwwroot\demos\Pages\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DemoPagesCs)" DestinationFiles="@(DemoPagesCs->'$(ProjectDir)wwwroot\demos\Pages\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DemoModelsCs)" DestinationFiles="@(DemoModelsCs->'$(ProjectDir)wwwroot\demos\Models\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DemoServicesCs)" DestinationFiles="@(DemoServicesCs->'$(ProjectDir)wwwroot\demos\Services\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DemoSharedRazor)" DestinationFiles="@(DemoSharedRazor->'$(ProjectDir)wwwroot\demos\Shared\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(DemoHostControllersCs)" DestinationFiles="@(DemoHostControllersCs->'$(ProjectDir)wwwroot\demos\Controllers\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
+  </Target>
 </Project>

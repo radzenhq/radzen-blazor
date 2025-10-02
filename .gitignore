@@ -347,3 +347,4 @@ Radzen.Blazor.min.js
 *.md
 /.gitignore
 /.gitignore
+RadzenBlazorDemos/wwwroot/demos
