@@ -21,16 +21,16 @@
                         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" class="rz-chat-users">
                             @foreach (var participant in Users.Take(MaxVisibleUsers))
                             {
-                                <div class="rz-chat-participant-avatar" title="@participant.Name">
+                                <RadzenStack class="rz-chat-participant-avatar" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0" title="@participant.Name">
                                     @if (!string.IsNullOrEmpty(participant.AvatarUrl))
                                     {
                                         <img src="@participant.AvatarUrl" alt="@participant.Name" class="rz-chat-participant-image" />
                                     }
                                     else
                                     {
-                                        <span class="rz-chat-participant-initials">@participant.GetInitials()</span>
+                                        <span class="rz-chat-avatar-initials">@participant.GetInitials()</span>
                                     }
-                                </div>
+                                </RadzenStack>
                             }
                             @if (Users.Count() > MaxVisibleUsers)
                             {

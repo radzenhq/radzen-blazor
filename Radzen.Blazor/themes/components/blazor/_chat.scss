@@ -88,7 +88,8 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     --rz-text-body2-margin-block-end: 0;
 }
 
-.rz-chat-message-avatar {
+.rz-chat-message-avatar,
+.rz-chat-participant-avatar  {
     width: var(--rz-chat-avatar-size);
     height: var(--rz-chat-avatar-size);
     border-radius: var(--rz-chat-avatar-border-radius);
