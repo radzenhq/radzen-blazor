@@ -77,11 +77,16 @@
                                 <span class="rz-chat-avatar-initials" title="@participant?.Name">@participant?.GetInitials()</span>
                             }
                         </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="@(isCurrentUser ? AlignItems.End : AlignItems.Start)" Gap="0.125rem" class="rz-chat-message-content">
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="@(isCurrentUser ? AlignItems.End : AlignItems.Start)" Gap="0.25rem" class="rz-chat-message-content">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="@(isCurrentUser ? JustifyContent.End : JustifyContent.Start)" Gap="0.5rem" class="rz-chat-message-info">
                             @if (!isCurrentUser && ShowUserNames)
                             {
                                 <div class="rz-chat-message-participant-name">@participant?.Name</div>
                             }
+                                <div class="rz-chat-message-time">
+                                    @message.Timestamp.ToString("HH:mm")
+                                </div>
+                            </RadzenStack>
                             <div class="rz-chat-message-text">
                                 @if (message.IsStreaming)
                                 {
@@ -92,9 +97,7 @@
                                     <RadzenMarkdown Text=@message.Content />
                                 }
                             </div>
-                            <div class="rz-chat-message-time">
-                                @message.Timestamp.ToString("HH:mm")
-                            </div>
+                            
                         </RadzenStack>
                     </div>
                 }

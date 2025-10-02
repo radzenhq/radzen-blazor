@@ -18,7 +18,7 @@ $rz-chat-avatar-size: 2rem !default;
 $rz-chat-avatar-border-radius: var(--rz-border-radius) !default;
 $rz-chat-avatar-font-size: 1rem !default;
 $rz-chat-avatar-font-weight: 700 !default;
-$rz-chat-message-time-padding: 0 !default;
+$rz-chat-message-info-padding: 0 !default;
 $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
 
 // Chat Component Styles - ChatGPT-like UI
@@ -66,7 +66,7 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
 
 .rz-chat-message {
     display: flex;
-    align-items: flex-end;
+    align-items: flex-start;
     gap: 0.5rem;
     max-width: 90%;
 }
@@ -107,10 +107,20 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     white-space: nowrap;
 }
 
+.rz-chat-message-info {
+    padding: var(--rz-chat-message-info-padding); 
+}
+
 .rz-chat-message-time {
     font-size: 0.75rem;
     color: var(--rz-text-disabled-color);
-    padding: var(--rz-chat-message-time-padding); 
+    line-height: 1;
+}
+
+.rz-chat-message-participant-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1;
 }
 
 .rz-chat-message-user {
@@ -125,8 +135,8 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     .rz-chat-message-text {
         background-color: var(--rz-chat-message-user-background-color);
         color: var(--rz-chat-message-user-color);
-        border-end-end-radius: var(--rz-chat-message-callout-radius);
-/*         --rz-text-h1-color: var(--rz-chat-message-user-color);
+        border-start-end-radius: var(--rz-chat-message-callout-radius);
+     /* --rz-text-h1-color: var(--rz-chat-message-user-color);
         --rz-text-h2-color: var(--rz-chat-message-user-color);
         --rz-text-h3-color: var(--rz-chat-message-user-color);
         --rz-text-h4-color: var(--rz-chat-message-user-color);
@@ -137,7 +147,8 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     }
 }
 
-.rz-chat-message-assistant {
+.rz-chat-message-assistant,
+.rz-chat-message-participant {
     align-self: flex-start;
 
     .rz-chat-message-avatar {
@@ -148,8 +159,8 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     .rz-chat-message-text {
         background-color: var(--rz-chat-message-assistant-background-color);
         color: var(--rz-chat-message-assistant-color);
-        border-end-start-radius: var(--rz-chat-message-callout-radius);
-/*         --rz-text-h1-color: var(--rz-chat-message-assistant-color);
+        border-start-start-radius: var(--rz-chat-message-callout-radius);
+     /* --rz-text-h1-color: var(--rz-chat-message-assistant-color);
         --rz-text-h2-color: var(--rz-chat-message-assistant-color);
         --rz-text-h3-color: var(--rz-chat-message-assistant-color);
         --rz-text-h4-color: var(--rz-chat-message-assistant-color);
@@ -242,10 +253,6 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     font-size: 0.75rem;
     font-weight: 600;
     border: 2px solid var(--rz-base-background-color);
-}
-
-.rz-chat-message-user {
-    align-self: flex-start;
 }
 
 .rz-chat-message-user-name {
