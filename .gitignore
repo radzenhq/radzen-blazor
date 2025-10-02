@@ -342,13 +342,3 @@ Radzen.DocFX/api/*.yml
 !Radzen.DocFX/api/index.md
 Radzen.DocFX/api/.manifest
 Radzen.Blazor.min.js
-/.claude
-/SANKEY_PATTERN_COMPARISON.md
-*.md
-/.gitignore
-/.gitignore
-/nul
-/.gitignore
-/.gitignore
-/.gitignore
-/.gitignore
