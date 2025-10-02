@@ -1,0 +1,99 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenStack class="rz-p-0 rz-p-md-12">
+    <RadzenCard class="rz-p-4" Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Text="Chat Controls" />
+            <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                <RadzenButton Text="Add User Message" 
+                              Icon="person_add"
+                              Click="@(async () => await basicChat?.AddMessage("Hello everyone! How's the project going?", "user1"))"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Add User Message" 
+                              Icon="message"
+                              Click="@(async () => await basicChat?.AddMessage("Great progress! The new features are working perfectly.", "user2"))"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Clear Chat" 
+                              Icon="delete_history"
+                              ButtonStyle="ButtonStyle.Light"
+                              Click="@(() => basicChat?.ClearChat())"
+                              Variant="Variant.Flat" />
+                
+                <RadzenButton Text="Send Message" 
+                              Icon="send" 
+                              ButtonStyle="ButtonStyle.Primary"
+                              Click="@(() => basicChat?.SendMessage("Thanks for the update!"))"
+                              Variant="Variant.Flat" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+    <RadzenChat @ref="basicChat" 
+                Title="Team Chat" 
+                CurrentUserId="user1"
+                Users="@users"
+                Messages="@messages"
+                MessagesChanged="@OnMessagesChanged"
+                Placeholder="Type your message..."
+                Style="height: 500px;"
+                MessageAdded="@OnMessageAdded"
+                MessageSent="@OnMessageSent"
+                ChatCleared="@OnChatCleared"
+                />
+</RadzenStack>
+
+<EventConsole @ref="console" Style="min-height: 230px;" />
+
+@code {
+    RadzenChat basicChat;
+    EventConsole console;
+    
+    private List<ChatUser> users = new();
+    private List<ChatMessage> messages = new();
+
+    protected override void OnInitialized()
+    {
+        // Initialize users
+        users.AddRange(new[]
+        {
+            new ChatUser { Id = "user1", Name = "John Doe", Color = "#1976d2" },
+            new ChatUser { Id = "user2", Name = "Jane Smith", Color = "#388e3c" },
+            new ChatUser { Id = "user3", Name = "Bob Johnson", Color = "#f57c00" }
+        });
+
+        // Add some sample messages
+        messages.AddRange(new[]
+        {
+            new ChatMessage { Content = "Welcome to the team chat! 👋", UserId = "user1", Timestamp = DateTime.Now.AddMinutes(-30) },
+            new ChatMessage { Content = "Thanks John! Looking forward to working together.", UserId = "user2", Timestamp = DateTime.Now.AddMinutes(-29) },
+            new ChatMessage { Content = "Same here! Let's make this project amazing! 🚀", UserId = "user3", Timestamp = DateTime.Now.AddMinutes(-28) }
+        });
+    }
+
+    void OnMessageAdded(ChatMessage message)
+    {
+        var participant = users.FirstOrDefault(p => p.Id == message.UserId);
+        var participantName = participant?.Name ?? "Unknown";
+        console.Log($"Message added: {participantName} - {message.Content.Substring(0, Math.Min(50, message.Content.Length))}...", 
+                   message.UserId == "user1" ? AlertStyle.Info : AlertStyle.Success);
+    }
+
+    void OnMessageSent(ChatMessage message)
+    {
+        console.Log($"Message sent: {message.Content}", AlertStyle.Info);
+    }
+
+    void OnMessagesChanged(IEnumerable<ChatMessage> newMessages)
+    {
+        messages = newMessages.ToList();
+        StateHasChanged();
+    }
+
+    void OnChatCleared()
+    {
+        console.Log("Chat cleared", AlertStyle.Warning);
+    }
+}

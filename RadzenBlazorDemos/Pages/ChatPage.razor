@@ -1,0 +1,60 @@
+@page "/chat"
+@page "/docs/guides/components/chat.html"
+
+@using Radzen
+@using Radzen.Blazor
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Chat
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    A modern chat component for multi-participant conversations with support for distinct user identities.
+    Perfect for team chats, group discussions, and real-time messaging applications.
+</RadzenText>
+
+<RadzenExample ComponentName="Chat" Example="ChatBasic">
+    <ChatBasic />
+</RadzenExample>
+
+<RadzenText Anchor="chat#users" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Multi-participant support
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    The <strong>Chat</strong> component supports multiple users with distinct identities, avatars, and online status indicators.
+    Use <code>Users</code> to manage the chat users and <code>CurrentUserId</code> to identify the current user.
+</RadzenText>
+<RadzenExample ComponentName="Chat" Example="ChatUsers">
+    <ChatUsers />
+</RadzenExample>
+
+<RadzenText Anchor="chat#customization" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Customization options
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Customize the appearance and behavior of the <strong>Chat</strong> component using various properties like <code>ShowUsers</code>, 
+    <code>ShowUserNames</code>, <code>MaxVisibleUsers</code>, and <code>ShowClearButton</code>.
+</RadzenText>
+<RadzenExample ComponentName="Chat" Example="ChatCustomization">
+    <ChatCustomization />
+</RadzenExample>
+
+<RadzenText Anchor="chat#events" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Events and interactions
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Handle chat events like <code>MessageAdded</code>, <code>MessageSent</code>, <code>UserAdded</code>, and <code>ChatCleared</code> 
+    to integrate with your application logic and provide real-time updates.
+</RadzenText>
+<RadzenExample ComponentName="Chat" Example="ChatEvents">
+    <ChatEvents />
+</RadzenExample>
+
+<RadzenText Anchor="chat#compact" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Compact chat
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Create a more compact chat interface suitable for smaller spaces or sidebar implementations by adjusting the height and hiding optional elements.
+</RadzenText>
+<RadzenExample ComponentName="Chat" Example="ChatCompact">
+    <ChatCompact />
+</RadzenExample>

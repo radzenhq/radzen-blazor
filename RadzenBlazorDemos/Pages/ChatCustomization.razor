@@ -1,0 +1,165 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenChat Title="Customizable Chat" 
+                    CurrentUserId="@currentUserId"
+                    Users="@users" 
+                    Messages="@messages"
+                    MessagesChanged="@OnMessagesChanged"
+                    ShowUsers="@showUsers"
+                    ShowUserNames="@showUserNames"
+                    ShowClearButton="@showClearButton"
+                    MaxVisibleUsers="@maxVisibleUsers"
+                    Placeholder="@placeholder"
+                    EmptyMessage="@emptyMessage"
+                    class="rz-h-100" />
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Display Options</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                            <RadzenCheckBox @bind-Value="@showUsers" TValue="bool" Name="showUsers" />
+                            <RadzenLabel Text="Show Users in Header" Component="showUsers" />
+                        </RadzenStack>
+                        
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                            <RadzenCheckBox @bind-Value="@showUserNames" TValue="bool" Name="showUserNames" />
+                            <RadzenLabel Text="Show User Names Above Messages" Component="showUserNames" />
+                        </RadzenStack>
+                        
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                            <RadzenCheckBox @bind-Value="@showClearButton" TValue="bool" Name="showClearButton" />
+                            <RadzenLabel Text="Show Clear Button" Component="showClearButton" />
+                        </RadzenStack>
+                        
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                            <RadzenLabel Text="Max Visible Users:" Style="white-space: nowrap;" />
+                            <RadzenNumeric @bind-Value="@maxVisibleUsers" Min="1" Max="10" Style="width: 100px;" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Text Customization</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Text="Placeholder Text" />
+                            <RadzenTextBox @bind-Value="@placeholder" Placeholder="Enter placeholder text..." />
+                        </RadzenStack>
+                        
+                        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                            <RadzenLabel Text="Empty Message" />
+                            <RadzenTextBox @bind-Value="@emptyMessage" Placeholder="Enter empty message text..." />
+                        </RadzenStack>
+                        
+                        <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                            <RadzenButton Text="Reset to Defaults" 
+                                        Icon="refresh" 
+                                        ButtonStyle="ButtonStyle.Light" 
+                                        Click="@OnResetDefaults" 
+                                        Variant="Variant.Flat" />
+                            <RadzenButton Text="Add Sample Messages" 
+                                        Icon="message" 
+                                        ButtonStyle="ButtonStyle.Success" 
+                                        Click="@OnAddSampleMessages" 
+                                        Variant="Variant.Flat" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenColumn>
+    <RadzenColumn Size="12">
+        <RadzenCard Variant="Variant.Outlined">
+            <RadzenText TextStyle="TextStyle.Subtitle1">Customization Features</RadzenText>
+            <RadzenRow>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenText TextStyle="TextStyle.H6">Display Controls</RadzenText>
+                    <ul>
+                        <li><code>ShowUsers</code> - Toggle participant avatars in header</li>
+                        <li><code>ShowUserNames</code> - Show/hide names above messages</li>
+                        <li><code>ShowClearButton</code> - Control clear chat button visibility</li>
+                        <li><code>MaxVisibleUsers</code> - Limit header participant display</li>
+                    </ul>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenText TextStyle="TextStyle.H6">Text Customization</RadzenText>
+                    <ul>
+                        <li><code>Placeholder</code> - Customize input field placeholder</li>
+                        <li><code>EmptyMessage</code> - Set message when chat is empty</li>
+                        <li><code>Title</code> - Set chat header title</li>
+                        <li>All text properties support localization</li>
+                    </ul>
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenCard>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private string currentUserId = "user1";
+    private List<ChatUser> users = new();
+    private List<ChatMessage> messages = new();
+    
+    // Customization options
+    private bool showUsers = true;
+    private bool showUserNames = true;
+    private bool showClearButton = true;
+    private int maxVisibleUsers = 5;
+    private string placeholder = "Type your message...";
+    private string emptyMessage = "No messages yet. Start a conversation!";
+
+    protected override void OnInitialized()
+    {
+        // Initialize users
+        users.AddRange(new[]
+        {
+            new ChatUser { Id = "user1", Name = "John Doe", Color = "#1976d2" },
+            new ChatUser { Id = "user2", Name = "Jane Smith", Color = "#388e3c" },
+            new ChatUser { Id = "user3", Name = "Bob Johnson", Color = "#f57c00" },
+            new ChatUser { Id = "user4", Name = "Alice Brown", Color = "#7b1fa2" },
+            new ChatUser { Id = "user5", Name = "Charlie Wilson", Color = "#d32f2f" },
+            new ChatUser { Id = "user6", Name = "Diana Prince", Color = "#0288d1" }
+        });
+    }
+
+    private void OnResetDefaults()
+    {
+        showUsers = true;
+        showUserNames = true;
+        showClearButton = true;
+        maxVisibleUsers = 5;
+        placeholder = "Type your message...";
+        emptyMessage = "No messages yet. Start a conversation!";
+        StateHasChanged();
+    }
+
+    private void OnAddSampleMessages()
+    {
+        messages.Clear();
+        var sampleMessages = new[]
+        {
+            new ChatMessage { Content = "Welcome to our customizable chat! 🎨", UserId = "user1", Timestamp = DateTime.Now.AddMinutes(-30) },
+            new ChatMessage { Content = "This is great! We can customize everything.", UserId = "user2", Timestamp = DateTime.Now.AddMinutes(-29) },
+            new ChatMessage { Content = "I love the **markdown** support and emoji! 😊", UserId = "user3", Timestamp = DateTime.Now.AddMinutes(-28) },
+            new ChatMessage { Content = "The participant management is really smooth.", UserId = "user4", Timestamp = DateTime.Now.AddMinutes(-27) },
+            new ChatMessage { Content = "Perfect for team collaboration! 👥", UserId = "user5", Timestamp = DateTime.Now.AddMinutes(-26) }
+        };
+        
+        messages.AddRange(sampleMessages);
+        StateHasChanged();
+    }
+
+    private void OnMessagesChanged(IEnumerable<ChatMessage> newMessages)
+    {
+        messages = newMessages.ToList();
+        StateHasChanged();
+    }
+}

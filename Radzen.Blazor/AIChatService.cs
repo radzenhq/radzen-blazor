@@ -10,29 +10,9 @@ using System.Text.Json.Serialization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using System.Linq;
+using Radzen.Blazor;
 
 namespace Radzen;
-
-/// <summary>
-/// Represents a chat message in the conversation history.
-/// </summary>
-public class ChatMessage
-{
-    /// <summary>
-    /// Gets or sets the role of the message sender (system, user, or assistant).
-    /// </summary>
-    public string Role { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the content of the message.
-    /// </summary>
-    public string Content { get; set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the timestamp when the message was created.
-    /// </summary>
-    public DateTime Timestamp { get; set; } = DateTime.Now;
-}
 
 /// <summary>
 /// Represents a conversation session with memory.
@@ -73,7 +53,8 @@ public class ConversationSession
     {
         Messages.Add(new ChatMessage
         {
-            Role = role,
+            UserId = role,
+            IsUser = role != "system",
             Content = content,
             Timestamp = DateTime.Now
         });
@@ -111,7 +92,7 @@ public class ConversationSession
         // Add conversation messages
         foreach (var message in Messages)
         {
-            messages.Add(new { role = message.Role, content = message.Content });
+            messages.Add(new { role = message.IsUser ? "user" : "system", content = message.Content });
         }
 
         return messages;

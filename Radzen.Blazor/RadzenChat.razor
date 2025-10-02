@@ -1,22 +1,46 @@
-﻿@using Radzen
+@using Radzen
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 
 @inherits RadzenComponent
 
-@inject IAIChatService ChatService
-
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@Style" id="@GetId()" >
         <!-- Chat Header -->
-        @if (!string.IsNullOrWhiteSpace(Title) || ShowClearButton)
+        @if (!string.IsNullOrWhiteSpace(Title) || ShowClearButton || ShowUsers)
         {       
             <RadzenStack class="rz-chat-header" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0.5rem">
-                @if (!string.IsNullOrWhiteSpace(Title))
-                {
-                    <span class="rz-chat-header-title">@Title</span>
-                }
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                    @if (!string.IsNullOrWhiteSpace(Title))
+                    {
+                        <span class="rz-chat-header-title">@Title</span>
+                    }
+                    @if (ShowUsers && Users.Any())
+                    {
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.25rem" class="rz-chat-users">
+                            @foreach (var participant in Users.Take(MaxVisibleUsers))
+                            {
+                                <RadzenStack class="rz-chat-participant-avatar" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0" title="@participant.Name">
+                                    @if (!string.IsNullOrEmpty(participant.AvatarUrl))
+                                    {
+                                        <img src="@participant.AvatarUrl" alt="@participant.Name" class="rz-chat-participant-image" />
+                                    }
+                                    else
+                                    {
+                                        <span class="rz-chat-avatar-initials">@participant.GetInitials()</span>
+                                    }
+                                </RadzenStack>
+                            }
+                            @if (Users.Count() > MaxVisibleUsers)
+                            {
+                                <div class="rz-chat-participant-more" title="@string.Join(", ", Users.Skip(MaxVisibleUsers).Select(p => p.Name))">
+                                    +@(Users.Count() - MaxVisibleUsers)
+                                </div>
+                            }
+                        </RadzenStack>
+                    }
+                </RadzenStack>
                 <RadzenStack class="rz-chat-header-actions" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem">
                 @if (ShowClearButton)
                 {
@@ -29,7 +53,7 @@
 
         <!-- Chat Messages -->
         <div class="rz-chat-messages" @ref="messagesContainer">
-            @if (Messages.Count == 0)
+            @if (Messages.Count() == 0)
             {
                 <RadzenStack class="rz-chat-empty" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem">
                     <RadzenIcon Icon="chat_bubble_outline" class="rz-text-secondary-color" />
@@ -40,19 +64,25 @@
             {
                 @foreach (var message in Messages)
                 {
-                    <div class="rz-chat-message @(message.IsUser ? "rz-chat-message-user" : "rz-chat-message-assistant")" @key="message.Id">
+                    var participant = GetUser(message.UserId);
+                    var isCurrentUser = message.UserId == CurrentUserId;
+                    <div class="rz-chat-message @(isCurrentUser ? "rz-chat-message-user" : "rz-chat-message-participant")" @key="message.Id">
                         <RadzenStack class="rz-chat-message-avatar" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0">
-                            @if (message.IsUser)
+                            @if (!string.IsNullOrEmpty(participant?.AvatarUrl))
                             {
-                                <span class="rz-chat-avatar-initials" title="@UserAvatarText">@UserAvatarText</span>
+                                <img src="@participant.AvatarUrl" alt="@participant.Name" class="rz-chat-avatar-image" />
                             }
                             else
                             {
-                                <span class="rz-chat-avatar-initials" title="@AssistantAvatarText">@AssistantAvatarText</span>
+                                <span class="rz-chat-avatar-initials" title="@participant?.Name">@participant?.GetInitials()</span>
                             }
                         </RadzenStack>
-                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="@(message.IsUser ? AlignItems.End : AlignItems.Start)" Gap="0.25rem" class="rz-chat-message-content">
-                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="@(message.IsUser ? JustifyContent.End : JustifyContent.Start)" Gap="0.5rem" class="rz-chat-message-info">
+                        <RadzenStack Orientation="Orientation.Vertical" AlignItems="@(isCurrentUser ? AlignItems.End : AlignItems.Start)" Gap="0.25rem" class="rz-chat-message-content">
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="@(isCurrentUser ? JustifyContent.End : JustifyContent.Start)" Gap="0.5rem" class="rz-chat-message-info">
+                            @if (!isCurrentUser && ShowUserNames)
+                            {
+                                <div class="rz-chat-message-participant-name">@participant?.Name</div>
+                            }
                                 <div class="rz-chat-message-time">
                                     @message.Timestamp.ToString("HH:mm")
                                 </div>
@@ -67,6 +97,7 @@
                                     <RadzenMarkdown Text=@message.Content />
                                 }
                             </div>
+                            
                         </RadzenStack>
                     </div>
                 }
