@@ -84,6 +84,20 @@ namespace Radzen.Blazor
         private ElementReference messagesContainer;
 
         /// <summary>
+        /// Gets or sets the message template.
+        /// </summary>
+        /// <value>The message template.</value>
+        [Parameter]
+        public RenderFragment<ChatMessage> MessageTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the empty template shown when there are no messages.
+        /// </summary>
+        /// <value>The empty template.</value>
+        [Parameter]
+        public RenderFragment EmptyTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets the current user's participant ID.
         /// </summary>
         [Parameter]

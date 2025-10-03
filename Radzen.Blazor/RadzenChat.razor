@@ -55,15 +55,28 @@
         <div class="rz-chat-messages" @ref="messagesContainer">
             @if (Messages.Count() == 0)
             {
+                if (EmptyTemplate != null)
+                {
+                    @EmptyTemplate    
+                }
+                else
+                {
                 <RadzenStack class="rz-chat-empty" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem">
                     <RadzenIcon Icon="chat_bubble_outline" class="rz-text-secondary-color" />
                     <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2 rz-text-tertiary-color">@EmptyMessage</RadzenText>
                 </RadzenStack>
+                }
             }
             else
             {
                 @foreach (var message in Messages)
                 {
+                    if (MessageTemplate != null)
+                    {
+                        @MessageTemplate(message)    
+                    }
+                    else
+                    {
                     var participant = GetUser(message.UserId);
                     var isCurrentUser = message.UserId == CurrentUserId;
                     <div class="rz-chat-message @(isCurrentUser ? "rz-chat-message-user" : "rz-chat-message-participant")" @key="message.Id">
@@ -100,6 +113,7 @@
                             
                         </RadzenStack>
                     </div>
+                    }
                 }
             }
         </div>
