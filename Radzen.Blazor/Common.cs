@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +21,67 @@ using System.Threading.Tasks;
 
 namespace Radzen
 {
+    /// <summary>
+    /// RadzenPivotAggreateContext.
+    /// </summary>
+    public class RadzenPivotAggreateContext<T>
+    {
+        /// <summary>
+        /// Gets the query.
+        /// </summary>
+        public IQueryable<T> View { get; internal set; }
+
+        /// <summary>
+        /// Gets the aggregate.
+        /// </summary>
+        public RadzenPivotAggregate<T> Aggregate { get; internal set; }
+
+        /// <summary>
+        /// Gets the aggregate value.
+        /// </summary>
+        public object Value { get; internal set; }
+
+        /// <summary>
+        /// Gets the row index.
+        /// </summary>
+        public int? Index { get; internal set; }
+    }
+
+    /// <summary>
+    /// Specifies the aggregate function for pivot values.
+    /// </summary>
+    public enum AggregateFunction
+    {
+        /// <summary>
+        /// Sum of values.
+        /// </summary>
+        Sum,
+        /// <summary>
+        /// Count of items.
+        /// </summary>
+        Count,
+        /// <summary>
+        /// Average of values.
+        /// </summary>
+        Average,
+        /// <summary>
+        /// Minimum value.
+        /// </summary>
+        Min,
+        /// <summary>
+        /// Maximum value.
+        /// </summary>
+        Max,
+        /// <summary>
+        /// First value.
+        /// </summary>
+        First,
+        /// <summary>
+        /// Last value.
+        /// </summary>
+        Last
+    }
+
     /// <summary>
     /// Colors.
     /// </summary>

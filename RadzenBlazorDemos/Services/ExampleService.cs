@@ -1023,6 +1023,40 @@ namespace RadzenBlazorDemos
         },
         new Example
         {
+            New = true,
+            Name = "PivotDataGrid",
+            Icon = "\ue871",
+            Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table" },
+            Children = new[]
+            {
+                new Example
+                {
+                    Name = "IQueryable",
+                    Path = "/pivot-data-grid",
+                    Title = "Blazor Pivot DataGrid Component - IQueryable data-binding | Free UI Components by Radzen",
+                    Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
+                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
+                },
+                new Example
+                {
+                    Name = "LoadData",
+                    Path = "/pivot-data-grid-load-data",
+                    Title = "Blazor Pivot DataGrid custom data-binding via the LoadData event.",
+                    Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
+                    Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
+                },
+                new Example
+                {
+                    Name = "OData",
+                    Path = "/pivot-data-grid-odata",
+                    Title = "Blazor Pivot DataGrid custom data-binding to OData service.",
+                    Description = "The RadzenPivotDataGrid component allows you to create cross-tabulation aggregates from IQueryable.",
+                    Tags = new [] { "odata", "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table", "query", "IQueryable" }
+                }
+            }
+        },
+        new Example
+        {
             Name = "Data",
             Updated = true,
             Icon = "\ue99c",
@@ -1206,7 +1240,7 @@ namespace RadzenBlazorDemos
                     }
                 }
             }
-},
+        },
         new Example
         {
             Toc = [ new () { Text = "Gravatar with email (info@radzen.com)", Anchor = "#gravatar-with-email" } ],
