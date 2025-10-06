@@ -1025,7 +1025,7 @@ namespace RadzenBlazorDemos
         {
             New = true,
             Name = "PivotDataGrid",
-            Icon = "\ue871",
+            Icon = "\ue9ce",
             Tags = new [] { "pivot", "crosstab", "analysis", "aggregation", "drill-down", "datagrid", "table" },
             Children = new[]
             {
