@@ -1118,7 +1118,7 @@ namespace Radzen.Blazor
 
             try
             {
-                var propertyType = typeof(TItem).GetProperty(aggregate.Property)?.PropertyType;
+                var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), aggregate.Property);
                 var isNumeric = PropertyAccess.IsNumeric(propertyType);
 
                 IQueryable values;
@@ -2080,7 +2080,7 @@ namespace Radzen.Blazor
 
         IEnumerable<AggregateFunction> GetAggregates(string propertyName)
         {
-            return PropertyAccess.IsNumeric(typeof(TItem).GetProperty(propertyName).PropertyType) ?
+            return PropertyAccess.IsNumeric(PropertyAccess.GetPropertyType(typeof(TItem), propertyName)) ?
                 allAggregates : allAggregates.Except(numericAggregates);
         }
 
