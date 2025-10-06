@@ -950,9 +950,7 @@ namespace Radzen.Blazor
 
                         for (int i = 0; i < colPath.Count; i++)
                         {
-                            var col = pivotColumns[i];
-                            var value = colPath[i] is string ? $@"""{colPath[i]}""" : colPath[i];
-                            items = items.Where($"i => i.{col.Property} == {value}");
+                            items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
                         }
 
                         var total = GetAggregateValue(items, aggregate);
@@ -1025,9 +1023,7 @@ namespace Radzen.Blazor
                     continue; // Skip padding cells added to align depths
                 }
 
-                var rowHeaderValue = cell.Title;
-                var rowProperty = pivotRows[i].Property;
-                items = items.Where($@"i => i.{rowProperty} == ""{rowHeaderValue}""");
+                items = items.Where($@"i => i.{pivotRows[i].Property} == {ExpressionSerializer.FormatValue(cell.Value)}");
             }
 
             return items;
@@ -1253,9 +1249,7 @@ namespace Radzen.Blazor
                         var items = node.Items;
                         for (int i = 0; i < colPath.Count; i++)
                         {
-                            var col = pivotColumns[i];
-                            var value = colPath[i] is string ? $@"""{colPath[i]}""" : colPath[i];
-                            items = items.Where($"i => i.{col.Property} == {value}");
+                            items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
                         }
                         row.ValueCells.Add(items.Count() > 0 ? GetAggregateValue(items, aggregate) : null);
                     }
@@ -1295,17 +1289,12 @@ namespace Radzen.Blazor
                                 // Filter by row path
                                 for (int i = 0; i < newPrefix.Count && i < pivotRows.Count; i++)
                                 {
-                                    var rowProperty = pivotRows[i].Property;
-                                    var rowValue = newPrefix[i].Value;
-                                    var value = rowValue is string ? $@"""{rowValue}""" : rowValue;
-                                    items = items.Where($@"i => i.{rowProperty} == {value}");
+                                    items = items.Where($@"i => i.{pivotRows[i].Property} == {ExpressionSerializer.FormatValue(newPrefix[i].Value)}");
                                 }
                                 // Filter by column path
                                 for (int i = 0; i < colPath.Count; i++)
                                 {
-                                    var col = pivotColumns[i];
-                                    var value = colPath[i] is string ? $@"""{colPath[i]}""" : colPath[i];
-                                    items = items.Where($"i => i.{col.Property} == {value}");
+                                    items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
                                 }
                                 collapsedRow.ValueCells.Add(items.Count() > 0 ? GetAggregateValue(items, aggregate) : null);
                             }
