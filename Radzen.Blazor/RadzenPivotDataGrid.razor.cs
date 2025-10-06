@@ -1269,7 +1269,7 @@ namespace Radzen.Blazor
                 foreach (var child in node.Children)
                 {
                     var cell = new RowHeaderCell {
-                        Value = node.Value,
+                        Value = child.Value,
                         Title = child.Title,
                         RowSpan = GetLeafCount(child),
                         IsCollapsed = child.IsCollapsed,
@@ -1296,8 +1296,9 @@ namespace Radzen.Blazor
                                 for (int i = 0; i < newPrefix.Count && i < pivotRows.Count; i++)
                                 {
                                     var rowProperty = pivotRows[i].Property;
-                                    var rowValue = newPrefix[i].Title;
-                                    items = items.Where($@"i => i.{rowProperty} == ""{rowValue}""");
+                                    var rowValue = newPrefix[i].Value;
+                                    var value = rowValue is string ? $@"""{rowValue}""" : rowValue;
+                                    items = items.Where($@"i => i.{rowProperty} == {value}");
                                 }
                                 // Filter by column path
                                 for (int i = 0; i < colPath.Count; i++)
