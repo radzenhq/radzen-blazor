@@ -284,7 +284,7 @@ namespace Radzen.Blazor
             YearFrom = min.HasValue ? min.Value.Year : int.Parse(YearRange.Split(':').First());
             YearTo = max.HasValue ? max.Value.Year : int.Parse(YearRange.Split(':').Last());
             months = Enumerable.Range(1, 12).Select(i => new NameValue() { Name = Culture.DateTimeFormat.GetMonthName(i), Value = i }).ToList();
-            years = YearFrom < YearTo ? Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
+            years = YearFrom <= YearTo ? Enumerable.Range(YearFrom, YearTo - YearFrom + 1)
                 .Select(i => new NameValue() { Name = YearFormatter(i), Value = i }).ToList() : Enumerable.Empty<NameValue>().ToList();
         }
 
