@@ -1,13 +1,54 @@
 ﻿@page "/changelog"
 
 <div class="changelog">
+<RadzenText Anchor="changelog#v8" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v8 Changelog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Track and review changes to Radzen Blazor Components v8
+</RadzenText>
+<RadzenText Anchor="changelog#v8-new-components" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    New Components
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="PivotDataGird" Path="/pivot-data-grid" /> - create cross-tabulation tables for analyzing large datasets.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="FAB" Path="/fab" /> - Floating Action Button helps highlight your app’s most important action.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Info" Shade="Shade.Lighter" Text="New" /> <RadzenLink Text="FabMenu" Path="/fab-menu" /> - RadzenFabMenu provides quick access to multiple actions.</li>
+</ul>
+<RadzenText Anchor="changelog#v8-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-4">
+    SiderBar
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Added two new options:
+        <ul>
+            <li><code>Position="SidebarPosition.Start"</code> to position the SideBar to Left, Right, Start, End</li>
+            <li><code>FullHeight</code> for setting the Sidebar to full height or wrapped between RadzenHeader and RadzenFooter. Default is <code>false</code>.</li>
+            <li>Example:
+<RadzenText TextStyle="TextStyle.Body1" class="rz-m-0">Old:</RadzenText>
+<pre><code>&lt;RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-header' 'rz-body rz-sidebar'"&gt;
+    &lt;RadzenSidebar&gt;
+    &lt;/RadzenSidebar&gt;
+&lt;/RadzenLayout&gt;
+</code></pre>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-m-0">New:</RadzenText>
+<pre><code>&lt;RadzenLayout&gt;
+    &lt;RadzenSidebar Position="SidebarPosition.End" &gt;
+    &lt;/RadzenSidebar&gt;
+&lt;/RadzenLayout&gt;
+</code></pre>  
+            </li>
+        </ul>
+    </li>
+</ul>
+
+
 <RadzenText Anchor="changelog#v7" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Components v7 Changelog
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     Track and review changes to Radzen Blazor Components v7
 </RadzenText>
-<RadzenText Anchor="changelog#v7-dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2">
+<RadzenText Anchor="changelog#v7-dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Dependencies
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1">
@@ -47,7 +88,7 @@
 <RadzenText Anchor="changelog#v6" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Components v6 Changelog
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P">
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     Track and review changes to Radzen Blazor Components v6
 </RadzenText>
 <RadzenText Anchor="changelog#v6-dependencies" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
@@ -68,7 +109,7 @@
     We have introduced <code>RenderFragment</code> based properties where needed.
     This change is made to improve the security of our components and to prevent certain XSS attacks.
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Body1">OLD:</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1">Old:</RadzenText>
 <pre><code>PagingSummaryFormat="Displaying page {0} of {1} &lt;b&gt;(total {2} records)&lt;/b&gt;</code></pre>
 <RadzenText TextStyle="TextStyle.Body1">New:</RadzenText>
 <pre><code>&lt;PagingSummaryTemplate&gt;
