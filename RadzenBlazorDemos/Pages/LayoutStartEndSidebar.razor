@@ -1,17 +1,17 @@
 <RadzenLayout>
     <RadzenHeader>
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0">
-            <RadzenSidebarToggle Click="@(() => leftSidebarExpanded = !leftSidebarExpanded)" />
+            <RadzenSidebarToggle Click="@(() => startSidebarExpanded = !startSidebarExpanded)" />
             <RadzenLabel Text="Header" />
         </RadzenStack>
     </RadzenHeader>
-    <RadzenSidebar Position="SidebarPosition.Left" @bind-Expanded="@leftSidebarExpanded">
+    <RadzenSidebar Position="SidebarPosition.Start" @bind-Expanded="@startSidebarExpanded">
         <RadzenPanelMenu>
             <RadzenPanelMenuItem Text="Home" Icon="home" />
             <RadzenPanelMenuItem Text="Users" Icon="account_box" />
         </RadzenPanelMenu>
         <div class="rz-p-4">
-            Left Sidebar
+            Start Sidebar
         </div>
     </RadzenSidebar>
     <RadzenBody>
@@ -19,18 +19,18 @@
             Body
         </div>
         <div class="rz-p-4">
-            <RadzenButton Text="Toggle left Sidebar" Click="@(() => leftSidebarExpanded = !leftSidebarExpanded)" />
-            <RadzenButton Text="Toggle right Sidebar" Click="@(() => rightSidebarExpanded = !rightSidebarExpanded)" />
+            <RadzenButton Text="Toggle start Sidebar" Click="@(() => startSidebarExpanded = !startSidebarExpanded)" />
+            <RadzenButton Text="Toggle end Sidebar" Click="@(() => endSidebarExpanded = !endSidebarExpanded)" />
         </div>
     </RadzenBody>
-    <RadzenSidebar Position="SidebarPosition.Right" @bind-Expanded="@rightSidebarExpanded" Style="width: 300px;">
+    <RadzenSidebar Position="SidebarPosition.End" @bind-Expanded="@endSidebarExpanded" Style="width: 300px;">
         <div class="rz-p-4">
-            Right Sidebar
+            End Sidebar
         </div>
     </RadzenSidebar>
 </RadzenLayout>
 
 @code {
-    bool leftSidebarExpanded = true;
-    bool rightSidebarExpanded = true;
+    bool startSidebarExpanded = true;
+    bool endSidebarExpanded = true;
 }

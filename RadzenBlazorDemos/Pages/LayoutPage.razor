@@ -44,6 +44,9 @@
 <RadzenText Anchor="layout#right-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
     Right Sidebar
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Position="SidebarPosition.Right"</code> if you need to explicitly position the sidebar to the right, or <code>Position="SidebarPosition.End"</code> if you need to take into account <strong>RTL support</strong>.
+</RadzenText>
 <RadzenExample ComponentName="Layout" Example="LayoutRightSidebar" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
     <LayoutRightSidebar />
 </RadzenExample>
@@ -58,8 +61,21 @@
 <RadzenText Anchor="layout#right-left-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
     Right and Left Sidebar
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Position="SidebarPosition.Right"</code> and <code>Position="SidebarPosition.Left"</code> if you need to explicitly position the sidebar to the right or to the left, without taking into account LTR or RTL direction.
+</RadzenText>
 <RadzenExample ComponentName="Layout" Example="LayoutRightLeftSidebar" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
     <LayoutRightLeftSidebar />
+</RadzenExample>
+
+<RadzenText Anchor="layout#start-end-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+    Start and End Sidebar
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>Position="SidebarPosition.Start"</code> or <code>Position="SidebarPosition.End"</code> for international applications with <strong>RTL support</strong>.
+</RadzenText>
+<RadzenExample ComponentName="Layout" Example="LayoutStartEndSidebar" Documentation="false" Heading="false" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenLayout.cs">
+    <LayoutStartEndSidebar />
 </RadzenExample>
 
 <RadzenText Anchor="layout#icon-sidebar" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">

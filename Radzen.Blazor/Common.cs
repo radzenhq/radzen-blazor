@@ -1,4 +1,4 @@
-﻿﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
@@ -1462,6 +1462,29 @@ namespace Radzen
         /// RadzenPager is displayed at the top and at the bottom of the component.
         /// </summary>
         TopAndBottom = Top | Bottom
+    }
+
+    /// <summary>
+    /// Specifies the ways a <see cref="RadzenSidebar" /> component renders inside RadzenLayout.
+    /// </summary>
+    public enum SidebarPosition
+    {
+        /// <summary>
+        /// The RadzenSidebar component is displayed at the start of RadzenLayout.
+        /// </summary>
+        Left,
+        /// <summary>
+        /// The RadzenSidebar component is displayed at the end of RadzenLayout.
+        /// </summary>
+        Right,
+        /// <summary>
+        /// The RadzenSidebar component is displayed at the start of RadzenLayout.
+        /// </summary>
+        Start,
+        /// <summary>
+        /// The RadzenSidebar component is displayed at the end of RadzenLayout.
+        /// </summary>
+        End
     }
 
     /// <summary>

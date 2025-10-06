@@ -31,6 +31,20 @@ namespace Radzen.Blazor
         private bool IsResponsive => Responsive && Layout != null;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="RadzenSidebar"/> should occupy the full height of the <see cref="RadzenLayout"/>.
+        /// When <c>false</c> (default), the sidebar is rendered next to <see cref="RadzenBody"/>.
+        /// When <c>true</c>, it stretches to the full height of the layout and appears alongside <see cref="RadzenHeader"/>, <see cref="RadzenBody"/>, and <see cref="RadzenFooter"/>.
+        /// </summary>
+        [Parameter]
+        public bool FullHeight { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the sidebar position (Left, Right, Start, End).
+        /// </summary>
+        [Parameter]
+        public SidebarPosition? Position { get; set; } = SidebarPosition.Start;
+
+        /// <summary>
         /// The <see cref="RadzenLayout" /> this component is nested in.
         /// </summary>
         [CascadingParameter]
@@ -47,9 +61,11 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return ClassList.Create("rz-sidebar").Add("rz-sidebar-expanded", expanded == true)
-                                                 .Add("rz-sidebar-collapsed", expanded == false)
-                                                 .Add("rz-sidebar-responsive", IsResponsive)
-                                                 .ToString();
+                                                          .Add("rz-sidebar-collapsed", expanded == false)
+                                                          .Add("rz-sidebar-responsive", IsResponsive)
+                                                          .Add("rz-sidebar-fullheight", FullHeight)
+                                                          .Add($"rz-sidebar-{Position.Value.ToString().ToLower()}")
+                                                          .ToString();
         }
 
         /// <summary>
