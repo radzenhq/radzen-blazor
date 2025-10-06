@@ -42,9 +42,9 @@
                         @foreach (var participant in users)
                         {
                             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-2 rz-border-bottom">
-                                <div class="rz-chat-participant-avatar" style="width: 2rem; height: 2rem;">
-                                    <span class="rz-chat-participant-initials">@participant.GetInitials()</span>
-                                </div>
+                                <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" class="rz-chat-message-avatar" style="width: 2rem; height: 2rem;">
+                                    <span class="rz-chat-avatar-initials">@participant.GetInitials()</span>
+                                </RadzenStack>
                                 <RadzenText TextStyle="TextStyle.Body2">@participant.Name</RadzenText>
                                 <RadzenBadge Text="@(participant.IsOnline ? "Online" : "Offline")" 
                                            BadgeStyle="@(participant.IsOnline ? BadgeStyle.Success : BadgeStyle.Light)" />
