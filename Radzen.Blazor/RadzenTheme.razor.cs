@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 
 #nullable enable
@@ -60,7 +61,11 @@ namespace Radzen.Blazor
 
             ThemeService.ThemeChanged += OnThemeChanged;
 
+#if NET8_0_OR_GREATER
+            persistingSubscription = persistentComponentState?.RegisterOnPersisting(PersistTheme, RenderMode.InteractiveAuto);
+#else
             persistingSubscription = persistentComponentState?.RegisterOnPersisting(PersistTheme);
+#endif
 
             base.OnInitialized();
         }
