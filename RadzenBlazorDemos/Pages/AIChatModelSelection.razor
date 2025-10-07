@@ -1,0 +1,141 @@
+@using Radzen
+@using Radzen.Blazor
+@inherits ComponentBase
+
+<RadzenRow Gap="1rem">
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenAIChat @ref="modelChat"
+                Title="AI Assistant with Dynamic Configuration" 
+                Placeholder="Ask me anything..."
+                MessageAdded="@OnMessageAdded"
+                ResponseReceived="@OnResponseReceived"
+                ShowClearButton="true"
+                Model="@selectedModel"
+                class="rz-h-100" />
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeLG="6">
+        <RadzenRow>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">AI Configuration</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+                            <RadzenLabel Style="white-space: nowrap;">Model:</RadzenLabel>
+                            <RadzenDropDown TValue="string" 
+                                          Data="@availableModels" 
+                                          @bind-Value="@selectedModel"
+                                          Change="@(args => OnClearChat())"
+                                          Placeholder="Select a model" 
+                                          Style="flex: 1; min-width: 200px;" />
+                        </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" Gap="0.5rem">
+                            <RadzenButton Text="Send Test Message" 
+                                        Icon="send" 
+                                        ButtonStyle="ButtonStyle.Primary"
+                                        Click="@OnSendTestMessage"
+                                        Variant="Variant.Flat" />
+                            <RadzenButton Text="Clear Chat" 
+                                        Icon="clear_all"
+                                        ButtonStyle="ButtonStyle.Danger"
+                                        Click="@OnClearChat"
+                                        Variant="Variant.Flat" />
+                            <RadzenButton Text="Reset Defaults" 
+                                        Icon="refresh"
+                                        ButtonStyle="ButtonStyle.Light"
+                                        Click="@OnResetDefaults"
+                                        Variant="Variant.Flat" />
+                        </RadzenStack>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Current Configuration</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical" Gap="0.25rem">
+                        <RadzenText TextStyle="TextStyle.Body2">
+                            <strong>Model:</strong> @selectedModel
+                        </RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body2">
+                            <strong>Total Messages:</strong> @messagesCount
+                        </RadzenText>
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12">
+                <RadzenCard Variant="Variant.Outlined">
+                    <RadzenText TextStyle="TextStyle.Subtitle1">Available Models</RadzenText>
+                    <RadzenStack Orientation="Orientation.Vertical">
+                        @foreach (var model in availableModels)
+                        {
+                            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-2 rz-border-bottom">
+                                <RadzenIcon Icon="smart_toy" />
+                                <RadzenText TextStyle="TextStyle.Body2">@model</RadzenText>
+                                @if (model == selectedModel)
+                                {
+                                    <RadzenBadge Text="Active" BadgeStyle="BadgeStyle.Success" />
+                                }
+                            </RadzenStack>
+                        }
+                    </RadzenStack>
+                </RadzenCard>
+            </RadzenColumn>
+        </RadzenRow>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    private RadzenAIChat modelChat;
+
+    // Default values
+    private const string DefaultModel = "@cf/meta/llama-4-scout-17b-16e-instruct";
+
+    // Configuration parameters
+    private string selectedModel = DefaultModel;
+    
+    private List<string> availableModels = new()
+    {
+        "@cf/meta/llama-4-scout-17b-16e-instruct",
+        "@cf/qwen/qwen1.5-14b-chat-awq",
+        "@cf/mistral/mistral-7b-instruct-v0.1"
+    };
+
+    private int messagesCount = 0;
+
+    private void OnMessageAdded(Radzen.Blazor.ChatMessage message)
+    {
+        messagesCount++;
+        StateHasChanged();
+    }
+
+    private void OnResponseReceived(string response)
+    {
+        // Response received from AI
+        StateHasChanged();
+    }
+
+    private async Task OnSendTestMessage()
+    {
+        if (modelChat != null && !string.IsNullOrEmpty(selectedModel))
+        {
+            await modelChat.SendMessage("What are your model name and parameters?");
+        }
+    }
+
+    private async Task OnClearChat()
+    {
+        if (modelChat != null)
+        {
+            await modelChat.ClearChat();
+            messagesCount = 0;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnResetDefaults()
+    {
+        selectedModel = DefaultModel;
+        await OnClearChat();
+        StateHasChanged();
+    }
+}
+

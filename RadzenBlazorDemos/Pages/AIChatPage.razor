@@ -56,4 +56,15 @@
 </RadzenText>
 <RadzenExample ComponentName="AIChat" Example="AIChatWithMemory">
     <AIChatWithMemory />
+</RadzenExample>
+
+<RadzenText Anchor="aichat#configuration" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Runtime AI Configuration
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Customize AI behavior at runtime by configuring the <code>Model</code>, <code>Temperature</code>, <code>MaxTokens</code>, <code>SystemPrompt</code>, <code>Endpoint</code>, <code>Proxy</code>, <code>ApiKey</code>, and <code>ApiKeyHeader</code> parameters. 
+    These parameters can be set on the component or passed to the <code>SendMessage</code> method to override settings per message, enabling dynamic switching between different AI providers and models.
+</RadzenText>
+<RadzenExample ComponentName="AIChat" Example="AIChatModelSelection">
+    <AIChatModelSelection />
 </RadzenExample> 

@@ -114,8 +114,12 @@ public interface IAIChatService
     /// <param name="systemPrompt">Optional system prompt to override the configured system prompt.</param>
     /// <param name="temperature">Optional temperature to override the configured temperature.</param>
     /// <param name="maxTokens">Optional maximum tokens to override the configured max tokens.</param>
+    /// <param name="endpoint">Optional endpoint URL to override the configured endpoint.</param>
+    /// <param name="proxy">Optional proxy URL to override the configured proxy.</param>
+    /// <param name="apiKey">Optional API key to override the configured API key.</param>
+    /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
     /// <returns>An async enumerable that yields streaming response chunks from the AI model.</returns>
-    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string sessionId = null, CancellationToken cancellationToken = default, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null);
+    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string sessionId = null, CancellationToken cancellationToken = default, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null, string endpoint = null, string proxy = null, string apiKey = null, string apiKeyHeader = null);
 
     /// <summary>
     /// Gets or creates a conversation session.
@@ -213,7 +217,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     public AIChatServiceOptions Options => options.Value;
 
     /// <inheritdoc />
-    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string sessionId = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null)
+    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string sessionId = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null, string endpoint = null, string proxy = null, string apiKey = null, string apiKeyHeader = null)
     {
         if (string.IsNullOrWhiteSpace(userInput))
         {
@@ -226,7 +230,10 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
         // Add user message to conversation history
         session.AddMessage("user", userInput);
 
-        var url = Options.Proxy ?? Options.Endpoint;
+        // Use runtime parameters or fall back to configured options
+        var url = proxy ?? Options.Proxy ?? endpoint ?? Options.Endpoint;
+        var effectiveApiKey = apiKey ?? Options.ApiKey;
+        var effectiveApiKeyHeader = apiKeyHeader ?? Options.ApiKeyHeader;
 
         // Get formatted messages including conversation history
         var messages = session.GetFormattedMessages(systemPrompt ?? Options.SystemPrompt);
@@ -245,15 +252,15 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
             Content = new StringContent(JsonSerializer.Serialize(payload, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }), Encoding.UTF8, "application/json")
         };
 
-        if (!string.IsNullOrEmpty(Options.ApiKey))
+        if (!string.IsNullOrEmpty(effectiveApiKey))
         {
-            if (string.Equals(Options.ApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(effectiveApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", Options.ApiKey);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", effectiveApiKey);
             }
             else
             {
-                request.Headers.Add(Options.ApiKeyHeader, Options.ApiKey);
+                request.Headers.Add(effectiveApiKeyHeader, effectiveApiKey);
             }
         }
 

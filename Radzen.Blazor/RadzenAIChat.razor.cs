@@ -79,6 +79,54 @@ namespace Radzen.Blazor
         public string AssistantAvatarText { get; set; } = "AI";
 
         /// <summary>
+        /// Gets or sets the model name.
+        /// </summary>
+        [Parameter]
+        public string Model { get; set; }
+
+        /// <summary>
+        /// Gets or sets the system prompt.
+        /// </summary>
+        [Parameter]
+        public string SystemPrompt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the temperature.
+        /// </summary>
+        [Parameter]
+        public double? Temperature { get; set; }
+
+        /// <summary>
+        /// Gets or sets the max tokens.
+        /// </summary>
+        [Parameter]
+        public int? MaxTokens { get; set; }
+
+        /// <summary>
+        /// Gets or sets the endpoint URL for the AI service.
+        /// </summary>
+        [Parameter]
+        public string Endpoint { get; set; }
+
+        /// <summary>
+        /// Gets or sets the proxy URL for the AI service.
+        /// </summary>
+        [Parameter]
+        public string Proxy { get; set; }
+
+        /// <summary>
+        /// Gets or sets the API key for authentication.
+        /// </summary>
+        [Parameter]
+        public string ApiKey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the API key header name.
+        /// </summary>
+        [Parameter]
+        public string ApiKeyHeader { get; set; }
+
+        /// <summary>
         /// Gets or sets whether to show the clear chat button.
         /// </summary>
         [Parameter]
@@ -214,7 +262,7 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
 
             // Get AI response
-            await GetAIResponse(content);
+            await GetAIResponse(content, Model, SystemPrompt, Temperature, MaxTokens, Endpoint, Proxy, ApiKey, ApiKeyHeader);
         }
 
         /// <summary>
@@ -225,7 +273,11 @@ namespace Radzen.Blazor
         /// <param name="systemPrompt">Optional system prompt to override the configured system prompt.</param>
         /// <param name="temperature">Optional temperature to override the configured temperature.</param>
         /// <param name="maxTokens">Optional maximum tokens to override the configured max tokens.</param>
-        public async Task SendMessage(string content, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null)
+        /// <param name="endpoint">Optional endpoint URL to override the configured endpoint.</param>
+        /// <param name="proxy">Optional proxy URL to override the configured proxy.</param>
+        /// <param name="apiKey">Optional API key to override the configured API key.</param>
+        /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
+        public async Task SendMessage(string content, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null, string endpoint = null, string proxy = null, string apiKey = null, string apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
                 return;
@@ -240,7 +292,7 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
 
             // Get AI response with custom parameters
-            await GetAIResponse(content, model, systemPrompt, temperature, maxTokens);
+            await GetAIResponse(content, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader);
         }
 
         /// <summary>
@@ -288,7 +340,7 @@ namespace Radzen.Blazor
             try
             {
                 var response = "";
-                await foreach (var token in ChatService.GetCompletionsAsync(userInput, currentSessionId, cts.Token))
+                await foreach (var token in ChatService.GetCompletionsAsync(userInput, currentSessionId, cts.Token, Model, SystemPrompt, Temperature, MaxTokens, Endpoint, Proxy, ApiKey, ApiKeyHeader))
                 {
                     response += token;
                     assistantMessage.Content = response;
@@ -312,7 +364,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private async Task GetAIResponse(string userInput, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null)
+        private async Task GetAIResponse(string userInput, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null, string endpoint = null, string proxy = null, string apiKey = null, string apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(userInput))
                 return;
@@ -335,7 +387,7 @@ namespace Radzen.Blazor
             try
             {
                 var response = "";
-                await foreach (var token in ChatService.GetCompletionsAsync(userInput, currentSessionId, cts.Token, model, systemPrompt, temperature, maxTokens))
+                await foreach (var token in ChatService.GetCompletionsAsync(userInput, currentSessionId, cts.Token, model, systemPrompt, temperature, maxTokens, endpoint, proxy, apiKey, apiKeyHeader))
                 {
                     response += token;
                     assistantMessage.Content = response;
