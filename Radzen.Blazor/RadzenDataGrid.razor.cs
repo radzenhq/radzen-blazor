@@ -46,7 +46,11 @@ namespace Radzen.Blazor
                     return true;
                 }
 
-                return editContexts.All(c => !c.Value.GetValidationMessages().Any());
+                return editContexts.All(c => 
+                { 
+                    c.Value.Validate();
+                    return !c.Value.GetValidationMessages().Any(); 
+                });
             }
         }
 

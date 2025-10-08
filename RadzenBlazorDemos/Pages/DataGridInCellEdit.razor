@@ -131,6 +131,8 @@ ColumnWidth="200px" CellClick="@OnCellClick">
         employees = dbContext.Employees;
 
         orders = dbContext.Orders.Include("Customer").Include("Employee");
+
+        orders.First().ShipName = null;
     }
 
     /// <summary>
