@@ -3,7 +3,7 @@
 Radzen Blazor Components
 ========================
 
-A set of **90+ free and open source** native Blazor UI controls.
+The most sophisticated free UI component library for Blazor, featuring **100+ native components**.
 
 See Online Demos or Read the Docs
 
