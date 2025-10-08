@@ -1093,6 +1093,12 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {
+            if (parameters.DidParameterChange(nameof(InitialViewDate), InitialViewDate) &&
+                (DateTimeValue == default(DateTime) || DateTimeValue == null))
+            {
+                _currentDate = default(DateTime);
+            }
+
             if (parameters.DidParameterChange(nameof(Min), Min) || parameters.DidParameterChange(nameof(Max), Max))
             {
                 var min = parameters.GetValueOrDefault<DateTime?>(nameof(Min));
