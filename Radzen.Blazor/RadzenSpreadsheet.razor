@@ -37,9 +37,16 @@
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="Insert">
                     <RadzenStack Orientation="Orientation.Horizontal">
-                        <DeleteRow Sheet=@Sheet />
-                        <InsertRowAfter Sheet=@Sheet />
-                        <InsertRowBefore Sheet=@Sheet />
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <DeleteRow Sheet=@Sheet />
+                            <InsertRowAfter Sheet=@Sheet />
+                            <InsertRowBefore Sheet=@Sheet />
+                        </RadzenStack>
+                        <RadzenStack Orientation="Orientation.Horizontal">
+                            <DeleteColumn Sheet=@Sheet />
+                            <InsertColumnAfter Sheet=@Sheet />
+                            <InsertColumnBefore Sheet=@Sheet />
+                        </RadzenStack>
                     </RadzenStack>
                 </RadzenTabsItem>
                 <RadzenTabsItem Text="View">
