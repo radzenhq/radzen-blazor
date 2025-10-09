@@ -5,7 +5,7 @@ namespace Radzen.Blazor.Spreadsheet.Tests;
 public class RowColumnCommandTests
 {
     [Fact]
-    public void DeleteRowCommand_ExecuteAndUndo_RestoresState()
+    public void DeleteRowsCommand_SingleRow_ExecuteAndUndo_RestoresState()
     {
         var sheet = new Sheet(4, 3);
         sheet.Cells[0, 0].Value = "R1";
@@ -13,7 +13,7 @@ public class RowColumnCommandTests
         sheet.Cells[2, 0].Value = "R3";
         sheet.Cells[3, 0].Value = "R4";
 
-        var cmd = new DeleteRowCommand(sheet, 1);
+        var cmd = new DeleteRowsCommand(sheet, 1, 1);
         Assert.True(sheet.Commands.Execute(cmd));
 
         Assert.Equal(3, sheet.RowCount);
@@ -28,6 +28,35 @@ public class RowColumnCommandTests
         Assert.Equal("R2", sheet.Cells[1, 0].Value);
         Assert.Equal("R3", sheet.Cells[2, 0].Value);
         Assert.Equal("R4", sheet.Cells[3, 0].Value);
+    }
+
+    [Fact]
+    public void DeleteRowsCommand_ExecuteAndUndo_RestoresState()
+    {
+        var sheet = new Sheet(6, 3);
+        sheet.Cells[0, 0].Value = "R1";
+        sheet.Cells[1, 0].Value = "R2";
+        sheet.Cells[2, 0].Value = "R3";
+        sheet.Cells[3, 0].Value = "R4";
+        sheet.Cells[4, 0].Value = "R5";
+        sheet.Cells[5, 0].Value = "R6";
+
+        var cmd = new DeleteRowsCommand(sheet, 1, 3); // delete rows 2..4
+        Assert.True(sheet.Commands.Execute(cmd));
+
+        Assert.Equal(3, sheet.RowCount);
+        Assert.Equal("R1", sheet.Cells[0, 0].Value);
+        Assert.Equal("R5", sheet.Cells[1, 0].Value);
+        Assert.Equal("R6", sheet.Cells[2, 0].Value);
+
+        sheet.Commands.Undo();
+        Assert.Equal(6, sheet.RowCount);
+        Assert.Equal("R1", sheet.Cells[0, 0].Value);
+        Assert.Equal("R2", sheet.Cells[1, 0].Value);
+        Assert.Equal("R3", sheet.Cells[2, 0].Value);
+        Assert.Equal("R4", sheet.Cells[3, 0].Value);
+        Assert.Equal("R5", sheet.Cells[4, 0].Value);
+        Assert.Equal("R6", sheet.Cells[5, 0].Value);
     }
 
     [Fact]
@@ -78,7 +107,7 @@ public class RowColumnCommandTests
     }
 
     [Fact]
-    public void DeleteColumnCommand_ExecuteAndUndo_RestoresState()
+    public void DeleteColumnsCommand_SingleColumn_ExecuteAndUndo_RestoresState()
     {
         var sheet = new Sheet(3, 4);
         sheet.Cells[0, 0].Value = "A";
@@ -86,7 +115,7 @@ public class RowColumnCommandTests
         sheet.Cells[0, 2].Value = "C";
         sheet.Cells[0, 3].Value = "D";
 
-        var cmd = new DeleteColumnCommand(sheet, 1);
+        var cmd = new DeleteColumnsCommand(sheet, 1, 1);
         Assert.True(sheet.Commands.Execute(cmd));
 
         Assert.Equal(3, sheet.ColumnCount);
@@ -101,6 +130,36 @@ public class RowColumnCommandTests
         Assert.Equal("B", sheet.Cells[0, 1].Value);
         Assert.Equal("C", sheet.Cells[0, 2].Value);
         Assert.Equal("D", sheet.Cells[0, 3].Value);
+    }
+
+    [Fact]
+    public void DeleteColumnsCommand_ExecuteAndUndo_RestoresState()
+    {
+        var sheet = new Sheet(3, 6);
+        sheet.Cells[0, 0].Value = "A";
+        sheet.Cells[0, 1].Value = "B";
+        sheet.Cells[0, 2].Value = "C";
+        sheet.Cells[0, 3].Value = "D";
+        sheet.Cells[0, 4].Value = "E";
+        sheet.Cells[0, 5].Value = "F";
+
+        var cmd = new DeleteColumnsCommand(sheet, 1, 3); // delete B..D
+        Assert.True(sheet.Commands.Execute(cmd));
+
+        Assert.Equal(3, sheet.ColumnCount);
+        Assert.Equal("A", sheet.Cells[0, 0].Value);
+        Assert.Equal("E", sheet.Cells[0, 1].Value);
+        Assert.Equal("F", sheet.Cells[0, 2].Value);
+
+        sheet.Commands.Undo();
+
+        Assert.Equal(6, sheet.ColumnCount);
+        Assert.Equal("A", sheet.Cells[0, 0].Value);
+        Assert.Equal("B", sheet.Cells[0, 1].Value);
+        Assert.Equal("C", sheet.Cells[0, 2].Value);
+        Assert.Equal("D", sheet.Cells[0, 3].Value);
+        Assert.Equal("E", sheet.Cells[0, 4].Value);
+        Assert.Equal("F", sheet.Cells[0, 5].Value);
     }
 
     [Fact]
