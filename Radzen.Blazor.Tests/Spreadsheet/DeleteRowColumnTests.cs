@@ -75,6 +75,7 @@ public class DeleteRowColumnTests
         Assert.Equal(CellError.Ref, sheet.Cells[0, 1].Value);
         Assert.Equal("=#REF!+A3", sheet.Cells[0, 1].Formula);
     }
+
 }
 
 
