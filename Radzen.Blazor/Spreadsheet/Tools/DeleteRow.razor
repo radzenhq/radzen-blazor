@@ -1,0 +1,22 @@
+@using Radzen.Blazor.Spreadsheet
+<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnDeleteRowClick Icon="delete" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet == null || Sheet.Selection.Cell == CellRef.Invalid;
+
+    private void OnDeleteRowClick()
+    {
+        if (Sheet == null)
+        {
+            return;
+        }
+
+        var selectedRow = Sheet.Selection.Cell.Row;
+        var command = new DeleteRowCommand(Sheet, selectedRow);
+        Sheet.Commands.Execute(command);
+    }
+}
