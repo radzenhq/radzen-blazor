@@ -1,0 +1,22 @@
+@using Radzen
+@using Radzen.Blazor.Spreadsheet
+<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnInsertColumnBeforeClick Icon="add_column_left" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet == null || Sheet.Selection.Cell == CellRef.Invalid;
+
+    private void OnInsertColumnBeforeClick()
+    {
+        if (Sheet == null)
+        {
+            return;
+        }
+        Sheet.Commands.Execute(new InsertColumnBeforeCommand(Sheet, Sheet.Selection.Cell.Column));
+    }
+}
+
+
