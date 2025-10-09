@@ -48,6 +48,7 @@ internal enum FormulaTokenType
     NumericLiteral,
     StringLiteral,
     CellIdentifier,
+    ErrorLiteral,
     Whitespace,
 }
 
@@ -79,6 +80,7 @@ internal class FormulaToken(FormulaTokenType type, string  value)
     public long LongValue { get; set; }
     public ulong UlongValue { get; set; }
     public CellRef AddressValue { get; set; }
+    public CellError ErrorValue { get; set; }
 
     // Absolute reference flags parsed for CellIdentifier tokens
     public bool IsRowAbsolute { get; set; }
@@ -253,6 +255,8 @@ internal class FormulaLexer(string expression, bool strict = true)
         {
             case '"':
                 return ScanStringLiteral();
+            case '#':
+                return ScanErrorLiteral();
             case '=':
 
                 if (TryAdvance('>'))
@@ -441,6 +445,23 @@ internal class FormulaLexer(string expression, bool strict = true)
         }
 
         return (char)value;
+    }
+
+    private FormulaToken ScanErrorLiteral()
+    {
+        // Support only #REF! for now
+        const string RefLiteral = "#REF!";
+        if (expression.AsSpan(position).StartsWith(RefLiteral, StringComparison.Ordinal))
+        {
+            position += RefLiteral.Length;
+            return new FormulaToken(FormulaTokenType.ErrorLiteral, RefLiteral)
+            {
+                ErrorValue = CellError.Ref
+            };
+        }
+
+        // Unknown error literal
+        return new FormulaToken(FormulaTokenType.None, string.Empty);
     }
 
     private FormulaToken ScanNumericLiteral()
