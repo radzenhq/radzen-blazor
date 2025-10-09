@@ -1,0 +1,21 @@
+@using Radzen
+@using Radzen.Blazor.Spreadsheet
+<RadzenButton ButtonStyle="ButtonStyle.Base" Click=@OnInsertRowAfterClick Icon="add_row_below" ButtonType="ButtonType.Button" Disabled=@IsDisabled />
+@code {
+#nullable enable
+
+    [Parameter]
+    public Sheet? Sheet { get; set; }
+
+    private bool IsDisabled => Sheet == null || Sheet.Selection.Cell == CellRef.Invalid;
+
+    private void OnInsertRowAfterClick()
+    {
+        if (Sheet == null)
+        {
+            return;
+        }
+
+        Sheet.Commands.Execute(new InsertRowAfterCommand(Sheet, Sheet.Selection.Cell.Row));
+    }
+}
