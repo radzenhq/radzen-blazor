@@ -16,6 +16,6 @@
             return;
         }
 
-        Sheet.Commands.Execute(new InsertRowBeforeCommand(Sheet, Sheet.Selection.Cell.Row));
+        Sheet.Commands.Execute(new InsertRowBeforeCommand(Sheet, Sheet.Selection.Range.Start.Row));
     }
 }
