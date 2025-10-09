@@ -23,11 +23,19 @@ public partial class Sheet
     /// <summary>
     /// Gets the number of rows in the sheet.
     /// </summary>
-    public int RowCount { get; private set; }
+    public int RowCount
+    {
+        get => Rows.Count;
+        private set => Rows.Count = value;
+    }
     /// <summary>
     /// Gets the number of columns in the sheet.
     /// </summary>
-    public int ColumnCount { get; private set; }
+    public int ColumnCount
+    {
+        get => Columns.Count;
+        private set => Columns.Count = value;
+    }
     /// <summary>
     /// Gets the collection of cells in the sheet.
     /// </summary>
@@ -71,7 +79,7 @@ public partial class Sheet
     /// </summary>
     public IReadOnlyList<Table> Tables => tables;
 
-    private readonly HashSet<int> filteredColumns = new();
+    private readonly HashSet<int> filteredColumns = [];
 
     /// <summary>
     /// Gets the set of columns that have filters applied.
@@ -119,8 +127,6 @@ public partial class Sheet
         Columns = new(100, columns);
         Rows.Offset = 24;
         Columns.Offset = 100;
-        RowCount = rows;
-        ColumnCount = columns;
         Selection = new(this);
         Editor = new(this);
         MergedCells = new(this);
@@ -420,6 +426,85 @@ public partial class Sheet
         }
     }
 
+    /// <summary>
+    /// Inserts one or more rows at the specified index and shifts existing cells down. Updates formulas and increases row count.
+    /// </summary>
+    public void InsertRow(int rowIndex, int count = 1)
+    {
+        if (rowIndex < 0 || rowIndex > RowCount) throw new ArgumentOutOfRangeException(nameof(rowIndex));
+        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
+
+        BeginUpdate();
+
+        var oldRowCount = RowCount;
+        RowCount += count;
+
+        for (var col = 0; col < ColumnCount; col++)
+        {
+            for (var row = oldRowCount - 1; row >= rowIndex; row--)
+            {
+                var target = Cells[row + count, col];
+                var source = Cells[row, col];
+                target.CopyFrom(source);
+            }
+
+            for (var r = 0; r < count; r++)
+            {
+                var inserted = Cells[rowIndex + r, col];
+                inserted.Formula = null;
+                inserted.Data = new CellData(null);
+            }
+        }
+
+        AdjustFormulas((cellToken) =>
+        {
+            var a = cellToken.AddressValue;
+            var newRow = a.Row >= rowIndex ? a.Row + count : a.Row;
+            return new CellRef(newRow, a.Column);
+        });
+
+        EndUpdate();
+    }
+
+    /// <summary>
+    /// Inserts one or more columns at the specified index and shifts existing cells right. Updates formulas and increases column count.
+    /// </summary>
+    public void InsertColumn(int columnIndex, int count = 1)
+    {
+        if (columnIndex < 0 || columnIndex > ColumnCount) throw new ArgumentOutOfRangeException(nameof(columnIndex));
+        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
+
+        BeginUpdate();
+
+        var oldColumnCount = ColumnCount;
+        ColumnCount += count;
+
+        for (var row = 0; row < RowCount; row++)
+        {
+            for (var col = oldColumnCount - 1; col >= columnIndex; col--)
+            {
+                var target = Cells[row, col + count];
+                var source = Cells[row, col];
+                target.CopyFrom(source);
+            }
+
+            for (var c = 0; c < count; c++)
+            {
+                var inserted = Cells[row, columnIndex + c];
+                inserted.Formula = null;
+                inserted.Data = new CellData(null);
+            }
+        }
+
+        AdjustFormulas((cellToken) =>
+        {
+            var a = cellToken.AddressValue;
+            var newCol = a.Column >= columnIndex ? a.Column + count : a.Column;
+            return new CellRef(a.Row, newCol);
+        });
+
+        EndUpdate();
+    }
     class FormulaRewriter : FormulaSyntaxNodeVisitorBase
     {
         private readonly Func<FormulaToken, CellRef> adjust;
