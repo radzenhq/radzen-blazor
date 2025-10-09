@@ -334,6 +334,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     }
 
     private readonly Dictionary<string, Func<KeyboardEventArgs, Task>> shortcuts = [];
+    private readonly SpreadsheetClipboard clipboard = new();
 
     /// <inheritdoc/>
     protected override void OnInitialized()
@@ -354,6 +355,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         shortcuts.Add("Shift+ArrowRight", _ => ExtendSelectionAsync(0, 1));
         shortcuts.Add("Ctrl+C", _ => CopySelectionAsync());
         shortcuts.Add("Ctrl+Z", _ => UndoAsync());
+        shortcuts.Add("Ctrl+X", _ => CutSelectionAsync());
         shortcuts.Add("Ctrl+Shift+Z", _ => RedoAsync());
     }
 
@@ -378,6 +380,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             var text = Sheet.GetDelimitedString(Sheet.Selection.Range);
 
             await jsRef.InvokeVoidAsync("copyToClipboard", text);
+            clipboard.Copy(Sheet);
+        }
+    }
+
+    private async Task CutSelectionAsync()
+    {
+        if (Sheet is not null && jsRef is not null)
+        {
+            var text = Sheet.GetDelimitedString(Sheet.Selection.Range);
+            await jsRef.InvokeVoidAsync("copyToClipboard", text);
+            clipboard.Cut(Sheet);
         }
     }
 
@@ -394,7 +407,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public Task OnPasteAsync(string text)
     {
-        Sheet?.InsertDelimitedString(Sheet.Selection.Cell, text);
+        if (Sheet is not null)
+        {
+            clipboard.Paste(Sheet, Sheet.Selection.Cell, text);
+        }
 
         return Task.CompletedTask;
     }
