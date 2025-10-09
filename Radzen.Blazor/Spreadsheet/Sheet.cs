@@ -284,6 +284,274 @@ public partial class Sheet
         }
     }
 
+    /// <summary>
+    /// Deletes the specified column and shifts cells left. Updates formulas and decreases column count.
+    /// </summary>
+    /// <param name="columnIndex"></param>
+    public void DeleteColumn(int columnIndex)
+    {
+        if (columnIndex < 0 || columnIndex >= ColumnCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(columnIndex));
+        }
+
+        BeginUpdate();
+
+        // Shift cell contents left for all rows starting at deleted column
+        for (var row = 0; row < RowCount; row++)
+        {
+            for (var col = columnIndex; col < ColumnCount - 1; col++)
+            {
+                var target = Cells[row, col];
+                var source = Cells[row, col + 1];
+                target.CopyFrom(source);
+            }
+
+            // Clear last column (now out of logical bounds)
+            var last = Cells[row, ColumnCount - 1];
+            last.Formula = null;
+            last.Data = new CellData(null);
+        }
+
+        // Decrease column count
+        ColumnCount--;
+
+        // Adjust formulas to reflect the deletion
+        AdjustFormulas((cellToken) =>
+        {
+            var address = cellToken.AddressValue;
+            var newColumn = address.Column;
+
+            if (newColumn > columnIndex)
+            {
+                newColumn -= 1;
+            }
+            // Keep the same index if it equals the deleted column (shifting semantics)
+
+            // Clamp to new bounds
+            if (newColumn >= ColumnCount)
+            {
+                newColumn = ColumnCount - 1;
+            }
+
+            return new CellRef(address.Row, Math.Max(0, newColumn));
+        });
+
+        EndUpdate();
+    }
+
+    /// <summary>
+    /// Deletes the specified row and shifts cells up. Updates formulas and decreases row count.
+    /// </summary>
+    /// <param name="rowIndex"></param>
+    public void DeleteRow(int rowIndex)
+    {
+        if (rowIndex < 0 || rowIndex >= RowCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(rowIndex));
+        }
+
+        BeginUpdate();
+
+        // Shift cell contents up for all columns starting at deleted row
+        for (var col = 0; col < ColumnCount; col++)
+        {
+            for (var row = rowIndex; row < RowCount - 1; row++)
+            {
+                var target = Cells[row, col];
+                var source = Cells[row + 1, col];
+                target.CopyFrom(source);
+            }
+
+            // Clear last row (now out of logical bounds)
+            var last = Cells[RowCount - 1, col];
+            last.Formula = null;
+            last.Data = new CellData(null);
+        }
+
+        // Decrease row count
+        RowCount--;
+
+        // Adjust formulas to reflect the deletion
+        AdjustFormulas((cellToken) =>
+        {
+            var address = cellToken.AddressValue;
+            var newRow = address.Row;
+
+            if (newRow > rowIndex)
+            {
+                newRow -= 1;
+            }
+            // Keep the same index if it equals the deleted row (shifting semantics)
+
+            // Clamp to new bounds
+            if (newRow >= RowCount)
+            {
+                newRow = RowCount - 1;
+            }
+
+            return new CellRef(Math.Max(0, newRow), address.Column);
+        });
+
+        EndUpdate();
+    }
+
+    private void AdjustFormulas(Func<FormulaToken, CellRef> adjust)
+    {
+        // Iterate through all cells to update their formulas
+        for (var row = 0; row < RowCount; row++)
+        {
+            for (var col = 0; col < ColumnCount; col++)
+            {
+                var cell = Cells[row, col];
+
+                if (cell.FormulaSyntaxTree == null || string.IsNullOrEmpty(cell.Formula))
+                {
+                    continue;
+                }
+
+                var newFormula = FormulaRewriter.Rewrite(cell.Formula!, cell.FormulaSyntaxTree!, adjust);
+
+                if (!string.Equals(newFormula, cell.Formula, StringComparison.Ordinal))
+                {
+                    cell.Formula = newFormula;
+                }
+            }
+        }
+    }
+
+    class FormulaRewriter : FormulaSyntaxNodeVisitorBase
+    {
+        private readonly Func<FormulaToken, CellRef> adjust;
+        private readonly StringBuilder builder = new();
+
+        private FormulaRewriter(Func<FormulaToken, CellRef> adjust)
+        {
+            this.adjust = adjust;
+        }
+
+        public static string Rewrite(string original, FormulaSyntaxTree tree, Func<FormulaToken, CellRef> adjust)
+        {
+            var rewriter = new FormulaRewriter(adjust);
+            // Always start with '=' for formulas
+            rewriter.builder.Append('=');
+            tree.Root.Accept(rewriter);
+            return rewriter.builder.ToString();
+        }
+
+        public override void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode)
+        {
+            builder.Append(numberLiteralSyntaxNode.Token.Value);
+        }
+
+        public override void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode)
+        {
+            builder.Append('"');
+            builder.Append(stringLiteralSyntaxNode.Token.Value);
+            builder.Append('"');
+        }
+
+        public override void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
+        {
+            binaryExpressionSyntaxNode.Left.Accept(this);
+            builder.Append(TokenToOperator(binaryExpressionSyntaxNode.Token));
+            binaryExpressionSyntaxNode.Right.Accept(this);
+        }
+
+        public override void VisitCell(CellSyntaxNode cellSyntaxNode)
+        {
+            var token = cellSyntaxNode.Token;
+            var adjusted = adjust(token);
+
+            if (token.IsColumnAbsolute)
+            {
+                builder.Append('$');
+            }
+            builder.Append(ColumnRef.ToString(adjusted.Column));
+            if (token.IsRowAbsolute)
+            {
+                builder.Append('$');
+            }
+            builder.Append(adjusted.Row + 1);
+        }
+
+        public override void VisitFunction(FunctionSyntaxNode functionSyntaxNode)
+        {
+            builder.Append(functionSyntaxNode.Name);
+            builder.Append('(');
+            for (int i = 0; i < functionSyntaxNode.Arguments.Count; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(',');
+                }
+                functionSyntaxNode.Arguments[i].Accept(this);
+            }
+            builder.Append(')');
+        }
+
+        public override void VisitRange(RangeSyntaxNode rangeSyntaxNode)
+        {
+            // Adjust both sides using the provided delegate
+            var startToken = rangeSyntaxNode.Start.Token;
+            var endToken = rangeSyntaxNode.End.Token;
+
+            var startAdjusted = adjust(startToken);
+            var endAdjusted = adjust(endToken);
+
+            // Ensure start <= end after adjustments
+            var startCell = startAdjusted;
+            var endCell = endAdjusted;
+
+            if (startCell.Row > endCell.Row || (startCell.Row == endCell.Row && startCell.Column > endCell.Column))
+            {
+                (startCell, endCell) = CellRef.Swap(startCell, endCell);
+            }
+
+            if (startToken.IsColumnAbsolute)
+            {
+                builder.Append('$');
+            }
+            builder.Append(ColumnRef.ToString(startCell.Column));
+            if (startToken.IsRowAbsolute)
+            {
+                builder.Append('$');
+            }
+            builder.Append(startCell.Row + 1);
+
+            builder.Append(':');
+
+            if (endToken.IsColumnAbsolute)
+            {
+                builder.Append('$');
+            }
+            builder.Append(ColumnRef.ToString(endCell.Column));
+            if (endToken.IsRowAbsolute)
+            {
+                builder.Append('$');
+            }
+            builder.Append(endCell.Row + 1);
+        }
+
+        private static string TokenToOperator(FormulaToken token)
+        {
+            return token.Type switch
+            {
+                FormulaTokenType.Plus => "+",
+                FormulaTokenType.Minus => "-",
+                FormulaTokenType.Star => "*",
+                FormulaTokenType.Slash => "/",
+                FormulaTokenType.Equals => "=",
+                FormulaTokenType.GreaterThan => ">",
+                FormulaTokenType.GreaterThanOrEqual => ">=",
+                FormulaTokenType.LessThan => "<",
+                FormulaTokenType.LessThanOrEqual => "<=",
+                FormulaTokenType.EqualsGreaterThan => ">=",
+                _ => throw new InvalidOperationException($"Unsupported operator token: {token.Type}")
+            };
+        }
+    }
+
     internal IEnumerable<RangeInfo> GetRanges(RangeRef range)
     {
         if (range == RangeRef.Invalid)
