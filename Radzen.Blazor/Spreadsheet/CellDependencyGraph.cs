@@ -104,6 +104,10 @@ class DependencyVisitor(Sheet sheet) : IFormulaSyntaxNodeVisitor
     {
     }
 
+    public void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
+    {
+    }
+
     public void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
     {
         binaryExpressionSyntaxNode.Left.Accept(this);
