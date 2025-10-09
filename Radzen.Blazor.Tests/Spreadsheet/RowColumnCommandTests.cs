@@ -107,6 +107,94 @@ public class RowColumnCommandTests
     }
 
     [Fact]
+    public void InsertRowAfterCommand_WithMultiSelection_InsertsAfterLastRow()
+    {
+        var sheet = new Sheet(6, 2);
+        // Mark rows with their index in A
+        for (int r = 0; r < 6; r++) sheet.Cells[r, 0].Value = r + 1;
+
+        // Simulate selection rows 1..3 (0-based), last is 3 -> insert after 3 at index 4
+        var cmd = new InsertRowAfterCommand(sheet, 3);
+        Assert.True(sheet.Commands.Execute(cmd));
+
+        Assert.Equal(7, sheet.RowCount);
+        // Inserted row at index 4 is empty
+        Assert.Null(sheet.Cells[4, 0].Value);
+        // Row 5 takes previous row 4 value (5)
+        Assert.Equal(5d, sheet.Cells[5, 0].Value);
+        // Row 6 takes previous row 5 value (6)
+        Assert.Equal(6d, sheet.Cells[6, 0].Value);
+
+        sheet.Commands.Undo();
+        Assert.Equal(6, sheet.RowCount);
+        Assert.Equal(5d, sheet.Cells[4, 0].Value);
+    }
+
+    [Fact]
+    public void InsertRowBeforeCommand_WithMultiSelection_InsertsBeforeFirstRow()
+    {
+        var sheet = new Sheet(6, 2);
+        for (int r = 0; r < 6; r++) sheet.Cells[r, 0].Value = r + 1;
+
+        // Simulate selection rows 2..4 (first is 2) -> insert at index 2
+        var cmd = new InsertRowBeforeCommand(sheet, 2);
+        Assert.True(sheet.Commands.Execute(cmd));
+
+        Assert.Equal(7, sheet.RowCount);
+        // Inserted row at index 2 is empty
+        Assert.Null(sheet.Cells[2, 0].Value);
+        // Row 3 takes previous row 2 value (3)
+        Assert.Equal(3d, sheet.Cells[3, 0].Value);
+
+        sheet.Commands.Undo();
+        Assert.Equal(6, sheet.RowCount);
+        Assert.Equal(3d, sheet.Cells[2, 0].Value);
+    }
+
+    [Fact]
+    public void InsertColumnAfterCommand_WithMultiSelection_InsertsAfterLastColumn()
+    {
+        var sheet = new Sheet(2, 6);
+        // Mark columns with their index in row 1
+        for (int c = 0; c < 6; c++) sheet.Cells[0, c].Value = c + 1;
+
+        // Simulate selection columns 1..3 (last is 3) -> insert after col 3 at index 4
+        var cmd = new InsertColumnAfterCommand(sheet, 3);
+        Assert.True(sheet.Commands.Execute(cmd));
+
+        Assert.Equal(7, sheet.ColumnCount);
+        // Inserted column at index 4 is empty
+        Assert.Null(sheet.Cells[0, 4].Value);
+        // Column 5 takes previous column 4 value (5)
+        Assert.Equal(5d, sheet.Cells[0, 5].Value);
+
+        sheet.Commands.Undo();
+        Assert.Equal(6, sheet.ColumnCount);
+        Assert.Equal(5d, sheet.Cells[0, 4].Value);
+    }
+
+    [Fact]
+    public void InsertColumnBeforeCommand_WithMultiSelection_InsertsBeforeFirstColumn()
+    {
+        var sheet = new Sheet(2, 6);
+        for (int c = 0; c < 6; c++) sheet.Cells[0, c].Value = c + 1;
+
+        // Simulate selection columns 2..4 (first is 2) -> insert at index 2
+        var cmd = new InsertColumnBeforeCommand(sheet, 2);
+        Assert.True(sheet.Commands.Execute(cmd));
+
+        Assert.Equal(7, sheet.ColumnCount);
+        // Inserted column at index 2 is empty
+        Assert.Null(sheet.Cells[0, 2].Value);
+        // Column 3 takes previous column 2 value (3)
+        Assert.Equal(3d, sheet.Cells[0, 3].Value);
+
+        sheet.Commands.Undo();
+        Assert.Equal(6, sheet.ColumnCount);
+        Assert.Equal(3d, sheet.Cells[0, 2].Value);
+    }
+
+    [Fact]
     public void DeleteColumnsCommand_SingleColumn_ExecuteAndUndo_RestoresState()
     {
         var sheet = new Sheet(3, 4);
