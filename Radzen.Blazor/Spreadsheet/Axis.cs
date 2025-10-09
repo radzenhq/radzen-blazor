@@ -150,9 +150,28 @@ public class Axis(double size, int count)
     public double Size => size;
 
     /// <summary>
-    /// The total size of the axis when.
+    /// The total number of items along this axis.
     /// </summary>
-    public int Count { get; } = count;
+    private int count = count;
+
+    /// <summary>
+    /// Gets or sets the total number of items along this axis.
+    /// Setting this property triggers a change event.
+    /// </summary>
+    public int Count
+    {
+        get => count;
+        set
+        {
+            if (value < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "Count cannot be negative.");
+            }
+
+            count = value;
+            TriggerChange();
+        }
+    }
 
     /// <summary>
     /// Fires when an axis property changes, such as when a row or column is hidden or shown, or when the size of a row or column changes.
