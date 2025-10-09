@@ -505,7 +505,13 @@ public partial class Sheet
             }
         }
 
-        // Do not adjust formulas on insert
+        // Adjust formulas: shift row indices at or after the insert point
+        AdjustFormulas((cellToken) =>
+        {
+            var a = cellToken.AddressValue;
+            var newRow = a.Row >= rowIndex ? a.Row + count : a.Row;
+            return new CellRef(newRow, a.Column);
+        });
 
         EndUpdate();
     }
@@ -540,7 +546,13 @@ public partial class Sheet
             }
         }
 
-        // Do not adjust formulas on insert
+        // Adjust formulas: shift column indices at or after the insert point
+        AdjustFormulas((cellToken) =>
+        {
+            var a = cellToken.AddressValue;
+            var newCol = a.Column >= columnIndex ? a.Column + count : a.Column;
+            return new CellRef(a.Row, newCol);
+        });
 
         EndUpdate();
     }
