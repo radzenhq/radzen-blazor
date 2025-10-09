@@ -15,8 +15,6 @@
             return;
         }
 
-        var selectedRow = Sheet.Selection.Cell.Row;
-        var command = new DeleteRowCommand(Sheet, selectedRow);
-        Sheet.Commands.Execute(command);
+        Sheet.Commands.Execute(new DeleteRowCommand(Sheet, Sheet.Selection.Cell.Row));
     }
 }
