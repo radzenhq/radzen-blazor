@@ -15,7 +15,7 @@
         {
             return;
         }
-        Sheet.Commands.Execute(new InsertColumnAfterCommand(Sheet, Sheet.Selection.Cell.Column));
+        Sheet.Commands.Execute(new InsertColumnAfterCommand(Sheet, Sheet.Selection.Range.End.Column));
     }
 }
 
