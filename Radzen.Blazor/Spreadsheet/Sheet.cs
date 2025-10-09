@@ -6,6 +6,12 @@ namespace Radzen.Blazor.Spreadsheet;
 
 #nullable enable
 
+enum FormulaAdjustment
+{
+    AdjustRelative,
+    Preserve
+}
+
 /// <summary>
 /// Represents a sheet in a spreadsheet.
 /// </summary>
@@ -399,6 +405,112 @@ public partial class Sheet
                     cell.Formula = newFormula;
                 }
             }
+        }
+    }
+
+
+    private static string AdjustFormulaForCopy(string formula, int rowDelta, int colDelta)
+    {
+        // Expect formula starts with '='; lexer scans tokens including '=' and cells
+        var tokens = FormulaLexer.Scan(formula, false);
+
+        for (int i = 0; i < tokens.Count; i++)
+        {
+            var t = tokens[i];
+            if (t.Type == FormulaTokenType.CellIdentifier)
+            {
+                var addr = t.AddressValue;
+                var newRow = t.IsRowAbsolute ? addr.Row : addr.Row + rowDelta;
+                var newCol = t.IsColumnAbsolute ? addr.Column : addr.Column + colDelta;
+
+                var sb = new StringBuilder();
+                if (formula.Length > 0 && formula[0] == '=')
+                {
+                    // no-op; we'll reconstruct by joining tokens
+                }
+
+                if (t.IsColumnAbsolute)
+                {
+                    sb.Append('$');
+                }
+                sb.Append(ColumnRef.ToString(newCol));
+                if (t.IsRowAbsolute)
+                {
+                    sb.Append('$');
+                }
+                sb.Append(newRow + 1);
+
+                t.Value = sb.ToString();
+                tokens[i] = t;
+            }
+        }
+
+        var result = new StringBuilder();
+        foreach (var t in tokens)
+        {
+            if (t.Type == FormulaTokenType.None)
+            {
+                break;
+            }
+            result.Append(t.Value);
+        }
+        return result.ToString();
+    }
+
+    internal void PasteRange(Sheet sourceSheet, RangeRef source, CellRef destinationStart, FormulaAdjustment adjustment)
+    {
+        if (source == RangeRef.Invalid)
+        {
+            return;
+        }
+
+        var rowDelta = destinationStart.Row - source.Start.Row;
+        var colDelta = destinationStart.Column - source.Start.Column;
+
+        BeginUpdate();
+
+        var cells  = new List<Cell>();
+
+        for (var sr = source.Start.Row; sr <= source.End.Row; sr++)
+        {
+            for (var sc = source.Start.Column; sc <= source.End.Column; sc++)
+            {
+                var dr = sr + rowDelta;
+                var dc = sc + colDelta;
+
+                if (!sourceSheet.Cells.TryGet(sr, sc, out var srcCell) || !Cells.TryGet(dr, dc, out var dstCell))
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(srcCell.Formula))
+                {
+                    var formula = srcCell.Formula!;
+
+                    if (adjustment == FormulaAdjustment.Preserve)
+                    {
+                        dstCell.Formula = formula;
+                    }
+                    else
+                    {
+                        var adjusted = AdjustFormulaForCopy(formula, rowDelta, colDelta);
+                        dstCell.Formula = adjusted;
+                    }
+                }
+                else
+                {
+                    dstCell.Value = srcCell.Value;
+                }
+
+                cells.Add(dstCell);
+            }
+        }
+
+        EndUpdate();
+
+        foreach (var cell in cells)
+        {
+            cell.OnChanged();
         }
     }
 
