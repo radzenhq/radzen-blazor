@@ -104,44 +104,89 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
     /// <returns>True if parsing was successful, otherwise false.</returns>
     public static bool TryParse(string index, out CellRef result)
     {
+        // Backwards compatible TryParse that accepts optional '$' but ignores absolute flags
+        return TryParse(index, out result, out _, out _);
+    }
+
+    /// <summary>
+    /// Attempts to parse a string in A1 notation (optionally with '$' absolute markers) into a CellRef instance.
+    /// Returns true if successful and outputs absolute flags for the column and row.
+    /// </summary>
+    /// <param name="index"></param>
+    /// <param name="result"></param>
+    /// <param name="isColumnAbsolute"></param>
+    /// <param name="isRowAbsolute"></param>
+    /// <returns></returns>
+    public static bool TryParse(string index, out CellRef result, out bool isColumnAbsolute, out bool isRowAbsolute)
+    {
         result = default;
+        isColumnAbsolute = false;
+        isRowAbsolute = false;
 
         if (string.IsNullOrEmpty(index))
         {
             return false;
         }
 
-        var column = 0;
-        var row = 0;
-        var hasLetters = false;
-        var hasNumbers = false;
+        var i = 0;
 
-        for (var i = 0; i < index.Length; i++)
+        // Optional $ before column
+        if (i < index.Length && index[i] == '$')
         {
-            var ch = index[i];
-
-            if (ch >= '1' && ch <= '9')
-            {
-                hasNumbers = true;
-
-                if (!int.TryParse(index[i..], out row))
-                {
-                    return false;
-                }
-
-                break;
-            }
-
-            if (!((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')))
-            {
-                return false;
-            }
-
-            hasLetters = true;
-            column = column * 26 + ch - 'A' + 1;
+            isColumnAbsolute = true;
+            i++;
         }
 
-        if (!hasLetters || !hasNumbers)
+        // Parse column letters
+        var column = 0;
+        var hasLetters = false;
+        while (i < index.Length)
+        {
+            var ch = index[i];
+            if ((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z'))
+            {
+                hasLetters = true;
+                var upper = ch >= 'a' && ch <= 'z' ? (char)(ch - 'a' + 'A') : ch;
+                column = column * 26 + (upper - 'A' + 1);
+                i++;
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        if (!hasLetters)
+        {
+            return false;
+        }
+
+        // Optional $ before row digits
+        if (i < index.Length && index[i] == '$')
+        {
+            isRowAbsolute = true;
+            i++;
+        }
+
+        // Parse row digits
+        var rowStart = i;
+        while (i < index.Length && index[i] >= '0' && index[i] <= '9')
+        {
+            i++;
+        }
+
+        if (rowStart == i)
+        {
+            return false;
+        }
+
+        if (!int.TryParse(index[rowStart..i], out var row))
+        {
+            return false;
+        }
+
+        // Must consume all characters
+        if (i != index.Length)
         {
             return false;
         }

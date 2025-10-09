@@ -80,6 +80,10 @@ internal class FormulaToken(FormulaTokenType type, string  value)
     public ulong UlongValue { get; set; }
     public CellRef AddressValue { get; set; }
 
+    // Absolute reference flags parsed for CellIdentifier tokens
+    public bool IsRowAbsolute { get; set; }
+    public bool IsColumnAbsolute { get; set; }
+
     public List<FormulaTokenTrivia> LeadingTrivia { get; } = new();
     public List<FormulaTokenTrivia> TrailingTrivia { get; } = new();
 
@@ -306,6 +310,9 @@ internal class FormulaLexer(string expression, bool strict = true)
                 return ScanNumericLiteral();
             case '_':
             case (>= 'a' and <= 'z') or (>= 'A' and <= 'Z'):
+                return ScanIdentifier();
+            case '$':
+                // Absolute reference marker is part of identifiers like $A$1
                 return ScanIdentifier();
 
         }
@@ -783,6 +790,10 @@ internal class FormulaLexer(string expression, bool strict = true)
                 case '_':
                     Advance(1);
                     continue;
+                case '$':
+                    // Absolute reference marker is part of identifiers
+                    Advance(1);
+                    continue;
 
                 default:
                     throw new InvalidOperationException($"Unexpected character '{Peek()}' at position {position}.");
@@ -792,11 +803,13 @@ internal class FormulaLexer(string expression, bool strict = true)
 
     private static FormulaToken CreateIdentifierToken(string value, bool hasLetters, bool hasNumbers)
     {
-        if (hasLetters && hasNumbers && CellRef.TryParse(value, out var cellIndex))
+        if (hasLetters && hasNumbers && CellRef.TryParse(value, out var cellIndex, out var colAbs, out var rowAbs))
         {
             return new FormulaToken(FormulaTokenType.CellIdentifier, value)
             {
-                AddressValue = cellIndex
+                AddressValue = cellIndex,
+                IsColumnAbsolute = colAbs,
+                IsRowAbsolute = rowAbs
             };
         }
 
