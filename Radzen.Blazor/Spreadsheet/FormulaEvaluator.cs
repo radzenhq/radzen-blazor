@@ -71,6 +71,11 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         }
     }
 
+    public void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
+    {
+        value = CellData.FromError(errorLiteralSyntaxNode.Token.ErrorValue);
+    }
+
     public void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
     {
         binaryExpressionSyntaxNode.Left.Accept(this);
@@ -188,6 +193,19 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
     public void VisitCell(CellSyntaxNode cellSyntaxNode)
     {
         var address = cellSyntaxNode.Token.AddressValue;
+        // If the row/column was deleted, set whole formula to =#REF!
+        if (sheet.IsDeletedRow(address.Row) || sheet.IsDeletedColumn(address.Column))
+        {
+            value = CellData.FromError(CellError.Ref);
+            return;
+        }
+
+        // If out of bounds, return #REF!
+        if ((address.Row < 0 || address.Row >= sheet.RowCount) || (address.Column < 0 || address.Column >= sheet.ColumnCount))
+        {
+            value = CellData.FromError(CellError.Ref);
+            return;
+        }
 
         if (!sheet.Cells.TryGet(address.Row, address.Column, out var cell))
         {
@@ -342,6 +360,16 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         {
             for (var column = start.Column; column <= end.Column; column++)
             {
+                if (sheet.IsDeletedRow(row) || sheet.IsDeletedColumn(column))
+                {
+                    value = CellData.FromError(CellError.Ref);
+                    return;
+                }
+                if (row < 0 || row >= sheet.RowCount || column < 0 || column >= sheet.ColumnCount)
+                {
+                    value = CellData.FromError(CellError.Ref);
+                    return;
+                }
                 if (!sheet.Cells.TryGet(row, column, out var cell))
                 {
                     value = CellData.FromError(CellError.Ref);
