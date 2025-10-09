@@ -8,6 +8,7 @@ internal interface IFormulaSyntaxNodeVisitor
 {
     void VisitNumberLiteral(NumberLiteralSyntaxNode numberLiteralSyntaxNode);
     void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode);
+    void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode);
     void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode);
     void VisitCell(CellSyntaxNode cellSyntaxNode);
     void VisitFunction(FunctionSyntaxNode functionSyntaxNode);
@@ -59,6 +60,11 @@ abstract class FormulaSyntaxNodeVisitorBase : IFormulaSyntaxNodeVisitor
     public virtual void VisitStringLiteral(StringLiteralSyntaxNode stringLiteralSyntaxNode)
     {
         Visit(stringLiteralSyntaxNode);
+    }
+
+    public virtual void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
+    {
+        Visit(errorLiteralSyntaxNode);
     }
 
     public virtual void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode)
@@ -168,6 +174,14 @@ internal class StringLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode(t
     public override void Accept(IFormulaSyntaxNodeVisitor visitor)
     {
         visitor.VisitStringLiteral(this);
+    }
+}
+
+internal class ErrorLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode(token)
+{
+    public override void Accept(IFormulaSyntaxNodeVisitor visitor)
+    {
+        visitor.VisitErrorLiteral(this);
     }
 }
 
@@ -369,6 +383,12 @@ internal class FormulaParser
         {
             Advance(1);
             return new StringLiteralSyntaxNode(token);
+        }
+
+        if (token.Type == FormulaTokenType.ErrorLiteral)
+        {
+            Advance(1);
+            return new ErrorLiteralSyntaxNode(token);
         }
 
         return ParseNumberLiteral();

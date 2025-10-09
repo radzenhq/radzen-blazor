@@ -12,6 +12,8 @@ namespace Radzen.Blazor.Spreadsheet;
 public partial class Sheet
 {
     private readonly CellDependencyGraph graph = new();
+    private readonly HashSet<int> invalidReferenceRows = [];
+    private readonly HashSet<int> invalidReferenceColumns = [];
 
     /// <summary>
     /// Gets a value indicating whether the sheet is currently being updated.
@@ -36,6 +38,10 @@ public partial class Sheet
         get => Columns.Count;
         private set => Columns.Count = value;
     }
+
+    internal bool IsDeletedRow(int rowIndex) => invalidReferenceRows.Contains(rowIndex);
+
+    internal bool IsDeletedColumn(int columnIndex) => invalidReferenceColumns.Contains(columnIndex);
     /// <summary>
     /// Gets the collection of cells in the sheet.
     /// </summary>
@@ -319,29 +325,14 @@ public partial class Sheet
             last.Data = new CellData(null);
         }
 
+        // Mark deleted column index as invalid for references
+        invalidReferenceColumns.Add(columnIndex);
+
+        // Any formulas that reference this column should be turned into =#REF!
+        InvalidateFormulasReferencingColumn(columnIndex);
+
         // Decrease column count
         ColumnCount--;
-
-        // Adjust formulas to reflect the deletion
-        AdjustFormulas((cellToken) =>
-        {
-            var address = cellToken.AddressValue;
-            var newColumn = address.Column;
-
-            if (newColumn > columnIndex)
-            {
-                newColumn -= 1;
-            }
-            // Keep the same index if it equals the deleted column (shifting semantics)
-
-            // Clamp to new bounds
-            if (newColumn >= ColumnCount)
-            {
-                newColumn = ColumnCount - 1;
-            }
-
-            return new CellRef(address.Row, Math.Max(0, newColumn));
-        });
 
         EndUpdate();
     }
@@ -375,29 +366,14 @@ public partial class Sheet
             last.Data = new CellData(null);
         }
 
+        // Mark deleted row index as invalid for references
+        invalidReferenceRows.Add(rowIndex);
+
+        // Any formulas that reference this row should be turned into =#REF!
+        InvalidateFormulasReferencingRow(rowIndex);
+
         // Decrease row count
         RowCount--;
-
-        // Adjust formulas to reflect the deletion
-        AdjustFormulas((cellToken) =>
-        {
-            var address = cellToken.AddressValue;
-            var newRow = address.Row;
-
-            if (newRow > rowIndex)
-            {
-                newRow -= 1;
-            }
-            // Keep the same index if it equals the deleted row (shifting semantics)
-
-            // Clamp to new bounds
-            if (newRow >= RowCount)
-            {
-                newRow = RowCount - 1;
-            }
-
-            return new CellRef(Math.Max(0, newRow), address.Column);
-        });
 
         EndUpdate();
     }
@@ -421,6 +397,79 @@ public partial class Sheet
                 if (!string.Equals(newFormula, cell.Formula, StringComparison.Ordinal))
                 {
                     cell.Formula = newFormula;
+                }
+            }
+        }
+    }
+
+    private void InvalidateFormulasReferencingRow(int rowIndex)
+    {
+        for (var row = 0; row < RowCount; row++)
+        {
+            for (var col = 0; col < ColumnCount; col++)
+            {
+                var cell = Cells[row, col];
+                var tree = cell.FormulaSyntaxTree;
+                if (tree == null) continue;
+
+                var hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.AddressValue.Row == rowIndex
+                    || node is RangeSyntaxNode r && r.Start.Token.AddressValue.Row <= rowIndex && r.End.Token.AddressValue.Row >= rowIndex).Count > 0;
+
+                if (hasRef)
+                {
+                    // Replace the referenced tokens with #REF! while preserving formula structure
+                    var tokens = FormulaLexer.Scan(cell.Formula!, false);
+                    for (int i = 0; i < tokens.Count; i++)
+                    {
+                        var t = tokens[i];
+                        if (t.Type == FormulaTokenType.CellIdentifier && t.AddressValue.Row == rowIndex)
+                        {
+                            tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
+                        }
+                    }
+                    var rebuilt = new StringBuilder();
+                    foreach (var t in tokens)
+                    {
+                        if (t.Type == FormulaTokenType.None) break;
+                        rebuilt.Append(t.Value);
+                    }
+                    cell.Formula = rebuilt.ToString();
+                }
+            }
+        }
+    }
+
+    private void InvalidateFormulasReferencingColumn(int columnIndex)
+    {
+        for (var row = 0; row < RowCount; row++)
+        {
+            for (var col = 0; col < ColumnCount; col++)
+            {
+                var cell = Cells[row, col];
+                var tree = cell.FormulaSyntaxTree;
+                if (tree == null) continue;
+
+                var hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.AddressValue.Column == columnIndex
+                    || node is RangeSyntaxNode r && r.Start.Token.AddressValue.Column <= columnIndex && r.End.Token.AddressValue.Column >= columnIndex).Count > 0;
+
+                if (hasRef)
+                {
+                    var tokens = FormulaLexer.Scan(cell.Formula!, false);
+                    for (int i = 0; i < tokens.Count; i++)
+                    {
+                        var t = tokens[i];
+                        if (t.Type == FormulaTokenType.CellIdentifier && t.AddressValue.Column == columnIndex)
+                        {
+                            tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
+                        }
+                    }
+                    var rebuilt = new StringBuilder();
+                    foreach (var t in tokens)
+                    {
+                        if (t.Type == FormulaTokenType.None) break;
+                        rebuilt.Append(t.Value);
+                    }
+                    cell.Formula = rebuilt.ToString();
                 }
             }
         }
@@ -456,12 +505,7 @@ public partial class Sheet
             }
         }
 
-        AdjustFormulas((cellToken) =>
-        {
-            var a = cellToken.AddressValue;
-            var newRow = a.Row >= rowIndex ? a.Row + count : a.Row;
-            return new CellRef(newRow, a.Column);
-        });
+        // Do not adjust formulas on insert
 
         EndUpdate();
     }
@@ -496,12 +540,7 @@ public partial class Sheet
             }
         }
 
-        AdjustFormulas((cellToken) =>
-        {
-            var a = cellToken.AddressValue;
-            var newCol = a.Column >= columnIndex ? a.Column + count : a.Column;
-            return new CellRef(a.Row, newCol);
-        });
+        // Do not adjust formulas on insert
 
         EndUpdate();
     }
