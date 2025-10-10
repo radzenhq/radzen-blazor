@@ -63,36 +63,41 @@ class Spreadsheet {
       const row = +cell.dataset.row;
       const column = +cell.dataset.column;
       addEventListener('pointerup', this.onCellPointerUp);
-      if (await this.dotNetRef.invokeMethodAsync('OnCellPointerDownAsync', { row, column, pointer: this.toEventArgs(e) })) {
-        addEventListener('pointermove', this.onCellPointerMove);
+      addEventListener('pointermove', this.onCellPointerMove);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnCellPointerDownAsync', { row, column, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onCellPointerMove);
       }
     } else if (e.target.matches('.rz-spreadsheet-row-header')) {
       const row = +e.target.dataset.row;
       addEventListener('pointerup', this.onRowPointerUp);
       addEventListener('pointermove', this.onRowPointerMove);
-      if (await this.dotNetRef.invokeMethodAsync('OnRowPointerDownAsync', { row, pointer: this.toEventArgs(e) })) {
-        addEventListener('pointermove', this.onRowPointerMove);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnRowPointerDownAsync', { row, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onRowPointerMove);
       }
     } else if (e.target.matches('.rz-spreadsheet-column-header')) {
       const column = +e.target.dataset.column;
       addEventListener('pointerup', this.onColumnPointerUp);
       addEventListener('pointermove', this.onColumnPointerMove);
-      if (await this.dotNetRef.invokeMethodAsync('OnColumnPointerDownAsync', { column, pointer: this.toEventArgs(e) })) {
-        addEventListener('pointermove', this.onColumnPointerMove);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnColumnPointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onColumnPointerMove);
       }
     } else if (e.target.matches('.rz-spreadsheet-column-resize-handle')) {
       const column = +e.target.dataset.column;
-      if (await this.dotNetRef.invokeMethodAsync('OnColumnResizePointerDownAsync', { column, pointer: this.toEventArgs(e) })) {
         addEventListener('pointermove', this.onColumnResizeMove);
         addEventListener('pointerup', this.onColumnResizeUp);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnColumnResizePointerDownAsync', { column, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onColumnResizeMove);
+        removeEventListener('pointerup', this.onColumnResizeUp);
       }
       e.preventDefault();
       e.stopPropagation();
     } else if (e.target.matches('.rz-spreadsheet-row-resize-handle')) {
       const row = +e.target.dataset.row;
-      if (await this.dotNetRef.invokeMethodAsync('OnRowResizePointerDownAsync', { row, pointer: this.toEventArgs(e) })) {
-        addEventListener('pointermove', this.onRowResizeMove);
-        addEventListener('pointerup', this.onRowResizeUp);
+      addEventListener('pointermove', this.onRowResizeMove);
+      addEventListener('pointerup', this.onRowResizeUp);
+      if (!(await this.dotNetRef.invokeMethodAsync('OnRowResizePointerDownAsync', { row, pointer: this.toEventArgs(e) }))) {
+        removeEventListener('pointermove', this.onRowResizeMove);
+        removeEventListener('pointerup', this.onRowResizeUp);
       }
       e.preventDefault();
       e.stopPropagation();
