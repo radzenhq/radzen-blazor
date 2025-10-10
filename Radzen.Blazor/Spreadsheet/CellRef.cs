@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -27,6 +28,16 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
     /// </summary>
     public int Column { get; } = column;
 
+    /// <summary>
+    /// Indicates whether the row reference is absolute (prefixed with '$' in A1 notation). 
+    /// </summary>
+    public bool IsRowAbsolute { get; init; }
+
+    /// <summary>
+    /// Indicates whether the column reference is absolute (prefixed with '$' in A1 notation).
+    /// </summary>
+    public bool IsColumnAbsolute { get; init; }
+
     /// <inheritdoc/>
     public bool Equals(CellRef other) => Row == other.Row && Column == other.Column;
 
@@ -54,9 +65,23 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
     /// <returns></returns>
     public override string ToString()
     {
-        var column = ColumnRef.ToString(Column);
+        var sb = StringBuilderCache.Acquire();
 
-        return $"{column}{Row + 1}";
+        if (IsColumnAbsolute)
+        {
+            sb.Append('$');
+        }
+
+        sb.Append(ColumnRef.ToString(Column));
+
+        if (IsRowAbsolute)
+        {
+            sb.Append('$');
+        }
+
+        sb.Append(Row + 1);
+
+        return StringBuilderCache.GetStringAndRelease(sb);
     }
 
     /// <summary>
@@ -96,32 +121,14 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
     }
 
     /// <summary>
-    /// Attempts to parse a string in A1 notation into a CellRef instance.
-    /// Returns true if the parsing is successful, otherwise false.
-    /// </summary>
-    /// <param name="index">The A1 notation string to parse.</param>
-    /// <param name="result">The parsed CellRef instance if successful, otherwise default.</param>
-    /// <returns>True if parsing was successful, otherwise false.</returns>
-    public static bool TryParse(string index, out CellRef result)
-    {
-        // Backwards compatible TryParse that accepts optional '$' but ignores absolute flags
-        return TryParse(index, out result, out _, out _);
-    }
-
-    /// <summary>
     /// Attempts to parse a string in A1 notation (optionally with '$' absolute markers) into a CellRef instance.
     /// Returns true if successful and outputs absolute flags for the column and row.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="result"></param>
-    /// <param name="isColumnAbsolute"></param>
-    /// <param name="isRowAbsolute"></param>
-    /// <returns></returns>
-    public static bool TryParse(string index, out CellRef result, out bool isColumnAbsolute, out bool isRowAbsolute)
+    public static bool TryParse(string index, out CellRef result)
     {
         result = default;
-        isColumnAbsolute = false;
-        isRowAbsolute = false;
 
         if (string.IsNullOrEmpty(index))
         {
@@ -129,6 +136,9 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
         }
 
         var i = 0;
+        var isColumnAbsolute = false;
+        var isRowAbsolute = false;
+
 
         // Optional $ before column
         if (i < index.Length && index[i] == '$')
@@ -191,7 +201,11 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
             return false;
         }
 
-        result = new CellRef(row - 1, column - 1);
+        result = new CellRef(row - 1, column - 1)
+        {
+            IsColumnAbsolute = isColumnAbsolute,
+            IsRowAbsolute = isRowAbsolute
+        };
         return true;
     }
 } 

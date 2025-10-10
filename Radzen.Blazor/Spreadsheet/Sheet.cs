@@ -419,9 +419,9 @@ public partial class Sheet
             var t = tokens[i];
             if (t.Type == FormulaTokenType.CellIdentifier)
             {
-                var addr = t.AddressValue;
-                var newRow = t.IsRowAbsolute ? addr.Row : addr.Row + rowDelta;
-                var newCol = t.IsColumnAbsolute ? addr.Column : addr.Column + colDelta;
+                var addr = t.Address;
+                var newRow = addr.IsRowAbsolute ? addr.Row : addr.Row + rowDelta;
+                var newCol = addr.IsColumnAbsolute ? addr.Column : addr.Column + colDelta;
 
                 var sb = new StringBuilder();
                 if (formula.Length > 0 && formula[0] == '=')
@@ -429,12 +429,12 @@ public partial class Sheet
                     // no-op; we'll reconstruct by joining tokens
                 }
 
-                if (t.IsColumnAbsolute)
+                if (addr.IsColumnAbsolute)
                 {
                     sb.Append('$');
                 }
                 sb.Append(ColumnRef.ToString(newCol));
-                if (t.IsRowAbsolute)
+                if (addr.IsRowAbsolute)
                 {
                     sb.Append('$');
                 }
@@ -524,8 +524,8 @@ public partial class Sheet
                 var tree = cell.FormulaSyntaxTree;
                 if (tree == null) continue;
 
-                var hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.AddressValue.Row == rowIndex
-                    || node is RangeSyntaxNode r && r.Start.Token.AddressValue.Row <= rowIndex && r.End.Token.AddressValue.Row >= rowIndex).Count > 0;
+                var hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.Address.Row == rowIndex
+                    || node is RangeSyntaxNode r && r.Start.Token.Address.Row <= rowIndex && r.End.Token.Address.Row >= rowIndex).Count > 0;
 
                 if (hasRef)
                 {
@@ -534,7 +534,7 @@ public partial class Sheet
                     for (int i = 0; i < tokens.Count; i++)
                     {
                         var t = tokens[i];
-                        if (t.Type == FormulaTokenType.CellIdentifier && t.AddressValue.Row == rowIndex)
+                        if (t.Type == FormulaTokenType.CellIdentifier && t.Address.Row == rowIndex)
                         {
                             tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
                         }
@@ -561,8 +561,8 @@ public partial class Sheet
                 var tree = cell.FormulaSyntaxTree;
                 if (tree == null) continue;
 
-                var hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.AddressValue.Column == columnIndex
-                    || node is RangeSyntaxNode r && r.Start.Token.AddressValue.Column <= columnIndex && r.End.Token.AddressValue.Column >= columnIndex).Count > 0;
+                var hasRef = tree.Find(node => node is CellSyntaxNode c && c.Token.Address.Column == columnIndex
+                    || node is RangeSyntaxNode r && r.Start.Token.Address.Column <= columnIndex && r.End.Token.Address.Column >= columnIndex).Count > 0;
 
                 if (hasRef)
                 {
@@ -570,7 +570,7 @@ public partial class Sheet
                     for (int i = 0; i < tokens.Count; i++)
                     {
                         var t = tokens[i];
-                        if (t.Type == FormulaTokenType.CellIdentifier && t.AddressValue.Column == columnIndex)
+                        if (t.Type == FormulaTokenType.CellIdentifier && t.Address.Column == columnIndex)
                         {
                             tokens[i] = new FormulaToken(FormulaTokenType.ErrorLiteral, "#REF!") { ErrorValue = CellError.Ref };
                         }
@@ -620,7 +620,7 @@ public partial class Sheet
         // Adjust formulas: shift row indices at or after the insert point
         AdjustFormulas((cellToken) =>
         {
-            var a = cellToken.AddressValue;
+            var a = cellToken.Address;
             var newRow = a.Row >= rowIndex ? a.Row + count : a.Row;
             return new CellRef(newRow, a.Column);
         });
@@ -661,7 +661,7 @@ public partial class Sheet
         // Adjust formulas: shift column indices at or after the insert point
         AdjustFormulas((cellToken) =>
         {
-            var a = cellToken.AddressValue;
+            var a = cellToken.Address;
             var newCol = a.Column >= columnIndex ? a.Column + count : a.Column;
             return new CellRef(a.Row, newCol);
         });
@@ -711,12 +711,12 @@ public partial class Sheet
             var token = cellSyntaxNode.Token;
             var adjusted = adjust(token);
 
-            if (token.IsColumnAbsolute)
+            if (token.Address.IsColumnAbsolute)
             {
                 builder.Append('$');
             }
             builder.Append(ColumnRef.ToString(adjusted.Column));
-            if (token.IsRowAbsolute)
+            if (token.Address.IsRowAbsolute)
             {
                 builder.Append('$');
             }
@@ -756,12 +756,12 @@ public partial class Sheet
                 (startCell, endCell) = CellRef.Swap(startCell, endCell);
             }
 
-            if (startToken.IsColumnAbsolute)
+            if (startToken.Address.IsColumnAbsolute)
             {
                 builder.Append('$');
             }
             builder.Append(ColumnRef.ToString(startCell.Column));
-            if (startToken.IsRowAbsolute)
+            if (startToken.Address.IsRowAbsolute)
             {
                 builder.Append('$');
             }
@@ -769,12 +769,12 @@ public partial class Sheet
 
             builder.Append(':');
 
-            if (endToken.IsColumnAbsolute)
+            if (endToken.Address.IsColumnAbsolute)
             {
                 builder.Append('$');
             }
             builder.Append(ColumnRef.ToString(endCell.Column));
-            if (endToken.IsRowAbsolute)
+            if (endToken.Address.IsRowAbsolute)
             {
                 builder.Append('$');
             }

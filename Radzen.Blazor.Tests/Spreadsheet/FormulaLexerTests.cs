@@ -13,7 +13,7 @@ public class FormulaLexerTests
         Assert.Equal(0, tokens[0].Start);
         Assert.Equal(1, tokens[0].End);
         Assert.Equal(FormulaTokenType.CellIdentifier, tokens[1].Type);
-        Assert.Equal("A1", tokens[1].AddressValue.ToString());
+        Assert.Equal("A1", tokens[1].Address.ToString());
         Assert.Equal(1, tokens[1].Start);
         Assert.Equal(3, tokens[1].End);
     }
