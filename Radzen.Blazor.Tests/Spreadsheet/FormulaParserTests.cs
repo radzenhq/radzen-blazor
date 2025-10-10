@@ -496,4 +496,12 @@ public class FormulaParserTests
         Assert.NotNull(node);
         Assert.IsType<BinaryExpressionSyntaxNode>(node);
     }
+
+    [Fact]
+    public void FormulaParser_ShouldParse_Percent()
+    {
+        var formula = "=$%";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.NotEmpty(syntaxTree.Errors);
+    }
 }
