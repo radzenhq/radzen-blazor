@@ -151,6 +151,53 @@ public class Format
     }
 
     /// <summary>
+    /// Creates a new format by merging this format with an overlay format.
+    /// </summary>
+    /// <param name="format">The format whose values should override this format.</param>
+    /// <returns>A new <see cref="Format"/> instance representing the merged result.</returns>
+    public Format Merge(Format format)
+    {
+        var merged = Clone();
+
+        if (format.Color != null)
+        {
+            merged.Color = format.Color;
+        }
+
+        if (format.BackgroundColor != null)
+        {
+            merged.BackgroundColor = format.BackgroundColor;
+        }
+
+        if (format.Bold)
+        {
+            merged.Bold = true;
+        }
+
+        if (format.Italic)
+        {
+            merged.Italic = true;
+        }
+
+        if (format.Underline)
+        {
+            merged.Underline = true;
+        }
+
+        if (format.TextAlign != TextAlign.Left)
+        {
+            merged.TextAlign = format.TextAlign;
+        }
+
+        if (format.VerticalAlign != VerticalAlign.Top)
+        {
+            merged.VerticalAlign = format.VerticalAlign;
+        }
+
+        return merged;
+    }
+
+    /// <summary>
     /// This method is used to create a copy of the current format with a new color.
     /// </summary>
     public Format WithColor(string? color)
