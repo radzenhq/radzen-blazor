@@ -116,7 +116,7 @@ class DependencyVisitor(Sheet sheet) : IFormulaSyntaxNodeVisitor
 
     public void VisitCell(CellSyntaxNode cellIdentifierSyntaxNode)
     {
-        var address = cellIdentifierSyntaxNode.Token.AddressValue;
+        var address = cellIdentifierSyntaxNode.Token.Address;
         if (address.Row >= sheet.RowCount || address.Column >= sheet.ColumnCount)
         {
             // Out of bounds, do not add dependency

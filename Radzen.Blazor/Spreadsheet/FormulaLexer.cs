@@ -79,12 +79,9 @@ internal class FormulaToken(FormulaTokenType type, string  value)
     public uint UintValue { get; set; }
     public long LongValue { get; set; }
     public ulong UlongValue { get; set; }
-    public CellRef AddressValue { get; set; }
+    public CellRef Address { get; set; }
     public CellError ErrorValue { get; set; }
 
-    // Absolute reference flags parsed for CellIdentifier tokens
-    public bool IsRowAbsolute { get; set; }
-    public bool IsColumnAbsolute { get; set; }
 
     public List<FormulaTokenTrivia> LeadingTrivia { get; } = new();
     public List<FormulaTokenTrivia> TrailingTrivia { get; } = new();
@@ -824,13 +821,11 @@ internal class FormulaLexer(string expression, bool strict = true)
 
     private static FormulaToken CreateIdentifierToken(string value, bool hasLetters, bool hasNumbers)
     {
-        if (hasLetters && hasNumbers && CellRef.TryParse(value, out var cellIndex, out var colAbs, out var rowAbs))
+        if (hasLetters && hasNumbers && CellRef.TryParse(value, out var cellIndex))
         {
             return new FormulaToken(FormulaTokenType.CellIdentifier, value)
             {
-                AddressValue = cellIndex,
-                IsColumnAbsolute = colAbs,
-                IsRowAbsolute = rowAbs
+                Address = cellIndex,
             };
         }
 

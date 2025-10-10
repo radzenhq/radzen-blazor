@@ -192,7 +192,7 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 
     public void VisitCell(CellSyntaxNode cellSyntaxNode)
     {
-        var address = cellSyntaxNode.Token.AddressValue;
+        var address = cellSyntaxNode.Token.Address;
         // If the row/column was deleted, set whole formula to =#REF!
         if (sheet.IsDeletedRow(address.Row) || sheet.IsDeletedColumn(address.Column))
         {
@@ -345,8 +345,8 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 
     public void VisitRange(RangeSyntaxNode rangeSyntaxNode)
     {
-        var start = rangeSyntaxNode.Start.Token.AddressValue;
-        var end = rangeSyntaxNode.End.Token.AddressValue;
+        var start = rangeSyntaxNode.Start.Token.Address;
+        var end = rangeSyntaxNode.End.Token.Address;
 
         if (start.Row > end.Row || (start.Row == end.Row && start.Column > end.Column))
         {

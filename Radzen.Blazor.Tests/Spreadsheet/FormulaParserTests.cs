@@ -192,7 +192,7 @@ public class FormulaParserTests
         var node = syntaxTree.Root;
         Assert.IsType<CellSyntaxNode>(node);
         var cellIdentifierNode = (CellSyntaxNode)node;
-        Assert.Equal("A1", cellIdentifierNode.Token.AddressValue.ToString());
+        Assert.Equal("A1", cellIdentifierNode.Token.Address.ToString());
     }
 
     [Fact]
@@ -210,7 +210,7 @@ public class FormulaParserTests
         Assert.IsType<NumberLiteralSyntaxNode>(functionNode.Arguments[1]);
 
         var cellIdentifierNode = (CellSyntaxNode)functionNode.Arguments[0];
-        Assert.Equal("A1", cellIdentifierNode.Token.AddressValue.ToString());
+        Assert.Equal("A1", cellIdentifierNode.Token.Address.ToString());
         var numberLiteralNode = (NumberLiteralSyntaxNode)functionNode.Arguments[1];
         Assert.Equal(1, numberLiteralNode.Token.IntValue);
     }
@@ -230,7 +230,7 @@ public class FormulaParserTests
         Assert.IsType<FunctionSyntaxNode>(functionNode.Arguments[1]);
 
         var cellIdentifierNode = (CellSyntaxNode)functionNode.Arguments[0];
-        Assert.Equal("A1", cellIdentifierNode.Token.AddressValue.ToString());
+        Assert.Equal("A1", cellIdentifierNode.Token.Address.ToString());
 
         var nestedFunctionNode = (FunctionSyntaxNode)functionNode.Arguments[1];
         Assert.Equal("MAX", nestedFunctionNode.Name);
@@ -240,8 +240,8 @@ public class FormulaParserTests
 
         var firstCellIdentifierNode = (CellSyntaxNode)nestedFunctionNode.Arguments[0];
         var secondCellIdentifierNode = (CellSyntaxNode)nestedFunctionNode.Arguments[1];
-        Assert.Equal("B1", firstCellIdentifierNode.Token.AddressValue.ToString());
-        Assert.Equal("C1", secondCellIdentifierNode.Token.AddressValue.ToString());
+        Assert.Equal("B1", firstCellIdentifierNode.Token.Address.ToString());
+        Assert.Equal("C1", secondCellIdentifierNode.Token.Address.ToString());
     }
 
     [Fact]
@@ -266,8 +266,8 @@ public class FormulaParserTests
         var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
-        Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
-        Assert.Equal("A2", rangeNode.End.Token.AddressValue.ToString());
+        Assert.Equal("A1", rangeNode.Start.Token.Address.ToString());
+        Assert.Equal("A2", rangeNode.End.Token.Address.ToString());
     }
 
     [Fact]
@@ -283,8 +283,8 @@ public class FormulaParserTests
         Assert.Single(functionNode.Arguments);
         Assert.IsType<RangeSyntaxNode>(functionNode.Arguments[0]);
         var rangeNode = (RangeSyntaxNode)functionNode.Arguments[0];
-        Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
-        Assert.Equal("A2", rangeNode.End.Token.AddressValue.ToString());
+        Assert.Equal("A1", rangeNode.Start.Token.Address.ToString());
+        Assert.Equal("A2", rangeNode.End.Token.Address.ToString());
     }
 
     [Fact]
@@ -296,8 +296,8 @@ public class FormulaParserTests
         var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
-        Assert.Equal("A2", rangeNode.Start.Token.AddressValue.ToString());
-        Assert.Equal("A1", rangeNode.End.Token.AddressValue.ToString());
+        Assert.Equal("A2", rangeNode.Start.Token.Address.ToString());
+        Assert.Equal("A1", rangeNode.End.Token.Address.ToString());
     }
 
     [Fact]
@@ -309,8 +309,8 @@ public class FormulaParserTests
         var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
-        Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
-        Assert.Equal("A1", rangeNode.End.Token.AddressValue.ToString());
+        Assert.Equal("A1", rangeNode.Start.Token.Address.ToString());
+        Assert.Equal("A1", rangeNode.End.Token.Address.ToString());
     }
 
     [Fact]
@@ -322,8 +322,8 @@ public class FormulaParserTests
         var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
-        Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
-        Assert.Equal("B1", rangeNode.End.Token.AddressValue.ToString());
+        Assert.Equal("A1", rangeNode.Start.Token.Address.ToString());
+        Assert.Equal("B1", rangeNode.End.Token.Address.ToString());
     }
 
     [Fact]
@@ -335,8 +335,8 @@ public class FormulaParserTests
         var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
-        Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
-        Assert.Equal("A2", rangeNode.End.Token.AddressValue.ToString());
+        Assert.Equal("A1", rangeNode.Start.Token.Address.ToString());
+        Assert.Equal("A2", rangeNode.End.Token.Address.ToString());
     }
 
     [Fact]
@@ -348,8 +348,8 @@ public class FormulaParserTests
         var node = syntaxTree.Root;
         Assert.IsType<RangeSyntaxNode>(node);
         var rangeNode = (RangeSyntaxNode)node;
-        Assert.Equal("A1", rangeNode.Start.Token.AddressValue.ToString());
-        Assert.Equal("B2", rangeNode.End.Token.AddressValue.ToString());
+        Assert.Equal("A1", rangeNode.Start.Token.Address.ToString());
+        Assert.Equal("B2", rangeNode.End.Token.Address.ToString());
     }
 
     [Fact]
