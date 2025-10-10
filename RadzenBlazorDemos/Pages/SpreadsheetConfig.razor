@@ -5,9 +5,23 @@
 <RadzenSpreadsheet Workbook=@workbook style="height: 500px" />
 
 @code {
+    #nullable enable
     Sheet sheet = new Sheet(40, 40);
 
     Workbook workbook = new Workbook();
+
+    class MyFormat : ConditionalFormatBase
+    {
+        public override Format? GetFormat(Cell cell)
+        {
+            if (cell.Data.GetValueOrDefault<double>() > 3)
+            {
+                return new Format { BackgroundColor = "lightgreen" };
+            }
+
+            return null;
+        }
+    }
 
     protected override void OnInitialized()
     {
@@ -30,6 +44,7 @@
         sheet.Cells["F4"].Value = 5;
         sheet.Selection.Select(RangeRef.Parse("A1:B2"));
         sheet.Validation.Add(RangeRef.Parse("E1:E10"), new NumberValidator());
+        sheet.ConditionalFormats.Add(RangeRef.Parse("A1:F10"), new MyFormat());
         sheet.EndUpdate();
     }
 }
