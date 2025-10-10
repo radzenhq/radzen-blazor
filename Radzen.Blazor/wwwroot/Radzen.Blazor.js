@@ -230,11 +230,23 @@ class SheetEditor {
     this.element.addEventListener('keydown', this.onKeyDown);
     this.element.addEventListener('blur', this.onBlur);
     this.element.addEventListener('focus', this.onFocus);
+    this.element.addEventListener('paste', this.onPaste);
     document.addEventListener('selectionchange', this.onSelectionChange);
     if (options.autoFocus) {
       this.focus();
     }
   }
+
+  onPaste = (e) => {
+    e.preventDefault();
+    const text = e.clipboardData.getData('text/plain');
+    const selection = getSelection();
+    if (!selection.rangeCount) return;
+    selection.deleteFromDocument();
+    selection.getRangeAt(0).insertNode(document.createTextNode(text));
+    selection.collapseToEnd();
+    this.onInput();
+  };
 
   onSelectionChange = (e) => {
     const selection = getSelection();
@@ -249,8 +261,8 @@ class SheetEditor {
     this.dotNetRef.invokeMethodAsync('OnSelectionChangeAsync', caretPosition);
   };
 
-  onInput = (e) => {
-    this.dotNetRef.invokeMethodAsync('OnInputAsync', e.target.innerText);
+  onInput = () => {
+    this.dotNetRef.invokeMethodAsync('OnInputAsync', this.element.innerText);
   };
 
   setValue = (value, moveCaretTo) => {
@@ -333,6 +345,7 @@ class SheetEditor {
     this.element.removeEventListener('keydown', this.onKeyDown);
     this.element.removeEventListener('blur', this.onBlur);
     this.element.removeEventListener('focus', this.onFocus);
+    this.element.removeEventListener('paste', this.onPaste);
     document.removeEventListener('selectionchange', this.onSelectionChange);
   }
 }
