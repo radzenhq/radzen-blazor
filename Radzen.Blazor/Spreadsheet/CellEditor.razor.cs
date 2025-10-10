@@ -91,8 +91,7 @@ public partial class CellEditor : ComponentBase, IDisposable
             rect.AppendStyle(sb);
 
             cell = Sheet.Cells[address];
-
-            cell.Format?.AppendStyle(sb);
+            cell.ApplyFormat(sb);
 
             cellStyle = StringBuilderCache.GetStringAndRelease(sb);
         }

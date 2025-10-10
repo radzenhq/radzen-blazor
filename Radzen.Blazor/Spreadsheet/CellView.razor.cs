@@ -147,7 +147,7 @@ public partial class CellView : CellBase, IDisposable
     protected override void AppendStyle(StringBuilder sb)
     {
         base.AppendStyle(sb);
-        cell.Format?.AppendStyle(sb);
+        cell.ApplyFormat(sb);
     }
 
     private async Task OnToggleAsync()
