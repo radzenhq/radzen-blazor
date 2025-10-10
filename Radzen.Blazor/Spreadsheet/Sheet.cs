@@ -77,6 +77,10 @@ public partial class Sheet
     /// </summary>
     public ValidationStore Validation { get; }
     /// <summary>
+    /// Gets the conditional formatting store for the sheet.
+    /// </summary>
+    public ConditionalFormatStore ConditionalFormats { get; }
+    /// <summary>
     /// Gets the undo/redo stack for the sheet, which allows tracking and reverting changes made to the sheet.
     /// </summary>
     public UndoRedoStack Commands { get; }
@@ -145,6 +149,7 @@ public partial class Sheet
         Cells = new CellStore(this);
         Commands = new();
         Validation = new();
+        ConditionalFormats = new();
     }
 
     /// <summary>
