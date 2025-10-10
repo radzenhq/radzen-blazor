@@ -29,6 +29,7 @@ internal enum ValueKind
 internal enum FormulaTokenType
 {
     None,
+    Unknown,
     Identifier,
     Equals,
     Plus,
@@ -318,7 +319,10 @@ internal class FormulaLexer(string expression, bool strict = true)
 
         }
 
-        return new FormulaToken(FormulaTokenType.None, string.Empty);
+        // Emit unknown token for any unrecognized character to preserve it in the token stream
+        var unknown = new FormulaToken(FormulaTokenType.Unknown, Peek().ToString());
+        Advance(1);
+        return unknown;
     }
 
     private FormulaToken ScanStringLiteral()
