@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -70,6 +71,20 @@ public class Cell
         format = other.format;
 
         Changed?.Invoke(this);
+    }
+
+    internal void ApplyFormat(StringBuilder sb)
+    {
+        var effectiveFormat = format;
+
+        var conditionalFormat = Sheet.ConditionalFormats.Calculate(this);
+
+        if (conditionalFormat != null)
+        {
+            effectiveFormat = format?.Merge(conditionalFormat) ?? conditionalFormat;
+        }
+
+        effectiveFormat?.AppendStyle(sb);
     }
 
     private void OnFormatChanged()
