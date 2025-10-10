@@ -17,7 +17,7 @@ public partial class SheetEditorHighlight : ComponentBase
 
     private List<HighlightToken> GetHighlightTokens()
     {
-        if (string.IsNullOrEmpty(Value) || !Value.StartsWith("="))
+        if (string.IsNullOrEmpty(Value) || !Value.StartsWith('='))
         {
             return [new() { Text = Value, Class = "rz-default-highlight" }];
         }
@@ -37,7 +37,7 @@ public partial class SheetEditorHighlight : ComponentBase
             {
                 var highlightToken = new HighlightToken
                 {
-                    Text = token.Type == FormulaTokenType.CellIdentifier ? token.AddressValue.ToString() : token.Value,
+                    Text = token.Type == FormulaTokenType.CellIdentifier ? token.Address.ToString() : token.Value,
                     Class = GetTokenClassName(token.Type),
                     Style = GetTokenStyle(token.Type, refCount)
                 };
