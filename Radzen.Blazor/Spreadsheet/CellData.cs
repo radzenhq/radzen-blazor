@@ -153,6 +153,57 @@ public class CellData : IComparable, IComparable<CellData>
         return false;
     }
 
+    internal bool TryGetInt(out int value)
+    {
+        value = 0;
+        if (!TryCoerceToNumber(out var number, allowBooleans: true, nonNumericTextAsZero: false))
+        {
+            return false;
+        }
+        value = (int)Math.Truncate(number);
+        return true;
+    }
+
+    internal bool TryCoerceToNumber(out double number, bool allowBooleans, bool nonNumericTextAsZero)
+    {
+        number = 0d;
+        switch (Type)
+        {
+            case CellDataType.Number:
+                number = GetValueOrDefault<double>();
+                return true;
+            case CellDataType.String:
+                if (TryConvertFromString(GetValueOrDefault<string>(), out var converted, out var valueType))
+                {
+                    if (valueType == CellDataType.Number)
+                    {
+                        number = (double)converted!;
+                        return true;
+                    }
+                    if (valueType == CellDataType.Boolean && allowBooleans)
+                    {
+                        number = (bool)converted! ? 1d : 0d;
+                        return true;
+                    }
+                }
+                if (nonNumericTextAsZero)
+                {
+                    number = 0d;
+                    return true;
+                }
+                return false;
+            case CellDataType.Boolean:
+                if (allowBooleans)
+                {
+                    number = GetValueOrDefault<bool>() ? 1d : 0d;
+                    return true;
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+
     private static CellDataType GetValueType(object? value, Type valType, bool isNullable, Type? nullableType)
     {
         if (value == null)
