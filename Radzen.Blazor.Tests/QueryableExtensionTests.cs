@@ -639,6 +639,295 @@ namespace Radzen.Blazor.Tests
             Assert.Equal(2, result.Count);
             Assert.All(result, r => Assert.True(r.Value < 150 || r.Value > 250));
         }
+
+        // Collection operator tests - In/NotIn
+        [Fact]
+        public void Where_SupportsInOperator_WithStringArray()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = new[] { "Alice", "Bob" },
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Name == "Alice");
+            Assert.Contains(result, r => r.Name == "Bob");
+        }
+
+        [Fact]
+        public void Where_SupportsDoesNotContainOperator_WithStringArray()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = new[] { "Alice", "Bob" },
+                    FilterOperator = FilterOperator.DoesNotContain
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(3, result.Count);
+            Assert.DoesNotContain(result, r => r.Name == "Alice");
+            Assert.DoesNotContain(result, r => r.Name == "Bob");
+        }
+
+        [Fact]
+        public void Where_SupportsInOperator_WithNumericValues()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Value", 
+                    FilterValue = new[] { 100, 200, 300 },
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(3, result.Count);
+            Assert.All(result, r => Assert.True(r.Value == 100 || r.Value == 200 || r.Value == 300));
+        }
+
+        [Fact]
+        public void Where_FiltersWithDoesNotContainOperator()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = "li",
+                    FilterOperator = FilterOperator.DoesNotContain
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(3, result.Count);
+            Assert.DoesNotContain(result, r => r.Name == "Alice");
+            Assert.DoesNotContain(result, r => r.Name == "Charlie");
+        }
+
+        [Fact]
+        public void Where_FiltersWithContainsOperator_EmptyString()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = "",
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Empty string contains returns all items (all strings contain empty string)
+            Assert.Equal(5, result.Count);
+        }
+
+        [Fact]
+        public void Where_FiltersWithContainsOperator_SingleValue()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = new[] { "Alice" },
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Single(result);
+            Assert.Equal("Alice", result[0].Name);
+        }
+
+        [Fact]
+        public void Where_FiltersWithDoesNotContainOperator_AllValues()
+        {
+            var data = GetTestData().AsQueryable();
+            var allNames = data.Select(x => x.Name).ToArray();
+            
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = allNames,
+                    FilterOperator = FilterOperator.DoesNotContain
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public void Where_FiltersArrayProperty_WithSpecificValue()
+        {
+            var testData = new List<TestItem>
+            {
+                new TestItem { Id = 1, Name = "Item1", Value = 100, Date = DateTime.Now, IsActive = true, Category = new TestCategory { Name = "A", Priority = 1 } },
+                new TestItem { Id = 2, Name = "Item2", Value = 200, Date = DateTime.Now, IsActive = false, Category = new TestCategory { Name = "B", Priority = 2 } },
+                new TestItem { Id = 3, Name = "Item3", Value = 300, Date = DateTime.Now, IsActive = true, Category = new TestCategory { Name = "C", Priority = 3 } }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = "Item1",
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Single(result);
+            Assert.Equal(1, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersArrayProperty_WithDoesNotContain()
+        {
+            var testData = new List<TestItem>
+            {
+                new TestItem { Id = 1, Name = "Item1", Value = 100, Date = DateTime.Now, IsActive = true, Category = new TestCategory { Name = "A", Priority = 1 } },
+                new TestItem { Id = 2, Name = "Item2", Value = 200, Date = DateTime.Now, IsActive = false, Category = new TestCategory { Name = "B", Priority = 2 } },
+                new TestItem { Id = 3, Name = "Item3", Value = 300, Date = DateTime.Now, IsActive = true, Category = new TestCategory { Name = "C", Priority = 3 } }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = "Item1",
+                    FilterOperator = FilterOperator.DoesNotContain
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.DoesNotContain(result, r => r.Name == "Item1");
+        }
+
+        [Fact]
+        public void Where_FiltersWithContainsOperator_CaseInsensitive()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = "ALICE",
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive).ToList();
+            
+            Assert.Single(result);
+            Assert.Equal("Alice", result[0].Name);
+        }
+
+        [Fact]
+        public void Where_FiltersWithMultipleContainsOperators_Combined()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = new[] { "Alice", "Bob" },
+                    FilterOperator = FilterOperator.Contains
+                },
+                new FilterDescriptor 
+                { 
+                    Property = "Value", 
+                    FilterValue = 100,
+                    FilterOperator = FilterOperator.GreaterThanOrEquals
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.All(result, r => Assert.True((r.Name == "Alice" || r.Name == "Bob") && r.Value >= 100));
+        }
+
+        [Fact]
+        public void Where_FiltersWithContains_OnMultipleProperties()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Name", 
+                    FilterValue = new[] { "Alice", "Charlie" },
+                    FilterOperator = FilterOperator.Contains
+                },
+                new FilterDescriptor 
+                { 
+                    Property = "Value", 
+                    FilterValue = new[] { 100, 150 },
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Name == "Alice" && r.Value == 100);
+            Assert.Contains(result, r => r.Name == "Charlie" && r.Value == 150);
+        }
+
+        [Fact]
+        public void Where_FiltersWithContainsOperator_MultipleValues()
+        {
+            var data = GetTestData().AsQueryable();
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Value", 
+                    FilterValue = new[] { 100, 150, 200 },
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(3, result.Count);
+        }
     }
 }
 

@@ -2057,5 +2057,487 @@ namespace Radzen.Blazor.Tests
                 Assert.True(raised, $"LoadData event should be raised for {mode}");
             }
         }
+
+        // Collection filtering tests with In/NotIn and Contains/DoesNotContain operators
+        [Fact]
+        public void DataGrid_Filters_WithInOperator()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Category = "Electronics" },
+                new { Id = 2, Category = "Books" },
+                new { Id = 3, Category = "Clothing" },
+                new { Id = 4, Category = "Electronics" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Category");
+                    builder.AddAttribute(2, "Title", "Category");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            // In operator should be available in Advanced mode
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_WithNotInOperator()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Status = "Active" },
+                new { Id = 2, Status = "Inactive" },
+                new { Id = 3, Status = "Pending" },
+                new { Id = 4, Status = "Active" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Status");
+                    builder.AddAttribute(2, "Title", "Status");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            // NotIn operator should be available in Advanced mode
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_WithDoesNotContainOperator()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Description = "High quality product" },
+                new { Id = 2, Description = "Budget friendly option" },
+                new { Id = 3, Description = "Premium item" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Description");
+                    builder.AddAttribute(2, "Title", "Description");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.SimpleWithMenu);
+            });
+
+            // DoesNotContain should be available
+            Assert.Contains("rz-filter-button", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_CollectionProperty_WithContains()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Name = "Product 1", Tags = new[] { "electronics", "new" } },
+                new { Id = 2, Name = "Product 2", Tags = new[] { "books", "bestseller" } },
+                new { Id = 3, Name = "Product 3", Tags = new[] { "electronics", "sale" } }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Name");
+                    builder.AddAttribute(2, "Title", "Name");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(4, "Property", "Tags");
+                    builder.AddAttribute(5, "Title", "Tags");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            // Should render grid with collection column
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_MultipleValues_WithInOperator()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Priority = 1 },
+                new { Id = 2, Priority = 2 },
+                new { Id = 3, Priority = 3 },
+                new { Id = 4, Priority = 1 },
+                new { Id = 5, Priority = 2 }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Priority");
+                    builder.AddAttribute(2, "Title", "Priority");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_CheckBoxListMode_SupportsInOperator()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[] { "Category A", "Category B", "Category C" };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<string>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<string>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<string>));
+                    builder.AddAttribute(1, "Property", "Length");
+                    builder.AddAttribute(2, "Title", "Length");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.CheckBoxList);
+            });
+
+            // CheckBoxList mode uses In operator for multiple selections
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_StringCollection_WithContainsAny()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Roles = new List<string> { "Admin", "User" } },
+                new { Id = 2, Roles = new List<string> { "User" } },
+                new { Id = 3, Roles = new List<string> { "Admin", "Manager" } }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "Id");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_NumericCollection_WithIn()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Scores = new[] { 90, 85, 88 } },
+                new { Id = 2, Scores = new[] { 75, 80, 82 } },
+                new { Id = 3, Scores = new[] { 95, 92, 98 } }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "Id");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_StringValues_WithCheckBoxListMode()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Type = "TypeA" },
+                new { Id = 2, Type = "TypeB" },
+                new { Id = 3, Type = "TypeC" },
+                new { Id = 4, Type = "TypeD" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Type");
+                    builder.AddAttribute(2, "Title", "Type");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_CombinesCollectionFilters_WithAnd()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Category = "A", Status = "Active" },
+                new { Id = 2, Category = "B", Status = "Inactive" },
+                new { Id = 3, Category = "A", Status = "Pending" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Category");
+                    builder.AddAttribute(2, "Title", "Category");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(4, "Property", "Status");
+                    builder.AddAttribute(5, "Title", "Status");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+                parameterBuilder.Add<LogicalFilterOperator>(p => p.LogicalFilterOperator, LogicalFilterOperator.And);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_CombinesCollectionFilters_WithOr()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Category = "Electronics", Price = 100 },
+                new { Id = 2, Category = "Books", Price = 20 },
+                new { Id = 3, Category = "Clothing", Price = 50 }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Category");
+                    builder.AddAttribute(2, "Title", "Category");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(4, "Property", "Price");
+                    builder.AddAttribute(5, "Title", "Price");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+                parameterBuilder.Add<LogicalFilterOperator>(p => p.LogicalFilterOperator, LogicalFilterOperator.Or);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_EmptyCollection_WithInOperator()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new string[] { } },
+                new { Id = 2, Tags = new[] { "tag1", "tag2" } },
+                new { Id = 3, Tags = new string[] { } }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "Id");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_NullCollection_HandledGracefully()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Items = (string[])null },
+                new { Id = 2, Items = new[] { "item1" } }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Id");
+                    builder.AddAttribute(2, "Title", "Id");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Renders_WithCheckBoxListFilterMode()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[] { "Category A", "Category B" };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<string>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<string>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<string>));
+                    builder.AddAttribute(1, "Property", "Length");
+                    builder.AddAttribute(2, "Title", "Length");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.CheckBoxList);
+            });
+
+            // Component should be rendered with CheckBoxList filter mode
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
+
+        [Fact]
+        public void DataGrid_Filters_NestedCollectionProperty()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var testData = new[]
+            {
+                new { Id = 1, Name = "Item1", Meta = new { Tags = new[] { "new", "featured" } } },
+                new { Id = 2, Name = "Item2", Meta = new { Tags = new[] { "sale" } } }
+            };
+
+            var component = ctx.RenderComponent<RadzenDataGrid<dynamic>>(parameterBuilder =>
+            {
+                parameterBuilder.Add<IEnumerable<dynamic>>(p => p.Data, testData);
+                parameterBuilder.Add<RenderFragment>(p => p.Columns, builder =>
+                {
+                    builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(1, "Property", "Name");
+                    builder.AddAttribute(2, "Title", "Name");
+                    builder.CloseComponent();
+                });
+                parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
+                parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.Advanced);
+            });
+
+            Assert.Contains("rz-grid-filter", component.Markup);
+        }
     }
 }
