@@ -27,27 +27,12 @@ class IntFunction : FormulaFunction
             return numberArg;
         }
 
-        double? number = null;
-
-        if (numberArg.Type == CellDataType.Number)
-        {
-            number = numberArg.GetValueOrDefault<double>();
-        }
-        else if (numberArg.Type == CellDataType.String)
-        {
-            if (CellData.TryConvertFromString(numberArg.GetValueOrDefault<string>(), out var converted, out var valueType) && valueType == CellDataType.Number)
-            {
-                number = (double)converted!;
-            }
-        }
-
-        if (number is null)
+        if (!numberArg.TryCoerceToNumber(out var number, allowBooleans: false, nonNumericTextAsZero: false))
         {
             return CellData.FromError(CellError.Value);
         }
 
-        var n = number.Value;
-        var result = Math.Floor(n);
+        var result = Math.Floor(number);
 
         return CellData.FromNumber(result);
     }
