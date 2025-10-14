@@ -8,8 +8,5 @@ class SmallFunction : KOrderFunctionBase
 {
     public override string Name => "SMALL";
 
-    protected override double GetResult(List<double> numbers, int k)
-    {
-        return numbers[k - 1];
-    }
+    protected override CellData Compute(List<double> numbers, int k) => AggregationMethods.Small(numbers, k);
 }
