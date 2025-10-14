@@ -196,6 +196,19 @@ public class FormulaParserTests
     }
 
     [Fact]
+    public void FormulaParser_ShouldParseSheetQualifiedCellIdentifier()
+    {
+        var formula = "=Sheet2!C1";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
+        Assert.IsType<CellSyntaxNode>(node);
+        var cellIdentifierNode = (CellSyntaxNode)node;
+        Assert.Equal("C1", cellIdentifierNode.Token.Address.ToString());
+        Assert.Equal("Sheet2", cellIdentifierNode.Token.Address.Sheet);
+    }
+
+    [Fact]
     public void FormulaParser_ShouldParseFunction()
     {
         var formula = "=SUM(A1,1)";
@@ -268,6 +281,21 @@ public class FormulaParserTests
         var rangeNode = (RangeSyntaxNode)node;
         Assert.Equal("A1", rangeNode.Start.Token.Address.ToString());
         Assert.Equal("A2", rangeNode.End.Token.Address.ToString());
+    }
+
+    [Fact]
+    public void FormulaParser_ShouldParseSheetQualifiedRange()
+    {
+        var formula = "=Sheet2!A1:Sheet2!B2";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var node = syntaxTree.Root;
+        Assert.IsType<RangeSyntaxNode>(node);
+        var rangeNode = (RangeSyntaxNode)node;
+        Assert.Equal("A1", rangeNode.Start.Token.Address.ToString());
+        Assert.Equal("B2", rangeNode.End.Token.Address.ToString());
+        Assert.Equal("Sheet2", rangeNode.Start.Token.Address.Sheet);
+        Assert.Equal("Sheet2", rangeNode.End.Token.Address.Sheet);
     }
 
     [Fact]
