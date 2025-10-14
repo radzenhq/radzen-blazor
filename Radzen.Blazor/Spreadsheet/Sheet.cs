@@ -180,7 +180,7 @@ public partial class Sheet
         else
         {
             isEvaluating = true;
-            var visitor = new FormulaEvaluator(this);
+            var visitor = new FormulaEvaluator(this, cell);
             var eval = visitor.Evaluate(tree.Root);
             cell.Data = eval;
             isEvaluating = false;
