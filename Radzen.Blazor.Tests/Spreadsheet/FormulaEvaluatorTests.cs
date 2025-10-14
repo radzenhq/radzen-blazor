@@ -265,5 +265,34 @@ public class FormulaEvaluationTests
         Assert.Equal(CellError.Div0, sheet.Cells["A2"].Value);
     }
 
-    // SUM and IFERROR combined tests are in IfErrorFunctionTests.cs
+    [Fact]
+    public void Evaluator_ShouldResolveCrossSheetCellReference()
+    {
+        var wb = new Workbook();
+        var s1 = wb.AddSheet("Sheet1", 5, 5);
+        var s2 = wb.AddSheet("Sheet2", 5, 5);
+
+        s2.Cells[0, 2].Value = 42; // C1 on Sheet2
+
+        s1.Cells[0, 0].Formula = "=Sheet2!C1"; // A1 on Sheet1 refers to Sheet2!C1
+
+        Assert.Equal(42d, s1.Cells[0, 0].Data.GetValueOrDefault<double>());
+    }
+
+    [Fact]
+    public void Evaluator_ShouldResolveCrossSheetRangeInFunction()
+    {
+        var wb = new Workbook();
+        var s1 = wb.AddSheet("Sheet1", 5, 5);
+        var s2 = wb.AddSheet("Sheet2", 5, 5);
+
+        s2.Cells[0, 0].Value = 1; // A1
+        s2.Cells[0, 1].Value = 2; // B1
+        s2.Cells[1, 0].Value = 3; // A2
+        s2.Cells[1, 1].Value = 4; // B2
+
+        s1.Cells[0, 0].Formula = "=SUM(Sheet2!A1:Sheet2!B2)";
+
+        Assert.Equal(10d, s1.Cells[0, 0].Data.GetValueOrDefault<double>());
+    }
 }
