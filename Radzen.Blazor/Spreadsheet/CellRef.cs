@@ -29,6 +29,12 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
     public int Column { get; } = column;
 
     /// <summary>
+    /// Gets the optional sheet name qualifier for this reference.
+    /// When null, the reference targets the current sheet.
+    /// </summary>
+    public string? Sheet { get; init; }
+
+    /// <summary>
     /// Indicates whether the row reference is absolute (prefixed with '$' in A1 notation). 
     /// </summary>
     public bool IsRowAbsolute { get; init; }
@@ -135,6 +141,21 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
             return false;
         }
 
+        // Support optional sheet name prefix: SheetName!A1
+        string? sheetName = null;
+        var bang = index.IndexOf('!');
+        if (bang >= 0)
+        {
+            sheetName = index[..bang];
+
+            if (string.IsNullOrEmpty(sheetName))
+            {
+                return false;
+            }
+
+            index = index[(bang + 1)..];
+        }
+
         var i = 0;
         var isColumnAbsolute = false;
         var isRowAbsolute = false;
@@ -204,7 +225,8 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
         result = new CellRef(row - 1, column - 1)
         {
             IsColumnAbsolute = isColumnAbsolute,
-            IsRowAbsolute = isRowAbsolute
+            IsRowAbsolute = isRowAbsolute,
+            Sheet = sheetName
         };
         return true;
     }
