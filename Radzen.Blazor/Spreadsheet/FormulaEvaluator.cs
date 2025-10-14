@@ -395,7 +395,7 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
 
         var rows = end.Row - start.Row + 1;
         var columns = end.Column - start.Column + 1;
-        var cells = new RangeList(rows, columns);
+        var cells = new RangeList(rows, columns, start.Row, start.Column, startSheet);
 
         for (var row = start.Row; row <= end.Row; row++)
         {
