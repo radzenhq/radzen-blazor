@@ -10,8 +10,8 @@ class IfErrorFunction : FormulaFunction
 
     public override FunctionParameter[] Parameters =>
     [
-            new("value", ParameterType.Single, isRequired: true),
-            new("value_if_error", ParameterType.Single, isRequired: true)
+        new("value", ParameterType.Single, isRequired: true),
+        new("value_if_error", ParameterType.Single, isRequired: true)
     ];
 
     public override CellData Evaluate(FunctionArguments arguments)
@@ -24,6 +24,7 @@ class IfErrorFunction : FormulaFunction
         }
 
         var valueIfError = arguments.GetSingle("value_if_error");
+
         if (valueIfError == null)
         {
             return CellData.FromError(CellError.Value);
