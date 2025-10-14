@@ -35,6 +35,9 @@ public class FunctionStore
         Add<AndFunction>();
         Add<OrFunction>();
         Add<NotFunction>();
+        Add<VerticalLookupFunction>();
+        Add<HorizontalLookupFunction>();
+        Add<XLookupFunction>();
     }
 
     /// <summary>
