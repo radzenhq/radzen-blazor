@@ -418,12 +418,8 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
                 }
 
                 var cellValue = EvaluateCell(cell);
-
-                if (cellValue.IsError)
-                {
-                    return;
-                }
-
+                // Do not short-circuit on errors here; include them in the range so
+                // functions like SUBTOTAL/AGGREGATE can decide how to handle them.
                 cells.Add(cellValue);
             }
         }
