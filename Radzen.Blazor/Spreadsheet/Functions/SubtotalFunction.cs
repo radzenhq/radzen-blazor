@@ -78,79 +78,13 @@ class SubtotalFunction : FormulaFunction
 
         return code switch
         {
-            1 => EvaluateAverage(numeric),
+            1 => AggregationMethods.Average(numeric),
             2 => CellData.FromNumber(numeric.Count),
             3 => CellData.FromNumber(nonEmptyCount),
-            4 => EvaluateMax(numeric),
-            5 => EvaluateMin(numeric),
-            9 => EvaluateSum(numeric),
+            4 => AggregationMethods.Max(numeric),
+            5 => AggregationMethods.Min(numeric),
+            9 => AggregationMethods.Sum(numeric),
             _ => CellData.FromError(CellError.Value)
         };
-    }
-
-    private static CellData EvaluateAverage(List<double> items)
-    {
-        if (items.Count == 0)
-        {
-            return CellData.FromError(CellError.Div0);
-        }
-
-        double sum = 0;
-
-        foreach (var d in items)
-        {
-            sum += d;
-        }
-
-        return CellData.FromNumber(sum / items.Count);
-    }
-
-    private static CellData EvaluateSum(List<double> items)
-    {
-        double sum = 0;
-        foreach (var d in items)
-        {
-            sum += d;
-        }
-        return CellData.FromNumber(sum);
-    }
-
-    private static CellData EvaluateMax(List<double> items)
-    {
-        if (items.Count == 0)
-        {
-            return CellData.FromNumber(0);
-        }
-
-        var max = items[0];
-
-        for (int i = 1; i < items.Count; i++) 
-        {
-            if (items[i] > max)
-            {
-                max = items[i];
-            }
-        }
-        return CellData.FromNumber(max);
-    }
-
-    private static CellData EvaluateMin(List<double> items)
-    {
-        if (items.Count == 0)
-        {
-            return CellData.FromNumber(0);
-        }
-
-        var min = items[0];
-
-        for (int i = 1; i < items.Count; i++) 
-        {
-            if (items[i] < min)
-            {
-                min = items[i];
-            }
-        }
-
-        return CellData.FromNumber(min);
     }
 }
