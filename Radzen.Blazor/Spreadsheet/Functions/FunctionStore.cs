@@ -44,6 +44,8 @@ public class FunctionStore
         Add<RoundUpFunction>();
         Add<RoundDownFunction>();
         Add<RoundFunction>();
+        Add<IntFunction>();
+        Add<TruncFunction>();
         Add<VerticalLookupFunction>();
         Add<HorizontalLookupFunction>();
         Add<XLookupFunction>();

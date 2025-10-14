@@ -13,5 +13,3 @@ class RoundFunction : RoundFunctionBase
         return Math.Round(value, MidpointRounding.AwayFromZero);
     }
 }
-
-

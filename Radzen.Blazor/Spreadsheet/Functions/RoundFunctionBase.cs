@@ -14,21 +14,28 @@ abstract class RoundFunctionBase : FormulaFunction
 
     protected abstract double Round(double value);
 
+    protected virtual bool TryGetDefaultDigits(out int digits)
+    {
+        digits = 0;
+        return false;
+    }
+
     public override CellData Evaluate(FunctionArguments arguments)
     {
         var numberArg = arguments.GetSingle("number");
         var digitsArg = arguments.GetSingle("num_digits");
 
-        if (numberArg == null || digitsArg == null)
+        if (numberArg == null)
         {
             return CellData.FromError(CellError.Value);
         }
-
+        
         if (numberArg.IsError)
         {
             return numberArg;
         }
-        if (digitsArg.IsError)
+
+        if (digitsArg != null && digitsArg.IsError)
         {
             return digitsArg;
         }
@@ -52,27 +59,38 @@ abstract class RoundFunctionBase : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        double? digitsDouble = null;
+        double? digits = null;
 
-        if (digitsArg.Type == CellDataType.Number)
+        if (digitsArg == null)
         {
-            digitsDouble = digitsArg.GetValueOrDefault<double?>();
+            if (TryGetDefaultDigits(out var def))
+            {
+                digits = def;
+            }
+            else
+            {
+                return CellData.FromError(CellError.Value);
+            }
+        }
+        else if (digitsArg.Type == CellDataType.Number)
+        {
+            digits = digitsArg.GetValueOrDefault<double?>();
         }
         else if (digitsArg.Type == CellDataType.String)
         {
             if (CellData.TryConvertFromString(digitsArg.GetValueOrDefault<string>(), out var converted, out var valueType) && valueType == CellDataType.Number)
             {
-                digitsDouble = (double)converted!;
+                digits = (double)converted!;
             }
         }
 
-        if (digitsDouble is null)
+        if (digits is null)
         {
             return CellData.FromError(CellError.Value);
         }
 
         var n = number.Value;
-        var d = (int)Math.Truncate(digitsDouble.Value);
+        var d = (int)Math.Truncate(digits.Value);
 
         double result;
 
