@@ -29,17 +29,9 @@ abstract class MinMaxBase : FormulaFunction
                 return value;
             }
 
-            if (value.Type == CellDataType.Number)
+            if (value.TryCoerceToNumber(out var num, allowBooleans: false, nonNumericTextAsZero: false))
             {
-                numeric.Add(value.GetValueOrDefault<double>());
-            }
-            else if (value.Type == CellDataType.String)
-            {
-                // Include numeric string literals (typed directly)
-                if (CellData.TryConvertFromString(value.GetValueOrDefault<string>(), out var converted, out var valueType) && valueType == CellDataType.Number)
-                {
-                    numeric.Add((double)converted!);
-                }
+                numeric.Add(num);
             }
         }
 
