@@ -51,6 +51,7 @@ public class FunctionStore
         Add<RandFunction>();
         Add<RandBetweenFunction>();
         Add<IndexFunction>();
+        Add<ChooseFunction>();
         Add<VerticalLookupFunction>();
         Add<HorizontalLookupFunction>();
         Add<XLookupFunction>();
