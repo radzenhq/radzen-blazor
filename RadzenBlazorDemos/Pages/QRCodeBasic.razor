@@ -1,0 +1,31 @@
+@using Radzen.Blazor
+
+<RadzenStack Orientation="Orientation.Horizontal">
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenFieldset Text="@url">
+            <RadzenQRCode Value="@url" />
+        </RadzenFieldset>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenFieldset Text="@email">
+            <RadzenQRCode Value="@email" />
+        </RadzenFieldset>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenFieldset Text="@tel">
+            <RadzenQRCode Value="@tel" />
+        </RadzenFieldset>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Vertical">
+        <RadzenFieldset Text="@geo">
+            <RadzenQRCode Value="@geo" />
+        </RadzenFieldset>
+    </RadzenStack>
+</RadzenStack>
+
+@code{
+    string url = "https://blazor.radzen.com";
+    string email = "mailto:info@radzen.com";
+    string tel = "tel:+1-111-222-3333";
+    string geo = "geo:51.5074,-0.1278,100";
+}

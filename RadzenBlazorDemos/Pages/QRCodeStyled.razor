@@ -1,0 +1,115 @@
+@using Microsoft.AspNetCore.Components.Forms
+
+<RadzenRow Gap="2rem">
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 100%;">
+            <RadzenQRCode Value="Radzen Blazor"
+                          Foreground="@foreground"
+                          Background="@background"
+                          EyeColor="@eyeColor"
+                          ModuleShape="@moduleShape"
+                          EyeShape="@eyeShape"
+                          EyeShapeTopLeft="@topLeftEyeShape"
+                          EyeShapeTopRight="@topRightEyeShape"
+                          EyeShapeBottomLeft="@bottomLeftEyeShape"
+                          EyeColorTopLeft="@topLeftEyeColor"
+                          EyeColorTopRight="@topRightEyeColor"
+                          EyeColorBottomLeft="@bottomLeftEyeColor"
+                          Image="@imageUrl"
+                          ImageBackground="@imageBackground" />
+        </RadzenStack>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenStack Gap="1rem">
+            <RadzenFieldset Text="Colors">
+                <RadzenStack Gap="1rem">
+                    <RadzenFormField Text="Foreground" Variant="@Variant.Outlined">
+                        <RadzenColorPicker @bind-Value="@foreground" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Background" Variant="@Variant.Outlined">
+                        <RadzenColorPicker @bind-Value="@background" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Eye Color" Variant="@Variant.Outlined">
+                        <RadzenColorPicker @bind-Value="@eyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Top Left Eye Color" Variant="@Variant.Outlined">
+                        <RadzenColorPicker @bind-Value="@topLeftEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Top Right Eye Color" Variant="@Variant.Outlined">
+                        <RadzenColorPicker @bind-Value="@topRightEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Bottom Left Eye Color" Variant="@Variant.Outlined">
+                        <RadzenColorPicker @bind-Value="@bottomLeftEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                </RadzenStack>
+            </RadzenFieldset>
+
+            <RadzenFieldset Text="Shapes">
+                <RadzenStack Gap="1rem">
+                    <RadzenFormField Text="Module Shape" Variant="@Variant.Outlined">
+                        <RadzenDropDown @bind-Value="@moduleShape" Data="@moduleShapes" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Eye Shape" Variant="@Variant.Outlined">
+                        <RadzenDropDown @bind-Value="@eyeShape" Data="@eyeShapes" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Top Left Eye Shape" Variant="@Variant.Outlined">
+                        <RadzenDropDown @bind-Value="@topLeftEyeShape" Data="@nullableEyeShapes" AllowClear="true" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Top Right Eye Shape" Variant="@Variant.Outlined">
+                        <RadzenDropDown @bind-Value="@topRightEyeShape" Data="@nullableEyeShapes" AllowClear="true" Style="width: 100%;" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Bottom Left Eye Shape" Variant="@Variant.Outlined">
+                        <RadzenDropDown @bind-Value="@bottomLeftEyeShape" Data="@nullableEyeShapes" AllowClear="true" Style="width: 100%;" />
+                    </RadzenFormField>
+                </RadzenStack>
+            </RadzenFieldset>
+
+            <RadzenFieldset Text="Center Image">
+                <RadzenStack Gap="1rem">
+                    <RadzenFormField Text="Image" Variant="@Variant.Outlined">
+                        <RadzenUpload Change="@OnImageChange" Accept="image/*" />
+                    </RadzenFormField>
+                    <RadzenFormField Text="Image Background" Variant="@Variant.Outlined">
+                        <RadzenColorPicker @bind-Value="@imageBackground" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                </RadzenStack>
+            </RadzenFieldset>
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    string foreground = "#0f62fe";
+    string background = "#eef4ff";
+
+    string eyeColor = "#0f62fe";
+    string topLeftEyeColor;
+    string topRightEyeColor;
+    string bottomLeftEyeColor;
+
+    QRCodeModuleShape moduleShape = QRCodeModuleShape.Square;
+
+    QRCodeEyeShape eyeShape = QRCodeEyeShape.Square;
+    QRCodeEyeShape? topLeftEyeShape;
+    QRCodeEyeShape? topRightEyeShape;
+    QRCodeEyeShape? bottomLeftEyeShape;
+
+    string imageUrl;
+    string imageBackground = "#FFFFFF";
+
+    QRCodeModuleShape[] moduleShapes = Enum.GetValues<QRCodeModuleShape>();
+    QRCodeEyeShape[] eyeShapes = Enum.GetValues<QRCodeEyeShape>();
+    QRCodeEyeShape?[] nullableEyeShapes = new QRCodeEyeShape?[] { null, QRCodeEyeShape.Framed, QRCodeEyeShape.Rounded, QRCodeEyeShape.Square};
+
+    async Task OnImageChange(UploadChangeEventArgs args)
+    {
+        var file = args.Files.FirstOrDefault();
+        if (file != null)
+        {
+            var buffers = new byte[file.Size];
+            await file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024).ReadAsync(buffers);
+            var base64 = Convert.ToBase64String(buffers);
+            imageUrl = $"data:{file.ContentType};base64,{base64}";
+        }
+    }
+}
