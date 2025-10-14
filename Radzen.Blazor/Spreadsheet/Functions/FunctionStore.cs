@@ -39,6 +39,8 @@ public class FunctionStore
         Add<MaxAllFunction>();
         Add<MinFunction>();
         Add<MinAllFunction>();
+        Add<LargeFunction>();
+        Add<SmallFunction>();
         Add<VerticalLookupFunction>();
         Add<HorizontalLookupFunction>();
         Add<XLookupFunction>();
