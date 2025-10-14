@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -117,12 +118,24 @@ class DependencyVisitor(Sheet sheet) : IFormulaSyntaxNodeVisitor
     public void VisitCell(CellSyntaxNode cellIdentifierSyntaxNode)
     {
         var address = cellIdentifierSyntaxNode.Token.Address;
-        if (address.Row >= sheet.RowCount || address.Column >= sheet.ColumnCount)
+        var targetSheet = sheet;
+
+        if (!string.IsNullOrEmpty(address.Sheet))
+        {
+            var wb = sheet.Workbook;
+            targetSheet = wb.GetSheet(address.Sheet) ?? targetSheet;
+            if (targetSheet.Name != address.Sheet)
+            {
+                return;
+            }
+        }
+
+        if (address.Row >= targetSheet.RowCount || address.Column >= targetSheet.ColumnCount)
         {
             // Out of bounds, do not add dependency
             return;
         }
-        var cell = sheet.Cells[address];
+        var cell = targetSheet.Cells[address];
         Dependencies.Add(cell);
     }
 

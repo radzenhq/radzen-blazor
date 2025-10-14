@@ -769,7 +769,6 @@ internal class FormulaLexer(string expression, bool strict = true)
                 case '\r':
                 case '\n':
                 case '\t':
-                case '!':
                 case '%':
                 case '(':
                 case ')':
@@ -812,8 +811,10 @@ internal class FormulaLexer(string expression, bool strict = true)
                 case '_':
                     Advance(1);
                     continue;
+                case '!':
+                    Advance(1);
+                    continue;
                 case '$':
-                    // Absolute reference marker is part of identifiers
                     Advance(1);
                     continue;
 
