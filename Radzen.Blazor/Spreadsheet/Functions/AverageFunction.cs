@@ -13,17 +13,16 @@ class AverageFunction : FormulaFunction
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var numbers = arguments.GetSequence("number");
+        var values = arguments.GetSequence("number");
 
-        if (numbers == null || numbers.Count == 0)
+        if (values == null || values.Count == 0)
         {
             return CellData.FromError(CellError.Div0);
         }
 
-        var sum = 0d;
-        var count = 0;
+        var numeric = new System.Collections.Generic.List<double>();
 
-        foreach (var argument in numbers)
+        foreach (var argument in values)
         {
             if (argument.IsError)
             {
@@ -35,17 +34,9 @@ class AverageFunction : FormulaFunction
                 continue;
             }
 
-            var value = argument.GetValueOrDefault<double>();
-
-            sum += value;
-            count++;
+            numeric.Add(argument.GetValueOrDefault<double>());
         }
 
-        if (count == 0)
-        {
-            return CellData.FromError(CellError.Div0);
-        }
-
-        return CellData.FromNumber(sum / count);
+        return AggregationMethods.Average(numeric);
     }
 }
