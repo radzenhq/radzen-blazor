@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Spreadsheet;
 
 abstract class KOrderFunctionBase : FormulaFunction
 {
-    protected abstract double GetResult(List<double> numbers, int k);
+    protected abstract CellData Compute(List<double> numbers, int k);
 
     public override FunctionParameter[] Parameters =>
     [
@@ -61,10 +61,6 @@ abstract class KOrderFunctionBase : FormulaFunction
             return CellData.FromError(CellError.Num);
         }
 
-        numbers.Sort();
-
-        var result = GetResult(numbers, k.Value);
-
-        return CellData.FromNumber(result);
+        return Compute(numbers, k.Value);
     }
 }
