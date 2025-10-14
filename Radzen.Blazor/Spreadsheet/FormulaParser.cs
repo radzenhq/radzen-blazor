@@ -373,6 +373,30 @@ internal class FormulaParser
             {
                 Advance(1);
                 var endToken = Expect(FormulaTokenType.CellIdentifier);
+                // If either side has a sheet, ensure both sides have the same sheet; if only one has sheet, propagate to the other
+                var startAddr = start.Token.Address;
+                var endAddr = endToken.Address;
+                if (startAddr.Sheet != null && endAddr.Sheet == null)
+                {
+                    endToken.Address = new CellRef(endAddr.Row, endAddr.Column)
+                    {
+                        IsColumnAbsolute = endAddr.IsColumnAbsolute,
+                        IsRowAbsolute = endAddr.IsRowAbsolute,
+                        Sheet = startAddr.Sheet
+                    };
+                }
+                else if (endAddr.Sheet != null && startAddr.Sheet == null)
+                {
+                    start = new CellSyntaxNode(new FormulaToken(start.Token.Type, start.Token.Value)
+                    {
+                        Address = new CellRef(startAddr.Row, startAddr.Column)
+                        {
+                            IsColumnAbsolute = startAddr.IsColumnAbsolute,
+                            IsRowAbsolute = startAddr.IsRowAbsolute,
+                            Sheet = endAddr.Sheet
+                        }
+                    });
+                }
                 return new RangeSyntaxNode(token, start, new CellSyntaxNode(endToken));
             }
 
