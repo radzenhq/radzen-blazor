@@ -8,8 +8,5 @@ class LargeFunction : KOrderFunctionBase
 {
     public override string Name => "LARGE";
 
-    protected override double GetResult(List<double> numbers, int k)
-    {
-        return numbers[numbers.Count - k];
-    }
+    protected override CellData Compute(List<double> numbers, int k) => AggregationMethods.Large(numbers, k);
 }
