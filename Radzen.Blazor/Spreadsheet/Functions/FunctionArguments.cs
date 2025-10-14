@@ -7,9 +7,14 @@ namespace Radzen.Blazor.Spreadsheet;
 /// <summary>
 /// Represents the arguments passed to a formula function, organized by parameter name.
 /// </summary>
-public class FunctionArguments
+public class FunctionArguments(Cell currentCell)
 {
     private readonly Dictionary<string, object> arguments = [];
+
+    /// <summary>
+    /// The cell currently being evaluated (context for functions like ROW/COLUMN when reference is omitted).
+    /// </summary>
+    public Cell CurrentCell => currentCell;
 
     /// <summary>
     /// Sets an argument value for the specified parameter name.
