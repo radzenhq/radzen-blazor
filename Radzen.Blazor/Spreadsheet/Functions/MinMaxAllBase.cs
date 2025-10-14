@@ -4,7 +4,7 @@ namespace Radzen.Blazor.Spreadsheet;
 
 abstract class MinMaxAllBase : FormulaFunction
 {
-    protected abstract bool Satisfies(double candidate, double best);
+    protected abstract CellData Compute(System.Collections.Generic.List<double> numbers);
 
     public override FunctionParameter[] Parameters =>
     [
@@ -20,8 +20,7 @@ abstract class MinMaxAllBase : FormulaFunction
             return CellData.FromNumber(0d);
         }
 
-        var hasAny = false;
-        double best = 0d;
+        var numeric = new System.Collections.Generic.List<double>();
 
         foreach (var value in values)
         {
@@ -35,46 +34,34 @@ abstract class MinMaxAllBase : FormulaFunction
                 continue;
             }
 
-            double? candidate = null;
-
             switch (value.Type)
             {
                 case CellDataType.Number:
-                    candidate = value.GetValueOrDefault<double>();
+                    numeric.Add(value.GetValueOrDefault<double>());
                     break;
                 case CellDataType.Boolean:
-                    candidate = value.GetValueOrDefault<bool>() ? 1d : 0d;
+                    numeric.Add(value.GetValueOrDefault<bool>() ? 1d : 0d);
                     break;
                 case CellDataType.String:
                     if (CellData.TryConvertFromString(value.GetValueOrDefault<string>(), out var converted, out var valueType) && valueType == CellDataType.Number)
                     {
-                        candidate = (double)converted!;
+                        numeric.Add((double)converted!);
                     }
                     else
                     {
-                        candidate = 0d;
+                        numeric.Add(0d);
                     }
                     break;
                 default:
                     break;
             }
-
-            if (candidate is null)
-            {
-                continue;
-            }
-
-            if (!hasAny)
-            {
-                best = candidate.Value;
-                hasAny = true;
-            }
-            else if (Satisfies(candidate.Value, best))
-            {
-                best = candidate.Value;
-            }
         }
 
-        return CellData.FromNumber(hasAny ? best : 0d);
+        if (numeric.Count == 0)
+        {
+            return CellData.FromNumber(0d);
+        }
+
+        return Compute(numeric);
     }
 }

@@ -5,5 +5,5 @@ namespace Radzen.Blazor.Spreadsheet;
 class MaxFunction : MinMaxBase
 {
     public override string Name => "MAX";
-    protected override bool Satisfies(double candidate, double best) => candidate > best;
+    protected override CellData Compute(System.Collections.Generic.List<double> numbers) => AggregationMethods.Max(numbers);
 }

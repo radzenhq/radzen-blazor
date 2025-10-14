@@ -4,7 +4,7 @@ namespace Radzen.Blazor.Spreadsheet;
 
 abstract class MinMaxBase : FormulaFunction
 {
-    protected abstract bool Satisfies(double candidate, double best);
+    protected abstract CellData Compute(System.Collections.Generic.List<double> numbers);
 
     public override FunctionParameter[] Parameters =>
     [
@@ -20,8 +20,7 @@ abstract class MinMaxBase : FormulaFunction
             return CellData.FromNumber(0d);
         }
 
-        var hasNumber = false;
-        double best = 0d;
+        var numeric = new System.Collections.Generic.List<double>();
 
         foreach (var value in values)
         {
@@ -30,39 +29,25 @@ abstract class MinMaxBase : FormulaFunction
                 return value;
             }
 
-            double? maybeNum = null;
-
             if (value.Type == CellDataType.Number)
             {
-                maybeNum = value.GetValueOrDefault<double>();
+                numeric.Add(value.GetValueOrDefault<double>());
             }
             else if (value.Type == CellDataType.String)
             {
-                // Count numeric string literals
+                // Include numeric string literals (typed directly)
                 if (CellData.TryConvertFromString(value.GetValueOrDefault<string>(), out var converted, out var valueType) && valueType == CellDataType.Number)
                 {
-                    maybeNum = (double)converted!;
+                    numeric.Add((double)converted!);
                 }
-            }
-
-            if (maybeNum is null)
-            {
-                continue;
-            }
-
-            var num = maybeNum.Value;
-
-            if (!hasNumber)
-            {
-                best = num;
-                hasNumber = true;
-            }
-            else if (Satisfies(num, best))
-            {
-                best = num;
             }
         }
 
-        return hasNumber ? CellData.FromNumber(best) : CellData.FromNumber(0d);
+        if (numeric.Count == 0)
+        {
+            return CellData.FromNumber(0d);
+        }
+
+        return Compute(numeric);
     }
 }
