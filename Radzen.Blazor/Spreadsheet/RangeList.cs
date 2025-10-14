@@ -11,6 +11,7 @@ namespace Radzen.Blazor.Spreadsheet;
 public class RangeList : List<CellData>
 {
     private readonly Sheet sheet;
+    internal Sheet Sheet => sheet;
     /// <summary>
     /// Number of rows in the range.
     /// </summary>
