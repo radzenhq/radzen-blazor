@@ -57,6 +57,23 @@ public class Workbook
     }
 
     /// <summary>
+    /// Gets the sheet with the specified name or null if not found.
+    /// </summary>
+    /// <param name="name"></param>
+    public Sheet? GetSheet(string name)
+    {
+        foreach (var sheet in sheets)
+        {
+            if (sheet.Name == name)
+            {
+                return sheet;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
     /// Saves the workbook to the specified stream in the Open XML Spreadsheet format (XLSX).
     /// </summary>
     /// <param name="stream"></param>

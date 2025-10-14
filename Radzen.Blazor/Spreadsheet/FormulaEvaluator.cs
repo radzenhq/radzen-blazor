@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -193,21 +194,34 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
     public void VisitCell(CellSyntaxNode cellSyntaxNode)
     {
         var address = cellSyntaxNode.Token.Address;
+        // Resolve sheet (default to current sheet)
+        var targetSheet = sheet;
+        if (!string.IsNullOrEmpty(address.Sheet))
+        {
+            var wb = sheet.Workbook;
+            targetSheet = wb.GetSheet(address.Sheet) ?? targetSheet;
+            if (targetSheet.Name != address.Sheet)
+            {
+                value = CellData.FromError(CellError.Ref);
+                return;
+            }
+        }
+
         // If the row/column was deleted, set whole formula to =#REF!
-        if (sheet.IsDeletedRow(address.Row) || sheet.IsDeletedColumn(address.Column))
+        if (targetSheet.IsDeletedRow(address.Row) || targetSheet.IsDeletedColumn(address.Column))
         {
             value = CellData.FromError(CellError.Ref);
             return;
         }
 
         // If out of bounds, return #REF!
-        if ((address.Row < 0 || address.Row >= sheet.RowCount) || (address.Column < 0 || address.Column >= sheet.ColumnCount))
+        if ((address.Row < 0 || address.Row >= targetSheet.RowCount) || (address.Column < 0 || address.Column >= targetSheet.ColumnCount))
         {
             value = CellData.FromError(CellError.Ref);
             return;
         }
 
-        if (!sheet.Cells.TryGet(address.Row, address.Column, out var cell))
+        if (!targetSheet.Cells.TryGet(address.Row, address.Column, out var cell))
         {
             value = CellData.FromError(CellError.Ref);
             return;
@@ -348,6 +362,31 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         var start = rangeSyntaxNode.Start.Token.Address;
         var end = rangeSyntaxNode.End.Token.Address;
 
+        // Resolve target sheet for the range
+        var startSheet = sheet;
+        if (!string.IsNullOrEmpty(start.Sheet))
+        {
+            var wb = sheet.Workbook;
+            startSheet = wb.Sheets.FirstOrDefault(s => s.Name == start.Sheet) ?? startSheet;
+            if (startSheet.Name != start.Sheet)
+            {
+                value = CellData.FromError(CellError.Ref);
+                return;
+            }
+        }
+
+        // If end has no sheet specified, assume same as start; otherwise they must match
+        var endSheet = startSheet;
+        if (!string.IsNullOrEmpty(end.Sheet))
+        {
+            endSheet = sheet.Workbook.Sheets.FirstOrDefault(s => s.Name == end.Sheet) ?? endSheet;
+            if (endSheet.Name != end.Sheet || endSheet != startSheet)
+            {
+                value = CellData.FromError(CellError.Ref);
+                return;
+            }
+        }
+
         if (start.Row > end.Row || (start.Row == end.Row && start.Column > end.Column))
         {
             value = CellData.FromError(CellError.Value);
@@ -360,17 +399,17 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
         {
             for (var column = start.Column; column <= end.Column; column++)
             {
-                if (sheet.IsDeletedRow(row) || sheet.IsDeletedColumn(column))
+                if (startSheet.IsDeletedRow(row) || startSheet.IsDeletedColumn(column))
                 {
                     value = CellData.FromError(CellError.Ref);
                     return;
                 }
-                if (row < 0 || row >= sheet.RowCount || column < 0 || column >= sheet.ColumnCount)
+                if (row < 0 || row >= startSheet.RowCount || column < 0 || column >= startSheet.ColumnCount)
                 {
                     value = CellData.FromError(CellError.Ref);
                     return;
                 }
-                if (!sheet.Cells.TryGet(row, column, out var cell))
+                if (!startSheet.Cells.TryGet(row, column, out var cell))
                 {
                     value = CellData.FromError(CellError.Ref);
                     return;
