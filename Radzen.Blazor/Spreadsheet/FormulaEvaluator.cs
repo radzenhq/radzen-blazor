@@ -41,7 +41,7 @@ public enum CellError
     Circular // #CIRCULAR - Circular reference
 }
 
-class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
+class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisitor
 {
     private readonly Sheet sheet = sheet;
     private object? value;
@@ -257,7 +257,7 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
     private FunctionArguments? ProcessArguments(FormulaFunction function, List<FormulaSyntaxNode> argumentNodes)
     {
         var parameterDefinitions = function.Parameters;
-        var functionArguments = new FunctionArguments();
+        var functionArguments = new FunctionArguments(currentCell);
         var argumentIndex = 0;
 
         for (int paramIndex = 0; paramIndex < parameterDefinitions.Length; paramIndex++)
@@ -305,6 +305,10 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
                     // Set the argument based on parameter type
                     if (paramDef.Type == ParameterType.Collection)
                     {
+                        if (argumentNodes[argumentIndex] is CellSyntaxNode cellNode)
+                        {
+                            argument = new RangeList(1, 1, cellNode.Token.Address.Row, cellNode.Token.Address.Column, sheet) { argument[0] };
+                        }
                         // For collections, pass the list directly
                         functionArguments.Set(paramDef.Name, argument);
                     }
@@ -406,11 +410,13 @@ class FormulaEvaluator(Sheet sheet) : IFormulaSyntaxNodeVisitor
                     value = CellData.FromError(CellError.Ref);
                     return;
                 }
+
                 if (row < 0 || row >= startSheet.RowCount || column < 0 || column >= startSheet.ColumnCount)
                 {
                     value = CellData.FromError(CellError.Ref);
                     return;
                 }
+
                 if (!startSheet.Cells.TryGet(row, column, out var cell))
                 {
                     value = CellData.FromError(CellError.Ref);
