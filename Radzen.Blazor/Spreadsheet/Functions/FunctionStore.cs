@@ -35,6 +35,7 @@ public class FunctionStore
         Add<AndFunction>();
         Add<OrFunction>();
         Add<NotFunction>();
+        Add<RowFunction>();
         Add<MaxFunction>();
         Add<MaxAllFunction>();
         Add<MinFunction>();
