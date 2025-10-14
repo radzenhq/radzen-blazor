@@ -48,6 +48,8 @@ public class FunctionStore
         Add<TruncFunction>();
         Add<SubtotalFunction>();
         Add<AggregateFunction>();
+        Add<RandFunction>();
+        Add<RandBetweenFunction>();
         Add<VerticalLookupFunction>();
         Add<HorizontalLookupFunction>();
         Add<XLookupFunction>();
