@@ -153,10 +153,10 @@ public class CellData : IComparable, IComparable<CellData>
         return false;
     }
 
-    internal bool TryGetInt(out int value)
+    internal bool TryGetInt(out int value, bool allowBooleans = true, bool nonNumericTextAsZero = false)
     {
         value = 0;
-        if (!TryCoerceToNumber(out var number, allowBooleans: true, nonNumericTextAsZero: false))
+        if (!TryCoerceToNumber(out var number, allowBooleans, nonNumericTextAsZero))
         {
             return false;
         }

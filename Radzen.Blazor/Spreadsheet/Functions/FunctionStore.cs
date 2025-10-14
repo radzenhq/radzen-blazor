@@ -50,6 +50,7 @@ public class FunctionStore
         Add<AggregateFunction>();
         Add<RandFunction>();
         Add<RandBetweenFunction>();
+        Add<IndexFunction>();
         Add<VerticalLookupFunction>();
         Add<HorizontalLookupFunction>();
         Add<XLookupFunction>();
