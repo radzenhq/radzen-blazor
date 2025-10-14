@@ -928,6 +928,767 @@ namespace Radzen.Blazor.Tests
             
             Assert.Equal(3, result.Count);
         }
+
+        // Property/FilterProperty tests for collection item filtering
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag1", Value = 50 }, new { Name = "tag5", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "tag1",
+                    FilterOperator = FilterOperator.Equals
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithContains()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "important", Value = 10 }, new { Name = "urgent", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "normal", Value = 30 }, new { Name = "low", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "important", Value = 50 }, new { Name = "high", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "import",
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithStartsWith()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag_alpha", Value = 10 }, new { Name = "tag_beta", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "item_gamma", Value = 30 }, new { Name = "item_delta", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag_epsilon", Value = 50 }, new { Name = "other", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "tag_",
+                    FilterOperator = FilterOperator.StartsWith
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithEndsWith()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "file.txt", Value = 10 }, new { Name = "doc.pdf", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "image.png", Value = 30 }, new { Name = "photo.jpg", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "data.txt", Value = 50 }, new { Name = "info.doc", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = ".txt",
+                    FilterOperator = FilterOperator.EndsWith
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithNotEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "active", Value = 10 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "inactive", Value = 20 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "pending", Value = 30 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "inactive",
+                    FilterOperator = FilterOperator.NotEquals
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithDoesNotContain()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "important-task", Value = 10 }, new { Name = "important-note", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "simple", Value = 30 }, new { Name = "basic", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "important-meeting", Value = 50 }, new { Name = "review", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "important",
+                    FilterOperator = FilterOperator.DoesNotContain
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 2);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_Numeric_WithGreaterThan()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 40,
+                    FilterOperator = FilterOperator.GreaterThan
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Single(result);
+            Assert.Equal(3, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_Numeric_WithLessThan()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 25,
+                    FilterOperator = FilterOperator.LessThan
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Single(result);
+            Assert.Equal(1, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_Numeric_WithGreaterThanOrEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 50,
+                    FilterOperator = FilterOperator.GreaterThanOrEquals
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Single(result);
+            Assert.Equal(3, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_Numeric_WithLessThanOrEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 20,
+                    FilterOperator = FilterOperator.LessThanOrEquals
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Single(result);
+            Assert.Equal(1, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithIsNull()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = (string)null, Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = (string)null, Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNull
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithIsNotNull()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = (string)null, Value = 10 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNotNull
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 2);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_CaseInsensitive()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "IMPORTANT", Value = 10 }, new { Name = "urgent", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "normal", Value = 30 }, new { Name = "low", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "Important", Value = 50 }, new { Name = "high", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "important",
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.CaseInsensitive).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_MultipleConditions_WithAnd()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 15 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag1", Value = 50 }, new { Name = "tag5", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 20,
+                    FilterOperator = FilterOperator.LessThan,
+                    SecondFilterValue = 10,
+                    SecondFilterOperator = FilterOperator.GreaterThan,
+                    LogicalFilterOperator = LogicalFilterOperator.And
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Only items with any tag Value < 20 AND any tag Value > 10
+            Assert.Single(result);
+            Assert.Equal(1, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_MultipleConditions_WithOr()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 70 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag1", Value = 50 }, new { Name = "tag5", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 20,
+                    FilterOperator = FilterOperator.LessThan,
+                    SecondFilterValue = 60,
+                    SecondFilterOperator = FilterOperator.GreaterThan,
+                    LogicalFilterOperator = LogicalFilterOperator.Or
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Items with tags where Value<20 OR Value>60
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 2);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithIsEmpty()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "", Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsEmpty
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithIsNotEmpty()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "", Value = 10 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNotEmpty
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 2);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_CombinedWithRegularFilter()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Name = "Product1", Tags = new[] { new { Label = "premium", Price = 100 } }.ToList() },
+                new { Id = 2, Name = "Product2", Tags = new[] { new { Label = "standard", Price = 50 } }.ToList() },
+                new { Id = 3, Name = "Product3", Tags = new[] { new { Label = "premium", Price = 150 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Label",
+                    FilterValue = "premium",
+                    FilterOperator = FilterOperator.Equals
+                },
+                new FilterDescriptor 
+                { 
+                    Property = "Name",
+                    FilterValue = "Product1",
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Single(result);
+            Assert.Equal(1, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersNestedCollectionItemProperty()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new { Category = "A" } } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new { Category = "B" } } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new { Category = "A" } } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Items",
+                    FilterProperty = "Meta.Category",
+                    FilterValue = "A",
+                    FilterOperator = FilterOperator.Equals
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersNestedCollectionItemProperty_WithIn()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new { Category = "A" } } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new { Category = "B" } } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new { Category = "C" } } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Items",
+                    FilterProperty = "Meta.Category",
+                    FilterValue = new[] { "A", "C" },
+                    FilterOperator = FilterOperator.In
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersNestedCollectionItemProperty_WithNotIn()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new { Category = "A" } } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new { Category = "B" } } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new { Category = "C" } } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Items",
+                    FilterProperty = "Meta.Category",
+                    FilterValue = new[] { "A" },
+                    FilterOperator = FilterOperator.NotIn
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 2);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersNestedCollectionItemProperty_WithContains()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new { Category = "Alpha" } } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new { Category = "Beta" } } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new { Category = "Alpine" } } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Items",
+                    FilterProperty = "Meta.Category",
+                    FilterValue = "Al",
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersNestedCollectionItemProperty_WithDoesNotContain()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new { Category = "Entertainment" } } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new { Category = "Sports" } } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new { Category = "Edutainment" } } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Items",
+                    FilterProperty = "Meta.Category",
+                    FilterValue = "tain",
+                    FilterOperator = FilterOperator.DoesNotContain
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            // Excludes categories containing "tain" -> Entertainment, Edutainment
+            Assert.Single(result);
+            Assert.Equal(2, result[0].Id);
+        }
+
+        // Nested collection (Items) with Meta also a collection. Use indexed access to Meta[0].Category
+        [Fact]
+        public void Where_FiltersDoubleNested_WithIn_OnFirstMeta()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new[] { new { Category = "A" }, new { Category = "X" } }.ToList() } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new[] { new { Category = "B" } }.ToList() } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new[] { new { Category = "C" } }.ToList() } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Items",
+                    FilterProperty = "Meta[0].Category",
+                    FilterValue = new[] { "A", "C" },
+                    FilterOperator = FilterOperator.In
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersDoubleNested_WithNotIn_OnFirstMeta()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new[] { new { Category = "A" } }.ToList() } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new[] { new { Category = "B" } }.ToList() } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new[] { new { Category = "C" } }.ToList() } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Items",
+                    FilterProperty = "Meta[0].Category",
+                    FilterValue = new[] { "A" },
+                    FilterOperator = FilterOperator.NotIn
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 2);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersDoubleNested_WithContains_OnFirstMeta()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new[] { new { Category = "Alpha" } }.ToList() } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new[] { new { Category = "Beta" } }.ToList() } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new[] { new { Category = "Alpine" } }.ToList() } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Items",
+                    FilterProperty = "Meta[0].Category",
+                    FilterValue = "Al",
+                    FilterOperator = FilterOperator.Contains
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersDoubleNested_WithDoesNotContain_OnFirstMeta()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Items = new[] { new { Name = "item1", Meta = new[] { new { Category = "Entertainment" } }.ToList() } }.ToList() },
+                new { Id = 2, Items = new[] { new { Name = "item2", Meta = new[] { new { Category = "Sports" } }.ToList() } }.ToList() },
+                new { Id = 3, Items = new[] { new { Name = "item3", Meta = new[] { new { Category = "Edutainment" } }.ToList() } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor
+                {
+                    Property = "Items",
+                    FilterProperty = "Meta[0].Category",
+                    FilterValue = "tain",
+                    FilterOperator = FilterOperator.DoesNotContain
+                }
+            };
+
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+
+            Assert.Single(result);
+            Assert.Equal(2, result[0].Id);
+        }
     }
 }
 
