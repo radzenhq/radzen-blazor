@@ -34,26 +34,9 @@ abstract class MinMaxAllBase : FormulaFunction
                 continue;
             }
 
-            switch (value.Type)
+            if (value.TryCoerceToNumber(out var num, allowBooleans: true, nonNumericTextAsZero: true))
             {
-                case CellDataType.Number:
-                    numeric.Add(value.GetValueOrDefault<double>());
-                    break;
-                case CellDataType.Boolean:
-                    numeric.Add(value.GetValueOrDefault<bool>() ? 1d : 0d);
-                    break;
-                case CellDataType.String:
-                    if (CellData.TryConvertFromString(value.GetValueOrDefault<string>(), out var converted, out var valueType) && valueType == CellDataType.Number)
-                    {
-                        numeric.Add((double)converted!);
-                    }
-                    else
-                    {
-                        numeric.Add(0d);
-                    }
-                    break;
-                default:
-                    break;
+                numeric.Add(num);
             }
         }
 
