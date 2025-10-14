@@ -32,7 +32,7 @@ class RandBetweenFunction : FormulaFunction
             return topArg;
         }
 
-        if (!TryToInt(bottomArg, out var bottom) || !TryToInt(topArg, out var top))
+        if (!bottomArg.TryGetInt(out var bottom) || !topArg.TryGetInt(out var top))
         {
             return CellData.FromError(CellError.Value);
         }
@@ -47,29 +47,5 @@ class RandBetweenFunction : FormulaFunction
         return CellData.FromNumber(result);
     }
 
-    private static bool TryToInt(CellData data, out int value)
-    {
-        value = 0;
-        if (data.Type == CellDataType.Number)
-        {
-            // Truncate toward zero like Excel INT for arguments
-            var d = data.GetValueOrDefault<double>();
-            value = (int)System.Math.Truncate(d);
-            return true;
-        }
-        if (data.Type == CellDataType.String)
-        {
-            if (CellData.TryConvertFromString(data.GetValueOrDefault<string>(), out var conv, out var t) && t == CellDataType.Number)
-            {
-                value = (int)System.Math.Truncate((double)conv!);
-                return true;
-            }
-        }
-        if (data.Type == CellDataType.Boolean)
-        {
-            value = data.GetValueOrDefault<bool>() ? 1 : 0;
-            return true;
-        }
-        return false;
-    }
+    // Number parsing moved to CellData.TryGetInt
 }

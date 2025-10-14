@@ -40,21 +40,7 @@ abstract class RoundFunctionBase : FormulaFunction
             return digitsArg;
         }
 
-        double? number = null;
-
-        if (numberArg.Type == CellDataType.Number)
-        {
-            number = numberArg.GetValueOrDefault<double>();
-        }
-        else if (numberArg.Type == CellDataType.String)
-        {
-            if (CellData.TryConvertFromString(numberArg.GetValueOrDefault<string>(), out var converted, out var valueType) && valueType == CellDataType.Number)
-            {
-                number = (double)converted!;
-            }
-        }
-
-        if (number is null)
+        if (!numberArg.TryCoerceToNumber(out var number, allowBooleans: false, nonNumericTextAsZero: false))
         {
             return CellData.FromError(CellError.Value);
         }
@@ -78,9 +64,9 @@ abstract class RoundFunctionBase : FormulaFunction
         }
         else if (digitsArg.Type == CellDataType.String)
         {
-            if (CellData.TryConvertFromString(digitsArg.GetValueOrDefault<string>(), out var converted, out var valueType) && valueType == CellDataType.Number)
+            if (digitsArg.TryCoerceToNumber(out var dn, allowBooleans: false, nonNumericTextAsZero: false))
             {
-                digits = (double)converted!;
+                digits = dn;
             }
         }
 
@@ -89,7 +75,7 @@ abstract class RoundFunctionBase : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        var n = number.Value;
+        var n = number;
         var d = (int)Math.Truncate(digits.Value);
 
         double result;
