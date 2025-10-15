@@ -84,7 +84,7 @@ app.UseRouting();
 app.UseAntiforgery();
 app.MapRazorPages();
 app.MapRazorComponents<RadzenBlazorDemos.Server.App>()
-    .AddInteractiveServerRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.App).Assembly);
+    .AddInteractiveServerRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly);
 app.MapControllers();
 
 app.Run();
