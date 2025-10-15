@@ -59,6 +59,7 @@ public class FunctionStore
         Add<VerticalLookupFunction>();
         Add<HorizontalLookupFunction>();
         Add<XLookupFunction>();
+        Add<LenFunction>();
     }
 
     /// <summary>
