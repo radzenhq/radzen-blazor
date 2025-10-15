@@ -92,7 +92,7 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedUICultures = supportedCultures
 });
 */
-
+app.UseStatusCodePagesWithReExecute("/not-found");
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
 app.MapStaticAssets();
@@ -101,6 +101,6 @@ app.UseRouting();
 app.UseAntiforgery();
 app.MapRazorPages();
 app.MapRazorComponents<RadzenBlazorDemos.Host.App>()
-    .AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.App).Assembly);
+    .AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly);
 app.MapControllers();
 app.Run();
