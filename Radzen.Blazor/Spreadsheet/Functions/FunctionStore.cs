@@ -64,6 +64,7 @@ public class FunctionStore
         Add<ConcatFunction>();
         Add<TextJoinFunction>();
         Add<LeftFunction>();
+        Add<RightFunction>();
     }
 
     /// <summary>
