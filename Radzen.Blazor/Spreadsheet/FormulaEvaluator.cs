@@ -118,6 +118,21 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
             BinaryOperator.LessThan or BinaryOperator.LessThanOrEqual or
             BinaryOperator.GreaterThan or BinaryOperator.GreaterThanOrEqual;
 
+        // Coerce Date to Number for arithmetic operations (Excel semantics: dates are serials)
+        if (!isComparisonOperator)
+        {
+            if (left.Type == CellDataType.Date)
+            {
+                var ln = left.GetValueOrDefault<DateTime>().ToNumber();
+                left = CellData.FromNumber(ln);
+            }
+            if (right.Type == CellDataType.Date)
+            {
+                var rn = right.GetValueOrDefault<DateTime>().ToNumber();
+                right = CellData.FromNumber(rn);
+            }
+        }
+
         if (!isComparisonOperator && (left.Type != CellDataType.Number || right.Type != CellDataType.Number))
         {
             value = CellData.FromError(CellError.Value);
