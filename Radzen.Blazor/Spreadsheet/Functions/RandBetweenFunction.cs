@@ -33,6 +33,4 @@ class RandBetweenFunction : FormulaFunction
         int result = bottom + System.Random.Shared.Next(range);
         return CellData.FromNumber(result);
     }
-
-    // Number parsing moved to CellData.TryGetInt
 }

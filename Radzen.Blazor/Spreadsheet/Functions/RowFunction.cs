@@ -35,8 +35,6 @@ class RowFunction : FormulaFunction
             return CellData.FromNumber(range.StartRow + 1);
         }
 
-        // Single value (treated as 1x1 reference), we cannot resolve its address → error
         return CellData.FromError(CellError.Value);
     }
 }
-

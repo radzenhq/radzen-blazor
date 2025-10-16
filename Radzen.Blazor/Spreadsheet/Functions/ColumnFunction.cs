@@ -33,5 +33,3 @@ class ColumnFunction : FormulaFunction
         return CellData.FromError(CellError.Value);
     }
 }
-
-
