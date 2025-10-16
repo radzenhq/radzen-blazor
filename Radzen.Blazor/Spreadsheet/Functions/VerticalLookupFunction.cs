@@ -1,8 +1,5 @@
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-
 namespace Radzen.Blazor.Spreadsheet;
 
 class VerticalLookupFunction : FormulaFunction
@@ -147,5 +144,3 @@ class VerticalLookupFunction : FormulaFunction
         return resultCell;
     }
 }
-
-
