@@ -109,6 +109,11 @@ class DependencyVisitor(Sheet sheet) : IFormulaSyntaxNodeVisitor
     {
     }
 
+    public void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
+    {
+        unaryExpressionSyntaxNode.Operand.Accept(this);
+    }
+
     public void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
     {
     }
