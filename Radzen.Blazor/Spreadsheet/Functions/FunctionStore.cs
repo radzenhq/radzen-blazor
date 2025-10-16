@@ -60,6 +60,7 @@ public class FunctionStore
         Add<HorizontalLookupFunction>();
         Add<XLookupFunction>();
         Add<LenFunction>();
+        Add<TrimFunction>();
     }
 
     /// <summary>
