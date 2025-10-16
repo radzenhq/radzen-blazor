@@ -67,6 +67,7 @@ public class FunctionStore
         Add<RightFunction>();
         Add<MidFunction>();
         Add<SearchFunction>();
+        Add<FindFunction>();
     }
 
     /// <summary>
