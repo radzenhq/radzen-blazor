@@ -2,7 +2,7 @@
 
 namespace Radzen.Blazor.Spreadsheet;
 
-class MidFunction : FormulaFunction
+class MidFunction : TextExtractFunctionBase
 {
     public override string Name => "MID";
 
@@ -15,40 +15,19 @@ class MidFunction : FormulaFunction
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var textArg = arguments.GetSingle("text");
-        var startArg = arguments.GetSingle("start_num");
-        var lenArg = arguments.GetSingle("num_chars");
-
-        if (textArg == null || startArg == null || lenArg == null)
+        if (!TryGetString(arguments, "text", out var text, out var error))
         {
-            return CellData.FromError(CellError.Value);
+            return error!;
         }
 
-        if (textArg.IsError)
+        if (!TryGetInteger(arguments, "start_num", isRequired: true, defaultValue: null, out var start, out error))
         {
-            return textArg;
+            return error!;
         }
 
-        if (startArg.IsError)
+        if (!TryGetInteger(arguments, "num_chars", isRequired: true, defaultValue: null, out var numChars, out error))
         {
-            return startArg;
-        }
-
-        if (lenArg.IsError)
-        {
-            return lenArg;
-        }
-
-        var text = textArg.GetValueOrDefault<string?>() ?? string.Empty;
-
-        if (!startArg.TryGetInt(out var start, allowBooleans: true, nonNumericTextAsZero: false))
-        {
-            return CellData.FromError(CellError.Value);
-        }
-
-        if (!lenArg.TryGetInt(out var numChars, allowBooleans: true, nonNumericTextAsZero: false))
-        {
-            return CellData.FromError(CellError.Value);
+            return error!;
         }
 
         if (numChars < 0)
@@ -61,15 +40,7 @@ class MidFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        if (start > text.Length)
-        {
-            return CellData.FromString(string.Empty);
-        }
-
         var zeroBasedStart = start - 1;
-        var available = text.Length - zeroBasedStart;
-        var take = numChars > available ? available : numChars;
-
-        return CellData.FromString(text.Substring(zeroBasedStart, take));
+        return Substring(text, zeroBasedStart, numChars);
     }
 }
