@@ -69,6 +69,7 @@ public class FunctionStore
         Add<SearchFunction>();
         Add<FindFunction>();
         Add<ReplaceFunction>();
+        Add<SubstituteFunction>();
     }
 
     /// <summary>
