@@ -11,6 +11,7 @@ internal interface IFormulaSyntaxNodeVisitor
     void VisitBooleanLiteral(BooleanLiteralSyntaxNode booleanLiteralSyntaxNode);
     void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode);
     void VisitBinaryExpression(BinaryExpressionSyntaxNode binaryExpressionSyntaxNode);
+    void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode);
     void VisitCell(CellSyntaxNode cellSyntaxNode);
     void VisitFunction(FunctionSyntaxNode functionSyntaxNode);
     void VisitRange(RangeSyntaxNode rangeSyntaxNode);
@@ -81,6 +82,12 @@ abstract class FormulaSyntaxNodeVisitorBase : IFormulaSyntaxNodeVisitor
         Visit(binaryExpressionSyntaxNode);
     }
 
+    public virtual void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
+    {
+        unaryExpressionSyntaxNode.Operand.Accept(this);
+        Visit(unaryExpressionSyntaxNode);
+    }
+
     public virtual void VisitCell(CellSyntaxNode cellSyntaxNode)
     {
         Visit(cellSyntaxNode);
@@ -132,6 +139,12 @@ internal enum BinaryOperator
     LessThanOrEqual,
     GreaterThan,
     GreaterThanOrEqual,
+}
+
+internal enum UnaryOperator
+{
+    Negate,
+    Plus,
 }
 
 static class FormulaTokenTypeExtensions
@@ -188,6 +201,17 @@ internal class BooleanLiteralSyntaxNode(FormulaToken token) : FormulaSyntaxNode(
     public override void Accept(IFormulaSyntaxNodeVisitor visitor)
     {
         visitor.VisitBooleanLiteral(this);
+    }
+}
+
+internal class UnaryExpressionSyntaxNode(FormulaToken token, FormulaSyntaxNode operand, UnaryOperator @operator) : FormulaSyntaxNode(token)
+{
+    public FormulaSyntaxNode Operand { get; } = operand;
+    public UnaryOperator Operator { get; } = @operator;
+
+    public override void Accept(IFormulaSyntaxNodeVisitor visitor)
+    {
+        visitor.VisitUnaryExpression(this);
     }
 }
 
@@ -364,6 +388,20 @@ internal class FormulaParser
     private FormulaSyntaxNode ParseFactor()
     {
         var token = Peek();
+
+        if (token.Type == FormulaTokenType.Minus)
+        {
+            Advance(1);
+            var operand = ParseFactor();
+            return new UnaryExpressionSyntaxNode(token, operand, UnaryOperator.Negate);
+        }
+
+        if (token.Type == FormulaTokenType.Plus)
+        {
+            Advance(1);
+            var operand = ParseFactor();
+            return new UnaryExpressionSyntaxNode(token, operand, UnaryOperator.Plus);
+        }
 
         if (token.Type == FormulaTokenType.OpenParen)
         {
