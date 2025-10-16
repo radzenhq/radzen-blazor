@@ -14,22 +14,16 @@ class ChooseFunction : FormulaFunction
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var indexArg = arguments.GetSingle("index_num");
         var values = arguments.GetSequence("value");
 
-        if (indexArg == null || values == null)
+        if (values == null)
         {
             return CellData.FromError(CellError.Value);
         }
 
-        if (indexArg.IsError)
+        if (!TryGetInteger(arguments, "index_num", isRequired: true, defaultValue: null, out var idx, out var error))
         {
-            return indexArg;
-        }
-
-        if (!indexArg.TryGetInt(out var idx, allowBooleans: false, nonNumericTextAsZero: false))
-        {
-            return CellData.FromError(CellError.Value);
+            return error!;
         }
 
         if (idx < 1 || idx > values.Count)
@@ -37,8 +31,6 @@ class ChooseFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        var choice = values[idx - 1];
-
-        return choice;
+        return values[idx - 1];
     }
 }

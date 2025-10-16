@@ -14,27 +14,14 @@ class RandBetweenFunction : FormulaFunction
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var bottomArg = arguments.GetSingle("bottom");
-        var topArg = arguments.GetSingle("top");
-
-        if (bottomArg == null || topArg == null)
+        if (!TryGetInteger(arguments, "bottom", isRequired: true, defaultValue: null, out var bottom, out var error))
         {
-            return CellData.FromError(CellError.Value);
+            return error!;
         }
 
-        if (bottomArg.IsError) 
+        if (!TryGetInteger(arguments, "top", isRequired: true, defaultValue: null, out var top, out error))
         {
-            return bottomArg;
-        }
-
-        if (topArg.IsError)
-        {
-            return topArg;
-        }
-
-        if (!bottomArg.TryGetInt(out var bottom) || !topArg.TryGetInt(out var top))
-        {
-            return CellData.FromError(CellError.Value);
+            return error!;
         }
 
         if (bottom > top)
