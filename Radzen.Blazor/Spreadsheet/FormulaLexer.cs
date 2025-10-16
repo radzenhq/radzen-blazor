@@ -827,7 +827,6 @@ internal class FormulaLexer(string expression, bool strict = true)
 
     private static FormulaToken CreateIdentifierToken(string value, bool hasLetters, bool hasNumbers)
     {
-        // Recognize boolean literals (case-insensitive)
         if (string.Equals(value, "TRUE", StringComparison.OrdinalIgnoreCase))
         {
             return new FormulaToken(FormulaTokenType.BooleanLiteral, value)
