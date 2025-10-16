@@ -175,6 +175,37 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
         throw new InvalidOperationException($"Unsupported operator: {binaryExpressionSyntaxNode.Operator}");
     }
 
+    public void VisitUnaryExpression(UnaryExpressionSyntaxNode unaryExpressionSyntaxNode)
+    {
+        unaryExpressionSyntaxNode.Operand.Accept(this);
+        var operand = (CellData)value!;
+
+        if (operand.IsError)
+        {
+            value = operand;
+            return;
+        }
+
+        if (operand.IsEmpty)
+        {
+            operand = CellData.FromNumber(0d);
+        }
+
+        if (unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate || unaryExpressionSyntaxNode.Operator == UnaryOperator.Plus)
+        {
+            if (operand.Type != CellDataType.Number)
+            {
+                value = CellData.FromError(CellError.Value);
+                return;
+            }
+            var n = operand.GetValueOrDefault<double>();
+            value = unaryExpressionSyntaxNode.Operator == UnaryOperator.Negate
+                ? CellData.FromNumber(-n)
+                : CellData.FromNumber(+n);
+            return;
+        }
+    }
+
     private CellData EvaluateCell(Cell cell)
     {
         if (!evaluationStack.Add(cell))
