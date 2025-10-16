@@ -135,5 +135,3 @@ class HorizontalLookupFunction : FormulaFunction
         return resultCell;
     }
 }
-
-
