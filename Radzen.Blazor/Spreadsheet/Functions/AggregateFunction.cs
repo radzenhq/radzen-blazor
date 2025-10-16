@@ -41,7 +41,6 @@ class AggregateFunction : FormulaFunction
 
         var ignoreHidden = opts.Value is 1 or 3 or 5 or 7;
         var ignoreErrors = opts.Value is 2 or 3 or 6 or 7;
-        var ignoreNested = opts.Value is 0 or 1 or 2 or 3; // Note: nested detection not implemented; placeholder only
 
         // Collect numeric values according to options
         var numbers = new List<double>();
@@ -96,24 +95,32 @@ class AggregateFunction : FormulaFunction
                 return AggregationMethods.Median(numbers);
             case 14: // LARGE
             {
-                if (kArg == null || kArg.IsError) return kArg ?? CellData.FromError(CellError.Value);
+                if (kArg == null || kArg.IsError) 
+                {
+                    return kArg ?? CellData.FromError(CellError.Value);
+                }
                 var k = kArg.GetValueOrDefault<int?>();
-                if (k is null) return CellData.FromError(CellError.Value);
+                if (k is null) 
+                {
+                    return CellData.FromError(CellError.Value);
+                }
                 return AggregationMethods.Large(numbers, k.Value);
             }
             case 15: // SMALL
             {
-                if (kArg == null || kArg.IsError) return kArg ?? CellData.FromError(CellError.Value);
+                if (kArg == null || kArg.IsError) 
+                {
+                    return kArg ?? CellData.FromError(CellError.Value);
+                }
                 var k = kArg.GetValueOrDefault<int?>();
-                if (k is null) return CellData.FromError(CellError.Value);
+                if (k is null) 
+                {
+                    return CellData.FromError(CellError.Value);
+                }
                 return AggregationMethods.Small(numbers, k.Value);
             }
             default:
                 return CellData.FromError(CellError.Value);
         }
     }
-
-    // Nested AGGREGATE/SUBTOTAL detection intentionally omitted in this version.
 }
-
-
