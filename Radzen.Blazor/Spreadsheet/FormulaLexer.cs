@@ -48,6 +48,7 @@ internal enum FormulaTokenType
     Colon,
     NumericLiteral,
     StringLiteral,
+    BooleanLiteral,
     CellIdentifier,
     ErrorLiteral,
     Whitespace,
@@ -826,6 +827,23 @@ internal class FormulaLexer(string expression, bool strict = true)
 
     private static FormulaToken CreateIdentifierToken(string value, bool hasLetters, bool hasNumbers)
     {
+        // Recognize boolean literals (case-insensitive)
+        if (string.Equals(value, "TRUE", StringComparison.OrdinalIgnoreCase))
+        {
+            return new FormulaToken(FormulaTokenType.BooleanLiteral, value)
+            {
+                ValueKind = ValueKind.True
+            };
+        }
+
+        if (string.Equals(value, "FALSE", StringComparison.OrdinalIgnoreCase))
+        {
+            return new FormulaToken(FormulaTokenType.BooleanLiteral, value)
+            {
+                ValueKind = ValueKind.False
+            };
+        }
+
         if (hasLetters && hasNumbers && CellRef.TryParse(value, out var cellIndex))
         {
             return new FormulaToken(FormulaTokenType.CellIdentifier, value)

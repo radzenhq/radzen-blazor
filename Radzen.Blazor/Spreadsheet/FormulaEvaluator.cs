@@ -72,6 +72,11 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
         }
     }
 
+    public void VisitBooleanLiteral(BooleanLiteralSyntaxNode booleanLiteralSyntaxNode)
+    {
+        value = CellData.FromBoolean(booleanLiteralSyntaxNode.Token.ValueKind == ValueKind.True);
+    }
+
     public void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
     {
         value = CellData.FromError(errorLiteralSyntaxNode.Token.ErrorValue);
