@@ -163,13 +163,18 @@ class FormulaEvaluator(Sheet sheet, Cell currentCell) : IFormulaSyntaxNodeVisito
         {
             var l = left.GetValueOrDefault<double>();
             var r = right.GetValueOrDefault<double>();
+            double res = 0d;
             switch (binaryExpressionSyntaxNode.Operator)
             {
-                case BinaryOperator.Plus: value = CellData.FromNumber(l + r); return;
-                case BinaryOperator.Minus: value = CellData.FromNumber(l - r); return;
-                case BinaryOperator.Multiply: value = CellData.FromNumber(l * r); return;
-                case BinaryOperator.Divide: value = CellData.FromNumber(l / r); return;
+                case BinaryOperator.Plus: res = l + r; break;
+                case BinaryOperator.Minus: res = l - r; break;
+                case BinaryOperator.Multiply: res = l * r; break;
+                case BinaryOperator.Divide: res = l / r; break;
             }
+            // Excel uses up to 15 significant digits; apply rounding to minimize binary artifacts
+            res = Math.Round(res, 15, MidpointRounding.AwayFromZero);
+            value = CellData.FromNumber(res);
+            return;
         }
 
         throw new InvalidOperationException($"Unsupported operator: {binaryExpressionSyntaxNode.Operator}");
