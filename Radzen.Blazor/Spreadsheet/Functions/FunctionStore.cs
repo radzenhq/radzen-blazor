@@ -70,6 +70,7 @@ public class FunctionStore
         Add<FindFunction>();
         Add<ReplaceFunction>();
         Add<SubstituteFunction>();
+        Add<ProperFunction>();
     }
 
     /// <summary>
