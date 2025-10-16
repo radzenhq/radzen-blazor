@@ -105,6 +105,10 @@ class DependencyVisitor(Sheet sheet) : IFormulaSyntaxNodeVisitor
     {
     }
 
+    public void VisitBooleanLiteral(BooleanLiteralSyntaxNode booleanLiteralSyntaxNode)
+    {
+    }
+
     public void VisitErrorLiteral(ErrorLiteralSyntaxNode errorLiteralSyntaxNode)
     {
     }
