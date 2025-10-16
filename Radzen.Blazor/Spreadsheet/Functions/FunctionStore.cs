@@ -72,6 +72,7 @@ public class FunctionStore
         Add<SubstituteFunction>();
         Add<ProperFunction>();
         Add<UpperFunction>();
+        Add<LowerFunction>();
     }
 
     /// <summary>
