@@ -328,7 +328,7 @@ namespace Radzen.Blazor.Tests
             
             var result = data.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
             
-            Assert.Equal(1, result.Count);
+            Assert.Single(result);
             Assert.Equal("Eve", result[0].Name);
         }
 
