@@ -75,6 +75,7 @@ public class FunctionStore
         Add<LowerFunction>();
         Add<ValueFunction>();
         Add<TextFunction>();
+        Add<ReptFunction>();
     }
 
     /// <summary>
