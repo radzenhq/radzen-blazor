@@ -75,6 +75,82 @@ public class FormulaParserTests
     }
 
     [Fact]
+    public void FormulaParser_ShouldParseUnaryNegativeNumber()
+    {
+        var formula = "=-123";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        Assert.IsType<UnaryExpressionSyntaxNode>(syntaxTree.Root);
+        var unary = (UnaryExpressionSyntaxNode)syntaxTree.Root;
+        Assert.Equal(UnaryOperator.Negate, unary.Operator);
+        Assert.IsType<NumberLiteralSyntaxNode>(unary.Operand);
+        Assert.Equal(123, ((NumberLiteralSyntaxNode)unary.Operand).Token.IntValue);
+    }
+
+    [Fact]
+    public void FormulaParser_ShouldParseUnaryPlusNumber()
+    {
+        var formula = "=+123";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        Assert.IsType<UnaryExpressionSyntaxNode>(syntaxTree.Root);
+        var unary = (UnaryExpressionSyntaxNode)syntaxTree.Root;
+        Assert.Equal(UnaryOperator.Plus, unary.Operator);
+        Assert.IsType<NumberLiteralSyntaxNode>(unary.Operand);
+        Assert.Equal(123, ((NumberLiteralSyntaxNode)unary.Operand).Token.IntValue);
+    }
+
+    [Fact]
+    public void FormulaParser_ShouldParseUnaryPlusInFunctionArgument()
+    {
+        var formula = "=LEFT(A1,+1)";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        Assert.IsType<FunctionSyntaxNode>(syntaxTree.Root);
+        var fn = (FunctionSyntaxNode)syntaxTree.Root;
+        Assert.Equal("LEFT", fn.Name);
+        Assert.IsType<UnaryExpressionSyntaxNode>(fn.Arguments[1]);
+    }
+
+    [Fact]
+    public void FormulaParser_ShouldParseMultipleUnaryOperators()
+    {
+        var formula = "=-+-+3";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        // Expect nested unary nodes: - ( + ( - ( + 3 ) ) )
+        var node = syntaxTree.Root;
+        Assert.IsType<UnaryExpressionSyntaxNode>(node);
+        var u1 = (UnaryExpressionSyntaxNode)node; // '-'
+        Assert.Equal(UnaryOperator.Negate, u1.Operator);
+        Assert.IsType<UnaryExpressionSyntaxNode>(u1.Operand);
+        var u2 = (UnaryExpressionSyntaxNode)u1.Operand; // '+'
+        Assert.Equal(UnaryOperator.Plus, u2.Operator);
+        Assert.IsType<UnaryExpressionSyntaxNode>(u2.Operand);
+        var u3 = (UnaryExpressionSyntaxNode)u2.Operand; // '-'
+        Assert.Equal(UnaryOperator.Negate, u3.Operator);
+        Assert.IsType<UnaryExpressionSyntaxNode>(u3.Operand);
+        var u4 = (UnaryExpressionSyntaxNode)u3.Operand; // '+'
+        Assert.Equal(UnaryOperator.Plus, u4.Operator);
+        Assert.IsType<NumberLiteralSyntaxNode>(u4.Operand);
+        Assert.Equal(3, ((NumberLiteralSyntaxNode)u4.Operand).Token.IntValue);
+    }
+
+    [Fact]
+    public void FormulaParser_ShouldParseUnaryNegativeInFunctionArgument()
+    {
+        var formula = "=LEFT(A1,-1)";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        Assert.IsType<FunctionSyntaxNode>(syntaxTree.Root);
+        var fn = (FunctionSyntaxNode)syntaxTree.Root;
+        Assert.Equal("LEFT", fn.Name);
+        Assert.Equal(2, fn.Arguments.Count);
+        Assert.IsType<CellSyntaxNode>(fn.Arguments[0]);
+        Assert.IsType<UnaryExpressionSyntaxNode>(fn.Arguments[1]);
+    }
+
+    [Fact]
     public void FormulaParser_ShouldParseSubtractionOfMultipleNumberLiterals()
     {
         var formula = "=123-456-789";
