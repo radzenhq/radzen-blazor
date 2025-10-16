@@ -76,6 +76,7 @@ public class FunctionStore
         Add<ValueFunction>();
         Add<TextFunction>();
         Add<ReptFunction>();
+        Add<TodayFunction>();
     }
 
     /// <summary>
