@@ -65,6 +65,7 @@ public class FunctionStore
         Add<TextJoinFunction>();
         Add<LeftFunction>();
         Add<RightFunction>();
+        Add<MidFunction>();
     }
 
     /// <summary>
