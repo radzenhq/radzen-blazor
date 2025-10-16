@@ -63,6 +63,7 @@ public class FunctionStore
         Add<TrimFunction>();
         Add<ConcatFunction>();
         Add<TextJoinFunction>();
+        Add<LeftFunction>();
     }
 
     /// <summary>
