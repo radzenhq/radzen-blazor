@@ -1,5 +1,3 @@
-using System;
-
 #nullable enable
 
 namespace Radzen.Blazor.Spreadsheet;
@@ -78,5 +76,4 @@ class SumIfFunction : FormulaFunction
 
         return CellData.FromNumber(sum);
     }
-
 }

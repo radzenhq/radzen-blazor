@@ -489,7 +489,7 @@ public class CellData : IComparable, IComparable<CellData>
             // Check for wildcard patterns
             if (criteriaString.Contains('*') || criteriaString.Contains('?'))
             {
-                return MatchesWildcardPattern(cellString, criteriaString);
+                return Wildcard.IsFullMatch(cellString, criteriaString);
             }
 
             // Check for comparison expressions
@@ -582,30 +582,5 @@ public class CellData : IComparable, IComparable<CellData>
             "<>" or "!=" => cellValue != numericValue,
             _ => false
         };
-    }
-
-    private static bool MatchesWildcardPattern(string text, string pattern)
-    {
-        // Handle tilde escape sequences first - convert ~* to literal * and ~? to literal ?
-        var processedPattern = pattern.Replace("~*", "LITERAL_ASTERISK")  // Use a temporary marker
-                                     .Replace("~?", "LITERAL_QUESTION");  // Use a temporary marker
-
-        // Escape special regex characters except * and ?
-        var escapedPattern = Regex.Escape(processedPattern)
-            .Replace("\\*", ".*")
-            .Replace("\\?", ".");
-
-        // Restore the escaped wildcards as literal characters
-        escapedPattern = escapedPattern.Replace("LITERAL_ASTERISK", "\\*")
-                                     .Replace("LITERAL_QUESTION", "\\?");
-
-        try
-        {
-            return Regex.IsMatch(text, "^" + escapedPattern + "$", RegexOptions.IgnoreCase);
-        }
-        catch
-        {
-            return false;
-        }
     }
 }
