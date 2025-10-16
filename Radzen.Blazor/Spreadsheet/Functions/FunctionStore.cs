@@ -61,6 +61,7 @@ public class FunctionStore
         Add<XLookupFunction>();
         Add<LenFunction>();
         Add<TrimFunction>();
+        Add<ConcatFunction>();
     }
 
     /// <summary>
