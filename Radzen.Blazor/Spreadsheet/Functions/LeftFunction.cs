@@ -2,7 +2,7 @@
 
 namespace Radzen.Blazor.Spreadsheet;
 
-class LeftFunction : FormulaFunction
+class LeftFunction : TextExtractFunctionBase
 {
     public override string Name => "LEFT";
 
@@ -14,34 +14,14 @@ class LeftFunction : FormulaFunction
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var textArg = arguments.GetSingle("text");
-        var numCharsArg = arguments.GetSingle("num_chars");
-
-        if (textArg == null)
+        if (!TryGetString(arguments, "text", out var text, out var error))
         {
-            return CellData.FromError(CellError.Value);
+            return error!;
         }
 
-        if (textArg.IsError)
+        if (!TryGetInteger(arguments, "num_chars", isRequired: false, defaultValue: 1, out var count, out error))
         {
-            return textArg;
-        }
-
-        if (numCharsArg != null && numCharsArg.IsError)
-        {
-            return numCharsArg;
-        }
-
-        var text = textArg.GetValueOrDefault<string?>() ?? string.Empty;
-
-        var count = 1;
-
-        if (numCharsArg != null)
-        {
-            if (!numCharsArg.TryGetInt(out count, allowBooleans: true, nonNumericTextAsZero: false))
-            {
-                return CellData.FromError(CellError.Value);
-            }
+            return error!;
         }
 
         if (count < 0)
@@ -49,11 +29,6 @@ class LeftFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        if (count >= text.Length)
-        {
-            return CellData.FromString(text);
-        }
-
-        return CellData.FromString(text.Substring(0, count));
+        return Substring(text, 0, count);
     }
 }
