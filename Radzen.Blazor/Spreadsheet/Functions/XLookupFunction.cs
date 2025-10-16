@@ -1,7 +1,5 @@
 #nullable enable
 
-using System;
-
 namespace Radzen.Blazor.Spreadsheet;
 
 class XLookupFunction : FormulaFunction
@@ -245,5 +243,3 @@ class XLookupFunction : FormulaFunction
         return -1;
     }
 }
-
-

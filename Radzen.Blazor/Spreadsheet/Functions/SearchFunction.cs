@@ -1,7 +1,5 @@
 #nullable enable
 
-using System.Text;
-using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -50,8 +48,7 @@ class SearchFunction : FormulaFunction
 
         if (findText.Contains('*') || findText.Contains('?') || findText.Contains('~'))
         {
-            var idx = FindWithWildcards(findText, withinText, startIndex);
-            pos = idx;
+            pos = Wildcard.FindFirstIndex(withinText, findText, startIndex);
         }
         else
         {
@@ -64,49 +61,5 @@ class SearchFunction : FormulaFunction
         }
 
         return CellData.FromNumber(pos + 1);
-    }
-
-    private static int FindWithWildcards(string pattern, string text, int startIndex)
-    {
-        var regexBuilder = StringBuilderCache.Acquire(pattern.Length);
-        for (int i = 0; i < pattern.Length; i++)
-        {
-            var ch = pattern[i];
-            if (ch == '~')
-            {
-                if (i + 1 < pattern.Length)
-                {
-                    var next = pattern[++i];
-                    // Escape the next character literally
-                    regexBuilder.Append(Regex.Escape(next.ToString()));
-                }
-                else
-                {
-                    // Trailing ~ treated as literal
-                    regexBuilder.Append(Regex.Escape("~"));
-                }
-            }
-            else if (ch == '*')
-            {
-                regexBuilder.Append(".*");
-            }
-            else if (ch == '?')
-            {
-                regexBuilder.Append('.');
-            }
-            else
-            {
-                regexBuilder.Append(Regex.Escape(ch.ToString()));
-            }
-        }
-
-        var regex = new Regex(StringBuilderCache.GetStringAndRelease(regexBuilder), RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-        var input = startIndex > 0 ? text[startIndex..] : text;
-        var match = regex.Match(input);
-        if (!match.Success)
-        {
-            return -1;
-        }
-        return startIndex + match.Index;
     }
 }
