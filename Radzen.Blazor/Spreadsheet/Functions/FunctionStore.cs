@@ -73,6 +73,8 @@ public class FunctionStore
         Add<ProperFunction>();
         Add<UpperFunction>();
         Add<LowerFunction>();
+        Add<ValueFunction>();
+        Add<TextFunction>();
     }
 
     /// <summary>
