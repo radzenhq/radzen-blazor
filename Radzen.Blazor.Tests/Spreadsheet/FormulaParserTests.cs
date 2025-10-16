@@ -602,6 +602,39 @@ public class FormulaParserTests
     }
 
     [Fact]
+    public void FormulaParser_ShouldParseBooleanTrue()
+    {
+        var formula = "=TRUE";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        Assert.IsType<BooleanLiteralSyntaxNode>(syntaxTree.Root);
+        var boolNode = (BooleanLiteralSyntaxNode)syntaxTree.Root;
+        Assert.Equal("TRUE", boolNode.Token.Value);
+    }
+
+    [Fact]
+    public void FormulaParser_ShouldParseBooleanFalse_Lowercase()
+    {
+        var formula = "=false";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        Assert.IsType<BooleanLiteralSyntaxNode>(syntaxTree.Root);
+        var boolNode = (BooleanLiteralSyntaxNode)syntaxTree.Root;
+        Assert.Equal("false", boolNode.Token.Value);
+    }
+
+    [Fact]
+    public void FormulaParser_ShouldParseBooleanInFunction()
+    {
+        var formula = "=TEXTJOIN(\", \", TRUE, A1:A2)";
+        var syntaxTree = FormulaParser.Parse(formula);
+        Assert.Empty(syntaxTree.Errors);
+        var fn = Assert.IsType<FunctionSyntaxNode>(syntaxTree.Root);
+        Assert.Equal("TEXTJOIN", fn.Name);
+        Assert.IsType<BooleanLiteralSyntaxNode>(fn.Arguments[1]);
+    }
+
+    [Fact]
     public void FormulaParser_ShouldParse_Percent()
     {
         var formula = "=$%";
