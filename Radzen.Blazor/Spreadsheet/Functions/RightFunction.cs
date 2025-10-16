@@ -2,7 +2,7 @@
 
 namespace Radzen.Blazor.Spreadsheet;
 
-class RightFunction : FormulaFunction
+class RightFunction : TextExtractFunctionBase
 {
     public override string Name => "RIGHT";
 
@@ -14,33 +14,14 @@ class RightFunction : FormulaFunction
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        var textArg = arguments.GetSingle("text");
-        var numCharsArg = arguments.GetSingle("num_chars");
-
-        if (textArg == null)
+        if (!TryGetString(arguments, "text", out var text, out var error))
         {
-            return CellData.FromError(CellError.Value);
+            return error!;
         }
 
-        if (textArg.IsError)
+        if (!TryGetInteger(arguments, "num_chars", isRequired: false, defaultValue: 1, out var count, out error))
         {
-            return textArg;
-        }
-
-        if (numCharsArg != null && numCharsArg.IsError)
-        {
-            return numCharsArg;
-        }
-
-        var text = textArg.GetValueOrDefault<string?>() ?? string.Empty;
-
-        var count = 1;
-        if (numCharsArg != null)
-        {
-            if (!numCharsArg.TryGetInt(out count, allowBooleans: true, nonNumericTextAsZero: false))
-            {
-                return CellData.FromError(CellError.Value);
-            }
+            return error!;
         }
 
         if (count < 0)
@@ -48,11 +29,9 @@ class RightFunction : FormulaFunction
             return CellData.FromError(CellError.Value);
         }
 
-        if (count >= text.Length)
-        {
-            return CellData.FromString(text);
-        }
+        var start = text.Length - count;
+        if (start < 0) start = 0;
 
-        return CellData.FromString(text.Substring(text.Length - count, count));
+        return Substring(text, start, count);
     }
 }
