@@ -81,6 +81,9 @@ public class FunctionStore
         Add<DayFunction>();
         Add<MonthFunction>();
         Add<YearFunction>();
+        Add<HourFunction>();
+        Add<MinuteFunction>();
+        Add<SecondFunction>();
     }
 
     /// <summary>
