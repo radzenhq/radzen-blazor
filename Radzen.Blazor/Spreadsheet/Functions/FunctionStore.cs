@@ -80,6 +80,7 @@ public class FunctionStore
         Add<NowFunction>();
         Add<DayFunction>();
         Add<MonthFunction>();
+        Add<YearFunction>();
     }
 
     /// <summary>
