@@ -79,7 +79,7 @@
                     {
                     var participant = GetUser(message.UserId);
                     var isCurrentUser = message.UserId == CurrentUserId;
-                    <div class="rz-chat-message @(isCurrentUser ? "rz-chat-message-user" : "rz-chat-message-participant")" @key="message.Id">
+                    <div class="rz-chat-message @(isCurrentUser ? "rz-chat-message-user" : "rz-chat-message-participant")" @key="message.Id" style="@($"color:{participant.Color}")">
                         <RadzenStack class="rz-chat-message-avatar" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0">
                             @if (!string.IsNullOrEmpty(participant?.AvatarUrl))
                             {
