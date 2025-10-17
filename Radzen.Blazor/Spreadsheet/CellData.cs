@@ -42,7 +42,8 @@ static class TypeExtensions
     public static double ToNumber(this DateTime date)
     {
         var epoch = new DateTime(1900, 1, 1);
-        return (date - epoch).Days;
+        var span = date - epoch;
+        return span.TotalDays; // include fractional day for time
     }
 
     public static DateTime ToDate(this double number)
