@@ -79,6 +79,7 @@ public class FunctionStore
         Add<TodayFunction>();
         Add<NowFunction>();
         Add<DayFunction>();
+        Add<MonthFunction>();
     }
 
     /// <summary>
