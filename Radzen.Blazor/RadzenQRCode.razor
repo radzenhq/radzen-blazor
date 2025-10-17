@@ -95,99 +95,47 @@
 
 @code
 {
-    // ---------- Helpers ----------
-    private static string Format(double v) => v.ToString(CultureInfo.InvariantCulture);
-
-    private static bool IsFinderCell(int r, int c, int n)
-    {
-        bool inTL = r < 7 && c < 7;
-        bool inTR = r < 7 && c >= n - 7;
-        bool inBL = r >= n - 7 && c < 7;
-        return inTL || inTR || inBL;
-    }
-
-    private static double Clamp(double v, double lo, double hi) => v < lo ? lo : (v > hi ? hi : v);
-
-    private static string NormalizeImageHref(string? image)
-    {
-        if (string.IsNullOrWhiteSpace(image)) return string.Empty;
-        var href = image.Trim();
-        bool looksUrl = href.Contains("://", StringComparison.OrdinalIgnoreCase);
-        bool isData = href.StartsWith("data:", StringComparison.OrdinalIgnoreCase);
-        if (!looksUrl && !isData)
-        {
-            // assume raw base64 png
-            href = "data:image/png;base64," + href;
-        }
-        return href;
-    }
-
     // Draw a 7x7 eye whose top-left screen coordinate (including quiet zone) is (x,y).
     // NOTE: x,y are *SVG units* (already offset by quiet zone).
-    private RenderFragment DrawEye(double x, double y, QRCodeEyeShape shape, string color) => builder =>
+    private RenderFragment DrawEye(double x, double y, QRCodeEyeShape shape, string color)
     {
-        int seq = 0;
-
-        // helpers
-        void Rect(double rx, double ry, double w, double h, double? cr = null)
+        return __builder =>
         {
-            builder.OpenElement(seq++, "rect"); builder.AddAttribute(seq++, "x", Format(rx));
-            builder.AddAttribute(seq++, "y", Format(ry)); builder.AddAttribute(seq++, "width", Format(w));
-            builder.AddAttribute(seq++, "height", Format(h)); builder.AddAttribute(seq++, "fill", color);
-            if (cr is not null) { builder.AddAttribute(seq++, "rx", Format(cr.Value)); builder.AddAttribute(seq++, "ry", Format(cr.Value)); }
-            builder.CloseElement();
-        }
+            <text>
+                @switch (shape)
+                {
+                    case QRCodeEyeShape.Rounded:
+                        {
+                            <!-- Outer 7x7 rounded ring -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" rx="@Format(1.25)" ry="@Format(1.25)" fill="@color" />
+                            <!-- Inner hole (background) -->
+                            <rect x="@Format(x + 1)" y="@Format(y + 1)" width="@Format(5)" height="@Format(5)" rx="@Format(0.25)" ry="@Format(0.25)" fill="@Background" />
+                            <!-- Pupil 3x3 rounded -->
+                            <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" rx="@Format(0.75)" ry="@Format(0.75)" fill="@color" />
+                        }
+                        break;
 
-        void RingSquare(double tx, double ty, double size, double thick, double? cr = null)
-        {
-            // Outer square
-            builder.OpenElement(seq++, "rect");
-            builder.AddAttribute(seq++, "x", Format(tx));
-            builder.AddAttribute(seq++, "y", Format(ty));
-            builder.AddAttribute(seq++, "width", Format(size));
-            builder.AddAttribute(seq++, "height", Format(size));
-            if (cr is not null) { builder.AddAttribute(seq++, "rx", Format(cr.Value)); builder.AddAttribute(seq++, "ry", Format(cr.Value)); }
-            builder.AddAttribute(seq++, "fill", color);
-            builder.CloseElement();
+                    case QRCodeEyeShape.Framed:
+                        {
+                            <!-- Bold square frame (thickness ~1.2) -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="@color" />
+                            <rect x="@Format(x + 1.2)" y="@Format(y + 1.2)" width="@Format(7 - 2 * 1.2)" height="@Format(7 - 2 * 1.2)" fill="@Background" />
+                            <!-- Pupil -->
+                            <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" fill="@color" />
+                        }
+                        break;
 
-            // Inner hole (draw as background)
-            builder.OpenElement(seq++, "rect");
-            builder.AddAttribute(seq++, "x", Format(tx + thick));
-            builder.AddAttribute(seq++, "y", Format(ty + thick));
-            builder.AddAttribute(seq++, "width", Format(size - 2 * thick));
-            builder.AddAttribute(seq++, "height", Format(size - 2 * thick));
-            if (cr is not null) { builder.AddAttribute(seq++, "rx", Format(Math.Max(0, cr.Value - thick))); builder.AddAttribute(seq++, "ry", Format(Math.Max(0, cr.Value - thick))); }
-            builder.AddAttribute(seq++, "fill", Background);
-            builder.CloseElement();
-        }
-
-        switch (shape)
-        {
-            case QRCodeEyeShape.Rounded:
-                // 7x7 outer with rounded corners; 5x5 inner hole; 3x3 pupil
-                RingSquare(x, y, 7, 1, cr: 1.25);
-                Rect(x + 2, y + 2, 3, 3, cr: 0.75); // pupil
-                break;
-
-            case QRCodeEyeShape.Framed:
-                // Square ring (bold frame) + square pupil
-                RingSquare(x, y, 7, 1.2);
-                Rect(x + 2, y + 2, 3, 3);
-                break;
-
-            case QRCodeEyeShape.Square:
-            default:
-                // Classic: outer 7x7 square, inner white 5x5, center 3x3 dark
-                Rect(x, y, 7, 7);
-                builder.OpenElement(seq++, "rect");
-                builder.AddAttribute(seq++, "x", Format(x + 1));
-                builder.AddAttribute(seq++, "y", Format(y + 1));
-                builder.AddAttribute(seq++, "width", Format(5));
-                builder.AddAttribute(seq++, "height", Format(5));
-                builder.AddAttribute(seq++, "fill", Background);
-                builder.CloseElement();
-                Rect(x + 2, y + 2, 3, 3);
-                break;
-        }
-    };
+                    case QRCodeEyeShape.Square:
+                    default:
+                        {
+                            <!-- Classic square: 7x7 outer, 5x5 inner (background), 3x3 pupil -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="@color" />
+                            <rect x="@Format(x + 1)" y="@Format(y + 1)" width="@Format(5)" height="@Format(5)" fill="@Background" />
+                            <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" fill="@color" />
+                        }
+                        break;
+                }
+            </text>
+        };
+    }
 }

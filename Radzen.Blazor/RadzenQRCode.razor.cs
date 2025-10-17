@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Radzen.Blazor
@@ -123,7 +124,31 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the component CSS class.
         /// </summary>
-        protected override string GetComponentCssClass() => "rz-qrcode";       
+        protected override string GetComponentCssClass() => "rz-qrcode";
+        private static string Format(double v) => v.ToString(CultureInfo.InvariantCulture);
+        private static bool IsFinderCell(int r, int c, int n)
+        {
+            bool inTL = r < 7 && c < 7;
+            bool inTR = r < 7 && c >= n - 7;
+            bool inBL = r >= n - 7 && c < 7;
+            return inTL || inTR || inBL;
+        }
+
+        private static double Clamp(double v, double lo, double hi) => v < lo ? lo : (v > hi ? hi : v);
+
+        private static string NormalizeImageHref(string? image)
+        {
+            if (string.IsNullOrWhiteSpace(image)) return string.Empty;
+            var href = image.Trim();
+            bool looksUrl = href.Contains("://", StringComparison.OrdinalIgnoreCase);
+            bool isData = href.StartsWith("data:", StringComparison.OrdinalIgnoreCase);
+            if (!looksUrl && !isData)
+            {
+                // assume raw base64 png
+                href = "data:image/png;base64," + href;
+            }
+            return href;
+        }
     }
 }
 
