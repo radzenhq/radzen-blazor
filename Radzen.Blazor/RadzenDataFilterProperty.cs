@@ -150,12 +150,6 @@ namespace Radzen.Blazor
         [Parameter]
         public Type Type { get; set; }
 
-        /// <summary>
-        /// Gets or sets the kind of DateTime bind to control
-        /// </summary>
-        [Parameter]
-        public DateTimeKind Kind { get; set; } = DateTimeKind.Unspecified;
-
         Func<TItem, object> propertyValueGetter;
 
         internal object GetHeader()
@@ -250,7 +244,7 @@ namespace Radzen.Blazor
         {
             if ((FilterPropertyType == typeof(DateTimeOffset) || FilterPropertyType == typeof(DateTimeOffset?)) && value != null && value is DateTime?)
             {
-                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, Kind);
+                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, ((DateTime?)value).Value.Kind);
                 value = offset;
             }
 

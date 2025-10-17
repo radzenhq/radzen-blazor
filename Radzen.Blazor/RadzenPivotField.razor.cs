@@ -351,7 +351,7 @@ namespace Radzen.Blazor
         {
             if ((FilterPropertyType == typeof(DateTimeOffset) || FilterPropertyType == typeof(DateTimeOffset?)) && value != null && value is DateTime?)
             {
-                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, Kind);
+                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, ((DateTime?)value).Value.Kind);
                 value = offset;
             }
 
@@ -418,12 +418,6 @@ namespace Radzen.Blazor
         /// <value>The data type.</value>
         [Parameter]
         public Type Type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the kind of DateTime bind to control
-        /// </summary>
-        [Parameter]
-        public DateTimeKind Kind { get; set; } = DateTimeKind.Unspecified;
 
         /// <summary>
         /// Disposes the component and removes it from the parent pivot grid.
