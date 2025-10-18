@@ -478,10 +478,12 @@ namespace Radzen
                 _ => null
             };
 
-            if (collectionItemType != null && primaryExpression != null &&
-                !(filter.FilterOperator == FilterOperator.In || filter.FilterOperator == FilterOperator.NotIn))
+            if (collectionItemType != null && primaryExpression != null 
+                                           && filter.FilterOperator is FilterOperator.Contains or FilterOperator.DoesNotContain)
             {
-                primaryExpression = Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType },
+                var methodName = filter.FilterOperator == FilterOperator.Contains ? nameof(Enumerable.Any) : nameof(Enumerable.All);
+
+                primaryExpression = Expression.Call(typeof(Enumerable), methodName, new Type[] { collectionItemType },
                     GetNestedPropertyExpression(parameter, filter.Property), Expression.Lambda(primaryExpression, collectionItemTypeParameter));
             }
 
