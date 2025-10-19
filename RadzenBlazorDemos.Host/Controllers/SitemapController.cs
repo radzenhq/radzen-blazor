@@ -58,7 +58,7 @@ public class SitemapController : Controller
             .Where(t => typeof(ComponentBase).IsAssignableFrom(t))
             .Select(t => new { Type = t, Route = t.GetCustomAttributes<BlazorRouteAttribute>().FirstOrDefault()?.Template })
             .Where(x => x.Route is not null)
-            .Select(x => Regex.Replace(x.Route, "{[^}]+}", ""));
+            .Select(x => Regex.Replace(x.Route, "{[^}]+}", "").TrimEnd('/'));
 
         return pageTypes.Distinct().OrderBy(x => x);
     }
