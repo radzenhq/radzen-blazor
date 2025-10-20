@@ -808,6 +808,18 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowTime { get; set; }
 
+        /// Gets or sets a value indicating whether hour is shown.
+        /// </summary>
+        /// <value><c>true</c> if hour is shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowHour { get; set; } = true;
+
+        /// Gets or sets a value indicating whether minutes are shown.
+        /// </summary>
+        /// <value><c>true</c> if minutes are shown; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool ShowMinutes { get; set; } = true;
+
         /// <summary>
         /// Gets or sets a value indicating whether seconds are shown.
         /// </summary>

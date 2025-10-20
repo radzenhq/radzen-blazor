@@ -110,14 +110,20 @@
                 @if (ShowTime)
                 {
                 <div class="rz-timepicker" @onmousedown:stopPropagation>
+                        @if (ShowHour)
+                        {
                         <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "hour" }})" TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)"
                            Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" Step="@HoursStep"
                            Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput Format="@(PadHours ? "00" : "")" Name="@($"{UniqueID}-h")" />
+                        }
+                        @if (ShowMinutes)
+                        {
                         <div class="rz-separator">
                             <span>:</span>
                         </div>
                         <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "minutes" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" Step="@MinutesStep" Min="0" Max="59"
                            Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes Format="@(PadMinutes ? "00" : "")" Name="@($"{UniqueID}-m")"/>
+                        }
                         @if (ShowSeconds)
                         {
                             <div class="rz-separator">
