@@ -133,22 +133,6 @@ namespace Radzen.Blazor
             bool inBL = r >= n - 7 && c < 7;
             return inTL || inTR || inBL;
         }
-
-        private static double Clamp(double v, double lo, double hi) => v < lo ? lo : (v > hi ? hi : v);
-
-        private static string NormalizeImageHref(string? image)
-        {
-            if (string.IsNullOrWhiteSpace(image)) return string.Empty;
-            var href = image.Trim();
-            bool looksUrl = href.Contains("://", StringComparison.OrdinalIgnoreCase);
-            bool isData = href.StartsWith("data:", StringComparison.OrdinalIgnoreCase);
-            if (!looksUrl && !isData)
-            {
-                // assume raw base64 png
-                href = "data:image/png;base64," + href;
-            }
-            return href;
-        }
     }
 }
 

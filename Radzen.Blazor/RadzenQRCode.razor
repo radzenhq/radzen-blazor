@@ -2,14 +2,14 @@
 @inherits RadzenComponent
 @{
     // Build the QR matrix
-    bool[,] modules = RadzenQREncoder.EncodeUtf8(Value, RadzenQREcc.Quartile);
+    bool[,] modules = RadzenQREncoder.EncodeUtf8(Value, Ecc);
     int n = modules.GetLength(0);
     int vb = n + 8; // quiet zone
 
     // --- Center Image math (viewBox units == modules incl. quiet zone) ---
     bool hasImage = !string.IsNullOrWhiteSpace(Image);
     // Clamp percent for scan reliability (5%..60% of QR inner box)
-    double pct = Clamp(ImageSizePercent, 5, 60);
+    double pct = Math.Clamp(ImageSizePercent, 5, 60);
     double boxModules = Math.Max(5, Math.Round(n * (pct / 100.0)));
     double pad = Math.Max(0, ImagePaddingModules);
 
@@ -23,8 +23,6 @@
     double cutoutY = centerY - cutoutH / 2.0;
     double imgX = centerX - boxModules / 2.0;
     double imgY = centerY - boxModules / 2.0;
-
-    string imgHref = NormalizeImageHref(Image);
 }
 
 <svg xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +78,7 @@
                   rx="@Format(ImageCornerRadius)"
                   ry="@Format(ImageCornerRadius)"
                   fill="@ImageBackground"
-                  fill-opacity="@Format(Clamp(ImageBackgroundOpacity, 0, 1))" />
+                  fill-opacity="@Format(Math.Clamp(ImageBackgroundOpacity, 0, 1))" />
 
             <!-- the logo image -->
             <image x="@Format(imgX)"
@@ -88,7 +86,7 @@
                    width="@Format(boxModules)"
                    height="@Format(boxModules)"
                    preserveAspectRatio="xMidYMid meet"
-                   href="@imgHref" />
+                   href="@Image" />
         }
     }
 </svg>
