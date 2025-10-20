@@ -1,6 +1,6 @@
 @using Microsoft.AspNetCore.Components.Forms
 
-<RadzenRow Gap="2rem">
+<RadzenRow Gap="2rem" AlignItems="AlignItems.Start">
     <RadzenColumn Size="12" SizeMD="6">
         <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 100%;">
             <RadzenQRCode Value="Radzen Blazor"
@@ -23,24 +23,38 @@
         <RadzenStack Gap="1rem">
             <RadzenFieldset Text="Colors">
                 <RadzenStack Gap="1rem">
-                    <RadzenFormField Text="Foreground" Variant="@Variant.Outlined">
-                        <RadzenColorPicker @bind-Value="@foreground" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Background" Variant="@Variant.Outlined">
-                        <RadzenColorPicker @bind-Value="@background" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Eye Color" Variant="@Variant.Outlined">
-                        <RadzenColorPicker @bind-Value="@eyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Top Left Eye Color" Variant="@Variant.Outlined">
-                        <RadzenColorPicker @bind-Value="@topLeftEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Top Right Eye Color" Variant="@Variant.Outlined">
-                        <RadzenColorPicker @bind-Value="@topRightEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Bottom Left Eye Color" Variant="@Variant.Outlined">
-                        <RadzenColorPicker @bind-Value="@bottomLeftEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
-                    </RadzenFormField>
+                    <RadzenRow>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Foreground" Variant="@Variant.Outlined" class="rz-w-100">
+                                <RadzenColorPicker @bind-Value="@foreground" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Background" Variant="@Variant.Outlined" class="rz-w-100">
+                                <RadzenColorPicker @bind-Value="@background" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Eye Color" Variant="@Variant.Outlined" class="rz-w-100">
+                                <RadzenColorPicker @bind-Value="@eyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Top Left Eye Color" Variant="@Variant.Outlined" class="rz-w-100">
+                                <RadzenColorPicker @bind-Value="@topLeftEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Top Right Eye Color" Variant="@Variant.Outlined" class="rz-w-100">
+                                <RadzenColorPicker @bind-Value="@topRightEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                        <RadzenColumn Size="12" SizeMD="6">
+                            <RadzenFormField Text="Bottom Left Eye Color" Variant="@Variant.Outlined" class="rz-w-100">
+                                <RadzenColorPicker @bind-Value="@bottomLeftEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                            </RadzenFormField>
+                        </RadzenColumn>
+                    </RadzenRow>
                     <RadzenButton Text="Reset Colors" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Base" Icon="refresh" Click="@ResetColors" />
                 </RadzenStack>
             </RadzenFieldset>
