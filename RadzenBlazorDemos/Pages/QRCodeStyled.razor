@@ -41,26 +41,47 @@
                     <RadzenFormField Text="Bottom Left Eye Color" Variant="@Variant.Outlined">
                         <RadzenColorPicker @bind-Value="@bottomLeftEyeColor" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
                     </RadzenFormField>
+                    <RadzenButton Text="Reset Colors" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Base" Icon="refresh" Click="@ResetColors" />
                 </RadzenStack>
             </RadzenFieldset>
 
             <RadzenFieldset Text="Shapes">
                 <RadzenStack Gap="1rem">
-                    <RadzenFormField Text="Module Shape" Variant="@Variant.Outlined">
-                        <RadzenDropDown @bind-Value="@moduleShape" Data="@moduleShapes" Style="width: 100%;" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Eye Shape" Variant="@Variant.Outlined">
-                        <RadzenDropDown @bind-Value="@eyeShape" Data="@eyeShapes" Style="width: 100%;" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Top Left Eye Shape" Variant="@Variant.Outlined">
-                        <RadzenDropDown @bind-Value="@topLeftEyeShape" Data="@nullableEyeShapes" AllowClear="true" Style="width: 100%;" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Top Right Eye Shape" Variant="@Variant.Outlined">
-                        <RadzenDropDown @bind-Value="@topRightEyeShape" Data="@nullableEyeShapes" AllowClear="true" Style="width: 100%;" />
-                    </RadzenFormField>
-                    <RadzenFormField Text="Bottom Left Eye Shape" Variant="@Variant.Outlined">
-                        <RadzenDropDown @bind-Value="@bottomLeftEyeShape" Data="@nullableEyeShapes" AllowClear="true" Style="width: 100%;" />
-                    </RadzenFormField>
+                    <RadzenLabel Text="Module Shape" />
+                    <RadzenSelectBar @bind-Value="@moduleShape" Data="@moduleShapes" />
+                    
+                    <RadzenLabel Text="Eye Shape" />
+                    <RadzenSelectBar @bind-Value="@eyeShape" Data="@eyeShapes" />
+                    
+                    <RadzenLabel Text="Top Left Eye Shape" />
+                    <RadzenSelectBar @bind-Value="@topLeftEyeShape">
+                        <Items>
+                            <RadzenSelectBarItem Text="Inherit" Value="@((QRCodeEyeShape?)null)" />
+                            <RadzenSelectBarItem Text="Framed" Value="@QRCodeEyeShape.Framed" />
+                            <RadzenSelectBarItem Text="Rounded" Value="@QRCodeEyeShape.Rounded" />
+                            <RadzenSelectBarItem Text="Square" Value="@QRCodeEyeShape.Square" />
+                        </Items>
+                    </RadzenSelectBar>
+                    
+                    <RadzenLabel Text="Top Right Eye Shape" />
+                    <RadzenSelectBar @bind-Value="@topRightEyeShape">
+                        <Items>
+                            <RadzenSelectBarItem Text="Inherit" Value="@((QRCodeEyeShape?)null)" />
+                            <RadzenSelectBarItem Text="Framed" Value="@QRCodeEyeShape.Framed" />
+                            <RadzenSelectBarItem Text="Rounded" Value="@QRCodeEyeShape.Rounded" />
+                            <RadzenSelectBarItem Text="Square" Value="@QRCodeEyeShape.Square" />
+                        </Items>
+                    </RadzenSelectBar>
+                    
+                    <RadzenLabel Text="Bottom Left Eye Shape" />
+                    <RadzenSelectBar @bind-Value="@bottomLeftEyeShape">
+                        <Items>
+                            <RadzenSelectBarItem Text="Inherit" Value="@((QRCodeEyeShape?)null)" />
+                            <RadzenSelectBarItem Text="Framed" Value="@QRCodeEyeShape.Framed" />
+                            <RadzenSelectBarItem Text="Rounded" Value="@QRCodeEyeShape.Rounded" />
+                            <RadzenSelectBarItem Text="Square" Value="@QRCodeEyeShape.Square" />
+                        </Items>
+                    </RadzenSelectBar>
                 </RadzenStack>
             </RadzenFieldset>
 
@@ -111,5 +132,16 @@
             var base64 = Convert.ToBase64String(buffers);
             imageUrl = $"data:{file.ContentType};base64,{base64}";
         }
+    }
+
+    void ResetColors()
+    {
+        foreground = "#0f62fe";
+        background = "#eef4ff";
+        eyeColor = "#0f62fe";
+        topLeftEyeColor = null;
+        topRightEyeColor = null;
+        bottomLeftEyeColor = null;
+        imageBackground = "#FFFFFF";
     }
 }
