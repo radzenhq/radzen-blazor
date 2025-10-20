@@ -1,0 +1,139 @@
+@using System.Globalization
+@inherits RadzenComponent
+@{
+    // Build the QR matrix
+    bool[,] modules = RadzenQREncoder.EncodeUtf8(Value, Ecc);
+    int n = modules.GetLength(0);
+    int vb = n + 8; // quiet zone
+
+    // --- Center Image math (viewBox units == modules incl. quiet zone) ---
+    bool hasImage = !string.IsNullOrWhiteSpace(Image);
+    // Clamp percent for scan reliability (5%..60% of QR inner box)
+    double pct = Math.Clamp(ImageSizePercent, 5, 60);
+    double boxModules = Math.Max(5, Math.Round(n * (pct / 100.0)));
+    double pad = Math.Max(0, ImagePaddingModules);
+
+    double cutoutW = boxModules + 2 * pad;
+    double cutoutH = boxModules + 2 * pad;
+
+    double centerX = vb / 2.0;
+    double centerY = vb / 2.0;
+
+    double cutoutX = centerX - cutoutW / 2.0;
+    double cutoutY = centerY - cutoutH / 2.0;
+    double imgX = centerX - boxModules / 2.0;
+    double imgY = centerY - boxModules / 2.0;
+}
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 @vb @vb"
+     shape-rendering="crispEdges"
+     width="@Size"
+     height="@Size"
+     @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
+    <!-- Background -->
+    <rect x="0" y="0" width="@vb" height="@vb" fill="@Background" />
+
+    @if (modules is not null)
+    {
+        <!-- finder patterns / eyes -->
+        @DrawEye(4, 4, EyeShapeTopLeft ?? EyeShape, EyeColorTopLeft ?? EyeColor ?? Foreground)
+        @DrawEye(vb - 11, 4, EyeShapeTopRight ?? EyeShape, EyeColorTopRight ?? EyeColor ?? Foreground)
+        @DrawEye(4, vb - 11, EyeShapeBottomLeft ?? EyeShape, EyeColorBottomLeft ?? EyeColor ?? Foreground)
+
+        <!-- data modules (skip eye regions) -->
+        @for (var r = 0; r < n; r++)
+        {
+            for (var c = 0; c < n; c++)
+            {
+                if (!modules[r, c]) continue;
+                if (IsFinderCell(r, c, n)) continue; // don't overdraw eyes
+
+                var x = c + 4; // quiet zone offset
+                var y = r + 4;
+
+                if (ModuleShape == QRCodeModuleShape.Circle)
+                {
+                    <circle cx="@Format(x + 0.5)" cy="@Format(y + 0.5)" r="0.5" fill="@Foreground" />
+                }
+                else if (ModuleShape == QRCodeModuleShape.Rounded)
+                {
+                    <rect x="@Format(x)" y="@Format(y)" width="1" height="1" rx="0.25" ry="0.25" fill="@Foreground" />
+                }
+                else
+                {
+                    <rect x="@Format(x)" y="@Format(y)" width="1" height="1" fill="@Foreground" />
+                }
+            }
+        }
+
+        @* Center image overlay (cutout + image) *@
+        @if (hasImage)
+        {
+            <!-- white (configurable) rounded cutout for the logo -->
+            <rect x="@Format(cutoutX)"
+                  y="@Format(cutoutY)"
+                  width="@Format(cutoutW)"
+                  height="@Format(cutoutH)"
+                  rx="@Format(ImageCornerRadius)"
+                  ry="@Format(ImageCornerRadius)"
+                  fill="@ImageBackground"
+                  fill-opacity="@Format(Math.Clamp(ImageBackgroundOpacity, 0, 1))" />
+
+            <!-- the logo image -->
+            <image x="@Format(imgX)"
+                   y="@Format(imgY)"
+                   width="@Format(boxModules)"
+                   height="@Format(boxModules)"
+                   preserveAspectRatio="xMidYMid meet"
+                   href="@Image" />
+        }
+    }
+</svg>
+
+@code
+{
+    // Draw a 7x7 eye whose top-left screen coordinate (including quiet zone) is (x,y).
+    // NOTE: x,y are *SVG units* (already offset by quiet zone).
+    private RenderFragment DrawEye(double x, double y, QRCodeEyeShape shape, string color)
+    {
+        return __builder =>
+        {
+            <text>
+                @switch (shape)
+                {
+                    case QRCodeEyeShape.Rounded:
+                        {
+                            <!-- Outer 7x7 rounded ring -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" rx="@Format(1.25)" ry="@Format(1.25)" fill="@color" />
+                            <!-- Inner hole (background) -->
+                            <rect x="@Format(x + 1)" y="@Format(y + 1)" width="@Format(5)" height="@Format(5)" rx="@Format(0.25)" ry="@Format(0.25)" fill="@Background" />
+                            <!-- Pupil 3x3 rounded -->
+                            <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" rx="@Format(0.75)" ry="@Format(0.75)" fill="@color" />
+                        }
+                        break;
+
+                    case QRCodeEyeShape.Framed:
+                        {
+                            <!-- Bold square frame (thickness ~1.2) -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="@color" />
+                            <rect x="@Format(x + 1.2)" y="@Format(y + 1.2)" width="@Format(7 - 2 * 1.2)" height="@Format(7 - 2 * 1.2)" fill="@Background" />
+                            <!-- Pupil -->
+                            <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" fill="@color" />
+                        }
+                        break;
+
+                    case QRCodeEyeShape.Square:
+                    default:
+                        {
+                            <!-- Classic square: 7x7 outer, 5x5 inner (background), 3x3 pupil -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="@color" />
+                            <rect x="@Format(x + 1)" y="@Format(y + 1)" width="@Format(5)" height="@Format(5)" fill="@Background" />
+                            <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" fill="@color" />
+                        }
+                        break;
+                }
+            </text>
+        };
+    }
+}
