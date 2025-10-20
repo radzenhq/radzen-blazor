@@ -2855,7 +2855,9 @@ Radzen.unregisterFabMenu = function(element){
     document.removeEventListener('click', handler);
     delete element.__rzOutsideClickHandler;
   }
-};class Spreadsheet {
+};
+
+class Spreadsheet {
   constructor(options) {
     this.element = options.element;
     this.dotNetRef = options.dotNetRef;
