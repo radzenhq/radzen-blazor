@@ -24,17 +24,7 @@ abstract class DatePartFunctionBase : FormulaFunction
             return arg;
         }
 
-        DateTime dt;
-
-        if (arg.Type == CellDataType.Date)
-        {
-            dt = arg.GetValueOrDefault<DateTime>();
-        }
-        else if (arg.TryCoerceToNumber(out var serial, allowBooleans: false, nonNumericTextAsZero: false))
-        {
-            dt = serial.ToDate();
-        }
-        else
+        if (!arg.TryCoerceToDate(out var dt))
         {
             return CellData.FromError(CellError.Value);
         }
