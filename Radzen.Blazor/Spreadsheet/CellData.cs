@@ -205,6 +205,37 @@ public class CellData : IComparable, IComparable<CellData>
         }
     }
 
+    internal bool TryCoerceToDate(out DateTime date)
+    {
+        date = default;
+        switch (Type)
+        {
+            case CellDataType.Date:
+                date = GetValueOrDefault<DateTime>();
+                return true;
+            case CellDataType.Number:
+                date = GetValueOrDefault<double>().ToDate();
+                return true;
+            case CellDataType.String:
+                if (TryConvertFromString(GetValueOrDefault<string>(), out var converted, out var valueType))
+                {
+                    if (valueType == CellDataType.Date)
+                    {
+                        date = (DateTime)converted!;
+                        return true;
+                    }
+                    if (valueType == CellDataType.Number)
+                    {
+                        date = ((double)converted!).ToDate();
+                        return true;
+                    }
+                }
+                return false;
+            default:
+                return false;
+        }
+    }
+
     private static CellDataType GetValueType(object? value, Type valType, bool isNullable, Type? nullableType)
     {
         if (value == null)

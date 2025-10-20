@@ -26,16 +26,7 @@ class WeekdayFunction : FormulaFunction
             return serialArg;
         }
 
-        DateTime dateTime;
-        if (serialArg.Type == CellDataType.Date)
-        {
-            dateTime = serialArg.GetValueOrDefault<DateTime>();
-        }
-        else if (serialArg.TryCoerceToNumber(out var serial, allowBooleans: false, nonNumericTextAsZero: false))
-        {
-            dateTime = serial.ToDate();
-        }
-        else
+        if (!serialArg.TryCoerceToDate(out var dateTime))
         {
             return CellData.FromError(CellError.Value);
         }
