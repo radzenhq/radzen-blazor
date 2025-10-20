@@ -85,6 +85,7 @@ public class FunctionStore
         Add<MinuteFunction>();
         Add<SecondFunction>();
         Add<WeekdayFunction>();
+        Add<WeeknumFunction>();
     }
 
     /// <summary>
