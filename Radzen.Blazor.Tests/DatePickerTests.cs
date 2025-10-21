@@ -732,5 +732,130 @@ namespace Radzen.Blazor.Tests
             var weekNumberHeader = component.Find(".rz-calendar-view th.rz-datepicker-week-number");
             Assert.Contains("Wk", weekNumberHeader.InnerHtml);
         }
+
+        [Fact]
+        public void DatePicker_Multiple_Selects_IEnumerableDateTime()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime> emitted = null;
+            var initial = new DateTime(2024, 1, 1);
+
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.InitialViewDate, initial);
+                parameters.Add(p => p.ValueChanged, args => { emitted = args; });
+            });
+
+            component.InvokeAsync(() => component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "10").ParentElement.Click());
+            component.InvokeAsync(() => component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "12").ParentElement.Click());
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Contains(new DateTime(2024, 1, 10), list.Select(d => d.Date));
+            Assert.Contains(new DateTime(2024, 1, 12), list.Select(d => d.Date));
+        }
+
+        [Fact]
+        public void DatePicker_Multiple_Selects_IEnumerableNullableDateTime()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTime?> emitted = null;
+            var initial = new DateTime(2024, 2, 1);
+
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTime?>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.InitialViewDate, initial);
+                parameters.Add(p => p.ValueChanged, args => { emitted = args; });
+            });
+
+            component.InvokeAsync(() => component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "3").ParentElement.Click());
+            component.InvokeAsync(() => component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "14").ParentElement.Click());
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.Contains(new DateTime(2024, 2, 3), list.Select(d => d.Value.Date));
+            Assert.Contains(new DateTime(2024, 2, 14), list.Select(d => d.Value.Date));
+        }
+
+        [Fact]
+        public void DatePicker_Multiple_Emits_IEnumerableDateTimeOffsetNullable_WithUtcKind()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateTimeOffset?> emitted = null;
+            var initial = new DateTime(2024, 3, 1);
+
+            var component = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateTimeOffset?>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.InitialViewDate, initial);
+                parameters.Add(p => p.Kind, DateTimeKind.Utc);
+                parameters.Add(p => p.ValueChanged, args => { emitted = args; });
+            });
+
+            component.InvokeAsync(() => component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "5").ParentElement.Click());
+            component.InvokeAsync(() => component.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "20").ParentElement.Click());
+
+            Assert.NotNull(emitted);
+            var list = emitted.ToList();
+            Assert.Equal(2, list.Count);
+            Assert.All(list, dto => Assert.Equal(TimeSpan.Zero, dto.Value.Offset));
+        }
+
+        [Fact]
+        public void DatePicker_Multiple_Emits_IEnumerableDateOnlyAndTimeOnlyNullable()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            IEnumerable<DateOnly?> emittedDates = null;
+            IEnumerable<TimeOnly?> emittedTimes = null;
+            var initial = new DateTime(2024, 4, 1);
+
+            var compDates = ctx.RenderComponent<RadzenDatePicker<IEnumerable<DateOnly?>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.InitialViewDate, initial);
+                parameters.Add(p => p.ValueChanged, args => { emittedDates = args; });
+            });
+
+            compDates.InvokeAsync(() => compDates.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "7").ParentElement.Click());
+            compDates.InvokeAsync(() => compDates.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "9").ParentElement.Click());
+
+            Assert.NotNull(emittedDates);
+            var dateList = emittedDates.ToList();
+            Assert.Equal(2, dateList.Count);
+            Assert.Contains(new DateOnly(2024, 4, 7), dateList.Select(d => d.Value));
+            Assert.Contains(new DateOnly(2024, 4, 9), dateList.Select(d => d.Value));
+
+            // TimeOnly? emission should produce midnight times for selected dates
+            var compTimes = ctx.RenderComponent<RadzenDatePicker<IEnumerable<TimeOnly?>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.InitialViewDate, initial);
+                parameters.Add(p => p.ValueChanged, args => { emittedTimes = args; });
+            });
+
+            compTimes.InvokeAsync(() => compTimes.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "1").ParentElement.Click());
+            compTimes.InvokeAsync(() => compTimes.FindAll("td:not(.rz-calendar-other-month) span").First(e => e.TextContent == "2").ParentElement.Click());
+
+            Assert.NotNull(emittedTimes);
+            var timeList = emittedTimes.ToList();
+            Assert.Equal(2, timeList.Count);
+            Assert.All(timeList, t => Assert.Equal(new TimeOnly(0, 0, 0), t.Value));
+        }
     }
 }

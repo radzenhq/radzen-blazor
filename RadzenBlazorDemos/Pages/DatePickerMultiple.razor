@@ -1,0 +1,10 @@
+<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-p-12">
+    <RadzenLabel Text="Select Dates" Component="DatePickerMultiple" />
+    <RadzenDatePicker Multiple @bind-Value=@values DateFormat="dd/MM/yyyy" Name="DatePickerMultiple" />
+</RadzenStack>
+
+@code {
+    IEnumerable<DateTime?> values;
+}
+
+
