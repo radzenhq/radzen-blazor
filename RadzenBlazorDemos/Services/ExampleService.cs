@@ -1501,15 +1501,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Basic", Anchor = "#basic" }, new () { Text = "Styled", Anchor = "#styled" } ],
-                    Name = "QRCode",
-                    Description = "Generate and display QR codes as SVG using RadzenQRCode.",
-                    Path = "qrcode",
-                    Icon = "\uef6b",
-                    Tags = new [] { "qr", "qrcode", "barcode", "svg" }
-                },
-                new Example
-                {
                     Toc = [ new () { Text = "Bound ToggleButton", Anchor = "#bound-toggle-button" }, new () { Text = "ToggleButton Shade", Anchor = "#shade" }, new () { Text = "ToggleButton Style", Anchor = "#style" }, new () { Text = "ToggleButton Variants", Anchor = "#variants" }, new () { Text = "Content in ToggleButtons", Anchor = "#content" }, new () { Text = "ToggleButton Sizes", Anchor = "#sizes" }, new () { Text = "Disabled ToggleButton", Anchor = "#disabled" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "ToggleButton",
                     Description = "Radzen Blazor ToggleButton is a button that changes its appearance or color when activated and returns to its original state when deactivated.",
@@ -2040,6 +2031,16 @@ namespace RadzenBlazorDemos
                     Description = "This example demonstrates multiple pointers with RadzenRadialGauge and multiple scales with RadzenArcGauge component.",
                     Icon = "\ue41d",
                     Tags = new [] { "gauge", "graph", "styling" }
+                },
+                new Example
+                {
+                    Toc = [ new () { Text = "Basic", Anchor = "#basic" }, new () { Text = "Styled", Anchor = "#styled" } ],
+                    Name = "QRCode",
+                    Description = "Generate and display QR codes as SVG using RadzenQRCode.",
+                    Path = "qrcode",
+                    Icon = "\uef6b",
+                    Tags = new [] { "qr", "qrcode", "barcode", "svg" },
+                    New = true
                 },
                 new Example
                 {
