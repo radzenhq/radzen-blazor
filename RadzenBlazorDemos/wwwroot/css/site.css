@@ -134,7 +134,7 @@ body {
     text-decoration: none;
 }
 
-/* CTA Buttons */
+/* CTA Buttons
 
 .cta-button {
     text-decoration: none;
@@ -162,8 +162,8 @@ body {
 .cta-button.primary {
     font-weight: 600;
     color: #ffffff !important;
-    border-color: var(--rz-primary); /*#FF504D*/
-    background: var(--rz-primary); /*#FF504D*/
+    border-color: var(--rz-primary); /*#FF504D
+    background: var(--rz-primary); /*§#FF504D
 }
 
 .cta-button:hover {
@@ -185,7 +185,7 @@ body {
 .dark .cta-button:active {
     color: #515256 !important;
 }
-
+ */
 /* Updated layout */
 
 .customers-logos {
@@ -474,12 +474,15 @@ svg.illustration {
     .nav-links a {
         margin-inline-start: 1rem;
     }
+
+    .rz-layout .rz-layout:not(:has(>.rz-sidebar:nth-of-type(2))) .rz-header,
+    .rz-layout .rz-layout:not(:has(>.rz-sidebar:nth-of-type(2))) .rz-footer,
+    .rz-layout .rz-layout:not(:has(>.rz-sidebar:nth-of-type(2))) .rz-body {
+        width: initial;
+    }
 }
 
 @media (max-width: 576px) {
-    .demos-home h1 {
-        font-size: 3.5rem;
-    }
     .all-components h4 {
         font-size: 1.25rem;
         font-weight: 700;

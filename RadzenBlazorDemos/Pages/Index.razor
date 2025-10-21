@@ -2,6 +2,7 @@
 @page "/"
 @page "/docs/"
 @inject ExampleService ExampleService
+@inject NotificationService NotificationService
 @inject DialogService DialogService
 
 <PageTitle>@ExampleService.TitleFor(null)</PageTitle>
@@ -13,50 +14,228 @@
   <RadzenStack Orientation="Orientation.Vertical" Gap="0px" class="rz-mx-auto">
     <RadzenRow>
       <RadzenColumn Size="12" class="rz-text-align-center">
-        <RadzenText TextStyle="TextStyle.DisplayH1" TagName="TagName.H1" class="rz-my-8 rz-pt-8 rz-my-sm-10 rz-pt-sm-10 rz-my-md-12 rz-pt-md-12" Style="--rz-text-display-h1-font-weight: 500;">Radzen Blazor Components</RadzenText>
-        <RadzenText TextStyle="TextStyle.DisplayH5" TagName="TagName.H2" Style="--rz-text-display-h5-font-weight: normal; --rz-text-display-h5-line-height: 1.4;">The most sophisticated free UI component library for Blazor, featuring <span style="font-weight: 600">100+</span> native components.<br /> Open source. Native. Growing.</RadzenText>
-
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-mt-8">
-          <RadzenLink Path="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE">
-            <img alt="License - MIT" src="https://img.shields.io/github/license/radzenhq/radzen-blazor?color=ff504d&logo=github&style=for-the-badge" style="border-radius: 20px;" />
-          </RadzenLink>
-          <RadzenLink Path="https://github.com/radzenhq/radzen-blazor/">
-            <img alt="Star Radzen on GitHub" src="https://img.shields.io/github/stars/radzenhq/radzen-blazor?color=ff504d&logo=github&style=for-the-badge" style="border-radius: 20px;" />
-          </RadzenLink>
-          <RadzenLink Path="https://github.com/radzenhq/radzen-blazor/graphs/contributors">
-            <img alt="Github Contributors" src="https://img.shields.io/github/contributors/radzenhq/radzen-blazor?color=ff504d&logo=github&style=for-the-badge" style="border-radius: 20px;" />
-          </RadzenLink>
-          <RadzenLink Path="https://www.nuget.org/packages/Radzen.Blazor">
-            <img alt="Nuget Downloads" src="https://img.shields.io/nuget/dt/Radzen.Blazor?color=ff504d&label=nuget%20downloads&logo=nuget&style=for-the-badge" style="border-radius: 20px;" />
-          </RadzenLink>
-        </RadzenStack>
-
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-mt-8 rz-py-8 rz-mt-sm-10 rz-py-sm-10 rz-mt-md-12 rz-py-md-12">
-          <NavLink class="cta-button primary" href="/get-started">
+        <RadzenText TextStyle="TextStyle.DisplayH6" TagName="TagName.H1" Style="max-width: 900px;" class="rz-mt-8 rz-mb-4 rz-mx-auto"><strong>100+</strong> native, open source Blazor components</RadzenText>
+        <RadzenText TextStyle="TextStyle.DisplayH2" TagName="TagName.H2" Style="--rz-text-display-h2-font-size: clamp(3rem, 4.167vw, 3.75rem); max-width: 900px;" class="rz-mx-auto">The most sophisticated free UI component library for Blazor</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Start" Style="max-width: 640px; font-weight: 500;" class="rz-mt-8 rz-mx-auto"><strong>Radzen Blazor Components</strong> give you everything you need to build responsive, data-driven web apps — for free.</RadzenText>
+        <RadzenText TextStyle="TextStyle.Body1" TextAlign="TextAlign.Start" Style="max-width: 640px; font-weight: 500;" class="rz-mt-4 rz-mb-0 rz-mx-auto">The <strong>Subscription</strong> extends your toolkit with dedicated support, premium themes, reusable UI blocks, complete app templates, and a visual design-time experience.</RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-py-8 rz-py-sm-10 rz-py-md-12 rz-mb-4">
+          <NavLink class="rz-button rz-button-lg rz-variant-flat rz-primary rz-shade-default" href="/get-started">
             <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Style="height: 100%;">
               <span>Get Started</span>
             </RadzenStack>
           </NavLink>
-          <Anchor class="cta-button" href="#components">
-            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-              <RadzenIcon aria-hidden="true" Icon="south" />
-              <span>Explore Components</span>
-            </RadzenStack>
-          </Anchor>
+          <Anchor class="rz-button rz-button-lg rz-variant-outlined rz-secondary rz-shade-default" href="#subscription-benefits">See Subscription Benefits</Anchor>
         </RadzenStack>
       </RadzenColumn>
     </RadzenRow>
 
-    <RadzenRow Gap="1rem" RowGap="1rem" class="rz-w-100 rz-mx-auto rz-mt-6 rz-mt-sm-8 rz-mt-md-12" Style="max-width: 1440px;">
+    <!-- Sample app -->
+    <RadzenRow Gap="1rem" RowGap="1rem" class="rz-w-100 rz-mx-auto" Style="max-width: 1300px;">
       <RadzenColumn Size="12">
-        <RadzenCard Variant="Variant.Outlined" class="rz-h-100 rz-p-6 rz-p-md-12 customers-logos rz-background-color-white">
-          <RadzenRow>
-            <RadzenColumn Size="12" SizeMD="3" class="rz-p-md-6 rz-pe-md-12">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3" class="rz-m-0 rz-color-base-900">Trusted by thousands of developers and IT leaders.</RadzenText>
-            </RadzenColumn>
-            <RadzenColumn Size="12" SizeMD="9" class="rz-pe-md-6">
-              <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center" Style="height: 100%;">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="0">
+        <RadzenCard Variant="Variant.Text" class="rz-p-0 rz-overflow-hidden rz-shadow-8" Style="height: 80vh; max-height: 900px;">
+          <RadzenLayout Style="position: relative;" class="rz-h-100">
+            <RadzenHeader>
+              <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="0px">
+                <RadzenColumn Size="5">
+                  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    <RadzenSidebarToggle Click="@(() => demoSidebarExpanded = !demoSidebarExpanded)" />
+                    <RadzenText TextStyle="TextStyle.H6" class="rz-m-0" Style="color: inherit;">My Dashboard</RadzenText>
+                  </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn Size="7">
+                  <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="1rem">
+                    <RadzenButton Icon="notifications" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Click="@ShowNotifications" class="rz-display-none rz-display-md-block" />
+                    <RadzenButton Icon="help" ButtonStyle="ButtonStyle.Base" Variant="Variant.Text" Click="@ShowHelp" class="rz-display-none rz-display-md-block" />
+                    <RadzenAppearanceToggle class="rz-display-none rz-display-md-block" />
+                    <RadzenProfileMenu>
+                      <Template>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" class="rz-me-2">
+                          <img src="data:image/jpg;base64,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" alt="User" style="width: 32px; height: 32px; border-radius: 50%;" />
+                          <RadzenText TextStyle="TextStyle.Body2" class="rz-m-0" Style="line-height: 1; color: inherit;">Alex Johnson</RadzenText>
+                        </RadzenStack>
+                      </Template>
+                      <ChildContent>
+                        <RadzenProfileMenuItem Text="My Profile" Icon="account_circle"></RadzenProfileMenuItem>
+                        <RadzenProfileMenuItem Text="Account Settings" Icon="manage_accounts"></RadzenProfileMenuItem>
+                        <RadzenProfileMenuItem Text="Notifications" Icon="notifications"></RadzenProfileMenuItem>
+                        <RadzenProfileMenuItem Text="Change Password" Icon="password"></RadzenProfileMenuItem>
+                        <RadzenProfileMenuItem Text="Sign Out" Icon="logout"></RadzenProfileMenuItem>
+                      </ChildContent>
+                    </RadzenProfileMenu>
+                  </RadzenStack>
+                </RadzenColumn>
+              </RadzenRow>
+            </RadzenHeader>
+            <RadzenFabMenu Direction="Radzen.FabMenuDirection.Top">
+              <RadzenFabMenuItem Text="Event" Icon="event" />
+              <RadzenFabMenuItem Text="Meeting" Icon="people_alt" />
+              <RadzenFabMenuItem Text="Task" Icon="task" />
+            </RadzenFabMenu>
+            <RadzenBody @ref="demoBody" Style="min-height: 300px;">
+              <RadzenStack Gap="1rem" class="rz-p-0 rz-pt-4 rz-px-md-3">
+                <RadzenRow JustifyContent="JustifyContent.SpaceBetween" AlignItems="AlignItems.Center">
+                  <RadzenColumn Size="9">
+                    <RadzenStack Gap="0.125rem">
+                      <RadzenText TextStyle="TextStyle.DisplayH6" TagName="TagName.H1">Good Morning, Alex</RadzenText>
+                      <RadzenText TextStyle="TextStyle.Body2" class="rz-color-text-secondary">Here's your task overview for today.</RadzenText>
+                    </RadzenStack>
+                  </RadzenColumn>
+                  <RadzenColumn Size="3">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="1rem">
+                      <RadzenButton Icon="refresh" Variant="Variant.Outlined" title="Refresh" />
+                    </RadzenStack>
+                  </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow>
+                  <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                      <RadzenStack JustifyContent="JustifyContent.SpaceBetween" class="rz-h-100" Gap="0.5rem;">
+                        <RadzenText TextStyle="TextStyle.Overline">Overdue</RadzenText>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
+                          <RadzenText TextStyle="TextStyle.DisplayH3" Style="line-height: 0.9; color: var(--rz-series-3)">@overdueTasks</RadzenText>
+                          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-series-3)">need attention</RadzenText>
+                          </RadzenStack>
+                        </RadzenStack>
+                      </RadzenStack>
+                    </RadzenCard>
+                  </RadzenColumn>
+                  <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                      <RadzenStack JustifyContent="JustifyContent.SpaceBetween" class="rz-h-100" Gap="0.5rem;">
+                        <RadzenText TextStyle="TextStyle.Overline">Completed Today</RadzenText>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
+                          <RadzenText TextStyle="TextStyle.DisplayH3" Style="line-height: 0.9; color: var(--rz-series-1">@tasksCompletedToday</RadzenText>
+                          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                            <RadzenIcon Icon="trending_up" Style="color: var(--rz-series-1)" />
+                            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-series-1)">+3 from yesterday</RadzenText>
+                          </RadzenStack>
+                        </RadzenStack>
+                      </RadzenStack>
+                    </RadzenCard>
+                  </RadzenColumn>
+                  <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                      <RadzenStack JustifyContent="JustifyContent.SpaceBetween" class="rz-h-100" Gap="0.5rem;">
+                        <RadzenText TextStyle="TextStyle.Overline">In Progress</RadzenText>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
+                          <RadzenText TextStyle="TextStyle.DisplayH3" Style="line-height: 0.9; color: var(--rz-series-2)">@tasksInProgress</RadzenText>
+                          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-series-2)">active tasks</RadzenText>
+                          </RadzenStack>
+                        </RadzenStack>
+                      </RadzenStack>
+                    </RadzenCard>
+                  </RadzenColumn>
+                  <RadzenColumn Size="12" SizeMD="3">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                      <RadzenStack JustifyContent="JustifyContent.SpaceBetween" class="rz-h-100" Gap="0.5rem;">
+                        <RadzenText TextStyle="TextStyle.Overline">Upcoming Deadlines</RadzenText>
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.End" Gap="0.5rem">
+                          <RadzenText TextStyle="TextStyle.DisplayH3" Style="line-height: 0.9;">@upcomingDeadlines</RadzenText>
+                          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                            <RadzenText TextStyle="TextStyle.Body2">next 7 days</RadzenText>
+                          </RadzenStack>
+                        </RadzenStack>
+                      </RadzenStack>
+                    </RadzenCard>
+                  </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow>
+                  <RadzenColumn Size="12">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                      <RadzenStack Gap="1rem">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween"> 
+                          <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2">Monthly Performance Overview</RadzenText>
+                          <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem" Wrap="FlexWrap.Wrap">
+                            <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                            <RadzenLabel Text="Show labels" Component="dataLabels" />
+                          </RadzenStack>
+                        </RadzenStack>
+                        <RadzenChart>
+                          <RadzenStackedColumnSeries Data="@completedTasksData" CategoryProperty="Month" Title="Completed" ValueProperty="Count">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                          </RadzenStackedColumnSeries>
+                          <RadzenStackedColumnSeries Data="@inProgressTasksData" CategoryProperty="Month" Title="In Progress" ValueProperty="Count">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                          </RadzenStackedColumnSeries>
+                          <RadzenStackedColumnSeries Data="@overdueTasksData" CategoryProperty="Month" Title="Overdue" ValueProperty="Count">
+                            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+                          </RadzenStackedColumnSeries>
+                          <RadzenColumnOptions Radius="4" Margin="5" />
+                          <RadzenCategoryAxis Padding="0" LabelAutoRotation="-60" />
+                          <RadzenValueAxis Min="0" Step="10">
+                            <RadzenGridLines Visible="true" />
+                            <RadzenAxisTitle Text="Number of Tasks" />
+                          </RadzenValueAxis>
+                          <RadzenLegend Position="LegendPosition.Bottom" />
+                        </RadzenChart>
+                      </RadzenStack>
+                    </RadzenCard>
+                  </RadzenColumn>
+                </RadzenRow>
+                <RadzenRow>
+                  <RadzenColumn Size="12">
+                    <RadzenCard Variant="Variant.Outlined" class="rz-h-100 rz-p-0 rz-overflow-hidden">
+                      <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.H6" TagName="TagName.H2" Style="padding: var(--rz-card-padding);">Upcoming Deadlines</RadzenText>
+                        <RadzenDataGrid Data="@upcomingDeadlinesData" AllowPaging="true" PageSize="6" AllowSorting="true" AllowGrouping="true" AllowColumnResize="true" Style="border-inline: none; border-block-end: none; border-radius: 0;">
+                          <Columns>
+                            <RadzenDataGridColumn TItem="TaskItem" Property="Id" Title="ID" Width="80px" />
+                            <RadzenDataGridColumn TItem="TaskItem" Property="Priority" Title="Priority" Width="100px">
+                              <Template Context="task">
+                                <RadzenBadge Text="@GetPriorityText(task.Priority)" BadgeStyle="BadgeStyle.Base" Shade="@GetPriorityStyle(task.Priority)" />
+                              </Template>
+                            </RadzenDataGridColumn>
+                            <RadzenDataGridColumn TItem="TaskItem" Property="Status" Title="Status" Width="100px">
+                              <Template Context="task">
+                                <RadzenBadge Text="@task.Status" BadgeStyle="@GetStatusStyle(task.Status)" />
+                              </Template>
+                            </RadzenDataGridColumn>
+                              <RadzenDataGridColumn TItem="TaskItem" Property="Name" Title="Task"  Width="200px" />
+                              <RadzenDataGridColumn TItem="TaskItem" Property="Description" Title="Description" />
+                            <RadzenDataGridColumn TItem="TaskItem" Property="DueDate" Title="Due Date"  Width="150px">
+                              <Template Context="task">
+                                <RadzenText>@task.DueDate.ToString("MMM dd, yyyy")</RadzenText>
+                              </Template>
+                            </RadzenDataGridColumn>
+                          </Columns>
+                        </RadzenDataGrid>
+                      </RadzenStack>
+                    </RadzenCard>
+                  </RadzenColumn>
+                </RadzenRow>
+              </RadzenStack>
+            </RadzenBody>
+            <RadzenSidebar @ref="demoSidebar" FullHeight="true" Responsive="false" Position="SidebarPosition.Start" @bind-Expanded="@demoSidebarExpanded" Style="--rz-sidebar-width: 250px;">
+              <RadzenStack Gap="0" Style="height: 100%;" JustifyContent="JustifyContent.SpaceBetween">
+                <RadzenText TextStyle="TextStyle.DisplayH6" TagName="TagName.H2" class="rz-mt-6 rz-ms-6 rz-mb-4">Radzen Tasks</RadzenText>
+                <RadzenPanelMenu @ref="demoPanelMenu" Style="flex: 1;">
+                  <RadzenPanelMenuItem Text="Dashboard" Icon="dashboard" Click="@(() => OnMenuItemClick("Dashboard"))" />
+                  <RadzenPanelMenuItem Text="My Tasks" Icon="assignment" Click="@(() => OnMenuItemClick("My Tasks"))" />
+                  <RadzenPanelMenuItem Text="Projects" Icon="folder" Click="@(() => OnMenuItemClick("Projects"))" />
+                  <RadzenPanelMenuItem Text="Calendar" Icon="event" Click="@(() => OnMenuItemClick("Calendar"))" />
+                  <RadzenPanelMenuItem Text="Reports" Icon="assessment" Click="@(() => OnMenuItemClick("Reports"))" />
+                  <RadzenPanelMenuItem Text="Settings" Icon="settings" Click="@(() => OnMenuItemClick("Settings"))" />
+                </RadzenPanelMenu>
+                <RadzenText TextStyle="TextStyle.Caption" class="rz-ms-6 rz-text-tertiary-color">Radzen Tasks v1.0.0</RadzenText>
+                <RadzenText TextStyle="TextStyle.Caption" class="rz-mb-6 rz-ms-6 rz-text-tertiary-color">Copyright Ⓒ 2025</RadzenText>
+              </RadzenStack>
+            </RadzenSidebar>
+          </RadzenLayout>
+        </RadzenCard>
+      </RadzenColumn>
+    </RadzenRow>
+    <!-- End Sample app -->
+
+    <RadzenRow Gap="1rem" RowGap="1rem" class="rz-w-100 rz-mx-auto" Style="max-width: 1100px;">
+      <RadzenColumn>
+        <RadzenStack AlignItems="Radzen.AlignItems.Center">
+          <RadzenText TextStyle="TextStyle.DisplayH5" TagName="TagName.H3" TextAlign="TextAlign.Center" Style="max-width: 900px; font-weight: 500;" class="rz-mt-8 rz-pt-4 rz-pt-sm-12 rz-mb-6 rz-mx-auto">Trusted by thousands of developers and IT leaders</RadzenText>
+          <RadzenRow class="rz-w-100 rz-mx-auto">
+            <RadzenColumn Size="12">
+              <RadzenCard Variant="Variant.Text" class="customers-logos rz-h-100 rz-background-color-white" >
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Wrap="FlexWrap.Wrap" Gap="0" class="rz-mx-auto" Style="max-width: 1000px;">
                   <span><img alt="Microsoft" src="images/microsoft.svg" /></span>
                   <span class="square"><img alt="Porsche" src="images/porsche.svg" /></span>
                   <span class="square"><img alt="NASA" src="images/nasa.svg" /></span>
@@ -71,329 +250,277 @@
                   <span><img alt="Accenture" src="images/accenture.svg" /></span>
                   <span><img alt="Deloitte" src="images/deloitte.svg" /></span>
                 </RadzenStack>
-              </RadzenStack>
+              </RadzenCard>
             </RadzenColumn>
           </RadzenRow>
-        </RadzenCard>
+        </RadzenStack>
+      </RadzenColumn>
+    </RadzenRow>
+    <RadzenRow Gap="1rem" RowGap="1rem" class="rz-w-100 rz-mx-auto" Style="max-width: 1100px;">
+      <RadzenColumn>
+        <RadzenStack AlignItems="Radzen.AlignItems.Center">
+          <RadzenText TextStyle="TextStyle.DisplayH5" TagName="TagName.H3" TextAlign="TextAlign.Center" Style="max-width: 900px; font-weight: 500;" class="rz-mt-6 rz-pt-4 rz-pt-sm-12 rz-mb-6 rz-mx-auto">Reliable, Productive, and Professional</RadzenText>
+          <RadzenRow class="rz-w-100 rz-mx-auto">
+            <RadzenColumn Size="12" SizeXS="4">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="speed" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Native components" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Implemented in C#/Razor with no wrappers around external JavaScript libraries or frameworks." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="extension" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Open and flexible" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Open source under the MIT license and easy to extend. No vendor lock-in." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="devices_other" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Responsive layouts" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600"  />
+                  <RadzenText Text="Adjusts automatically to any screen size or device." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="accessibility_new" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Accessibility" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Includes ARIA support and full keyboard navigation." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="sync_alt" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="RTL" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Supports right-to-left layouts for multilingual apps." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="verified" class="rz-text-tertiary-color rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Consistent quality" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Actively maintained and tested by the Radzen team." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+          </RadzenRow>
+        </RadzenStack>
       </RadzenColumn>
     </RadzenRow>
 
-    <RadzenRow ID="components" Gap="1rem" class="rz-w-100 rz-mx-auto rz-mt-12 rz-pt-12" Style="max-width: 1440px;">
+    <RadzenRow ID="subscription-benefits" Gap="1rem" RowGap="1rem" class="rz-w-100 rz-mx-auto" Style="max-width: 1100px;">
       <RadzenColumn Size="12">
-            <RadzenToc Orientation="Orientation.Horizontal" Selector=".radzen-blazor" Style="position: sticky; top: 2rem; z-index: 1;" class="rz-display-none rz-display-md-flex">
-                <RadzenTocItem Text="UI Components" Selector="#get-started"></RadzenTocItem>
-                <RadzenTocItem Selector="#blocks">
-                  <Template>
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                      <RadzenText Text="UI Blocks" /> <RadzenBadge Text="Pro" BadgeStyle="BadgeStyle.Danger" />
+        <RadzenStack AlignItems="Radzen.AlignItems.Center">
+          <RadzenText TextStyle="TextStyle.DisplayH5" TagName="TagName.H3" TextAlign="TextAlign.Center" Style="max-width: 900px; font-weight: 500;" class="rz-mt-6 rz-pt-4 rz-pt-sm-12 rz-mb-6 rz-mx-auto">Subscribe and Get</RadzenText>
+          <RadzenRow class="rz-w-100 rz-mx-auto">
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="palette" class="rz-color-series-1 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Premium Themes & Swatches" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Ensure a consistent, polished look that matches your brand and supports accessibility." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="brush" class="rz-color-series-1 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Theme Editor" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Customize colors, typography, and component properties visually. No manual CSS required." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="widgets" class="rz-color-series-1 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Reusable UI Blocks" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600"  />
+                  <RadzenText Text="Assemble pages quickly from ready-made layouts, forms, and dashboards." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="dashboard_customize" class="rz-color-series-1 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Complete App Templates" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Start faster with project templates that cover common business scenarios." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="format_shapes" class="rz-color-series-2 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Visual Design-Time Experience" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Design pages visually in your Visual Studio or the standalone Radzen Blazor Studio IDE." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="assistant" class="rz-color-series-2 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Page & Layout Wizards" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Use guided wizards to build new pages and layouts quickly and consistently." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="dns" class="rz-color-series-2 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="CRUD" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Generate create, read, update, and delete pages from your data sources in minutes." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="filter_alt" class="rz-color-series-2 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Query Builder" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Sort and Filter your data when you bind it to components." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="schema" class="rz-color-series-3 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Visual Method Editor" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Define and edit custom logic visually with a clean, intuitive interface." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="bug_report" class="rz-color-series-3 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Debugging" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Run, test, and debug your applications without leaving the environment." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="support" class="rz-color-series-3 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Dedicated Support" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Get direct help from the Radzen team. Expert guidance when you need it most." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+            <RadzenColumn Size="12" SizeXS="4" SizeSM="3">
+              <RadzenCard Variant="Variant.Outlined" class="rz-h-100">
+                <RadzenStack Gap="0.5rem">
+                  <RadzenIcon Icon="auto_fix_high" class="rz-color-series-3 rz-mb-2" Style="font-size: 32px; font-weight: 300" />
+                  <RadzenText Text="Priority Fixes & Feature Requests" TextStyle="Radzen.Blazor.TextStyle.H6" Style="--rz-text-h6-font-weight: 600" />
+                  <RadzenText Text="Subscribers receive priority handling for bug fixes and new feature requests." TextStyle="Radzen.Blazor.TextStyle.Body2" />
+                </RadzenStack>
+              </RadzenCard>
+            </RadzenColumn>
+          </RadzenRow>
+          <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-py-8 rz-py-sm-10 rz-py-md-12">
+            <NavLink class="rz-button rz-button-lg rz-variant-flat rz-primary rz-shade-default" href="https://www.radzen.com/blazor-studio/download/" target="_blank" title="Explore Radzen Blazor Studio features">Start Free</NavLink>
+            <NavLink class="rz-button rz-button-lg rz-variant-outlined rz-secondary rz-shade-default" href="https://www.radzen.com/pricing/" target="_blank" title="Radzen Pricing">See Subscription Plans</NavLink>
+          </RadzenStack>
+          <RadzenCarousel ButtonShade="Radzen.Shade.Dark" AllowNavigation="false" Interval="6000" class="rz-w-100 rz-mx-auto rz-pb-8" >
+            <Items>
+              <RadzenCarouselItem>
+                <RadzenRow RowGap="3rem" Gap="1rem">
+                  <RadzenColumn Size="12">
+                    <RadzenStack Style="max-width: 800px" Gap="3.5rem" class="rz-mx-auto">
+                      <RadzenStack Style="margin-top: 40px" Gap="1rem">
+                        <RadzenText Text="&ldquo;" TextStyle="Radzen.Blazor.TextStyle.DisplayH1" TagName="Radzen.Blazor.TagName.P" Style="line-height: 8px; font-weight: 700; font-family: Georgia, serif" class="rz-m-0" />
+                        <RadzenText Text="" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 500; line-height: 1.2em" class="">
+                          <span>Radzen is a top quality RAD product!</span>
+                          <span Style="font-weight: 300" class="rz-m-0 rz-text-tertiary-color">Apart from the excellent customer support (particularly their thorough understanding of our problems), the time saving element of Radzen truly impressed us.</span>
+                        </RadzenText>
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
+                          <RadzenStack Gap="0">
+                            <RadzenText Text="Miguel Reis" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-secondary-color" />
+                            <RadzenText Text="R & D Project Manager at SIER Group" class="rz-m-0 rz-text-tertiary-color" />
+                          </RadzenStack>
+                        </RadzenStack>
+                      </RadzenStack>
                     </RadzenStack>
-                  </Template>
-                </RadzenTocItem>
-                <RadzenTocItem Selector="#templates">
-                  <Template>
-                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-                      <RadzenText Text="App Templates" /> <RadzenBadge Text="Pro" BadgeStyle="BadgeStyle.Danger" />
+                  </RadzenColumn>
+                </RadzenRow>
+              </RadzenCarouselItem>
+              <RadzenCarouselItem>
+                <RadzenRow RowGap="3rem" Gap="1rem">
+                  <RadzenColumn Size="12">
+                    <RadzenStack Style="max-width: 800px" Gap="3.5rem" class="rz-mx-auto">
+                      <RadzenStack Style="margin-top: 60px" Gap="1rem">
+                        <RadzenText Text="&ldquo;" TextStyle="Radzen.Blazor.TextStyle.DisplayH1" TagName="Radzen.Blazor.TagName.P" Style="line-height: 8px; font-weight: 700; font-family: Georgia, serif" class="rz-m-0" />
+                        <RadzenText Text="" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 500; line-height: 1.2em" class="">
+                          <span>Why Radzen?</span>
+                          <span Style="font-weight: 300" class="rz-m-0 rz-text-tertiary-color">Speed of development, proven technologies and spectacular support and commitment from the Radzen team.</span>
+                        </RadzenText>
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
+                          <RadzenStack Gap="0">
+                            <RadzenText Text="Carlos Carminati" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-secondary-color" />
+                            <RadzenText Text="Solution Architect at Mine IT" class="rz-m-0 rz-text-tertiary-color" />
+                          </RadzenStack>
+                        </RadzenStack>
+                      </RadzenStack>
                     </RadzenStack>
-                  </Template>
-                </RadzenTocItem>
-            </RadzenToc>
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12" ID="get-started">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Get Started</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow RowGap="1.5rem">
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3">
-                    <RadzenLink Path="/get-started">
-                      <RadzenIcon aria-hidden="true" Icon="@("\ue1c4")" /><span>Get Started</span>
-                      <RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge>
-                    </RadzenLink>
-                  </RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ai"><RadzenIcon aria-hidden="true" Icon="@("\uefac")" /><span>AI</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/support"><RadzenIcon aria-hidden="true" Icon="@("\ue0c6")" /><span>Support</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/accessibility"><RadzenIcon aria-hidden="true" Icon="@("\ue92c")" /><span>Accessibility</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3">
-                    <RadzenLink Path="/dashboard">
-                      <RadzenIcon aria-hidden="true" Icon="@("\ue871")" /><span>Sample Dashboard</span>
-                      <RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge>
-                    </RadzenLink>
                   </RadzenColumn>
                 </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Data</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow RowGap="1.5rem">
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/datagrid"><RadzenIcon aria-hidden="true" Icon="@("\uf191")" /><span>DataGrid</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/pivot-data-grid"><RadzenIcon aria-hidden="true" Icon="@("\ue9ce")" /><span>PivotDataGrid</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/datalist"><RadzenIcon aria-hidden="true" Icon="@("\ue896")" /><span>DataList</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/datafilter"><RadzenIcon aria-hidden="true" Icon="@("\uef4f")" /><span>DataFilter</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/markdown"><RadzenIcon aria-hidden="true" Icon="@("\uf552")" /><span>Markdown</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/pager"><RadzenIcon aria-hidden="true" Icon="@("\ueb8d")" /><span>Pager</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/picklist"><RadzenIcon aria-hidden="true" Icon="@("\ue0b8")" /><span>PickList</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/scheduler"><RadzenIcon aria-hidden="true" Icon="@("\ue616")" /><span>Scheduler</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/table"><RadzenIcon aria-hidden="true" Icon="@("\uf101")" /><span>Table</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/tree"><RadzenIcon aria-hidden="true" Icon="@("\ue94b")" /><span>Tree</span></RadzenLink></RadzenColumn>
+              </RadzenCarouselItem>
+              <RadzenCarouselItem>
+                <RadzenRow RowGap="3rem" Gap="1rem">
+                  <RadzenColumn Size="12">
+                    <RadzenStack Style="max-width: 800px" Gap="3.5rem" class="rz-mx-auto">
+                      <RadzenStack Style="margin-top: 60px" Gap="1rem">
+                        <RadzenText Text="&ldquo;" TextStyle="Radzen.Blazor.TextStyle.DisplayH1" TagName="Radzen.Blazor.TagName.P" Style="line-height: 8px; font-weight: 700; font-family: Georgia, serif" class="rz-m-0" />
+                        <RadzenText Text="" TextStyle="Radzen.Blazor.TextStyle.H3" TagName="Radzen.Blazor.TagName.P" Style="font-weight: 500; line-height: 1.2em" class="">
+                          <span>The time and money we invested before we switched to Radzen was significantly higher.</span>
+                          <span Style="font-weight: 300" class="rz-m-0 rz-text-tertiary-color">Managing our always-evolving data structures is now much easier and reliable.</span>
+                        </RadzenText>
+                        <RadzenStack AlignItems="Radzen.AlignItems.Center" class="rz-mt-4" Gap="1rem" Orientation="Radzen.Orientation.Horizontal">
+                          <RadzenStack Gap="0">
+                            <RadzenText Text="Maximilian Rogl" Style="font-weight: 600" TextStyle="Radzen.Blazor.TextStyle.H4" class="rz-m-0 rz-text-secondary-color" />
+                            <RadzenText Text="Chief Product Owner at adventics GmbH" class="rz-m-0 rz-text-tertiary-color" />
+                          </RadzenStack>
+                        </RadzenStack>
+                      </RadzenStack>
+                    </RadzenStack>
+                  </RadzenColumn>
                 </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">UI Fundamentals</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow RowGap="1.5rem">
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/themes"><RadzenIcon aria-hidden="true" Icon="@("\ue40a")" /><span>Themes</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/theme-service"><RadzenIcon aria-hidden="true" Icon="@("\ue3ae")" /><span>ThemeService</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/appearance-toggle"><RadzenIcon aria-hidden="true" Icon="@("\ueb37")" /><span>AppearanceToggle</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/colors"><RadzenIcon aria-hidden="true" Icon="@("\ue997")" /><span>Colors</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/typography"><RadzenIcon aria-hidden="true" Icon="@("\ue264")" /><span>Typography</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/icon"><RadzenIcon aria-hidden="true" Icon="@("\ue148")" /><span>Icons</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/borders"><RadzenIcon aria-hidden="true" Icon="@("\ue3c6")" /><span>Borders</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/breakpoints"><RadzenIcon aria-hidden="true" Icon="@("\ue1b1")" /><span>Breakpoints</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/display"><RadzenIcon aria-hidden="true" Icon="@("\uf023")" /><span>Display</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/overflow"><RadzenIcon aria-hidden="true" Icon="@("\uf829")" /><span>Overflow</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ripple"><RadzenIcon aria-hidden="true" Icon="@("\ue762")" /><span>Ripple</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/shadows"><RadzenIcon aria-hidden="true" Icon="@("\ue9df")" /><span>Shadows</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/sizing"><RadzenIcon aria-hidden="true" Icon="@("\uf730")" /><span>Sizing</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/skeleton"><RadzenIcon aria-hidden="true" Icon="@("\uf486")" /><span>Skeleton</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/spacing"><RadzenIcon aria-hidden="true" Icon="@("\uf773")" /><span>Spacing</span></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Images</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/gravatar"><RadzenIcon aria-hidden="true" Icon="@("\ue420")" /><span>Gravatar</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/image"><RadzenIcon aria-hidden="true" Icon="@("\ue3c4")" /><span>Image</span></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Layout</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/layout"><RadzenIcon aria-hidden="true" Icon="@("\ue8f1")" /><span>Layout</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/stack"><RadzenIcon aria-hidden="true" Icon="@("\ue8e9")" /><span>Stack</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/row"><RadzenIcon aria-hidden="true" Icon="@("\uf676")" /><span>Row</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/column"><RadzenIcon aria-hidden="true" Icon="@("\uf674")" /><span>Column</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/card"><RadzenIcon aria-hidden="true" Icon="@("\uefad")" /><span>Card</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/card-group"><RadzenIcon aria-hidden="true" Icon="@("\ue8f3")" /><span>CardGroup</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/dialog"><RadzenIcon aria-hidden="true" Icon="@("\ue069")" /><span>Dialog</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/dropzone"><RadzenIcon aria-hidden="true" Icon="@("\ue945")" /><span>DropZone</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/panel"><RadzenIcon aria-hidden="true" Icon="@("\uf732")" /><span>Panel</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/popup"><RadzenIcon aria-hidden="true" Icon="@("\ue0ca")" /><span>Popup</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/splitter"><RadzenIcon aria-hidden="true" Icon="@("\ue42a")" /><span>Splitter</span></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Navigation</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/accordion"><RadzenIcon aria-hidden="true" Icon="@("\ue8fe")" /><span>Accordion</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/breadcrumb"><RadzenIcon aria-hidden="true" Icon="@("\uea50")" /><span>BreadCrumb</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/carousel"><RadzenIcon aria-hidden="true" Icon="@("\ue8eb")" /><span>Carousel</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/contextmenu"><RadzenIcon aria-hidden="true" Icon="@("\ue8de")" /><span>ContextMenu</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/link"><RadzenIcon aria-hidden="true" Icon="@("\ue157")" /><span>Link</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/login"><RadzenIcon aria-hidden="true" Icon="@("\uea77")" /><span>Login</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/menu"><RadzenIcon aria-hidden="true" Icon="@("\ue5d2")" /><span>Menu</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/panelmenu"><RadzenIcon aria-hidden="true" Icon="@("\ue875")" /><span>PanelMenu</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/profile-menu"><RadzenIcon aria-hidden="true" Icon="@("\ue851")" /><span>ProfileMenu</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/steps"><RadzenIcon aria-hidden="true" Icon="@("\ue8be")" /><span>Steps</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/tabs"><RadzenIcon aria-hidden="true" Icon="@("\ue8d8")" /><span>Tabs</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/toc"><RadzenIcon aria-hidden="true" Icon="@("\ue241")" /><span>Toc</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Forms</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/aichat"><RadzenIcon aria-hidden="true" Icon="@("\ue0b7")" /><span>AIChat</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/chat"><RadzenIcon aria-hidden="true" Icon="@("\uefd1")" /><span>Chat</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/autocomplete"><RadzenIcon aria-hidden="true" Icon="@("\ue03b")" /><span>AutoComplete</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/button"><RadzenIcon aria-hidden="true" Icon="@("\ue72f")" /><span>Button</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/toggle-button"><RadzenIcon aria-hidden="true" Icon="@("\ue8e0")" /><span>ToggleButton</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/checkbox"><RadzenIcon aria-hidden="true" Icon="@("\ue834")" /><span>CheckBox</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/checkboxlist"><RadzenIcon aria-hidden="true" Icon="@("\ue6b1")" /><span>CheckBoxList</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/colorpicker"><RadzenIcon aria-hidden="true" Icon="@("\ue40a")" /><span>ColorPicker</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/datepicker"><RadzenIcon aria-hidden="true" Icon="@("\ue916")" /><span>DatePicker</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/dropdown"><RadzenIcon aria-hidden="true" Icon="@("\ue172")" /><span>DropDown</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/dropdown-datagrid"><RadzenIcon aria-hidden="true" Icon="@("\ue99c")" /><span>DropDownDataGrid</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/fab"><RadzenIcon aria-hidden="true" Icon="@("\ue147")" /><span>Fab</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/fab-menu"><RadzenIcon aria-hidden="true" Icon="@("\ue091")" /><span>FabMenu</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/fieldset"><RadzenIcon aria-hidden="true" Icon="@("\ue728")" /><span>Fieldset</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/fileinput"><RadzenIcon aria-hidden="true" Icon="@("\ue226")" /><span>FileInput</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/form-field"><RadzenIcon aria-hidden="true" Icon="@("\ue578")" /><span>FormField</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/html-editor"><RadzenIcon aria-hidden="true" Icon="@("\ue3c9")" /><span>HTMLEditor</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/listbox"><RadzenIcon aria-hidden="true" Icon="@("\ue0ee")" /><span>ListBox</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/mask"><RadzenIcon aria-hidden="true" Icon="@("\ue262")" /><span>Mask</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/numeric"><RadzenIcon aria-hidden="true" Icon="@("\uf04a")" /><span>Numeric</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/password"><RadzenIcon aria-hidden="true" Icon="@("\uf042")" /><span>Password</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/radiobuttonlist"><RadzenIcon aria-hidden="true" Icon="@("\ue837")" /><span>RadioButtonList</span><RadzenBadge BadgeStyle="BadgeStyle.Info" Title="Updated"><RadzenIcon aria-hidden="true" Icon="@("\ue863")" /><span>Updated</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/rating"><RadzenIcon aria-hidden="true" Icon="@("\ue839")" /><span>Rating</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/security-code"><RadzenIcon aria-hidden="true" Icon="@("\uf045")" /><span>SecurityCode</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/selectbar"><RadzenIcon aria-hidden="true" Icon="@("\uf8e8")" /><span>SelectBar</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/slider"><RadzenIcon aria-hidden="true" Icon="@("\ue429")" /><span>Slider</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/speechtotextbutton"><RadzenIcon aria-hidden="true" Icon="@("\ue029")" /><span>SpeechToTextButton</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/splitbutton"><RadzenIcon aria-hidden="true" Icon="@("\uf756")" /><span>SplitButton</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/switch"><RadzenIcon aria-hidden="true" Icon="@("\ue9f6")" /><span>Switch</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/templateform"><RadzenIcon aria-hidden="true" Icon="@("\uebed")" /><span>TemplateForm</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/textarea"><RadzenIcon aria-hidden="true" Icon="@("\ue167")" /><span>TextArea</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/textbox"><RadzenIcon aria-hidden="true" Icon="@("\ue9f1")" /><span>TextBox</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/timespanpicker"><RadzenIcon aria-hidden="true" Icon="@("\ue425")" /><span>TimeSpanPicker</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/example-upload"><RadzenIcon aria-hidden="true" Icon="@("\uf09b")" /><span>Upload</span></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Data Visualization</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/area-chart"><RadzenIcon aria-hidden="true" Icon="@("\ue770")" /><span>Area Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/bar-chart"><RadzenIcon aria-hidden="true" Icon="@("\ue26b")" Style="transform: rotate(90deg);" /><span>Bar Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/column-chart"><RadzenIcon aria-hidden="true" Icon="@("\ue26b")" /><span>Column Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/donut-chart"><RadzenIcon aria-hidden="true" Icon="@("\ue918")" /><span>Donut Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/line-chart"><RadzenIcon aria-hidden="true" Icon="@("\uf22b")" /><span>Line Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/pie-chart"><RadzenIcon aria-hidden="true" Icon="@("\ue6c4")" /><span>Pie Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/sparkline"><RadzenIcon aria-hidden="true" Icon="@("\uf64f")" /><span>Sparkline</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/arc-gauge"><RadzenIcon aria-hidden="true" Icon="@("\ue9e4")" /><span>Arc Gauge</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/radial-gauge"><RadzenIcon aria-hidden="true" Icon="@("\ue01b")" /><span>Radial Gauge</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/stacked-area-chart"><RadzenIcon aria-hidden="true" Icon="@("\ue770")" /><span>Stacked Area Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/stacked-bar-chart"><RadzenIcon aria-hidden="true" Icon="@("\ue9e6")" Style="transform: rotate(90deg);" /><span>Stacked Bar Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/stacked-column-chart"><RadzenIcon aria-hidden="true" Icon="@("\ue9e6")" /><span>Stacked Column Chart</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/timeline"><RadzenIcon aria-hidden="true" Icon="@("\ue00d")" /><span>Timeline</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/googlemap"><RadzenIcon aria-hidden="true" Icon="@("\ue55b")" /><span>GoogleMap</span></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Feedback</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/alert"><RadzenIcon aria-hidden="true" Icon="@("\ue88e")" /><span>Alert</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/badge"><RadzenIcon aria-hidden="true" Icon="@("\uf7f1")" /><span>Badge</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/notification"><RadzenIcon aria-hidden="true" Icon="@("\ue87f")" /><span>Notification</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/progressbar"><RadzenIcon aria-hidden="true" Icon="@("\ue9e3")" /><span>ProgressBar</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/progressbarcircular"><RadzenIcon aria-hidden="true" Icon="@("\ue9d0")" /><span>ProgressBarCircular</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/tooltip"><RadzenIcon aria-hidden="true" Icon="@("\ue9f8")" /><span>Tooltip</span></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">Validators</RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/comparevalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue877")" /><span>CompareValidator</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/dataannotationvalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue6b3")" /><span>DataAnnotationValidator</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/emailvalidator"><RadzenIcon aria-hidden="true" Icon="@("\uf18c")" /><span>EmailValidator</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/lengthvalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue90a")" /><span>LengthValidator</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/numericrangevalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue3d0")" /><span>NumericRangeValidator</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/regexvalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue53f")" /><span>RegexValidator</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/requiredvalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue578")" /><span>RequiredValidator</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/customvalidator"><RadzenIcon aria-hidden="true" Icon="@("\ue7d8")" /><span>CustomValidator</span></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12" ID="blocks">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">UI Blocks <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Pro" Title="Pro" Style="vertical-align: top;" /></RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow RowGap="1.5rem">
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-cta"><RadzenIcon aria-hidden="true" Icon="@("\ue06c")" /><span>Call-to-Action</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-cards"><RadzenIcon aria-hidden="true" Icon="@("\ue991")" /><span>Cards</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-faq"><RadzenIcon aria-hidden="true" Icon="@("\uf04c")" /><span>FAQ</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-features"><RadzenIcon aria-hidden="true" Icon="@("\ue031")" /><span>Features</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-footers"><RadzenIcon aria-hidden="true" Icon="@("\uf7e6")" /><span>Footers</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-logos"><RadzenIcon aria-hidden="true" Icon="@("\ue574")" /><span>Logo Clouds</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-newsletter"><RadzenIcon aria-hidden="true" Icon="@("\uf18c")" /><span>Newsletter</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-page-headings"><RadzenIcon aria-hidden="true" Icon="@("\ue9ea")" /><span>Page Headings</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-pricing"><RadzenIcon aria-hidden="true" Icon="@("\uf05b")" /><span>Pricing</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/ui-blocks-testimonials"><RadzenIcon aria-hidden="true" Icon="@("\uf054")" /><span>Testimonials</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
-            <RadzenRow class="rz-mt-8 rz-mt-sm-6 rz-pt-sm-6 rz-mt-lg-12 rz-pt-lg-12" ID="templates">
-              <RadzenColumn Size="12" SizeMD="3" SizeLG="2" SizeXL="3">
-                <RadzenText TextStyle="TextStyle.H4" TagName="TagName.H3">App Templates <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Pro" Title="Pro" Style="vertical-align: top;" /></RadzenText>
-              </RadzenColumn>
-              <RadzenColumn Size="12" SizeMD="9" SizeLG="10" SizeXL="9" class="rz-ps-6 rz-ps-md-0 components-list">
-                <RadzenRow RowGap="1.5rem">
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/dashboard"><RadzenIcon aria-hidden="true" Icon="@("\ue868")" /><span>Issues Dashboard</span></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/templates-healthcare"><RadzenIcon aria-hidden="true" Icon="@("\ueb4c")" /><span>Healthcare</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/templates-realestate"><RadzenIcon aria-hidden="true" Icon="@("\ue73a")" /><span>Real Estate</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                  <RadzenColumn Size="12" SizeXS="6" SizeSM="4" SizeLG="3"><RadzenLink Path="/templates-repairshop"><RadzenIcon aria-hidden="true" Icon="@("\uf56c")" /><span>Repair Workshop</span><RadzenBadge BadgeStyle="BadgeStyle.Success" Title="New"><RadzenIcon aria-hidden="true" Icon="@("\ue061")" /><span>New</span></RadzenBadge></RadzenLink></RadzenColumn>
-                </RadzenRow>
-              </RadzenColumn>
-            </RadzenRow>
-
+              </RadzenCarouselItem>
+            </Items>
+          </RadzenCarousel>
+        </RadzenStack>
       </RadzenColumn>
     </RadzenRow>
   </RadzenStack>
 </div>
 <div class="demos-home dark rz-px-6 rz-px-md-12">
   <RadzenStack Orientation="Orientation.Vertical" Gap="0px" class="rz-mx-auto rz-text-align-center" Style="max-width: 1280px;">
-    <RadzenText TextStyle="TextStyle.DisplayH2" class="rz-mb-12" Style="--rz-text-display-h2-font-weight: 600; text-wrap: balance;">Accelerated, smarter, and cost-effective Blazor development</RadzenText>
-    <RadzenText TextStyle="TextStyle.DisplayH5" TagName="TagName.H3" class="rz-mb-12 rz-pb-2" Style="--rz-text-display-h5-font-weight: 300;">Radzen Blazor Studio provides tons of productivity gains for Blazor developers</RadzenText>
-    <NavLink href="https://www.radzen.com/blazor-studio/" target="_blank" title="Explore Radzen Blazor Studio features"><img alt="Radzen Blazor Studio" src="images/radzen-blazor-studio-dark.png" width="100%" /></NavLink>
-    <RadzenRow Gap="3rem" class="rz-mt-12 radzen-features rz-text-align-start">
-      <RadzenColumn SizeSM="6" SizeLG="5" OffsetLG="1">
-        <ul>
-          <li>Quickly create Blazor pages with familiar WYSIWYG Blazor designer.</li>
-          <li>Scaffold a complete CRUD application from your MSSQL, MySQL, Postgres or Oracle database.</li>
-          <li>Get access to the premium themes.</li>
-          <li>Customize the Radzen Blazor Components look and feel to match your or your customer's branding.</li>
-        </ul>
-      </RadzenColumn>
-      <RadzenColumn SizeSM="6" SizeLG="5">
-          <ul>
-          <li>Authentication, authorization, user and role management are built-in. Azure AD, Active Directory, Windows Authentication or ASP.NET Identity.</li>
-          <li>Run your Radzen Blazor application directly from Visual Studio Code or Visual Studio Professional.</li>
-          <li>Deploy your Blazor applications to IIS and Azure with a single click.</li>
-          <li>Dedicated support with 24 hour response time (or even less).</li>
-          <li>Get help from the active <RadzenLink Path="https://forum.radzen.com/" target="_blank" Text="community" />.</li>
-        </ul>
-      </RadzenColumn>
-    </RadzenRow>
-    <RadzenText TextStyle="TextStyle.DisplayH4" class="rz-mt-12 rz-mb-6">Get started today. Radzen Blazor Studio is free to use.</RadzenText>
+    <RadzenText TextStyle="TextStyle.DisplayH2" TagName="TagName.H2" Style="--rz-text-display-h2-font-size: clamp(3rem, 4.167vw, 3.75rem); max-width: 900px;" class="rz-mx-auto">Accelerated, smarter, and cost-effective Blazor development</RadzenText>
+    <RadzenText TextStyle="TextStyle.DisplayH4" class="rz-mt-12 rz-mb-6">Get started today. Radzen is free to use.</RadzenText>
     <RadzenText TextStyle="TextStyle.Body1">You can also test the premium features for 15 days.</RadzenText>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Gap="1.5rem" Wrap="FlexWrap.Wrap" class="rz-mt-12">
-      <NavLink class="cta-button primary" href="https://www.radzen.com/blazor-studio/download/" target="_blank" title="Get Radzen Blazor Studio for Windows, Mac or Linux">Download Now</NavLink>
-      <NavLink class="cta-button" href="https://www.radzen.com/blazor-studio/" target="_blank" title="Explore Radzen Blazor Studio features">Learn More</NavLink>
+      <NavLink class="rz-button rz-button-lg rz-variant-flat rz-primary rz-shade-default" href="https://www.radzen.com/blazor-studio/download/" target="_blank" title="Get Radzen Blazor Studio for Windows, Mac or Linux">Start Free</NavLink>
+      <NavLink class="rz-button rz-button-lg rz-variant-outlined rz-light rz-shade-default" href="https://www.radzen.com/blazor-studio/" target="_blank" title="Explore Radzen Blazor Studio features">Learn More</NavLink>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Vertical" JustifyContent="JustifyContent.Center" class="copyright">
-            <RadzenLink Path="https://www.radzen.com" title="Create .NET Core web applications fast & easy" target="_blank"><img alt="Easier than you think" src="images/easier-than-you-think.svg" /></RadzenLink>
+      <RadzenLink Path="https://www.radzen.com" title="Create .NET Core web applications fast & easy" target="_blank"><img alt="Easier than you think" src="images/easier-than-you-think.svg" /></RadzenLink>
       <p class="rz-mt-12">
         Radzen Blazor Components, &copy; 2018-2025 Radzen.<br />
         <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" Text="Source Code" target="_blank" /> licensed under
@@ -415,4 +542,213 @@
           Resizable = true
         });
     }
+
+// Data Models
+  public class TaskActivity
+  {
+    public string Type { get; set; }
+    public string Description { get; set; }
+    public DateTime Timestamp { get; set; }
+  }
+
+  public class TaskOverTimeData
+  {
+    public string Date { get; set; }
+    public int Completed { get; set; }
+  }
+
+  public class TaskItem
+  {
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public DateTime DueDate { get; set; }
+    public string Priority { get; set; }
+    public string Status { get; set; }
+  }
+
+  public class TaskCountData
+  {
+    public string Month { get; set; }
+    public int Count { get; set; }
+  }
+
+  // Properties
+  private RadzenSidebar demoSidebar;
+  private RadzenBody demoBody;
+  private RadzenPanelMenu demoPanelMenu;
+  private bool demoSidebarExpanded = false;
+
+  // Task Metrics
+  private int tasksCompletedToday = 8;
+  private int tasksInProgress = 12;
+  private int upcomingDeadlines = 5;
+  private int overdueTasks = 2;
+  private int weeklyProgress = 75;
+
+  // Data Collections
+  private List<TaskOverTimeData> tasksOverTimeData = new();
+  private List<TaskItem> upcomingDeadlinesData = new();
+  private List<TaskCountData> completedTasksData = new();
+  private List<TaskCountData> inProgressTasksData = new();
+  private List<TaskCountData> overdueTasksData = new();
+  private List<string> priorityOptions = new() { "High", "Medium", "Low" };
+  private List<string> categoryOptions = new() { "Work", "Personal", "Learning", "Health" };
+  private bool showDataLabels = false;
+
+  protected override void OnInitialized()
+  {
+    InitializeSampleData();
+  }
+
+  private void InitializeSampleData()
+  {
+    // Initialize tasks over time data
+    tasksOverTimeData = new List<TaskOverTimeData>
+    {
+      new TaskOverTimeData { Date = "Mon", Completed = 5 },
+      new TaskOverTimeData { Date = "Tue", Completed = 7 },
+      new TaskOverTimeData { Date = "Wed", Completed = 6 },
+      new TaskOverTimeData { Date = "Thu", Completed = 8 },
+      new TaskOverTimeData { Date = "Fri", Completed = 9 },
+      new TaskOverTimeData { Date = "Sat", Completed = 4 },
+      new TaskOverTimeData { Date = "Sun", Completed = 3 }
+    };
+
+    // Initialize upcoming deadlines data
+    upcomingDeadlinesData = new List<TaskItem>
+    {
+      new TaskItem { Id = 1001, Name = "Finish report", Description = "Complete the quarterly sales report with all metrics and analysis", DueDate = DateTime.Now.AddDays(1), Priority = "High", Status = "In Progress" },
+      new TaskItem { Id = 1002, Name = "Buy groceries", Description = "Weekly grocery shopping for household essentials", DueDate = DateTime.Now.AddDays(1), Priority = "Low", Status = "Pending" },
+      new TaskItem { Id = 1003, Name = "Prepare presentation", Description = "Create slides for the client meeting on new product features", DueDate = DateTime.Now.AddDays(2), Priority = "High", Status = "In Progress" },
+      new TaskItem { Id = 1004, Name = "Review budget", Description = "Analyze department budget and prepare recommendations", DueDate = DateTime.Now.AddDays(3), Priority = "Medium", Status = "Pending" },
+      new TaskItem { Id = 1005, Name = "Team meeting", Description = "Weekly team standup to discuss project progress and blockers", DueDate = DateTime.Now.AddDays(4), Priority = "Medium", Status = "Scheduled" },
+      new TaskItem { Id = 1006, Name = "Update documentation", Description = "Update API documentation with latest changes and examples", DueDate = DateTime.Now.AddDays(5), Priority = "Low", Status = "Pending" },
+      new TaskItem { Id = 1007, Name = "Client call", Description = "Follow-up call with potential client to discuss requirements", DueDate = DateTime.Now.AddDays(6), Priority = "High", Status = "Scheduled" },
+      new TaskItem { Id = 1008, Name = "Code review", Description = "Review pull requests from development team members", DueDate = DateTime.Now.AddDays(7), Priority = "Medium", Status = "In Progress" },
+      new TaskItem { Id = 1009, Name = "Submit proposal", Description = "Submit project proposal for the new marketing campaign", DueDate = DateTime.Now.AddDays(8), Priority = "High", Status = "Pending" },
+      new TaskItem { Id = 1010, Name = "Gym workout", Description = "Regular fitness session at the local gym", DueDate = DateTime.Now.AddDays(9), Priority = "Low", Status = "Scheduled" },
+      new TaskItem { Id = 1011, Name = "Database backup", Description = "Perform scheduled backup of production database", DueDate = DateTime.Now.AddDays(10), Priority = "Medium", Status = "Pending" },
+      new TaskItem { Id = 1012, Name = "Project planning", Description = "Plan next sprint and assign tasks to team members", DueDate = DateTime.Now.AddDays(11), Priority = "High", Status = "In Progress" },
+      new TaskItem { Id = 1013, Name = "Email follow-up", Description = "Follow up on pending emails and respond to inquiries", DueDate = DateTime.Now.AddDays(12), Priority = "Low", Status = "Pending" },
+      new TaskItem { Id = 1014, Name = "System testing", Description = "Perform comprehensive testing of the new feature release", DueDate = DateTime.Now.AddDays(13), Priority = "Medium", Status = "Scheduled" },
+      new TaskItem { Id = 1015, Name = "Quarterly review", Description = "Conduct quarterly performance review with team members", DueDate = DateTime.Now.AddDays(14), Priority = "High", Status = "Pending" },
+      new TaskItem { Id = 1016, Name = "Website update", Description = "Update company website with latest news and announcements", DueDate = DateTime.Now.AddDays(15), Priority = "Medium", Status = "In Progress" },
+      new TaskItem { Id = 1017, Name = "Training session", Description = "Attend training session on new software tools", DueDate = DateTime.Now.AddDays(16), Priority = "Low", Status = "Scheduled" },
+      new TaskItem { Id = 1018, Name = "Security audit", Description = "Conduct security audit of all systems and applications", DueDate = DateTime.Now.AddDays(17), Priority = "High", Status = "Pending" }
+    };
+
+    // Initialize monthly performance data (Jan-Dec) - separate arrays for each series
+    completedTasksData = new List<TaskCountData>
+    {
+      new TaskCountData { Month = "Jan", Count = 25 },
+      new TaskCountData { Month = "Feb", Count = 32 },
+      new TaskCountData { Month = "Mar", Count = 28 },
+      new TaskCountData { Month = "Apr", Count = 35 },
+      new TaskCountData { Month = "May", Count = 30 },
+      new TaskCountData { Month = "Jun", Count = 38 },
+      new TaskCountData { Month = "Jul", Count = 33 },
+      new TaskCountData { Month = "Aug", Count = 36 },
+      new TaskCountData { Month = "Sep", Count = 31 },
+      new TaskCountData { Month = "Oct", Count = 42 },
+      new TaskCountData { Month = "Nov", Count = 37 },
+      new TaskCountData { Month = "Dec", Count = 29 }
+    };
+
+    inProgressTasksData = new List<TaskCountData>
+    {
+      new TaskCountData { Month = "Jan", Count = 12 },
+      new TaskCountData { Month = "Feb", Count = 15 },
+      new TaskCountData { Month = "Mar", Count = 18 },
+      new TaskCountData { Month = "Apr", Count = 14 },
+      new TaskCountData { Month = "May", Count = 16 },
+      new TaskCountData { Month = "Jun", Count = 13 },
+      new TaskCountData { Month = "Jul", Count = 17 },
+      new TaskCountData { Month = "Aug", Count = 11 },
+      new TaskCountData { Month = "Sep", Count = 19 },
+      new TaskCountData { Month = "Oct", Count = 12 },
+      new TaskCountData { Month = "Nov", Count = 15 },
+      new TaskCountData { Month = "Dec", Count = 20 }
+    };
+
+    overdueTasksData = new List<TaskCountData>
+    {
+      new TaskCountData { Month = "Jan", Count = 6 },
+      new TaskCountData { Month = "Feb", Count = 7 },
+      new TaskCountData { Month = "Mar", Count = 8 },
+      new TaskCountData { Month = "Apr", Count = 6 },
+      new TaskCountData { Month = "May", Count = 9 },
+      new TaskCountData { Month = "Jun", Count = 7 },
+      new TaskCountData { Month = "Jul", Count = 10 },
+      new TaskCountData { Month = "Aug", Count = 6 },
+      new TaskCountData { Month = "Sep", Count = 11 },
+      new TaskCountData { Month = "Oct", Count = 8 },
+      new TaskCountData { Month = "Nov", Count = 9 },
+      new TaskCountData { Month = "Dec", Count = 12 }
+    };
+  }
+
+  private void ShowNotifications()
+  {
+    NotificationService.Notify(new NotificationMessage 
+    { 
+      Severity = NotificationSeverity.Info, 
+      Summary = "Notifications", 
+      Detail = "You have 3 new task notifications." 
+    });
+  }
+
+  private void ShowHelp()
+  {
+    NotificationService.Notify(new NotificationMessage 
+    { 
+      Severity = NotificationSeverity.Info, 
+      Summary = "Help", 
+      Detail = "Task management help documentation is available." 
+    });
+  }
+
+  private void OnMenuItemClick(string menuItem)
+  {
+    NotificationService.Notify(new NotificationMessage 
+    { 
+      Severity = NotificationSeverity.Info, 
+      Summary = "Menu Clicked", 
+      Detail = $"Clicked on {menuItem} menu item. Navigation disabled for demo purposes." 
+    });
+  }
+
+  private string GetPriorityText(string priority)
+  {
+    return priority switch
+    {
+      "High" => "High",
+      "Medium" => "Medium",
+      "Low" => "Low",
+      _ => priority
+    };
+  }
+
+  private Shade GetPriorityStyle(string priority)
+  {
+    return priority switch
+    {
+      "High" => Shade.Darker,
+      "Medium" => Shade.Default,
+      "Low" => Shade.Light,
+      _ => Shade.Default
+    };
+  }
+
+  private BadgeStyle GetStatusStyle(string status)
+  {
+    return status switch
+    {
+      "In Progress" => BadgeStyle.Warning,
+      "Pending" => BadgeStyle.Info,
+      "Scheduled" => BadgeStyle.Primary,
+      "Completed" => BadgeStyle.Success,
+      _ => BadgeStyle.Secondary
+    };
+  }
 }
