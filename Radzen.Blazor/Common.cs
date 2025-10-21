@@ -2623,6 +2623,12 @@ namespace Radzen
         public string FormatString { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether to show the footer for the group.
+        /// </summary>
+        /// <value><c>true</c> if the footer should be shown; otherwise, <c>false</c>.</value>
+        public bool? ShowFooter { get; set; }
+
+        /// <summary>
         /// Gets the title of the group.
         /// </summary>
         /// <returns>System.String.</returns>
