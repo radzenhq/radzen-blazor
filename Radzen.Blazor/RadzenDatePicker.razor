@@ -89,7 +89,7 @@
                                                 var dateArgs = DateAttributes(date);
 
                                                 <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)" 
-                                                @onclick="@(() => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                @onclick="@(() => { if (!Disabled && !dateArgs.Disabled) { SetDay(date); } })">
                                                     <span class=@GetDayCssClass(date, dateArgs, false)>@date.Day</span>
                                                 </td>
                                             }
