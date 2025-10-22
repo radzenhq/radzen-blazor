@@ -207,6 +207,30 @@ namespace Radzen.Blazor
 
         async Task OkClick(bool shouldClose = true)
         {
+            // Prevent single-value change path in Multiple mode
+            if (Multiple)
+            {
+                if (Min.HasValue && CurrentDate < Min.Value || Max.HasValue && CurrentDate > Max.Value)
+                {
+                    return;
+                }
+
+                if (!Disabled)
+                {
+                    // Use the currently selected date (with current time if shown) and update the multi-selection
+                    var date = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, CurrentDate.Hour, CurrentDate.Minute, CurrentDate.Second);
+                    ToggleSelectedDate(date);
+                    await UpdateValueFromSelectedDates(date);
+                }
+
+                if (shouldClose)
+                {
+                    Close();
+                }
+
+                return;
+            }
+
             if (shouldClose)
             {
                 Close();
@@ -1186,6 +1210,11 @@ namespace Radzen.Blazor
 
         async Task OnChange()
         {
+            // In Multiple mode we update and raise ValueChanged/Change elsewhere
+            if (Multiple)
+            {
+                return;
+            }
             if ((typeof(TValue) == typeof(DateTimeOffset) || typeof(TValue) == typeof(DateTimeOffset?)) && Value != null)
             {
                 DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)Value, Kind);
