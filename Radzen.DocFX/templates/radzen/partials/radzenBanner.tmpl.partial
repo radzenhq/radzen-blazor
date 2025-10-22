@@ -2,12 +2,12 @@
   <div class="col-12 col-lg-6 text-left">
     <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
     <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
-    <p><a href="https://www.radzen.com/blazor-studio/" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
   </div>
   <div class="col-12 col-lg-6 text-right visible-lg">
-    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download/" target="_blank">Download Now</a>
+    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
   </div>
   <div class="col-12 col-lg-6 text-left hidden-lg">
-    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download/" target="_blank">Download Now</a>
+    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
   </div>
 </div>

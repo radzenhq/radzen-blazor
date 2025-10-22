@@ -15,7 +15,7 @@ See Online Demos or Read the Docs
 
 Radzen Blazor Components are open source and free for commercial use. You can install them from [NuGet](https://www.nuget.org/packages/Radzen.Blazor) or build your own copy from source.
 
-Paid support is available as part of the [Radzen Professional subscription](https://www.radzen.com/blazor-studio/pricing/).
+Paid support is available as part of the [Radzen Professional subscription](https://www.radzen.com/pricing).
 
 ### :computer: Native
 
@@ -38,9 +38,9 @@ Everybody is welcome to visit the [Radzen Community forum](https://forum.radzen.
 
 The Radzen team monitors the forum threads, but does not guarantee a response to every question. For guaranteed responses you may consider the dedicated support option.
 
-Dedicated support for the Radzen Blazor Components is available as part of the [Radzen Professional subscription](https://www.radzen.com/blazor-studio/pricing/).
+Dedicated support for the Radzen Blazor Components is available as part of the [Radzen Professional subscription](https://www.radzen.com/pricing).
 
-Our flagship product [Radzen Blazor Studio](https://www.radzen.com/blazor-studio/) provides tons of productivity features for Blazor developers:
+Our flagship product [Radzen Blazor Studio](https://www.radzen.com/blazor-studio) provides tons of productivity features for Blazor developers:
 - An industry-leading WYSIWYG Blazor design time canvas
 - Scaffolding a complete CRUD applications from a database
 - Built-in security - authentication and authorization
@@ -50,7 +50,7 @@ Our flagship product [Radzen Blazor Studio](https://www.radzen.com/blazor-studio
 
 ## Get started with Radzen Blazor Components
 
-Check the [getting started](https://blazor.radzen.com/getting-started) instructions to start making awesome Blazor applications.
+Check the [getting started](https://blazor.radzen.com/get-started) instructions to start making awesome Blazor applications.
 
 ## Run demos locally
 
