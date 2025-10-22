@@ -1,7 +1,8 @@
 ﻿@using RadzenBlazorDemos.Data
 @using RadzenBlazorDemos.Models.Northwind
 @using Microsoft.EntityFrameworkCore
-@using System.Linq 
+@using System.Linq
+@using System.Linq.Dynamic.Core
 
 @inherits DbContextPage
 
@@ -10,7 +11,9 @@
     <Columns>
         <RadzenDataGridColumn Width="60px" Title="#" Filterable="false" Sortable="false" TextAlign="TextAlign.Center">
             <Template>
-                @{var pageSize = Math.Min(ordersGrid.PageSize, ordersGrid.View.Count());}
+                @{
+                    var pageSize = Math.Min(ordersGrid.PageSize, orders.AsQueryable().Where(ordersGrid.Query.Filter).Count());
+                }
                 <RenderOnceComponent CanRender=@(!(index >= pageSize))>
                 @{
                     ResetIndex(index >= pageSize);
@@ -21,7 +24,7 @@
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Property="OrderID" Title="Order ID">
             <FooterTemplate>
-                Displayed orders: <b>@ordersGrid.View.Count()</b> of <b>@orders.Count()</b>
+                Displayed orders: <b>@orders.AsQueryable().Where(ordersGrid.Query.Filter).Count()</b> of <b>@orders.Count()</b>
             </FooterTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn  Width="160px" Property="Employee.LastName" Title="Employee">
