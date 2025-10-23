@@ -84,6 +84,13 @@ namespace Radzen.Blazor
         public ProgressBarStyle ProgressBarStyle { get; set; }
 
         /// <summary>
+        /// Gets or sets the aria-label attribute for accessibility. Used by screen readers to announce the progress bar.
+        /// </summary>
+        /// <value>The aria-label text.</value>
+        [Parameter]
+        public string AriaLabel { get; set; }
+
+        /// <summary>
         /// Progress in range from 0 to 1.
         /// </summary>
         protected double NormalizedValue => Math.Min(Math.Max((Value - Min) / (Max - Min), 0), 1);

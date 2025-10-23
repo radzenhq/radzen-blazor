@@ -1,20 +1,20 @@
 ﻿@using Radzen
 
 <div class="rz-m-12">
-    <RadzenProgressBar @bind-Value="@value" />
+    <RadzenProgressBar @bind-Value="@value" AriaLabel="Progress" />
 </div>
 
 <RadzenStack Gap="1rem" class="rz-m-12">
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">ProgressBar with <strong>ProgressBarStyle</strong> property and <strong>ShowValue="false"</strong></RadzenText>
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value="@value" ShowValue="false" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Secondary" @bind-Value="@value" ShowValue="false" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Base" @bind-Value="@value" ShowValue="false" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="@value" ShowValue="false" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Dark" @bind-Value="@value" ShowValue="false" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="@value" ShowValue="false" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="@value" ShowValue="false" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="@value" ShowValue="false" />
-    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="@value" ShowValue="false" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value="@value" ShowValue="false" AriaLabel="Primary progress" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Secondary" @bind-Value="@value" ShowValue="false" AriaLabel="Secondary progress" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Base" @bind-Value="@value" ShowValue="false" AriaLabel="Base progress" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="@value" ShowValue="false" AriaLabel="Light progress" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Dark" @bind-Value="@value" ShowValue="false" AriaLabel="Dark progress" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="@value" ShowValue="false" AriaLabel="Success progress" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="@value" ShowValue="false" AriaLabel="Danger progress" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="@value" ShowValue="false" AriaLabel="Warning progress" />
+    <RadzenProgressBar ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="@value" ShowValue="false" AriaLabel="Info progress" />
 </RadzenStack>
 
 @code {

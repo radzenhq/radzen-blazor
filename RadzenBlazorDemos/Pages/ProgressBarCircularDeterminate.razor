@@ -1,18 +1,18 @@
 ﻿@using Radzen
 
 <RadzenStack AlignItems="AlignItems.Center" class="rz-m-12" Gap="2rem">
-    <RadzenProgressBarCircular @bind-Value="@value" />
+    <RadzenProgressBarCircular @bind-Value="@value" AriaLabel="Progress" />
     <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">ProgressBarCircular with <strong>ProgressBarStyle</strong> property</RadzenText>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center" Wrap="FlexWrap.Wrap">
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value="@value" />
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Secondary" @bind-Value="@value" />
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Base" @bind-Value="@value" />
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="@value" />
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" @bind-Value="@value" />
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="@value" />
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="@value" />
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="@value" />
-        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="@value" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Primary" @bind-Value="@value" AriaLabel="Primary progress" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Secondary" @bind-Value="@value" AriaLabel="Secondary progress" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Base" @bind-Value="@value" AriaLabel="Base progress" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Light" @bind-Value="@value" AriaLabel="Light progress" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Dark" @bind-Value="@value" AriaLabel="Dark progress" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Success" @bind-Value="@value" AriaLabel="Success progress" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Danger" @bind-Value="@value" AriaLabel="Danger progress" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Warning" @bind-Value="@value" AriaLabel="Warning progress" />
+        <RadzenProgressBarCircular ProgressBarStyle="ProgressBarStyle.Info" @bind-Value="@value" AriaLabel="Info progress" />
     </RadzenStack>
 </RadzenStack>
 

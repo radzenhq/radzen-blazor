@@ -4,7 +4,7 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@($"--rz-progressbar-value: {(NormalizedValue * 100).ToInvariantString()}%;{Style}")" aria-valuemax="@Max" aria-valuemin="@Min" role="progressbar" @attributes="Attributes" class="@GetCssClass()"
-         aria-valuenow="@Value" id="@GetId()">
+         aria-valuenow="@Value" aria-label="@AriaLabel" id="@GetId()">
         <div class="rz-progressbar-value"></div>
         @if (ShowValue)
         {
