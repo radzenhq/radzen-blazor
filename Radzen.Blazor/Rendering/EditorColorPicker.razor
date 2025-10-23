@@ -3,15 +3,10 @@
         <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
         <div class="rz-html-editor-color-value" style="background-color:@Value"></div>
     </button>
-    <RadzenColorPicker
-        @bind-Value=@Value Change=@OnChange @onclick:stopPropagation TabIndex=-1
+    <RadzenColorPicker @bind-Value=@Value Change=@OnChange @onclick:stopPropagation TabIndex=-1
         Open=@OnOpen Disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode())) ShowHSV=@ShowHSV
-        ShowRGBA=@ShowRGBA ShowColors=@ShowColors ShowButton=@ShowButton
-        HexText=@HexText RedText=@RedText GreenText=@GreenText BlueText=@BlueText AlphaText=@AlphaText
-        ButtonText=@ButtonText
-        >
-    @ChildContent
-    </RadzenColorPicker>
+        ShowRGBA=@ShowRGBA ShowColors=@ShowColors ShowButton=@ShowButton HexText=@HexText RedText=@RedText GreenText=@GreenText 
+        BlueText=@BlueText AlphaText=@AlphaText ButtonText=@ButtonText ChildContent=@ChildContent />
 </div>
 
 @code {
