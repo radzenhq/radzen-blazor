@@ -353,11 +353,22 @@ namespace Radzen
             bool pageSizeChanged = parameters.DidParameterChange(nameof(PageSize), PageSize) &&
                 PageSize != pageSize;
 
+            bool visibleChanged = parameters.DidParameterChange(nameof(Visible), Visible);
+            bool wasVisible = Visible;
+
             await base.SetParametersAsync(parameters);
 
             if (pageSizeChanged && !firstRender)
             {
                await InvokeAsync(Reload);
+            }
+
+            // Reset to first page when becoming visible again
+            if (visibleChanged && !firstRender && Visible && !wasVisible)
+            {
+                skip = 0;
+                CurrentPage = 0;
+                _view = null;
             }
         }
 
