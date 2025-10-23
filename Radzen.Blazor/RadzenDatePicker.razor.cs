@@ -1269,7 +1269,10 @@ namespace Radzen.Blazor
                     Close();
                 }
             }
-            await FocusAsync();
+            if (!Multiple)
+            {
+                await FocusAsync();
+            }
         }
 
         void ToggleSelectedDate(DateTime date)
@@ -1549,7 +1552,7 @@ namespace Radzen.Blazor
                 FocusedDate = FocusedDate.AddDays(key == "ArrowUp" ? -7 : 7);
                 CurrentDate = FocusedDate;
             }
-            else if (key == "Enter")
+            else if (key == "Enter" || (key == "Space" && Multiple))
             {
                 preventKeyPress = true;
 
@@ -1560,8 +1563,8 @@ namespace Radzen.Blazor
                     if (!Multiple)
                     {
                         await ClosePopup();
+                        await FocusAsync();
                     }
-                    await FocusAsync();
                 }
             }
             else if (key == "Escape")
