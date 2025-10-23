@@ -80,6 +80,13 @@ namespace Radzen.Blazor
         public string Value { get; set; }
 
         /// <summary>
+        /// Gets or sets the template.
+        /// </summary>
+        /// <value>The template.</value>
+        [Parameter]
+        public RenderFragment Template { get; set; }
+
+        /// <summary>
         /// Gets or sets the menu.
         /// </summary>
         /// <value>The menu.</value>
@@ -124,7 +131,7 @@ namespace Radzen.Blazor
 
         internal string GetItemCssClass()
         {
-            return $"{GetCssClass()} {(Parent.IsFocused(this) ? "rz-state-focused" : "")}".Trim();
+            return $"{GetCssClass()} {(Parent?.IsFocused(this) == true ? "rz-state-focused" : "")}".Trim();
         }
     }
 }

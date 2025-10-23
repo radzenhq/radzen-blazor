@@ -15,7 +15,14 @@
                     {
                         <img class="notranslate rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
                     }
-                    <span class="rz-navigation-item-text">@Text</span>
+                    @if (Template != null)
+                    {
+                        @Template
+                    }
+                    else
+                    {
+                        <span class="rz-navigation-item-text">@Text</span>
+                    }
                 </NavLink>
             }
             else
@@ -29,7 +36,14 @@
                     {
                         <img class="notranslate rzi rz-navigation-item-icon" src="@Image" alt=@ImageAlternateText />
                     }
-                    <span class="rz-navigation-item-text">@Text</span>
+                    @if (Template != null)
+                    {
+                        @Template
+                    }
+                    else
+                    {
+                        <span class="rz-navigation-item-text">@Text</span>
+                    }
                 </div>
             }
         </div>
