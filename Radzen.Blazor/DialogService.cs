@@ -846,6 +846,25 @@ namespace Radzen
 				}
 			}
         }
+
+        private RenderFragment<DialogService> titleContent;
+
+        /// <summary>
+        /// Gets or sets the title content.
+        /// </summary>
+        /// <value>The title content.</value>
+        public RenderFragment<DialogService> TitleContent
+		{
+			get => titleContent;
+			set
+			{
+				if (titleContent != value)
+				{
+					titleContent = value;
+					OnPropertyChanged(nameof(TitleContent));
+				}
+			}
+		}
     }
 
     /// <summary>
@@ -1121,25 +1140,6 @@ namespace Radzen
 				{
 					childContent = value;
 					OnPropertyChanged(nameof(ChildContent));
-				}
-			}
-		}
-
-        private RenderFragment<DialogService> titleContent;
-
-        /// <summary>
-        /// Gets or sets the title content.
-        /// </summary>
-        /// <value>The title content.</value>
-        public RenderFragment<DialogService> TitleContent
-		{
-			get => titleContent;
-			set
-			{
-				if (titleContent != value)
-				{
-					titleContent = value;
-					OnPropertyChanged(nameof(TitleContent));
 				}
 			}
 		}

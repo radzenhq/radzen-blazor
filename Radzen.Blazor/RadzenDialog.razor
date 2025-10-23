@@ -19,7 +19,20 @@
         @if (sideDialogOptions.ShowTitle)
         {
             <div class="rz-dialog-side-titlebar">
-                <div class="rz-dialog-side-title" style="display: inline" id="rz-dialog-side-label">@sideDialogOptions.Title</div>
+                <div class="rz-dialog-side-title" style="display: inline" id="rz-dialog-side-label">
+                    @if (sideDialogOptions.TitleContent != null)
+                    {
+                        @sideDialogOptions.TitleContent(Service)
+                    }
+                    else if (!string.IsNullOrEmpty(sideDialog?.Title))
+                    {
+                        @sideDialog.Title
+                    }
+                    else
+                    {
+                        @sideDialogOptions.Title
+                    }
+                </div>
                 @if (sideDialogOptions.ShowClose)
                 {
                     <a id="@(sideDialogOptions.GetHashCode() + "cl")" aria-label="@CloseSideDialogAriaLabel" @onclick:preventDefault="true" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service.CloseSide(null))" role="button" tabindex="@sideDialogOptions.CloseTabIndex">
@@ -69,6 +82,7 @@
     bool isSideDialogOpen = false;
     RenderFragment sideDialogContent;
     SideDialogOptions sideDialogOptions;
+    Dialog sideDialog;
 
     public async Task Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
@@ -113,14 +127,50 @@
     void OnSideOpen(Type sideComponent, Dictionary<string, object> parameters, SideDialogOptions options)
     {
         sideDialogOptions = options;
+        
+        // Create a DialogOptions from SideDialogOptions by copying common properties
+        var dialogOptions = new DialogOptions()
+        {
+            ShowTitle = options.ShowTitle,
+            ShowClose = options.ShowClose,
+            Width = options.Width,
+            Height = options.Height,
+            Style = options.Style,
+            CloseDialogOnOverlayClick = options.CloseDialogOnOverlayClick,
+            CssClass = options.CssClass,
+            WrapperCssClass = options.WrapperCssClass,
+            ContentCssClass = options.ContentCssClass,
+            CloseTabIndex = options.CloseTabIndex,
+            TitleContent = options.TitleContent
+        };
+        
+        // Create a Dialog object for the side dialog to support cascading parameter
+        sideDialog = new Dialog() 
+        { 
+            Title = options.Title, 
+            Type = sideComponent, 
+            Parameters = parameters, 
+            Options = dialogOptions 
+        };
+        
+        // Wrap the content in a CascadingValue to provide the Dialog object to child components
         sideDialogContent = new RenderFragment(builder =>
         {
-            builder.OpenComponent(0, sideComponent);
-            foreach (var parameter in parameters)
+            // Open CascadingValue
+            builder.OpenComponent<CascadingValue<Dialog>>(0);
+            builder.AddAttribute(1, "Value", sideDialog);
+            builder.AddAttribute(2, "IsFixed", true);
+            builder.AddAttribute(3, "ChildContent", (RenderFragment)((builder2) =>
             {
-                builder.AddAttribute(1, parameter.Key, parameter.Value);
-            }
-            builder.CloseComponent();
+                // Open the actual component
+                builder2.OpenComponent(0, sideComponent);
+                foreach (var parameter in parameters)
+                {
+                    builder2.AddAttribute(1, parameter.Key, parameter.Value);
+                }
+                builder2.CloseComponent();
+            }));
+            builder.CloseComponent(); // Close CascadingValue
         });
         isSideDialogOpen = true;
         StateHasChanged();
