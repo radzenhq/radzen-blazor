@@ -6,10 +6,11 @@
 
 @inherits DbContextPage
 
-<p>Right click on a table cell to open the context menu.</p>
+<p>Right click on a table cell to open the <strong>cell-specific</strong> context menu. Right click on the grid header, pager, or empty space to open the <strong>grid-level</strong> context menu.</p>
 <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
             AllowSorting="true" Data="@employees" ColumnWidth="200px"
-            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees  TItem="Employee" CellContextMenu="@OnCellContextMenu">
+            SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees  TItem="Employee" 
+            CellContextMenu="@OnCellContextMenu" ContextMenu="@OnGridContextMenu">
     <Columns>
         <RadzenDataGridColumn Property="@nameof(Employee.Photo)" Title="Employee" Sortable="false" Filterable="false">
             <Template Context="data">
@@ -51,12 +52,28 @@
 
         ContextMenuService.Open(args,
             new List<ContextMenuItem> {
-                new ContextMenuItem(){ Text = "Context menu item 1", Value = 1, Icon = "home" },
-                new ContextMenuItem(){ Text = "Context menu item 2", Value = 2, Icon = "search" },
-                new ContextMenuItem(){ Text = "Context menu item 3", Value = 3, Icon = "info" },
+                new ContextMenuItem(){ Text = "Cell Menu - Edit", Value = 1, Icon = "edit" },
+                new ContextMenuItem(){ Text = "Cell Menu - Delete", Value = 2, Icon = "delete" },
+                new ContextMenuItem(){ Text = "Cell Menu - Copy", Value = 3, Icon = "content_copy" },
             }, 
             (e) => { 
-             console.Log($"Menu item with Value={e.Value} clicked. Column: {args.Column.Property}, EmployeeID: {args.Data.EmployeeID}"); 
+             console.Log($"Cell context menu item clicked. Value={e.Value}, Column: {args.Column.Property}, EmployeeID: {args.Data.EmployeeID}"); 
+            }
+         );
+    }
+
+    void OnGridContextMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
+    {
+        selectedEmployees = null;
+
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Grid Menu - Refresh", Value = 1, Icon = "refresh" },
+                new ContextMenuItem(){ Text = "Grid Menu - Export", Value = 2, Icon = "save_alt" },
+                new ContextMenuItem(){ Text = "Grid Menu - Settings", Value = 3, Icon = "settings" },
+            }, 
+            (e) => { 
+             console.Log($"Grid context menu item clicked. Value={e.Value} (clicked on grid, not on a cell)"); 
             }
          );
     }

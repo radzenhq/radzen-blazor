@@ -16,7 +16,7 @@
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()"
         @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="true" tabindex=0
-        @onblur=@(args => JSRuntime.InvokeVoidAsync("Radzen.clearFocusedHeaderCell", UniqueID))>
+        @onblur=@(args => JSRuntime.InvokeVoidAsync("Radzen.clearFocusedHeaderCell", UniqueID)) @oncontextmenu=OnContextMenu @oncontextmenu:preventDefault="@this.ContextMenu.HasDelegate">
         @if (AllowGrouping || AllowColumnPicking)
         {
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
@@ -579,7 +579,7 @@
             <text>
             @if (this.AllowCompositeDataCells ? RowIndex == column.GetLevel() : (column.Parent != null && RowIndex == column.GetLevel() || column.Columns == null))
             {
-                <td @attributes="@CellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation="true">
+                <td @attributes="@CellAttributes" @oncontextmenu:preventDefault="@this.CellContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.CellContextMenu.HasDelegate" @onkeydown:stopPropagation="true">
                     @if (this.Responsive)
                     {
                         <span class="rz-column-title">

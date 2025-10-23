@@ -231,10 +231,7 @@ namespace Radzen
 
                 if (Visible)
                 {
-                    if (ContextMenu.HasDelegate)
-                    {
-                        await JSRuntime.InvokeVoidAsync("Radzen.addContextMenu", GetId(), Reference);
-                    }
+                    await AddContextMenu();
 
                     if (MouseEnter.HasDelegate)
                     {
@@ -271,6 +268,17 @@ namespace Radzen
             if (MouseEnter.HasDelegate)
             {
                 await OnMouseEnter();
+            }
+        }
+
+        /// <summary>
+        /// Adds context menu for this component.
+        /// </summary>
+        protected virtual async System.Threading.Tasks.Task AddContextMenu()
+        {
+            if (ContextMenu.HasDelegate)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.addContextMenu", GetId(), Reference);
             }
         }
 

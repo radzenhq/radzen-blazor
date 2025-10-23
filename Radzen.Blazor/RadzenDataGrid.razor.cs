@@ -2697,6 +2697,23 @@ namespace Radzen.Blazor
         [Parameter]
         public DataGridSelectionMode SelectionMode { get; set; } = DataGridSelectionMode.Single;
 
+        /// <summary>
+        /// Raises <see cref="ContextMenu" />.
+        /// </summary>
+        /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.MouseEventArgs"/> instance containing the event data.</param>
+        public override async Task OnContextMenu(Microsoft.AspNetCore.Components.Web.MouseEventArgs args)
+        {
+            await ContextMenu.InvokeAsync(args);
+        }
+
+        /// <summary>
+        /// Adds context menu for this component.
+        /// </summary>
+        protected override async System.Threading.Tasks.Task AddContextMenu()
+        {
+            await Task.CompletedTask;
+        }
+
         internal async Task OnCellContextMenu(DataGridCellMouseEventArgs<TItem> args)
         {
             await CellContextMenu.InvokeAsync(args);
