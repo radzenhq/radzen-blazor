@@ -114,38 +114,73 @@ public partial class RadzenMarkdown : RadzenComponent
         var markdown = new StringBuilder();
         var outletFrames = new Dictionary<int, (int startIndex, int endIndex)>();
         var markerId = 0;
-        var index = 0;
 
-        while (index < frames.Count)
+        void ProcessRange(int start, int end)
         {
-            var frame = frames.Array[index];
+            var index = start;
 
-            if (frame.FrameType == RenderTreeFrameType.Text || frame.FrameType == RenderTreeFrameType.Markup)
+            while (index < end)
             {
-                var content = frame.FrameType == RenderTreeFrameType.Text ? frame.TextContent : frame.MarkupContent;
-                markdown.Append(content);
-                index++;
-            }
-            else if (frame.FrameType == RenderTreeFrameType.Component || frame.FrameType == RenderTreeFrameType.Element)
-            {
-                // Insert a marker for this component
-                var marker = string.Format(BlazorMarkdownRenderer.Outlet, markerId);
-                markdown.Append(marker);
+                var frame = frames.Array[index];
 
-                // Store the component information for later
-                var subtreeLength = GetSubtreeLength(frame);
-                outletFrames.Add(markerId, (index, index + subtreeLength));
+                if (frame.FrameType == RenderTreeFrameType.Text || frame.FrameType == RenderTreeFrameType.Markup)
+                {
+                    var content = frame.FrameType == RenderTreeFrameType.Text ? frame.TextContent : frame.MarkupContent;
+                    markdown.Append(content);
+                    index++;
+                }
+                else if (frame.FrameType == RenderTreeFrameType.Element)
+                {
+                    // Special-case: flatten <span class="rbs-text"> by inlining its children into markdown
+                    if (string.Equals(frame.ElementName, "span", StringComparison.OrdinalIgnoreCase) && ElementHasCssClass(frames, index, "rbs-text"))
+                    {
+                        var subtreeEnd = index + frame.ElementSubtreeLength;
 
-                // Increment marker ID and skip past this component
-                markerId++;
-                index += subtreeLength;
-            }
-            else
-            {
-                // Skip other frame types
-                index++;
+                        // Skip over attribute frames to reach first child
+                        var childIndex = index + 1;
+                        while (childIndex < subtreeEnd && frames.Array[childIndex].FrameType == RenderTreeFrameType.Attribute)
+                        {
+                            childIndex++;
+                        }
+
+                        // Inline-process children
+                        ProcessRange(childIndex, subtreeEnd);
+
+                        // Skip the entire element subtree
+                        index = subtreeEnd;
+                    }
+                    else
+                    {
+                        // Insert a marker for this element and skip its subtree
+                        var marker = string.Format(BlazorMarkdownRenderer.Outlet, markerId);
+                        markdown.Append(marker);
+
+                        var subtreeLength = frame.ElementSubtreeLength;
+                        outletFrames.Add(markerId, (index, index + subtreeLength));
+                        markerId++;
+                        index += subtreeLength;
+                    }
+                }
+                else if (frame.FrameType == RenderTreeFrameType.Component)
+                {
+                    // Insert a marker for this component and skip its subtree
+                    var marker = string.Format(BlazorMarkdownRenderer.Outlet, markerId);
+                    markdown.Append(marker);
+
+                    var subtreeLength = frame.ComponentSubtreeLength;
+                    outletFrames.Add(markerId, (index, index + subtreeLength));
+                    markerId++;
+                    index += subtreeLength;
+                }
+                else
+                {
+                    // Skip other frame types
+                    index++;
+                }
             }
         }
+
+        ProcessRange(0, frames.Count);
 
         var document = MarkdownParser.Parse(markdown.ToString());
 
@@ -185,7 +220,7 @@ public partial class RadzenMarkdown : RadzenComponent
 
                     builder.CloseComponent();
 
-                    startIndex += frame.ElementSubtreeLength;
+                    startIndex += frame.ComponentSubtreeLength;
                     break;
                 case RenderTreeFrameType.Attribute:
                     builder.AddAttribute(frame.Sequence, frame.AttributeName, frame.AttributeValue);
@@ -220,15 +255,36 @@ public partial class RadzenMarkdown : RadzenComponent
         }
     }
 
-    private static int GetSubtreeLength(RenderTreeFrame frame)
+    private static bool ElementHasCssClass(ArrayRange<RenderTreeFrame> frames, int elementIndex, string value)
     {
-        return frame.FrameType switch
+        var elementFrame = frames.Array[elementIndex];
+        var end = elementIndex + elementFrame.ElementSubtreeLength;
+        var index = elementIndex + 1;
+
+        while (index < end && frames.Array[index].FrameType == RenderTreeFrameType.Attribute)
         {
-            RenderTreeFrameType.Element => frame.ElementSubtreeLength,
-            RenderTreeFrameType.Component => frame.ComponentSubtreeLength,
-            RenderTreeFrameType.Region => frame.RegionSubtreeLength,
-            _ => 1,
-        };
+            var attributeFrame = frames.Array[index];
+
+            if (string.Equals(attributeFrame.AttributeName, "class", StringComparison.OrdinalIgnoreCase))
+            {
+                if (attributeFrame.AttributeValue is string className)
+                {
+                    var parts = className.Split([' ', '\t', '\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
+
+                    for (var i = 0; i < parts.Length; i++)
+                    {
+                        if (string.Equals(parts[i], value, StringComparison.Ordinal))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            index++;
+        }
+
+        return false;
     }
 }
 #pragma warning restore BL0006 // Do not use RenderTree types
