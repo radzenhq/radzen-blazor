@@ -9,6 +9,10 @@
     Use the <code>LoadData</code> event to get data from a REST service.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo sales data loads from an OData service with the same pivot structure (Year/Country columns, Category/Product rows), using <code>RowTotalTemplate</code> with <code>PivotDataGridODataAggregateValue</code> component for server-side aggregate calculations.
+</RadzenText>
+
 <RadzenExample ComponentName="PivotDataGrid" Example="PivotDataGridOData" AdditionalSourceCodePages=@(new[] { "PivotDataGridODataAggregateValue.razor" })>
     <PivotDataGridOData />
 </RadzenExample>

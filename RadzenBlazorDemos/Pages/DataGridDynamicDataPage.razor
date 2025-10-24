@@ -7,6 +7,10 @@
     Sometimes your data comes from external API and you don't have a C# model for it. This demo shows how to implement such a scenario.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo the grid binds to <code>IDictionary&lt;string, object&gt;</code> with 100 rows and 58 dynamically generated columns including various types (int, enum, string, DateTime, DateOnly, TimeOnly, Guid), demonstrating filtering and sorting on unknown schemas using <code>PropertyAccess.GetDynamicPropertyExpression</code>.
+</RadzenText>
+
 <RadzenExample ComponentName="DataGrid" Example="DataGridDynamicData">
     <DataGridDynamicData />
 </RadzenExample>

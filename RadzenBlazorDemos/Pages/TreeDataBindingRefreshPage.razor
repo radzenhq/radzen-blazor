@@ -7,6 +7,10 @@
     Lazily populate a RadzenTree and refresh it programmatically. Use the context menu of a node to open a dialog for adding new child items in the data model.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo the <strong>Volkswagen Group</strong> company hierarchy loads subsidiaries on demand via <code>Expand</code> event, right-clicking any node opens a dialog to add new subsidiaries which updates the data dictionary and calls <code>tree.Reload()</code> to refresh the display.
+</RadzenText>
+
 <RadzenExample ComponentName="Tree" Example="TreeDataBindingRefresh">
     <TreeDataBindingRefresh />
 </RadzenExample>

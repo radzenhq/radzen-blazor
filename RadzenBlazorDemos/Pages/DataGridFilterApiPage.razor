@@ -7,6 +7,10 @@
     Set the initial filter of your RadzenDataGrid via the <code>FilterValue</code> and <code>FilterOperator</code> column properties.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo the <strong>Birth Date</strong> column uses a custom <code>MyCustomDataGridColumn</code> component, and the <strong>First Name</strong> filter is programmatically set to "Nan" with <code>FilterOperator.StartsWith</code> on first render using <code>SetFilterValue</code> and <code>SetFilterOperator</code>.
+</RadzenText>
+
 <RadzenExample ComponentName="DataGrid" Example="DataGridFilterApi" AdditionalSourceCodePages=@(new [] { "/demos/Pages/MyCustomDataGridColumn.razor" })>
     <DataGridFilterApi />
 </RadzenExample>

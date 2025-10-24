@@ -11,8 +11,6 @@
 
 @inherits DbContextPage
 
-<p>This example shows how to save/load DataGrid state using Settings property when binding using LoadData event.</p>
-<p>The state includes current page index, page size, groups and columns filter, sort, order, width and visibility.</p>
 <RadzenButton Click="@(args => Settings = null)" Text="Clear saved settings" Style="margin-bottom: 16px" />
 <RadzenButton Click="@(args => NavigationManager.NavigateTo("/datagrid-save-settings-loaddata", true))" Text="Reload" Style="margin-bottom: 16px" />
 <RadzenDataGrid @ref=grid @bind-Settings="@Settings" LoadSettings="@LoadSettings" AllowFiltering="true" AllowColumnPicking="true" AllowGrouping="true" AllowPaging="true" 

@@ -6,6 +6,10 @@
     Demonstration and configuration of the Radzen Blazor <strong>DataAnnotationValidator</strong> component.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo the form validates using C# Data Annotations: <strong>Username</strong> requires 4-15 characters (<code>[StringLength]</code>), <strong>Password</strong> requires 6-100 characters, and <strong>Confirm Password</strong> must match using <code>[Compare]</code> attribute, with a toggle for popup vs inline validation display.
+</RadzenText>
+
 <RadzenExample ComponentName="DataAnnotationValidator" Example="DataAnnotationValidatorConfig" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenDataAnnotationValidator.cs">
     <DataAnnotationValidatorConfig />
 </RadzenExample>

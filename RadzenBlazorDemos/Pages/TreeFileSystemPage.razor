@@ -7,6 +7,10 @@
     Populate RadzenTree from the file system.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo the tree displays the server's file system starting from the application directory, using <code>Directory.GetDirectories</code> for initial load and <code>Expand</code> event with <code>Directory.EnumerateFileSystemEntries</code> to load subdirectories and files on-demand, with custom <code>Template</code> showing folder/file icons.
+</RadzenText>
+
 <RadzenExample ComponentName="Tree" Example="TreeFileSystem">
     <TreeFileSystem />
 </RadzenExample>

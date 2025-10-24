@@ -8,6 +8,10 @@
     Use this technique to render conditionally specific DataGrid column(s) and keep the render order as declared in the markup/code.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo the <strong>Photo</strong> column uses <code>showPhoto</code> within a <code>RenderFragment</code> to conditionally render in the correct position (between ID and First Name), with a switch to toggle its visibility while preserving column order.
+</RadzenText>
+
 <RadzenExample ComponentName="DataGrid" Example="DataGridConditionalColumns">
     <DataGridConditionalColumns />
 </RadzenExample>

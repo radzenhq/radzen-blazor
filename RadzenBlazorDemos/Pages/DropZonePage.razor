@@ -17,6 +17,11 @@
     Use <code>ItemSelector</code> callback to define which item in which zone will appear, <code>Drop</code> callback to customize the drop logic and 
     <code>ItemRender</code> callback to customize if the item can be dragged, appearance, etc.
 </RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo tasks can be dragged between <strong>Not started</strong> (yellow), <strong>Started</strong> (blue), <strong>Completed</strong> (green), and <strong>Deleted</strong> (red) zones, with <code>CanDrop</code> preventing direct moves from "Not started" to "Completed", <code>ItemRender</code> making "Task2" non-draggable, and items deleted when dropped in the Deleted zone.
+</RadzenText>
+
 <RadzenExample ComponentName="DropZone" Example="DropZoneConfig">
     <DropZoneConfig />
 </RadzenExample>

@@ -6,9 +6,10 @@
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     Virtualization allows you to render large amounts of data on demand. The RadzenDataGrid component uses Entity Framework to query the visible data.
 </RadzenText>
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Just set the <code>AllowVirtualization</code> property to <code>true</code>. Requires .NET Core 5.0+.
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo the <strong>OrderDetails</strong> grid binds to <code>IQueryable</code> with a fixed height (400px) and renders only visible rows, with <strong>Unit Price</strong> and <strong>Discount</strong> columns showing formatted currency and percentage values.
 </RadzenText>
+
 
 <RadzenExample ComponentName="DataGrid" Example="DataGridVirtualization">
     <DataGridVirtualization />

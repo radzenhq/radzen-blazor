@@ -1320,7 +1320,6 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Templates", Anchor = "#templates" }, new () { Text = "Expand/Collapse", Anchor = "#expand-collapse" } ],
                     Name = "Panel",
                     Description = "Demonstration and configuration of the Blazor RadzenPanel component.",
                     Path = "panel",

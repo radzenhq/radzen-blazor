@@ -7,6 +7,10 @@
     This page demonstrates how to export a Radzen Blazor DataGrid to Excel and CSV.
 </RadzenText>
 
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    In this demo the <strong>Order Details</strong> grid includes <strong>Export XLS</strong> and <strong>Export CSV</strong> buttons in the header that export visible columns with current filters, sorting, and selection using the <code>NorthwindService.Export</code> method which constructs query parameters from <code>grid.Query</code> properties.
+</RadzenText>
+
 <RadzenExample ComponentName="DataGrid" Example="ExportToExcelCsv" AdditionalSourceCodePages="@(new [] {"/demos/Services/NorthwindService.cs", "/demos/Controllers/ExportNorthwindController.cs", "/demos/Controllers/ExportController.cs"})">
     <ExportToExcelCsv />
 </RadzenExample>
