@@ -10,17 +10,41 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenCheckBoxList component.
+    /// A checkbox group component that allows users to select multiple options from a list of choices.
+    /// RadzenCheckBoxList displays multiple checkboxes with configurable layout, orientation, and data binding, binding to a collection of selected values.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TValue">The type of individual item values. The bound Value is IEnumerable&lt;TValue&gt; containing all selected items.</typeparam>
+    /// <remarks>
+    /// Checkbox lists allow multiple selections, unlike radio button lists. The bound value is a collection of all checked items.
+    /// The component supports:
+    /// - **Multiple Selection**: Users can check/uncheck any number of items
+    /// - **Data Binding**: Bind to a data source via Data property or statically declare items
+    /// - **Layout**: Configurable orientation (Horizontal/Vertical), gap spacing, wrapping, alignment, and justification
+    /// - **Templating**: Custom item templates for complex checkbox content
+    /// - **Disabled/ReadOnly Items**: Individual items or the entire list can be disabled or read-only
+    /// - **Keyboard Navigation**: Arrow keys, Space, and Enter for accessibility
+    /// 
+    /// The Value property is IEnumerable&lt;TValue&gt; containing all selected item values.
+    /// Common uses include multi-select filters, preference selections, or feature toggles.
+    /// </remarks>
     /// <example>
+    /// Static checkbox list:
     /// <code>
-    /// &lt;RadzenCheckBoxList @bind-Value=@checkedValues TValue="int" &gt;
+    /// &lt;RadzenCheckBoxList @bind-Value=@selectedOptions TValue="string"&gt;
     ///     &lt;Items&gt;
-    ///         &lt;RadzenCheckBoxListItem Text="Orders" Value="1" /&gt;
-    ///         &lt;RadzenCheckBoxListItem Text="Employees" Value="2" /&gt;
+    ///         &lt;RadzenCheckBoxListItem Text="Email notifications" Value="email" /&gt;
+    ///         &lt;RadzenCheckBoxListItem Text="SMS notifications" Value="sms" /&gt;
+    ///         &lt;RadzenCheckBoxListItem Text="Push notifications" Value="push" /&gt;
     ///     &lt;/Items&gt;
     /// &lt;/RadzenCheckBoxList&gt;
+    /// @code {
+    ///     IEnumerable&lt;string&gt; selectedOptions = new[] { "email" };
+    /// }
+    /// </code>
+    /// Data-bound checkbox list:
+    /// <code>
+    /// &lt;RadzenCheckBoxList @bind-Value=@selectedIds TValue="int" Data=@categories 
+    ///                      TextProperty="Name" ValueProperty="Id" Orientation="Orientation.Horizontal" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenCheckBoxList<TValue> : FormComponent<IEnumerable<TValue>>

@@ -10,12 +10,48 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSlider component.
+    /// A slider component for selecting numeric values by dragging a handle along a track.
+    /// RadzenSlider supports single value selection or range selection (min/max) with horizontal or vertical orientation.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TValue">The type of the slider value. Supports numeric types (int, decimal, double) or IEnumerable for range selection.</typeparam>
+    /// <remarks>
+    /// Sliders provide an intuitive way to select numeric values within a range, especially useful when:
+    /// - The exact value is less important than the approximate position
+    /// - You want to show the valid range visually
+    /// - The input should be constrained to specific increments
+    /// 
+    /// The component features:
+    /// - **Single/Range Selection**: Select one value or a min/max range
+    /// - **Orientation**: Horizontal (default) or Vertical layout
+    /// - **Constraints**: Min, Max values define the selectable range
+    /// - **Step Increments**: Step property controls value granularity
+    /// - **Visual Feedback**: Colored track showing selected portion
+    /// - **Keyboard Support**: Arrow keys for precise adjustment
+    /// - **Touch Support**: Drag gestures on mobile devices
+    /// 
+    /// For range selection, set Range=true and bind to IEnumerable&lt;TValue&gt; (e.g., IEnumerable&lt;int&gt;) for min/max values.
+    /// Common uses include price filters, volume controls, zoom levels, or any bounded numeric input.
+    /// </remarks>
     /// <example>
+    /// Basic slider:
     /// <code>
-    /// &lt;RadzenSlider @bind-Value=@value TValue="int" Min="0" Max="100" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// &lt;RadzenSlider @bind-Value=@volume TValue="int" Min="0" Max="100" /&gt;
+    /// @code {
+    ///     int volume = 50;
+    /// }
+    /// </code>
+    /// Range slider for price filter:
+    /// <code>
+    /// &lt;RadzenSlider @bind-Value=@priceRange TValue="IEnumerable&lt;decimal&gt;" Range="true" 
+    ///               Min="0" Max="1000" Step="10" /&gt;
+    /// @code {
+    ///     IEnumerable&lt;decimal&gt; priceRange = new decimal[] { 100, 500 };
+    /// }
+    /// </code>
+    /// Vertical slider with step:
+    /// <code>
+    /// &lt;RadzenSlider @bind-Value=@value TValue="double" Min="0" Max="1" Step="0.1" 
+    ///               Orientation="Orientation.Vertical" Style="height: 200px;" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenSlider<TValue> : FormComponent<TValue>

@@ -4,26 +4,63 @@ using Radzen.Blazor.Rendering;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSkeleton component. Displays a loading placeholder with various animation types.
+    /// A skeleton screen component that displays placeholder shapes while content is loading.
+    /// RadzenSkeleton provides subtle loading states that match content structure, improving perceived performance.
     /// </summary>
+    /// <remarks>
+    /// Skeleton screens show gray placeholder shapes that mimic the structure of the content being loaded.
+    /// This approach provides better UX than spinners by:
+    /// - **Content Preview**: Users see the approximate layout before content appears
+    /// - **Perceived Performance**: Makes loading feel faster by showing immediate feedback
+    /// - **Reduced Anxiety**: Progressive disclosure is less frustrating than blank screens or spinners
+    /// 
+    /// The component supports multiple shapes:
+    /// - **Text**: Horizontal bars for text lines (default)
+    /// - **Circle**: Circular placeholders for avatars or icons
+    /// - **Rectangle**: Rectangular blocks for images or cards
+    /// 
+    /// Animations (None, Pulse, Wave) can be applied for additional loading feedback.
+    /// Use multiple skeletons to represent the full structure of your loading content.
+    /// </remarks>
     /// <example>
+    /// Text line skeleton:
     /// <code>
-    /// &lt;RadzenSkeleton Variant="SkeletonVariant.Text" Animation="SkeletonAnimation.Wave" Style="width: 200px; height: 20px;" /&gt;
+    /// &lt;RadzenSkeleton Style="width: 100%; height: 20px;" Animation="SkeletonAnimation.Pulse" /&gt;
+    /// </code>
+    /// Avatar and text skeleton:
+    /// <code>
+    /// &lt;RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center"&gt;
+    ///     &lt;RadzenSkeleton Variant="SkeletonVariant.Circle" Style="width: 50px; height: 50px;" /&gt;
+    ///     &lt;RadzenStack Gap="0.5rem"&gt;
+    ///         &lt;RadzenSkeleton Style="width: 200px; height: 16px;" /&gt;
+    ///         &lt;RadzenSkeleton Style="width: 150px; height: 16px;" /&gt;
+    ///     &lt;/RadzenStack&gt;
+    /// &lt;/RadzenStack&gt;
+    /// </code>
+    /// Image card skeleton:
+    /// <code>
+    /// &lt;RadzenCard Style="width: 300px;"&gt;
+    ///     &lt;RadzenSkeleton Variant="SkeletonVariant.Rectangle" Style="width: 100%; height: 200px;" Animation="SkeletonAnimation.Wave" /&gt;
+    ///     &lt;RadzenSkeleton Style="width: 80%; height: 24px; margin-top: 1rem;" /&gt;
+    ///     &lt;RadzenSkeleton Style="width: 60%; height: 16px; margin-top: 0.5rem;" /&gt;
+    /// &lt;/RadzenCard&gt;
     /// </code>
     /// </example>
     public partial class RadzenSkeleton : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the type of skeleton shape.
+        /// Gets or sets the shape variant of the skeleton placeholder.
+        /// Text creates horizontal bars, Circle creates circular shapes, Rectangle creates rectangular blocks.
         /// </summary>
-        /// <value>The type.</value>
+        /// <value>The skeleton shape variant. Default is <see cref="SkeletonVariant.Text"/>.</value>
         [Parameter]
         public SkeletonVariant Variant { get; set; } = SkeletonVariant.Text;
 
         /// <summary>
-        /// Gets or sets the animation type for the skeleton.
+        /// Gets or sets the animation effect applied to the skeleton placeholder.
+        /// None (static), Pulse (fade in/out), or Wave (shimmer effect moving across).
         /// </summary>
-        /// <value>The animation.</value>
+        /// <value>The animation type. Default is <see cref="SkeletonAnimation.None"/>.</value>
         [Parameter]
         public SkeletonAnimation Animation { get; set; } = SkeletonAnimation.None;
 

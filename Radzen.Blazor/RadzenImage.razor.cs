@@ -5,33 +5,58 @@ using System;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenImage component.
+    /// An image display component that renders images from various sources including URLs, base64 data, or application assets.
+    /// RadzenImage provides a simple wrapper for HTML img elements with click event support and alternate text for accessibility.
     /// </summary>
+    /// <remarks>
+    /// The image component can display images from:
+    /// - **File Paths**: Relative or absolute URLs to image files
+    /// - **External URLs**: Full HTTP/HTTPS URLs to remote images
+    /// - **Base64 Data**: Data URLs with embedded image data (e.g., from file uploads or database BLOBs)
+    /// - **Application Assets**: Images from wwwroot or other application folders
+    /// 
+    /// Use AlternateText to provide descriptive text for screen readers and when images fail to load.
+    /// The Click event can be used to make images interactive (e.g., opening lightboxes or navigating).
+    /// Combine with CSS (via Style or class attributes) for sizing, borders, shadows, and other visual effects.
+    /// </remarks>
     /// <example>
+    /// Basic image from file:
     /// <code>
-    /// &lt;RadzenImage Path="someimage.png" /&gt;
+    /// &lt;RadzenImage Path="images/logo.png" AlternateText="Company Logo" Style="width: 200px;" /&gt;
+    /// </code>
+    /// Image with click handler:
+    /// <code>
+    /// &lt;RadzenImage Path=@product.ImageUrl AlternateText=@product.Name Click=@(args => ShowImageGallery(product)) Style="cursor: pointer;" /&gt;
+    /// </code>
+    /// Image from base64 data:
+    /// <code>
+    /// &lt;RadzenImage Path=@($"data:image/jpeg;base64,{base64String}") AlternateText="Uploaded Photo" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenImage : RadzenComponentWithChildren
     {
         /// <summary>
-        /// Gets or sets the path.
+        /// Gets or sets the image source path or URL.
+        /// Supports file paths (relative or absolute), external URLs, or data URLs with base64-encoded images.
         /// </summary>
-        /// <value>The path.</value>
+        /// <value>The image source path, URL, or data URL.</value>
         [Parameter]
         public string Path { get; set; }
 
         /// <summary>
-        /// Gets or sets the text.
+        /// Gets or sets the alternate text describing the image for accessibility and when the image fails to load.
+        /// This text is read by screen readers and displayed if the image cannot be shown.
+        /// Always provide descriptive alternate text for better accessibility.
         /// </summary>
-        /// <value>The text.</value>
+        /// <value>The image alternate text. Default is "image".</value>
         [Parameter]
         public string AlternateText { get; set; } = "image";
 
         /// <summary>
-        /// Gets or sets the click callback.
+        /// Gets or sets the callback invoked when the image is clicked.
+        /// Use this to make images interactive, such as opening modal viewers, navigating, or triggering actions.
         /// </summary>
-        /// <value>The click callback.</value>
+        /// <value>The click event callback.</value>
         [Parameter]
         public EventCallback<MouseEventArgs> Click { get; set; }
 

@@ -7,33 +7,68 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Renders line series in <see cref="RadzenChart" />.
+    /// A chart series that displays data as a continuous line connecting data points in a RadzenChart.
+    /// RadzenLineSeries is ideal for showing trends over time, continuous data, or comparing multiple data series.
     /// </summary>
-    /// <typeparam name="TItem">The type of the series data item.</typeparam>
+    /// <typeparam name="TItem">The type of data items in the series. Each item represents one point on the line.</typeparam>
+    /// <remarks>
+    /// Line series connect data points with lines, making it easy to visualize trends and patterns.
+    /// The series supports multiple interpolation modes (straight lines, smooth curves, step functions),
+    /// customizable appearance (color, width, line style), markers at data points, and data labels.
+    /// Multiple line series can be combined in one chart for comparison, and the line can be styled with different patterns (solid, dashed, dotted).
+    /// 
+    /// Use CategoryProperty for the X-axis values and ValueProperty for the Y-axis values.
+    /// Enable Smooth for curved lines, or use Interpolation for more control over line rendering.
+    /// </remarks>
+    /// <example>
+    /// Basic line series:
+    /// <code>
+    /// &lt;RadzenChart&gt;
+    ///     &lt;RadzenLineSeries Data=@temperatures CategoryProperty="Date" ValueProperty="Temperature" Title="Temperature" /&gt;
+    /// &lt;/RadzenChart&gt;
+    /// </code>
+    /// Smooth line with markers:
+    /// <code>
+    /// &lt;RadzenChart&gt;
+    ///     &lt;RadzenLineSeries Data=@data CategoryProperty="X" ValueProperty="Y" Smooth="true" Stroke="#FF6384" StrokeWidth="3"&gt;
+    ///         &lt;RadzenMarkers MarkerType="MarkerType.Circle" /&gt;
+    ///         &lt;RadzenSeriesDataLabels Visible="true" /&gt;
+    ///     &lt;/RadzenLineSeries&gt;
+    /// &lt;/RadzenChart&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenLineSeries<TItem> : CartesianSeries<TItem>
     {
         /// <summary>
-        /// Specifies the color of the line.
+        /// Gets or sets the color of the line.
+        /// Supports any valid CSS color value (e.g., "#FF0000", "rgb(255,0,0)", "var(--my-color)").
+        /// If not set, uses the color from the chart's color scheme.
         /// </summary>
-        /// <value>The stroke.</value>
+        /// <value>The line color as a CSS color value.</value>
         [Parameter]
         public string Stroke { get; set; }
 
         /// <summary>
-        /// Specifies the pixel width of the line. Set to <c>2</c> by default.
+        /// Gets or sets the width of the line in pixels.
+        /// Thicker lines are more visible but may obscure details in dense data.
         /// </summary>
+        /// <value>The line width in pixels. Default is 2.</value>
         [Parameter]
         public double StrokeWidth { get; set; } = 2;
 
         /// <summary>
-        /// Specifies the line type.
+        /// Gets or sets the line style pattern (solid, dashed, dotted).
+        /// Use LineType.Dashed or LineType.Dotted to create non-solid lines for visual distinction or to represent projected/estimated data.
         /// </summary>
+        /// <value>The line style. Default is solid.</value>
         [Parameter]
         public LineType LineType { get; set; }
 
         /// <summary>
-        /// Specifies whether to render a smooth line. Set to <c>false</c> by default.
+        /// Gets or sets whether to render smooth curved lines between data points instead of straight lines.
+        /// When true, uses spline interpolation to create smooth curves. This is a convenience property for setting <see cref="Interpolation"/> to Spline.
         /// </summary>
+        /// <value><c>true</c> for smooth curved lines; <c>false</c> for straight lines. Default is <c>false</c>.</value>
         [Parameter]
         public bool Smooth
         {
@@ -42,8 +77,10 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Specifies how to render lines between data points. Set to <see cref="Line"/> by default
+        /// Gets or sets the interpolation method used to render lines between data points.
+        /// Options include Line (straight lines), Spline (smooth curves), and Step (stair-step lines).
         /// </summary>
+        /// <value>The interpolation method. Default is <see cref="Interpolation.Line"/>.</value>
         [Parameter]
         public Interpolation Interpolation { get; set; } = Interpolation.Line;
 

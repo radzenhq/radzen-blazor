@@ -12,11 +12,35 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenAutoComplete component.
+    /// An autocomplete text input component that provides real-time suggestions as users type based on a data source.
+    /// RadzenAutoComplete filters and displays matching items in a dropdown, enabling quick selection without typing complete values.
     /// </summary>
+    /// <remarks>
+    /// The autocomplete component combines a text input with a suggestion dropdown that filters as the user types.
+    /// Key features include:
+    /// - **Auto-suggestions**: Displays filtered matches from a data source as user types
+    /// - **Filtering**: Configurable filter operators (Contains, StartsWith, etc.) and case sensitivity
+    /// - **Data Binding**: Bind to any IEnumerable data source, with TextProperty to specify display field
+    /// - **Minimum Length**: Set MinLength to require typing before showing suggestions
+    /// - **Delay**: FilterDelay controls debouncing for better performance
+    /// - **Templates**: Custom templates for rendering suggestion items
+    /// - **On-Demand Loading**: Use LoadData event for server-side filtering
+    /// - **Multiline**: Support for textarea-style input with suggestions
+    /// - **Open on Focus**: Option to show all items when field gains focus
+    /// 
+    /// Unlike dropdown, autocomplete allows free-text entry and suggests matching items.
+    /// The Value is the entered text, while SelectedItem provides access to the selected data object.
+    /// </remarks>
     /// <example>
+    /// Basic autocomplete:
     /// <code>
-    /// &lt;RadzenAutoComplete Data=@customers TextProperty="CompanyName" Change=@(args => Console.WriteLine($"Selected text: {args}")) /&gt;
+    /// &lt;RadzenAutoComplete @bind-Value=@customerName Data=@customers TextProperty="CompanyName" /&gt;
+    /// </code>
+    /// Autocomplete with custom filtering and delay:
+    /// <code>
+    /// &lt;RadzenAutoComplete @bind-Value=@search Data=@products TextProperty="ProductName"
+    ///                      FilterOperator="StringFilterOperator.Contains" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+    ///                      MinLength="2" FilterDelay="300" Placeholder="Type to search products..." /&gt;
     /// </code>
     /// </example>
     public partial class RadzenAutoComplete : DataBoundFormComponent<string>

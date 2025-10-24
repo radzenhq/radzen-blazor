@@ -4,47 +4,72 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// A validator component which checks if a component value is within a specified range.
-    /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}" />
+    /// A validator component that ensures a numeric value falls within a specified minimum and maximum range.
+    /// RadzenNumericRangeValidator is ideal for quantity limits, age restrictions, price ranges, or any bounded numeric input.
+    /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/>.
     /// </summary>
+    /// <remarks>
+    /// Numeric range validators ensure values are within acceptable bounds.
+    /// The component checks that the value is greater than or equal to Min and less than or equal to Max.
+    /// Both bounds are inclusive. You can specify just Min, just Max, or both:
+    /// - **Min only**: Validates minimum value (e.g., age must be at least 18)
+    /// - **Max only**: Validates maximum value (e.g., quantity cannot exceed 100)
+    /// - **Both**: Validates range (e.g., rating must be between 1 and 5)
+    /// 
+    /// The validator works with any IComparable type (int, decimal, double, DateTime, etc.).
+    /// Set AllowNull = true to accept null values as valid (for optional nullable fields).
+    /// </remarks>
     /// <example>
+    /// Age minimum validation:
     /// <code>
     /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
-    ///    &lt;RadzenNumeric style="display: block" Name="Quantity" @bind-Value=@model.Quantity /&gt;
-    ///    &lt;RadzenNumericRangeValidator Component="Quantity" Min="1" Max="10" Text="Quantity should be between 1 and 10" Style="position: absolute" /&gt;
+    ///     &lt;RadzenNumeric Name="Age" @bind-Value=@model.Age /&gt;
+    ///     &lt;RadzenNumericRangeValidator Component="Age" Min="18" Text="Must be 18 or older" Style="position: absolute" /&gt;
     /// &lt;/RadzenTemplateForm&gt;
-    /// @code {
-    ///    class Model
-    ///    {
-    ///       public decimal Quantity { get; set; }
-    ///    }
-    ///    Model model = new Model();
-    /// }
     /// </code>
-    /// </example>>
+    /// Quantity range validation:
+    /// <code>
+    /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
+    ///     &lt;RadzenNumeric Name="Quantity" @bind-Value=@model.Quantity /&gt;
+    ///     &lt;RadzenNumericRangeValidator Component="Quantity" Min="1" Max="100" 
+    ///                                   Text="Quantity must be between 1 and 100" Style="position: absolute" /&gt;
+    /// &lt;/RadzenTemplateForm&gt;
+    /// </code>
+    /// </example>
     public class RadzenNumericRangeValidator : ValidatorBase
     {
         /// <summary>
-        /// Gets or sets the message displayed when the component is invalid. Set to <c>"Not in the valid range"</c> by default.
+        /// Gets or sets the error message displayed when the value is outside the valid range.
+        /// Customize to provide specific guidance (e.g., "Age must be between 18 and 65").
         /// </summary>
+        /// <value>The validation error message. Default is "Not in the valid range".</value>
         [Parameter]
         public override string Text { get; set; } = "Not in the valid range";
 
         /// <summary>
-        /// Specifies the minimum value. The component value should be greater than the minimum in order to be valid.
+        /// Gets or sets the minimum allowed value (inclusive).
+        /// The component value must be greater than or equal to this value. Can be null to only validate maximum.
+        /// Works with any IComparable type (int, decimal, DateTime, etc.).
         /// </summary>
+        /// <value>The minimum value, or null for no minimum constraint.</value>
         [Parameter]
         public IComparable Min { get; set; }
 
         /// <summary>
-        /// Specifies the maximum value. The component value should be less than the maximum in order to be valid.
+        /// Gets or sets the maximum allowed value (inclusive).
+        /// The component value must be less than or equal to this value. Can be null to only validate minimum.
+        /// Works with any IComparable type (int, decimal, DateTime, etc.).
         /// </summary>
+        /// <value>The maximum value, or null for no maximum constraint.</value>
         [Parameter]
         public IComparable Max { get; set; }
 
         /// <summary>
-        /// Specifies if value can be null. If true, a null component value will be accepted.
+        /// Gets or sets whether null values should be considered valid.
+        /// When true, null values pass validation (useful for optional nullable fields).
+        /// When false (default), null values fail validation.
         /// </summary>
+        /// <value><c>true</c> to allow null values; <c>false</c> to require a value. Default is <c>false</c>.</value>
         [Parameter]
         public bool AllowNull { get; set; } = false;
 

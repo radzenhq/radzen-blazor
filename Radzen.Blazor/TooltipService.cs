@@ -8,21 +8,30 @@ using Radzen.Blazor;
 namespace Radzen
 {
     /// <summary>
-    /// Class TooltipService. Contains various methods with options to open and close tooltips.
-    /// Should be added as scoped service in the application services and RadzenTooltip should be added in application main layout.
-    /// Implements the <see cref="IDisposable" />
+    /// A service for displaying tooltips programmatically on UI elements or at specific positions.
+    /// TooltipService provides methods to show tooltips with text or custom HTML content, with configurable positioning, delays, and durations.
     /// </summary>
-    /// <seealso cref="IDisposable" />
+    /// <remarks>
+    /// To use this service, add it as a scoped service in your application's service collection and place a RadzenTooltip component in your main layout.
+    /// The service manages tooltip lifecycle, automatically closing tooltips on navigation and providing various positioning options (top, bottom, left, right).
+    /// Tooltips can be shown on mouse enter/leave events or on demand, with configurable delays before showing and auto-close durations.
+    /// </remarks>
     /// <example>
+    /// Show a simple text tooltip:
     /// <code>
-    /// @inject TooltipService tooltipService
-    /// &lt;RadzenButton Text="Show tooltip" MouseEnter="@(args =&gt; ShowTooltipWithHtml(args, new TooltipOptions(){ Style = "color:#000", Duration = null }))" /&gt;
+    /// @inject TooltipService TooltipService
+    /// &lt;RadzenButton Text="Hover me" MouseEnter="@(args =&gt; TooltipService.Open(args, "This is a tooltip"))" /&gt;
+    /// </code>
+    /// Show a tooltip with HTML content and custom options:
+    /// <code>
+    /// @inject TooltipService TooltipService
+    /// &lt;RadzenButton Text="Show tooltip" MouseEnter="@(args =&gt; ShowTooltipWithHtml(args))" /&gt;
     /// @code {
-    ///     void ShowTooltipWithHtml(ElementReference elementReference, TooltipOptions options = null) =&gt; tooltipService.Open(elementReference, ds =&gt;
+    ///     void ShowTooltipWithHtml(ElementReference element) =&gt; TooltipService.Open(element, ts =&gt;
     ///         @&lt;div&gt;
-    ///             Some&lt;b&gt;HTML&lt;/b&gt; content
-    ///         &lt;/div&gt;, options);
-    ///     }
+    ///             &lt;b&gt;Bold&lt;/b&gt; and &lt;i&gt;italic&lt;/i&gt; content
+    ///         &lt;/div&gt;, 
+    ///         new TooltipOptions { Position = TooltipPosition.Top, Duration = 5000 });
     /// }
     /// </code>
     /// </example>
@@ -82,49 +91,52 @@ namespace Radzen
         internal event Action<ElementReference, double, double, ChartTooltipOptions> OnOpenChartTooltip;
 
         /// <summary>
-        /// Opens the specified element.
+        /// Opens a tooltip with custom HTML content near the specified element.
+        /// The tooltip will be positioned according to the options and can contain any Blazor markup.
         /// </summary>
-        /// <param name="element">The element.</param>
-        /// <param name="childContent">Content of the child.</param>
-        /// <param name="o">The o.</param>
-        public void Open(ElementReference element, RenderFragment<TooltipService> childContent, TooltipOptions o = null)
+        /// <param name="element">The HTML element reference near which the tooltip will be displayed.</param>
+        /// <param name="childContent">A render fragment that defines the custom HTML content of the tooltip. Receives the TooltipService as context.</param>
+        /// <param name="options">Optional tooltip configuration including position, duration, delay, and styling. If null, default options are used.</param>
+        public void Open(ElementReference element, RenderFragment<TooltipService> childContent, TooltipOptions options = null)
         {
-            var options = o ?? new TooltipOptions();
+            var tooltipOptions = options ?? new TooltipOptions();
 
-            options.ChildContent = childContent;
+            tooltipOptions.ChildContent = childContent;
 
-            OpenTooltip<object>(element, options);
+            OpenTooltip<object>(element, tooltipOptions);
         }
 
         /// <summary>
-        /// Opens the specified element.
+        /// Opens a tooltip with simple text content near the specified element.
+        /// This is the most common way to show basic informational tooltips.
         /// </summary>
-        /// <param name="element">The element.</param>
-        /// <param name="text">The text.</param>
-        /// <param name="o">The o.</param>
-        public void Open(ElementReference element, string text, TooltipOptions o = null)
+        /// <param name="element">The HTML element reference near which the tooltip will be displayed.</param>
+        /// <param name="text">The text content to display in the tooltip.</param>
+        /// <param name="options">Optional tooltip configuration including position, duration, delay, and styling. If null, default options are used.</param>
+        public void Open(ElementReference element, string text, TooltipOptions options = null)
         {
-            var options = o ?? new TooltipOptions();
+            var tooltipOptions = options ?? new TooltipOptions();
 
-            options.Text = text;
+            tooltipOptions.Text = text;
 
-            OpenTooltip<object>(element, options);
+            OpenTooltip<object>(element, tooltipOptions);
         }
 
         /// <summary>
-        /// Opens the specified element on the top position.
+        /// Opens a tooltip with text content positioned above the specified element.
+        /// This is a convenience method equivalent to calling Open() with TooltipPosition.Top.
         /// </summary>
-        /// <param name="element">The element.</param>
-        /// <param name="text">The text.</param>
-        /// <param name="o">The o.</param>
-        public void OpenOnTheTop(ElementReference element, string text, TooltipOptions o = null)
+        /// <param name="element">The HTML element reference above which the tooltip will be displayed.</param>
+        /// <param name="text">The text content to display in the tooltip.</param>
+        /// <param name="options">Optional additional tooltip configuration. The Position will be set to Top regardless of the value in options.</param>
+        public void OpenOnTheTop(ElementReference element, string text, TooltipOptions options = null)
         {
-            var options = o ?? new TooltipOptions();
+            var tooltipOptions = options ?? new TooltipOptions();
 
-            options.Text = text;
-            options.Position = TooltipPosition.Top;
+            tooltipOptions.Text = text;
+            tooltipOptions.Position = TooltipPosition.Top;
 
-            OpenTooltip<object>(element, options);
+            OpenTooltip<object>(element, tooltipOptions);
         }
 
         /// <summary>

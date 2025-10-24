@@ -4,14 +4,21 @@ using Microsoft.AspNetCore.Components;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// A validator component which checks if a component value is a valid email address.
-    /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}" />
+    /// A validator component that verifies whether a text input contains a valid email address format.
+    /// RadzenEmailValidator uses the .NET EmailAddressAttribute to validate email format according to standard rules.
+    /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/> and associated with a named input component.
     /// </summary>
+    /// <remarks>
+    /// The validator checks email format using System.ComponentModel.DataAnnotations.EmailAddressAttribute validation rules.
+    /// Empty or null values are considered valid - combine with <see cref="RadzenRequiredValidator"/> to ensure the field is not empty.
+    /// The validation runs when the form is submitted or when the component loses focus.
+    /// </remarks>
     /// <example>
+    /// Basic email validation:
     /// <code>
     /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;
     ///   &lt;RadzenTextBox style="display: block" Name="Email" @bind-Value=@model.Email /&gt;
-    ///   &lt;RadzenEmailValidator Component="Email" Style="position: absolute" /&gt;
+    ///   &lt;RadzenEmailValidator Component="Email" Text="Please enter a valid email address" Style="position: absolute" /&gt;
     /// &lt;/RadzenTemplateForm&gt;
     /// @code {
     ///  class Model
@@ -22,12 +29,20 @@ namespace Radzen.Blazor
     ///  Model model = new Model();
     /// }
     /// </code>
+    /// Combined with required validator:
+    /// <code>
+    /// &lt;RadzenTextBox Name="Email" @bind-Value=@model.Email /&gt;
+    /// &lt;RadzenRequiredValidator Component="Email" Text="Email is required" /&gt;
+    /// &lt;RadzenEmailValidator Component="Email" Text="Invalid email format" /&gt;
+    /// </code>
     /// </example>
     public class RadzenEmailValidator : ValidatorBase
     {
         /// <summary>
-        /// Gets or sets the message displayed when the component is invalid. Set to <c>"Invalid email"</c> by default.
+        /// Gets or sets the error message displayed when the email address format is invalid.
+        /// Customize this message to provide clear feedback to users about the expected email format.
         /// </summary>
+        /// <value>The validation error message. Default is "Invalid email".</value>
         [Parameter]
         public override string Text { get; set; } = "Invalid email";
 

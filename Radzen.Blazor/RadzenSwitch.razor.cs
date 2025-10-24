@@ -6,19 +6,45 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSwitch component.
+    /// A toggle switch component for boolean on/off states with a sliding animation.
+    /// RadzenSwitch provides an alternative to checkboxes with a more modern toggle UI pattern, ideal for settings and preferences.
     /// </summary>
+    /// <remarks>
+    /// The switch component displays as a sliding toggle that users can click or drag to change between on (true) and off (false) states.
+    /// It provides visual feedback with a sliding animation and color change. Common uses include:
+    /// - Enable/disable settings or features
+    /// - Toggle visibility of sections
+    /// - On/off preferences in configuration panels
+    /// - Boolean options in forms
+    /// 
+    /// The component supports keyboard navigation (Space/Enter to toggle) for accessibility.
+    /// Unlike checkboxes, switches are typically used for immediate effects rather than form submission actions.
+    /// </remarks>
     /// <example>
+    /// Basic switch:
     /// <code>
-    /// &lt;RadzenSwitch @bind-Value=@value Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// &lt;RadzenSwitch @bind-Value=@isEnabled /&gt;
+    /// </code>
+    /// Switch with label and change event:
+    /// <code>
+    /// &lt;RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center"&gt;
+    ///     &lt;RadzenSwitch @bind-Value=@notifications Change=@(enabled => Console.WriteLine($"Notifications: {enabled}")) /&gt;
+    ///     &lt;RadzenLabel Text="Enable notifications" /&gt;
+    /// &lt;/RadzenStack&gt;
+    /// </code>
+    /// Read-only switch for display:
+    /// <code>
+    /// &lt;RadzenSwitch Value=@feature.IsEnabled ReadOnly="true" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenSwitch : FormComponent<bool>
     {
         /// <summary>
-        /// Gets or sets a value indicating whether is read only.
+        /// Gets or sets whether the switch is read-only and cannot be toggled by user interaction.
+        /// When true, the switch displays its current state but prevents clicking or keyboard toggling.
+        /// Useful for displaying switch state in view-only forms or dashboards.
         /// </summary>
-        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if the switch is read-only; otherwise, <c>false</c>. Default is <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 
@@ -29,17 +55,21 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Specifies additional custom attributes that will be rendered by the input.
+        /// Gets or sets additional HTML attributes to be applied to the underlying input element.
+        /// This allows passing custom attributes like data-* attributes, aria-* attributes, or other HTML attributes directly to the input.
         /// </summary>
-        /// <value>The attributes.</value>
+        /// <value>A dictionary of custom HTML attributes.</value>
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 
         private string ValueAsString => Value.ToString().ToLower();
 
         /// <summary>
-        /// Toggles this instance checked state.
+        /// Programmatically toggles the switch between on (true) and off (false) states.
+        /// This method is public and can be called from code to toggle the switch without user interaction.
+        /// Does nothing if the switch is disabled or read-only.
         /// </summary>
+        /// <returns>A task representing the asynchronous toggle operation.</returns>
         public async System.Threading.Tasks.Task Toggle()
         {
             if (Disabled || ReadOnly)

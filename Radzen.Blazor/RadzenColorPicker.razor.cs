@@ -8,11 +8,36 @@ using Microsoft.JSInterop;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenColorPicker component.
+    /// A color picker component that allows users to select colors through various input methods including color palette, RGB sliders, hex input, and predefined swatches.
+    /// RadzenColorPicker provides a comprehensive color selection interface with alpha channel support.
     /// </summary>
+    /// <remarks>
+    /// The color picker displays a button showing the current color. Clicking opens a popup with multiple color selection methods:
+    /// - **Visual Picker**: Click on a hue/saturation gradient to select colors visually
+    /// - **Hue/Alpha Sliders**: Fine-tune hue and transparency
+    /// - **RGB Input**: Enter specific Red, Green, Blue values (0-255)
+    /// - **Hex Input**: Enter hex color codes (#RRGGBB or #RRGGBBAA)
+    /// - **Swatches**: Predefined color palette for quick selection
+    /// 
+    /// The Value is a hex color string (e.g., "#FF0000" for red, "#FF0000AA" for semi-transparent red).
+    /// The component supports alpha channel (transparency) in RGBA format.
+    /// Use for applications requiring color customization like themes, charts, or design tools.
+    /// </remarks>
     /// <example>
+    /// Basic color picker:
     /// <code>
-    /// &lt;RadzenColorPicker @bind-Value=@color Change=@(args => Console.WriteLine($"Selected color: {args}")) /&gt;
+    /// &lt;RadzenColorPicker @bind-Value=@backgroundColor /&gt;
+    /// @code {
+    ///     string backgroundColor = "#FF5733";
+    /// }
+    /// </code>
+    /// Color picker with predefined swatches:
+    /// <code>
+    /// &lt;RadzenColorPicker @bind-Value=@color Change=@OnColorChange&gt;
+    ///     &lt;RadzenColorPickerItem Value="#FF0000" /&gt;
+    ///     &lt;RadzenColorPickerItem Value="#00FF00" /&gt;
+    ///     &lt;RadzenColorPickerItem Value="#0000FF" /&gt;
+    /// &lt;/RadzenColorPicker&gt;
     /// </code>
     /// </example>
     public partial class RadzenColorPicker : FormComponent<string>

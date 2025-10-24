@@ -10,17 +10,36 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenRadioButtonList component.
+    /// A radio button group component that allows users to select a single option from a list of choices.
+    /// RadzenRadioButtonList displays multiple radio buttons with configurable layout, orientation, and data binding.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TValue">The type of the selected value. Each radio button option has a value of this type.</typeparam>
+    /// <remarks>
+    /// Radio button lists present mutually exclusive options where only one can be selected at a time.
+    /// The component supports:
+    /// - **Data Binding**: Bind to a data source via Data property or statically declare items
+    /// - **Layout**: Configurable orientation (Horizontal/Vertical), gap spacing, wrapping, alignment, and justification
+    /// - **Templating**: Custom item templates for complex radio button content
+    /// - **Disabled Items**: Individual items or the entire list can be disabled
+    /// - **Keyboard Navigation**: Arrow keys, Space, and Enter for accessibility
+    /// 
+    /// Use for forms where users must choose one option from several, like payment methods, shipping options, or preference settings.
+    /// </remarks>
     /// <example>
+    /// Static radio button list:
     /// <code>
-    /// &lt;RadzenRadioButtonList @bind-Value=@value TValue="int" Orientation="Orientation.Vertical" &gt;
+    /// &lt;RadzenRadioButtonList @bind-Value=@selectedOption TValue="string" Orientation="Orientation.Vertical"&gt;
     ///     &lt;Items&gt;
-    ///         &lt;RadzenRadioButtonListItem Text="Orders" Value="1" /&gt;
-    ///         &lt;RadzenRadioButtonListItem Text="Employees" Value="2" /&gt;
+    ///         &lt;RadzenRadioButtonListItem Text="Option 1" Value="option1" /&gt;
+    ///         &lt;RadzenRadioButtonListItem Text="Option 2" Value="option2" /&gt;
+    ///         &lt;RadzenRadioButtonListItem Text="Option 3" Value="option3" /&gt;
     ///     &lt;/Items&gt;
     /// &lt;/RadzenRadioButtonList&gt;
+    /// </code>
+    /// Data-bound radio list with disabled item:
+    /// <code>
+    /// &lt;RadzenRadioButtonList @bind-Value=@paymentMethod TValue="int" Data=@paymentMethods 
+    ///                         TextProperty="Name" ValueProperty="Id" DisabledProperty="IsDisabled" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenRadioButtonList<TValue> : FormComponent<TValue>

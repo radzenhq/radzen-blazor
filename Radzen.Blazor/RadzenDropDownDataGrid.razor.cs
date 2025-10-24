@@ -10,12 +10,49 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenDropDownDataGrid component.
+    /// A dropdown component that displays items in a DataGrid within the popup instead of a simple list.
+    /// RadzenDropDownDataGrid combines dropdown selection with grid features like multiple columns, sorting, filtering, and paging.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <typeparam name="TValue">The type of the selected value. Can be a single value or IEnumerable for multiple selection.</typeparam>
+    /// <remarks>
+    /// This component is ideal when dropdown items have multiple properties you want to display in columns.
+    /// Instead of showing just one property per item, the grid popup can display multiple columns.
+    /// Perfect for scenarios like:
+    /// - Selecting products with columns for Name, SKU, Price, Stock
+    /// - Choosing employees with Name, Department, Email columns
+    /// - Picking customers with Company, Contact, Location columns
+    /// 
+    /// The component features:
+    /// - **DataGrid Popup**: Full DataGrid with columns, sorting, filtering in the dropdown
+    /// - **Multiple Columns**: Define columns using RadzenDropDownDataGridColumn
+    /// - **Filtering**: Built-in column filtering in the grid
+    /// - **Multiple Selection**: Select multiple items with checkboxes
+    /// - **Paging**: Optional paging for large datasets
+    /// - **Templates**: Custom column templates for rich item display
+    /// 
+    /// Define columns as child components to specify what data to show in the grid popup.
+    /// </remarks>
     /// <example>
+    /// Basic dropdown with grid:
     /// <code>
-    /// &lt;RadzenDropDownDataGrid @bind-Value=@customerID TValue="string" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => Console.WriteLine($"Selected CustomerID: {args}")) /&gt;
+    /// &lt;RadzenDropDownDataGrid @bind-Value=@selectedCustomerId TValue="int" 
+    ///                          Data=@customers ValueProperty="CustomerId"&gt;
+    ///     &lt;Columns&gt;
+    ///         &lt;RadzenDropDownDataGridColumn Property="CompanyName" Title="Company" /&gt;
+    ///         &lt;RadzenDropDownDataGridColumn Property="ContactName" Title="Contact" /&gt;
+    ///         &lt;RadzenDropDownDataGridColumn Property="City" Title="City" /&gt;
+    ///     &lt;/Columns&gt;
+    /// &lt;/RadzenDropDownDataGrid&gt;
+    /// </code>
+    /// Multiple selection with filtering:
+    /// <code>
+    /// &lt;RadzenDropDownDataGrid @bind-Value=@selectedIds TValue="IEnumerable&lt;int&gt;" 
+    ///                          Multiple="true" AllowFiltering="true" Data=@products&gt;
+    ///     &lt;Columns&gt;
+    ///         &lt;RadzenDropDownDataGridColumn Property="Name" Title="Product" /&gt;
+    ///         &lt;RadzenDropDownDataGridColumn Property="Price" Title="Price" FormatString="{0:C}" /&gt;
+    ///     &lt;/Columns&gt;
+    /// &lt;/RadzenDropDownDataGrid&gt;
     /// </code>
     /// </example>
     public partial class RadzenDropDownDataGrid<TValue> : DropDownBase<TValue>

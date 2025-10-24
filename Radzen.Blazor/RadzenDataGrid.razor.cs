@@ -15,17 +15,79 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenDataGrid component.
+    /// A powerful data grid component for displaying and manipulating tabular data with support for sorting, filtering, paging, grouping, editing, and selection.
+    /// RadzenDataGrid provides a full-featured table with inline editing, master-detail views, virtualization, export capabilities, and extensive customization options.
     /// </summary>
-    /// <typeparam name="TItem">The type of the DataGrid data item.</typeparam>
+    /// <typeparam name="TItem">The type of data items displayed in the grid. Each row represents one instance of TItem.</typeparam>
+    /// <remarks>
+    /// RadzenDataGrid is a comprehensive data table component supporting:
+    /// - **Data Operations**: Sorting (single/multiple columns), filtering (simple/advanced), paging, grouping, aggregation
+    /// - **Editing**: Inline editing, cell editing, add/edit/delete operations with validation
+    /// - **Selection**: Single/multiple row selection with checkbox column support
+    /// - **Performance**: Virtualization for large datasets, on-demand data loading via LoadData event
+    /// - **Export**: Export to Excel and CSV formats
+    /// - **Customization**: Column templates, row templates, group headers/footers, custom cell rendering
+    /// - **Responsive**: Density modes (Default/Compact), responsive column visibility
+    /// 
+    /// The grid can work with in-memory collections or load data on-demand from APIs. Use the LoadData event for server-side operations.
+    /// Columns are defined using RadzenDataGridColumn components within the Columns template.
+    /// </remarks>
     /// <example>
+    /// Basic data grid with sorting, paging, and filtering:
     /// <code>
-    /// &lt;RadzenDataGrid @data=@orders TItem="Order" AllowSorting="true" AllowPaging="true" AllowFiltering="true"&gt;
+    /// &lt;RadzenDataGrid Data=@orders TItem="Order" AllowSorting="true" AllowPaging="true" AllowFiltering="true" PageSize="10"&gt;
     ///     &lt;Columns&gt;
-    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderId" Title="OrderId" /&gt;
-    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="OrderDate" /&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderId" Title="Order ID" /&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderDate" Title="Order Date" FormatString="{0:d}" /&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Property="CustomerName" Title="Customer" /&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Property="Total" Title="Total" FormatString="{0:C}" /&gt;
     ///     &lt;/Columns&gt;
     /// &lt;/RadzenDataGrid&gt;
+    /// </code>
+    /// Grid with inline editing:
+    /// <code>
+    /// &lt;RadzenDataGrid @ref=grid Data=@orders TItem="Order" EditMode="DataGridEditMode.Single"&gt;
+    ///     &lt;Columns&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderId" Title="ID" Frozen="true"&gt;
+    ///             &lt;EditTemplate Context="order"&gt;
+    ///                 &lt;RadzenNumeric @bind-Value="order.OrderId" Style="width:100%" /&gt;
+    ///             &lt;/EditTemplate&gt;
+    ///         &lt;/RadzenDataGridColumn&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Context="order" Filterable="false" Sortable="false" TextAlign="TextAlign.Right"&gt;
+    ///             &lt;Template Context="order"&gt;
+    ///                 &lt;RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Click="@(args =&gt; EditRow(order))" /&gt;
+    ///             &lt;/Template&gt;
+    ///             &lt;EditTemplate Context="order"&gt;
+    ///                 &lt;RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Click="@(args =&gt; SaveRow(order))" /&gt;
+    ///                 &lt;RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Click="@(args =&gt; CancelEdit(order))" /&gt;
+    ///             &lt;/EditTemplate&gt;
+    ///         &lt;/RadzenDataGridColumn&gt;
+    ///     &lt;/Columns&gt;
+    /// &lt;/RadzenDataGrid&gt;
+    /// </code>
+    /// Server-side data with LoadData:
+    /// <code>
+    /// &lt;RadzenDataGrid Data=@orders TItem="Order" LoadData=@LoadData Count=@count IsLoading=@isLoading
+    ///                 AllowSorting="true" AllowFiltering="true" AllowPaging="true" PageSize="20"&gt;
+    ///     &lt;Columns&gt;
+    ///         &lt;RadzenDataGridColumn TItem="Order" Property="OrderId" Title="ID" /&gt;
+    ///     &lt;/Columns&gt;
+    /// &lt;/RadzenDataGrid&gt;
+    /// 
+    /// @code {
+    ///     IEnumerable&lt;Order&gt; orders;
+    ///     int count;
+    ///     bool isLoading;
+    /// 
+    ///     async Task LoadData(LoadDataArgs args)
+    ///     {
+    ///         isLoading = true;
+    ///         var result = await orderService.GetOrders(args.Skip, args.Top, args.OrderBy, args.Filter);
+    ///         orders = result.Data;
+    ///         count = result.Count;
+    ///         isLoading = false;
+    ///     }
+    /// }
     /// </code>
     /// </example>
 #if NET6_0_OR_GREATER
@@ -34,9 +96,10 @@ namespace Radzen.Blazor
     public partial class RadzenDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
         /// <summary>
-        /// Returns the validity of the DataGrid.
+        /// Gets whether all inline edit validators in the DataGrid are currently valid.
+        /// Use this property to check validation state before saving edited rows.
         /// </summary>
-        /// <value><c>true</c> if all validators in the DataGrid a valid; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if all edit form validators are valid; otherwise, <c>false</c>. Returns <c>true</c> if no rows are being edited.</value>
         public bool IsValid
         {
             get
@@ -55,9 +118,10 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Returns wether the FilterRow is visible on the DataGrid.
+        /// Gets whether the filter row (containing filter input controls for each column) is currently visible in the DataGrid.
+        /// The filter row appears below the header row when filtering is enabled and at least one column is filterable.
         /// </summary>
-        /// <value><c>true</c> if all conditions for showing the row with the filter controls are met otherwise <c>false</c>.</value>
+        /// <value><c>true</c> if AllowFiltering is enabled, FilterMode includes Simple mode, and at least one filterable column exists; otherwise, <c>false</c>.</value>
         public bool FilterRowActive
         {
             get
@@ -67,15 +131,20 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is virtualized.
+        /// Gets or sets whether the DataGrid uses virtualization to improve performance with large datasets.
+        /// When enabled, only visible rows are rendered in the DOM, with additional rows loaded as the user scrolls.
+        /// Virtualization significantly reduces memory usage and initial render time for grids with thousands of rows.
         /// </summary>
-        /// <value><c>true</c> if this instance is virtualized; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> to enable row virtualization; otherwise, <c>false</c>. Default is <c>false</c>.</value>
         [Parameter]
         public bool AllowVirtualization { get; set; }
 
         /// <summary>
-        /// Gets or sets a value that determines how many additional items will be rendered before and after the visible region. This help to reduce the frequency of rendering during scrolling. However, higher values mean that more elements will be present in the page.
+        /// Gets or sets the number of additional rows to render before and after the visible viewport when virtualization is enabled.
+        /// A higher overscan count reduces the chance of seeing blank space during fast scrolling, but increases the number of rendered elements.
+        /// The optimal value depends on row height and typical scroll speed.
         /// </summary>
+        /// <value>The number of extra rows to render outside the viewport. Default is 3 (determined by the Virtualize component).</value>
         [Parameter]
         public int VirtualizationOverscanCount { get; set; }
 
@@ -88,8 +157,11 @@ namespace Radzen.Blazor
         internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<GroupResult> groupVirtualize;
 
         /// <summary>
-        /// Gets Virtualize component reference.
+        /// Gets a reference to the underlying Blazor Virtualize component used for row virtualization.
+        /// This reference can be used to programmatically control virtualization behavior or access virtualization state.
+        /// Only available when <see cref="AllowVirtualization"/> is enabled and items are not grouped.
         /// </summary>
+        /// <value>The Virtualize component reference, or null if virtualization is not active.</value>
         public Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> Virtualize
         {
             get
@@ -101,8 +173,11 @@ namespace Radzen.Blazor
         List<TItem> virtualDataItems = new List<TItem>();
 
         /// <summary>
-        /// Clears the cache and refreshes the Virtualize component.
+        /// Clears the internal data cache and refreshes the DataGrid, reloading data from the source.
+        /// When virtualization is enabled, this method refreshes the Virtualize component. Otherwise, it triggers a standard reload.
+        /// Call this method after external data changes to ensure the grid displays current data.
         /// </summary>
+        /// <returns>A task representing the asynchronous refresh operation.</returns>
         public async Task RefreshDataAsync()
         {
             ResetLoadData();
@@ -118,7 +193,9 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Reset the LoadData internal state
+        /// Resets the internal LoadData state, forcing the next data operation to reload from the source.
+        /// This is useful when you've made changes to the underlying data source and want to ensure the next load operation fetches fresh data
+        /// instead of using cached arguments. Typically called before RefreshDataAsync or when manually managing data reload.
         /// </summary>
         public void ResetLoadData()
         {

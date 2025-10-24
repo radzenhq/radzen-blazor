@@ -7,40 +7,80 @@ using Radzen.Blazor.Rendering;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSidebar component.
+    /// A collapsible sidebar component for application navigation, typically used within RadzenLayout.
+    /// RadzenSidebar provides a navigation panel that can be toggled open/closed and responds to screen size changes.
     /// </summary>
+    /// <remarks>
+    /// Sidebars are commonly used in application layouts for primary navigation menus.
+    /// The component features:
+    /// - **Responsive**: Automatically collapses on mobile devices and expands on desktop (configurable)
+    /// - **Positioning**: Can be placed on Left, Right, Start, or End of the layout
+    /// - **Full Height**: Option to span entire layout height or align with body section only
+    /// - **Toggle**: Programmatic expand/collapse via Expanded property or Toggle() method
+    /// - **Integration**: Works seamlessly with RadzenLayout, RadzenHeader, RadzenBody, RadzenFooter
+    /// - **Navigation Content**: Typically contains RadzenPanelMenu or RadzenMenu for navigation
+    /// 
+    /// Must be used inside RadzenLayout to enable responsive behavior and proper layout integration.
+    /// Use @bind-Expanded for two-way binding to control sidebar state from code.
+    /// </remarks>
+    /// <example>
+    /// Basic sidebar with menu:
+    /// <code>
+    /// &lt;RadzenLayout&gt;
+    ///     &lt;RadzenHeader&gt;...&lt;/RadzenHeader&gt;
+    ///     &lt;RadzenSidebar @bind-Expanded=@sidebarExpanded&gt;
+    ///         &lt;RadzenPanelMenu&gt;
+    ///             &lt;RadzenPanelMenuItem Text="Home" Icon="home" Path="/" /&gt;
+    ///             &lt;RadzenPanelMenuItem Text="Orders" Icon="shopping_cart" Path="/orders" /&gt;
+    ///         &lt;/RadzenPanelMenu&gt;
+    ///     &lt;/RadzenSidebar&gt;
+    ///     &lt;RadzenBody&gt;...&lt;/RadzenBody&gt;
+    /// &lt;/RadzenLayout&gt;
+    /// </code>
+    /// Right-positioned full-height sidebar:
+    /// <code>
+    /// &lt;RadzenSidebar Position="SidebarPosition.Right" FullHeight="true"&gt;
+    ///     Sidebar content...
+    /// &lt;/RadzenSidebar&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenSidebar : RadzenComponentWithChildren
     {
         private const string DefaultStyle = "top:51px;bottom:57px;width:250px;";
 
         /// <summary>
-        /// Gets or sets the style.
+        /// Gets or sets custom CSS styles for the sidebar.
+        /// Default positioning and sizing can be overridden via this property.
         /// </summary>
-        /// <value>The style.</value>
+        /// <value>The CSS style string. Default is "top:51px;bottom:57px;width:250px;".</value>
         [Parameter]
         public override string Style { get; set; } = DefaultStyle;
 
         /// <summary>
-        /// Toggles the responsive mode of the component. If set to <c>true</c> (the default) the component will be 
-        /// expanded on larger displays and collapsed on touch devices. Set to <c>false</c> if you want to disable this behavior.
-        /// Responsive mode is only available when RadzenSidebar is inside <see cref="RadzenLayout" />.
+        /// Gets or sets whether the sidebar should automatically collapse on small screens (responsive mode).
+        /// When true (default), the sidebar expands on desktop and collapses on mobile. When false, responsive behavior is disabled.
+        /// Responsive mode only works when RadzenSidebar is inside <see cref="RadzenLayout"/>.
         /// </summary>
+        /// <value><c>true</c> to enable responsive collapse/expand; <c>false</c> to disable. Default is <c>true</c>.</value>
         [Parameter]
         public bool Responsive { get; set; } = true;
 
         private bool IsResponsive => Responsive && Layout != null;
 
         /// <summary>
-        /// Gets or sets a value indicating whether the <see cref="RadzenSidebar"/> should occupy the full height of the <see cref="RadzenLayout"/>.
-        /// When <c>false</c> (default), the sidebar is rendered next to <see cref="RadzenBody"/>.
-        /// When <c>true</c>, it stretches to the full height of the layout and appears alongside <see cref="RadzenHeader"/>, <see cref="RadzenBody"/>, and <see cref="RadzenFooter"/>.
+        /// Gets or sets whether the sidebar occupies the full height of the layout (from top to bottom).
+        /// When false (default), sidebar appears between header and footer, aligned with body section.
+        /// When true, sidebar stretches the entire layout height alongside all sections.
         /// </summary>
+        /// <value><c>true</c> for full-height sidebar; <c>false</c> for body-aligned sidebar. Default is <c>false</c>.</value>
         [Parameter]
         public bool FullHeight { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets the sidebar position (Left, Right, Start, End).
+        /// Gets or sets which side of the layout the sidebar appears on.
+        /// Options include Left, Right, Start (left in LTR, right in RTL), End (right in LTR, left in RTL).
         /// </summary>
+        /// <value>The sidebar position. Default is <see cref="SidebarPosition.Start"/>.</value>
         [Parameter]
         public SidebarPosition? Position { get; set; } = SidebarPosition.Start;
 
@@ -69,7 +109,8 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Toggles this instance expanded state.
+        /// Programmatically toggles the sidebar between expanded and collapsed states.
+        /// Call this method to show/hide the sidebar from code, such as from a hamburger menu button click.
         /// </summary>
         public void Toggle()
         {

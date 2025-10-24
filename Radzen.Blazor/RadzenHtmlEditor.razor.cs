@@ -9,27 +9,72 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// A component which edits HTML content. Provides built-in upload capabilities.
+    /// A rich text HTML editor component with WYSIWYG editing, formatting toolbar, image upload, and custom tool support.
+    /// RadzenHtmlEditor provides a full-featured editor for creating and editing formatted content with a Microsoft Word-like interface.
     /// </summary>
+    /// <remarks>
+    /// The HTML editor allows users to create rich formatted content without knowing HTML.
+    /// Key features include:
+    /// - **WYSIWYG Editing**: What-you-see-is-what-you-get visual editing interface
+    /// - **Formatting Tools**: Bold, italic, underline, font selection, colors, alignment, lists, links, images
+    /// - **Image Upload**: Built-in image upload with configurable upload URL
+    /// - **Custom Tools**: Add custom toolbar buttons via RadzenHtmlEditorCustomTool
+    /// - **Source Mode**: Toggle between visual editing and HTML source code view
+    /// - **Paste Filtering**: Filter unwanted HTML when pasting from other sources
+    /// - **Commands**: Programmatic execution of formatting commands via ExecuteCommandAsync()
+    /// 
+    /// The Value property contains HTML markup. Use UploadUrl to configure where images are uploaded.
+    /// Add custom tools for domain-specific functionality like inserting templates or special content.
+    /// </remarks>
     /// <example>
+    /// Basic HTML editor:
     /// <code>
-    /// &lt;RadzenHtmlEditor @bind-Value=@html /&gt;
+    /// &lt;RadzenHtmlEditor @bind-Value=@htmlContent Style="height: 400px;" /&gt;
     /// @code {
-    ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
+    ///     string htmlContent = "&lt;p&gt;Enter content here...&lt;/p&gt;";
+    /// }
+    /// </code>
+    /// Editor with image upload:
+    /// <code>
+    /// &lt;RadzenHtmlEditor @bind-Value=@content UploadUrl="api/upload/image" UploadHeaders=@uploadHeaders&gt;
+    ///     &lt;RadzenHtmlEditorBold /&gt;
+    ///     &lt;RadzenHtmlEditorItalic /&gt;
+    ///     &lt;RadzenHtmlEditorUnderline /&gt;
+    ///     &lt;RadzenHtmlEditorSeparator /&gt;
+    ///     &lt;RadzenHtmlEditorImage /&gt;
+    /// &lt;/RadzenHtmlEditor&gt;
+    /// </code>
+    /// Editor with custom tool:
+    /// <code>
+    /// &lt;RadzenHtmlEditor @bind-Value=@html Execute=@OnExecute&gt;
+    ///     &lt;RadzenHtmlEditorCustomTool CommandName="InsertDate" Icon="calendar_today" Title="Insert Current Date" /&gt;
+    /// &lt;/RadzenHtmlEditor&gt;
+    /// @code {
+    ///     async Task OnExecute(HtmlEditorExecuteEventArgs args)
+    ///     {
+    ///         if (args.CommandName == "InsertDate")
+    ///         {
+    ///             await args.Editor.ExecuteCommandAsync(HtmlEditorCommands.InsertHtml, DateTime.Today.ToLongDateString());
+    ///         }
+    ///     }
     /// }
     /// </code>
     /// </example>
     public partial class RadzenHtmlEditor : FormComponent<string>
     {
         /// <summary>
-        /// Specifies whether to show the toolbar. Set it to false to hide the toolbar. Default value is true.
+        /// Gets or sets whether to display the formatting toolbar above the editor.
+        /// When false, hides the toolbar but editing is still possible. Useful for read-only or simplified views.
         /// </summary>
+        /// <value><c>true</c> to show the toolbar; <c>false</c> to hide it. Default is <c>true</c>.</value>
         [Parameter]
         public bool ShowToolbar { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets the mode of the editor.
+        /// Gets or sets the editor mode determining whether users see the visual editor or HTML source code.
+        /// Design mode shows WYSIWYG editing, Source mode shows raw HTML for advanced users.
         /// </summary>
+        /// <value>The editor mode. Default is <see cref="HtmlEditorMode.Design"/>.</value>
         [Parameter]
         public HtmlEditorMode Mode { get; set; } = HtmlEditorMode.Design;
 

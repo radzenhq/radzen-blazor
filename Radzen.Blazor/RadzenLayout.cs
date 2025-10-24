@@ -6,8 +6,36 @@ using System;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenLayout component.
+    /// A layout container component that defines the overall structure of a Blazor application with header, sidebar, body, and footer sections.
+    /// RadzenLayout is typically used in MainLayout.razor to create a consistent page structure with optional collapsible sidebar and theme integration.
     /// </summary>
+    /// <remarks>
+    /// RadzenLayout works with companion components: RadzenHeader, RadzenSidebar, RadzenBody, and RadzenFooter.
+    /// The layout automatically integrates with ThemeService to apply theme-specific CSS classes.
+    /// All sections are optional and can be used in any combination to create the desired page structure.
+    /// The sidebar can be configured as collapsible, and the layout adjusts automatically when the sidebar expands or collapses.
+    /// </remarks>
+    /// <example>
+    /// Basic layout with all sections:
+    /// <code>
+    /// &lt;RadzenLayout&gt;
+    ///     &lt;RadzenHeader&gt;
+    ///         &lt;h1&gt;My Application&lt;/h1&gt;
+    ///     &lt;/RadzenHeader&gt;
+    ///     &lt;RadzenSidebar&gt;
+    ///         &lt;RadzenPanelMenu&gt;
+    ///             @* Navigation menu items *@
+    ///         &lt;/RadzenPanelMenu&gt;
+    ///     &lt;/RadzenSidebar&gt;
+    ///     &lt;RadzenBody&gt;
+    ///         @Body
+    ///     &lt;/RadzenBody&gt;
+    ///     &lt;RadzenFooter&gt;
+    ///         © 2025 My Company
+    ///     &lt;/RadzenFooter&gt;
+    /// &lt;/RadzenLayout&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenLayout : RadzenComponentWithChildren
     {
         [Inject]

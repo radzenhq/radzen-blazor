@@ -10,16 +10,41 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSelectBar component.
+    /// A segmented button control component that displays options as a group of connected buttons for single or multiple selection.
+    /// RadzenSelectBar provides a visually distinct way to select from a limited set of options, commonly used for view modes, filters, or categories.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TValue">The type of the selected value. Can be a single value or IEnumerable for multiple selection.</typeparam>
+    /// <remarks>
+    /// SelectBar presents options as a row or column of connected buttons where selected items are highlighted.
+    /// This is ideal when you have 2-7 options and want a more prominent UI than radio buttons or checkboxes.
+    /// The component supports:
+    /// - **Selection Modes**: Single selection (default) or multiple selection via Multiple property
+    /// - **Orientation**: Horizontal (side-by-side buttons) or Vertical (stacked buttons)
+    /// - **Data Binding**: Bind to a data source or statically declare items
+    /// - **Templating**: Custom item templates with text, icons, or images
+    /// - **Sizing**: ExtraSmall, Small, Medium, Large button sizes
+    /// - **Disabled Items**: Individual items can be disabled
+    /// - **Keyboard Navigation**: Arrow keys and Space/Enter for accessibility
+    /// 
+    /// Common uses include view toggles (list/grid), time period selectors (day/week/month), category filters, or any small set of mutually exclusive options.
+    /// </remarks>
     /// <example>
+    /// Basic select bar:
     /// <code>
-    /// &lt;RadzenSelectBar @bind-Value=@values TValue="IEnumerable&lt;int&gt;" Multiple="true"&gt;
+    /// &lt;RadzenSelectBar @bind-Value=@viewMode TValue="string"&gt;
     ///     &lt;Items&gt;
-    ///         &lt;RadzenSelectBarItem Text="Orders" Value="1" /&gt;
-    ///         &lt;RadzenSelectBarItem Text="Employees" Value="2" /&gt;
-    ///         &lt;RadzenSelectBarItem Text="Customers" Value="3" /&gt;
+    ///         &lt;RadzenSelectBarItem Text="List" Value="list" Icon="list" /&gt;
+    ///         &lt;RadzenSelectBarItem Text="Grid" Value="grid" Icon="grid_view" /&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenSelectBar&gt;
+    /// </code>
+    /// Multiple selection for filters:
+    /// <code>
+    /// &lt;RadzenSelectBar @bind-Value=@selectedCategories TValue="IEnumerable&lt;int&gt;" Multiple="true" Size="ButtonSize.Small"&gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenSelectBarItem Text="Electronics" Value="1" /&gt;
+    ///         &lt;RadzenSelectBarItem Text="Clothing" Value="2" /&gt;
+    ///         &lt;RadzenSelectBarItem Text="Books" Value="3" /&gt;
     ///     &lt;/Items&gt;
     /// &lt;/RadzenSelectBar&gt;
     /// </code>
@@ -27,16 +52,18 @@ namespace Radzen.Blazor
     public partial class RadzenSelectBar<TValue> : FormComponent<TValue>, IRadzenSelectBar
     {
         /// <summary>
-        /// Gets or sets the size. Set to <c>ButtonSize.Medium</c> by default.
+        /// Gets or sets the size of the buttons in the select bar.
+        /// Controls the button padding, font size, and overall dimensions for all items.
         /// </summary>
-        /// <value>The size.</value>
+        /// <value>The button size. Default is <see cref="ButtonSize.Medium"/>.</value>
         [Parameter]
         public ButtonSize Size { get; set; } = ButtonSize.Medium;
 
         /// <summary>
-        /// Gets or sets the orientation. Set to <c>Orientation.Horizontal</c> by default.
+        /// Gets or sets the layout direction of the select bar.
+        /// Horizontal displays buttons side-by-side in a row, Vertical stacks buttons in a column.
         /// </summary>
-        /// <value>The orientation.</value>
+        /// <value>The orientation. Default is <see cref="Orientation.Horizontal"/>.</value>
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Horizontal;
 

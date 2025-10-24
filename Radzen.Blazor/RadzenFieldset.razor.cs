@@ -7,20 +7,40 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenFieldset component.
+    /// A fieldset container component that groups related form fields with a legend/header and optional collapse functionality.
+    /// RadzenFieldset provides semantic form grouping with visual borders, useful for organizing complex forms into logical sections.
     /// </summary>
+    /// <remarks>
+    /// Fieldsets are HTML form elements that semantically group related inputs, improving form structure and accessibility.
+    /// The component provides:
+    /// - **Grouping**: Visually and semantically groups related form fields
+    /// - **Legend**: Customizable header via Text or HeaderTemplate
+    /// - **Collapsible**: Optional expand/collapse to hide/show grouped fields
+    /// - **Icon**: Optional icon in the legend
+    /// - **Summary**: Optional summary content shown when collapsed
+    /// - **Accessibility**: Screen readers announce fieldset legends for grouped fields
+    /// 
+    /// Use to organize forms into sections like "Personal Information", "Address", "Payment Details".
+    /// When AllowCollapse is enabled, users can collapse sections they don't need to see.
+    /// </remarks>
     /// <example>
+    /// Basic fieldset grouping form fields:
     /// <code>
-    /// &lt;RadzenFieldset AllowCollapse="true""&gt;
-    ///     &lt;HeaderTemplate&gt;
-    ///         Header
-    ///     &lt;/HeaderTemplate&gt;
-    ///     &lt;ChildContent&gt;
-    ///         Content
-    ///     &lt;/ChildContent&gt;
-    ///     &lt;SummaryTemplate&gt;
-    ///         Summary
-    ///     &lt;/SummaryTemplate&gt;
+    /// &lt;RadzenFieldset Text="Personal Information"&gt;
+    ///     &lt;RadzenStack Gap="1rem"&gt;
+    ///         &lt;RadzenFormField Text="First Name"&gt;
+    ///             &lt;RadzenTextBox @bind-Value=@model.FirstName /&gt;
+    ///         &lt;/RadzenFormField&gt;
+    ///         &lt;RadzenFormField Text="Last Name"&gt;
+    ///             &lt;RadzenTextBox @bind-Value=@model.LastName /&gt;
+    ///         &lt;/RadzenFormField&gt;
+    ///     &lt;/RadzenStack&gt;
+    /// &lt;/RadzenFieldset&gt;
+    /// </code>
+    /// Collapsible fieldset:
+    /// <code>
+    /// &lt;RadzenFieldset Text="Advanced Options" Icon="settings" AllowCollapse="true"&gt;
+    ///     Advanced configuration fields...
     /// &lt;/RadzenFieldset&gt;
     /// </code>
     /// </example>

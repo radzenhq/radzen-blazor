@@ -12,18 +12,22 @@ using Radzen.Blazor.Rendering;
 namespace Radzen
 {
     /// <summary>
-    /// Class FormComponentWithAutoComplete.
+    /// Base class for form input components that support browser autocomplete functionality.
+    /// Extends <see cref="FormComponent{T}"/> with properties for controlling browser autocomplete behavior and ARIA autocomplete attributes.
     /// </summary>
+    /// <typeparam name="T">The type of the form component's value.</typeparam>
+    /// <remarks>
+    /// This base class is used by input components like RadzenTextBox, RadzenPassword, RadzenNumeric, and RadzenMask.
+    /// It provides standardized autocomplete behavior for better integration with browser password managers and autofill features.
+    /// </remarks>
     public class FormComponentWithAutoComplete<T> : FormComponent<T>
     {
         /// <summary>
-        /// Gets or sets a value indicating the type of built-in autocomplete
-        /// the browser should use.
-        /// <see cref="Blazor.AutoCompleteType" />
+        /// Gets or sets the browser autocomplete behavior for this input field.
+        /// Controls whether browsers should offer to autofill this field based on user history or saved data.
+        /// Common values include On (enable), Off (disable), Username, CurrentPassword, Email, etc.
         /// </summary>
-        /// <value>
-        /// The type of built-in autocomplete.
-        /// </value>
+        /// <value>The autocomplete type. Default is <see cref="AutoCompleteType.On"/>.</value>
         [Parameter]
         public virtual AutoCompleteType AutoCompleteType { get; set; } = AutoCompleteType.On;
 
@@ -76,26 +80,40 @@ namespace Radzen
     }
 
     /// <summary>
-    /// Class FormComponent.
-    /// Implements the <see cref="Radzen.RadzenComponent" />
-    /// Implements the <see cref="Radzen.IRadzenFormComponent" />
+    /// Base class for all Radzen form input components providing data binding, validation, and change event capabilities.
+    /// FormComponent integrates with Blazor's EditContext for form validation and provides common functionality for all input controls.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <seealso cref="Radzen.RadzenComponent" />
-    /// <seealso cref="Radzen.IRadzenFormComponent" />
+    /// <typeparam name="T">The type of the component's bound value (string, int, DateTime, etc.).</typeparam>
+    /// <remarks>
+    /// This is the base class for components like RadzenTextBox, RadzenCheckBox, RadzenDropDown, RadzenDatePicker, etc.
+    /// It provides:
+    /// - **Two-way Binding**: @bind-Value support for data binding
+    /// - **Validation**: Integration with Blazor EditContext and validators
+    /// - **Change Events**: Change and ValueChanged callbacks
+    /// - **Disabled State**: Disable property to prevent user interaction
+    /// - **Placeholder**: Placeholder text for empty inputs
+    /// - **Field Identification**: Name property for validation and label association
+    /// - **Tab Order**: TabIndex for keyboard navigation control
+    /// 
+    /// Components inheriting from FormComponent automatically work with RadzenTemplateForm and validators.
+    /// </remarks>
     public class FormComponent<T> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>
-        /// Gets or sets the name.
+        /// Gets or sets the unique name identifier for this form component.
+        /// Used for validation association (linking with validators and labels) and for identifying the field in form submission.
+        /// This name should be unique within the form and match the Component property of associated validators/labels.
         /// </summary>
-        /// <value>The name.</value>
+        /// <value>The component name.</value>
         [Parameter]
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the index of the tab.
+        /// Gets or sets the tab order index for keyboard navigation.
+        /// Controls the order in which fields receive focus when the user presses the Tab key.
+        /// Lower values receive focus first. Use -1 to exclude from tab navigation.
         /// </summary>
-        /// <value>The index of the tab.</value>
+        /// <value>The tab index. Default is 0 (natural tab order).</value>
         [Parameter]
         public int TabIndex { get; set; } = 0;
 

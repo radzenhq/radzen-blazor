@@ -9,12 +9,27 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Displays line, area, donut, pie, bar or column series.
+    /// A versatile chart component for visualizing data through various chart types including line, area, column, bar, pie, and donut series.
+    /// RadzenChart supports multiple series, customizable axes, legends, tooltips, data labels, markers, and interactive features.
     /// </summary>
+    /// <remarks>
+    /// RadzenChart is a container for one or more chart series components. Each series (RadzenLineSeries, RadzenColumnSeries, RadzenAreaSeries, etc.) 
+    /// defines how data is visualized. The chart supports:
+    /// - **Cartesian Charts**: Line, Area, Column, Bar, StackedColumn, StackedBar, StackedArea with X/Y axes
+    /// - **Pie Charts**: Pie and Donut series for showing proportions
+    /// - **Customization**: Color schemes, axis configuration, grid lines, legends, tooltips, data labels, markers
+    /// - **Interactivity**: Click events on series and legend items, hover tooltips
+    /// - **Annotations**: Trend lines, mean/median/mode lines, value annotations
+    /// - **Responsive**: Automatically adapts to container size
+    /// 
+    /// Series are defined as child components within the RadzenChart. Configure axes using RadzenCategoryAxis and RadzenValueAxis,
+    /// customize the legend with RadzenLegend, and add tooltips with RadzenChartTooltipOptions.
+    /// </remarks>
     /// <example>
+    /// Basic column chart:
     /// <code>
     ///   &lt;RadzenChart&gt;
-    ///       &lt;RadzenColumnSeries Data=@revenue CategoryProperty="Quarter" ValueProperty="Revenue" /&gt;
+    ///       &lt;RadzenColumnSeries Data=@revenue CategoryProperty="Quarter" Title="Revenue" ValueProperty="Revenue" /&gt;
     ///   &lt;/RadzenChart&gt;
     ///   @code {
     ///       class DataItem
@@ -31,25 +46,41 @@ namespace Radzen.Blazor
     ///       };
     ///   }
     /// </code>
+    /// Chart with multiple series and custom legend:
+    /// <code>
+    /// &lt;RadzenChart&gt;
+    ///     &lt;RadzenLineSeries Data=@sales2023 CategoryProperty="Month" ValueProperty="Amount" Title="2023 Sales" /&gt;
+    ///     &lt;RadzenLineSeries Data=@sales2024 CategoryProperty="Month" ValueProperty="Amount" Title="2024 Sales" /&gt;
+    ///     &lt;RadzenLegend Position="LegendPosition.Bottom" /&gt;
+    ///     &lt;RadzenCategoryAxis Formatter="@(value =&gt; value.ToString())" /&gt;
+    ///     &lt;RadzenValueAxis Formatter="@(value =&gt; value.ToString("C"))" /&gt;
+    /// &lt;/RadzenChart&gt;
+    /// </code>
     /// </example>
     public partial class RadzenChart : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the color scheme used to render the series.
+        /// Gets or sets the color scheme used to assign colors to chart series.
+        /// Determines the palette of colors applied sequentially to each series when series-specific colors are not set.
+        /// Available schemes include Pastel, Palette (default), Monochrome, and custom color schemes.
         /// </summary>
-        /// <value>The color scheme.</value>
+        /// <value>The color scheme. Default uses the Palette scheme.</value>
         [Parameter]
         public ColorScheme ColorScheme { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user clicks on a series.
+        /// Gets or sets the callback invoked when a user clicks on a data point or segment in a chart series.
+        /// Provides information about the clicked series, data item, and value in the event arguments.
         /// </summary>
+        /// <value>The series click event callback.</value>
         [Parameter]
         public EventCallback<SeriesClickEventArgs> SeriesClick { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user clicks on a legend.
+        /// Gets or sets the callback invoked when a user clicks on a legend item.
+        /// Useful for implementing custom behaviors like toggling series visibility or filtering data.
         /// </summary>
+        /// <value>The legend click event callback.</value>
         [Parameter]
         public EventCallback<LegendClickEventArgs> LegendClick { get; set; }
 

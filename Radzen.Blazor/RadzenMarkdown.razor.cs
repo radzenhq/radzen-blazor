@@ -13,54 +13,95 @@ namespace Radzen.Blazor;
 #pragma warning disable ASP0006 // Do not use non-literal sequence numbers
 
 /// <summary>
-/// A component which renders markdown content.
+/// A markdown rendering component that parses and displays Markdown syntax as formatted HTML.
+/// RadzenMarkdown converts Markdown text (headings, lists, links, code blocks, etc.) into rich HTML content with security features.
 /// </summary>
+/// <remarks>
+/// The markdown component parses CommonMark-compliant markdown and renders it as HTML.
+/// It's ideal for documentation, blog posts, README files, or any content authored in Markdown format.
+/// Key features:
+/// - **CommonMark Support**: Full support for standard Markdown syntax (headings, bold, italic, lists, links, images, code, blockquotes, tables)
+/// - **HTML Support**: Optionally allow HTML tags within markdown with security filtering
+/// - **Security**: Dangerous tags (script, iframe, object) are filtered out to prevent XSS attacks
+/// - **Auto-Linking**: Automatically create anchor links for headings (configurable depth)
+/// - **Customization**: Control allowed HTML tags and attributes
+/// - **Flexible Input**: Provide markdown as child content or via Text property
+/// 
+/// The component parses markdown and renders it as Blazor components/HTML for display.
+/// Use AllowHtml = false to strictly render only Markdown syntax without any HTML pass-through.
+/// </remarks>
 /// <example>
+/// Basic markdown rendering:
+/// <code>
 /// &lt;RadzenMarkdown&gt;
-/// # Hello, world!
-/// - This is a list item
-/// - This is another list item
-/// > This is a blockquote
+/// # Welcome
+/// This is **bold** and this is *italic*.
+/// - List item 1
+/// - List item 2
+/// [Link to Radzen](https://radzen.com)
 /// &lt;/RadzenMarkdown&gt;
+/// </code>
+/// Markdown from variable:
+/// <code>
+/// &lt;RadzenMarkdown Text=@markdownContent /&gt;
+/// @code {
+///     string markdownContent = "## Documentation\nThis is the content...";
+/// }
+/// </code>
+/// Markdown with auto-linking headings:
+/// <code>
+/// &lt;RadzenMarkdown AutoLinkHeadingDepth="3" Text=@readme /&gt;
+/// </code>
 /// </example>
 public partial class RadzenMarkdown : RadzenComponent
 {
     /// <summary>
-    /// Gets or sets the markdown content.
+    /// Gets or sets the markdown content as a render fragment.
+    /// The markdown text should be placed directly inside the component tags. Overridden by <see cref="Text"/> if both are set.
     /// </summary>
+    /// <value>The markdown content render fragment.</value>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether to allow HTML content in the markdown. Certain dangerous HTML tags (script, style, object, iframe) and attributes are removed.
-    /// Set to <c>true</c> by default.
+    /// Gets or sets whether HTML tags within the markdown are rendered or escaped.
+    /// When true (default), safe HTML tags are allowed. Dangerous tags (script, iframe, style, object) are always filtered.
+    /// When false, all HTML is treated as plain text and displayed literally.
     /// </summary>
+    /// <value><c>true</c> to allow safe HTML; <c>false</c> to escape all HTML. Default is <c>true</c>.</value>
     [Parameter]
     public bool AllowHtml { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a list of allowed HTML tags. If set, only these tags will be allowed in the markdown content. By default would use a list of safe HTML tags.
-    /// Considered only if <see cref="AllowHtml"/> is set to <c>true</c>.
+    /// Gets or sets a whitelist of HTML tags permitted in the markdown when <see cref="AllowHtml"/> is true.
+    /// If set, only these tags will be rendered; others are stripped. If not set, uses a default list of safe tags.
     /// </summary>
+    /// <value>The allowed HTML tag names, or null to use the default safe tag list.</value>
     [Parameter]
     public IEnumerable<string>? AllowedHtmlTags { get; set; }
 
     /// <summary>
-    /// Gets or sets a list of allowed HTML attributes. If set, only these attributes will be allowed in the markdown content. By default would use a list of safe HTML attributes.
-    /// Considered only if <see cref="AllowHtml"/> is set to <c>true</c>.
+    /// Gets or sets a whitelist of HTML attributes permitted on HTML tags when <see cref="AllowHtml"/> is true.
+    /// If set, only these attributes are rendered; others are stripped. If not set, uses a default list of safe attributes.
     /// </summary>
+    /// <value>The allowed HTML attribute names, or null to use the default safe attribute list.</value>
     [Parameter]
     public IEnumerable<string>? AllowedHtmlAttributes { get; set; }
 
     /// <summary>
-    /// Gets or sets the markdown content as a string. Overrides <see cref="ChildContent"/> if set.
+    /// Gets or sets the markdown content as a string.
+    /// When set, takes precedence over <see cref="ChildContent"/>. Use this to bind markdown from a variable.
     /// </summary>
+    /// <value>The markdown text content.</value>
     [Parameter]
     public string? Text { get; set; }
 
     /// <summary>
-    /// The maximum heading depth to create anchor links for. Set to <c>0</c> to disable auto-linking.
+    /// Gets or sets the maximum heading level (1-6) for which to automatically generate anchor links.
+    /// For example, setting to 3 creates anchors for h1, h2, and h3 headings.
+    /// Set to 0 to disable auto-linking. Auto-links enable table of contents navigation.
     /// </summary>
+    /// <value>The maximum heading depth for auto-linking (0-6). Default is 0 (disabled).</value>
     [Parameter]
     public int AutoLinkHeadingDepth { get; set; }
 

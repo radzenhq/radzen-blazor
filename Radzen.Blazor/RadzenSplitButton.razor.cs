@@ -9,17 +9,51 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenSplitButton component.
+    /// A split button component that combines a primary action button with a dropdown menu of additional related actions.
+    /// RadzenSplitButton displays a main button with a small dropdown toggle, allowing quick access to a default action while providing alternatives.
     /// </summary>
+    /// <remarks>
+    /// Split buttons are ideal when you have a primary action and several related alternatives.
+    /// The left side executes the default action, the right side opens a menu of options.
+    /// Common examples include:
+    /// - Save (with options: Save As, Save and Close)
+    /// - Download (with options: Download PDF, Download Excel, Download CSV)
+    /// - Send (with options: Send Now, Schedule Send, Save Draft)
+    /// 
+    /// The component features:
+    /// - **Primary Button**: Main action triggered by clicking the left portion
+    /// - **Dropdown Menu**: Additional options in a dropdown from the right toggle
+    /// - **Styling**: ButtonStyle, Variant, Shade, Size for consistent appearance
+    /// - **Icons**: Optional icon on the main button
+    /// - **Keyboard Navigation**: Arrow keys, Enter, Escape for menu navigation
+    /// 
+    /// Menu items are defined using RadzenSplitButtonItem components as child content.
+    /// </remarks>
     /// <example>
+    /// Basic split button:
     /// <code>
-    /// &lt;RadzenSplitButton Click=@(args => Console.WriteLine($"Value is: {args.Value}"))&gt;
+    /// &lt;RadzenSplitButton Text="Save" Icon="save" Click=@OnSave&gt;
     ///     &lt;ChildContent&gt;
-    ///         &lt;RadzenSplitButtonItem Text="Orders" Value="1" /&gt;
-    ///         &lt;RadzenSplitButtonItem Text="Employees" Value="2" /&gt;
-    ///         &lt;RadzenSplitButtonItem Text="Customers" Value="3" /&gt;
+    ///         &lt;RadzenSplitButtonItem Text="Save and Close" Value="save-close" /&gt;
+    ///         &lt;RadzenSplitButtonItem Text="Save As..." Value="save-as" /&gt;
     ///     &lt;/ChildContent&gt;
-    /// &lt;/RadzenSelectBar&gt;
+    /// &lt;/RadzenSplitButton&gt;
+    /// @code {
+    ///     void OnSave(RadzenSplitButtonItem item)
+    ///     {
+    ///         Console.WriteLine(item?.Value ?? "primary");
+    ///     }
+    /// }
+    /// </code>
+    /// Download split button with variants:
+    /// <code>
+    /// &lt;RadzenSplitButton Text="Download" Icon="download" ButtonStyle="ButtonStyle.Success" Click=@Download&gt;
+    ///     &lt;ChildContent&gt;
+    ///         &lt;RadzenSplitButtonItem Text="Download PDF" Icon="picture_as_pdf" Value="pdf" /&gt;
+    ///         &lt;RadzenSplitButtonItem Text="Download Excel" Icon="table_view" Value="excel" /&gt;
+    ///         &lt;RadzenSplitButtonItem Text="Download CSV" Icon="description" Value="csv" /&gt;
+    ///     &lt;/ChildContent&gt;
+    /// &lt;/RadzenSplitButton&gt;
     /// </code>
     /// </example>
     public partial class RadzenSplitButton : RadzenComponentWithChildren

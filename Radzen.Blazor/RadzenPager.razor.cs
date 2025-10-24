@@ -10,11 +10,39 @@ using Radzen.Blazor.Rendering;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenPager component.
+    /// A pagination component that provides navigation controls for paged data display.
+    /// RadzenPager displays page numbers, navigation buttons, and optional page size selector for navigating through large datasets.
     /// </summary>
+    /// <remarks>
+    /// The pager component works standalone or integrated with data components like RadzenDataGrid and RadzenDataList.
+    /// It provides:
+    /// - **Navigation Buttons**: First/Previous/Next/Last page buttons with customizable labels and icons
+    /// - **Page Numbers**: Clickable page number buttons with configurable count
+    /// - **Page Size Selector**: Optional dropdown to change items per page
+    /// - **Summary**: "Page X of Y" or custom summary text
+    /// - **Alignment**: Position controls (left/center/right) via HorizontalAlign
+    /// - **Density**: Compact or default spacing
+    /// - **Accessibility**: ARIA labels for all buttons
+    /// 
+    /// The PageChanged event provides Skip and Top values for loading the correct page of data.
+    /// Use Count to specify total items, PageSize for items per page, and PageNumbersCount for visible page buttons.
+    /// </remarks>
     /// <example>
+    /// Basic pager:
     /// <code>
-    /// &lt;RadzenPager Count="100" PageSize="10" PageNumbersCount="5" PageChanged=@(args => Console.WriteLine($"Skip: {args.Skip}, Top: {args.Top}")) /&gt;
+    /// &lt;RadzenPager Count=@totalCount PageSize="20" PageNumbersCount="5" PageChanged=@LoadPage /&gt;
+    /// @code {
+    ///     int totalCount = 250;
+    ///     async Task LoadPage(PagerEventArgs args) 
+    ///     {
+    ///         // Load items from args.Skip, take args.Top
+    ///     }
+    /// }
+    /// </code>
+    /// Pager with page size selector:
+    /// <code>
+    /// &lt;RadzenPager Count=@totalCount PageSize=@pageSize PageSizeChanged=@OnPageSizeChanged
+    ///              PageSizeOptions=@(new int[] { 10, 20, 50, 100 }) ShowPagingSummary="true" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenPager : RadzenComponent

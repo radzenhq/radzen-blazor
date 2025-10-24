@@ -5,14 +5,42 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenDataList component.
+    /// A data list component for displaying collections of items using custom templates, with support for paging and virtualization.
+    /// RadzenDataList provides a flexible way to render data in cards, tiles, or custom layouts instead of traditional table rows.
     /// </summary>
-    /// <typeparam name="TItem">The type of the item.</typeparam>
+    /// <typeparam name="TItem">The type of data items in the list. Each item is rendered using the Template.</typeparam>
+    /// <remarks>
+    /// DataList is ideal when you need more control over item presentation than a traditional table provides.
+    /// Perfect for product catalogs, image galleries, card-based dashboards, or any non-tabular data display.
+    /// The component supports:
+    /// - **Custom Templates**: Complete control over item rendering via Template parameter
+    /// - **Paging**: Built-in paging support with configurable page size
+    /// - **Wrapping**: Items can wrap to multiple columns/rows based on container width
+    /// - **Virtualization**: Efficient rendering for large datasets
+    /// - **Empty State**: Customizable message or template when no data exists
+    /// - **LoadData**: On-demand data loading for server-side paging
+    /// 
+    /// Use Template to define how each item should be rendered. The template receives the item as @context.
+    /// Combine with RadzenRow/RadzenColumn for grid-based layouts or RadzenCard for card designs.
+    /// </remarks>
     /// <example>
+    /// Basic data list with card template:
     /// <code>
-    /// &lt;RadzenDataList @data=@orders TItem="Order" AllowPaging="true" WrapItems="true"&gt;
-    ///     &lt;Template&gt;
-    ///         @context.OrderId
+    /// &lt;RadzenDataList Data=@products TItem="Product" AllowPaging="true" PageSize="12"&gt;
+    ///     &lt;Template Context="product"&gt;
+    ///         &lt;RadzenCard Style="width: 250px; margin: 1rem;"&gt;
+    ///             &lt;RadzenImage Path=@product.ImageUrl Style="width: 100%;" /&gt;
+    ///             &lt;RadzenText TextStyle="TextStyle.H6"&gt;@product.Name&lt;/RadzenText&gt;
+    ///             &lt;RadzenText&gt;@product.Price.ToString("C")&lt;/RadzenText&gt;
+    ///         &lt;/RadzenCard&gt;
+    ///     &lt;/Template&gt;
+    /// &lt;/RadzenDataList&gt;
+    /// </code>
+    /// Data list with empty state:
+    /// <code>
+    /// &lt;RadzenDataList Data=@items TItem="Item" WrapItems="true" ShowEmptyMessage="true" EmptyText="No items found"&gt;
+    ///     &lt;Template Context="item"&gt;
+    ///         &lt;div class="item-card"&gt;@item.Name&lt;/div&gt;
     ///     &lt;/Template&gt;
     /// &lt;/RadzenDataList&gt;
     /// </code>
@@ -29,16 +57,19 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether DataList should show empty message.
+        /// Gets or sets whether to display an empty message when the data source has no items.
+        /// Enable this to show EmptyText or EmptyTemplate when the list is empty, providing user feedback.
         /// </summary>
+        /// <value><c>true</c> to show empty message; <c>false</c> to show nothing. Default is <c>false</c>.</value>
         [Parameter]
         public bool ShowEmptyMessage { get; set; }
 
         private string _emptyText = "No records to display.";
         /// <summary>
-        /// Gets or sets the empty text shown when Data is empty collection.
+        /// Gets or sets the text message displayed when the data source is empty.
+        /// Only shown if <see cref="ShowEmptyMessage"/> is true and no <see cref="EmptyTemplate"/> is specified.
         /// </summary>
-        /// <value>The empty text.</value>
+        /// <value>The empty state message text. Default is "No records to display."</value>
         [Parameter]
         public string EmptyText
         {
@@ -53,23 +84,27 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets the empty template shown when Data is empty collection.
+        /// Gets or sets a custom template for rendering the empty state when the data source has no items.
+        /// Takes precedence over <see cref="EmptyText"/> when both are set.
+        /// Use this for rich empty states with images, icons, or action buttons.
         /// </summary>
-        /// <value>The empty template.</value>
+        /// <value>The empty state template render fragment.</value>
         [Parameter]
         public RenderFragment EmptyTemplate { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether to wrap items.
+        /// Gets or sets whether items should wrap to multiple rows based on their width and the container size.
+        /// When true, items flow horizontally and wrap like words in a paragraph. When false, items stack vertically.
         /// </summary>
-        /// <value><c>true</c> if wrap items; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> to enable wrapping (horizontal flow); <c>false</c> for vertical stacking. Default is <c>false</c>.</value>
         [Parameter]
         public bool WrapItems { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether this instance is virtualized.
+        /// Gets or sets whether the DataList uses virtualization to improve performance with large datasets.
+        /// When enabled, only visible items are rendered in the DOM, significantly improving performance for long lists.
         /// </summary>
-        /// <value><c>true</c> if this instance is virtualized; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> to enable virtualization; <c>false</c> for standard rendering. Default is <c>false</c>.</value>
         [Parameter]
         public bool AllowVirtualization { get; set; }
 

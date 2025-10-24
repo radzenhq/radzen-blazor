@@ -6,8 +6,36 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenProfileMenuItem component.
+    /// A menu item component used within RadzenProfileMenu to define individual navigation or action items.
+    /// RadzenProfileMenuItem represents one clickable item in a profile menu dropdown with support for icons, navigation, and custom content.
     /// </summary>
+    /// <remarks>
+    /// Profile menu items are used inside RadzenProfileMenu to create user profile dropdown menus.
+    /// Each item can navigate to a page (via Path), trigger an action (via click event), or display custom content (via Template).
+    /// Common uses in profile menus include:
+    /// - Account settings
+    /// - User profile page
+    /// - Logout/sign out
+    /// - Preferences
+    /// - Help/documentation
+    /// 
+    /// Items support icons, images, text, and custom templates for flexible rendering.
+    /// </remarks>
+    /// <example>
+    /// Profile menu items in a profile menu:
+    /// <code>
+    /// &lt;RadzenProfileMenu&gt;
+    ///     &lt;Template&gt;
+    ///         &lt;RadzenIcon Icon="account_circle" /&gt; John Doe
+    ///     &lt;/Template&gt;
+    ///     &lt;ChildContent&gt;
+    ///         &lt;RadzenProfileMenuItem Text="Profile" Icon="person" Path="/profile" /&gt;
+    ///         &lt;RadzenProfileMenuItem Text="Settings" Icon="settings" Path="/settings" /&gt;
+    ///         &lt;RadzenProfileMenuItem Text="Logout" Icon="logout" Value="logout" /&gt;
+    ///     &lt;/ChildContent&gt;
+    /// &lt;/RadzenProfileMenu&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenProfileMenuItem : RadzenComponent
     {
         /// <inheritdoc />

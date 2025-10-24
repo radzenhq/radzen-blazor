@@ -13,27 +13,45 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenDatePicker component.
+    /// A date and time picker component that provides a calendar popup for selecting dates and optional time selection.
+    /// RadzenDatePicker supports DateTime, DateTime?, DateTimeOffset, DateTimeOffset?, DateOnly, and DateOnly? types with extensive customization options.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <typeparam name="TValue">The type of the date/time value. Supports DateTime, DateTime?, DateTimeOffset, DateTimeOffset?, DateOnly, and DateOnly?.</typeparam>
+    /// <remarks>
+    /// The component displays a text input with a calendar icon button. Clicking opens a popup calendar for date selection.
+    /// Optional time selection can be enabled via ShowTime property, supporting both 12-hour and 24-hour formats.
+    /// The picker supports features like min/max date constraints, disabled dates, initial view configuration, calendar week display,
+    /// inline calendar mode (always visible), time-only mode, multiple date selection, and culture-specific formatting.
+    /// </remarks>
     /// <example>
+    /// Basic date picker:
     /// <code>
-    /// &lt;RadzenDatePicker @bind-Value=@someValue TValue="DateTime" Change=@(args => Console.WriteLine($"Selected date: {args}")) /&gt;
+    /// &lt;RadzenDatePicker @bind-Value=@birthDate TValue="DateTime" Placeholder="Select date" /&gt;
+    /// </code>
+    /// Date and time picker with 12-hour format:
+    /// <code>
+    /// &lt;RadzenDatePicker @bind-Value=@appointmentDate TValue="DateTime" ShowTime="true" TimeOnly="false" HoursStep="1" MinutesStep="15" /&gt;
+    /// </code>
+    /// Date picker with constraints:
+    /// <code>
+    /// &lt;RadzenDatePicker @bind-Value=@selectedDate TValue="DateTime" Min="@DateTime.Today" Max="@DateTime.Today.AddMonths(6)" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenDatePicker<TValue> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>
-        /// Gets or sets a value indicating whether calendar week will be shown.
+        /// Gets or sets whether the calendar week number column should be displayed in the calendar popup.
+        /// When enabled, each week row shows its corresponding week number according to ISO 8601.
         /// </summary>
-        /// <value><c>true</c> if calendar week is shown; otherwise, <c>false</c>.</value>
-
+        /// <value><c>true</c> to show calendar week numbers; otherwise, <c>false</c>. Default is <c>false</c>.</value>
         [Parameter]
         public bool ShowCalendarWeek { get; set; }
 
         /// <summary>
-        /// Enables selecting multiple dates.
+        /// Gets or sets whether multiple dates can be selected.
+        /// When enabled, users can select multiple dates from the calendar, and the value will be a collection of DateTimes.
         /// </summary>
+        /// <value><c>true</c> to enable multiple date selection; otherwise, <c>false</c>. Default is <c>false</c>.</value>
         [Parameter]
         public bool Multiple { get; set; }
 

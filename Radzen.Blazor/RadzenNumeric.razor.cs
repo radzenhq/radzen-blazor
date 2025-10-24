@@ -11,20 +11,36 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenNumeric component.
+    /// A numeric input component that allows users to enter numbers with optional increment/decrement buttons and value constraints.
+    /// RadzenNumeric supports various numeric types, formatting, min/max validation, step increments, and culture-specific number display.
     /// </summary>
-    /// <typeparam name="TValue">The type of the t value.</typeparam>
+    /// <typeparam name="TValue">The numeric type of the value. Supports int, long, short, byte, float, double, decimal and their nullable variants.</typeparam>
+    /// <remarks>
+    /// The component provides up/down arrow buttons for incrementing/decrementing the value by a specified step amount.
+    /// It supports min/max constraints that are enforced during input and stepping, formatted value display using standard .NET format strings,
+    /// and can be configured with or without the up/down buttons. The component handles overflow protection and respects the numeric type's natural limits.
+    /// </remarks>
     /// <example>
+    /// Basic integer numeric input with constraints:
     /// <code>
-    /// &lt;RadzenNumeric TValue="int" Min="1" Max="10" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// &lt;RadzenNumeric @bind-Value=@quantity TValue="int" Min="1" Max="100" Step="1" /&gt;
+    /// </code>
+    /// Decimal input with custom formatting:
+    /// <code>
+    /// &lt;RadzenNumeric @bind-Value=@price TValue="decimal" Min="0" Format="c" Placeholder="Enter price" /&gt;
+    /// </code>
+    /// Nullable numeric without increment buttons:
+    /// <code>
+    /// &lt;RadzenNumeric @bind-Value=@optionalValue TValue="int?" ShowUpDown="false" Placeholder="Optional" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenNumeric<TValue> : FormComponentWithAutoComplete<TValue>
     {
         /// <summary>
-        /// Specifies additional custom attributes that will be rendered by the input.
+        /// Gets or sets additional HTML attributes to be applied to the underlying input element.
+        /// This allows passing custom attributes like data-* attributes, aria-* attributes, or other HTML attributes directly to the input.
         /// </summary>
-        /// <value>The attributes.</value>
+        /// <value>A dictionary of custom HTML attributes.</value>
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 

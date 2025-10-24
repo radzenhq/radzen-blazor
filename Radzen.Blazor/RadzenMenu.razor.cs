@@ -9,31 +9,60 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenMenu component.
+    /// A horizontal menu component with support for nested submenus, icons, and responsive behavior.
+    /// RadzenMenu provides a classic menu bar for navigation, typically used in application headers or toolbars.
     /// </summary>
+    /// <remarks>
+    /// RadzenMenu displays menu items horizontally with dropdown submenus. Key features:
+    /// - **Hierarchy**: Supports multi-level nested menus via RadzenMenuItem child items
+    /// - **Navigation**: Automatic navigation via Path property or custom Click handlers
+    /// - **Icons**: Display icons alongside menu item text
+    /// - **Responsive**: Automatically collapses to a hamburger menu on small screens (configurable)
+    /// - **Interaction**: Click-to-open or hover-to-open modes
+    /// - **Keyboard Navigation**: Arrow keys, Enter, Escape for accessibility
+    /// - **Separators**: Visual separators between menu items
+    /// 
+    /// Use for application navigation bars, command menus, or toolbar-style interfaces.
+    /// Menu items are defined using RadzenMenuItem components as child content.
+    /// </remarks>
     /// <example>
+    /// Basic menu with navigation:
     /// <code>
     /// &lt;RadzenMenu&gt;
+    ///     &lt;RadzenMenuItem Text="Home" Path="/" Icon="home" /&gt;
     ///     &lt;RadzenMenuItem Text="Data"&gt;
-    ///         &lt;RadzenMenuItem Text="Orders" Path="orders" /&gt;
-    ///         &lt;RadzenMenuItem Text="Employees" Path="employees" /&gt;
-    ///     &lt;/RadzenMenuItemItem&gt;
+    ///         &lt;RadzenMenuItem Text="Orders" Path="/orders" /&gt;
+    ///         &lt;RadzenMenuItem Text="Customers" Path="/customers" /&gt;
+    ///     &lt;/RadzenMenuItem&gt;
+    ///     &lt;RadzenMenuItem Text="Reports" Path="/reports" /&gt;
+    /// &lt;/RadzenMenu&gt;
+    /// </code>
+    /// Menu with click handlers:
+    /// <code>
+    /// &lt;RadzenMenu Click=@OnMenuClick&gt;
+    ///     &lt;RadzenMenuItem Text="File"&gt;
+    ///         &lt;RadzenMenuItem Text="New" Value="new" Icon="add" /&gt;
+    ///         &lt;RadzenMenuItem Text="Open" Value="open" Icon="folder_open" /&gt;
+    ///         &lt;RadzenMenuItem Text="Save" Value="save" Icon="save" /&gt;
+    ///     &lt;/RadzenMenuItem&gt;
     /// &lt;/RadzenMenu&gt;
     /// </code>
     /// </example>
     public partial class RadzenMenu : RadzenComponentWithChildren
     {
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenMenu"/> is responsive.
+        /// Gets or sets whether the menu should automatically collapse to a hamburger menu on small screens.
+        /// When enabled, displays a toggle button that expands/collapses the menu on mobile devices.
         /// </summary>
-        /// <value><c>true</c> if responsive; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> to enable responsive behavior with hamburger menu; <c>false</c> for always-horizontal menu. Default is <c>true</c>.</value>
         [Parameter]
         public bool Responsive { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="RadzenMenu"/> should open item on click or on hover.
+        /// Gets or sets the interaction mode for opening submenus.
+        /// When true, submenus open on click. When false, submenus open on hover (desktop) and click (touch devices).
         /// </summary>
-        /// <value><c>true</c> if open item on click; otherwise, <c>false</c> and items will open on hover.</value>
+        /// <value><c>true</c> to open on click; <c>false</c> to open on hover. Default is <c>true</c>.</value>
         [Parameter]
         public bool ClickToOpen { get; set; } = true;
 

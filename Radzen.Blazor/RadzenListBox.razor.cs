@@ -8,12 +8,33 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenListBox component.
+    /// A list box component that displays a scrollable list of items with single or multiple selection support.
+    /// RadzenListBox provides an always-visible alternative to dropdowns, ideal for showing multiple options without requiring a popup.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TValue">The type of the selected value. Can be a single value or IEnumerable for multiple selection.</typeparam>
+    /// <remarks>
+    /// ListBox displays all items in a scrollable container, making all options visible at once (unlike dropdowns which hide options in a popup).
+    /// The component supports:
+    /// - **Selection Modes**: Single selection (default) or multiple selection via Multiple property
+    /// - **Filtering**: Built-in search/filter with configurable operators and case sensitivity
+    /// - **Data Binding**: Bind to any IEnumerable data source with TextProperty and ValueProperty
+    /// - **Templates**: Custom item templates for rich list item content
+    /// - **Virtualization**: Efficient rendering of large lists via IQueryable support
+    /// - **Select All**: Optional "Select All" checkbox for multiple selection mode
+    /// - **Keyboard Navigation**: Arrow keys, Page Up/Down, Home/End for accessibility
+    /// 
+    /// Use when you want to show all available options without requiring clicks to open a dropdown,
+    /// or when multiple selection is needed and checkboxes would take too much space.
+    /// </remarks>
     /// <example>
+    /// Basic list box:
     /// <code>
-    /// &lt;RadzenListBox @bind-Value=@customerID TValue="string" Data=@customers TextProperty="CompanyName" ValueProperty="CustomerID" Change=@(args => Console.WriteLine($"Selected CustomerID: {args}")) /&gt;
+    /// &lt;RadzenListBox @bind-Value=@selectedId TValue="int" Data=@countries TextProperty="Name" ValueProperty="Id" Style="height: 300px;" /&gt;
+    /// </code>
+    /// Multiple selection with Select All:
+    /// <code>
+    /// &lt;RadzenListBox @bind-Value=@selectedIds TValue="IEnumerable&lt;int&gt;" Multiple="true" SelectAllText="Select All"
+    ///                 Data=@items TextProperty="Name" ValueProperty="Id" Style="height: 400px;" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenListBox<TValue> : DropDownBase<TValue>

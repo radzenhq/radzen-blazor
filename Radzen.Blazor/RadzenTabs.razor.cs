@@ -9,65 +9,100 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenTabs component.
+    /// A tabbed interface component that organizes content into multiple panels with clickable tabs for navigation.
+    /// RadzenTabs allows users to switch between different views or sections without navigating away from the page.
     /// </summary>
+    /// <remarks>
+    /// RadzenTabs provides a container for RadzenTabsItem components, each representing one tab and its associated content panel.
+    /// The component supports:
+    /// - **Tab Positioning**: Tabs can be positioned at Top, Bottom, Left, Right, TopRight, or BottomRight
+    /// - **Render Modes**: Server-side rendering (default) or client-side rendering for improved interactivity
+    /// - **Selection**: Programmatic selection via SelectedIndex with two-way binding
+    /// - **Events**: Change event fires when tabs are switched
+    /// - **Dynamic Tabs**: Add or remove tabs programmatically using AddTab() and RemoveItem()
+    /// - **Keyboard Navigation**: Arrow keys, Home, End, Space, and Enter for accessibility
+    /// - **Disabled Tabs**: Individual tabs can be disabled to prevent selection
+    /// 
+    /// Use Server render mode for standard Blazor rendering, or Client mode for faster tab switching with JavaScript.
+    /// </remarks>
     /// <example>
+    /// Basic tabs with server-side rendering:
     /// <code>
-    /// &lt;RadzenTabs RenderMode="TabRenderMode.Client" Change=@(args => Console.WriteLine($"Selected index is: {args}"))&gt;
+    /// &lt;RadzenTabs&gt;
     ///     &lt;Tabs&gt;
     ///         &lt;RadzenTabsItem Text="Orders"&gt;
-    ///             Details for Orders
+    ///             Order list and details...
     ///         &lt;/RadzenTabsItem&gt;
-    ///         &lt;RadzenTabsItem Text="Employees"&gt;
-    ///             Details for Employees
+    ///         &lt;RadzenTabsItem Text="Customers"&gt;
+    ///             Customer information...
     ///         &lt;/RadzenTabsItem&gt;
     ///     &lt;/Tabs&gt;
     /// &lt;/RadzenTabs&gt;
+    /// </code>
+    /// Tabs with client-side rendering and change event:
+    /// <code>
+    /// &lt;RadzenTabs RenderMode="TabRenderMode.Client" @bind-SelectedIndex=@selectedTab Change=@OnTabChange&gt;
+    ///     &lt;Tabs&gt;
+    ///         &lt;RadzenTabsItem Text="Tab 1" Icon="home"&gt;Content 1&lt;/RadzenTabsItem&gt;
+    ///         &lt;RadzenTabsItem Text="Tab 2" Icon="settings" Disabled="true"&gt;Content 2&lt;/RadzenTabsItem&gt;
+    ///     &lt;/Tabs&gt;
+    /// &lt;/RadzenTabs&gt;
+    /// @code {
+    ///     int selectedTab = 0;
+    ///     void OnTabChange(int index) => Console.WriteLine($"Selected tab: {index}");
+    /// }
     /// </code>
     /// </example>
     public partial class RadzenTabs : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the render mode.
+        /// Gets or sets the rendering mode that determines how tab content is rendered and switched.
+        /// Server mode re-renders on the server when tabs change, while Client mode uses JavaScript for instant switching.
         /// </summary>
-        /// <value>The render mode.</value>
+        /// <value>The tab render mode. Default is <see cref="TabRenderMode.Server"/>.</value>
         [Parameter]
         public TabRenderMode RenderMode { get; set; } = TabRenderMode.Server;
 
         /// <summary>
-        /// Gets or sets the tab position.
+        /// Gets or sets the visual position of the tab headers relative to the content panels.
+        /// Controls the layout direction and can position tabs at Top, Bottom, Left, Right, TopRight, or BottomRight of the content.
         /// </summary>
-        /// <value>The tab position.</value>
+        /// <value>The tab position. Default is <see cref="TabPosition.Top"/>.</value>
         [Parameter]
         public TabPosition TabPosition { get; set; } = TabPosition.Top;
 
         /// <summary>
-        /// Gets or sets the selected index.
+        /// Gets or sets the zero-based index of the currently selected tab.
+        /// Use with @bind-SelectedIndex for two-way binding to track and control the active tab.
+        /// Set to -1 for no selection (though typically the first tab is selected automatically).
         /// </summary>
-        /// <value>The selected index.</value>
+        /// <value>The selected tab index. Default is -1 (auto-select first tab).</value>
         [Parameter]
         public int SelectedIndex { get; set; } = -1;
 
         private int selectedIndex = -1;
 
         /// <summary>
-        /// Gets or sets the selected index changed callback.
+        /// Gets or sets the callback invoked when the selected tab index changes.
+        /// Used for two-way binding with @bind-SelectedIndex.
         /// </summary>
-        /// <value>The selected index changed callback.</value>
+        /// <value>The event callback receiving the new selected index.</value>
         [Parameter]
         public EventCallback<int> SelectedIndexChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets the change callback.
+        /// Gets or sets the callback invoked when the user switches to a different tab.
+        /// Provides the index of the newly selected tab. Use this for side effects or logging.
         /// </summary>
-        /// <value>The change callback.</value>
+        /// <value>The change event callback receiving the selected tab index.</value>
         [Parameter]
         public EventCallback<int> Change { get; set; }
 
         /// <summary>
-        /// Gets or sets the tabs.
+        /// Gets or sets the render fragment containing RadzenTabsItem components that define the tabs.
+        /// Each RadzenTabsItem represents one tab with its header and content.
         /// </summary>
-        /// <value>The tabs.</value>
+        /// <value>The tabs render fragment containing tab definitions.</value>
         [Parameter]
         public RenderFragment Tabs { get; set; }
 

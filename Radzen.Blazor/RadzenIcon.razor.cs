@@ -3,32 +3,62 @@
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenIcon component. Displays icon from Material Symbols variable font.
+    /// An icon component that displays icons from the Material Symbols font (2,500+ icons included).
+    /// RadzenIcon provides a simple way to add scalable vector icons to your Blazor application without external dependencies.
     /// </summary>
+    /// <remarks>
+    /// RadzenIcon uses the embedded Material Symbols Outlined variable font to render icons as text glyphs.
+    /// This approach provides several benefits:
+    /// - **No Image Files**: Icons are part of the font, no HTTP requests for icon files
+    /// - **Scalability**: Vector-based icons scale perfectly at any size
+    /// - **Customization**: Icons inherit text color and can be colored via IconColor or CSS
+    /// - **Variety**: Access to 2,500+ Material Symbols icons
+    /// - **Styles**: Supports Outlined (default), Filled, Rounded, and Sharp variants via IconStyle
+    /// 
+    /// Icon names use underscores (e.g., "home", "account_circle", "check_circle").
+    /// See Material Symbols documentation for the full icon list.
+    /// </remarks>
     /// <example>
+    /// Basic icon:
     /// <code>
-    /// &lt;RadzenIcon Icon="3d_rotation" /&gt;
+    /// &lt;RadzenIcon Icon="home" /&gt;
+    /// </code>
+    /// Colored icon with custom style:
+    /// <code>
+    /// &lt;RadzenIcon Icon="favorite" IconColor="#FF0000" IconStyle="IconStyle.Filled" Style="font-size: 2rem;" /&gt;
+    /// </code>
+    /// Icons in buttons:
+    /// <code>
+    /// &lt;RadzenButton Icon="save" Text="Save" /&gt;
+    /// &lt;RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenIcon : RadzenComponent
     {
         /// <summary>
-        /// Gets or sets the icon.
+        /// Gets or sets the Material Symbols icon name to display.
+        /// Use icon names with underscores (e.g., "home", "settings", "account_circle", "check_circle").
+        /// See the Material Symbols icon library for available names.
         /// </summary>
-        /// <value>The icon.</value>
+        /// <value>The Material icon name.</value>
         [Parameter]
         public string Icon { get; set; }
 
         /// <summary>
-        /// Gets or sets the icon color.
+        /// Gets or sets a custom color for the icon.
+        /// Supports any valid CSS color value (e.g., "#FF0000", "rgb(255, 0, 0)", "var(--primary-color)").
+        /// If not set, the icon inherits the current text color from its parent.
         /// </summary>
-        /// <value>The icon color.</value>
+        /// <value>The icon color as a CSS color value.</value>
         [Parameter]
         public string IconColor { get; set; }
 
         /// <summary>
-        /// Specifies the display style of the icon.
+        /// Gets or sets the visual style variant of the icon.
+        /// Material Symbols supports different styles: Outlined (default), Filled, Rounded, and Sharp.
+        /// The style affects the icon's visual appearance (e.g., Filled icons have solid shapes vs. outlined strokes).
         /// </summary>
+        /// <value>The icon style variant, or null to use the default Outlined style.</value>
         [Parameter]
         public IconStyle? IconStyle { get; set; }
 

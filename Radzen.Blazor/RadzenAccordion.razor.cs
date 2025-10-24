@@ -9,18 +9,45 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenAccordion component.
+    /// An accordion component that displays collapsible content panels with only one or multiple panels expanded at a time.
+    /// RadzenAccordion organizes content into expandable sections, saving vertical space while keeping all content accessible.
     /// </summary>
+    /// <remarks>
+    /// Accordions are ideal for FAQs, settings panels, grouped content, or any scenario where showing all content at once would be overwhelming.
+    /// The component features:
+    /// - **Single/Multiple Expand**: Control whether one or multiple items can be expanded simultaneously
+    /// - **Icons**: Optional icons in panel headers
+    /// - **Programmatic Control**: Use SelectedIndex for two-way binding to control which item is expanded
+    /// - **Events**: Expand and Collapse callbacks for tracking state changes
+    /// - **Keyboard Navigation**: Arrow keys, Space/Enter, Home/End for accessibility
+    /// - **Disabled Items**: Individual accordion items can be disabled to prevent expansion
+    /// 
+    /// By default, only one panel can be expanded at a time (Multiple = false).
+    /// Set Multiple = true to allow multiple panels to be expanded simultaneously.
+    /// </remarks>
     /// <example>
+    /// Basic accordion (single expand mode):
     /// <code>
     /// &lt;RadzenAccordion&gt;
     ///     &lt;Items&gt;
-    ///         &lt;RadzenAccordionItem Text="Orders" Icon="account_balance_wallet"&gt;
-    ///             Details for Orders
+    ///         &lt;RadzenAccordionItem Text="Personal Information" Icon="person"&gt;
+    ///             Name, email, address fields...
     ///         &lt;/RadzenAccordionItem&gt;
-    ///         &lt;RadzenAccordionItem Text="Employees" Icon="account_box"&gt;
-    ///             Details for Employees
+    ///         &lt;RadzenAccordionItem Text="Account Settings" Icon="settings"&gt;
+    ///             Password, preferences, notifications...
     ///         &lt;/RadzenAccordionItem&gt;
+    ///         &lt;RadzenAccordionItem Text="Billing" Icon="payment"&gt;
+    ///             Payment methods, invoices...
+    ///         &lt;/RadzenAccordionItem&gt;
+    ///     &lt;/Items&gt;
+    /// &lt;/RadzenAccordion&gt;
+    /// </code>
+    /// Accordion with multiple expand and events:
+    /// <code>
+    /// &lt;RadzenAccordion Multiple="true" Expand=@OnExpand Collapse=@OnCollapse&gt;
+    ///     &lt;Items&gt;
+    ///         &lt;RadzenAccordionItem Text="FAQ 1" Selected="true"&gt;Answer 1&lt;/RadzenAccordionItem&gt;
+    ///         &lt;RadzenAccordionItem Text="FAQ 2"&gt;Answer 2&lt;/RadzenAccordionItem&gt;
     ///     &lt;/Items&gt;
     /// &lt;/RadzenAccordion&gt;
     /// </code>
@@ -34,44 +61,52 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether multiple items can be expanded.
+        /// Gets or sets whether multiple accordion items can be expanded simultaneously.
+        /// When false (default), expanding one item automatically collapses others.
+        /// When true, users can expand multiple items independently.
         /// </summary>
-        /// <value><c>true</c> if multiple items can be expanded; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> to allow multiple items expanded; <c>false</c> for single-item expansion. Default is <c>false</c>.</value>
         [Parameter]
         public bool Multiple { get; set; }
 
         /// <summary>
-        /// Gets or sets the index of the selected item.
+        /// Gets or sets the zero-based index of the currently expanded item.
+        /// Use with @bind-SelectedIndex for two-way binding to programmatically control which item is expanded.
+        /// In multiple expand mode, this represents the last expanded item.
         /// </summary>
-        /// <value>The index of the selected item.</value>
+        /// <value>The selected item index. Default is -1 (no selection).</value>
         [Parameter]
         public int SelectedIndex { get; set; }
 
         /// <summary>
-        /// Gets or sets the value changed.
+        /// Gets or sets the callback invoked when the selected index changes.
+        /// Used for two-way binding with @bind-SelectedIndex.
         /// </summary>
-        /// <value>The value changed.</value>
+        /// <value>The event callback receiving the new selected index.</value>
         [Parameter]
         public EventCallback<int> SelectedIndexChanged { get; set; }
 
         /// <summary>
-        /// Gets or sets a callback raised when the item is expanded.
+        /// Gets or sets the callback invoked when an accordion item is expanded.
+        /// Receives the index of the expanded item as a parameter.
         /// </summary>
-        /// <value>The expand.</value>
+        /// <value>The expand event callback.</value>
         [Parameter]
         public EventCallback<int> Expand { get; set; }
 
         /// <summary>
-        /// Gets or sets a callback raised when the item is collapsed.
+        /// Gets or sets the callback invoked when an accordion item is collapsed.
+        /// Receives the index of the collapsed item as a parameter.
         /// </summary>
-        /// <value>The collapse.</value>
+        /// <value>The collapse event callback.</value>
         [Parameter]
         public EventCallback<int> Collapse { get; set; }
 
         /// <summary>
-        /// Gets or sets the items.
+        /// Gets or sets the render fragment containing RadzenAccordionItem components that define the accordion panels.
+        /// Each RadzenAccordionItem represents one expandable panel with its header and content.
         /// </summary>
-        /// <value>The items.</value>
+        /// <value>The items render fragment containing accordion item definitions.</value>
         [Parameter]
         public RenderFragment Items { get; set; }
 

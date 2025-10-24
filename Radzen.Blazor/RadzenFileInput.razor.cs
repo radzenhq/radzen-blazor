@@ -10,12 +10,42 @@ using System.Linq;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenFileInput component.
+    /// A file input component that reads selected files and binds their content as base64 strings or byte arrays.
+    /// RadzenFileInput provides client-side file reading without server upload, ideal for form fields or immediate file processing.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TValue">The type of the bound value. Use string for base64-encoded content or byte[] for binary data.</typeparam>
+    /// <remarks>
+    /// Unlike RadzenUpload which sends files to a server, FileInput reads files on the client and binds the content to a property.
+    /// This is useful for:
+    /// - **Form Integration**: Include file content in form models without separate upload
+    /// - **Client-Side Processing**: Process files in browser (image preview, parsing, etc.)
+    /// - **Embedded Storage**: Store file content in database as base64 or binary
+    /// - **No Server Upload**: Avoid server-side upload endpoints when file content is part of form data
+    /// 
+    /// The component reads the selected file and binds it as:
+    /// - **TValue = string**: Base64-encoded data URL (e.g., "data:image/png;base64,iVBORw0K...")
+    /// - **TValue = byte[]**: Raw binary file content
+    /// 
+    /// For image files, the component automatically shows a preview. Use MaxFileSize to limit file size.
+    /// </remarks>
     /// <example>
+    /// File input binding to string (base64):
     /// <code>
-    /// &lt;RadzenFileInput @bind-Value=@employee.Photo TValue="string" Change=@(args => Console.WriteLine($"File content as base64 string: {args}")) /&gt;
+    /// &lt;RadzenFileInput @bind-Value=@model.PhotoData TValue="string" /&gt;
+    /// @code {
+    ///     class Employee
+    ///     {
+    ///         public string PhotoData { get; set; } // Contains base64 image data
+    ///     }
+    ///     Employee model = new Employee();
+    /// }
+    /// </code>
+    /// File input binding to byte array:
+    /// <code>
+    /// &lt;RadzenFileInput @bind-Value=@fileContent TValue="byte[]" Accept="image/*" MaxFileSize="2000000" /&gt;
+    /// @code {
+    ///     byte[] fileContent;
+    /// }
     /// </code>
     /// </example>
     public partial class RadzenFileInput<TValue> : FormComponent<TValue>

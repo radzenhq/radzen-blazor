@@ -6,21 +6,54 @@ using System.Collections.Generic;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenCard component.
+    /// A flexbox row container component that horizontally arranges RadzenColumn components in a responsive 12-column grid layout.
+    /// RadzenRow provides gap spacing, alignment, and justification controls for creating flexible, responsive page layouts.
     /// </summary>
+    /// <remarks>
+    /// RadzenRow serves as a container for RadzenColumn components, creating a horizontal flexbox layout.
+    /// Columns within a row automatically wrap to the next line when their combined Size values exceed 12.
+    /// The row supports:
+    /// - **Gap Control**: Gap and RowGap properties for spacing between columns and wrapped rows
+    /// - **Alignment**: AlignItems for vertical alignment (start, center, end, stretch, baseline)
+    /// - **Justification**: JustifyContent for horizontal distribution (start, center, end, space-between, space-around)
+    /// - **Responsive**: Works seamlessly with RadzenColumn's breakpoint-specific sizing
+    /// 
+    /// Use AlignItems and JustifyContent from the base RadzenFlexComponent to control layout behavior.
+    /// </remarks>
+    /// <example>
+    /// Basic row with columns and gap:
+    /// <code>
+    /// &lt;RadzenRow Gap="1rem"&gt;
+    ///     &lt;RadzenColumn Size="4"&gt;Column 1&lt;/RadzenColumn&gt;
+    ///     &lt;RadzenColumn Size="4"&gt;Column 2&lt;/RadzenColumn&gt;
+    ///     &lt;RadzenColumn Size="4"&gt;Column 3&lt;/RadzenColumn&gt;
+    /// &lt;/RadzenRow&gt;
+    /// </code>
+    /// Row with alignment and justification:
+    /// <code>
+    /// &lt;RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.SpaceBetween" Gap="2rem"&gt;
+    ///     &lt;RadzenColumn Size="3"&gt;Left&lt;/RadzenColumn&gt;
+    ///     &lt;RadzenColumn Size="3"&gt;Right&lt;/RadzenColumn&gt;
+    /// &lt;/RadzenRow&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenRow : RadzenFlexComponent
     {
         /// <summary>
-        /// Gets or sets the gap.
+        /// Gets or sets the spacing between columns within the row.
+        /// Accepts CSS length values (e.g., "1rem", "16px", "2em") or unitless numbers (interpreted as pixels).
+        /// This sets the horizontal gap between column elements.
         /// </summary>
-        /// <value>The gap.</value>
+        /// <value>The gap spacing as a CSS length value. Default is null (no gap).</value>
         [Parameter]
         public string Gap { get; set; }
 
         /// <summary>
-        /// Gets or sets the row gap.
+        /// Gets or sets the vertical spacing between wrapped rows when columns wrap to multiple lines.
+        /// Accepts CSS length values (e.g., "1rem", "16px", "2em") or unitless numbers (interpreted as pixels).
+        /// Only applicable when columns wrap due to exceeding the 12-column limit.
         /// </summary>
-        /// <value>The row gap.</value>
+        /// <value>The row gap spacing as a CSS length value. Default is null (no row gap).</value>
         [Parameter]
         public string RowGap { get; set; }
 

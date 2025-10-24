@@ -7,27 +7,44 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenCheckBox component.
+    /// A checkbox input component that supports two-state (checked/unchecked) or tri-state (checked/unchecked/indeterminate) modes.
+    /// RadzenCheckBox provides data binding, validation, and keyboard accessibility for boolean or nullable boolean values.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
+    /// <typeparam name="TValue">The type of the bound value. Typically bool for two-state or bool? for tri-state checkboxes.</typeparam>
+    /// <remarks>
+    /// In two-state mode, the value toggles between true and false.
+    /// In tri-state mode (<see cref="TriState"/> = true), the value cycles through false → null → true → false.
+    /// The component supports keyboard interaction (Space/Enter to toggle) and integrates with Blazor EditContext for form validation.
+    /// </remarks>
     /// <example>
+    /// Basic two-state checkbox:
     /// <code>
-    /// &lt;RadzenCheckBox @bind-Value=@someValue TValue="bool" Change=@(args => Console.WriteLine($"Is checked: {args}")) /&gt;
+    /// &lt;RadzenCheckBox @bind-Value=@isChecked TValue="bool" /&gt;
+    /// </code>
+    /// Tri-state checkbox with change handler:
+    /// <code>
+    /// &lt;RadzenCheckBox @bind-Value=@nullableBool TValue="bool?" TriState="true" Change=@(args => Console.WriteLine($"Value: {args}")) /&gt;
+    /// </code>
+    /// Read-only checkbox for display purposes:
+    /// <code>
+    /// &lt;RadzenCheckBox Value=@isEnabled TValue="bool" ReadOnly="true" /&gt;
     /// </code>
     /// </example>
     public partial class RadzenCheckBox<TValue> : FormComponent<TValue>
     {
         /// <summary>
-        /// Specifies additional custom attributes that will be rendered by the input.
+        /// Gets or sets additional HTML attributes to be applied to the underlying input element.
+        /// This allows passing custom attributes like data-* attributes, aria-* attributes, or other HTML attributes directly to the input.
         /// </summary>
-        /// <value>The attributes.</value>
+        /// <value>A dictionary of custom HTML attributes.</value>
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether is tri-state (true, false or null).
+        /// Gets or sets whether the checkbox supports three states: checked (true), unchecked (false), and indeterminate (null).
+        /// When enabled, clicking cycles through all three states. Use with nullable boolean (<c>bool?</c>) values.
         /// </summary>
-        /// <value><c>true</c> if tri-state; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> to enable tri-state mode; <c>false</c> for standard two-state mode. Default is <c>false</c>.</value>
         [Parameter]
         public bool TriState { get; set; } = false;
 
@@ -57,9 +74,11 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether is read only.
+        /// Gets or sets whether the checkbox is read-only and cannot be toggled by user interaction.
+        /// When true, the checkbox displays its current state but prevents clicking or keyboard toggling.
+        /// Useful for displaying checkbox state in view-only scenarios.
         /// </summary>
-        /// <value><c>true</c> if is read only; otherwise, <c>false</c>.</value>
+        /// <value><c>true</c> if the checkbox is read-only; otherwise, <c>false</c>. Default is <c>false</c>.</value>
         [Parameter]
         public bool ReadOnly { get; set; }
 

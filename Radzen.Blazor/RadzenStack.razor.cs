@@ -6,35 +6,77 @@ using System.Text;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// RadzenStack component.
+    /// A flexbox container component that arranges child elements in a vertical or horizontal stack with configurable spacing and alignment.
+    /// RadzenStack provides a simpler alternative to RadzenRow/RadzenColumn for linear layouts without the 12-column grid constraint.
     /// </summary>
+    /// <remarks>
+    /// RadzenStack is ideal for creating simple vertical or horizontal layouts without needing a grid system.
+    /// Unlike RadzenRow/RadzenColumn which uses a 12-column grid, Stack arranges children linearly with equal spacing.
+    /// Key features:
+    /// - **Orientation**: Vertical (column) or Horizontal (row) layout
+    /// - **Gap**: Consistent spacing between child elements
+    /// - **Alignment**: AlignItems for cross-axis alignment, JustifyContent for main-axis distribution
+    /// - **Reverse**: Option to reverse the order of children
+    /// - **Wrap**: Control whether children wrap to new lines or stay in a single line
+    /// 
+    /// Use for simpler layouts like button groups, form field stacks, or toolbar arrangements.
+    /// </remarks>
+    /// <example>
+    /// Vertical stack with gap spacing:
+    /// <code>
+    /// &lt;RadzenStack Gap="1rem"&gt;
+    ///     &lt;RadzenText&gt;First item&lt;/RadzenText&gt;
+    ///     &lt;RadzenText&gt;Second item&lt;/RadzenText&gt;
+    ///     &lt;RadzenText&gt;Third item&lt;/RadzenText&gt;
+    /// &lt;/RadzenStack&gt;
+    /// </code>
+    /// Horizontal button group:
+    /// <code>
+    /// &lt;RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" JustifyContent="JustifyContent.End"&gt;
+    ///     &lt;RadzenButton Text="Cancel" /&gt;
+    ///     &lt;RadzenButton Text="Save" ButtonStyle="ButtonStyle.Primary" /&gt;
+    /// &lt;/RadzenStack&gt;
+    /// </code>
+    /// Centered content with wrapping:
+    /// <code>
+    /// &lt;RadzenStack Orientation="Orientation.Horizontal" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center" Gap="2rem"&gt;
+    ///     @* Child elements *@
+    /// &lt;/RadzenStack&gt;
+    /// </code>
+    /// </example>
     public partial class RadzenStack : RadzenFlexComponent
     {
         /// <summary>
-        /// Gets or sets the wrap.
+        /// Gets or sets the flex wrap behavior controlling whether child elements wrap to new lines when they don't fit.
+        /// NoWrap keeps all children on one line (may cause overflow), Wrap allows wrapping to multiple lines.
         /// </summary>
-        /// <value>The wrap.</value>
+        /// <value>The flex wrap mode. Default is <see cref="FlexWrap.NoWrap"/>.</value>
         [Parameter]
         public FlexWrap Wrap { get; set; } = FlexWrap.NoWrap;
 
         /// <summary>
-        /// Gets or sets the orientation.
+        /// Gets or sets the stack direction: Vertical arranges children top-to-bottom, Horizontal arranges left-to-right.
+        /// This determines the main axis direction for the flexbox layout.
         /// </summary>
-        /// <value>The orientation.</value>
+        /// <value>The stack orientation. Default is <see cref="Orientation.Vertical"/>.</value>
         [Parameter]
         public Orientation Orientation { get; set; } = Orientation.Vertical;
 
         /// <summary>
-        /// Gets or sets the spacing
+        /// Gets or sets the spacing between child elements in the stack.
+        /// Accepts CSS length values (e.g., "1rem", "16px", "2em") or unitless numbers (interpreted as pixels).
+        /// The gap applies uniformly between all adjacent children.
         /// </summary>
-        /// <value>The spacing.</value>
+        /// <value>The gap spacing as a CSS length value. Default is null (no gap).</value>
         [Parameter]
         public string Gap { get; set; }
 
         /// <summary>
-        /// Gets or sets the reverse
+        /// Gets or sets whether to reverse the display order of child elements.
+        /// When true, children are displayed in reverse order (bottom-to-top for vertical, right-to-left for horizontal).
+        /// Useful for visual reordering without changing markup order.
         /// </summary>
-        /// <value>The reverse.</value>
+        /// <value><c>true</c> to reverse child order; otherwise, <c>false</c>. Default is <c>false</c>.</value>
         [Parameter]
         public bool Reverse { get; set; }
 

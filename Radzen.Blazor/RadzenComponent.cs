@@ -8,46 +8,73 @@ using Microsoft.JSInterop;
 namespace Radzen
 {
     /// <summary>
-    ///   Base class of Radzen Blazor components.
+    /// Base class for all Radzen Blazor components providing common functionality for styling, attributes, events, and lifecycle management.
+    /// All Radzen components inherit from RadzenComponent to gain standard features like visibility control, custom attributes, mouse events, and disposal.
     /// </summary>
+    /// <remarks>
+    /// RadzenComponent provides foundational functionality shared across all Radzen components:
+    /// - **Visibility**: Control component visibility via Visible property
+    /// - **Styling**: Apply custom CSS via Style property and class via Attributes
+    /// - **Custom Attributes**: Pass any HTML attribute via unmatched parameters
+    /// - **Mouse Events**: MouseEnter, MouseLeave, ContextMenu callbacks
+    /// - **Culture**: Localization support for numbers, dates, and text
+    /// - **Element Reference**: Access to the rendered HTML element
+    /// - **Disposal**: Proper cleanup via IDisposable pattern
+    /// 
+    /// Components inheriting from RadzenComponent can override GetComponentCssClass() to provide their base CSS classes
+    /// and use the protected Visible property to control rendering.
+    /// </remarks>
     public class RadzenComponent : ComponentBase, IDisposable
     {
         /// <summary>
-        /// Specifies additional custom attributes that will be rendered by the component.
+        /// Gets or sets a dictionary of additional HTML attributes that will be applied to the component's root element.
+        /// Any attributes not explicitly defined as parameters will be captured here and rendered on the element.
+        /// Use this to add data-* attributes, ARIA attributes, or any custom HTML attributes.
         /// </summary>
-        /// <value>The attributes.</value>
+        /// <value>The unmatched attributes dictionary.</value>
         [Parameter(CaptureUnmatchedValues = true)]
         public IReadOnlyDictionary<string, object> Attributes { get; set; }
 
         /// <summary>
-        /// Gets a reference to the HTML element rendered by the component.
+        /// Gets a reference to the HTML element rendered by this component.
+        /// Can be used with JavaScript interop or for programmatic DOM manipulation.
+        /// The reference is only valid after the component has been rendered (after OnAfterRender).
         /// </summary>
+        /// <value>The element reference to the rendered HTML element.</value>
         public ElementReference Element { get; protected internal set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user hovers the component. Commonly used to display a tooltip via 
-        /// <see cref="TooltipService.Open(ElementReference, string, TooltipOptions)" />.
+        /// Gets or sets the callback invoked when the mouse pointer enters the component's bounds.
+        /// Commonly used with <see cref="TooltipService"/> to display tooltips on hover.
+        /// Receives the component's ElementReference as a parameter.
         /// </summary>
+        /// <value>The mouse enter event callback.</value>
         [Parameter]
         public EventCallback<ElementReference> MouseEnter { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user moves the mouse out of the component. Commonly used to hide a tooltip via 
-        /// <see cref="TooltipService.Close" />.
+        /// Gets or sets the callback invoked when the mouse pointer leaves the component's bounds.
+        /// Commonly used with <see cref="TooltipService"/> to hide tooltips when hover ends.
+        /// Receives the component's ElementReference as a parameter.
         /// </summary>
+        /// <value>The mouse leave event callback.</value>
         [Parameter]
         public EventCallback<ElementReference> MouseLeave { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user right-clicks the component. Commonly used to display a context menu via 
-        /// <see cref="ContextMenuService.Open(Microsoft.AspNetCore.Components.Web.MouseEventArgs, IEnumerable{ContextMenuItem}, Action{MenuItemEventArgs})" />.
+        /// Gets or sets the callback invoked when the user right-clicks the component.
+        /// Commonly used with <see cref="ContextMenuService"/> to display context menus.
+        /// Receives mouse event arguments containing click position.
         /// </summary>
+        /// <value>The context menu (right-click) event callback.</value>
         [Parameter]
         public EventCallback<Microsoft.AspNetCore.Components.Web.MouseEventArgs> ContextMenu { get; set; }
 
         /// <summary>
-        /// Gets or sets the culture used to display localizable data (numbers, dates). Set by default to <see cref="CultureInfo.CurrentCulture" />.
+        /// Gets or sets the culture used for formatting and parsing localizable data (numbers, dates, currency).
+        /// If not set, uses the <see cref="DefaultCulture"/> from a parent component or falls back to <see cref="CultureInfo.CurrentCulture"/>.
         /// </summary>
+        /// <value>The culture for localization. Default is <see cref="CultureInfo.CurrentCulture"/>.</value>
         [Parameter]
         public CultureInfo Culture
         {
@@ -56,8 +83,11 @@ namespace Radzen
         }
 
         /// <summary>
-        /// Gets or sets the culture set by a parent component.
+        /// Gets or sets the default culture cascaded from a parent component.
+        /// This allows setting a culture at the layout level that applies to all child Radzen components.
+        /// Child components can override this by setting their own Culture property.
         /// </summary>
+        /// <value>The cascaded default culture.</value>
         [CascadingParameter(Name = nameof(DefaultCulture))]
         public CultureInfo DefaultCulture { get; set; }
 

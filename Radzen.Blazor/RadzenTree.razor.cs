@@ -11,25 +11,48 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// A component which displays a hierarchy of items. Supports inline definition and data-binding.
+    /// A hierarchical tree view component for displaying nested data structures with expand/collapse functionality.
+    /// RadzenTree supports both inline item definition and data-binding for displaying file systems, organization charts, category hierarchies, or any tree-structured data.
     /// </summary>
+    /// <remarks>
+    /// Trees organize data in a parent-child hierarchy where items can be expanded to reveal children.
+    /// The component supports:
+    /// - **Static Definition**: Declare tree structure using nested RadzenTreeItem components
+    /// - **Data Binding**: Bind to hierarchical data using RadzenTreeLevel components
+    /// - **Selection**: Single or multiple item selection with checkboxes
+    /// - **Expand/Collapse**: Individual item or programmatic expand/collapse control
+    /// - **Icons**: Custom icons per item or data-bound icon properties
+    /// - **Templates**: Custom rendering for tree items
+    /// - **Keyboard Navigation**: Arrow keys, Space/Enter, Home/End for accessibility
+    /// - **Events**: Change, Expand, and selection events
+    /// 
+    /// For data binding, use RadzenTreeLevel to define how to render each hierarchy level from your data model.
+    /// For checkbox selection, use AllowCheckBoxes and bind to CheckedValues.
+    /// </remarks>
     /// <example>
-    ///   <code>
+    /// Static tree with inline items:
+    /// <code>
     /// &lt;RadzenTree&gt;
-    ///     &lt;RadzenTreeItem Text="BMW"&gt;
-    ///         &lt;RadzenTreeItem Text="M3" /&gt;
-    ///         &lt;RadzenTreeItem Text="M5" /&gt;
-    ///     &lt;/RadzenTreeItem&gt;
-    ///     &lt;RadzenTreeItem Text="Audi"&gt;
-    ///         &lt;RadzenTreeItem Text="RS4" /&gt;
-    ///         &lt;RadzenTreeItem Text="RS6" /&gt;
-    ///     &lt;/RadzenTreeItem&gt;
-    ///     &lt;RadzenTreeItem Text="Mercedes"&gt;
-    ///         &lt;RadzenTreeItem Text="C63 AMG" /&gt;
-    ///         &lt;RadzenTreeItem Text="S63 AMG" /&gt;
+    ///     &lt;RadzenTreeItem Text="Documents" Icon="folder"&gt;
+    ///         &lt;RadzenTreeItem Text="Work" Icon="folder"&gt;
+    ///             &lt;RadzenTreeItem Text="report.pdf" Icon="description" /&gt;
+    ///         &lt;/RadzenTreeItem&gt;
+    ///         &lt;RadzenTreeItem Text="Personal" Icon="folder"&gt;
+    ///             &lt;RadzenTreeItem Text="photo.jpg" Icon="image" /&gt;
+    ///         &lt;/RadzenTreeItem&gt;
     ///     &lt;/RadzenTreeItem&gt;
     /// &lt;/RadzenTree&gt;
-    ///   </code>
+    /// </code>
+    /// Data-bound tree with selection:
+    /// <code>
+    /// &lt;RadzenTree Data=@categories AllowCheckBoxes="true" @bind-CheckedValues=@selectedCategories Change=@OnChange&gt;
+    ///     &lt;RadzenTreeLevel TextProperty="Name" ChildrenProperty="Children" /&gt;
+    /// &lt;/RadzenTree&gt;
+    /// @code {
+    ///     IEnumerable&lt;object&gt; selectedCategories;
+    ///     void OnChange(TreeEventArgs args) => Console.WriteLine($"Selected: {args.Text}");
+    /// }
+    /// </code>
     /// </example>
     public partial class RadzenTree : RadzenComponent
     {
