@@ -41,6 +41,13 @@ These instructions assume the new application layout which uses rendering modes 
 <code>&lt;RadzenTheme Theme="material" /&gt;
 </code>
 </pre>
+            <RadzenText>
+                Open the <code>Program.cs</code> file and include:
+            </RadzenText>
+<pre class="rz-p-4">
+<code>builder.Services.AddRadzenComponents();
+</code>
+</pre>
             @IncludeJavaScript(("App.razor", CurrentVersion))
             @UseComponent(CurrentVersion)
             <RadzenText Anchor="@($"get-started/{CurrentVersion}#additional")" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-mt-12 rz-mb-4">6. Use Dialog, Notification, ContextMenu and Tooltip components</RadzenText>
@@ -53,13 +60,6 @@ These instructions assume the new application layout which uses rendering modes 
             <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
                 Set the <code>@@rendermode</code> attribute to the render mode of your application e.g. <code>InteractiveServer</code>, <code>InteractiveWebAssembly</code> or <code>InteractiveAuto</code>.
             </RadzenAlert>
-            <RadzenText>
-                Open the <code>Program.cs</code> file and include:
-            </RadzenText>
-<pre class="rz-p-4">
-<code>builder.Services.AddRadzenComponents();
-</code>
-</pre>
         @Next
         </div>
         </RadzenTabsItem>
@@ -225,6 +225,13 @@ These instructions assume the new application layout which uses rendering modes 
 <code>&lt;component type="typeof(RadzenTheme)" render-mode="@(args.renderMode)" param-Theme="@@("material")" /&gt;
 </code>
 </pre>
+        <RadzenText>
+            Open the <code>Program.cs</code> file and include:
+        </RadzenText>
+<pre class="rz-p-4">
+<code>builder.Services.AddRadzenComponents();
+</code>
+</pre>
         </text>;
 
 
@@ -259,13 +266,6 @@ These instructions assume the new application layout which uses rendering modes 
                 Make sure that you do not nest <code>RadzenComponents</code> inside a positioned element (i.e. with position: relative, position: absolute or position: fixed).
                 To be safe you can add them at the end of the layout file after all other elements.
             </RadzenAlert>
-            <RadzenText>
-                Open the <code>Program.cs</code> file and include:
-            </RadzenText>
-<pre class="rz-p-4">
-<code>builder.Services.AddRadzenComponents();
-</code>
-</pre>
     </text>;
     RenderFragment Next =
         @<text>

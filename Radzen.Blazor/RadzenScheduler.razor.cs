@@ -12,7 +12,7 @@ namespace Radzen.Blazor
     /// A scheduler component for displaying and managing calendar appointments in multiple view types (day, week, month, year).
     /// RadzenScheduler provides a rich calendar interface with drag-and-drop, inline editing, recurring events, and customizable views.
     /// Displays time-based events in various calendar views, ideal for appointment booking, event calendars, resource scheduling, or any time-based data visualization.
-    /// Features multiple views (Day, Week, Month, Year Planner, Year Timeline), drag & drop to move appointments between time slots, resize to adjust appointment duration by dragging edges,
+    /// Features multiple views (Day, Week, Month, Year Planner, Year Timeline), drag &amp; drop to move appointments between time slots, resize to adjust appointment duration by dragging edges,
     /// inline editing to create and edit appointments directly in the calendar, tooltips for quick info on hover, customizable appointment templates,
     /// support for all-day and multi-day events, and timezone-aware appointments.
     /// Define data properties using StartProperty, EndProperty, and TextProperty. Add view components (RadzenDayView, RadzenWeekView, RadzenMonthView) as child content.
