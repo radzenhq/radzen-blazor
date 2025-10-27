@@ -14,64 +14,91 @@
 
 <HelpPrerequirements/>
 
-<RadzenText Anchor="dialog#open-page-as-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8 rz-mb-6">
+<RadzenText Anchor="dialog#open-page-as-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
     Open page as a dialog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>DialogService</code> to open any Blazor component or page as a modal dialog.
 </RadzenText>
 <RadzenExample ComponentName="Dialog" Example="DialogWithPage" AdditionalSourceCodePages=@(new List<string>() { "/demos/Pages/DialogCardPage.razor" })>
     <DialogWithPage />
 </RadzenExample>
 
-<RadzenText Anchor="dialog#inline-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="dialog#inline-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Inline Dialog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Display a dialog inline within the page content without using the DialogService.
 </RadzenText>
 <RadzenExample ComponentName="Dialog" Example="DialogInline">
     <DialogInline />
 </RadzenExample>
 
-<RadzenText Anchor="dialog#busy-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="dialog#busy-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Busy Dialog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Show a busy/loading indicator dialog while processing long-running operations.
 </RadzenText>
 <RadzenExample ComponentName="Dialog" Example="DialogBusy">
     <DialogBusy />
 </RadzenExample>
 
-<RadzenText Anchor="dialog#confirm-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="dialog#confirm-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Confirm Dialog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>DialogService.Confirm()</code> to display a confirmation dialog with customizable buttons and messages.
 </RadzenText>
 <RadzenExample ComponentName="Dialog" Example="DialogConfirm">
     <DialogConfirm />
 </RadzenExample>
 
-<RadzenText Anchor="dialog#alert-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="dialog#alert-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Alert Dialog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>DialogService.Alert()</code> to display simple alert messages to users.
 </RadzenText>
 <RadzenExample ComponentName="Dialog" Example="DialogAlert">
     <DialogAlert />
 </RadzenExample>
 
-<RadzenText Anchor="dialog#close-dialog-by-clicking-outside" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="dialog#close-dialog-by-clicking-outside" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Close Dialog by clicking outside
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Enable <code>CloseDialogOnOverlayClick</code> to allow users to close the dialog by clicking on the overlay backdrop.
 </RadzenText>
 <RadzenExample ComponentName="Dialog" Example="DialogOverlayClose">
     <DialogOverlayClose />
 </RadzenExample>
 
-<RadzenText Anchor="dialog#side-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="dialog#side-dialog" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Side Dialog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Position dialogs on the side of the screen using custom CSS classes for slide-in panel effects.
 </RadzenText>
 <RadzenExample ComponentName="Dialog" Example="DialogSide">
     <DialogSide />
 </RadzenExample>
 
-<RadzenText Anchor="dialog#custom-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="dialog#custom-css-classes" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Dialog with custom CSS classes
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Apply custom CSS classes to dialogs for complete styling customization and theming.
 </RadzenText>
 <RadzenExample ComponentName="Dialog" Example="DialogCss">
     <DialogCss />
 </RadzenExample>
 
-<RadzenText Anchor="dialog#cascading-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="dialog#cascading-value" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Update dialog properties
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Dynamically update dialog properties like title, width, and height at runtime using the cascading dialog reference.
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     Use the <code>Dialog</code> 
