@@ -1,0 +1,51 @@
+<RadzenTemplateForm Data=@model>
+    <RadzenStack Gap="1.5rem">
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Component="EmailRequiredInput">
+                Email <span style="color: var(--rz-danger);">*</span>
+            </RadzenLabel>
+            <RadzenTextBox Name="EmailRequiredInput" @bind-Value=@model.Email Style="width: 100%; max-width: 400px;" />
+            <RadzenRequiredValidator Component="EmailRequiredInput" Text="Email is required" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Component="NameRequiredInput">
+                Full Name <RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Required" Variant="Variant.Outlined" IsPill="true" class="rz-ml-1" />
+            </RadzenLabel>
+            <RadzenTextBox Name="NameRequiredInput" @bind-Value=@model.FullName Style="width: 100%; max-width: 400px;" />
+            <RadzenRequiredValidator Component="NameRequiredInput" Text="Full Name is required" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Component="CountryRequiredInput">
+                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.25rem" AlignItems="AlignItems.Center">
+                    <RadzenText>Country</RadzenText>
+                    <RadzenIcon Icon="star" IconStyle="IconStyle.Danger" Style="font-size: 0.6rem; color: var(--rz-danger);" />
+                </RadzenStack>
+            </RadzenLabel>
+            <RadzenDropDown Name="CountryRequiredInput" @bind-Value=@model.Country Data=@countries Placeholder="Select a country" Style="width: 100%; max-width: 400px;" />
+            <RadzenRequiredValidator Component="CountryRequiredInput" Text="Country is required" />
+        </RadzenStack>
+
+        <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+            <RadzenLabel Text="Phone (Optional)" Component="PhoneInput" />
+            <RadzenTextBox Name="PhoneInput" @bind-Value=@model.Phone Style="width: 100%; max-width: 400px;" />
+        </RadzenStack>
+
+        <RadzenButton ButtonType="ButtonType.Submit" Text="Submit Form" />
+    </RadzenStack>
+</RadzenTemplateForm>
+
+@code {
+    class FormModel
+    {
+        public string Email { get; set; }
+        public string FullName { get; set; }
+        public string Country { get; set; }
+        public string Phone { get; set; }
+    }
+
+    FormModel model = new FormModel();
+    List<string> countries = new List<string> { "USA", "Canada", "UK", "Germany", "France", "Japan", "Australia" };
+}
+

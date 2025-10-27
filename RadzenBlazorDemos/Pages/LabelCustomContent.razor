@@ -1,0 +1,38 @@
+<RadzenStack Gap="1.5rem">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Component="UsernameInput">
+            <RadzenIcon Icon="person" class="rz-mr-1" /> Username
+        </RadzenLabel>
+        <RadzenTextBox Name="UsernameInput" @bind-Value=@username />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Component="PriorityInput">
+            Priority Level <RadzenBadge BadgeStyle="BadgeStyle.Info" Text="New" IsPill="true" class="rz-ml-2" />
+        </RadzenLabel>
+        <RadzenDropDown Name="PriorityInput" @bind-Value=@priority Data=@priorities Style="width: 100%; max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Component="DescriptionInput">
+            <strong>Description</strong> <em>(optional)</em>
+        </RadzenLabel>
+        <RadzenTextArea Name="DescriptionInput" @bind-Value=@description Rows="3" Style="width: 100%; max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Component="ColorInput">
+            Choose Color <RadzenIcon Icon="palette" Style="color: var(--rz-primary);" class="rz-ml-1" />
+        </RadzenLabel>
+        <RadzenColorPicker Name="ColorInput" @bind-Value=@selectedColor Style="width: 100%; max-width: 300px;" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    string username;
+    string priority = "Medium";
+    List<string> priorities = new List<string> { "Low", "Medium", "High", "Critical" };
+    string description;
+    string selectedColor;
+}
+

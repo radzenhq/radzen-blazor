@@ -1405,6 +1405,16 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Basic Label with Input", Anchor = "#basic-usage" }, new () { Text = "Labels with Different Input Types", Anchor = "#input-types" }, new () { Text = "Label with Custom Content", Anchor = "#custom-content" }, new () { Text = "Required Field Indicators", Anchor = "#required-fields" }, new () { Text = "Label Styling", Anchor = "#styling" } ],
+                    Name = "Label",
+                    Title = "Blazor Label Component | Free UI Components by Radzen",
+                    Description = "Associate descriptive text labels with form inputs for better accessibility and usability. Clicking a label focuses its associated input.",
+                    Path = "label",
+                    Icon = "\ue893",
+                    Tags = new [] { "label", "form", "input", "accessibility", "required", "validation", "formfield", "association", "aria" }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Login Events", Anchor = "#login-events" }, new () { Text = "Simple Login", Anchor = "#simple-login" }, new () { Text = "Login with Register (hide password reset)", Anchor = "#login-with-register" }, new () { Text = "Remember me", Anchor = "#remember-me" }, new () { Text = "Form fields", Anchor = "#form-fields" }, new () { Text = "Localization", Anchor = "#localization" }, new () { Text = "Horizontal login layout example", Anchor = "#horizontal-login-example" }, new () { Text = "Vertical login layout example", Anchor = "#vertical-login-example" } ],
                     Name = "Login",
                     Description = "Demonstration and configuration of the Blazor RadzenLogin component.",

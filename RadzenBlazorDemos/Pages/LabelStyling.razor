@@ -1,0 +1,38 @@
+<RadzenStack Gap="1.5rem">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Default Label" Component="Input1" />
+        <RadzenTextBox Name="Input1" @bind-Value=@value1 Style="max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Bold Label" Component="Input2" Style="font-weight: bold;" />
+        <RadzenTextBox Name="Input2" @bind-Value=@value2 Style="max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Large Label" Component="Input3" Style="font-size: 1.2rem;" />
+        <RadzenTextBox Name="Input3" @bind-Value=@value3 Style="max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Colored Label" Component="Input4" Style="color: var(--rz-primary); font-weight: 500;" />
+        <RadzenTextBox Name="Input4" @bind-Value=@value4 Style="max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Small Uppercase Label" Component="Input5" Style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--rz-text-secondary-color);" />
+        <RadzenTextBox Name="Input5" @bind-Value=@value5 Style="max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Component="Input6" class="rz-text-secondary-color">
+            <em>Italic styled label</em>
+        </RadzenLabel>
+        <RadzenTextBox Name="Input6" @bind-Value=@value6 Style="max-width: 300px;" />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    string value1, value2, value3, value4, value5, value6;
+}
+

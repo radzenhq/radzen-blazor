@@ -1,0 +1,64 @@
+@page "/label"
+@page "/docs/guides/components/label.html"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Label
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>Label</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    The RadzenLabel component creates accessible labels for form inputs. When properly associated with an input component via the <code>Component</code> property, clicking the label focuses the input, improving usability and accessibility. These demos showcase basic label-input associations, labels with various input types, custom content including required field indicators, and integration with FormField for complete form layouts.
+</RadzenText>
+
+<RadzenText Anchor="label#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Basic Label with Input
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Text</code> property to display label text and the <code>Component</code> property to associate the label with an input by matching the input's <code>Name</code> property.
+</RadzenText>
+<RadzenExample ComponentName="Label" Example="LabelBasic">
+    <LabelBasic />
+</RadzenExample>
+
+<RadzenText Anchor="label#input-types" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Labels with Different Input Types
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    RadzenLabel works seamlessly with all Radzen input components, creating proper label-input associations for enhanced accessibility.
+</RadzenText>
+<RadzenExample ComponentName="Label" Example="LabelInputTypes">
+    <LabelInputTypes />
+</RadzenExample>
+
+<RadzenText Anchor="label#custom-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Label with Custom Content
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use <code>ChildContent</code> to create labels with rich content including icons, badges, required indicators, or formatting.
+</RadzenText>
+<RadzenExample ComponentName="Label" Example="LabelCustomContent">
+    <LabelCustomContent />
+</RadzenExample>
+
+<RadzenText Anchor="label#required-fields" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Required Field Indicators
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Add visual indicators for required fields using custom content with asterisks, badges, or other markers.
+</RadzenText>
+<RadzenExample ComponentName="Label" Example="LabelRequiredFields">
+    <LabelRequiredFields />
+</RadzenExample>
+
+<RadzenText Anchor="label#styling" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Label Styling
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Customize label appearance using the <code>Style</code> and <code>class</code> properties for different font sizes, colors, and weights.
+</RadzenText>
+<RadzenExample ComponentName="Label" Example="LabelStyling">
+    <LabelStyling />
+</RadzenExample>
+

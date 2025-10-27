@@ -1,0 +1,36 @@
+<RadzenStack Gap="1.5rem">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Dropdown Selection" Component="DropdownInput" />
+        <RadzenDropDown Name="DropdownInput" @bind-Value=@selectedCountry Data=@countries Placeholder="Select a country" Style="width: 100%; max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Date of Birth" Component="DateInput" />
+        <RadzenDatePicker Name="DateInput" @bind-Value=@dateOfBirth Style="width: 100%; max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Age" Component="NumericInput" />
+        <RadzenNumeric Name="NumericInput" @bind-Value=@age Min="0" Max="120" Style="width: 100%; max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Comments" Component="TextAreaInput" />
+        <RadzenTextArea Name="TextAreaInput" @bind-Value=@comments Rows="3" Style="width: 100%; max-width: 300px;" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Newsletter Subscription" Component="CheckboxInput" />
+        <RadzenCheckBox Name="CheckboxInput" @bind-Value=@subscribed />
+    </RadzenStack>
+</RadzenStack>
+
+@code {
+    string selectedCountry;
+    List<string> countries = new List<string> { "USA", "Canada", "UK", "Germany", "France", "Japan" };
+    DateTime? dateOfBirth;
+    int? age;
+    string comments;
+    bool subscribed;
+}
+

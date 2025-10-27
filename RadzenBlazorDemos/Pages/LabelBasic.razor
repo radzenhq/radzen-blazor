@@ -1,0 +1,27 @@
+<RadzenStack Gap="1rem">
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="First Name" Component="FirstNameInput" />
+        <RadzenTextBox Name="FirstNameInput" @bind-Value=@firstName Placeholder="Enter your first name" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Email Address" Component="EmailInput" />
+        <RadzenTextBox Name="EmailInput" @bind-Value=@email Placeholder="your.email@example.com" />
+    </RadzenStack>
+
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenLabel Text="Password" Component="PasswordInput" />
+        <RadzenPassword Name="PasswordInput" @bind-Value=@password />
+    </RadzenStack>
+
+    <RadzenText TextStyle="TextStyle.Caption" class="rz-mt-2">
+        Click on any label to focus its associated input field.
+    </RadzenText>
+</RadzenStack>
+
+@code {
+    string firstName = "";
+    string email = "";
+    string password = "";
+}
+
