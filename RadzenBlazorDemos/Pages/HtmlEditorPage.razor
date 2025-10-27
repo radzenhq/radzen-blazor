@@ -83,8 +83,11 @@ The Radzen HtmlEditor supports the following tools:
 <RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorUploadUrl" AdditionalSourceCodePages="@(new [] { "/demos/Controllers/UploadController.cs"})" >
     <HtmlEditorUploadUrl />
 </RadzenExample>
-<RadzenText Anchor="html-editor#focus" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="html-editor#focus" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Focus
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Programmatically set focus to the HTML editor using the <code>FocusAsync()</code> method.
 </RadzenText>
 <RadzenExample ComponentName="HtmlEditor" Example="HtmlEditorFocus">
     <HtmlEditorFocus />

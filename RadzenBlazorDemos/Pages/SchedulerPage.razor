@@ -30,18 +30,22 @@
     <SchedulerPlannerTimeline />
 </RadzenExample>
 
-<RadzenText Anchor="scheduler#tooltips" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="scheduler#tooltips" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Display additional content when the user hovers an appointment
 </RadzenText>
-
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>SlotRender</code> event and templates to display tooltips with additional appointment details on hover.
+</RadzenText>
 <RadzenExample ComponentName="Scheduler" Example="SchedulerTooltips" AdditionalSourceCodePages=@(new [] { "/demos/Models/Appointment.cs" })>
     <SchedulerTooltips />
 </RadzenExample>
 
-<RadzenText Anchor="scheduler#multiday" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
+<RadzenText Anchor="scheduler#multiday" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
     Display any number of days side-by-side
 </RadzenText>
-
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Configure the scheduler to display multiple days simultaneously for better week or multi-day planning views.
+</RadzenText>
 <RadzenExample ComponentName="Scheduler" Example="SchedulerMultiDay" AdditionalSourceCodePages=@(new [] { "/demos/Models/Appointment.cs" })>
     <SchedulerMultiDay />
 </RadzenExample>
