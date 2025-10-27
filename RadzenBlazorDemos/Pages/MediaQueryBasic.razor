@@ -1,0 +1,27 @@
+<RadzenCard class="rz-p-4">
+    <RadzenMediaQuery Query="(max-width: 768px)" Change=@OnChange />
+    
+    <RadzenText TextStyle="TextStyle.H6" class="rz-mb-4">
+        Current viewport status:
+    </RadzenText>
+    
+    <RadzenBadge BadgeStyle="@(isMobile ? BadgeStyle.Success : BadgeStyle.Info)" 
+                 Text="@(isMobile ? "Mobile View (≤ 768px)" : "Desktop View (> 768px)")" 
+                 IsPill="true" 
+                 class="rz-my-2" />
+    
+    <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-4">
+        Resize your browser window to see the media query in action.
+    </RadzenText>
+</RadzenCard>
+
+@code {
+    bool isMobile = false;
+
+    void OnChange(bool matches)
+    {
+        isMobile = matches;
+        StateHasChanged();
+    }
+}
+

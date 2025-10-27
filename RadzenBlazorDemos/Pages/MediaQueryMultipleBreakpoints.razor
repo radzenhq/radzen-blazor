@@ -1,0 +1,51 @@
+<RadzenMediaQuery Query="(max-width: 576px)" Change=@(matches => OnBreakpointChange("xs", matches)) />
+<RadzenMediaQuery Query="(min-width: 577px) and (max-width: 768px)" Change=@(matches => OnBreakpointChange("sm", matches)) />
+<RadzenMediaQuery Query="(min-width: 769px) and (max-width: 1024px)" Change=@(matches => OnBreakpointChange("md", matches)) />
+<RadzenMediaQuery Query="(min-width: 1025px)" Change=@(matches => OnBreakpointChange("lg", matches)) />
+
+<RadzenCard class="rz-p-4">
+    <RadzenText TextStyle="TextStyle.H6" class="rz-mb-4">
+        Current Breakpoint: <strong>@currentBreakpoint</strong>
+    </RadzenText>
+    
+    <RadzenStack Orientation="Orientation.Vertical" Gap="0.5rem">
+        <RadzenText TextStyle="TextStyle.Body2">
+            <RadzenBadge BadgeStyle="@(currentBreakpoint == "xs" ? BadgeStyle.Success : BadgeStyle.Light)" 
+                         Text="XS" Variant="Variant.Flat" class="rz-mr-2" />
+            Extra Small: ≤ 576px
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2">
+            <RadzenBadge BadgeStyle="@(currentBreakpoint == "sm" ? BadgeStyle.Success : BadgeStyle.Light)" 
+                         Text="SM" Variant="Variant.Flat" class="rz-mr-2" />
+            Small: 577px - 768px
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2">
+            <RadzenBadge BadgeStyle="@(currentBreakpoint == "md" ? BadgeStyle.Success : BadgeStyle.Light)" 
+                         Text="MD" Variant="Variant.Flat" class="rz-mr-2" />
+            Medium: 769px - 1024px
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2">
+            <RadzenBadge BadgeStyle="@(currentBreakpoint == "lg" ? BadgeStyle.Success : BadgeStyle.Light)" 
+                         Text="LG" Variant="Variant.Flat" class="rz-mr-2" />
+            Large: ≥ 1025px
+        </RadzenText>
+    </RadzenStack>
+    
+    <RadzenText TextStyle="TextStyle.Caption" class="rz-mt-4">
+        Resize your browser window to see different breakpoints activate.
+    </RadzenText>
+</RadzenCard>
+
+@code {
+    string currentBreakpoint = "lg";
+
+    void OnBreakpointChange(string breakpoint, bool matches)
+    {
+        if (matches)
+        {
+            currentBreakpoint = breakpoint;
+            StateHasChanged();
+        }
+    }
+}
+

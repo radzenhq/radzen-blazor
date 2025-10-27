@@ -1,0 +1,35 @@
+<RadzenMediaQuery Query="(max-width: 768px)" Change=@OnMobileChange />
+
+<RadzenCard class="rz-p-4">
+    @if (isMobile)
+    {
+        <RadzenStack Orientation="Orientation.Vertical" Gap="1rem">
+            <RadzenText TextStyle="TextStyle.H6">Mobile Navigation</RadzenText>
+            <RadzenButton Text="Home" Icon="home" Style="width: 100%" />
+            <RadzenButton Text="Products" Icon="shopping_cart" Style="width: 100%" />
+            <RadzenButton Text="About" Icon="info" Style="width: 100%" />
+            <RadzenButton Text="Contact" Icon="email" Style="width: 100%" />
+        </RadzenStack>
+    }
+    else
+    {
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" AlignItems="AlignItems.Center">
+            <RadzenText TextStyle="TextStyle.H6">Desktop Navigation:</RadzenText>
+            <RadzenButton Text="Home" Icon="home" />
+            <RadzenButton Text="Products" Icon="shopping_cart" />
+            <RadzenButton Text="About" Icon="info" />
+            <RadzenButton Text="Contact" Icon="email" />
+        </RadzenStack>
+    }
+</RadzenCard>
+
+@code {
+    bool isMobile = false;
+
+    void OnMobileChange(bool matches)
+    {
+        isMobile = matches;
+        StateHasChanged();
+    }
+}
+

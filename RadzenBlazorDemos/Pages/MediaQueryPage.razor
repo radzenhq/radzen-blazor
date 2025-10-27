@@ -1,0 +1,54 @@
+@page "/media-query"
+@page "/docs/guides/components/media-query.html"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    MediaQuery
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Demonstration and configuration of the Radzen Blazor <strong>MediaQuery</strong> component.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    The MediaQuery component allows you to respond to browser viewport size changes using CSS media queries. It fires a callback when the media query matches or stops matching, enabling responsive behavior in your Blazor applications. Common use cases include showing/hiding content based on screen size, adapting layouts for mobile devices, and adjusting component behavior for different viewport widths.
+</RadzenText>
+
+<RadzenText Anchor="media-query#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Basic Usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>Query</code> parameter to specify a CSS media query and the <code>Change</code> event to respond when the query matches or stops matching.
+</RadzenText>
+<RadzenExample ComponentName="MediaQuery" Example="MediaQueryBasic">
+    <MediaQueryBasic />
+</RadzenExample>
+
+<RadzenText Anchor="media-query#responsive-content" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Show/Hide Content Based on Screen Size
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Conditionally display different content for mobile and desktop viewports using media queries.
+</RadzenText>
+<RadzenExample ComponentName="MediaQuery" Example="MediaQueryResponsiveContent">
+    <MediaQueryResponsiveContent />
+</RadzenExample>
+
+<RadzenText Anchor="media-query#multiple-breakpoints" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Multiple Breakpoints
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use multiple <code>RadzenMediaQuery</code> components to respond to different screen sizes and create complex responsive layouts.
+</RadzenText>
+<RadzenExample ComponentName="MediaQuery" Example="MediaQueryMultipleBreakpoints">
+    <MediaQueryMultipleBreakpoints />
+</RadzenExample>
+
+<RadzenText Anchor="media-query#orientation" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Device Orientation
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Detect device orientation changes using <code>orientation: portrait</code> or <code>orientation: landscape</code> media queries.
+</RadzenText>
+<RadzenExample ComponentName="MediaQuery" Example="MediaQueryOrientation">
+    <MediaQueryOrientation />
+</RadzenExample>
+

@@ -164,6 +164,16 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Show/Hide Content Based on Screen Size", Anchor = "#responsive-content" }, new () { Text = "Multiple Breakpoints", Anchor = "#multiple-breakpoints" }, new () { Text = "Device Orientation", Anchor = "#orientation" } ],
+                    Name = "MediaQuery",
+                    Title = "Blazor MediaQuery Component | Free UI Components by Radzen",
+                    Description = "Respond to browser viewport size changes using CSS media queries. Perfect for creating responsive Blazor applications.",
+                    Path = "media-query",
+                    Icon = "\ue337",
+                    Tags = new [] { "mediaquery", "media", "query", "responsive", "breakpoint", "viewport", "screen", "mobile", "tablet", "desktop", "orientation", "utility"}
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Ripple RadzenButton", Anchor = "#ripple-button" }, new () { Text = "Ripple RadzenLink", Anchor = "#ripple-link" }, new () { Text = "Ripple HTML div", Anchor = "#ripple-div" } ],
                     Name = "Ripple",
                     Title = "Blazor Ripple Effect | Free UI Components by Radzen",

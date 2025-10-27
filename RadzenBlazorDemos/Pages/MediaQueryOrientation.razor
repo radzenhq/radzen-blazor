@@ -1,0 +1,39 @@
+<RadzenMediaQuery Query="(orientation: portrait)" Change=@OnOrientationChange />
+
+<RadzenCard class="rz-p-4 rz-text-align-center">
+    @if (isPortrait)
+    {
+        <RadzenIcon Icon="stay_current_portrait" Style="font-size: 4rem; color: var(--rz-primary);" />
+        <RadzenText TextStyle="TextStyle.H5" class="rz-mt-4">
+            Portrait Mode
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">
+            Device is in portrait orientation (height > width)
+        </RadzenText>
+    }
+    else
+    {
+        <RadzenIcon Icon="stay_current_landscape" Style="font-size: 4rem; color: var(--rz-success);" />
+        <RadzenText TextStyle="TextStyle.H5" class="rz-mt-4">
+            Landscape Mode
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.Body2" class="rz-mt-2">
+            Device is in landscape orientation (width > height)
+        </RadzenText>
+    }
+    
+    <RadzenText TextStyle="TextStyle.Caption" class="rz-mt-4">
+        Rotate your device or resize the browser window to see orientation changes.
+    </RadzenText>
+</RadzenCard>
+
+@code {
+    bool isPortrait = false;
+
+    void OnOrientationChange(bool matches)
+    {
+        isPortrait = matches;
+        StateHasChanged();
+    }
+}
+
