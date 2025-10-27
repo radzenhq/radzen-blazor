@@ -283,5 +283,28 @@ namespace Radzen.Blazor
                 preventKeyPress = false;
             }
         }
+
+        async Task OnDoubleClick(MouseEventArgs args)
+        {
+            // Only handle double-click if the pane or its next pane is collapsible
+            if (!IsCollapsible && !IsExpandable)
+                return;
+
+            // If the current pane is collapsed, expand it
+            if (GetCollapsed())
+            {
+                await Splitter.OnExpand(Index);
+            }
+            // If the current pane can be collapsed, collapse it
+            else if (IsCollapsible)
+            {
+                await Splitter.OnCollapse(Index);
+            }
+            // If the next pane is the last and is expandable, expand it
+            else if (IsExpandable)
+            {
+                await Splitter.OnExpand(Index);
+            }
+        }
     }
 }
