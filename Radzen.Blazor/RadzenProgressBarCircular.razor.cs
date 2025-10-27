@@ -6,18 +6,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A circular progress indicator component for showing task completion or ongoing processes in a compact circular format.
     /// RadzenProgressBarCircular displays progress as a ring with determinate (specific value) or indeterminate (spinning) modes.
+    /// Space-efficient and works well for dashboards, loading states, or anywhere circular design fits better than linear bars.
+    /// Inherits all features from RadzenProgressBar and adds circular design showing progress as a ring/arc instead of a linear bar,
+    /// size options (ExtraSmall, Small, Medium, Large) for different contexts, value display in the center of the circle, and compact design taking less space than linear progress bars.
+    /// Use for dashboard KPIs, button loading states, or compact loading indicators. The circular shape makes it ideal for displaying progress where space is limited.
     /// </summary>
-    /// <remarks>
-    /// Circular progress indicators are space-efficient and work well for dashboards, loading states, or anywhere circular design fits better than linear bars.
-    /// Inherits all features from RadzenProgressBar and adds:
-    /// - **Circular Design**: Progress shown as a ring/arc instead of a linear bar
-    /// - **Size Options**: ExtraSmall, Small, Medium, Large for different contexts
-    /// - **Center Content**: Value display in the center of the circle
-    /// - **Compact**: Takes less space than linear progress bars
-    /// 
-    /// Use for dashboard KPIs, button loading states, or compact loading indicators.
-    /// The circular shape makes it ideal for displaying progress where space is limited.
-    /// </remarks>
     /// <example>
     /// Basic circular progress:
     /// <code>

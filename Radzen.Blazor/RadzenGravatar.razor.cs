@@ -7,20 +7,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A Gravatar avatar component that displays a user's profile image from Gravatar.com based on their email address.
     /// RadzenGravatar automatically fetches and displays the globally recognized avatar associated with an email.
-    /// </summary>
-    /// <remarks>
     /// Gravatar (Globally Recognized Avatar) is a service that associates profile images with email addresses.
-    /// The component:
-    /// - **Email-Based**: Fetches avatar using MD5 hash of email address
-    /// - **Automatic**: No need to store or manage avatar images
-    /// - **Fallback**: Shows default retro-style avatar if email has no Gravatar
-    /// - **Sizing**: Configurable pixel dimensions
-    /// - **Global Service**: Uses secure.gravatar.com to retrieve images
-    /// 
-    /// The component generates a Gravatar URL from the email and displays it as an image.
-    /// If the email doesn't have a Gravatar account, a retro-style default avatar is shown.
+    /// Fetches avatar using MD5 hash of email address, requires no storage or management of avatar images, shows default retro-style avatar if email has no Gravatar,
+    /// features configurable pixel dimensions, and uses secure.gravatar.com to retrieve images.
+    /// Generates a Gravatar URL from the email and displays it as an image. If the email doesn't have a Gravatar account, a retro-style default avatar is shown.
     /// Commonly used in user profiles, comment sections, or anywhere user identity is displayed.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic Gravatar:
     /// <code>

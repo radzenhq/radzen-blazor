@@ -8,20 +8,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A collapsible panel component with customizable header, content, summary, and footer sections.
     /// RadzenPanel provides an expandable/collapsible container for organizing and hiding content, ideal for settings panels, detail sections, or grouped information.
-    /// </summary>
-    /// <remarks>
-    /// RadzenPanel displays content in a structured container with optional collapsing functionality.
-    /// When AllowCollapse is enabled, users can click the header to toggle the panel's expanded/collapsed state.
-    /// The panel supports:
-    /// - **Header**: Customizable via HeaderTemplate, Text, and Icon properties
-    /// - **Content**: Main panel body set via ChildContent (standard Blazor child content)
-    /// - **Summary**: Optional summary content shown when collapsed, defined via SummaryTemplate
-    /// - **Footer**: Optional footer section via FooterTemplate
-    /// - **State**: Collapsed property with two-way binding to control expand/collapse programmatically
-    /// - **Events**: Expand and Collapse callbacks for responding to state changes
-    /// 
+    /// Displays content in a structured container with optional collapsing functionality. When AllowCollapse is enabled, users can click the header to toggle the panel's expanded/collapsed state.
+    /// Supports customizable header via HeaderTemplate/Text/Icon properties, main panel body via ChildContent, optional summary content shown when collapsed (SummaryTemplate),
+    /// optional footer section (FooterTemplate), Collapsed property with two-way binding for programmatic control, and Expand/Collapse event callbacks.
     /// The header displays a collapse/expand icon when AllowCollapse is true, and users can click anywhere on the header to toggle.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic collapsible panel:
     /// <code>

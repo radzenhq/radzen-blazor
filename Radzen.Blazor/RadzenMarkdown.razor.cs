@@ -15,21 +15,12 @@ namespace Radzen.Blazor;
 /// <summary>
 /// A markdown rendering component that parses and displays Markdown syntax as formatted HTML.
 /// RadzenMarkdown converts Markdown text (headings, lists, links, code blocks, etc.) into rich HTML content with security features.
+/// Parses CommonMark-compliant markdown and renders it as HTML. Ideal for documentation, blog posts, README files, or any content authored in Markdown format.
+/// Features full support for standard Markdown syntax (headings, bold, italic, lists, links, images, code, blockquotes, tables), optional HTML tag support within markdown with security filtering,
+/// dangerous tag filtering (script, iframe, object) to prevent XSS attacks, automatic anchor link creation for headings (configurable depth),
+/// control over allowed HTML tags and attributes, and flexible input via child content or Text property.
+/// Parses markdown and renders it as Blazor components/HTML for display. Use AllowHtml = false to strictly render only Markdown syntax without any HTML pass-through.
 /// </summary>
-/// <remarks>
-/// The markdown component parses CommonMark-compliant markdown and renders it as HTML.
-/// It's ideal for documentation, blog posts, README files, or any content authored in Markdown format.
-/// Key features:
-/// - **CommonMark Support**: Full support for standard Markdown syntax (headings, bold, italic, lists, links, images, code, blockquotes, tables)
-/// - **HTML Support**: Optionally allow HTML tags within markdown with security filtering
-/// - **Security**: Dangerous tags (script, iframe, object) are filtered out to prevent XSS attacks
-/// - **Auto-Linking**: Automatically create anchor links for headings (configurable depth)
-/// - **Customization**: Control allowed HTML tags and attributes
-/// - **Flexible Input**: Provide markdown as child content or via Text property
-/// 
-/// The component parses markdown and renders it as Blazor components/HTML for display.
-/// Use AllowHtml = false to strictly render only Markdown syntax without any HTML pass-through.
-/// </remarks>
 /// <example>
 /// Basic markdown rendering:
 /// <code>

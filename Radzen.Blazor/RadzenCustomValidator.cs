@@ -7,20 +7,11 @@ namespace Radzen.Blazor
     /// A validator component that executes custom validation logic via a user-provided function.
     /// RadzenCustomValidator enables complex validation rules that cannot be achieved with built-in validators, such as database checks, cross-field validation, or business rule enforcement.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/>.
+    /// Provides complete flexibility for validation logic by executing a Func&lt;bool&gt; that you define. The validator is valid when the function returns true, invalid when it returns false.
+    /// Common use cases include uniqueness checks (validating email/username against existing database records), business rules (enforcing domain-specific validation logic),
+    /// cross-field validation (validating relationships between multiple fields), API validation (checking values against external services), and any complex logic requiring custom code.
+    /// The Validator function should return true for valid values and false for invalid values. The function is called during form validation, so keep it fast or use async patterns for slow operations.
     /// </summary>
-    /// <remarks>
-    /// Custom validators provide complete flexibility for validation logic by executing a Func&lt;bool&gt; that you define.
-    /// The validator is valid when the function returns true, invalid when it returns false.
-    /// Common use cases include:
-    /// - **Uniqueness Checks**: Validate email/username against existing database records
-    /// - **Business Rules**: Enforce domain-specific validation logic
-    /// - **Cross-Field Validation**: Validate relationships between multiple fields
-    /// - **API Validation**: Check values against external services
-    /// - **Complex Logic**: Any validation that requires custom code
-    /// 
-    /// The Validator function should return true for valid values and false for invalid values.
-    /// The function is called during form validation, so keep it fast or use async patterns for slow operations.
-    /// </remarks>
     /// <example>
     /// Uniqueness validation:
     /// <code>

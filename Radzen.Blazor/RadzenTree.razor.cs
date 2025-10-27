@@ -13,22 +13,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A hierarchical tree view component for displaying nested data structures with expand/collapse functionality.
     /// RadzenTree supports both inline item definition and data-binding for displaying file systems, organization charts, category hierarchies, or any tree-structured data.
+    /// Organizes data in a parent-child hierarchy where items can be expanded to reveal children.
+    /// Supports static definition declaring tree structure using nested RadzenTreeItem components, data binding to hierarchical data using RadzenTreeLevel components,
+    /// single or multiple item selection with checkboxes, individual item or programmatic expand/collapse control, custom icons per item or data-bound icon properties,
+    /// custom rendering templates for tree items, keyboard navigation (Arrow keys, Space/Enter, Home/End) for accessibility, and Change/Expand/selection events.
+    /// For data binding, use RadzenTreeLevel to define how to render each hierarchy level from your data model. For checkbox selection, use AllowCheckBoxes and bind to CheckedValues.
     /// </summary>
-    /// <remarks>
-    /// Trees organize data in a parent-child hierarchy where items can be expanded to reveal children.
-    /// The component supports:
-    /// - **Static Definition**: Declare tree structure using nested RadzenTreeItem components
-    /// - **Data Binding**: Bind to hierarchical data using RadzenTreeLevel components
-    /// - **Selection**: Single or multiple item selection with checkboxes
-    /// - **Expand/Collapse**: Individual item or programmatic expand/collapse control
-    /// - **Icons**: Custom icons per item or data-bound icon properties
-    /// - **Templates**: Custom rendering for tree items
-    /// - **Keyboard Navigation**: Arrow keys, Space/Enter, Home/End for accessibility
-    /// - **Events**: Change, Expand, and selection events
-    /// 
-    /// For data binding, use RadzenTreeLevel to define how to render each hierarchy level from your data model.
-    /// For checkbox selection, use AllowCheckBoxes and bind to CheckedValues.
-    /// </remarks>
     /// <example>
     /// Static tree with inline items:
     /// <code>

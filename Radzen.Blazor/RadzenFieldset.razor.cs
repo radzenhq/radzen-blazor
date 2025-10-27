@@ -9,20 +9,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A fieldset container component that groups related form fields with a legend/header and optional collapse functionality.
     /// RadzenFieldset provides semantic form grouping with visual borders, useful for organizing complex forms into logical sections.
-    /// </summary>
-    /// <remarks>
     /// Fieldsets are HTML form elements that semantically group related inputs, improving form structure and accessibility.
-    /// The component provides:
-    /// - **Grouping**: Visually and semantically groups related form fields
-    /// - **Legend**: Customizable header via Text or HeaderTemplate
-    /// - **Collapsible**: Optional expand/collapse to hide/show grouped fields
-    /// - **Icon**: Optional icon in the legend
-    /// - **Summary**: Optional summary content shown when collapsed
-    /// - **Accessibility**: Screen readers announce fieldset legends for grouped fields
-    /// 
-    /// Use to organize forms into sections like "Personal Information", "Address", "Payment Details".
-    /// When AllowCollapse is enabled, users can collapse sections they don't need to see.
-    /// </remarks>
+    /// Features visual and semantic grouping of related form fields, customizable header via Text or HeaderTemplate, optional expand/collapse to hide/show grouped fields,
+    /// optional icon in the legend, optional summary content shown when collapsed, and screen reader announcement of fieldset legends for grouped fields.
+    /// Use to organize forms into sections like "Personal Information", "Address", "Payment Details". When AllowCollapse is enabled, users can collapse sections they don't need to see.
+    /// </summary>
     /// <example>
     /// Basic fieldset grouping form fields:
     /// <code>

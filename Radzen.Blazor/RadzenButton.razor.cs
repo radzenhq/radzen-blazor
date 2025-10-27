@@ -9,12 +9,10 @@ namespace Radzen.Blazor
     /// <summary>
     /// A clickable button component that supports various visual styles, icons, images, and loading states.
     /// RadzenButton provides a consistent and accessible way to trigger actions in your Blazor application.
-    /// </summary>
-    /// <remarks>
-    /// The button supports multiple visual variants (Filled, Flat, Outlined, Text), color styles (Primary, Secondary, Success, etc.), 
+    /// Supports multiple visual variants (Filled, Flat, Outlined, Text), color styles (Primary, Secondary, Success, etc.), 
     /// and sizes (ExtraSmall, Small, Medium, Large). It can display text, icons, images, or a combination of these.
     /// When <see cref="IsBusy"/> is true, the button shows a loading indicator and becomes disabled.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic usage with text and click handler:
     /// <code>

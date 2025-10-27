@@ -9,17 +9,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A chart series that displays data as a continuous line connecting data points in a RadzenChart.
     /// RadzenLineSeries is ideal for showing trends over time, continuous data, or comparing multiple data series.
+    /// Connects data points with lines, making it easy to visualize trends and patterns.
+    /// Supports multiple interpolation modes (straight lines, smooth curves, step functions), customizable appearance (color, width, line style),
+    /// markers at data points, data labels, combination of multiple line series in one chart for comparison, and line styling with different patterns (solid, dashed, dotted).
+    /// Use CategoryProperty for the X-axis values and ValueProperty for the Y-axis values. Enable Smooth for curved lines, or use Interpolation for more control over line rendering.
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the series. Each item represents one point on the line.</typeparam>
-    /// <remarks>
-    /// Line series connect data points with lines, making it easy to visualize trends and patterns.
-    /// The series supports multiple interpolation modes (straight lines, smooth curves, step functions),
-    /// customizable appearance (color, width, line style), markers at data points, and data labels.
-    /// Multiple line series can be combined in one chart for comparison, and the line can be styled with different patterns (solid, dashed, dotted).
-    /// 
-    /// Use CategoryProperty for the X-axis values and ValueProperty for the Y-axis values.
-    /// Enable Smooth for curved lines, or use Interpolation for more control over line rendering.
-    /// </remarks>
     /// <example>
     /// Basic line series:
     /// <code>

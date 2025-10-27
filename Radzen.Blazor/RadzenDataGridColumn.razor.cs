@@ -14,22 +14,15 @@ namespace Radzen.Blazor
     /// Defines a column in a RadzenDataGrid, specifying how data is displayed, sorted, filtered, and edited.
     /// RadzenDataGridColumn supports data binding via Property, custom templates, formatting, sorting, filtering, grouping, aggregation, and inline editing.
     /// Must be placed inside a <see cref="RadzenDataGrid{TItem}"/> within the Columns template.
+    /// Each column represents one field or computed value from the data source.
+    /// Features data binding using Property to bind to a data field or Template for custom content, display properties (Title, FormatString, TextAlign, Width, Frozen for locked scrolling),
+    /// Sortable property enabling/disabling sorting, Filterable property with FilterTemplate for custom filter UI and FilterValue for programmatic filtering,
+    /// EditTemplate for inline editing with Editable property to control edit permission, GroupProperty for hierarchical data grouping,
+    /// FooterTemplate with Sum()/Average()/Count() aggregation functions, child columns for multi-level headers,
+    /// and Visible property with responsive breakpoint properties (visible-sm, visible-md, etc.).
+    /// Use Template for complete control over cell rendering, or EditTemplate for edit mode cells.
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the parent DataGrid. Must match the grid's TItem type.</typeparam>
-    /// <remarks>
-    /// Each column represents one field or computed value from the data source. Key features include:
-    /// - **Data Binding**: Use Property to bind to a data field, or use Template for custom content
-    /// - **Display**: Title, FormatString, TextAlign, Width, Frozen (locked scrolling)
-    /// - **Sorting**: Sortable property enables/disables sorting for this column
-    /// - **Filtering**: Filterable property with FilterTemplate for custom filter UI, FilterValue for programmatic filtering
-    /// - **Editing**: EditTemplate for inline editing, Editable property to control edit permission
-    /// - **Grouping**: GroupProperty for hierarchical data grouping
-    /// - **Aggregation**: FooterTemplate with Sum(), Average(), Count() etc.
-    /// - **Hierarchy**: Columns can contain child columns for multi-level headers
-    /// - **Visibility**: Visible property and responsive breakpoint properties (visible-sm, visible-md, etc.)
-    /// 
-    /// Use Template for complete control over cell rendering, or EditTemplate for edit mode cells.
-    /// </remarks>
     /// <example>
     /// Simple data-bound column:
     /// <code>

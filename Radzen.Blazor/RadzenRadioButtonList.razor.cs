@@ -12,19 +12,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A radio button group component that allows users to select a single option from a list of choices.
     /// RadzenRadioButtonList displays multiple radio buttons with configurable layout, orientation, and data binding.
+    /// Presents mutually exclusive options where only one can be selected at a time.
+    /// Supports data binding via Data property or static item declaration, configurable layout including orientation (Horizontal/Vertical), gap spacing, wrapping, alignment, and justification,
+    /// custom item templates for complex radio button content, disabled items individually or for the entire list, and keyboard navigation (Arrow keys, Space, Enter) for accessibility.
+    /// Use for forms where users must choose one option from several, like payment methods, shipping options, or preference settings.
     /// </summary>
     /// <typeparam name="TValue">The type of the selected value. Each radio button option has a value of this type.</typeparam>
-    /// <remarks>
-    /// Radio button lists present mutually exclusive options where only one can be selected at a time.
-    /// The component supports:
-    /// - **Data Binding**: Bind to a data source via Data property or statically declare items
-    /// - **Layout**: Configurable orientation (Horizontal/Vertical), gap spacing, wrapping, alignment, and justification
-    /// - **Templating**: Custom item templates for complex radio button content
-    /// - **Disabled Items**: Individual items or the entire list can be disabled
-    /// - **Keyboard Navigation**: Arrow keys, Space, and Enter for accessibility
-    /// 
-    /// Use for forms where users must choose one option from several, like payment methods, shipping options, or preference settings.
-    /// </remarks>
     /// <example>
     /// Static radio button list:
     /// <code>

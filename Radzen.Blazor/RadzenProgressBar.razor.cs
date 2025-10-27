@@ -7,21 +7,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A linear progress bar component for indicating task completion or ongoing processes.
     /// RadzenProgressBar displays progress horizontally with determinate (specific value) or indeterminate (ongoing) modes.
+    /// Provides visual feedback about the status of lengthy operations like file uploads, data processing, or multi-step workflows.
+    /// Supports determinate mode showing specific progress value (0-100%) with a filling bar, indeterminate mode with animated bar indicating ongoing operation without specific progress,
+    /// optional percentage or custom unit value display overlay, configurable Min/Max values for non-percentage scales, various semantic colors (Primary, Success, Info, Warning, Danger),
+    /// custom template to override default value display, and ARIA attributes for screen reader support.
+    /// Use determinate mode when you can calculate progress percentage (e.g., file upload, form completion). Use indeterminate mode for operations with unknown duration (e.g., waiting for server response).
     /// </summary>
-    /// <remarks>
-    /// Progress bars provide visual feedback about the status of lengthy operations like file uploads, data processing, or multi-step workflows.
-    /// The component supports:
-    /// - **Determinate Mode**: Shows specific progress value (0-100%) with a filling bar
-    /// - **Indeterminate Mode**: Animated bar indicating ongoing operation without specific progress
-    /// - **Value Display**: Optional percentage or custom unit display overlay
-    /// - **Range**: Configurable Min/Max values for non-percentage scales
-    /// - **Styles**: Various semantic colors (Primary, Success, Info, Warning, Danger)
-    /// - **Custom Template**: Override default value display with custom content
-    /// - **Accessibility**: ARIA attributes for screen reader support
-    /// 
-    /// Use determinate mode when you can calculate progress percentage (e.g., file upload, form completion).
-    /// Use indeterminate mode for operations with unknown duration (e.g., waiting for server response).
-    /// </remarks>
     /// <example>
     /// Determinate progress bar:
     /// <code>

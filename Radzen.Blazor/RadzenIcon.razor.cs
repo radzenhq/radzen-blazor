@@ -5,19 +5,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// An icon component that displays icons from the Material Symbols font (2,500+ icons included).
     /// RadzenIcon provides a simple way to add scalable vector icons to your Blazor application without external dependencies.
+    /// Uses the embedded Material Symbols Outlined variable font to render icons as text glyphs, providing benefits including no HTTP requests for icon files (icons are part of the font),
+    /// vector-based icons that scale perfectly at any size, text color inheritance with coloring via IconColor or CSS, access to 2,500+ Material Symbols icons,
+    /// and support for Outlined (default), Filled, Rounded, and Sharp variants via IconStyle.
+    /// Icon names use underscores (e.g., "home", "account_circle", "check_circle"). See Material Symbols documentation for the full icon list.
     /// </summary>
-    /// <remarks>
-    /// RadzenIcon uses the embedded Material Symbols Outlined variable font to render icons as text glyphs.
-    /// This approach provides several benefits:
-    /// - **No Image Files**: Icons are part of the font, no HTTP requests for icon files
-    /// - **Scalability**: Vector-based icons scale perfectly at any size
-    /// - **Customization**: Icons inherit text color and can be colored via IconColor or CSS
-    /// - **Variety**: Access to 2,500+ Material Symbols icons
-    /// - **Styles**: Supports Outlined (default), Filled, Rounded, and Sharp variants via IconStyle
-    /// 
-    /// Icon names use underscores (e.g., "home", "account_circle", "check_circle").
-    /// See Material Symbols documentation for the full icon list.
-    /// </remarks>
     /// <example>
     /// Basic icon:
     /// <code>

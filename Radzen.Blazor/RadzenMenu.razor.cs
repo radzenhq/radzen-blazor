@@ -11,20 +11,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A horizontal menu component with support for nested submenus, icons, and responsive behavior.
     /// RadzenMenu provides a classic menu bar for navigation, typically used in application headers or toolbars.
+    /// Displays menu items horizontally with dropdown submenus.
+    /// Supports multi-level nested menus via RadzenMenuItem child items, automatic navigation via Path property or custom Click handlers,
+    /// icons displayed alongside menu item text, responsive design that automatically collapses to a hamburger menu on small screens (configurable),
+    /// click-to-open or hover-to-open interaction modes, keyboard navigation (Arrow keys, Enter, Escape) for accessibility, and visual separators between menu items.
+    /// Use for application navigation bars, command menus, or toolbar-style interfaces. Menu items are defined using RadzenMenuItem components as child content.
     /// </summary>
-    /// <remarks>
-    /// RadzenMenu displays menu items horizontally with dropdown submenus. Key features:
-    /// - **Hierarchy**: Supports multi-level nested menus via RadzenMenuItem child items
-    /// - **Navigation**: Automatic navigation via Path property or custom Click handlers
-    /// - **Icons**: Display icons alongside menu item text
-    /// - **Responsive**: Automatically collapses to a hamburger menu on small screens (configurable)
-    /// - **Interaction**: Click-to-open or hover-to-open modes
-    /// - **Keyboard Navigation**: Arrow keys, Enter, Escape for accessibility
-    /// - **Separators**: Visual separators between menu items
-    /// 
-    /// Use for application navigation bars, command menus, or toolbar-style interfaces.
-    /// Menu items are defined using RadzenMenuItem components as child content.
-    /// </remarks>
     /// <example>
     /// Basic menu with navigation:
     /// <code>

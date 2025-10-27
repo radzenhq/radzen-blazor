@@ -11,23 +11,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A file upload component with progress tracking, multiple file support, and drag-and-drop capability.
     /// RadzenUpload provides a full-featured file upload interface with automatic or manual upload, server communication, and comprehensive event handling.
+    /// Handles file selection and upload to a server endpoint with automatic upload on file selection or manual triggering via Upload() method,
+    /// real-time upload progress with percentage and bytes loaded, file type restriction via Accept property (MIME types or extensions),
+    /// custom authentication or HTTP headers, Complete/Error/Progress/Change events for tracking upload lifecycle,
+    /// automatic image preview for image files, file removal support, and built-in drag-and-drop for file selection.
+    /// Uploads files to the URL endpoint via HTTP POST multipart/form-data. Server-side endpoint must accept file uploads and return appropriate responses.
     /// </summary>
-    /// <remarks>
-    /// The upload component handles file selection and upload to a server endpoint with progress tracking.
-    /// Key features:
-    /// - **Auto/Manual Upload**: Automatic upload on file selection or manual triggering via Upload() method
-    /// - **Multiple Files**: Support for selecting and uploading multiple files simultaneously
-    /// - **Progress Tracking**: Real-time upload progress with percentage and bytes loaded
-    /// - **File Filtering**: Restrict file types via Accept property (MIME types or extensions)
-    /// - **Custom Headers**: Add authentication or custom HTTP headers to upload requests
-    /// - **Events**: Complete, Error, Progress, Change events for tracking upload lifecycle
-    /// - **Preview**: Automatic image preview for image files
-    /// - **Removal**: Delete uploaded files before or after upload
-    /// - **Drag &amp; Drop**: Built-in drag-and-drop support for file selection
-    /// 
-    /// The component uploads files to the URL endpoint via HTTP POST multipart/form-data.
-    /// Server-side endpoint must accept file uploads and return appropriate responses.
-    /// </remarks>
     /// <example>
     /// Basic upload with auto-upload:
     /// <code>

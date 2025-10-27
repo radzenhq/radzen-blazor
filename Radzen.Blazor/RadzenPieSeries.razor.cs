@@ -10,21 +10,13 @@ namespace Radzen.Blazor
     /// <summary>
     /// A chart series that displays data as a circular pie chart with segments representing proportions of a whole.
     /// RadzenPieSeries is ideal for showing percentage breakdowns, composition analysis, or relative comparisons of parts to a total.
+    /// Divides a circle into segments where each segment's angle is proportional to its value relative to the sum of all values.
+    /// Supports segment color customization via Fills, borders via Strokes with custom radius and positioning, TotalAngle to create semi-circles or partial pie charts (e.g., gauge-like displays),
+    /// StartAngle controlling where the first segment begins, optional labels showing values or percentages on segments, interactive tooltips showing category/value/percentage,
+    /// and legend where each segment appears as a legend item using category values.
+    /// Use CategoryProperty for segment labels (shown in legend/tooltip) and ValueProperty for the numeric value determining segment size. For a donut chart (pie with hollow center), use RadzenDonutSeries instead.
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the series. Each item represents one pie segment.</typeparam>
-    /// <remarks>
-    /// Pie series divide a circle into segments where each segment's angle is proportional to its value relative to the sum of all values.
-    /// The series supports:
-    /// - **Customization**: Segment colors via Fills, borders via Strokes, custom radius and positioning
-    /// - **Partial Pies**: Use TotalAngle to create semi-circles or partial pie charts (e.g., gauge-like displays)
-    /// - **Rotation**: StartAngle controls where the first segment begins
-    /// - **Data Labels**: Optional labels showing values or percentages on segments
-    /// - **Tooltips**: Interactive tooltips showing category, value, and percentage
-    /// - **Legend**: Each segment appears as a legend item using category values
-    /// 
-    /// Use CategoryProperty for segment labels (shown in legend/tooltip) and ValueProperty for the numeric value determining segment size.
-    /// For a donut chart (pie with hollow center), use RadzenDonutSeries instead.
-    /// </remarks>
     /// <example>
     /// Basic pie chart:
     /// <code>

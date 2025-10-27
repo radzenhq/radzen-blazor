@@ -7,18 +7,10 @@ namespace Radzen.Blazor
     /// A validator component that ensures a numeric value falls within a specified minimum and maximum range.
     /// RadzenNumericRangeValidator is ideal for quantity limits, age restrictions, price ranges, or any bounded numeric input.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/>.
+    /// Ensures values are within acceptable bounds by checking that the value is greater than or equal to Min and less than or equal to Max. Both bounds are inclusive.
+    /// You can specify just Min to validate minimum value (e.g., age must be at least 18), just Max to validate maximum value (e.g., quantity cannot exceed 100), or both to validate range (e.g., rating must be between 1 and 5).
+    /// Works with any IComparable type (int, decimal, double, DateTime, etc.). Set AllowNull = true to accept null values as valid (for optional nullable fields).
     /// </summary>
-    /// <remarks>
-    /// Numeric range validators ensure values are within acceptable bounds.
-    /// The component checks that the value is greater than or equal to Min and less than or equal to Max.
-    /// Both bounds are inclusive. You can specify just Min, just Max, or both:
-    /// - **Min only**: Validates minimum value (e.g., age must be at least 18)
-    /// - **Max only**: Validates maximum value (e.g., quantity cannot exceed 100)
-    /// - **Both**: Validates range (e.g., rating must be between 1 and 5)
-    /// 
-    /// The validator works with any IComparable type (int, decimal, double, DateTime, etc.).
-    /// Set AllowNull = true to accept null values as valid (for optional nullable fields).
-    /// </remarks>
     /// <example>
     /// Age minimum validation:
     /// <code>

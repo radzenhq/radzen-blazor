@@ -7,20 +7,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A timeline component for displaying chronological sequences of events with visual indicators and connecting lines.
     /// RadzenTimeline presents events along a vertical or horizontal axis, ideal for histories, project milestones, or process flows.
+    /// Visualizes temporal data in a linear sequence with customizable markers, labels, and content for each event.
+    /// Supports Vertical (top-to-bottom) or Horizontal (left-to-right) orientation, Center/Start/End/Alternate positioning of the connecting line,
+    /// custom point markers/labels/content per item via templates, content alignment control (start, center, end, stretch), chronological order reversal,
+    /// and flexible content where each item can have point marker, label, and main content.
+    /// Timeline items are defined using RadzenTimelineItem components. Common uses include order tracking, project progress, changelog displays, or activity feeds.
     /// </summary>
-    /// <remarks>
-    /// Timelines visualize temporal data in a linear sequence with customizable markers, labels, and content for each event.
-    /// The component supports:
-    /// - **Orientation**: Vertical (top-to-bottom) or Horizontal (left-to-right) layout
-    /// - **Line Position**: Center, Start, End, or Alternate positioning of the connecting line
-    /// - **Customization**: Custom point markers, labels, and content per item via templates
-    /// - **Alignment**: Control content alignment (start, center, end, stretch)
-    /// - **Reverse**: Reverse the chronological order visually
-    /// - **Flexible Content**: Each item can have point marker, label, and main content
-    /// 
-    /// Timeline items are defined using RadzenTimelineItem components.
-    /// Common uses include order tracking, project progress, changelog displays, or activity feeds.
-    /// </remarks>
     /// <example>
     /// Basic vertical timeline:
     /// <code>

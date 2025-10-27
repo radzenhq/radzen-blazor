@@ -11,20 +11,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A versatile chart component for visualizing data through various chart types including line, area, column, bar, pie, and donut series.
     /// RadzenChart supports multiple series, customizable axes, legends, tooltips, data labels, markers, and interactive features.
+    /// Container for one or more chart series components. Each series (RadzenLineSeries, RadzenColumnSeries, RadzenAreaSeries, etc.) defines how data is visualized.
+    /// Supports Cartesian charts (Line, Area, Column, Bar, StackedColumn, StackedBar, StackedArea with X/Y axes), Pie charts (Pie and Donut series for showing proportions),
+    /// customization of color schemes/axis configuration/grid lines/legends/tooltips/data labels/markers, interactive click events on series and legend items with hover tooltips,
+    /// annotations including trend lines/mean/median/mode lines/value annotations, and responsive design that automatically adapts to container size.
+    /// Series are defined as child components within the RadzenChart. Configure axes using RadzenCategoryAxis and RadzenValueAxis, customize the legend with RadzenLegend, and add tooltips with RadzenChartTooltipOptions.
     /// </summary>
-    /// <remarks>
-    /// RadzenChart is a container for one or more chart series components. Each series (RadzenLineSeries, RadzenColumnSeries, RadzenAreaSeries, etc.) 
-    /// defines how data is visualized. The chart supports:
-    /// - **Cartesian Charts**: Line, Area, Column, Bar, StackedColumn, StackedBar, StackedArea with X/Y axes
-    /// - **Pie Charts**: Pie and Donut series for showing proportions
-    /// - **Customization**: Color schemes, axis configuration, grid lines, legends, tooltips, data labels, markers
-    /// - **Interactivity**: Click events on series and legend items, hover tooltips
-    /// - **Annotations**: Trend lines, mean/median/mode lines, value annotations
-    /// - **Responsive**: Automatically adapts to container size
-    /// 
-    /// Series are defined as child components within the RadzenChart. Configure axes using RadzenCategoryAxis and RadzenValueAxis,
-    /// customize the legend with RadzenLegend, and add tooltips with RadzenChartTooltipOptions.
-    /// </remarks>
     /// <example>
     /// Basic column chart:
     /// <code>

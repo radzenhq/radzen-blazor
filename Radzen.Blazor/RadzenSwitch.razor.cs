@@ -8,18 +8,10 @@ namespace Radzen.Blazor
     /// <summary>
     /// A toggle switch component for boolean on/off states with a sliding animation.
     /// RadzenSwitch provides an alternative to checkboxes with a more modern toggle UI pattern, ideal for settings and preferences.
+    /// Displays as a sliding toggle that users can click or drag to change between on (true) and off (false) states, providing visual feedback with a sliding animation and color change.
+    /// Common uses include enabling/disabling settings or features, toggling visibility of sections, on/off preferences in configuration panels, and boolean options in forms.
+    /// Supports keyboard navigation (Space/Enter to toggle) for accessibility. Unlike checkboxes, switches are typically used for immediate effects rather than form submission actions.
     /// </summary>
-    /// <remarks>
-    /// The switch component displays as a sliding toggle that users can click or drag to change between on (true) and off (false) states.
-    /// It provides visual feedback with a sliding animation and color change. Common uses include:
-    /// - Enable/disable settings or features
-    /// - Toggle visibility of sections
-    /// - On/off preferences in configuration panels
-    /// - Boolean options in forms
-    /// 
-    /// The component supports keyboard navigation (Space/Enter to toggle) for accessibility.
-    /// Unlike checkboxes, switches are typically used for immediate effects rather than form submission actions.
-    /// </remarks>
     /// <example>
     /// Basic switch:
     /// <code>

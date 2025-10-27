@@ -25,13 +25,10 @@ public readonly struct ClassList
     public static ClassList Create(string className = null) => new(className);
 
     /// <summary>
-    /// Adds the specified class name if the condition is true.
+    /// Adds the specified class name if the condition is true. The class name is added only if it is not null or empty.
     /// </summary>
     /// <param name="className">Name of the class.</param>
     /// <param name="condition">if set to <c>true</c> the class name is added.</param>
-    /// <remarks>
-    /// The class name is added only if it is not null or empty.
-    /// </remarks>
     public ClassList Add(string className, bool condition = true)
     {
         if (condition && !string.IsNullOrWhiteSpace(className))

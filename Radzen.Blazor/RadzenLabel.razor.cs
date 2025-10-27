@@ -5,19 +5,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A label component for associating descriptive text with form input components.
     /// RadzenLabel creates accessible labels linked to input fields via the HTML for/id relationship.
+    /// Provides descriptive text for form inputs, improving usability and accessibility. When properly associated with an input (via the Component property), clicking the label focuses the input.
+    /// Features association linking to input components via the Component property (matching the input's Name), proper label/input relationships for screen readers,
+    /// click behavior that focuses the associated input, and content display via Text property or custom content via ChildContent.
+    /// Always use labels with form inputs for better UX and accessibility compliance. The Component property should match the Name property of the input it describes.
     /// </summary>
-    /// <remarks>
-    /// Labels provide descriptive text for form inputs, improving usability and accessibility.
-    /// When properly associated with an input (via the Component property), clicking the label focuses the input.
-    /// The component:
-    /// - **Association**: Links to input components via the Component property (matching the input's Name)
-    /// - **Accessibility**: Creates proper label/input relationships for screen readers
-    /// - **Click Behavior**: Clicking the label focuses the associated input
-    /// - **Content**: Display text via Text property or custom content via ChildContent
-    /// 
-    /// Always use labels with form inputs for better UX and accessibility compliance.
-    /// The Component property should match the Name property of the input it describes.
-    /// </remarks>
     /// <example>
     /// Basic label with input:
     /// <code>

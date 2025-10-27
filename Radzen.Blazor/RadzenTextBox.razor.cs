@@ -7,12 +7,10 @@ namespace Radzen.Blazor
     /// <summary>
     /// A single-line text input component that supports data binding, validation, and various input behaviors.
     /// RadzenTextBox provides a styled text input with support for placeholders, autocomplete, immediate updates, and string trimming.
-    /// </summary>
-    /// <remarks>
-    /// The component supports two-way data binding via @bind-Value, form validation when used within Radzen forms,
-    /// and can be configured for immediate value updates as the user types or deferred updates on blur/change.
+    /// Supports two-way data binding via @bind-Value and form validation when used within Radzen forms.
+    /// Can be configured for immediate value updates as the user types or deferred updates on blur/change.
     /// Use <see cref="Trim"/> to automatically remove whitespace, and <see cref="MaxLength"/> to limit input length.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic usage with two-way binding:
     /// <code>

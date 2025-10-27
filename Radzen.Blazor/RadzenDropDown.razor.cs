@@ -11,13 +11,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A dropdown select component that allows users to choose one or multiple items from a popup list.
     /// RadzenDropDown supports data binding, filtering, templates, virtual scrolling, and both single and multiple selection modes.
+    /// Binds to a data source via the Data property and uses TextProperty and ValueProperty to determine what to display and what value to bind.
+    /// Supports filtering (with configurable operators and case sensitivity), custom item templates, empty state templates, value templates for the selected item display,
+    /// and can be configured as editable to allow custom text entry. For multiple selection, set Multiple=true and bind to a collection type.
     /// </summary>
     /// <typeparam name="TValue">The type of the selected value. Can be a primitive type, complex object, or collection for multiple selection.</typeparam>
-    /// <remarks>
-    /// The dropdown binds to a data source via the Data property and uses TextProperty and ValueProperty to determine what to display and what value to bind.
-    /// It supports filtering (with configurable operators and case sensitivity), custom item templates, empty state templates, value templates for the selected item display,
-    /// and can be configured as editable to allow custom text entry. For multiple selection, set Multiple=true and bind to a collection type.
-    /// </remarks>
     /// <example>
     /// Basic dropdown with data binding:
     /// <code>

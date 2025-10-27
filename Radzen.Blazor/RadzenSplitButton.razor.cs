@@ -11,24 +11,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A split button component that combines a primary action button with a dropdown menu of additional related actions.
     /// RadzenSplitButton displays a main button with a small dropdown toggle, allowing quick access to a default action while providing alternatives.
-    /// </summary>
-    /// <remarks>
-    /// Split buttons are ideal when you have a primary action and several related alternatives.
-    /// The left side executes the default action, the right side opens a menu of options.
-    /// Common examples include:
-    /// - Save (with options: Save As, Save and Close)
-    /// - Download (with options: Download PDF, Download Excel, Download CSV)
-    /// - Send (with options: Send Now, Schedule Send, Save Draft)
-    /// 
-    /// The component features:
-    /// - **Primary Button**: Main action triggered by clicking the left portion
-    /// - **Dropdown Menu**: Additional options in a dropdown from the right toggle
-    /// - **Styling**: ButtonStyle, Variant, Shade, Size for consistent appearance
-    /// - **Icons**: Optional icon on the main button
-    /// - **Keyboard Navigation**: Arrow keys, Enter, Escape for menu navigation
-    /// 
+    /// Ideal when you have a primary action and several related alternatives. The left side executes the default action, the right side opens a menu of options.
+    /// Common examples include Save (with options: Save As, Save and Close), Download (with options: Download PDF, Download Excel, Download CSV), and Send (with options: Send Now, Schedule Send, Save Draft).
+    /// Features main action triggered by clicking the left portion, additional options in a dropdown from the right toggle, ButtonStyle/Variant/Shade/Size for consistent appearance,
+    /// optional icon on the main button, and keyboard navigation (Arrow keys, Enter, Escape) for menu navigation.
     /// Menu items are defined using RadzenSplitButtonItem components as child content.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic split button:
     /// <code>

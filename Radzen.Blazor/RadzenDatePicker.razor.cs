@@ -15,14 +15,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A date and time picker component that provides a calendar popup for selecting dates and optional time selection.
     /// RadzenDatePicker supports DateTime, DateTime?, DateTimeOffset, DateTimeOffset?, DateOnly, and DateOnly? types with extensive customization options.
+    /// Displays a text input with a calendar icon button. Clicking opens a popup calendar for date selection.
+    /// Optional time selection can be enabled via ShowTime property, supporting both 12-hour and 24-hour formats.
+    /// Supports features like min/max date constraints, disabled dates, initial view configuration, calendar week display,
+    /// inline calendar mode (always visible), time-only mode, multiple date selection, and culture-specific formatting.
     /// </summary>
     /// <typeparam name="TValue">The type of the date/time value. Supports DateTime, DateTime?, DateTimeOffset, DateTimeOffset?, DateOnly, and DateOnly?.</typeparam>
-    /// <remarks>
-    /// The component displays a text input with a calendar icon button. Clicking opens a popup calendar for date selection.
-    /// Optional time selection can be enabled via ShowTime property, supporting both 12-hour and 24-hour formats.
-    /// The picker supports features like min/max date constraints, disabled dates, initial view configuration, calendar week display,
-    /// inline calendar mode (always visible), time-only mode, multiple date selection, and culture-specific formatting.
-    /// </remarks>
     /// <example>
     /// Basic date picker:
     /// <code>

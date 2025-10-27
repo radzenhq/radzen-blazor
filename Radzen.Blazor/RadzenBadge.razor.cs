@@ -5,19 +5,13 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// A small label component used to display counts, statuses, or short text labels with semantic color coding.
-    /// RadzenBadge is commonly used for notification counts, status indicators, tags, or highlighting important information.
+    /// RadzenBadge is a compact visual indicator commonly used for notification counts, status indicators, tags, or highlighting important information.
+    /// Supports multiple styles (Primary, Secondary, Success, Info, Warning, Danger, Light, Dark) for semantic coloring,
+    /// variants (Filled, Flat, Outlined, Text) for different appearances, and shapes (standard rectangular or pill-shaped via IsPill).
+    /// Content can be simple text via Text property or custom content via ChildContent.
+    /// Can be absolutely positioned to overlay other elements (e.g., notification icon with count).
+    /// Often used inline with text, on buttons (to show counts), or overlaid on icons (notification badges).
     /// </summary>
-    /// <remarks>
-    /// Badges are compact visual indicators that draw attention to specific information or states.
-    /// The component supports:
-    /// - **Styles**: Primary, Secondary, Success, Info, Warning, Danger, Light, Dark for semantic coloring
-    /// - **Variants**: Filled (solid background), Flat (subtle background), Outlined (border only), Text (minimal styling)
-    /// - **Shapes**: Standard rectangular or pill-shaped (rounded ends) via IsPill property
-    /// - **Content**: Simple text via Text property or custom content via ChildContent
-    /// - **Positioning**: Can be absolutely positioned to overlay other elements (e.g., notification icon with count)
-    /// 
-    /// Badges are often used inline with text, on buttons (to show counts), or overlaid on icons (notification badges).
-    /// </remarks>
     /// <example>
     /// Basic badge with text:
     /// <code>

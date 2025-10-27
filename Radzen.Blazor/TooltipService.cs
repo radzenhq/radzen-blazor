@@ -10,12 +10,10 @@ namespace Radzen
     /// <summary>
     /// A service for displaying tooltips programmatically on UI elements or at specific positions.
     /// TooltipService provides methods to show tooltips with text or custom HTML content, with configurable positioning, delays, and durations.
-    /// </summary>
-    /// <remarks>
     /// To use this service, add it as a scoped service in your application's service collection and place a RadzenTooltip component in your main layout.
-    /// The service manages tooltip lifecycle, automatically closing tooltips on navigation and providing various positioning options (top, bottom, left, right).
+    /// Manages tooltip lifecycle, automatically closing tooltips on navigation and providing various positioning options (top, bottom, left, right).
     /// Tooltips can be shown on mouse enter/leave events or on demand, with configurable delays before showing and auto-close durations.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Show a simple text tooltip:
     /// <code>

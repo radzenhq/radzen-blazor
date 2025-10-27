@@ -5,13 +5,10 @@ namespace Radzen.Blazor
     /// <summary>
     /// A password input component that masks entered characters for secure password entry with autocomplete support.
     /// RadzenPassword provides a styled password field with browser autocomplete integration for password managers.
-    /// </summary>
-    /// <remarks>
-    /// The password input displays entered characters as dots or asterisks to protect sensitive data from shoulder surfing.
-    /// The component integrates with browser password managers by setting appropriate autocomplete attributes.
+    /// Displays entered characters as dots or asterisks to protect sensitive data from shoulder surfing, integrates with browser password managers by setting appropriate autocomplete attributes.
     /// Supports data binding, validation, placeholder text, and read-only mode for display purposes.
     /// Use within forms for login, registration, password change, or any scenario requiring secure text entry.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic password input:
     /// <code>

@@ -6,22 +6,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A skeleton screen component that displays placeholder shapes while content is loading.
     /// RadzenSkeleton provides subtle loading states that match content structure, improving perceived performance.
+    /// Shows gray placeholder shapes that mimic the structure of the content being loaded, providing better UX than spinners by showing users the approximate layout before content appears,
+    /// making loading feel faster with immediate feedback, and reducing anxiety through progressive disclosure.
+    /// Supports multiple shapes including Text (horizontal bars for text lines, default), Circle (circular placeholders for avatars or icons), and Rectangle (rectangular blocks for images or cards).
+    /// Animations (None, Pulse, Wave) can be applied for additional loading feedback. Use multiple skeletons to represent the full structure of your loading content.
     /// </summary>
-    /// <remarks>
-    /// Skeleton screens show gray placeholder shapes that mimic the structure of the content being loaded.
-    /// This approach provides better UX than spinners by:
-    /// - **Content Preview**: Users see the approximate layout before content appears
-    /// - **Perceived Performance**: Makes loading feel faster by showing immediate feedback
-    /// - **Reduced Anxiety**: Progressive disclosure is less frustrating than blank screens or spinners
-    /// 
-    /// The component supports multiple shapes:
-    /// - **Text**: Horizontal bars for text lines (default)
-    /// - **Circle**: Circular placeholders for avatars or icons
-    /// - **Rectangle**: Rectangular blocks for images or cards
-    /// 
-    /// Animations (None, Pulse, Wave) can be applied for additional loading feedback.
-    /// Use multiple skeletons to represent the full structure of your loading content.
-    /// </remarks>
     /// <example>
     /// Text line skeleton:
     /// <code>

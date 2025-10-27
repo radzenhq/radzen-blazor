@@ -17,8 +17,7 @@ static class StringBuilderCache
     [ThreadStatic]
     private static StringBuilder? t_cachedInstance;
 
-    /// <summary>Get a StringBuilder for the specified capacity.</summary>
-    /// <remarks>If a StringBuilder of an appropriate size is cached, it will be returned and the cache emptied.</remarks>
+    /// <summary>Get a StringBuilder for the specified capacity. If a StringBuilder of an appropriate size is cached, it will be returned and the cache emptied.</summary>
     public static StringBuilder Acquire(int capacity = DefaultCapacity)
     {
         if (capacity <= MaxBuilderSize)

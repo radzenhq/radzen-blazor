@@ -13,24 +13,12 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// An autocomplete text input component that provides real-time suggestions as users type based on a data source.
-    /// RadzenAutoComplete filters and displays matching items in a dropdown, enabling quick selection without typing complete values.
+    /// RadzenAutoComplete combines a text input with a suggestion dropdown that filters and displays matching items, enabling quick selection without typing complete values.
+    /// Features configurable filter operators (Contains, StartsWith, etc.) and case sensitivity, binding to any IEnumerable data source with TextProperty to specify display field,
+    /// MinLength to require typing before showing suggestions, FilterDelay for debouncing, custom templates for rendering suggestion items,
+    /// LoadData event for on-demand server-side filtering, textarea-style multiline input support, and option to show all items when field gains focus.
+    /// Unlike dropdown, allows free-text entry and suggests matching items. The Value is the entered text, while SelectedItem provides access to the selected data object.
     /// </summary>
-    /// <remarks>
-    /// The autocomplete component combines a text input with a suggestion dropdown that filters as the user types.
-    /// Key features include:
-    /// - **Auto-suggestions**: Displays filtered matches from a data source as user types
-    /// - **Filtering**: Configurable filter operators (Contains, StartsWith, etc.) and case sensitivity
-    /// - **Data Binding**: Bind to any IEnumerable data source, with TextProperty to specify display field
-    /// - **Minimum Length**: Set MinLength to require typing before showing suggestions
-    /// - **Delay**: FilterDelay controls debouncing for better performance
-    /// - **Templates**: Custom templates for rendering suggestion items
-    /// - **On-Demand Loading**: Use LoadData event for server-side filtering
-    /// - **Multiline**: Support for textarea-style input with suggestions
-    /// - **Open on Focus**: Option to show all items when field gains focus
-    /// 
-    /// Unlike dropdown, autocomplete allows free-text entry and suggests matching items.
-    /// The Value is the entered text, while SelectedItem provides access to the selected data object.
-    /// </remarks>
     /// <example>
     /// Basic autocomplete:
     /// <code>
@@ -124,11 +112,8 @@ namespace Radzen.Blazor
         public int FilterDelay { get; set; } = 500;
 
         /// <summary>
-        /// Gets or sets the underlying input type.
+        /// Gets or sets the underlying input type. This does not apply when <see cref="Multiline"/> is <c>true</c>.
         /// </summary>
-        /// <remarks>
-        /// This does not apply when <see cref="Multiline"/> is <c>true</c>.
-        /// </remarks>
         /// <value>The input type.</value>
         [Parameter]
         public string InputType { get; set; } = "text";

@@ -78,19 +78,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A responsive grid column component used within RadzenRow to create flexible, responsive layouts based on a 12-column grid system.
     /// RadzenColumn provides breakpoint-specific sizing, offsetting, and ordering capabilities for building adaptive interfaces.
-    /// </summary>
-    /// <remarks>
-    /// RadzenColumn must be used inside a RadzenRow component. The column width is specified as a value from 1-12, representing the number of grid columns to span.
-    /// The component supports responsive design through breakpoint-specific properties:
-    /// - **Size**: Default column width (1-12)
-    /// - **SizeXS/SM/MD/LG/XL/XX**: Breakpoint-specific widths for Extra Small, Small, Medium, Large, Extra Large, and Extra Extra Large screens
-    /// - **Offset**: Number of columns to skip before this column (creates left margin)
-    /// - **OffsetXS/SM/MD/LG/XL/XX**: Breakpoint-specific offsets
-    /// - **Order**: Controls the visual order of columns (useful for reordering on different screen sizes)
-    /// - **OrderXS/SM/MD/LG/XL/XX**: Breakpoint-specific ordering
-    /// 
+    /// Must be used inside a RadzenRow component. The column width is specified as a value from 1-12, representing the number of grid columns to span.
+    /// Supports responsive design through breakpoint-specific properties including Size for default column width (1-12), SizeXS/SM/MD/LG/XL/XX for breakpoint-specific widths,
+    /// Offset for number of columns to skip before this column (creates left margin), OffsetXS/SM/MD/LG/XL/XX for breakpoint-specific offsets,
+    /// Order to control visual order of columns (useful for reordering on different screen sizes), and OrderXS/SM/MD/LG/XL/XX for breakpoint-specific ordering.
     /// Columns automatically fill available space when no size is specified, and wrap to new lines when the total exceeds 12.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic columns with fixed sizes:
     /// <code>

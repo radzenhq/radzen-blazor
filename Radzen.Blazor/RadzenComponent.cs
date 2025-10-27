@@ -10,20 +10,11 @@ namespace Radzen
     /// <summary>
     /// Base class for all Radzen Blazor components providing common functionality for styling, attributes, events, and lifecycle management.
     /// All Radzen components inherit from RadzenComponent to gain standard features like visibility control, custom attributes, mouse events, and disposal.
+    /// Provides foundational functionality including visibility control via Visible property, custom CSS via Style property and class via Attributes,
+    /// HTML attribute passing via unmatched parameters, MouseEnter/MouseLeave/ContextMenu event callbacks, localization support for numbers/dates/text,
+    /// access to the rendered HTML element via Element Reference, and proper cleanup via IDisposable pattern.
+    /// Components inheriting from RadzenComponent can override GetComponentCssClass() to provide their base CSS classes and use the protected Visible property to control rendering.
     /// </summary>
-    /// <remarks>
-    /// RadzenComponent provides foundational functionality shared across all Radzen components:
-    /// - **Visibility**: Control component visibility via Visible property
-    /// - **Styling**: Apply custom CSS via Style property and class via Attributes
-    /// - **Custom Attributes**: Pass any HTML attribute via unmatched parameters
-    /// - **Mouse Events**: MouseEnter, MouseLeave, ContextMenu callbacks
-    /// - **Culture**: Localization support for numbers, dates, and text
-    /// - **Element Reference**: Access to the rendered HTML element
-    /// - **Disposal**: Proper cleanup via IDisposable pattern
-    /// 
-    /// Components inheriting from RadzenComponent can override GetComponentCssClass() to provide their base CSS classes
-    /// and use the protected Visible property to control rendering.
-    /// </remarks>
     public class RadzenComponent : ComponentBase, IDisposable
     {
         /// <summary>

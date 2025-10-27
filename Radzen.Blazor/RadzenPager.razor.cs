@@ -12,21 +12,13 @@ namespace Radzen.Blazor
     /// <summary>
     /// A pagination component that provides navigation controls for paged data display.
     /// RadzenPager displays page numbers, navigation buttons, and optional page size selector for navigating through large datasets.
-    /// </summary>
-    /// <remarks>
-    /// The pager component works standalone or integrated with data components like RadzenDataGrid and RadzenDataList.
-    /// It provides:
-    /// - **Navigation Buttons**: First/Previous/Next/Last page buttons with customizable labels and icons
-    /// - **Page Numbers**: Clickable page number buttons with configurable count
-    /// - **Page Size Selector**: Optional dropdown to change items per page
-    /// - **Summary**: "Page X of Y" or custom summary text
-    /// - **Alignment**: Position controls (left/center/right) via HorizontalAlign
-    /// - **Density**: Compact or default spacing
-    /// - **Accessibility**: ARIA labels for all buttons
-    /// 
+    /// Works standalone or integrated with data components like RadzenDataGrid and RadzenDataList.
+    /// Provides navigation buttons (First/Previous/Next/Last page with customizable labels and icons), clickable page number buttons with configurable count,
+    /// optional dropdown to change items per page, summary display ("Page X of Y" or custom summary text), alignment controls (left/center/right) via HorizontalAlign,
+    /// compact or default spacing density, and ARIA labels for all buttons for accessibility.
     /// The PageChanged event provides Skip and Top values for loading the correct page of data.
     /// Use Count to specify total items, PageSize for items per page, and PageNumbersCount for visible page buttons.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic pager:
     /// <code>
@@ -174,20 +166,16 @@ namespace Radzen.Blazor
         public bool ShowPagingSummary { get; set; }
 
         /// <summary>
-        /// Gets or sets the pager summary format.
+        /// Gets or sets the pager summary format. <see cref="PagingSummaryTemplate" /> has preference over this property.
         /// </summary>
         /// <value>The pager summary format.</value>
-        /// <remarks>
-        /// <see cref="PagingSummaryTemplate" /> has preference
-        /// </remarks>
         [Parameter]
         public string PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
 
 #nullable enable
         /// <summary>
-        /// Gets or sets the pager summary template.
+        /// Gets or sets the pager summary template. Has preference over <see cref="PagingSummaryFormat" />.
         /// </summary>
-        /// <remarks>Has preference over <see cref="PagingSummaryFormat" /></remarks>
         [Parameter]
 		public RenderFragment<PagingInformation>? PagingSummaryTemplate { get; set; }
 #nullable restore

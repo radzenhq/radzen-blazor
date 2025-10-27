@@ -8,22 +8,12 @@ namespace Radzen.Blazor
     /// A pre-built login form component with username/password fields and optional "Remember Me", "Register", and "Reset Password" features.
     /// RadzenLogin provides a ready-to-use authentication UI that can be customized with events for login, registration, and password reset flows.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/>.
+    /// Eliminates the need to manually create login forms by providing a complete, styled login interface.
+    /// Features pre-configured text and password inputs, optional switch for persistent sessions (Remember Me), optional link to registration page/modal,
+    /// optional link for password recovery (Reset Password), browser password manager integration with autocomplete, customizable labels/button text/layout via parameters,
+    /// Login/Register/ResetPassword event callbacks for implementing auth logic, and built-in required field validation.
+    /// Handle the Login event to authenticate users with your backend. Use AllowRegister and AllowResetPassword to show/hide those links based on your auth requirements.
     /// </summary>
-    /// <remarks>
-    /// The login component eliminates the need to manually create login forms by providing a complete, styled login interface.
-    /// Features include:
-    /// - **Username/Password Fields**: Pre-configured text and password inputs
-    /// - **Remember Me**: Optional switch for persistent sessions
-    /// - **Register Link**: Optional link to registration page or modal
-    /// - **Reset Password**: Optional link for password recovery
-    /// - **Autocomplete**: Browser password manager integration
-    /// - **Customization**: Customizable labels, button text, and layout via parameters
-    /// - **Events**: Login, Register, and ResetPassword callbacks for implementing auth logic
-    /// - **Validation**: Built-in required field validation
-    /// 
-    /// Handle the Login event to authenticate users with your backend.
-    /// Use AllowRegister and AllowResetPassword to show/hide those links based on your auth requirements.
-    /// </remarks>
     /// <example>
     /// Basic login form:
     /// <code>

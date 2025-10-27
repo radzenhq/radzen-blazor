@@ -11,20 +11,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// An accordion component that displays collapsible content panels with only one or multiple panels expanded at a time.
     /// RadzenAccordion organizes content into expandable sections, saving vertical space while keeping all content accessible.
+    /// Ideal for FAQs, settings panels, grouped content, or any scenario where showing all content at once would be overwhelming.
+    /// Features single/multiple expand control, optional icons in panel headers, programmatic control via SelectedIndex two-way binding,
+    /// Expand and Collapse event callbacks, keyboard navigation (Arrow keys, Space/Enter, Home/End), and disabled item support.
+    /// By default, only one panel can be expanded at a time (Multiple = false). Set Multiple = true to allow multiple panels to be expanded simultaneously.
     /// </summary>
-    /// <remarks>
-    /// Accordions are ideal for FAQs, settings panels, grouped content, or any scenario where showing all content at once would be overwhelming.
-    /// The component features:
-    /// - **Single/Multiple Expand**: Control whether one or multiple items can be expanded simultaneously
-    /// - **Icons**: Optional icons in panel headers
-    /// - **Programmatic Control**: Use SelectedIndex for two-way binding to control which item is expanded
-    /// - **Events**: Expand and Collapse callbacks for tracking state changes
-    /// - **Keyboard Navigation**: Arrow keys, Space/Enter, Home/End for accessibility
-    /// - **Disabled Items**: Individual accordion items can be disabled to prevent expansion
-    /// 
-    /// By default, only one panel can be expanded at a time (Multiple = false).
-    /// Set Multiple = true to allow multiple panels to be expanded simultaneously.
-    /// </remarks>
     /// <example>
     /// Basic accordion (single expand mode):
     /// <code>

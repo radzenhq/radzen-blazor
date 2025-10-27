@@ -7,12 +7,10 @@ namespace Radzen.Blazor
     /// A validator component that ensures a form input component has a non-empty value.
     /// RadzenRequiredValidator verifies that required fields are filled before form submission.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/> and associated with a named input component.
-    /// </summary>
-    /// <remarks>
-    /// The validator checks if the associated component has a value (HasValue returns true) and that the value is not equal to the optional DefaultValue.
+    /// Checks if the associated component has a value (HasValue returns true) and that the value is not equal to the optional DefaultValue.
     /// For text inputs, an empty string is considered invalid. For dropdowns and other components, null or default values are considered invalid.
     /// The validation message can be customized via the Text property and displayed inline, as a block, or as a popup depending on the Style property.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic required field validation:
     /// <code>

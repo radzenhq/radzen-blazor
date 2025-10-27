@@ -1,17 +1,12 @@
 ﻿namespace Radzen.Blazor
 {
     /// <summary>
-    /// The <c>AutomCompleteType</c> is a string-associated enum of
-    /// browser-supported autocomplete attribute values.
-    /// </summary>
-    /// <remarks>
-    /// This class lists the autocomplete attirbute options allowing
-    /// developers to provide the browser with guidance on how to pre-populate
-    /// the form fields. It is a class rather than a simpler enum to associate
-    /// each option with the string the browser expects. For more information
-    /// please review the list of options (https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete)
+    /// The <c>AutomCompleteType</c> is a string-associated enum of browser-supported autocomplete attribute values.
+    /// Lists the autocomplete attribute options allowing developers to provide the browser with guidance on how to pre-populate the form fields.
+    /// It is a class rather than a simpler enum to associate each option with the string the browser expects.
+    /// For more information please review the list of options (https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/autocomplete)
     /// and the spec (https://html.spec.whatwg.org/multipage/form-control-infrastructure.html#autofill).
-    /// </remarks>
+    /// </summary>
     public enum AutoCompleteType
     {
         /// <summary>Autocomplete is disabled. </summary>

@@ -9,20 +9,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// An alert/notification box component for displaying important messages with semantic colors and optional close functionality.
     /// RadzenAlert provides contextual feedback messages for Success, Info, Warning, Error, and other notification scenarios.
+    /// Supports semantic styles (Info, Success, Warning, Danger) for contextual coloring, variants (Filled, Flat, Outlined, Text), 
+    /// automatic contextual icons or custom icons via Icon property, optional close button via AllowClose for dismissible alerts,
+    /// sizes (ExtraSmall, Small, Medium, Large), and content via Title/Text properties or rich content via ChildContent.
+    /// Automatically displays appropriate icons based on AlertStyle (checkmark for Success, warning triangle for Warning, etc.) unless ShowIcon is set to false or a custom Icon is provided.
     /// </summary>
-    /// <remarks>
-    /// Alerts are used to display prominent messages that require user attention or provide feedback about operations.
-    /// The component supports:
-    /// - **Semantic Styles**: Info, Success, Warning, Danger for contextual coloring
-    /// - **Variants**: Filled (solid background), Flat (subtle), Outlined (border only), Text (minimal)
-    /// - **Icons**: Automatic contextual icons or custom icons via Icon property
-    /// - **Dismissible**: Optional close button via AllowClose for removable alerts
-    /// - **Sizes**: ExtraSmall, Small, Medium, Large for different layouts
-    /// - **Content**: Simple text via Title/Text properties or rich content via ChildContent
-    /// 
-    /// Alerts automatically display appropriate icons based on AlertStyle (checkmark for Success, warning triangle for Warning, etc.)
-    /// unless ShowIcon is set to false or a custom Icon is provided.
-    /// </remarks>
     /// <example>
     /// Basic success alert:
     /// <code>

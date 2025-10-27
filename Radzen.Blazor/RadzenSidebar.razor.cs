@@ -9,20 +9,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A collapsible sidebar component for application navigation, typically used within RadzenLayout.
     /// RadzenSidebar provides a navigation panel that can be toggled open/closed and responds to screen size changes.
+    /// Commonly used in application layouts for primary navigation menus.
+    /// Features responsive design (automatically collapses on mobile devices and expands on desktop, configurable), positioning on Left/Right/Start/End of the layout,
+    /// full height option to span entire layout height or align with body section only, programmatic expand/collapse via Expanded property or Toggle() method,
+    /// seamless integration with RadzenLayout/RadzenHeader/RadzenBody/RadzenFooter, and typically contains RadzenPanelMenu or RadzenMenu for navigation.
+    /// Must be used inside RadzenLayout to enable responsive behavior and proper layout integration. Use @bind-Expanded for two-way binding to control sidebar state from code.
     /// </summary>
-    /// <remarks>
-    /// Sidebars are commonly used in application layouts for primary navigation menus.
-    /// The component features:
-    /// - **Responsive**: Automatically collapses on mobile devices and expands on desktop (configurable)
-    /// - **Positioning**: Can be placed on Left, Right, Start, or End of the layout
-    /// - **Full Height**: Option to span entire layout height or align with body section only
-    /// - **Toggle**: Programmatic expand/collapse via Expanded property or Toggle() method
-    /// - **Integration**: Works seamlessly with RadzenLayout, RadzenHeader, RadzenBody, RadzenFooter
-    /// - **Navigation Content**: Typically contains RadzenPanelMenu or RadzenMenu for navigation
-    /// 
-    /// Must be used inside RadzenLayout to enable responsive behavior and proper layout integration.
-    /// Use @bind-Expanded for two-way binding to control sidebar state from code.
-    /// </remarks>
     /// <example>
     /// Basic sidebar with menu:
     /// <code>

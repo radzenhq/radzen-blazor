@@ -7,22 +7,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A data list component for displaying collections of items using custom templates, with support for paging and virtualization.
     /// RadzenDataList provides a flexible way to render data in cards, tiles, or custom layouts instead of traditional table rows.
+    /// Ideal when you need more control over item presentation than a traditional table provides. Perfect for product catalogs, image galleries, card-based dashboards, or any non-tabular data display.
+    /// Supports complete control over item rendering via Template parameter, built-in paging with configurable page size, item wrapping to multiple columns/rows based on container width,
+    /// efficient rendering for large datasets via virtualization, customizable message or template for empty state when no data exists, and on-demand data loading for server-side paging via LoadData.
+    /// Use Template to define how each item should be rendered. The template receives the item as @context. Combine with RadzenRow/RadzenColumn for grid-based layouts or RadzenCard for card designs.
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the list. Each item is rendered using the Template.</typeparam>
-    /// <remarks>
-    /// DataList is ideal when you need more control over item presentation than a traditional table provides.
-    /// Perfect for product catalogs, image galleries, card-based dashboards, or any non-tabular data display.
-    /// The component supports:
-    /// - **Custom Templates**: Complete control over item rendering via Template parameter
-    /// - **Paging**: Built-in paging support with configurable page size
-    /// - **Wrapping**: Items can wrap to multiple columns/rows based on container width
-    /// - **Virtualization**: Efficient rendering for large datasets
-    /// - **Empty State**: Customizable message or template when no data exists
-    /// - **LoadData**: On-demand data loading for server-side paging
-    /// 
-    /// Use Template to define how each item should be rendered. The template receives the item as @context.
-    /// Combine with RadzenRow/RadzenColumn for grid-based layouts or RadzenCard for card designs.
-    /// </remarks>
     /// <example>
     /// Basic data list with card template:
     /// <code>

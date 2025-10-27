@@ -13,13 +13,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A numeric input component that allows users to enter numbers with optional increment/decrement buttons and value constraints.
     /// RadzenNumeric supports various numeric types, formatting, min/max validation, step increments, and culture-specific number display.
+    /// Provides up/down arrow buttons for incrementing/decrementing the value by a specified step amount.
+    /// Supports min/max constraints that are enforced during input and stepping, formatted value display using standard .NET format strings,
+    /// and can be configured with or without the up/down buttons. Handles overflow protection and respects the numeric type's natural limits.
     /// </summary>
     /// <typeparam name="TValue">The numeric type of the value. Supports int, long, short, byte, float, double, decimal and their nullable variants.</typeparam>
-    /// <remarks>
-    /// The component provides up/down arrow buttons for incrementing/decrementing the value by a specified step amount.
-    /// It supports min/max constraints that are enforced during input and stepping, formatted value display using standard .NET format strings,
-    /// and can be configured with or without the up/down buttons. The component handles overflow protection and respects the numeric type's natural limits.
-    /// </remarks>
     /// <example>
     /// Basic integer numeric input with constraints:
     /// <code>

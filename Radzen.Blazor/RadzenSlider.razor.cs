@@ -12,26 +12,14 @@ namespace Radzen.Blazor
     /// <summary>
     /// A slider component for selecting numeric values by dragging a handle along a track.
     /// RadzenSlider supports single value selection or range selection (min/max) with horizontal or vertical orientation.
-    /// </summary>
-    /// <typeparam name="TValue">The type of the slider value. Supports numeric types (int, decimal, double) or IEnumerable for range selection.</typeparam>
-    /// <remarks>
-    /// Sliders provide an intuitive way to select numeric values within a range, especially useful when:
-    /// - The exact value is less important than the approximate position
-    /// - You want to show the valid range visually
-    /// - The input should be constrained to specific increments
-    /// 
-    /// The component features:
-    /// - **Single/Range Selection**: Select one value or a min/max range
-    /// - **Orientation**: Horizontal (default) or Vertical layout
-    /// - **Constraints**: Min, Max values define the selectable range
-    /// - **Step Increments**: Step property controls value granularity
-    /// - **Visual Feedback**: Colored track showing selected portion
-    /// - **Keyboard Support**: Arrow keys for precise adjustment
-    /// - **Touch Support**: Drag gestures on mobile devices
-    /// 
+    /// Provides an intuitive way to select numeric values within a range, especially useful when the exact value is less important than the approximate position,
+    /// you want to show the valid range visually, or the input should be constrained to specific increments.
+    /// Features single value or min/max range selection, Horizontal (default) or Vertical layout, Min/Max values defining the selectable range,
+    /// Step property controlling value granularity, colored track showing selected portion for visual feedback, Arrow key support for precise adjustment, and drag gestures on mobile devices.
     /// For range selection, set Range=true and bind to IEnumerable&lt;TValue&gt; (e.g., IEnumerable&lt;int&gt;) for min/max values.
     /// Common uses include price filters, volume controls, zoom levels, or any bounded numeric input.
-    /// </remarks>
+    /// </summary>
+    /// <typeparam name="TValue">The type of the slider value. Supports numeric types (int, decimal, double) or IEnumerable for range selection.</typeparam>
     /// <example>
     /// Basic slider:
     /// <code>

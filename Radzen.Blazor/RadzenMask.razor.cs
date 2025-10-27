@@ -6,18 +6,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A masked text input component that enforces a specific format pattern as users type (e.g., phone numbers, dates, credit cards).
     /// RadzenMask guides users to enter data in the correct format by automatically formatting input according to a mask pattern.
+    /// Uses a pattern string where asterisks (*) represent user-input positions and other characters are literals. As users type, the input is automatically formatted to match the mask.
+    /// Features mask pattern definition using * for input positions (e.g., "(***) ***-****" for phone numbers), character filtering via Pattern (regex) to remove invalid characters and CharacterPattern (regex) to specify valid characters,
+    /// automatic insertion of literal characters (parentheses, dashes, spaces, etc.), and placeholder showing the expected format to guide users.
+    /// Common uses include phone numbers, dates, credit cards, SSN, postal codes, or any fixed-format data entry. The mask helps prevent input errors and improves data consistency.
     /// </summary>
-    /// <remarks>
-    /// The mask component uses a pattern string where asterisks (*) represent user-input positions and other characters are literals.
-    /// As users type, the input is automatically formatted to match the mask:
-    /// - **Mask Pattern**: Define the format using * for input positions (e.g., "(***) ***-****" for phone numbers)
-    /// - **Character Filtering**: Pattern (regex) removes invalid characters, CharacterPattern (regex) specifies valid characters
-    /// - **Auto-Formatting**: Automatically inserts literal characters (parentheses, dashes, spaces, etc.)
-    /// - **Placeholder**: Shows the expected format to guide users
-    /// 
-    /// Common uses include phone numbers, dates, credit cards, SSN, postal codes, or any fixed-format data entry.
-    /// The mask helps prevent input errors and improves data consistency.
-    /// </remarks>
     /// <example>
     /// Phone number mask:
     /// <code>

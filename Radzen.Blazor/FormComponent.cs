@@ -14,12 +14,10 @@ namespace Radzen
     /// <summary>
     /// Base class for form input components that support browser autocomplete functionality.
     /// Extends <see cref="FormComponent{T}"/> with properties for controlling browser autocomplete behavior and ARIA autocomplete attributes.
+    /// Used by input components like RadzenTextBox, RadzenPassword, RadzenNumeric, and RadzenMask.
+    /// Provides standardized autocomplete behavior for better integration with browser password managers and autofill features.
     /// </summary>
     /// <typeparam name="T">The type of the form component's value.</typeparam>
-    /// <remarks>
-    /// This base class is used by input components like RadzenTextBox, RadzenPassword, RadzenNumeric, and RadzenMask.
-    /// It provides standardized autocomplete behavior for better integration with browser password managers and autofill features.
-    /// </remarks>
     public class FormComponentWithAutoComplete<T> : FormComponent<T>
     {
         /// <summary>
@@ -82,21 +80,13 @@ namespace Radzen
     /// <summary>
     /// Base class for all Radzen form input components providing data binding, validation, and change event capabilities.
     /// FormComponent integrates with Blazor's EditContext for form validation and provides common functionality for all input controls.
+    /// This is the base class for components like RadzenTextBox, RadzenCheckBox, RadzenDropDown, RadzenDatePicker, etc.
+    /// Provides @bind-Value support for two-way binding, integration with Blazor EditContext and validators, Change and ValueChanged callbacks,
+    /// Disable property to prevent user interaction, Placeholder text for empty inputs, Name property for validation and label association,
+    /// and TabIndex for keyboard navigation control.
+    /// Components inheriting from FormComponent automatically work with RadzenTemplateForm and validators.
     /// </summary>
     /// <typeparam name="T">The type of the component's bound value (string, int, DateTime, etc.).</typeparam>
-    /// <remarks>
-    /// This is the base class for components like RadzenTextBox, RadzenCheckBox, RadzenDropDown, RadzenDatePicker, etc.
-    /// It provides:
-    /// - **Two-way Binding**: @bind-Value support for data binding
-    /// - **Validation**: Integration with Blazor EditContext and validators
-    /// - **Change Events**: Change and ValueChanged callbacks
-    /// - **Disabled State**: Disable property to prevent user interaction
-    /// - **Placeholder**: Placeholder text for empty inputs
-    /// - **Field Identification**: Name property for validation and label association
-    /// - **Tab Order**: TabIndex for keyboard navigation control
-    /// 
-    /// Components inheriting from FormComponent automatically work with RadzenTemplateForm and validators.
-    /// </remarks>
     public class FormComponent<T> : RadzenComponent, IRadzenFormComponent
     {
         /// <summary>

@@ -7,18 +7,10 @@ namespace Radzen.Blazor
     /// <summary>
     /// A star rating input component that allows users to provide ratings by selecting a number of stars.
     /// RadzenRating displays an interactive or read-only star rating with configurable number of stars and keyboard accessibility.
+    /// Displays a row of stars (or other symbols) that users can click to select a rating value. The value is an integer from 0 to the number of stars configured.
+    /// Common uses include product reviews and ratings, user feedback and satisfaction surveys, content quality indicators, and service ratings.
+    /// Supports keyboard navigation (arrow keys, Space/Enter) for accessibility. Use ReadOnly mode to display ratings without allowing user input.
     /// </summary>
-    /// <remarks>
-    /// The rating component displays a row of stars (or other symbols) that users can click to select a rating value.
-    /// The value is an integer from 0 to the number of stars configured. Common uses include:
-    /// - Product reviews and ratings
-    /// - User feedback and satisfaction surveys
-    /// - Content quality indicators
-    /// - Service ratings
-    /// 
-    /// The component supports keyboard navigation (arrow keys, Space/Enter) for accessibility.
-    /// Use ReadOnly mode to display ratings without allowing user input.
-    /// </remarks>
     /// <example>
     /// Basic 5-star rating:
     /// <code>

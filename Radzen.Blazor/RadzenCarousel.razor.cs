@@ -14,21 +14,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A carousel/slideshow component for cycling through content items (images, cards, or custom content) with navigation and paging controls.
     /// RadzenCarousel displays one item at a time with automatic or manual advancement and various navigation options.
+    /// Perfect for image galleries, product showcases, hero sections, or any content that benefits from sequential presentation.
+    /// Features automatic advancement with configurable interval, Previous/Next buttons with customizable icons and text, dot indicators or page numbers for direct item selection,
+    /// infinite loop for continuous cycling from last to first item, keyboard control (Arrow keys for navigation, Page Up/Down for first/last), swipe gestures on touch devices,
+    /// and customization of button styles, pager position (top/bottom/overlay), and navigation visibility.
+    /// Items are defined using RadzenCarouselItem components. Each item can contain images, text, or complex layouts. Use Auto property to enable automatic cycling, and Interval to control slide duration.
     /// </summary>
-    /// <remarks>
-    /// Carousels are perfect for image galleries, product showcases, hero sections, or any content that benefits from sequential presentation.
-    /// The component features:
-    /// - **Auto-Play**: Automatic advancement with configurable interval
-    /// - **Navigation**: Previous/Next buttons with customizable icons and text
-    /// - **Paging**: Dot indicators or page numbers for direct item selection
-    /// - **Infinite Loop**: Continuous cycling from last to first item
-    /// - **Keyboard Control**: Arrow keys for navigation, Page Up/Down for first/last
-    /// - **Touch Support**: Swipe gestures on touch devices
-    /// - **Customizable**: Button styles, pager position (top/bottom/overlay), navigation visibility
-    /// 
-    /// Items are defined using RadzenCarouselItem components. Each item can contain images, text, or complex layouts.
-    /// Use Auto property to enable automatic cycling, and Interval to control slide duration.
-    /// </remarks>
     /// <example>
     /// Basic image carousel:
     /// <code>

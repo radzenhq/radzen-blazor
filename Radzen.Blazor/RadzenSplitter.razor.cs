@@ -12,25 +12,14 @@ namespace Radzen.Blazor
     /// <summary>
     /// A splitter component that divides space between resizable panes with draggable dividers.
     /// RadzenSplitter creates layouts with user-adjustable panel sizes, ideal for multi-column interfaces or resizable sidebars.
-    /// </summary>
-    /// <remarks>
-    /// Splitters allow users to customize their workspace by dragging dividers to resize panes.
-    /// Common use cases include:
-    /// - Code editors with resizable file explorer, code, and output panes
-    /// - Email clients with adjustable folder list, message list, and message preview
-    /// - Admin dashboards with resizable navigation and content areas
-    /// - Data analysis tools with adjustable grid, chart, and filter panels
-    /// 
-    /// The component features:
-    /// - **Resizable Panes**: Drag dividers between panes to adjust sizes
-    /// - **Orientation**: Horizontal (side-by-side) or Vertical (top-to-bottom) layout
-    /// - **Size Control**: Fixed pixel sizes, percentages, or auto-sized panes
-    /// - **Min/Max Constraints**: Prevent panes from becoming too small or large
-    /// - **Collapsible**: Optional collapse/expand functionality per pane
-    /// - **Nested Splitters**: Create complex layouts with splitters inside panes
-    /// 
+    /// Allows users to customize their workspace by dragging dividers to resize panes.
+    /// Common use cases include code editors with resizable file explorer/code/output panes, email clients with adjustable folder list/message list/message preview,
+    /// admin dashboards with resizable navigation and content areas, and data analysis tools with adjustable grid/chart/filter panels.
+    /// Features resizable panes (drag dividers between panes to adjust sizes), Horizontal (side-by-side) or Vertical (top-to-bottom) orientation,
+    /// size control with fixed pixel sizes/percentages/auto-sized panes, min/max constraints to prevent panes from becoming too small or large,
+    /// optional collapse/expand functionality per pane, and nested splitters to create complex layouts.
     /// Panes are defined using RadzenSplitterPane components. Use Size property for fixed widths/heights.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic horizontal splitter:
     /// <code>

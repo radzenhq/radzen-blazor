@@ -6,20 +6,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A hyperlink component for navigation within the application or to external URLs.
     /// RadzenLink provides styled links with icon support, active state highlighting, and disabled states.
+    /// Enables navigation styled according to the application theme.
+    /// Supports internal navigation using Path for Blazor routing without page reloads, external links opening in same or new window via Target property,
+    /// automatic highlighting when the current URL matches the link path, optional icon before text via Icon property, alternative icon using custom image via Image property,
+    /// disabled state that prevents navigation and changes visual appearance, and prefix or exact matching for active state detection.
+    /// For internal navigation, uses Blazor's NavigationManager for client-side routing. For external URLs, use Target="_blank" to open in a new tab.
     /// </summary>
-    /// <remarks>
-    /// Links enable navigation and are styled according to the application theme. The component supports:
-    /// - **Internal Navigation**: Use Path for Blazor routing without page reloads
-    /// - **External Links**: Full URLs open in same or new window via Target property
-    /// - **Active State**: Automatically highlights when the current URL matches the link path
-    /// - **Icons**: Optional icon before text via Icon property
-    /// - **Images**: Alternative icon using custom image via Image property
-    /// - **Disabled State**: Prevents navigation and changes visual appearance
-    /// - **Match Modes**: Prefix or exact matching for active state detection
-    /// 
-    /// For internal navigation, the component uses Blazor's NavigationManager for client-side routing.
-    /// For external URLs, use Target="_blank" to open in a new tab.
-    /// </remarks>
     /// <example>
     /// Internal navigation link:
     /// <code>

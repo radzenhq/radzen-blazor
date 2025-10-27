@@ -9,13 +9,10 @@ namespace Radzen.Blazor
     /// <summary>
     /// A checkbox input component that supports two-state (checked/unchecked) or tri-state (checked/unchecked/indeterminate) modes.
     /// RadzenCheckBox provides data binding, validation, and keyboard accessibility for boolean or nullable boolean values.
+    /// In two-state mode, the value toggles between true and false. In tri-state mode (<see cref="TriState"/> = true), the value cycles through false → null → true → false.
+    /// Supports keyboard interaction (Space/Enter to toggle) and integrates with Blazor EditContext for form validation.
     /// </summary>
     /// <typeparam name="TValue">The type of the bound value. Typically bool for two-state or bool? for tri-state checkboxes.</typeparam>
-    /// <remarks>
-    /// In two-state mode, the value toggles between true and false.
-    /// In tri-state mode (<see cref="TriState"/> = true), the value cycles through false → null → true → false.
-    /// The component supports keyboard interaction (Space/Enter to toggle) and integrates with Blazor EditContext for form validation.
-    /// </remarks>
     /// <example>
     /// Basic two-state checkbox:
     /// <code>

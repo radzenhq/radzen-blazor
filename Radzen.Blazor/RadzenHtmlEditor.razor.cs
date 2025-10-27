@@ -11,21 +11,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A rich text HTML editor component with WYSIWYG editing, formatting toolbar, image upload, and custom tool support.
     /// RadzenHtmlEditor provides a full-featured editor for creating and editing formatted content with a Microsoft Word-like interface.
+    /// Allows users to create rich formatted content without knowing HTML.
+    /// Features WYSIWYG (what-you-see-is-what-you-get) visual editing interface, formatting tools (bold, italic, underline, font selection, colors, alignment, lists, links, images),
+    /// built-in image upload with configurable upload URL, custom toolbar buttons via RadzenHtmlEditorCustomTool, toggle between visual editing and HTML source code view,
+    /// paste filtering to remove unwanted HTML when pasting from other sources, and programmatic execution of formatting commands via ExecuteCommandAsync().
+    /// The Value property contains HTML markup. Use UploadUrl to configure where images are uploaded. Add custom tools for domain-specific functionality like inserting templates or special content.
     /// </summary>
-    /// <remarks>
-    /// The HTML editor allows users to create rich formatted content without knowing HTML.
-    /// Key features include:
-    /// - **WYSIWYG Editing**: What-you-see-is-what-you-get visual editing interface
-    /// - **Formatting Tools**: Bold, italic, underline, font selection, colors, alignment, lists, links, images
-    /// - **Image Upload**: Built-in image upload with configurable upload URL
-    /// - **Custom Tools**: Add custom toolbar buttons via RadzenHtmlEditorCustomTool
-    /// - **Source Mode**: Toggle between visual editing and HTML source code view
-    /// - **Paste Filtering**: Filter unwanted HTML when pasting from other sources
-    /// - **Commands**: Programmatic execution of formatting commands via ExecuteCommandAsync()
-    /// 
-    /// The Value property contains HTML markup. Use UploadUrl to configure where images are uploaded.
-    /// Add custom tools for domain-specific functionality like inserting templates or special content.
-    /// </remarks>
     /// <example>
     /// Basic HTML editor:
     /// <code>

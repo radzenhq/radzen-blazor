@@ -12,22 +12,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A segmented button control component that displays options as a group of connected buttons for single or multiple selection.
     /// RadzenSelectBar provides a visually distinct way to select from a limited set of options, commonly used for view modes, filters, or categories.
+    /// Presents options as a row or column of connected buttons where selected items are highlighted. Ideal when you have 2-7 options and want a more prominent UI than radio buttons or checkboxes.
+    /// Supports single selection (default) or multiple selection via Multiple property, Horizontal (side-by-side) or Vertical (stacked) button orientation, binding to a data source or static declaration of items,
+    /// custom item templates with text/icons/images, ExtraSmall/Small/Medium/Large button sizes, disabled items, and keyboard navigation (Arrow keys and Space/Enter) for accessibility.
+    /// Common uses include view toggles (list/grid), time period selectors (day/week/month), category filters, or any small set of mutually exclusive options.
     /// </summary>
     /// <typeparam name="TValue">The type of the selected value. Can be a single value or IEnumerable for multiple selection.</typeparam>
-    /// <remarks>
-    /// SelectBar presents options as a row or column of connected buttons where selected items are highlighted.
-    /// This is ideal when you have 2-7 options and want a more prominent UI than radio buttons or checkboxes.
-    /// The component supports:
-    /// - **Selection Modes**: Single selection (default) or multiple selection via Multiple property
-    /// - **Orientation**: Horizontal (side-by-side buttons) or Vertical (stacked buttons)
-    /// - **Data Binding**: Bind to a data source or statically declare items
-    /// - **Templating**: Custom item templates with text, icons, or images
-    /// - **Sizing**: ExtraSmall, Small, Medium, Large button sizes
-    /// - **Disabled Items**: Individual items can be disabled
-    /// - **Keyboard Navigation**: Arrow keys and Space/Enter for accessibility
-    /// 
-    /// Common uses include view toggles (list/grid), time period selectors (day/week/month), category filters, or any small set of mutually exclusive options.
-    /// </remarks>
     /// <example>
     /// Basic select bar:
     /// <code>

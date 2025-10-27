@@ -10,20 +10,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A wizard-style steps component that guides users through a multi-step process with numbered navigation.
     /// RadzenSteps displays a visual progress indicator and manages sequential navigation through each step, ideal for forms, checkout flows, or setup wizards.
+    /// Provides a structured way to break complex processes into manageable sequential stages.
+    /// Features numbered circles showing current/completed/upcoming steps for visual progress, Next/Previous buttons for moving between steps or clicking on step numbers,
+    /// optional form validation integration to prevent advancing with invalid data, CanChange event to control when users can move between steps,
+    /// navigation to specific steps via SelectedIndex binding, and optional built-in Next/Previous buttons or use your own custom navigation.
+    /// Each step is defined using RadzenStepsItem components. Use the CanChange event to validate data before allowing step transitions. Integrates with Blazor EditContext for form validation.
     /// </summary>
-    /// <remarks>
-    /// Steps components provide a structured way to break complex processes into manageable sequential stages.
-    /// The component features:
-    /// - **Visual Progress**: Numbered circles showing current, completed, and upcoming steps
-    /// - **Navigation**: Next/Previous buttons for moving between steps, or click on step numbers
-    /// - **Validation**: Optional form validation integration to prevent advancing with invalid data
-    /// - **Conditional Navigation**: CanChange event to control when users can move between steps
-    /// - **Programmatic Control**: Navigate to specific steps via SelectedIndex binding
-    /// - **Buttons**: Optional built-in Next/Previous buttons, or use your own custom navigation
-    /// 
-    /// Each step is defined using RadzenStepsItem components. Use the CanChange event to validate data before allowing step transitions.
-    /// The component integrates with Blazor EditContext for form validation.
-    /// </remarks>
     /// <example>
     /// Basic wizard with steps:
     /// <code>

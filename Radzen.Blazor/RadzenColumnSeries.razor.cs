@@ -9,19 +9,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A chart series that displays data as vertical columns (bars) in a RadzenChart.
     /// RadzenColumnSeries is ideal for comparing values across categories or showing trends over time with discrete data points.
+    /// Renders vertical rectangles where the height represents the data value. Multiple column series in the same chart are displayed side-by-side for each category.
+    /// Supports fill color/stroke color/width customization with individual column colors via Fills/Strokes, dynamic coloring based on value ranges using FillRange and StrokeRange,
+    /// optional value labels on top of columns, interactive tooltips showing category/value/series name, and click event handling for drill-down scenarios.
+    /// Use CategoryProperty to specify the X-axis field and ValueProperty for the column height (Y-axis value).
     /// </summary>
     /// <typeparam name="TItem">The type of data items in the series. Each item represents one column in the chart.</typeparam>
-    /// <remarks>
-    /// Column series render vertical rectangles where the height represents the data value. Multiple column series in the same chart
-    /// are displayed side-by-side for each category. The series supports:
-    /// - **Customization**: Fill color, stroke color/width, individual column colors via Fills/Strokes
-    /// - **Color Ranges**: Dynamic coloring based on value ranges using FillRange and StrokeRange
-    /// - **Data Labels**: Optional value labels on top of columns
-    /// - **Tooltips**: Interactive tooltips showing category, value, and series name
-    /// - **Click Events**: Handle column clicks for drill-down scenarios
-    /// 
-    /// Use CategoryProperty to specify the X-axis field and ValueProperty for the column height (Y-axis value).
-    /// </remarks>
     /// <example>
     /// Basic column series:
     /// <code>

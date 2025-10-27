@@ -5,18 +5,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A multi-line text input component for entering longer text content with configurable dimensions.
     /// RadzenTextArea provides a resizable textarea with data binding, validation, and automatic sizing options.
-    /// </summary>
-    /// <remarks>
-    /// The textarea component supports multi-line text entry and is ideal for comments, descriptions, messages, or any content requiring multiple lines.
-    /// The component provides:
-    /// - **Sizing**: Configurable via Rows (height) and Cols (width) properties
-    /// - **Limits**: MaxLength to restrict input length
-    /// - **Auto-sizing**: Browsers typically allow users to resize the textarea
-    /// - **Validation**: Integrates with Blazor EditContext for form validation
-    /// - **Data Binding**: Two-way binding via @bind-Value
-    /// 
+    /// Ideal for comments, descriptions, messages, or any content requiring multiple lines.
+    /// Features configurable sizing via Rows (height) and Cols (width) properties, MaxLength to restrict input length,
+    /// browser-resizable textarea, integration with Blazor EditContext for form validation, and two-way binding via @bind-Value.
     /// The Rows and Cols properties set the initial/minimum size, but users can often resize the textarea using the resize handle.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic textarea:
     /// <code>

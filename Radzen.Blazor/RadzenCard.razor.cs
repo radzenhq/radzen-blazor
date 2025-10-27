@@ -5,15 +5,12 @@ namespace Radzen.Blazor
 {
     /// <summary>
     /// A card container component that groups related content with a consistent visual design and optional elevation.
-    /// RadzenCard provides a styled container for displaying information, images, actions, and other content in a structured format.
-    /// </summary>
-    /// <remarks>
-    /// Cards are versatile containers commonly used in modern UI design to present focused content.
-    /// The component supports different visual variants (Filled, Flat, Outlined, Text) that affect the card's appearance.
-    /// Cards work well in grid layouts (using RadzenRow/RadzenColumn) or can be stacked vertically.
-    /// Use cards to group related information, create dashboard widgets, display product information, or organize form sections.
+    /// RadzenCard provides a versatile styled container for displaying information, images, actions, and other content in a structured format.
+    /// Supports different visual variants (Filled, Flat, Outlined, Text) that affect the card's appearance.
+    /// Works well in grid layouts (using RadzenRow/RadzenColumn) or can be stacked vertically.
+    /// Ideal for grouping related information, creating dashboard widgets, displaying product information, or organizing form sections.
     /// Combine with other Radzen components like RadzenImage, RadzenText, and RadzenButton for rich card content.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic card with content:
     /// <code>

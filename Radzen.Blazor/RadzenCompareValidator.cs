@@ -41,12 +41,10 @@ namespace Radzen.Blazor
     /// A validator component that compares a form input's value against another value or another component's value using a specified comparison operator.
     /// RadzenCompareValidator is commonly used for password confirmation, numeric range validation, or ensuring field values match expected criteria.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/> and associated with a named input component.
-    /// </summary>
-    /// <remarks>
-    /// The validator supports various comparison operations (Equal, NotEqual, GreaterThan, LessThan, etc.) via the Operator property.
+    /// Supports various comparison operations (Equal, NotEqual, GreaterThan, LessThan, etc.) via the Operator property.
     /// For password confirmation scenarios, set the Value property to the password field and the Component to the confirmation field name.
-    /// The validator can react to changes in the comparison value by setting ValidateOnComponentValueChange to true (default).
-    /// </remarks>
+    /// Can react to changes in the comparison value by setting ValidateOnComponentValueChange to true (default).
+    /// </summary>
     /// <example>
     /// <code>
     /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;

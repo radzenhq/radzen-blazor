@@ -38,20 +38,13 @@ namespace Radzen.Blazor
     /// <summary>
     /// A form field container component that wraps input components with labels, icons, helper text, and validation messages.
     /// RadzenFormField provides a Material Design-style field layout with floating labels and consistent spacing.
-    /// </summary>
-    /// <remarks>
-    /// FormField enhances form inputs by adding structure, labels, and supplementary content in a cohesive layout.
-    /// The component provides:
-    /// - **Labels**: Top-aligned or floating labels via Text property
-    /// - **Start/End Content**: Icons or buttons before/after the input (e.g., search icon, clear button)
-    /// - **Helper Text**: Explanatory text or validation messages below the input
-    /// - **Variants**: Filled, Outlined, or Flat appearance matching Material Design
-    /// - **Floating Labels**: Labels that animate upward when input is focused or has value
-    /// - **Automatic Validation**: Displays validation messages when used with validators
-    /// 
+    /// Enhances form inputs by adding structure, labels, and supplementary content in a cohesive layout.
+    /// Features top-aligned or floating labels via Text property, Start/End content for icons or buttons before/after the input (e.g., search icon, clear button),
+    /// helper text for explanatory text or validation messages below the input, Filled/Outlined/Flat variants matching Material Design,
+    /// floating labels that animate upward when input is focused or has value, and automatic display of validation messages when used with validators.
     /// Compatible with RadzenTextBox, RadzenTextArea, RadzenPassword, RadzenDropDown, RadzenNumeric, RadzenDatePicker, and similar input components.
     /// Use Start for leading icons (search, email), End for trailing icons (visibility toggle, clear button).
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic form field with label:
     /// <code>

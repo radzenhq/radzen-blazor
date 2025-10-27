@@ -88,20 +88,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A text display component with predefined typography styles matching Material Design text hierarchy.
     /// RadzenText provides consistent text formatting for headings, subtitles, body text, captions, and more with semantic HTML tags.
+    /// Simplifies typography by providing preset styles that match your theme's design system, allowing consistent, professionally designed text formatting without managing CSS classes manually.
+    /// Supports text styles (Display headings H1-H6, subtitles, body text, captions, button text, overlines), automatically uses appropriate HTML tags (h1-h6, p, span) based on style,
+    /// manual HTML tag specification via TagName property, built-in text alignment (left, right, center, justify), and optional anchor links for heading navigation.
+    /// TextStyle.DisplayH1-H6 provide large display headings, TextStyle.H1-H6 provide standard headings, Subtitle1/2 for subtitles, Body1/2 for paragraphs, Caption for small text, and Overline for labels.
     /// </summary>
-    /// <remarks>
-    /// RadzenText simplifies typography by providing preset styles that match your theme's design system.
-    /// Instead of managing CSS classes manually, use TextStyle to get consistent, professionally designed text formatting.
-    /// The component supports:
-    /// - **Text Styles**: Display headings (H1-H6), subtitles, body text, captions, button text, overlines
-    /// - **Semantic Tags**: Automatically uses appropriate HTML tags (h1-h6, p, span) based on style
-    /// - **Tag Override**: Manually specify the HTML tag via TagName property
-    /// - **Alignment**: Built-in text alignment (left, right, center, justify)
-    /// - **Anchors**: Optionally create anchor links for heading navigation
-    /// 
-    /// TextStyle.DisplayH1-H6 provide large display headings, TextStyle.H1-H6 provide standard headings,
-    /// Subtitle1/2 for subtitles, Body1/2 for paragraphs, Caption for small text, and Overline for labels.
-    /// </remarks>
     /// <example>
     /// Heading text:
     /// <code>

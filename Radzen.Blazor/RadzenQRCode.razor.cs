@@ -47,21 +47,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A QR code generator component that creates scannable QR codes from text, URLs, or other data as SVG graphics.
     /// RadzenQRCode supports extensive customization including colors, shapes, error correction, and embedded logos.
+    /// Encodes data in a two-dimensional barcode format scannable by smartphones and QR code readers. Generates QR codes entirely client-side as SVG, with no external dependencies.
+    /// Features data encoding (text, URLs, contact info, WiFi credentials, or any string data), error correction levels (Low, Medium, Quartile, High) for different damage resistance,
+    /// customization of colors for modules (dots) and background with custom shapes (Square, Rounded, Circle), optional logo/image embedding in the center of the QR code,
+    /// eye styling to customize the appearance of the three corner finder patterns, and responsive size (percentage or pixel-based) for responsive layouts.
+    /// Higher error correction levels allow the QR code to remain scannable even when partially damaged or obscured (e.g., by a logo). Use Quartile or High error correction when embedding logos.
     /// </summary>
-    /// <remarks>
-    /// QR codes encode data in a two-dimensional barcode format scannable by smartphones and QR code readers.
-    /// The component generates QR codes entirely client-side as SVG, with no external dependencies.
-    /// Features include:
-    /// - **Data Encoding**: Encode text, URLs, contact info, WiFi credentials, or any string data
-    /// - **Error Correction**: Low, Medium, Quartile, High levels for different damage resistance
-    /// - **Customization**: Colors for modules (dots) and background, custom shapes (Square, Rounded, Circle)
-    /// - **Logo Embedding**: Optionally embed a logo/image in the center of the QR code
-    /// - **Eye Styling**: Customize the appearance of the three corner finder patterns
-    /// - **Responsive**: Size can be percentage or pixel-based for responsive layouts
-    /// 
-    /// Higher error correction levels allow the QR code to remain scannable even when partially damaged or obscured (e.g., by a logo).
-    /// Use Quartile or High error correction when embedding logos.
-    /// </remarks>
     /// <example>
     /// Basic QR code for URL:
     /// <code>

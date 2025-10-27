@@ -8,19 +8,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A flexbox container component that arranges child elements in a vertical or horizontal stack with configurable spacing and alignment.
     /// RadzenStack provides a simpler alternative to RadzenRow/RadzenColumn for linear layouts without the 12-column grid constraint.
-    /// </summary>
-    /// <remarks>
-    /// RadzenStack is ideal for creating simple vertical or horizontal layouts without needing a grid system.
-    /// Unlike RadzenRow/RadzenColumn which uses a 12-column grid, Stack arranges children linearly with equal spacing.
-    /// Key features:
-    /// - **Orientation**: Vertical (column) or Horizontal (row) layout
-    /// - **Gap**: Consistent spacing between child elements
-    /// - **Alignment**: AlignItems for cross-axis alignment, JustifyContent for main-axis distribution
-    /// - **Reverse**: Option to reverse the order of children
-    /// - **Wrap**: Control whether children wrap to new lines or stay in a single line
-    /// 
+    /// Ideal for creating simple vertical or horizontal layouts without needing a grid system. Unlike RadzenRow/RadzenColumn which uses a 12-column grid, Stack arranges children linearly with equal spacing.
+    /// Features Vertical (column) or Horizontal (row) orientation, consistent gap spacing between child elements, AlignItems for cross-axis alignment and JustifyContent for main-axis distribution,
+    /// option to reverse the order of children, and control whether children wrap to new lines or stay in a single line.
     /// Use for simpler layouts like button groups, form field stacks, or toolbar arrangements.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Vertical stack with gap spacing:
     /// <code>

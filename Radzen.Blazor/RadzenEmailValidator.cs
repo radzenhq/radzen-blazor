@@ -7,12 +7,10 @@ namespace Radzen.Blazor
     /// A validator component that verifies whether a text input contains a valid email address format.
     /// RadzenEmailValidator uses the .NET EmailAddressAttribute to validate email format according to standard rules.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/> and associated with a named input component.
-    /// </summary>
-    /// <remarks>
-    /// The validator checks email format using System.ComponentModel.DataAnnotations.EmailAddressAttribute validation rules.
+    /// Checks email format using System.ComponentModel.DataAnnotations.EmailAddressAttribute validation rules.
     /// Empty or null values are considered valid - combine with <see cref="RadzenRequiredValidator"/> to ensure the field is not empty.
     /// The validation runs when the form is submitted or when the component loses focus.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic email validation:
     /// <code>

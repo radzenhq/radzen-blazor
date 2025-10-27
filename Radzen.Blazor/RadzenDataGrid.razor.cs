@@ -17,21 +17,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A powerful data grid component for displaying and manipulating tabular data with support for sorting, filtering, paging, grouping, editing, and selection.
     /// RadzenDataGrid provides a full-featured table with inline editing, master-detail views, virtualization, export capabilities, and extensive customization options.
+    /// Supports single/multiple column sorting, simple/advanced filtering, grouping with aggregation, inline/cell editing with validation, and single/multiple row selection with checkbox columns.
+    /// Features on-demand data loading via LoadData event for server-side operations, export to Excel and CSV formats, column/row templates, group headers/footers, and density modes (Default/Compact) for responsive layouts.
+    /// The grid can work with in-memory collections or load data on-demand from APIs.
+    /// Columns are defined using RadzenDataGridColumn components within the Columns template.
     /// </summary>
     /// <typeparam name="TItem">The type of data items displayed in the grid. Each row represents one instance of TItem.</typeparam>
-    /// <remarks>
-    /// RadzenDataGrid is a comprehensive data table component supporting:
-    /// - **Data Operations**: Sorting (single/multiple columns), filtering (simple/advanced), paging, grouping, aggregation
-    /// - **Editing**: Inline editing, cell editing, add/edit/delete operations with validation
-    /// - **Selection**: Single/multiple row selection with checkbox column support
-    /// - **Performance**: Virtualization for large datasets, on-demand data loading via LoadData event
-    /// - **Export**: Export to Excel and CSV formats
-    /// - **Customization**: Column templates, row templates, group headers/footers, custom cell rendering
-    /// - **Responsive**: Density modes (Default/Compact), responsive column visibility
-    /// 
-    /// The grid can work with in-memory collections or load data on-demand from APIs. Use the LoadData event for server-side operations.
-    /// Columns are defined using RadzenDataGridColumn components within the Columns template.
-    /// </remarks>
     /// <example>
     /// Basic data grid with sorting, paging, and filtering:
     /// <code>

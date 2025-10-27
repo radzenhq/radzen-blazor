@@ -8,19 +8,10 @@ namespace Radzen.Blazor
     /// <summary>
     /// A menu item component used within RadzenProfileMenu to define individual navigation or action items.
     /// RadzenProfileMenuItem represents one clickable item in a profile menu dropdown with support for icons, navigation, and custom content.
-    /// </summary>
-    /// <remarks>
-    /// Profile menu items are used inside RadzenProfileMenu to create user profile dropdown menus.
-    /// Each item can navigate to a page (via Path), trigger an action (via click event), or display custom content (via Template).
-    /// Common uses in profile menus include:
-    /// - Account settings
-    /// - User profile page
-    /// - Logout/sign out
-    /// - Preferences
-    /// - Help/documentation
-    /// 
+    /// Used inside RadzenProfileMenu to create user profile dropdown menus. Each item can navigate to a page (via Path), trigger an action (via click event), or display custom content (via Template).
+    /// Common uses in profile menus include account settings, user profile page, logout/sign out, preferences, and help/documentation.
     /// Items support icons, images, text, and custom templates for flexible rendering.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Profile menu items in a profile menu:
     /// <code>

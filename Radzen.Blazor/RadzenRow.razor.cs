@@ -8,18 +8,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A flexbox row container component that horizontally arranges RadzenColumn components in a responsive 12-column grid layout.
     /// RadzenRow provides gap spacing, alignment, and justification controls for creating flexible, responsive page layouts.
-    /// </summary>
-    /// <remarks>
-    /// RadzenRow serves as a container for RadzenColumn components, creating a horizontal flexbox layout.
-    /// Columns within a row automatically wrap to the next line when their combined Size values exceed 12.
-    /// The row supports:
-    /// - **Gap Control**: Gap and RowGap properties for spacing between columns and wrapped rows
-    /// - **Alignment**: AlignItems for vertical alignment (start, center, end, stretch, baseline)
-    /// - **Justification**: JustifyContent for horizontal distribution (start, center, end, space-between, space-around)
-    /// - **Responsive**: Works seamlessly with RadzenColumn's breakpoint-specific sizing
-    /// 
+    /// Serves as a container for RadzenColumn components, creating a horizontal flexbox layout where columns automatically wrap to the next line when their combined Size values exceed 12.
+    /// Supports Gap and RowGap properties for spacing between columns and wrapped rows, AlignItems for vertical alignment (start, center, end, stretch, baseline),
+    /// JustifyContent for horizontal distribution (start, center, end, space-between, space-around), and works seamlessly with RadzenColumn's breakpoint-specific sizing.
     /// Use AlignItems and JustifyContent from the base RadzenFlexComponent to control layout behavior.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic row with columns and gap:
     /// <code>

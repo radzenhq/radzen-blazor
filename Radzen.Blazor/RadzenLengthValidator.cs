@@ -6,13 +6,10 @@ namespace Radzen.Blazor
     /// A validator component that ensures a text input's length falls within a specified minimum and maximum range.
     /// RadzenLengthValidator is useful for enforcing username lengths, password complexity, or limiting text field sizes.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/> and associated with a named input component.
-    /// </summary>
-    /// <remarks>
-    /// The validator checks the string length against optional Min and Max constraints.
-    /// If only Min is set, it validates minimum length. If only Max is set, it validates maximum length.
-    /// If both are set, the length must be within the range (inclusive).
+    /// Checks the string length against optional Min and Max constraints.
+    /// If only Min is set, validates minimum length. If only Max is set, validates maximum length. If both are set, the length must be within the range (inclusive).
     /// Null or empty values are considered invalid if Min is set, and valid if only Max is set.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// <code>
     /// &lt;RadzenTemplateForm TItem="Model" Data=@model&gt;

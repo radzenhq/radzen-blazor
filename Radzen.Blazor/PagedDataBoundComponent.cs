@@ -187,20 +187,16 @@ namespace Radzen
         public bool ShowPagingSummary { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets the pager summary format.
+        /// Gets or sets the pager summary format. <see cref="PagingSummaryTemplate" /> has preference over this property.
         /// </summary>
         /// <value>The pager summary format.</value>
-        /// <remarks>
-        /// <see cref="PagingSummaryTemplate" /> has preference
-        /// </remarks>
         [Parameter]
         public string PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
 
 #nullable enable
         /// <summary>
-        /// Gets or sets the pager summary template.
+        /// Gets or sets the pager summary template. Has preference over <see cref="PagingSummaryFormat" />.
         /// </summary>
-        /// <remarks>Has preference over <see cref="PagingSummaryFormat" /></remarks>
         [Parameter]
         public RenderFragment<PagingInformation>? PagingSummaryTemplate { get; set; }
 #nullable restore

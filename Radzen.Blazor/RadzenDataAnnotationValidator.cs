@@ -10,20 +10,12 @@ namespace Radzen.Blazor
     /// A validator component that validates form inputs using Data Annotations attributes defined on model properties.
     /// RadzenDataAnnotationValidator enables automatic validation based on attributes like [Required], [StringLength], [Range], [EmailAddress], etc.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/>.
+    /// Uses the standard .NET validation attributes from System.ComponentModel.DataAnnotations. Reads all validation attributes on a model property and validates the input accordingly.
+    /// Benefits include centralized validation (define rules once on the model, use everywhere), support for multiple validation attributes per property,
+    /// built-in attributes (Required, StringLength, Range, EmailAddress, Phone, Url, RegularExpression, etc.), works with custom ValidationAttribute implementations,
+    /// and multiple errors joined with MessageSeparator.
+    /// Ideal when your validation rules are already defined on your data models using data annotations. Automatically extracts error messages from the attributes' ErrorMessage properties.
     /// </summary>
-    /// <remarks>
-    /// Data annotation validation uses the standard .NET validation attributes from System.ComponentModel.DataAnnotations.
-    /// This validator reads all validation attributes on a model property and validates the input accordingly.
-    /// Benefits include:
-    /// - **Centralized Validation**: Define rules once on the model, use everywhere
-    /// - **Multiple Attributes**: Supports multiple validation attributes per property
-    /// - **Built-in Attributes**: Required, StringLength, Range, EmailAddress, Phone, Url, RegularExpression, etc.
-    /// - **Custom Attributes**: Works with custom ValidationAttribute implementations
-    /// - **Combined Messages**: Multiple errors are joined with MessageSeparator
-    /// 
-    /// This is ideal when your validation rules are already defined on your data models using data annotations.
-    /// The validator automatically extracts error messages from the attributes' ErrorMessage properties.
-    /// </remarks>
     /// <example>
     /// Model-based validation with data annotations:
     /// <code>

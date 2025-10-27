@@ -12,26 +12,13 @@ namespace Radzen.Blazor
     /// <summary>
     /// A dropdown component that displays items in a DataGrid within the popup instead of a simple list.
     /// RadzenDropDownDataGrid combines dropdown selection with grid features like multiple columns, sorting, filtering, and paging.
+    /// Ideal when dropdown items have multiple properties you want to display in columns. Instead of showing just one property per item, the grid popup can display multiple columns.
+    /// Perfect for scenarios like selecting products with columns for Name/SKU/Price/Stock, choosing employees with Name/Department/Email columns, or picking customers with Company/Contact/Location columns.
+    /// Features full DataGrid with columns/sorting/filtering in the dropdown popup, column definition using RadzenDropDownDataGridColumn, built-in column filtering in the grid,
+    /// multiple selection with checkboxes, optional paging for large datasets, and custom column templates for rich item display.
+    /// Define columns as child components to specify what data to show in the grid popup.
     /// </summary>
     /// <typeparam name="TValue">The type of the selected value. Can be a single value or IEnumerable for multiple selection.</typeparam>
-    /// <remarks>
-    /// This component is ideal when dropdown items have multiple properties you want to display in columns.
-    /// Instead of showing just one property per item, the grid popup can display multiple columns.
-    /// Perfect for scenarios like:
-    /// - Selecting products with columns for Name, SKU, Price, Stock
-    /// - Choosing employees with Name, Department, Email columns
-    /// - Picking customers with Company, Contact, Location columns
-    /// 
-    /// The component features:
-    /// - **DataGrid Popup**: Full DataGrid with columns, sorting, filtering in the dropdown
-    /// - **Multiple Columns**: Define columns using RadzenDropDownDataGridColumn
-    /// - **Filtering**: Built-in column filtering in the grid
-    /// - **Multiple Selection**: Select multiple items with checkboxes
-    /// - **Paging**: Optional paging for large datasets
-    /// - **Templates**: Custom column templates for rich item display
-    /// 
-    /// Define columns as child components to specify what data to show in the grid popup.
-    /// </remarks>
     /// <example>
     /// Basic dropdown with grid:
     /// <code>

@@ -65,24 +65,13 @@ namespace Radzen.Blazor
     /// <summary>
     /// A chat interface component for displaying and sending messages in multi-participant conversations.
     /// RadzenChat provides a complete chat UI with message history, user avatars, typing indicators, and message composition.
-    /// </summary>
-    /// <remarks>
-    /// The chat component creates a messaging interface similar to modern chat applications.
-    /// It's ideal for customer support chats, team collaboration, messaging features, or AI chatbots.
-    /// Key features:
-    /// - **Multi-User Support**: Display messages from multiple participants with avatars and names
-    /// - **Message Display**: Chronological message list with sender identification
-    /// - **User Avatars**: Show user photos or initials with customizable colors
-    /// - **Typing Indicators**: Optional "User is typing..." feedback
-    /// - **Message Composition**: Text input with Send button for new messages
-    /// - **Templates**: Customize message rendering, empty state, and typing indicator
-    /// - **Auto-Scroll**: Automatically scrolls to newest messages
-    /// - **Time Stamps**: Display message send times
-    /// 
-    /// Provide a list of ChatUser objects for participants and ChatMessage objects for message history.
-    /// Set CurrentUserId to distinguish the current user's messages (typically right-aligned) from others (left-aligned).
+    /// Creates a messaging interface similar to modern chat applications, ideal for customer support chats, team collaboration, messaging features, or AI chatbots.
+    /// Features multi-user support displaying messages from multiple participants with avatars and names, chronological message list with sender identification,
+    /// user avatars showing photos or initials with customizable colors, optional "User is typing..." feedback, text input with Send button for new messages,
+    /// customizable templates for message rendering/empty state/typing indicator, automatic scrolling to newest messages, and message send time stamps.
+    /// Provide a list of ChatUser objects for participants and ChatMessage objects for message history. Set CurrentUserId to distinguish the current user's messages (typically right-aligned) from others (left-aligned).
     /// Handle MessageSent to process new messages (save to database, send to server, etc.).
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic chat:
     /// <code>

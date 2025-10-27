@@ -7,18 +7,10 @@ namespace Radzen.Blazor
     /// A validator component that ensures a text input matches a specified regular expression pattern.
     /// RadzenRegexValidator is useful for validating formats like ZIP codes, phone numbers, custom IDs, or any pattern-based data.
     /// Must be placed inside a <see cref="RadzenTemplateForm{TItem}"/>.
+    /// Checks input against a regular expression pattern using .NET's RegularExpressionAttribute.
+    /// Common use cases include ZIP/postal codes (e.g., "\d{5}" for US ZIP), phone numbers (e.g., "\d{3}-\d{3}-\d{4}"), custom ID formats (e.g., "^[A-Z]{2}\d{6}$"), and alphanumeric constraints (e.g., "^[a-zA-Z0-9]+$").
+    /// The validator passes when the value matches the entire pattern (implicit anchoring). Empty or null values are considered valid - combine with RadzenRequiredValidator to ensure the field is filled.
     /// </summary>
-    /// <remarks>
-    /// Regex validators check input against a regular expression pattern using .NET's RegularExpressionAttribute.
-    /// Common use cases include:
-    /// - ZIP/postal codes (e.g., "\d{5}" for US ZIP)
-    /// - Phone numbers (e.g., "\d{3}-\d{3}-\d{4}")
-    /// - Custom ID formats (e.g., "^[A-Z]{2}\d{6}$")
-    /// - Alphanumeric constraints (e.g., "^[a-zA-Z0-9]+$")
-    /// 
-    /// The validator passes when the value matches the entire pattern (implicit anchoring).
-    /// Empty or null values are considered valid - combine with RadzenRequiredValidator to ensure the field is filled.
-    /// </remarks>
     /// <example>
     /// ZIP code validation:
     /// <code>

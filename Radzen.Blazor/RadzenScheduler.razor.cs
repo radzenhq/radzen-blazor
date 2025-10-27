@@ -11,24 +11,13 @@ namespace Radzen.Blazor
     /// <summary>
     /// A scheduler component for displaying and managing calendar appointments in multiple view types (day, week, month, year).
     /// RadzenScheduler provides a rich calendar interface with drag-and-drop, inline editing, recurring events, and customizable views.
+    /// Displays time-based events in various calendar views, ideal for appointment booking, event calendars, resource scheduling, or any time-based data visualization.
+    /// Features multiple views (Day, Week, Month, Year Planner, Year Timeline), drag & drop to move appointments between time slots, resize to adjust appointment duration by dragging edges,
+    /// inline editing to create and edit appointments directly in the calendar, tooltips for quick info on hover, customizable appointment templates,
+    /// support for all-day and multi-day events, and timezone-aware appointments.
+    /// Define data properties using StartProperty, EndProperty, and TextProperty. Add view components (RadzenDayView, RadzenWeekView, RadzenMonthView) as child content.
     /// </summary>
     /// <typeparam name="TItem">The type of appointment data items. Must have DateTime properties for start/end times and a string property for text.</typeparam>
-    /// <remarks>
-    /// The scheduler component displays time-based events in various calendar views.
-    /// It's ideal for appointment booking, event calendars, resource scheduling, or any time-based data visualization.
-    /// Key features:
-    /// - **Multiple Views**: Day, Week, Month, Year Planner, Year Timeline views
-    /// - **Drag &amp; Drop**: Move appointments between time slots
-    /// - **Resize**: Adjust appointment duration by dragging edges
-    /// - **Inline Editing**: Create and edit appointments directly in the calendar
-    /// - **Tooltips**: Hover over appointments for quick info
-    /// - **Templates**: Customize appointment rendering
-    /// - **All-Day Events**: Support for all-day and multi-day events
-    /// - **Time Zones**: Handle timezone-aware appointments
-    /// 
-    /// Define data properties using StartProperty, EndProperty, and TextProperty.
-    /// Add view components (RadzenDayView, RadzenWeekView, RadzenMonthView) as child content.
-    /// </remarks>
     /// <example>
     /// Basic scheduler with month view:
     /// <code>

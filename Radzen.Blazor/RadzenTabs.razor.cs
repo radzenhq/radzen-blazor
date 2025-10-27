@@ -11,20 +11,12 @@ namespace Radzen.Blazor
     /// <summary>
     /// A tabbed interface component that organizes content into multiple panels with clickable tabs for navigation.
     /// RadzenTabs allows users to switch between different views or sections without navigating away from the page.
-    /// </summary>
-    /// <remarks>
-    /// RadzenTabs provides a container for RadzenTabsItem components, each representing one tab and its associated content panel.
-    /// The component supports:
-    /// - **Tab Positioning**: Tabs can be positioned at Top, Bottom, Left, Right, TopRight, or BottomRight
-    /// - **Render Modes**: Server-side rendering (default) or client-side rendering for improved interactivity
-    /// - **Selection**: Programmatic selection via SelectedIndex with two-way binding
-    /// - **Events**: Change event fires when tabs are switched
-    /// - **Dynamic Tabs**: Add or remove tabs programmatically using AddTab() and RemoveItem()
-    /// - **Keyboard Navigation**: Arrow keys, Home, End, Space, and Enter for accessibility
-    /// - **Disabled Tabs**: Individual tabs can be disabled to prevent selection
-    /// 
+    /// Provides a container for RadzenTabsItem components, each representing one tab and its associated content panel.
+    /// Supports tab positioning at Top, Bottom, Left, Right, TopRight, or BottomRight, server-side rendering (default) or client-side rendering for improved interactivity,
+    /// programmatic selection via SelectedIndex with two-way binding, Change event when tabs are switched, dynamic tab addition/removal using AddTab() and RemoveItem(),
+    /// keyboard navigation (Arrow keys, Home, End, Space, Enter) for accessibility, and disabled tabs to prevent selection.
     /// Use Server render mode for standard Blazor rendering, or Client mode for faster tab switching with JavaScript.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic tabs with server-side rendering:
     /// <code>

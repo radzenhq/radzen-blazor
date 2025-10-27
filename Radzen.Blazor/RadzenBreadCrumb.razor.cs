@@ -5,19 +5,11 @@ namespace Radzen.Blazor
     /// <summary>
     /// A breadcrumb navigation component that displays the current page's location within the application hierarchy.
     /// RadzenBreadCrumb shows a trail of links representing the path from the root to the current page, helping users understand their location and navigate back.
-    /// </summary>
-    /// <remarks>
-    /// Breadcrumbs provide secondary navigation showing the user's location in the site hierarchy.
-    /// The component displays items separated by a visual divider (typically ">"), with each item linking to its respective page.
-    /// Common uses include:
-    /// - Multi-level navigation indicating current location
-    /// - E-commerce category navigation (Home > Electronics > Laptops)
-    /// - Documentation section paths
-    /// - File system or folder navigation
-    /// 
+    /// Provides secondary navigation with items separated by a visual divider (typically ">"), with each item linking to its respective page.
+    /// Common uses include multi-level navigation indicating current location, e-commerce category navigation (Home > Electronics > Laptops), documentation section paths, and file system or folder navigation.
     /// Items are defined using RadzenBreadCrumbItem components as child content.
     /// The last item typically represents the current page and is often not clickable.
-    /// </remarks>
+    /// </summary>
     /// <example>
     /// Basic breadcrumb:
     /// <code>
