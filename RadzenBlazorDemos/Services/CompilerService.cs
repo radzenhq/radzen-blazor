@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Runtime.Loader;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -15,14 +14,16 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Razor;
 using Radzen.Blazor;
+using Microsoft.Extensions.DependencyInjection;
 using RadzenBlazorDemos.Shared;
+using Microsoft.AspNetCore.Components.WebAssembly.Services;
 using MetadataReferenceService.Abstractions.Types;
 using MetadataReferenceService.BlazorWasm;
 using System.ComponentModel;
 
 namespace RadzenBlazorDemos
 {
-    public class CompilerService
+    public class CompilerService : ICompilerService
     {
         class CollectibleAssemblyLoadContext : AssemblyLoadContext
         {
@@ -94,13 +95,11 @@ namespace RadzenBlazorDemos
 @using RadzenBlazorDemos.Shared
 @using RadzenBlazorDemos.Pages
 ";
-        private readonly HttpClient httpClient;
         private readonly BlazorWasmMetadataReferenceService metadataReferenceService;
 
-        public CompilerService(HttpClient httpClient, NavigationManager navigationManager)
+        public CompilerService(NavigationManager navigationManager)
         {
-            this.httpClient = httpClient;
-            this.metadataReferenceService = new BlazorWasmMetadataReferenceService(navigationManager);
+            metadataReferenceService = new BlazorWasmMetadataReferenceService(navigationManager);
         }
 
         private async Task<IEnumerable<MetadataReference>> GetReferencesAsync(IEnumerable<Assembly> assemblies)
@@ -158,7 +157,7 @@ namespace RadzenBlazorDemos
             });
         }
 
-        private IEnumerable<Assembly> GetAssemblies()
+        private static List<Assembly> GetAssemblies()
         {
              var referenceAssemblyRoots = new[]
              {

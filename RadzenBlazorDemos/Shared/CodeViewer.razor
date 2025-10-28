@@ -1,9 +1,14 @@
 @using System.Text.RegularExpressions;
 @using System.IO;
 @using System.Net.Http;
+@using System.Reflection;
+@using Microsoft.Extensions.DependencyInjection;
+@using System.Linq;
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
 @inject IJSRuntime JSRuntime
-@inject CompilerService Compiler
 @inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IServiceProvider ServiceProvider
 
 <RadzenRow class="rz-p-2" Gap="0.5rem" Style="border-bottom: var(--rz-border-disabled);">
     <RadzenColumn>
@@ -51,6 +56,7 @@
     private string source;
     private string error;
     private string language = "razor";
+    private ICompilerService compiler;
 
     [Parameter]
     public EventCallback<Type> Compiled { get; set; }
@@ -119,8 +125,6 @@
         await OnValueChanged(source);
     }
 
-    
-
     bool isBusy;
 
     async Task Run()
@@ -133,7 +137,9 @@
 
             await Task.Yield();
 
-            var type = await Compiler.CompileAsync(source);
+            await EnsureCompilerAsync();
+
+            var type = await compiler.CompileAsync(source);
 
             await Compiled.InvokeAsync(type);
 
@@ -145,5 +151,32 @@
 
         isBusy = false;
         await JSRuntime.InvokeVoidAsync("eval", $"instances['{monaco.Id}'].updateOptions({{domReadOnly: false, readOnly: false }})");
+    }
+
+    async Task EnsureCompilerAsync()
+    {
+        if (compiler != null)
+        {
+            return;
+        }
+
+        var assemblyLoader = ServiceProvider.GetService<LazyAssemblyLoader>();
+
+        if (assemblyLoader != null)
+        {
+            await assemblyLoader.LoadAssembliesAsync(new[]
+            {
+                "Microsoft.CodeAnalysis.dll",
+                "Microsoft.CodeAnalysis.CSharp.dll",
+                "Microsoft.CodeAnalysis.Razor.dll",
+                "Microsoft.AspNetCore.Razor.Language.dll",
+                "Microsoft.AspNetCore.Mvc.Razor.Extensions.dll",
+                "MetadataReferenceService.BlazorWasm.dll",
+                "MetadataReferenceService.Abstractions.dll"
+            });
+        }
+
+        var compilerType = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("RadzenBlazorDemos.CompilerService", false)).FirstOrDefault(t => t != null);
+        compiler = (ICompilerService)Activator.CreateInstance(compilerType, NavigationManager);
     }
 }

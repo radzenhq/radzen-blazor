@@ -107,11 +107,14 @@ app.UseStatusCodePagesWithReExecute("/not-found");
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
 app.MapStaticAssets();
-app.UseStaticFiles(new StaticFileOptions {
-    FileProvider = new PhysicalFileProvider(
-        Path.Combine(app.Environment.WebRootPath, "demos")),
-    RequestPath = "/demos"
-});
+if (!app.Environment.IsDevelopment())
+{
+    app.UseStaticFiles(new StaticFileOptions {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(app.Environment.WebRootPath, "demos")),
+        RequestPath = "/demos"
+    });
+}
 app.UseRouting();
 app.UseAntiforgery();
 app.MapRazorPages();

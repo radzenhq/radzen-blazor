@@ -14,6 +14,15 @@
     <PackageReference Include="MetadataReferenceService.BlazorWasm" Version="*" />
   </ItemGroup>
   <ItemGroup>
+    <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.dll" />
+    <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.CSharp.dll" />
+    <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.Razor.dll" />
+    <BlazorWebAssemblyLazyLoad Include="Microsoft.AspNetCore.Razor.Language.dll" />
+    <BlazorWebAssemblyLazyLoad Include="Microsoft.AspNetCore.Mvc.Razor.Extensions.dll" />
+    <BlazorWebAssemblyLazyLoad Include="MetadataReferenceService.BlazorWasm.dll" />
+    <BlazorWebAssemblyLazyLoad Include="MetadataReferenceService.Abstractions.dll" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Update="Pages\DataGridRowDragSchedulerPage.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
@@ -24,7 +33,7 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
   </ItemGroup>
-  <Target Name="CopyDemoPagesToWwwroot" AfterTargets="Build;Publish">
+  <Target Name="CopyDemoPagesToWwwroot" BeforeTargets="ResolveStaticWebAssetsInputs;ProcessStaticWebAssets">
     <ItemGroup>
       <DemoPagesRazor Include="Pages\**\*.razor" />
       <DemoPagesCs Include="Pages\**\*.cs" />

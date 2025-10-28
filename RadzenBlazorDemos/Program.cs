@@ -18,7 +18,6 @@ builder.Services.AddDbContextFactory<NorthwindContext>();
 builder.Services.AddRadzenComponents();
 builder.Services.AddRadzenQueryStringThemeService();
 
-builder.Services.AddScoped<CompilerService>();
 builder.Services.AddScoped<ExampleService>();
 builder.Services.AddScoped<NorthwindService>();
 builder.Services.AddScoped<NorthwindODataService>();
