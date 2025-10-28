@@ -838,8 +838,8 @@ window.Radzen = {
       }
     }
   },
-  removeFileFromUpload: function (fileInput, name) {
-    var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
+  removeFileFromUpload: function (ref, name, id) {
+    var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[ref];
     if (!uploadComponent) return;
     var file = uploadComponent.files.find(function (f) { return f.name == name; })
     if (!file) { return; }
@@ -851,7 +851,10 @@ window.Radzen = {
     if (index != -1) {
         uploadComponent.files.splice(index, 1);
     }
-    fileInput.value = '';
+    var fileInput = document.getElementById(id);
+    if (fileInput && uploadComponent.files.length == 0) {
+        fileInput.value = '';
+    }
   },
   removeFileFromFileInput: function (fileInput) {
     fileInput.value = '';
