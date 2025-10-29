@@ -1449,6 +1449,89 @@ window.Radzen = {
           }
       }, 500);
   },
+  initSideDialogResize: function(handle, sideDialog){
+        const dir = (handle.dataset.dir || 'right').toLowerCase();
+        const cs = window.getComputedStyle(sideDialog);
+        const parent = sideDialog.parentNode;
+        const parentIsFlex = parent && getComputedStyle(parent).display.includes('flex');
+        const toPixels = (v, axis) => {
+            if (!v || v === 'none') return NaN;
+            if (v.endsWith && v.endsWith('px')) return parseFloat(v);
+            if (v.endsWith && v.endsWith('%')) {
+                const base = axis === 'y' ? window.innerHeight : window.innerWidth;
+                const p = parseFloat(v);
+                return Number.isFinite(p) ? (base * p / 100) : NaN;
+            }
+            const n = parseFloat(v);
+            return Number.isFinite(n) ? n : NaN;
+        };
+
+        let MIN_W = toPixels(cs.minWidth, 'x') || 300;
+        let MAX_W = toPixels(cs.maxWidth, 'x') || Infinity;
+        let MIN_H = toPixels(cs.minHeight, 'y') || 200;
+        let MAX_H = toPixels(cs.maxHeight, 'y') || Infinity;
+
+        // Guard against invalid ranges caused by percentage max being smaller than min
+        if (Number.isFinite(MIN_W) && Number.isFinite(MAX_W) && MAX_W < MIN_W) MAX_W = Infinity;
+        if (Number.isFinite(MIN_H) && Number.isFinite(MAX_H) && MAX_H < MIN_H) MAX_H = Infinity;
+
+        let start = null;
+
+        const onDown = (e) => {
+            e.preventDefault();
+            handle.setPointerCapture?.(e.pointerId);
+
+            const rect = sideDialog.getBoundingClientRect();
+            start = { x: e.clientX, y: e.clientY, w: rect.width, h: rect.height };
+
+            document.addEventListener('pointermove', onMove);
+            document.addEventListener('pointerup', onUp, { once: true });
+            document.body.classList.add('dragging');
+        };
+
+        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+        const applyWidth = (w) => {
+            if (parentIsFlex)
+                sideDialog.style.flexBasis = Math.round(w) + 'px';
+            else
+                sideDialog.style.width = Math.round(w) + 'px';
+        };
+        const applyHeight = (h) => {
+            sideDialog.style.height = `${Math.round(h)}px`;
+        };
+
+        const onMove = (e) => {
+            if (!start) return;
+
+            const dx = e.clientX - start.x;
+            const dy = e.clientY - start.y;
+
+            switch (dir) {
+                case 'right': applyWidth(clamp(start.w - dx, MIN_W, MAX_W)); break;
+                case 'left': applyWidth(clamp(start.w + dx, MIN_W, MAX_W)); break;
+                case 'bottom': applyHeight(clamp(start.h - dy, MIN_H, MAX_H)); break;
+                case 'top': applyHeight(clamp(start.h + dy, MIN_H, MAX_H)); break;
+            }
+        };
+
+        const onUp = (e) => {
+            handle.releasePointerCapture?.(e.pointerId);
+            start = null;
+            document.removeEventListener('pointermove', onMove);
+            document.body.classList.remove('dragging');
+        };
+
+        handle.addEventListener('pointerdown', onDown);
+
+        return {
+            dispose() {
+                handle.removeEventListener('pointerdown', onDown);
+                document.removeEventListener('pointermove', onMove);
+                document.body.classList.remove('dragging');
+            }
+        };
+  },
   openDialog: function (options, dialogService, dialog) {
     if (Radzen.closeAllPopups) {
         Radzen.closeAllPopups();

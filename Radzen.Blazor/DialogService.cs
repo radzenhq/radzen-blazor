@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 namespace Radzen
 {
     /// <summary>
-    /// Class DialogService. Contains various methods with options to open and close dialogs. 
+    /// Class DialogService. Contains various methods with options to open and close dialogs.
     /// Should be added as scoped service in the application services and RadzenDialog should be added in application main layout.
     /// </summary>
     /// <example>
@@ -54,7 +54,7 @@ namespace Radzen
                 return reference;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the URI helper.
         /// </summary>
@@ -384,7 +384,7 @@ namespace Radzen
             // register the cancellation token
             if (cancellationToken.HasValue)
                 cancellationToken.Value.Register(() => task.TrySetCanceled());
-            
+
             tasks.Add(task);
 
             options ??= new DialogOptions();
@@ -484,8 +484,8 @@ namespace Radzen
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : ""; // Width is set to 600px by default by OpenAsync
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-confirm {options.CssClass}" : "rz-dialog-confirm";
-            options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";    
-            
+            options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
+
             return await OpenAsync(title, ds =>
             {
                 RenderFragment content = b =>
@@ -578,7 +578,7 @@ namespace Radzen
             // Validate and set default values for the dialog options
             options ??= new();
             options.OkButtonText = !String.IsNullOrEmpty(options.OkButtonText) ? options.OkButtonText : "Ok";
-            options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";  
+            options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "";
             options.Style = !String.IsNullOrEmpty(options.Style) ? options.Style : "";
             options.CssClass = !String.IsNullOrEmpty(options.CssClass) ? $"rz-dialog-alert {options.CssClass}" : "rz-dialog-alert";
             options.WrapperCssClass = !String.IsNullOrEmpty(options.WrapperCssClass) ? $"rz-dialog-wrapper {options.WrapperCssClass}" : "rz-dialog-wrapper";
@@ -848,6 +848,7 @@ namespace Radzen
         }
 
         private RenderFragment<DialogService> titleContent;
+        private bool resizable;
 
         /// <summary>
         /// Gets or sets the title content.
@@ -862,6 +863,23 @@ namespace Radzen
                 {
                     titleContent = value;
                     OnPropertyChanged(nameof(TitleContent));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if resizable; otherwise, <c>false</c>.</value>
+        public bool Resizable
+        {
+            get => resizable;
+            set
+            {
+                if (resizable != value)
+                {
+                    resizable = value;
+                    OnPropertyChanged(nameof(Resizable));
                 }
             }
         }
@@ -991,25 +1009,6 @@ namespace Radzen
         /// Gets or sets the CSS style of the Icon in Title.
         /// </summary>
         public string IconStyle { get; set; } = "margin-right: 0.75rem";
-
-        
-        private bool resizable;
-        /// <summary>
-        /// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
-        /// </summary>
-        /// <value><c>true</c> if resizable; otherwise, <c>false</c>.</value>
-        public bool Resizable
-        {
-            get => resizable;
-            set
-            {
-                if (resizable != value)
-                {
-                    resizable = value;
-                    OnPropertyChanged(nameof(Resizable));
-                }
-            }
-        }
 
         private Action<Size> resize;
 
@@ -1147,7 +1146,7 @@ namespace Radzen
         private bool autoFocusFirstElement = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether to focus the first focusable HTML element. 
+        /// Gets or sets a value indicating whether to focus the first focusable HTML element.
         /// </summary>
         /// <value><c>true</c> if the first focusable element is focused; otherwise, <c>false</c>. Default is <c>true</c>.</value>
         public bool AutoFocusFirstElement
@@ -1237,7 +1236,7 @@ namespace Radzen
     public class Dialog : INotifyPropertyChanged
     {
         private string title;
-    
+
         /// <summary>
         /// Gets or sets the title.
         /// </summary>

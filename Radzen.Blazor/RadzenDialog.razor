@@ -12,10 +12,26 @@
 {
     <aside
         class="@GetSideDialogCssClass()"
+        @ref="sideDialogHandle"
         tabindex="@(isSideDialogOpen ? "0" : "-1")"
         style="@GetSideDialogStyle()"
-        aria-labelledby="rz-dialog-side-label"
-        >
+        aria-labelledby="rz-dialog-side-label">
+        @if (sideDialogOptions.Resizable)
+        {
+            <div @ref="sideDialogResizeHandle"
+                 class="@GetResizBarCssClass()"
+                 data-dir="@(sideDialogOptions.Position switch
+                           {
+                               DialogPosition.Left => "left",
+                               DialogPosition.Top => "top",
+                               DialogPosition.Bottom => "bottom",
+                               _ => "right"
+                           })"
+                 title="Drag to resize" aria-label="Resize side dialog">
+                <span class="rz-resize" aria-hidden="true"></span>
+            </div>
+
+        }
         @if (sideDialogOptions.ShowTitle)
         {
             <div class="rz-dialog-side-titlebar">
@@ -83,6 +99,9 @@
     RenderFragment sideDialogContent;
     SideDialogOptions sideDialogOptions;
     Dialog sideDialog;
+    ElementReference? sideDialogResizeHandle;
+    ElementReference? sideDialogHandle;
+    IJSObjectReference sideDialogResizeHandleJsModule;
 
     public async Task Open(string title, Type type, Dictionary<string, object> parameters, DialogOptions options)
     {
@@ -219,6 +238,9 @@
                                                .Add("rz-close", sideDialogClosing)
                                                .ToString();
 
+    string GetResizBarCssClass() => ClassList.Create("rz-dialog-resize-bar")
+                                               .ToString();
+
     string GetSideDialogStyle()
     {
         string widthStyle = string.IsNullOrEmpty(sideDialogOptions.Width) ? string.Empty : $"width: {sideDialogOptions.Width};";
@@ -233,7 +255,28 @@
 
         if (isSideDialogOpen)
         {
-            await JSRuntime.InvokeAsync<string>("Radzen.openSideDialog", sideDialogOptions);
+           await JSRuntime.InvokeAsync<string>("Radzen.openSideDialog", sideDialogOptions);
+
+            if (sideDialogOptions.Resizable && sideDialogResizeHandle.HasValue)
+            {
+                sideDialogResizeHandleJsModule = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.initSideDialogResize", sideDialogResizeHandle, sideDialogHandle);
+            }
         }
     }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            if (sideDialogResizeHandleJsModule != null)
+            {
+                await sideDialogResizeHandleJsModule.InvokeVoidAsync("dispose");
+            }
+        }
+        catch
+        {
+            /* Ignore */
+        }
+    }
+
 }
