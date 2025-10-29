@@ -142,5 +142,45 @@ namespace Radzen.Blazor.Tests
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Mode, ProgressBarMode.Indeterminate));
             Assert.Contains(@$"rz-progressbar-info", component.Markup);
         }
+
+        [Fact]
+        public void ProgressBar_Renders_ShowValue_True()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            {
+                parameters.Add(p => p.ShowValue, true);
+                parameters.Add(p => p.Value, 50);
+            });
+
+            Assert.Contains("rz-progressbar-label", component.Markup);
+            Assert.Contains("50%", component.Markup);
+        }
+
+        [Fact]
+        public void ProgressBar_Renders_ShowValue_False()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            {
+                parameters.Add(p => p.ShowValue, false);
+                parameters.Add(p => p.Value, 50);
+            });
+
+            Assert.DoesNotContain("rz-progressbar-label", component.Markup);
+        }
+
+        [Fact]
+        public void ProgressBar_Renders_Template()
+        {
+            using var ctx = new TestContext();
+            var component = ctx.RenderComponent<RadzenProgressBar>(parameters =>
+            {
+                parameters.Add(p => p.Value, 75);
+                parameters.Add(p => p.Template, builder => builder.AddContent(0, "Custom: 75%"));
+            });
+
+            Assert.Contains("Custom: 75%", component.Markup);
+        }
     }
 }

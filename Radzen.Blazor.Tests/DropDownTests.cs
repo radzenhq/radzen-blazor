@@ -686,5 +686,58 @@ namespace Radzen.Blazor.Tests
             public IEnumerator<T> GetEnumerator() => _items.GetEnumerator();
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
+
+        [Fact]
+        public void DropDown_Renders_Placeholder()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            {
+                parameters.Add(p => p.Placeholder, "Select an option");
+            });
+
+            Assert.Contains("Select an option", component.Markup);
+            Assert.Contains("rz-placeholder", component.Markup);
+        }
+
+        [Fact]
+        public void DropDown_Renders_AllowClear_WithValue()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new[] { new DataItem { Text = "Item 1", Id = 1 } };
+
+            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            {
+                parameters.Add(p => p.AllowClear, true);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Value, 1);
+            });
+
+            Assert.Contains("rz-dropdown-clear-icon", component.Markup);
+        }
+
+        [Fact]
+        public void DropDown_DoesNotRender_AllowClear_WhenNotAllowed()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new[] { new DataItem { Text = "Item 1", Id = 1 } };
+
+            var component = ctx.RenderComponent<RadzenDropDown<int>>(parameters =>
+            {
+                parameters.Add(p => p.AllowClear, false);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, nameof(DataItem.Text));
+                parameters.Add(p => p.ValueProperty, nameof(DataItem.Id));
+                parameters.Add(p => p.Value, 1);
+            });
+
+            Assert.DoesNotContain("rz-dropdown-clear-icon", component.Markup);
+        }
     }
 }

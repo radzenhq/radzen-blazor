@@ -1,9 +1,74 @@
-﻿using Xunit;
+﻿using Bunit;
+using Xunit;
+using System.Collections.Generic;
 
 namespace Radzen.Blazor.Tests
 {
 	public class AutoCompleteTests
 	{
+        [Fact]
+        public void AutoComplete_Renders_WithClassName()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenAutoComplete>();
+
+            Assert.Contains(@"rz-autocomplete", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_Renders_InputElement()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenAutoComplete>();
+
+            Assert.Contains("type=\"text\"", component.Markup);
+            Assert.Contains("rz-inputtext", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_Renders_Disabled()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters.Add(p => p.Disabled, true);
+            });
+
+            Assert.Contains("disabled", component.Markup);
+            Assert.Contains("rz-state-disabled", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_Renders_Placeholder()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters.Add(p => p.Placeholder, "Type to search...");
+            });
+
+            Assert.Contains("placeholder=\"Type to search...\"", component.Markup);
+        }
+
+        [Fact]
+        public void AutoComplete_Renders_WithData()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple", "Banana", "Cherry" };
+
+            var component = ctx.RenderComponent<RadzenAutoComplete>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+            });
+
+            Assert.Contains("rz-autocomplete-panel", component.Markup);
+        }
+
         [Fact]
         public void AutoComplete_Enum_Converts_To_Attr_Value()
         {

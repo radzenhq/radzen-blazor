@@ -89,5 +89,71 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
+
+        [Fact]
+        public void Slider_Renders_Orientation_Vertical()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            {
+                parameters.Add(p => p.Orientation, Orientation.Vertical);
+            });
+
+            Assert.Contains("rz-slider-vertical", component.Markup);
+        }
+
+        [Fact]
+        public void Slider_Renders_Disabled()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenSlider<int>>(parameters =>
+            {
+                parameters.Add(p => p.Disabled, true);
+            });
+
+            Assert.Contains("rz-state-disabled", component.Markup);
+        }
+
+        [Fact]
+        public void Slider_Renders_SliderHandle()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenSlider<int>>();
+
+            Assert.Contains("rz-slider-handle", component.Markup);
+        }
+
+        [Fact]
+        public void Slider_Renders_SliderRange()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenSlider<int>>();
+
+            Assert.Contains("rz-slider-range", component.Markup);
+        }
+
+        [Fact]
+        public void Slider_Renders_TabIndex()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            ctx.JSInterop.SetupModule("_content/Radzen.Blazor/Radzen.Blazor.js");
+
+            var component = ctx.RenderComponent<RadzenSlider<int>>();
+
+            Assert.Contains("tabindex=\"0\"", component.Markup);
+        }
     }
 }
