@@ -70,31 +70,12 @@ namespace Radzen.Blazor
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected Task OnChange(ChangeEventArgs args)
+        protected async Task OnChange(ChangeEventArgs args)
         {
-            if (Immediate)
-                return Task.CompletedTask;
-
-            return OnValueChanged(args.Value?.ToString());
-        }
-
-        /// <summary>
-        /// Handles the <see cref="E:Input" /> event.
-        /// </summary>
-        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected Task OnInput(ChangeEventArgs args)
-        {
-            if (!Immediate)
-                return Task.CompletedTask;
-
-            return OnValueChanged(args.Value?.ToString());
-        }
-
-        protected async Task OnValueChanged(string value)
-        {
-            Value = value;
+            Value = $"{args.Value}";
 
             await ValueChanged.InvokeAsync(Value);
+
             if (FieldIdentifier.FieldName != null)
             {
                 EditContext?.NotifyFieldChanged(FieldIdentifier);
