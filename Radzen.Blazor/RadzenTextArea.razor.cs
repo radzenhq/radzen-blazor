@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -60,15 +61,45 @@ namespace Radzen.Blazor
         public int Cols { get; set; } = 20;
 
         /// <summary>
+        /// Gets or sets a value indicating whether the component should update the value immediately when the user types. Set to <c>false</c> by default.
+        /// </summary>
+        [Parameter]
+        public bool Immediate { get; set; }
+
+        /// <summary>
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+        protected Task OnChange(ChangeEventArgs args)
         {
-            Value = $"{args.Value}";
+            if (Immediate)
+                return Task.CompletedTask;
+
+            return OnValueChanged(args.Value?.ToString());
+        }
+
+        /// <summary>
+        /// Handles the <see cref="E:Input" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
+        protected Task OnInput(ChangeEventArgs args)
+        {
+            if (!Immediate)
+                return Task.CompletedTask;
+
+            return OnValueChanged(args.Value?.ToString());
+        }
+
+        protected async Task OnValueChanged(string value)
+        {
+            Value = value;
 
             await ValueChanged.InvokeAsync(Value);
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            if (FieldIdentifier.FieldName != null)
+            {
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
+            }
+
             await Change.InvokeAsync(Value);
         }
 
