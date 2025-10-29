@@ -848,6 +848,7 @@ namespace Radzen
         }
 
         private RenderFragment<DialogService> titleContent;
+        private bool resizable;
 
         /// <summary>
         /// Gets or sets the title content.
@@ -865,6 +866,23 @@ namespace Radzen
 				}
 			}
 		}
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
+        /// </summary>
+        /// <value><c>true</c> if resizable; otherwise, <c>false</c>.</value>
+        public bool Resizable
+        {
+            get => resizable;
+            set
+            {
+                if (resizable != value)
+                {
+                    resizable = value;
+                    OnPropertyChanged(nameof(Resizable));
+                }
+            }
+        }
     }
 
     /// <summary>
@@ -992,24 +1010,6 @@ namespace Radzen
         /// </summary>
         public string IconStyle { get; set; } = "margin-right: 0.75rem";
 
-        
-        private bool resizable;
-		/// <summary>
-		/// Gets or sets a value indicating whether the dialog is resizable. Set to <c>false</c> by default.
-		/// </summary>
-		/// <value><c>true</c> if resizable; otherwise, <c>false</c>.</value>
-		public bool Resizable
-		{
-			get => resizable;
-			set
-			{
-				if (resizable != value)
-				{
-					resizable = value;
-					OnPropertyChanged(nameof(Resizable));
-				}
-			}
-		}
 
         private Action<Size> resize;
 
