@@ -31,10 +31,16 @@
         </RadzenCard>
     </RadzenColumn>
     <RadzenColumn Size="12" SizeMD="4">
-        <RadzenCard>
-            <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Auto-resize TextArea</RadzenText>
-            <RadzenTextArea oninput="event.target.style.height = Math.max(event.target.clientHeight, event.target.scrollHeight) + 'px';" Change=@(args => OnChange(args, "Auto-resize")) Style="width: 100%" aria-label="Auto-resize" />
-        </RadzenCard>
+	    <RadzenCard>
+		    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Auto-resize TextArea</RadzenText>
+		    <RadzenTextArea oninput="event.target.style.height = Math.max(event.target.clientHeight, event.target.scrollHeight) + 'px';" Change=@(args => OnChange(args, "Auto-resize")) Style="width: 100%" aria-label="Auto-resize" />
+	    </RadzenCard>
+    </RadzenColumn>
+    <RadzenColumn Size="12" SizeMD="4">
+	    <RadzenCard>
+		    <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">Change on every input</RadzenText>
+            <RadzenTextArea Immediate="true" Change=@(args => OnChange(args, "TextBox with change on every input")) @bind-Value=@value aria-label="TextArea with change on every input" />
+	    </RadzenCard>
     </RadzenColumn>
 </RadzenRow>
 
