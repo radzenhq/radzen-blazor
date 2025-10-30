@@ -1,6 +1,7 @@
 using Bunit;
 using Xunit;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Blazor.Tests
 {
@@ -50,13 +51,14 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void DropDownDataGrid_Renders_WithCustomTextProperty()
+        public void DropDownDataGrid_Renders_WithCustomTextValueProperties()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var data = new List<Customer>
             {
-                new Customer { Id = 1, CompanyName = "Acme Corp" }
+                new Customer { Id = 1, CompanyName = "Acme Corp", ContactName = "John Doe" },
+                new Customer { Id = 2, CompanyName = "Tech Inc", ContactName = "Jane Smith" }
             };
 
             var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
@@ -67,6 +69,23 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("rz-lookup-panel", component.Markup);
+            Assert.Contains("rz-data-grid", component.Markup);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Renders_DataGrid()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1" };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+            });
+
+            // DropDownDataGrid embeds a DataGrid
+            Assert.Contains("rz-data-grid", component.Markup);
         }
 
         [Fact]
@@ -83,6 +102,7 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("rz-lookup-search", component.Markup);
+            Assert.Contains("rz-lookup-search-input", component.Markup);
         }
 
         [Fact]
@@ -100,7 +120,7 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void DropDownDataGrid_Renders_AllowClear()
+        public void DropDownDataGrid_Renders_AllowClear_WithValue()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
@@ -114,6 +134,23 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("rz-dropdown-clear-icon", component.Markup);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_DoesNotRender_AllowClear_WhenNotAllowed()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1" };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.AllowClear, false);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Value, "Item1");
+            });
+
+            Assert.DoesNotContain("rz-dropdown-clear-icon", component.Markup);
         }
 
         [Fact]
@@ -131,17 +168,121 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void DropDownDataGrid_Renders_Multiple_WithChips()
+        public void DropDownDataGrid_Renders_Multiple_Panel()
         {
             using var ctx = new TestContext();
             ctx.JSInterop.Mode = JSRuntimeMode.Loose;
             var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<int>>>(parameters =>
             {
                 parameters.Add(p => p.Multiple, true);
-                parameters.Add(p => p.Chips, true);
             });
 
             Assert.Contains("rz-multiselect-panel", component.Markup);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Renders_Multiple_WithChips()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1", "Item2" };
+            var selectedItems = new List<string> { "Item1" };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<IEnumerable<string>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Chips, true);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.Value, selectedItems);
+            });
+
+            Assert.Contains("rz-dropdown-chips-wrapper", component.Markup);
+            Assert.Contains("rz-chip", component.Markup);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Renders_AllowSorting()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<Customer>
+            {
+                new Customer { Id = 1, CompanyName = "Acme" }
+            };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<int>>(parameters =>
+            {
+                parameters.Add(p => p.AllowSorting, true);
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.TextProperty, "CompanyName");
+            });
+
+            Assert.Contains("rz-data-grid", component.Markup);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Renders_SearchTextPlaceholder()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1" };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.SearchTextPlaceholder, "Type to filter...");
+                parameters.Add(p => p.Data, data);
+            });
+
+            Assert.Contains("placeholder=\"Type to filter...\"", component.Markup);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Renders_EmptyText()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, new List<string>());
+                parameters.Add(p => p.EmptyText, "No items found");
+            });
+
+            Assert.Contains("No items found", component.Markup);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Renders_PageSize()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = Enumerable.Range(1, 20).Select(i => $"Item {i}").ToList();
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+                parameters.Add(p => p.PageSize, 10);
+            });
+
+            // DataGrid with paging should be present
+            Assert.Contains("rz-data-grid", component.Markup);
+        }
+
+        [Fact]
+        public void DropDownDataGrid_Renders_AllowRowSelectOnRowClick()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1", "Item2" };
+
+            var component = ctx.RenderComponent<RadzenDropDownDataGrid<string>>(parameters =>
+            {
+                parameters.Add(p => p.AllowRowSelectOnRowClick, true);
+                parameters.Add(p => p.Data, data);
+            });
+
+            Assert.Contains("rz-data-grid", component.Markup);
         }
     }
 }
