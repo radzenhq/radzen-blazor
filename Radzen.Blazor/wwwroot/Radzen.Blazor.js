@@ -1565,8 +1565,9 @@ window.Radzen = {
         // If this is inside a .rz-html-editor with tabindex="-1", skip it
         var editorParent = el.closest('.rz-html-editor');
         if (editorParent && editorParent.hasAttribute('tabindex') && editorParent.tabIndex === -1) return false;
+        else if (editorParent) return true;
     
-        return el.tabIndex > -1 || el.isContentEditable;
+        return el.tabIndex > -1;
     });
   },
   focusTrap: function (e) {
