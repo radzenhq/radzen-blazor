@@ -23,22 +23,6 @@ namespace Radzen.Blazor.Tests
         }
 
         [Fact]
-        public void ListBox_Renders_ListWrapper()
-        {
-            using var ctx = new TestContext();
-            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
-            var data = new List<string> { "Apple", "Banana", "Cherry" };
-
-            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
-            {
-                parameters.Add(p => p.Data, data);
-            });
-
-            Assert.Contains("rz-listbox-list-wrapper", component.Markup);
-            Assert.Contains("rz-listbox-list", component.Markup);
-        }
-
-        [Fact]
         public void ListBox_Renders_WithData_SimpleList()
         {
             using var ctx = new TestContext();
@@ -135,6 +119,79 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains("Select an item", component.Markup);
         }
+
+        [Fact]
+        public void ListBox_Renders_Multiple_WithCheckboxes()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1", "Item2" };
+
+            var component = ctx.RenderComponent<RadzenListBox<IEnumerable<string>>>(parameters =>
+            {
+                parameters.Add(p => p.Multiple, true);
+                parameters.Add(p => p.Data, data);
+            });
+
+            // Multiple selection shows checkboxes in header
+            Assert.Contains("rz-listbox-header-w-checkbox", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Renders_ReadOnly()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenListBox<int>>(parameters =>
+            {
+                parameters.Add(p => p.ReadOnly, true);
+            });
+
+            Assert.Contains("readonly", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Renders_TabIndex()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenListBox<int>>();
+
+            Assert.Contains("tabindex=", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Renders_ListWrapper()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Item1" };
+
+            var component = ctx.RenderComponent<RadzenListBox<string>>(parameters =>
+            {
+                parameters.Add(p => p.Data, data);
+            });
+
+            Assert.Contains("rz-listbox-list-wrapper", component.Markup);
+            Assert.Contains("rz-listbox-list", component.Markup);
+        }
+
+        [Fact]
+        public void ListBox_Renders_SearchAriaLabel()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = ctx.RenderComponent<RadzenListBox<int>>(parameters =>
+            {
+                parameters.Add(p => p.AllowFiltering, true);
+                parameters.Add(p => p.SearchAriaLabel, "Search items");
+                parameters.Add(p => p.Data, new List<string> { "Item1" });
+            });
+
+            Assert.Contains("aria-label=\"Search items\"", component.Markup);
+        }
     }
 }
+
+
 
