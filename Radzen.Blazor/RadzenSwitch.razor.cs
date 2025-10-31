@@ -72,7 +72,7 @@ namespace Radzen.Blazor
             Value = !Value;
 
             await ValueChanged.InvokeAsync(Value);
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
             await Change.InvokeAsync(Value);
         }
 
