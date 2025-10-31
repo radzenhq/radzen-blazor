@@ -120,7 +120,7 @@ namespace Radzen.Blazor
         public async Task OnValueChange(string value)
         {
             await ValueChanged.InvokeAsync(value);
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
             await Change.InvokeAsync(value);
         }
 

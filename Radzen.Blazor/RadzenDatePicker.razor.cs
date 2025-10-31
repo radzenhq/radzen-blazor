@@ -861,10 +861,7 @@ namespace Radzen.Blazor
                     await ValueChanged.InvokeAsync(Value == null ? default(TValue) : (TValue)Value);
                 }
 
-                if (FieldIdentifier.FieldName != null)
-                {
-                    EditContext?.NotifyFieldChanged(FieldIdentifier);
-                }
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
 
                 await Change.InvokeAsync(DateTimeValue);
                 StateHasChanged();
@@ -918,10 +915,7 @@ namespace Radzen.Blazor
 
                 await ValueChanged.InvokeAsync(default(TValue));
 
-                if (FieldIdentifier.FieldName != null)
-                {
-                    EditContext?.NotifyFieldChanged(FieldIdentifier);
-                }
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
 
                 await Change.InvokeAsync(null);
                 StateHasChanged();
@@ -932,10 +926,7 @@ namespace Radzen.Blazor
 
                 await ValueChanged.InvokeAsync(default(TValue));
 
-                if (FieldIdentifier.FieldName != null)
-                {
-                    EditContext?.NotifyFieldChanged(FieldIdentifier);
-                }
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
 
                 await Change.InvokeAsync(DateTimeValue);
                 StateHasChanged();
@@ -1245,7 +1236,7 @@ namespace Radzen.Blazor
                 await ValueChanged.InvokeAsync((TValue)Value);
             }
 
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
             await Change.InvokeAsync(DateTimeValue);
 
         }
@@ -1366,10 +1357,7 @@ namespace Radzen.Blazor
                 await ValueChanged.InvokeAsync((TValue)(object)newValue);
             }
 
-            if (FieldIdentifier.FieldName != null)
-            {
-                EditContext?.NotifyFieldChanged(FieldIdentifier);
-            }
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
 
             await Change.InvokeAsync(_dateTimeValue);
             StateHasChanged();

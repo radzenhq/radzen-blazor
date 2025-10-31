@@ -216,24 +216,47 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
-        
+
         [Fact]
         public void TextBox_Raises_ChangedEvent()
         {
             using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenTextBox>();
-
-            var raised = false;
+            var raisedAmount = 0;
             var value = "Test";
             object newValue = null;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            {
+                parameters.Add(p => p.Change, args => { raisedAmount++; newValue = args; });
+                parameters.Add(p => p.Immediate, false);
+            });
 
             component.Find("input").Change(value);
+            component.Find("input").Input("NotValue");
 
-            Assert.True(raised);
-            Assert.True(object.Equals(value, newValue));
+            Assert.Equal(1, raisedAmount);
+            Assert.Equal(value, newValue);
+        }
+
+        [Fact]
+        public void TextBox_Raises_InputEvent()
+        {
+            using var ctx = new TestContext();
+            var raisedAmount = 0;
+            var value = "Test";
+            object newValue = null;
+
+            var component = ctx.RenderComponent<RadzenTextBox>(parameters =>
+            {
+                parameters.Add(p => p.Change, args => { raisedAmount++; newValue = args; });
+                parameters.Add(p => p.Immediate, true);
+            });
+
+            component.Find("input").Change("NotValue");
+            component.Find("input").Input(value);
+
+            Assert.Equal(1, raisedAmount);
+            Assert.Equal(value, newValue);
         }
 
         [Fact]
