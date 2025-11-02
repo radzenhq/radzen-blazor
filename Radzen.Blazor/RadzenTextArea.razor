@@ -3,6 +3,14 @@
 @inherits FormComponent<string>
 @if (Visible)
 {
+    if (Immediate)
+    {
     <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-              placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @oninput="@(Immediate? OnChange : null)" @onchange="@(!Immediate ? OnChange : null)" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
+        placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @oninput="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
+    }
+    else
+    {
+    <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
+        placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
+    }
 }
