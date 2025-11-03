@@ -171,24 +171,49 @@ namespace Radzen.Blazor.Tests
 
             Assert.Contains(@$"autofocus", component.Markup);
         }
-        
+
         [Fact]
         public void Password_Raises_ChangedEvent()
         {
             using var ctx = new TestContext();
-
-            var component = ctx.RenderComponent<RadzenPassword>();
-
-            var raised = false;
+            var hasRaised = false;
             var value = "Test";
             object newValue = null;
 
-            component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
+            var component = ctx.RenderComponent<RadzenPassword>(parameters =>
+            {
+                parameters.Add(p => p.Change, args => { hasRaised = true; newValue = args; });
+                parameters.Add(p => p.Immediate, false);
+            });
 
-            component.Find("input").Change(value);
+            var inputElement = component.Find("input");
+            inputElement.Change(value);
 
-            Assert.True(raised);
-            Assert.True(object.Equals(value, newValue));
+            Assert.DoesNotContain("oninput", inputElement.ToMarkup());
+            Assert.True(hasRaised);
+            Assert.Equal(value, newValue);
+        }
+
+        [Fact]
+        public void Password_Raises_InputEvent()
+        {
+            using var ctx = new TestContext();
+            var hasRaised = false;
+            var value = "Test";
+            object newValue = null;
+
+            var component = ctx.RenderComponent<RadzenPassword>(parameters =>
+            {
+                parameters.Add(p => p.Change, args => { hasRaised = true; newValue = args; });
+                parameters.Add(p => p.Immediate, true);
+            });
+
+            var inputElement = component.Find("input");
+            inputElement.Input(value);
+
+            Assert.DoesNotContain("onchange", inputElement.ToMarkup());
+            Assert.True(hasRaised);
+            Assert.Equal(value, newValue);
         }
 
         [Fact]
