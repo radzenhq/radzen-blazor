@@ -330,7 +330,7 @@ namespace Radzen
             }
 
             await collectionAssignment.MakeAssignment((IEnumerable)internalValue, ValueChanged);
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
             await Change.InvokeAsync(internalValue);
 
             StateHasChanged();
@@ -382,7 +382,7 @@ namespace Radzen
             selectedIndex = -1;
 
             await ValueChanged.InvokeAsync((T)internalValue);
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
             await Change.InvokeAsync(internalValue);
 
             await OnFilter(new ChangeEventArgs());
@@ -1201,7 +1201,7 @@ namespace Radzen
                     }
                 }
 
-                if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+                EditContext?.NotifyFieldChanged(FieldIdentifier);
 
                 await Change.InvokeAsync(internalValue);
             }

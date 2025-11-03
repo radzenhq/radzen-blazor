@@ -261,7 +261,7 @@ namespace Radzen.Blazor
             Value = args.Value?.ToString();
 
             await ValueChanged.InvokeAsync($"{Value}");
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
             await Change.InvokeAsync(Value);
 
             await SelectedItemChanged.InvokeAsync(null);
@@ -279,7 +279,7 @@ namespace Radzen.Blazor
             }
 
             await ValueChanged.InvokeAsync($"{Value}");
-            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            EditContext?.NotifyFieldChanged(FieldIdentifier);
             await Change.InvokeAsync(Value);
 
             await SelectedItemChanged.InvokeAsync(item);

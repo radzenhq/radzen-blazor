@@ -89,10 +89,7 @@ namespace Radzen.Blazor
             {
                 Unsubscribe();
 
-                if (FieldIdentifier.FieldName != null)
-                {
-                    messages.Clear(FieldIdentifier);
-                }
+                messages.Clear(FieldIdentifier);
             }
 
             messages = null;
@@ -120,22 +117,19 @@ namespace Radzen.Blazor
                 throw new InvalidOperationException($"Cannot find component with Name {Component}");
             }
 
-            if (component.FieldIdentifier.FieldName != null)
+            var previousIsValid = IsValid;
+            IsValid = Validate(component);
+
+            messages.Clear(component.FieldIdentifier);
+
+            if (!IsValid)
             {
-                var previousIsValid = IsValid;
-                IsValid = Validate(component);
+                messages.Add(component.FieldIdentifier, Text);
+            }
 
-                messages.Clear(component.FieldIdentifier);
-
-                if (!IsValid)
-                {
-                    messages.Add(component.FieldIdentifier, Text);
-                }
-
-                if (previousIsValid != IsValid)
-                {
-                    EditContext?.NotifyValidationStateChanged();
-                }
+            if (previousIsValid != IsValid)
+            {
+                EditContext?.NotifyValidationStateChanged();
             }
 
             FieldIdentifier = component.FieldIdentifier;
