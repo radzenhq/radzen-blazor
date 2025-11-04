@@ -567,6 +567,14 @@ namespace Radzen
         /// CustomFilterExpression.
         /// </summary>
         public string CustomFilterExpression { get; set; }
+
+        /// <summary>
+        /// Gets or sets the mode that determines whether the filter applies to any or all items in a collection.
+        /// </summary>
+        /// <value>
+        /// A <see cref="CollectionFilterMode"/> value indicating whether the filter is satisfied by any or all items.
+        /// </value>
+        public CollectionFilterMode CollectionFilterMode { get; set; }
     }
 #if NET7_0_OR_GREATER
 #else

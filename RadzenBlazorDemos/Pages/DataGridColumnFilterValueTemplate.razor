@@ -15,10 +15,20 @@ ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Em
         </RadzenDataGridColumn>
 
         <RadzenDataGridColumn Title="Awards" Property="Awards" Type="typeof(IEnumerable<string>)" FilterValue="@selectedAwards" LogicalFilterOperator="LogicalFilterOperator.Or"
-                              FilterOperator="FilterOperator.In" FilterOperators="@(new FilterOperator[]{ FilterOperator.In, FilterOperator.NotIn})">
+                              FilterOperator="FilterOperator.In" FilterOperators="@(new FilterOperator[]{ FilterOperator.In, FilterOperator.NotIn})" CollectionFilterMode="@collectionFilterMode">
             <FilterValueTemplate>
                 <RadzenDropDown @ref=sadd @bind-Value=@selectedAwards Style="width:100%;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by Awards" } })"
-                                Change=@OnSelectedAwardsChange Data="@(awards)" AllowClear="true" Multiple="true" />
+                                Change=@OnSelectedAwardsChange Data="@(awards)" AllowClear="true" Multiple="true">
+                    <HeaderTemplate>
+                        <RadzenSelectBar @bind-Value=@collectionFilterMode Style="width:100%;margin-top:1rem;"
+                            TValue="CollectionFilterMode">
+                            <Items>
+                                <RadzenSelectBarItem Text="Any" Value="@(CollectionFilterMode.Any)" />
+                                <RadzenSelectBarItem Text="All" Value="@(CollectionFilterMode.All)" />
+                            </Items>
+                        </RadzenSelectBar>
+                    </HeaderTemplate>
+                </RadzenDropDown>
             </FilterValueTemplate>
             <Template>
                 @(string.Join(',', context.Awards))
@@ -59,6 +69,7 @@ ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Em
     RadzenDropDown<IEnumerable<string>> sadd;
     RadzenDropDown<IEnumerable<WorkStatus>> swdd;
     RadzenDataGrid<Employee> grid;
+    CollectionFilterMode collectionFilterMode;
     int? idValue;
     DateTime? hireDate;
     TitleOfCourtesy? currentTOC;

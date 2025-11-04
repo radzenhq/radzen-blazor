@@ -928,6 +928,7 @@ namespace Radzen.Blazor
         object secondFilterValue;
         FilterOperator? secondFilterOperator;
         LogicalFilterOperator? logicalFilterOperator;
+        CollectionFilterMode? collectionFilterMode;
         string customFilterExpression;
 
         /// <summary>
@@ -1062,6 +1063,30 @@ namespace Radzen.Blazor
                 }
             }
 
+            if (parameters.DidParameterChange(nameof(CollectionFilterMode), CollectionFilterMode))
+            {
+                collectionFilterMode = parameters.GetValueOrDefault<CollectionFilterMode>(nameof(CollectionFilterMode));
+
+                if (FilterTemplate != null || FilterValueTemplate != null)
+                {
+                    CollectionFilterMode = collectionFilterMode ?? default(CollectionFilterMode);
+                    Grid.SaveSettings();
+                    if (Grid.IsVirtualizationAllowed())
+                    {
+                        if (Grid.virtualize != null)
+                        {
+                            await Grid.virtualize.RefreshDataAsync();
+                        }
+                    }
+                    else
+                    {
+                        await Grid.Reload();
+                    }
+
+                    return;
+                }
+            }
+
             if (filterOperator == null && (parameters.DidParameterChange(nameof(FilterOperator), FilterOperator) || _filterOperator != null))
             {
                 filterOperator = _filterOperator ?? parameters.GetValueOrDefault<FilterOperator>(nameof(FilterOperator));
@@ -1139,6 +1164,14 @@ namespace Radzen.Blazor
         public LogicalFilterOperator GetLogicalFilterOperator()
         {
             return logicalFilterOperator ?? LogicalFilterOperator;
+        }
+
+        /// <summary>
+        /// Get column collection filter mode.
+        /// </summary>
+        public CollectionFilterMode GetCollectionFilterMode()
+        {
+            return collectionFilterMode ?? CollectionFilterMode;
         }
 
         /// <summary>
@@ -1363,13 +1396,20 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Set column second logical operator.
+        /// Set column logical operator.
         /// </summary>
         public void SetLogicalFilterOperator(LogicalFilterOperator value)
         {
             LogicalFilterOperator = value;
         }
 
+        /// <summary>
+        /// Set column collection filter mode.
+        /// </summary>
+        public void SetCollectionFilterMode(CollectionFilterMode? value)
+        {
+            collectionFilterMode = value;
+        }
 
         /// <summary>
         /// Closes this column filter popup.

@@ -628,7 +628,7 @@ namespace Radzen
                     SecondFilterValue = c.GetSecondFilterValue(),
                     SecondFilterOperator = c.GetSecondFilterOperator(),
                     LogicalFilterOperator = c.GetLogicalFilterOperator(),
-                    CollectionFilterMode = c.CollectionFilterMode
+                    CollectionFilterMode = c.GetCollectionFilterMode()
                 });
 
                 if (filters.Any())
@@ -1031,7 +1031,7 @@ namespace Radzen
                     SecondFilterValue = c.GetSecondFilterValue(),
                     SecondFilterOperator = c.GetSecondFilterOperator(),
                     LogicalFilterOperator = c.GetLogicalFilterOperator(),
-                    CollectionFilterMode = c.CollectionFilterMode
+                    CollectionFilterMode = c.GetCollectionFilterMode()
                 }), gridLogicalFilterOperator, gridFilterCaseSensitivity);
             }
 
