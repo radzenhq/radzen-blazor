@@ -61,6 +61,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Service provider injected from the Dependency Injection (DI) container.
         /// </summary>
+        [Inject]
         public IServiceProvider ServiceProvider { get; set; }
 
         /// <inheritdoc />
