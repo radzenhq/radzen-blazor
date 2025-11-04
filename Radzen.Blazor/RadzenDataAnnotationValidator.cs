@@ -58,6 +58,12 @@ namespace Radzen.Blazor
         [Parameter]
         public string MessageSeparator { get; set; } = " and ";
 
+        /// <summary>
+        /// Service provider injected from the Dependency Injection (DI) container.
+        /// </summary>
+        [Inject]
+        public IServiceProvider ServiceProvider { get; set; }
+
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
@@ -69,7 +75,7 @@ namespace Radzen.Blazor
 
             var value = getter(model);
 
-            var validationContext = new ValidationContext(model)
+            var validationContext = new ValidationContext(model, ServiceProvider, null)
             {
                 MemberName = component.FieldIdentifier.FieldName
             };
