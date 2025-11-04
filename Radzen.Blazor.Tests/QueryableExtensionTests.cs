@@ -1689,6 +1689,838 @@ namespace Radzen.Blazor.Tests
             Assert.Single(result);
             Assert.Equal(2, result[0].Id);
         }
+
+        // CollectionFilterMode tests
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag1", Value = 50 }, new { Name = "tag5", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "tag1",
+                    FilterOperator = FilterOperator.Equals,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has Name == "tag1"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "active", Value = 10 }, new { Name = "active", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "active", Value = 30 }, new { Name = "inactive", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "active", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "active",
+                    FilterOperator = FilterOperator.Equals,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have Name == "active"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithGreaterThan()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 60 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 5 }, new { Name = "tag6", Value = 8 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 50,
+                    FilterOperator = FilterOperator.GreaterThan,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has Value > 50
+            Assert.Single(result);
+            Assert.Equal(2, result[0].Id);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithGreaterThan()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 60 }, new { Name = "tag2", Value = 70 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 60 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 55 }, new { Name = "tag6", Value = 80 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 50,
+                    FilterOperator = FilterOperator.GreaterThan,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have Value > 50
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithContains()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "important-task", Value = 10 }, new { Name = "review", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "normal", Value = 30 }, new { Name = "basic", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "important-meeting", Value = 50 }, new { Name = "urgent", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "important",
+                    FilterOperator = FilterOperator.Contains,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag contains "important"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithContains()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "important-task", Value = 10 }, new { Name = "important-note", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "important-meeting", Value = 30 }, new { Name = "basic", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "important-reminder", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "important",
+                    FilterOperator = FilterOperator.Contains,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags contain "important"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithStartsWith()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "prefix_alpha", Value = 10 }, new { Name = "other_beta", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "prefix_gamma", Value = 30 }, new { Name = "prefix_delta", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "other_epsilon", Value = 50 }, new { Name = "other_zeta", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "prefix_",
+                    FilterOperator = FilterOperator.StartsWith,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag starts with "prefix_"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 2);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithStartsWith()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "prefix_alpha", Value = 10 }, new { Name = "prefix_beta", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "prefix_gamma", Value = 30 }, new { Name = "other_delta", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "prefix_epsilon", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "prefix_",
+                    FilterOperator = FilterOperator.StartsWith,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags start with "prefix_"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithEndsWith()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "file.txt", Value = 10 }, new { Name = "doc.pdf", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "image.png", Value = 30 }, new { Name = "photo.txt", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "data.csv", Value = 50 }, new { Name = "info.doc", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = ".txt",
+                    FilterOperator = FilterOperator.EndsWith,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag ends with ".txt"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 2);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithEndsWith()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "file.txt", Value = 10 }, new { Name = "doc.txt", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "image.txt", Value = 30 }, new { Name = "photo.png", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "data.txt", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = ".txt",
+                    FilterOperator = FilterOperator.EndsWith,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags end with ".txt"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithNotEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "active", Value = 10 }, new { Name = "inactive", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "inactive", Value = 30 }, new { Name = "inactive", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "pending", Value = 50 }, new { Name = "active", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "inactive",
+                    FilterOperator = FilterOperator.NotEquals,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag is not equal to "inactive"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithNotEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "active", Value = 10 }, new { Name = "pending", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "active", Value = 30 }, new { Name = "inactive", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "pending", Value = 50 }, new { Name = "active", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "inactive",
+                    FilterOperator = FilterOperator.NotEquals,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags are not equal to "inactive"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithDoesNotContain()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "test-alpha", Value = 10 }, new { Name = "beta", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "test-gamma", Value = 30 }, new { Name = "test-delta", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "epsilon", Value = 50 }, new { Name = "zeta", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "test",
+                    FilterOperator = FilterOperator.DoesNotContain,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag does not contain "test"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithDoesNotContain()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "alpha", Value = 10 }, new { Name = "beta", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "test-gamma", Value = 30 }, new { Name = "delta", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "epsilon", Value = 50 }, new { Name = "zeta", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterValue = "test",
+                    FilterOperator = FilterOperator.DoesNotContain,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags do not contain "test"
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithLessThan()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 50 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 60 }, new { Name = "tag4", Value = 70 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 15 }, new { Name = "tag6", Value = 80 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 20,
+                    FilterOperator = FilterOperator.LessThan,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has Value < 20
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithLessThan()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 15 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 18 }, new { Name = "tag4", Value = 70 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 5 }, new { Name = "tag6", Value = 12 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 20,
+                    FilterOperator = FilterOperator.LessThan,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have Value < 20
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithLessThanOrEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 20 }, new { Name = "tag2", Value = 50 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 60 }, new { Name = "tag4", Value = 70 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 15 }, new { Name = "tag6", Value = 80 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 20,
+                    FilterOperator = FilterOperator.LessThanOrEquals,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has Value <= 20
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithLessThanOrEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 18 }, new { Name = "tag4", Value = 70 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 5 }, new { Name = "tag6", Value = 12 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 20,
+                    FilterOperator = FilterOperator.LessThanOrEquals,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have Value <= 20
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithGreaterThanOrEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 50 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 10 }, new { Name = "tag4", Value = 15 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 60 }, new { Name = "tag6", Value = 30 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 50,
+                    FilterOperator = FilterOperator.GreaterThanOrEquals,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has Value >= 50
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithGreaterThanOrEquals()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 50 }, new { Name = "tag2", Value = 60 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 55 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 70 }, new { Name = "tag6", Value = 80 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Value",
+                    FilterValue = 50,
+                    FilterOperator = FilterOperator.GreaterThanOrEquals,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have Value >= 50
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithIsNull()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = (string)null, Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = (string)null, Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNull,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has null Name
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithIsNull()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = (string)null, Value = 10 }, new { Name = (string)null, Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = (string)null, Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = (string)null, Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNull,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have null Name
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithIsNotNull()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = (string)null, Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = (string)null, Value = 30 }, new { Name = (string)null, Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNotNull,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has non-null Name
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithIsNotNull()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = (string)null, Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNotNull,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have non-null Name
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithIsEmpty()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "", Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsEmpty,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has empty Name
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithIsEmpty()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "", Value = 10 }, new { Name = "", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "", Value = 30 }, new { Name = "tag4", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsEmpty,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have empty Name
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_Any_WithIsNotEmpty()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "", Value = 30 }, new { Name = "", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 }, new { Name = "tag6", Value = 60 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNotEmpty,
+                    CollectionFilterMode = CollectionFilterMode.Any
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where at least one tag has non-empty Name
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
+
+        [Fact]
+        public void Where_FiltersCollectionItemProperty_WithCollectionFilterMode_All_WithIsNotEmpty()
+        {
+            var testData = new[]
+            {
+                new { Id = 1, Tags = new[] { new { Name = "tag1", Value = 10 }, new { Name = "tag2", Value = 20 } }.ToList() },
+                new { Id = 2, Tags = new[] { new { Name = "tag3", Value = 30 }, new { Name = "", Value = 40 } }.ToList() },
+                new { Id = 3, Tags = new[] { new { Name = "tag5", Value = 50 } }.ToList() }
+            }.AsQueryable();
+
+            var filters = new List<FilterDescriptor>
+            {
+                new FilterDescriptor 
+                { 
+                    Property = "Tags",
+                    FilterProperty = "Name",
+                    FilterOperator = FilterOperator.IsNotEmpty,
+                    CollectionFilterMode = CollectionFilterMode.All
+                }
+            };
+            
+            var result = testData.Where(filters, LogicalFilterOperator.And, FilterCaseSensitivity.Default).ToList();
+            
+            // Should return items where all tags have non-empty Name
+            Assert.Equal(2, result.Count);
+            Assert.Contains(result, r => r.Id == 1);
+            Assert.Contains(result, r => r.Id == 3);
+        }
     }
 }
 

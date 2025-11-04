@@ -653,6 +653,15 @@ namespace Radzen.Blazor
         public LogicalFilterOperator LogicalFilterOperator { get; set; } = LogicalFilterOperator.And;
 
         /// <summary>
+        /// Gets or sets the mode that determines whether the filter applies to any or all items in a collection.
+        /// </summary>
+        /// <value>
+        /// A <see cref="CollectionFilterMode"/> value indicating whether the filter is satisfied by any or all items.
+        /// </value>
+        [Parameter]
+        public CollectionFilterMode CollectionFilterMode { get; set; }
+
+        /// <summary>
         /// Gets or sets the data type.
         /// </summary>
         /// <value>The data type.</value>

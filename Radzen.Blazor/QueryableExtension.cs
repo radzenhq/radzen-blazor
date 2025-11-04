@@ -481,7 +481,7 @@ namespace Radzen
             if (collectionItemType != null && primaryExpression != null &&
                 !(filter.FilterOperator == FilterOperator.In || filter.FilterOperator == FilterOperator.NotIn))
             {
-                primaryExpression = Expression.Call(typeof(Enumerable), nameof(Enumerable.Any), new Type[] { collectionItemType },
+                primaryExpression = Expression.Call(typeof(Enumerable), filter.CollectionFilterMode == CollectionFilterMode.Any ? nameof(Enumerable.Any) : nameof(Enumerable.All), new Type[] { collectionItemType },
                     GetNestedPropertyExpression(parameter, filter.Property), Expression.Lambda(primaryExpression, collectionItemTypeParameter));
             }
 
@@ -627,7 +627,8 @@ namespace Radzen
                     FilterOperator = c.GetFilterOperator(),
                     SecondFilterValue = c.GetSecondFilterValue(),
                     SecondFilterOperator = c.GetSecondFilterOperator(),
-                    LogicalFilterOperator = c.GetLogicalFilterOperator()
+                    LogicalFilterOperator = c.GetLogicalFilterOperator(),
+                    CollectionFilterMode = c.CollectionFilterMode
                 });
 
                 if (filters.Any())
@@ -1029,7 +1030,8 @@ namespace Radzen
                     FilterOperator = c.GetFilterOperator(),
                     SecondFilterValue = c.GetSecondFilterValue(),
                     SecondFilterOperator = c.GetSecondFilterOperator(),
-                    LogicalFilterOperator = c.GetLogicalFilterOperator()
+                    LogicalFilterOperator = c.GetLogicalFilterOperator(),
+                    CollectionFilterMode = c.CollectionFilterMode
                 }), gridLogicalFilterOperator, gridFilterCaseSensitivity);
             }
 
