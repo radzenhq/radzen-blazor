@@ -2574,37 +2574,37 @@ window.Radzen = {
 
       this.unregisterScrollListener(element);
       element.scrollHandler = () => {
-        const center = (container.tagName === 'HTML' ? 0 : container.getBoundingClientRect().top) + container.clientHeight / 2;
-
-        let min = Number.MAX_SAFE_INTEGER;
-        let match;
-
-        for (let i = 0; i < elements.length; i++) {
-          const element = elements[i];
-          if (!element) continue;
-
-          const rect = element.getBoundingClientRect();
-          const diff = Math.abs(rect.top - center);
-
-          if (!match && rect.top < center) {
-            match = selectors[i];
-            min = diff;
-            continue;
-          }
-
-          if (match && rect.top >= center) continue;
-
-          if (diff < min) {
-            match = selectors[i];
-            min = diff;
-          }
-        }
-
-        if (match !== currentSelector) {
-          currentSelector = match;
-          this.navigateTo(currentSelector, false);
-          ref.invokeMethodAsync('ScrollIntoView', currentSelector);
-        }
+        const contTop = container.tagName === 'HTML' ? 0 : container.getBoundingClientRect().top;
+	    const center = contTop + container.clientHeight / 2; 
+	  
+	    let min = Number.MAX_SAFE_INTEGER; 
+	    let match; 
+	  
+	    for (let i = 0; i < elements.length; i++) { 
+	      const element = elements[i]; 
+	      if (!element) continue; 
+	  
+	      const rect = element.getBoundingClientRect(); 
+	  
+	      if (!match && rect.top < center) { 
+	        match = selectors[i]; 
+		    min = rect.top; 
+		    continue; 
+	      } 
+	  
+	      if (match && rect.top >= center) continue; 
+	   
+	      if (match && (min < contTop || rect.top < min && rect.top >= contTop)) { 
+		    match = selectors[i]; 
+		    min = rect.top; 
+	      } 
+	    } 
+	  
+	    if (match !== currentSelector) { 
+	      currentSelector = match; 
+	      this.navigateTo(currentSelector, false); 
+	      ref.invokeMethodAsync('ScrollIntoView', currentSelector); 
+	    } 
       };
 
       document.addEventListener('scroll', element.scrollHandler, true);
