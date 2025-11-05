@@ -17,7 +17,7 @@ namespace Radzen.Blazor
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 
-        private string _text;
+        private string text;
 
         /// <summary>
         /// Gets or sets the text.
@@ -28,13 +28,13 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _text;
+                return text;
             }
             set
             {
-                if (value != _text)
+                if (value != text)
                 {
-                    _text = value;
+                    text = value;
 
                     if (List != null)
                         List.Refresh();
@@ -63,7 +63,7 @@ namespace Radzen.Blazor
         [Parameter]
         public virtual bool Disabled { get; set; }
 
-        RadzenRadioButtonList<TValue> _list;
+        private RadzenRadioButtonList<TValue> list;
 
         /// <summary>
         /// Gets or sets the list.
@@ -74,14 +74,14 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _list;
+                return list;
             }
             set
             {
-                if (_list != value)
+                if (list != value)
                 {
-                    _list = value;
-                    _list.AddItem(this);
+                    list = value;
+                    list.AddItem(this);
                 }
             }
         }

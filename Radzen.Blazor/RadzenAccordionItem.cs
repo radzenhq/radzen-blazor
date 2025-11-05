@@ -102,7 +102,7 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment Template { get; set; }
 
-        bool _visible = true;
+        private bool visible = true;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAccordionItem"/> is visible.
         /// </summary>
@@ -112,13 +112,13 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _visible;
+                return visible;
             }
             set
             {
-                if (_visible != value)
+                if (visible != value)
                 {
-                    _visible = value;
+                    visible = value;
                     if (Accordion != null)
                     {
                         Accordion.Refresh();
@@ -179,7 +179,7 @@ namespace Radzen.Blazor
 
             if (parameters.DidParameterChange(nameof(Visible), Visible))
             {
-                _visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
+                visible = parameters.GetValueOrDefault<bool>(nameof(Visible));
                 shouldRefresh = true;
             }
 

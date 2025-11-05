@@ -191,7 +191,7 @@ namespace Radzen.Blazor
             }
         }
 
-        IEnumerable _data = null;
+        private IEnumerable data = null;
 
         /// <summary>
         /// Gets or sets the data used to generate items.
@@ -202,13 +202,13 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _data;
+                return data;
             }
             set
             {
-                if (_data != value)
+                if (data != value)
                 {
-                    _data = value;
+                    data = value;
                     StateHasChanged();
                 }
             }

@@ -6,7 +6,7 @@
 @implements IRadzenFormComponent
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@getStyle()" id="@GetId()">
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" style="@GetStyle()" id="@GetId()">
         @if (!Inline)
         {
             @if (ShowInput || !ShowButton)

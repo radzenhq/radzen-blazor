@@ -1,65 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.JSInterop;
 
 namespace Radzen.Blazor.Markdown;
 
 #nullable enable
 
-class BlazorMarkdownRendererOptions
+/// <summary>
+/// Renders markdown content as Blazor components.
+/// </summary>
+internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
 {
-    public int AutoLinkHeadingDepth { get; set; }
-    public bool AllowHtml { get; set; }
-
-    public IEnumerable<string>? AllowedHtmlTags { get; set; }
-
-    public IEnumerable<string>? AllowedHtmlAttributes { get; set; }
-}
-
-class RadzenAnchor : ComponentBase
-{
-    [Inject]
-    IJSRuntime JSRuntime { get; set; } = null!;
-
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object>? Attributes { get; set; }
-
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
-    protected override void BuildRenderTree(RenderTreeBuilder builder)
-    {
-        builder.OpenElement(1, "a");
-        builder.AddMultipleAttributes(2, Attributes);
-        builder.AddEventPreventDefaultAttribute(3, "onclick", true);
-        builder.AddAttribute(4, "onclick", EventCallback.Factory.Create<MouseEventArgs>(this, OnClick));
-        builder.AddContent(5, ChildContent);
-        builder.CloseElement();
-    }
-
-    private async Task OnClick()
-    {
-        if (Attributes?.TryGetValue("href", out var href) == true)
-        {
-            await JSRuntime.InvokeVoidAsync("eval", $"document.querySelector('{href}').scrollIntoView()");
-        }
-    }
-}
-
-class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBuilder builder, Action<RenderTreeBuilder, int> outlet) : NodeVisitorBase
-{
+    /// <summary>
+    /// The outlet placeholder format.
+    /// </summary>
     public const string Outlet = "<!--rz-outlet-{0}-->";
+
     private static readonly Regex OutletRegex = new(@"<!--rz-outlet-(\d+)-->");
     private static readonly Regex HtmlTagRegex = new(@"<(\w+)((?:\s+[^>]*)?)\/?>");
     private static readonly Regex HtmlClosingTagRegex = new(@"</(\w+)>");
     private static readonly Regex AttributeRegex = new(@"(\w+)(?:\s*=\s*(?:([""'])(.*?)\2|([^\s>]+)))?");
     private readonly HtmlSanitizer sanitizer = new(options.AllowedHtmlTags, options.AllowedHtmlAttributes);
 
+    /// <inheritdoc />
     public override void VisitHeading(Heading heading)
     {
         builder.OpenComponent<RadzenText>(0);
@@ -100,6 +65,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseComponent();
     }
 
+    /// <inheritdoc />
     public override void VisitTable(Table table)
     {
         builder.OpenComponent<RadzenTable>(0);
@@ -107,12 +73,15 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseComponent();
     }
 
+    /// <inheritdoc />
     public override void VisitTableRow(TableRow row)
     {
         builder.OpenComponent<RadzenTableRow>(0);
         builder.AddAttribute(1, nameof(RadzenTableRow.ChildContent), RenderChildren(row.Cells));
         builder.CloseComponent();
     }
+
+    /// <inheritdoc />
     public override void VisitTableCell(TableCell cell)
     {
         builder.OpenComponent<RadzenTableCell>(0);
@@ -134,6 +103,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         }
     }
 
+    /// <inheritdoc />
     public override void VisitTableHeaderRow(TableHeaderRow header)
     {
         builder.OpenComponent<RadzenTableHeader>(0);
@@ -155,6 +125,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseComponent();
     }
 
+    /// <inheritdoc />
     public override void VisitIndentedCodeBlock(IndentedCodeBlock code)
     {
         builder.OpenElement(0, "pre");
@@ -164,6 +135,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitParagraph(Paragraph paragraph)
     {
         if (paragraph.Parent is ListItem item && item.Parent is List list && list.Tight)
@@ -187,6 +159,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         };
     }
 
+    /// <inheritdoc />
     public override void VisitBlockQuote(BlockQuote blockQuote)
     {
         builder.OpenElement(0, "blockquote");
@@ -194,6 +167,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitCode(Code code)
     {
         builder.OpenElement(0, "code");
@@ -201,6 +175,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitStrong(Strong strong)
     {
         builder.OpenElement(0, "strong");
@@ -208,6 +183,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitEmphasis(Emphasis emphasis)
     {
         builder.OpenElement(0, "em");
@@ -215,6 +191,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitLink(Link link)
     {
         if (link.Destination.StartsWith("#"))
@@ -246,9 +223,9 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
             }
             builder.CloseComponent();
         }
-
     }
 
+    /// <inheritdoc />
     public override void VisitImage(Image image)
     {
         builder.OpenComponent<RadzenImage>(0);
@@ -266,6 +243,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitOrderedList(OrderedList orderedList)
     {
         builder.OpenElement(0, "ol");
@@ -273,6 +251,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitUnorderedList(UnorderedList unorderedList)
     {
         builder.OpenElement(0, "ul");
@@ -280,6 +259,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitListItem(ListItem listItem)
     {
         builder.OpenElement(0, "li");
@@ -287,6 +267,7 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitFencedCodeBlock(FencedCodeBlock fencedCodeBlock)
     {
         builder.OpenElement(0, "pre");
@@ -296,12 +277,14 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitThematicBreak(ThematicBreak thematicBreak)
     {
         builder.OpenElement(0, "hr");
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitHtmlBlock(HtmlBlock htmlBlock)
     {
         var match = OutletRegex.Match(htmlBlock.Value);
@@ -322,12 +305,14 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         }
     }
 
+    /// <inheritdoc />
     public override void VisitLineBreak(LineBreak lineBreak)
     {
         builder.OpenElement(0, "br");
         builder.CloseElement();
     }
 
+    /// <inheritdoc />
     public override void VisitText(Text text)
     {
         builder.AddContent(0, text.Value);
@@ -355,11 +340,13 @@ class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, RenderTreeBu
         };
     }
 
+    /// <inheritdoc />
     public override void VisitSoftLineBreak(SoftLineBreak softBreak)
     {
         builder.AddContent(0, "\n");
     }
 
+    /// <inheritdoc />
     public override void VisitHtmlInline(HtmlInline htmlInline)
     {
         var match = OutletRegex.Match(htmlInline.Value);

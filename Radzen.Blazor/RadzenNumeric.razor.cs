@@ -61,7 +61,7 @@ namespace Radzen.Blazor
                         .ToString();
         }
 
-        private string getOnInput()
+        private string GetOnInput()
         {
             object minArg = Min;
             object maxArg = Max;
@@ -69,7 +69,7 @@ namespace Radzen.Blazor
             return (Min != null || Max != null) ? $@"Radzen.numericOnInput(event, {minArg ?? "null"}, {maxArg ?? "null"}, {isNull})" : "";
         }
 
-        private string getOnPaste()
+        private string GetOnPaste()
         {
             object minArg = Min;
             object maxArg = Max;

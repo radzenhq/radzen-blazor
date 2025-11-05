@@ -27,9 +27,9 @@
                 }
                 else
                 {
-                    @if (!string.IsNullOrEmpty(getIcon()))
+                    @if (!string.IsNullOrEmpty(GetIcon()))
                     {
-                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@getIcon()</i>
+                        <i class="notranslate rz-button-icon-left rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@GetIcon()</i>
                     }
                     @if (!string.IsNullOrEmpty(Image))
                     {

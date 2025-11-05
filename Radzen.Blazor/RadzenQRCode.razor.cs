@@ -66,7 +66,7 @@ namespace Radzen.Blazor
     /// </code>
     /// </example>
     public partial class RadzenQRCode : RadzenComponent
-	{
+    {
         /// <summary>
         /// Gets or sets the error correction level determining how much damage the QR code can sustain while remaining scannable.
         /// Higher levels add more redundancy but reduce data capacity. Use High or Quartile when embedding logos.
@@ -81,12 +81,12 @@ namespace Radzen.Blazor
         /// <value>The data to encode. Default is empty string.</value>
         [Parameter] public string Value { get; set; } = string.Empty;
 
-		/// <summary>
-		/// Gets or sets the rendered size (both width and height) of the QR code SVG.
-		/// Accepts CSS units (e.g., "200px", "100%", "10rem"). Use percentage for responsive sizing.
-		/// </summary>
-		/// <value>The size in CSS units. Default is "100%".</value>
-		[Parameter] public string Size { get; set; } = "100%";
+        /// <summary>
+        /// Gets or sets the rendered size (both width and height) of the QR code SVG.
+        /// Accepts CSS units (e.g., "200px", "100%", "10rem"). Use percentage for responsive sizing.
+        /// </summary>
+        /// <value>The size in CSS units. Default is "100%".</value>
+        [Parameter] public string Size { get; set; } = "100%";
 
 		/// <summary>
 		/// Gets or sets the color of the QR code modules (the dark squares/dots).

@@ -425,82 +425,82 @@
     </div>
 
     <!-- Filter Popup -->
-    @if (AllowFiltering && _currentFilterField != null)
+    @if (AllowFiltering && currentFilterField != null)
     {
-        <Popup @ref="_filterPopup" id="@($"pivot-filter-{_currentFilterField.Property}")" class="rz-overlaypanel"
+        <Popup @ref="filterPopup" id="@($"pivot-filter-{currentFilterField.Property}")" class="rz-overlaypanel"
                style="display:none;min-width:250px;" @onkeydown="OnFilterPopupKeyPressed">
             <div class="rz-overlaypanel-content">
-                @if (_currentFilterField.FilterTemplate != null)
+                @if (currentFilterField.FilterTemplate != null)
                 {
-                    @_currentFilterField.FilterTemplate(_currentFilterField)
+                    @currentFilterField.FilterTemplate(currentFilterField)
                 }
                 else
                 {
-                    <form id="@($"pivot-filter-{_currentFilterField.Property}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
+                    <form id="@($"pivot-filter-{currentFilterField.Property}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
                         <span class="rz-grid-filter-label">@FilterText</span>
-                        <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", FilterOperatorAriaLabel + GetFilterOperatorText(_currentFilterField.GetSecondFilterOperator()) }})"
-                                        @onclick:preventDefault="true" Data="@(GetFilterOperators(_currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@_currentFilterField.GetFilterOperator()" Change="@(args => SetFilterOperator(_currentFilterField, (FilterOperator)args))" />
-                        @if (_currentFilterField.FilterValueTemplate != null)
+                        <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", FilterOperatorAriaLabel + GetFilterOperatorText(currentFilterField.GetSecondFilterOperator()) }})"
+                                        @onclick:preventDefault="true" Data="@(GetFilterOperators(currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@currentFilterField.GetFilterOperator()" Change="@(args => SetFilterOperator(currentFilterField, (FilterOperator)args))" />
+                        @if (currentFilterField.FilterValueTemplate != null)
                         {
-                            @_currentFilterField.FilterValueTemplate(_currentFilterField)
+                            @currentFilterField.FilterValueTemplate(currentFilterField)
                         }
-                        else if (PropertyAccess.IsNullableEnum(GetFilterPropertyType(_currentFilterField)) || PropertyAccess.IsEnum(GetFilterPropertyType(_currentFilterField)))
+                        else if (PropertyAccess.IsNullableEnum(GetFilterPropertyType(currentFilterField)) || PropertyAccess.IsEnum(GetFilterPropertyType(currentFilterField)))
                         {
-                            <RadzenDropDown Disabled="@(!CanSetFilterValue(_currentFilterField))" AllowClear="false" AllowFiltering="false" TValue="@object"
-                                            Value="@_currentFilterField.GetFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(_currentFilterField)) ?? GetFilterPropertyType(_currentFilterField), EnumFilterTranslationFunc)"
-                                            Change="@(args => SetFilterValue(_currentFilterField, args))"
-                                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + FilterValueAriaLabel + _currentFilterField.GetFilterValue() }})" />
+                            <RadzenDropDown Disabled="@(!CanSetFilterValue(currentFilterField))" AllowClear="false" AllowFiltering="false" TValue="@object"
+                                            Value="@currentFilterField.GetFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(currentFilterField)) ?? GetFilterPropertyType(currentFilterField), EnumFilterTranslationFunc)"
+                                            Change="@(args => SetFilterValue(currentFilterField, args))"
+                                            InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + FilterValueAriaLabel + currentFilterField.GetFilterValue() }})" />
                         }
-                        else if (PropertyAccess.IsNumeric(GetFilterPropertyType(_currentFilterField)))
+                        else if (PropertyAccess.IsNumeric(GetFilterPropertyType(currentFilterField)))
                         {
-                            @DrawNumericFilter(_currentFilterField, false)
+                            @DrawNumericFilter(currentFilterField, false)
                         }
-                        else if (PropertyAccess.IsDate(GetFilterPropertyType(_currentFilterField)))
+                        else if (PropertyAccess.IsDate(GetFilterPropertyType(currentFilterField)))
                         {
-                            <RadzenDatePicker Disabled="@(!CanSetFilterValue(_currentFilterField))" TValue="@object" ShowTime="@ShowTimeForDateTimeFilter(_currentFilterField)" ShowTimeOkButton="true" DateFormat="@GetFilterDateFormat(_currentFilterField)"
-                                                Value="@_currentFilterField.GetFilterValue()" Change="@(args => SetFilterValue(_currentFilterField, PropertyAccess.IsDateOnly(GetFilterPropertyType(_currentFilterField)) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value))" AllowInput="@AllowFilterDateInput"
-                                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + FilterValueAriaLabel + _currentFilterField.GetFilterValue() }})" />
+                            <RadzenDatePicker Disabled="@(!CanSetFilterValue(currentFilterField))" TValue="@object" ShowTime="@ShowTimeForDateTimeFilter(currentFilterField)" ShowTimeOkButton="true" DateFormat="@GetFilterDateFormat(currentFilterField)"
+                                                Value="@currentFilterField.GetFilterValue()" Change="@(args => SetFilterValue(currentFilterField, PropertyAccess.IsDateOnly(GetFilterPropertyType(currentFilterField)) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value))" AllowInput="@AllowFilterDateInput"
+                                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + FilterValueAriaLabel + currentFilterField.GetFilterValue() }})" />
                         }
-                        else if (GetFilterPropertyType(_currentFilterField) == typeof(bool) || GetFilterPropertyType(_currentFilterField) == typeof(bool?))
+                        else if (GetFilterPropertyType(currentFilterField) == typeof(bool) || GetFilterPropertyType(currentFilterField) == typeof(bool?))
                         {
-                            <RadzenCheckBox Disabled="@(!CanSetFilterValue(_currentFilterField))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + FilterValueAriaLabel + _currentFilterField.GetFilterValue() }})" TriState="true" TValue="@object" Value="@_currentFilterField.GetFilterValue()" Change="@(args => { SetFilterValue(_currentFilterField, null); SetFilterValue(_currentFilterField, args);  })" />
-                        }
-                        else
-                        {
-                            <RadzenTextBox Disabled="@(!CanSetFilterValue(_currentFilterField))" id="@($"pivot-filter-{_currentFilterField.Property}-sf")" aria-label="@(_currentFilterField.GetTitle() + FilterValueAriaLabel + _currentFilterField.GetFilterValue())" Value="@($"{_currentFilterField.GetFilterValue()}")" Change="@(args => SetFilterValue(_currentFilterField, args))" />
-                        }
-
-                        <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + LogicalOperatorAriaLabel + (_currentFilterField.GetLogicalFilterOperator() == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText) }})"
-                                        Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator?" Value="@_currentFilterField.GetLogicalFilterOperator()" Change="@(args => SetLogicalFilterOperator(_currentFilterField, (LogicalFilterOperator)args))" />
-
-                        <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SecondFilterOperatorAriaLabel + GetFilterOperatorText(_currentFilterField.GetSecondFilterOperator()) }})" @onclick:preventDefault="true" Data="@(GetFilterOperators(_currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@_currentFilterField.GetSecondFilterOperator()" Change="@(args => SetSecondFilterOperator(_currentFilterField, (FilterOperator)args))" />
-                        @if (_currentFilterField.SecondFilterValueTemplate != null)
-                        {
-                            @_currentFilterField.SecondFilterValueTemplate(_currentFilterField)
-                        }
-                        else if (PropertyAccess.IsNullableEnum(GetFilterPropertyType(_currentFilterField)) || PropertyAccess.IsEnum(GetFilterPropertyType(_currentFilterField)))
-                        {
-                            <RadzenDropDown Disabled="@(!CanSetFilterValue(_currentFilterField, false))" AllowClear="false" AllowFiltering="false" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + SecondFilterValueAriaLabel }})"
-                                            Value="@_currentFilterField.GetSecondFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(_currentFilterField)) ?? GetFilterPropertyType(_currentFilterField), EnumFilterTranslationFunc)"
-                                            Change="@(args => SetFilterValue(_currentFilterField, args, false))" />
-                        }
-                        else if (PropertyAccess.IsNumeric(GetFilterPropertyType(_currentFilterField)))
-                        {
-                            @DrawNumericFilter(_currentFilterField, false, false)
-                        }
-                        else if (PropertyAccess.IsDate(GetFilterPropertyType(_currentFilterField)))
-                        {
-                            <RadzenDatePicker Disabled="@(!CanSetFilterValue(_currentFilterField, false))" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + SecondFilterValueAriaLabel + _currentFilterField.GetSecondFilterValue() }})"
-                                                ShowTime="@ShowTimeForDateTimeFilter(_currentFilterField)" ShowTimeOkButton="true" DateFormat="@GetFilterDateFormat(_currentFilterField)"
-                                                Value="@_currentFilterField.GetSecondFilterValue()" Change="@(args => SetFilterValue(_currentFilterField, PropertyAccess.IsDateOnly(GetFilterPropertyType(_currentFilterField)) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value, false))" AllowInput="@AllowFilterDateInput" />
-                        }
-                        else if (GetFilterPropertyType(_currentFilterField) == typeof(bool) || GetFilterPropertyType(_currentFilterField) == typeof(bool?))
-                        {
-                            <RadzenCheckBox Disabled="@(!CanSetFilterValue(_currentFilterField, false))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", _currentFilterField.GetTitle() + SecondFilterValueAriaLabel + _currentFilterField.GetSecondFilterValue() }})" TriState="true" TValue="@object" Value="@_currentFilterField.GetSecondFilterValue()" Change="@(args => { SetFilterValue(_currentFilterField, args, false);  })" />
+                            <RadzenCheckBox Disabled="@(!CanSetFilterValue(currentFilterField))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + FilterValueAriaLabel + currentFilterField.GetFilterValue() }})" TriState="true" TValue="@object" Value="@currentFilterField.GetFilterValue()" Change="@(args => { SetFilterValue(currentFilterField, null); SetFilterValue(currentFilterField, args);  })" />
                         }
                         else
                         {
-                            <RadzenTextBox Disabled="@(!CanSetFilterValue(_currentFilterField, false))" id="@($"pivot-filter-{_currentFilterField.Property}-sf2")" aria-label="@(_currentFilterField.GetTitle() + SecondFilterValueAriaLabel + _currentFilterField.GetSecondFilterValue())" Value="@($"{_currentFilterField.GetSecondFilterValue()}")" Change="@(args => SetFilterValue(_currentFilterField, args, false))" />
+                            <RadzenTextBox Disabled="@(!CanSetFilterValue(currentFilterField))" id="@($"pivot-filter-{currentFilterField.Property}-sf")" aria-label="@(currentFilterField.GetTitle() + FilterValueAriaLabel + currentFilterField.GetFilterValue())" Value="@($"{currentFilterField.GetFilterValue()}")" Change="@(args => SetFilterValue(currentFilterField, args))" />
+                        }
+
+                        <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + LogicalOperatorAriaLabel + (currentFilterField.GetLogicalFilterOperator() == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText) }})"
+                                        Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = t == LogicalFilterOperator.And ? AndOperatorText : OrOperatorText, Value = t }))" TValue="LogicalFilterOperator?" Value="@currentFilterField.GetLogicalFilterOperator()" Change="@(args => SetLogicalFilterOperator(currentFilterField, (LogicalFilterOperator)args))" />
+
+                        <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SecondFilterOperatorAriaLabel + GetFilterOperatorText(currentFilterField.GetSecondFilterOperator()) }})" @onclick:preventDefault="true" Data="@(GetFilterOperators(currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@currentFilterField.GetSecondFilterOperator()" Change="@(args => SetSecondFilterOperator(currentFilterField, (FilterOperator)args))" />
+                        @if (currentFilterField.SecondFilterValueTemplate != null)
+                        {
+                            @currentFilterField.SecondFilterValueTemplate(currentFilterField)
+                        }
+                        else if (PropertyAccess.IsNullableEnum(GetFilterPropertyType(currentFilterField)) || PropertyAccess.IsEnum(GetFilterPropertyType(currentFilterField)))
+                        {
+                            <RadzenDropDown Disabled="@(!CanSetFilterValue(currentFilterField, false))" AllowClear="false" AllowFiltering="false" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + SecondFilterValueAriaLabel }})"
+                                            Value="@currentFilterField.GetSecondFilterValue()" Multiple="false" Placeholder="@EnumFilterSelectText" TextProperty="Text" ValueProperty="Value" Data="@EnumExtensions.EnumAsKeyValuePair(Nullable.GetUnderlyingType(GetFilterPropertyType(currentFilterField)) ?? GetFilterPropertyType(currentFilterField), EnumFilterTranslationFunc)"
+                                            Change="@(args => SetFilterValue(currentFilterField, args, false))" />
+                        }
+                        else if (PropertyAccess.IsNumeric(GetFilterPropertyType(currentFilterField)))
+                        {
+                            @DrawNumericFilter(currentFilterField, false, false)
+                        }
+                        else if (PropertyAccess.IsDate(GetFilterPropertyType(currentFilterField)))
+                        {
+                            <RadzenDatePicker Disabled="@(!CanSetFilterValue(currentFilterField, false))" TValue="@object" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + SecondFilterValueAriaLabel + currentFilterField.GetSecondFilterValue() }})"
+                                                ShowTime="@ShowTimeForDateTimeFilter(currentFilterField)" ShowTimeOkButton="true" DateFormat="@GetFilterDateFormat(currentFilterField)"
+                                                Value="@currentFilterField.GetSecondFilterValue()" Change="@(args => SetFilterValue(currentFilterField, PropertyAccess.IsDateOnly(GetFilterPropertyType(currentFilterField)) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value, false))" AllowInput="@AllowFilterDateInput" />
+                        }
+                        else if (GetFilterPropertyType(currentFilterField) == typeof(bool) || GetFilterPropertyType(currentFilterField) == typeof(bool?))
+                        {
+                            <RadzenCheckBox Disabled="@(!CanSetFilterValue(currentFilterField, false))" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", currentFilterField.GetTitle() + SecondFilterValueAriaLabel + currentFilterField.GetSecondFilterValue() }})" TriState="true" TValue="@object" Value="@currentFilterField.GetSecondFilterValue()" Change="@(args => { SetFilterValue(currentFilterField, args, false);  })" />
+                        }
+                        else
+                        {
+                            <RadzenTextBox Disabled="@(!CanSetFilterValue(currentFilterField, false))" id="@($"pivot-filter-{currentFilterField.Property}-sf2")" aria-label="@(currentFilterField.GetTitle() + SecondFilterValueAriaLabel + currentFilterField.GetSecondFilterValue())" Value="@($"{currentFilterField.GetSecondFilterValue()}")" Change="@(args => SetFilterValue(currentFilterField, args, false))" />
                         }
                     </form>
                     <div class="rz-grid-filter-buttons">

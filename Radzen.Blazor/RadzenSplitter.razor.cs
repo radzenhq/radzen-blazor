@@ -46,7 +46,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenSplitter : RadzenComponent
     {
-        private int _sizeautopanes = 0;
+        private int sizeAutoPanes = 0;
 
         /// <summary>
         /// Gets or sets the panes to display within the splitter.
@@ -79,7 +79,7 @@ namespace Radzen.Blazor
             {
                 //no size defined
                 pane.SizeAuto = true;
-                _sizeautopanes++;
+                sizeAutoPanes++;
             }
 
             pane.Index = Panes.Count;
@@ -90,7 +90,7 @@ namespace Radzen.Blazor
                 if (!iPane.SizeAuto)
                     continue;
 
-                iPane.SizeRuntine = (100 / _sizeautopanes) + "%";
+                iPane.SizeRuntine = (100 / sizeAutoPanes) + "%";
             }
         }
 

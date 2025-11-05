@@ -1,7 +1,7 @@
-
 namespace Radzen.Blazor.Markdown;
 
 #nullable enable
+
 /// <summary>
 /// Base class for a markdown block nodes.
 /// </summary>
@@ -10,7 +10,7 @@ public abstract class Block : INode
     /// <summary>
     /// Accepts a visitor.
     /// </summary>
-    /// <param name="visitor"></param>
+    /// <param name="visitor">The visitor to accept.</param>
     public abstract void Accept(INodeVisitor visitor);
 
     /// <summary>
@@ -51,23 +51,4 @@ public abstract class Block : INode
     {
         Open = false;
     }
-}
-
-enum BlockMatch
-{
-    Match,
-    Skip,
-    Break
-}
-
-struct Position
-{
-    public int Line { get; set; }
-    public int Column { get; set; }
-}
-
-struct Range
-{
-    public Position Start;
-    public Position End;
 }

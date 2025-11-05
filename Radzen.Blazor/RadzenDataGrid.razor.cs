@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -819,17 +819,17 @@ namespace Radzen.Blazor
         /// Updates pickable columns.
         /// </summary>
         public void UpdatePickableColumns()
-		{
-			if (allColumns.Any(c => c.Pickable))
-			{
-				if (AllowColumnPicking)
-				{
-					allPickableColumns = allColumns.Where(c => c.Pickable).OrderBy(c => c.GetOrderIndex()).ToList();
-				}
-			}
-		}
+        {
+            if (allColumns.Any(c => c.Pickable))
+            {
+                if (AllowColumnPicking)
+                {
+                    allPickableColumns = allColumns.Where(c => c.Pickable).OrderBy(c => c.GetOrderIndex()).ToList();
+                }
+            }
+        }
 
-		internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
+        internal void RemoveColumn(RadzenDataGridColumn<TItem> column)
         {
             if (columns.Contains(column))
             {
@@ -1057,7 +1057,7 @@ namespace Radzen.Blazor
         public PopupRenderMode FilterPopupRenderMode { get; set; } = PopupRenderMode.Initial;
 
         /// <summary>
-        /// Сlear filter on the specified column
+        /// ?lear filter on the specified column
         /// </summary>
         public async Task ClearFilter(RadzenDataGridColumn<TItem> column, bool closePopup = false, bool shouldReload = true)
         {
@@ -1445,7 +1445,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string ColumnWidth { get; set; }
 
-        private string _emptyText = "No records to display.";
+        private string emptyText = "No records to display.";
         /// <summary>
         /// Gets or sets the empty text shown when Data is empty collection.
         /// </summary>
@@ -1453,12 +1453,12 @@ namespace Radzen.Blazor
         [Parameter]
         public string EmptyText
         {
-            get { return _emptyText; }
+            get { return emptyText; }
             set
             {
-                if (value != _emptyText)
+                if (value != emptyText)
                 {
-                    _emptyText = value;
+                    emptyText = value;
                 }
             }
         }
@@ -3689,42 +3689,42 @@ namespace Radzen.Blazor
             }
         }
 
-		/// <summary>
-		/// Compares two objects for equality.
-		/// </summary>
-		/// <param name="object1">The first object to compare.</param>
-		/// <param name="object2">The second object to compare.</param>
-		/// <returns>True if the objects are equal, false otherwise.</returns>
-		private static bool AreObjectsEqual(object object1, object object2)
-		{
-			// If both objects are null, they are considered equal
-			if (object1 == null && object2 == null)
-			{
-				return true;
-			}
+        /// <summary>
+        /// Compares two objects for equality.
+        /// </summary>
+        /// <param name="object1">The first object to compare.</param>
+        /// <param name="object2">The second object to compare.</param>
+        /// <returns>True if the objects are equal, false otherwise.</returns>
+        private static bool AreObjectsEqual(object object1, object object2)
+        {
+            // If both objects are null, they are considered equal
+            if (object1 == null && object2 == null)
+            {
+                return true;
+            }
 
-			// If only one of the objects is null, they are considered not equal
-			if (object1 == null || object2 == null)
-			{
-				return false;
-			}
+            // If only one of the objects is null, they are considered not equal
+            if (object1 == null || object2 == null)
+            {
+                return false;
+            }
 
-			// If both objects are enumerable, compare their elements
-			if (object1 is IEnumerable list1 && object2 is IEnumerable list2)
-			{
-				// Create hash sets from the enumerable objects
-				var set1 = new HashSet<object>(list1.Cast<object>());
-				var set2 = new HashSet<object>(list2.Cast<object>());
+            // If both objects are enumerable, compare their elements
+            if (object1 is IEnumerable list1 && object2 is IEnumerable list2)
+            {
+                // Create hash sets from the enumerable objects
+                var set1 = new HashSet<object>(list1.Cast<object>());
+                var set2 = new HashSet<object>(list2.Cast<object>());
 
-				// Check if the hash sets are equal
-				return set1.SetEquals(set2);
-			}
+                // Check if the hash sets are equal
+                return set1.SetEquals(set2);
+            }
 
-			// If the objects are not enumerable, compare them using the Equals method
-			return object1.Equals(object2);
-		}
+            // If the objects are not enumerable, compare them using the Equals method
+            return object1.Equals(object2);
+        }
 
-		object GetFilterValue(object value, Type type)
+        object GetFilterValue(object value, Type type)
         {
             if (value != null && value is JsonElement)
             {
