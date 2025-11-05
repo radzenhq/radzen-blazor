@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace Radzen.Blazor;
 
+#nullable enable
+
 /// <summary>
 /// Represents a dialog component in the Radzen framework.
 /// RadzenDialog is a reusable component that facilitates the creation of modal dialogs.
@@ -26,7 +28,7 @@ public partial class RadzenDialog
         }
     }
 
-    [Inject] private DialogService Service { get; set; }
+    [Inject] private DialogService? Service { get; set; }
 
     /// <summary>
     /// Gets or sets the close side dialog aria label text.
@@ -36,13 +38,13 @@ public partial class RadzenDialog
     public string CloseSideDialogAriaLabel { get; set; } = "Close side dialog";
 
     private List<Dialog> dialogs = new List<Dialog>();
-    private bool isSideDialogOpen = false;
-    private RenderFragment sideDialogContent;
-    private SideDialogOptions sideDialogOptions;
-    private Dialog sideDialog;
+    private bool isSideDialogOpen;
+    private RenderFragment? sideDialogContent;
+    private SideDialogOptions? sideDialogOptions;
+    private Dialog? sideDialog;
     private ElementReference? resizeBarElement;
     private ElementReference? sideDialogElement;
-    private IJSObjectReference sideDialogResizeHandleJsModule;
+    private IJSObjectReference? sideDialogResizeHandleJsModule;
 
     /// <summary>
     /// Opens a new dialog with specified parameters and options.
