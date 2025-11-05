@@ -40,8 +40,8 @@ public partial class RadzenDialog
     private RenderFragment sideDialogContent;
     private SideDialogOptions sideDialogOptions;
     private Dialog sideDialog;
-    private ElementReference? sideDialogResizeHandle;
-    private ElementReference? sideDialogHandle;
+    private ElementReference? resizeBarElement;
+    private ElementReference? sideDialogElement;
     private IJSObjectReference sideDialogResizeHandleJsModule;
 
     /// <summary>
@@ -222,11 +222,11 @@ public partial class RadzenDialog
         {
             await JSRuntime.InvokeAsync<string>("Radzen.openSideDialog", sideDialogOptions);
 
-            if (sideDialogOptions is { Resizable: true } && sideDialogResizeHandle.HasValue)
+            if (sideDialogOptions is { Resizable: true } && resizeBarElement.HasValue)
             {
                 sideDialogResizeHandleJsModule =
                     await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.initSideDialogResize",
-                        sideDialogResizeHandle, sideDialogHandle);
+                        resizeBarElement, sideDialogElement);
             }
         }
     }

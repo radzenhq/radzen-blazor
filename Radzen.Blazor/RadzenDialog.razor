@@ -12,13 +12,13 @@
 {
     <aside
         class="@GetSideDialogCssClass()"
-        @ref="sideDialogHandle"
+        @ref="sideDialogElement"
         tabindex="@(isSideDialogOpen ? "0" : "-1")"
         style="@GetSideDialogStyle()"
         aria-labelledby="rz-dialog-side-label">
         @if (sideDialogOptions.Resizable)
         {
-            <div @ref="sideDialogResizeHandle"
+            <div @ref="resizeBarElement"
                  class="@GetResizeBarCssClass()"
                  data-dir="@(sideDialogOptions.Position switch
                            {
@@ -72,9 +72,4 @@
             <div class="rz-dialog-mask"></div>
         }
     }
-}
-
-@code {
-#nullable enable
-
 }
