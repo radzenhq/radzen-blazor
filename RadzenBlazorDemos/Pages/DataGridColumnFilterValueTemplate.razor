@@ -1,33 +1,37 @@
 ﻿<RadzenDataGrid @ref="grid" Data=@employees FilterMode="FilterMode.SimpleWithMenu" AllowFiltering="true" AllowPaging="true" AllowSorting="true"
-ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Employee">
+                ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Employee">
     <Columns>
         <RadzenDataGridColumn Property="ID" Title="ID" FilterValue="@idValue">
             <FilterValueTemplate>
-                <RadzenNumeric @bind-Value=idValue ShowUpDown=false Style="width:100%" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by ID" }})" />
+                <RadzenNumeric @bind-Value=idValue ShowUpDown=false Style="width:100%" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by ID" } })" />
             </FilterValueTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Title="Customer" Property="CompanyName" Type="typeof(IEnumerable<string>)" FilterValue="@selectedCompanyNames" LogicalFilterOperator="LogicalFilterOperator.Or"
-                              FilterOperator="FilterOperator.Contains" FilterOperators="@(new FilterOperator[]{ FilterOperator.Contains, FilterOperator.DoesNotContain})">
+                              FilterOperator="FilterOperator.Contains" FilterOperators="@(new FilterOperator[] { FilterOperator.Contains, FilterOperator.DoesNotContain })">
             <FilterValueTemplate>
-                <RadzenDropDown @ref=scdd @bind-Value=@selectedCompanyNames Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Company" }})"
+                <RadzenDropDown @ref=scdd @bind-Value=@selectedCompanyNames Style="width:100%;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by Company" } })"
                                 Change=@OnSelectedCompanyNamesChange Data="@(companyNames)" AllowClear="true" Multiple="true" />
             </FilterValueTemplate>
         </RadzenDataGridColumn>
 
-        <RadzenDataGridColumn Title="Awards" Property="Awards" Type="typeof(IEnumerable<string>)" FilterValue="@selectedAwards" LogicalFilterOperator="LogicalFilterOperator.Or"
-                              FilterOperator="FilterOperator.In" FilterOperators="@(new FilterOperator[]{ FilterOperator.In, FilterOperator.NotIn})" CollectionFilterMode="@collectionFilterMode">
+        <RadzenDataGridColumn Title="Awards" Property="Awards" Type="typeof(IEnumerable<string>)" FilterValue="@selectedAwards"
+                              LogicalFilterOperator="LogicalFilterOperator.Or"
+                              FilterOperator="FilterOperator.In"
+                              FilterOperators="@(new FilterOperator[] { FilterOperator.In, FilterOperator.NotIn })"
+                              CollectionFilterMode="@(collectionFilterMode)">
             <FilterValueTemplate>
-                <RadzenDropDown @ref=sadd @bind-Value=@selectedAwards Style="width:100%;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by Awards" } })"
-                                Change=@OnSelectedAwardsChange Data="@(awards)" AllowClear="true" Multiple="true">
-                    <HeaderTemplate>
-                        <RadzenSelectBar @bind-Value=@collectionFilterMode Style="width:100%;margin-top:1rem;"
-                            TValue="CollectionFilterMode">
+                <RadzenDropDown @ref="sadd" @bind-Value="@selectedAwards" Style="width:100%;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by Awards" } })"
+                                Change="@OnSelectedAwardsChange" Data="@(awards)" AllowClear="true" Multiple="true">
+                    <FooterTemplate>
+                        <div class="rz-footer rz-justify-content-center">
+                        <RadzenSelectBar @bind-Value="@collectionFilterMode" TValue="CollectionFilterMode">
                             <Items>
-                                <RadzenSelectBarItem Text="Any" Value="@(CollectionFilterMode.Any)" />
-                                <RadzenSelectBarItem Text="All" Value="@(CollectionFilterMode.All)" />
+                                <RadzenSelectBarItem Text="Any" Value="@(CollectionFilterMode.Any)"/>
+                                <RadzenSelectBarItem Text="All" Value="@(CollectionFilterMode.All)"/>
                             </Items>
                         </RadzenSelectBar>
-                    </HeaderTemplate>
+                        </div>
+                    </FooterTemplate>
                 </RadzenDropDown>
             </FilterValueTemplate>
             <Template>
@@ -36,28 +40,28 @@ ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Em
         </RadzenDataGridColumn>
 
         <RadzenDataGridColumn Title="Hire Date" Property="HireDate.Date" FormatString="{0:d}"
-        FilterValue="@hireDate?.Date">
+                              FilterValue="@hireDate?.Date">
             <FilterValueTemplate>
-                <RadzenDatePicker @bind-Value=@hireDate Style="width:100%;" AllowClear="true" DateFormat="d" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by Hire Date" }})" />
+                <RadzenDatePicker @bind-Value=@hireDate Style="width:100%;" AllowClear="true" DateFormat="d" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by Hire Date" } })" />
             </FilterValueTemplate>
         </RadzenDataGridColumn>
         <RadzenDataGridColumn Title="WorkStatus" Property="WorkStatus" Type="typeof(IEnumerable<WorkStatus>)" Sortable=false
-        FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" FilterOperators="@(new FilterOperator[]{ FilterOperator.In, FilterOperator.NotIn})" LogicalFilterOperator="LogicalFilterOperator.Or">
+                              FilterValue="@selectedWorkStatus" FilterOperator="FilterOperator.In" FilterOperators="@(new FilterOperator[] { FilterOperator.In, FilterOperator.NotIn })" LogicalFilterOperator="LogicalFilterOperator.Or">
             <FilterValueTemplate>
-                <RadzenDropDown @ref=swdd @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=false Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by WorkStatus" }})"
-                Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses TextProperty="Text" ValueProperty="Value" />
+                <RadzenDropDown @ref=swdd @bind-Value=@selectedWorkStatus Multiple="true" AllowSelectAll=false Style="width:100%;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by WorkStatus" } })"
+                                Change=@OnSelectedWorkStatusChange Data=@allWorkStatuses TextProperty="Text" ValueProperty="Value" />
             </FilterValueTemplate>
             <Template>
                 @(string.Join(',', context.WorkStatus.Select(i => Enum.GetName((WorkStatus)i))))
             </Template>
         </RadzenDataGridColumn>
-        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy" 
-        FilterValue="@currentTOC">
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title Of Courtesy"
+                              FilterValue="@currentTOC">
             <FilterValueTemplate>
                 <RadzenDataGridFilterMenu Grid="@grid" Column="@context" />
-                <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "filter by title of courtesy" }})"
-                Change=@OnSelectedTOCChange
-                Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy?>().Select(t => new { Text = $"{t}", Value = t == TitleOfCourtesy.All ? null : t }))" />
+                <RadzenDropDown @bind-Value="@currentTOC" TextProperty="Text" ValueProperty="Value" Style="width:100%;" InputAttributes="@(new Dictionary<string, object>() { { "aria-label", "filter by title of courtesy" } })"
+                                Change=@OnSelectedTOCChange
+                                Data="@(Enum.GetValues(typeof(TitleOfCourtesy)).Cast<TitleOfCourtesy?>().Select(t => new { Text = $"{t}", Value = t == TitleOfCourtesy.All ? null : t }))" />
             </FilterValueTemplate>
         </RadzenDataGridColumn>
     </Columns>
@@ -78,7 +82,7 @@ ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Em
     IEnumerable<WorkStatus> selectedWorkStatus;
     IEnumerable<object> allWorkStatuses = Enum.GetValues(typeof(WorkStatus)).Cast<WorkStatus>().Select(t => new { Text = $"{t}", Value = t });
 
-    List<string> companyNames = new List<string> {"Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
+    List<string> companyNames = new List<string> { "Vins et alcools Chevalier", "Toms Spezialitäten", "Hanari Carnes", "Richter Supermarkt", "Wellington Importadora", "Centro comercial Moctezuma" };
     List<string> awards = new List<string> { "award 1", "award 2", "award 3", "award 4", "award 5" };
 
     public enum TitleOfCourtesy
@@ -108,7 +112,7 @@ ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Em
     {
         if (selectedCompanyNames != null && !selectedCompanyNames.Any())
         {
-            selectedCompanyNames = null;  
+            selectedCompanyNames = null;
         }
     }
 
@@ -185,7 +189,7 @@ ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Em
         ClearCustomFilters(args);
     }
 
-    IEnumerable<Employee> employees; 
+    IEnumerable<Employee> employees;
 
     protected override async Task OnInitializedAsync()
     {
@@ -197,7 +201,7 @@ ColumnWidth="300px" Filter="@OnFilter" FilterCleared="OnFilterCleared" TItem="Em
                 Awards = awards[..^(i % 5)],
                 HireDate = DateTime.Now.AddMonths(-i),
                 TitleOfCourtesy = i < 5 ? TitleOfCourtesy.Mr : TitleOfCourtesy.Ms,
-                    WorkStatus = i < 3 ?
+                WorkStatus = i < 3 ?
                             new WorkStatus[] { WorkStatus.Office } :
                                             i < 5 ? new WorkStatus[] { WorkStatus.Remote } : new WorkStatus[] { WorkStatus.Office, WorkStatus.Remote },
             }).AsQueryable());
