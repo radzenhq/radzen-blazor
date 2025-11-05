@@ -2573,7 +2573,19 @@ window.Radzen = {
       const elements = selectors.map(document.querySelector, document);
 
       this.unregisterScrollListener(element);
+      let suppressInitialScroll = false;
+
+      if (selectors.indexOf(location.hash) !== -1) {
+        currentSelector = location.hash;
+        suppressInitialScroll = true;
+      }
+
       element.scrollHandler = () => {
+        if (suppressInitialScroll) {
+          suppressInitialScroll = false;
+          ref.invokeMethodAsync('ScrollIntoView', currentSelector);
+          return;
+        }
         const center = (container.tagName === 'HTML' ? 0 : container.getBoundingClientRect().top) + container.clientHeight / 2;
 
         let min = Number.MAX_SAFE_INTEGER;
