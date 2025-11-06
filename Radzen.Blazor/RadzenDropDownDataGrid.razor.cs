@@ -207,6 +207,20 @@ namespace Radzen.Blazor
         public bool AllowColumnResize { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether column reorder is allowed.
+        /// </summary>
+        /// <value><c>true</c> if column reorder is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowColumnReorder { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether column picking is allowed.
+        /// </summary>
+        /// <value><c>true</c> if column picking is allowed; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool AllowColumnPicking { get; set; }
+
+        /// <summary>
         /// Gets or sets the width of all columns.
         /// </summary>
         /// <value>The width of all columns.</value>
@@ -245,6 +259,12 @@ namespace Radzen.Blazor
         /// <value>Row selection preservation on pageing.</value>
         [Parameter]
         public bool PreserveRowSelectionOnPaging { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the page size options.</summary>
+        /// <value>The page size options.</value>
+        [Parameter]
+        public IEnumerable<int> PageSizeOptions { get; set; }
 
         /// <summary>
         /// Gets or sets the page numbers count.
