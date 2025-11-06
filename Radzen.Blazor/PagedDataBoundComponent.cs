@@ -48,7 +48,7 @@ namespace Radzen
         [Parameter]
         public bool AllowPaging { get; set; }
 
-        int _PageSize = 10;
+        int pageSizeField = 10;
         /// <summary>
         /// Gets or sets the size of the page.
         /// </summary>
@@ -58,13 +58,13 @@ namespace Radzen
         {
             get
             {
-                return pageSize ?? _PageSize;
+                return pageSize ?? pageSizeField;
             }
             set
             {
-                if (_PageSize != value)
+                if (pageSizeField != value)
                 {
-                    _PageSize = value;
+                    pageSizeField = value;
                     InvokeAsync(() => OnPageSizeChanged(value));
                 }
             }
@@ -72,12 +72,12 @@ namespace Radzen
 
         internal int GetPageSize()
         {
-            return _PageSize;
+            return pageSizeField;
         }
 
         internal void SetPageSize(int value)
         {
-            _PageSize = value;
+            pageSizeField = value;
         }
 
         /// <summary>

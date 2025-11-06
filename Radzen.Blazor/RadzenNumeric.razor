@@ -32,7 +32,7 @@
                        class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
                        placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" @bind:get="FormattedValue" @bind:set="SetValue"
                        onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
-                       onblur="@getOnInput()" onpaste="@getOnPaste()" maxlength="@MaxLength"
+                       onblur="@GetOnInput()" onpaste="@GetOnPaste()" maxlength="@MaxLength"
                        @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
             </text>
         };
@@ -43,7 +43,7 @@
                        class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
                        placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
                        onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
-                       onblur="@getOnInput()" onpaste="@getOnPaste()" maxlength="@MaxLength"
+                       onblur="@GetOnInput()" onpaste="@GetOnPaste()" maxlength="@MaxLength"
                        @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
             </text>
         };

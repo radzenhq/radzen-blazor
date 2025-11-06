@@ -1,150 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.Linq.Expressions;
 using System.Text;
 
 namespace Radzen;
 
-class Token
-{
-    public TokenType Type { get; set; }
-    public string Value { get; set; } = string.Empty;
-    public ValueKind ValueKind { get; set; } = ValueKind.None;
-    public int IntValue { get; internal set; }
-    public uint UintValue { get; internal set; }
-    public long LongValue { get; internal set; }
-    public ulong UlongValue { get; internal set; }
-    public decimal DecimalValue { get; internal set; }
-    public float FloatValue { get; internal set; }
-    public double DoubleValue { get; internal set; }
-
-    public Token(TokenType type)
-    {
-        Type = type;
-    }
-
-    public Token(TokenType type, string value)
-    {
-        Type = type;
-        Value = value;
-    }
-
-    public ConstantExpression ToConstantExpression()
-    {
-        return ValueKind switch
-        {
-            ValueKind.Null => Expression.Constant(null),
-            ValueKind.String => Expression.Constant(Value),
-            ValueKind.Character => Expression.Constant(Value[0]),
-            ValueKind.Int => Expression.Constant(IntValue),
-            ValueKind.UInt => Expression.Constant(UintValue),
-            ValueKind.Long => Expression.Constant(LongValue),
-            ValueKind.ULong => Expression.Constant(UlongValue),
-            ValueKind.Float => Expression.Constant(FloatValue),
-            ValueKind.Double => Expression.Constant(DoubleValue),
-            ValueKind.Decimal => Expression.Constant(DecimalValue),
-            ValueKind.True => Expression.Constant(true),
-            ValueKind.False => Expression.Constant(false),
-            _ => throw new InvalidOperationException($"Unsupported value kind: {ValueKind}")
-        };
-    }
-}
-
-enum ValueKind
-{
-    None,
-    String,
-    Int,
-    Float,
-    Double,
-    Decimal,
-    Character,
-    Null,
-    True,
-    False,
-    Long,
-    UInt,
-    ULong,
-}
-
-
-enum TokenType
-{
-    None,
-    Identifier,
-    EqualsEquals,
-    NotEquals,
-    EqualsGreaterThan,
-    StringLiteral,
-    NumericLiteral,
-    Dot,
-    OpenParen,
-    CloseParen,
-    Comma,
-    AmpersandAmpersand,
-    Ampersand,
-    BarBar,
-    Bar,
-    GreaterThan,
-    LessThan,
-    LessThanOrEqual,
-    GreaterThanOrEqual,
-    Plus,
-    Minus,
-    Star,
-    Slash,
-    CharacterLiteral,
-    QuestionMark,
-    QuestionMarkQuestionMark,
-    Colon,
-    QuestionDot,
-    New,
-    NullLiteral,
-    TrueLiteral,
-    FalseLiteral,
-    OpenBracket,
-    CloseBracket,
-    OpenBrace,
-    CloseBrace,
-    ExclamationMark,
-    Equals,
-    Caret,
-    GreaterThanGreaterThan,
-    LessThanLessThan,
-}
-
-static class TokenTypeExtensions
-{
-    public static ExpressionType ToExpressionType(this TokenType tokenType)
-    {
-        return tokenType switch
-        {
-            TokenType.EqualsEquals => ExpressionType.Equal,
-            TokenType.NotEquals => ExpressionType.NotEqual,
-            TokenType.EqualsGreaterThan => ExpressionType.GreaterThanOrEqual,
-            TokenType.AmpersandAmpersand => ExpressionType.AndAlso,
-            TokenType.Ampersand => ExpressionType.And,
-            TokenType.BarBar => ExpressionType.OrElse,
-            TokenType.Bar => ExpressionType.Or,
-            TokenType.GreaterThan => ExpressionType.GreaterThan,
-            TokenType.LessThan => ExpressionType.LessThan,
-            TokenType.LessThanOrEqual => ExpressionType.LessThanOrEqual,
-            TokenType.GreaterThanOrEqual => ExpressionType.GreaterThanOrEqual,
-            TokenType.Plus => ExpressionType.Add,
-            TokenType.Minus => ExpressionType.Subtract,
-            TokenType.Star => ExpressionType.Multiply,
-            TokenType.Slash => ExpressionType.Divide,
-            TokenType.Caret => ExpressionType.ExclusiveOr,
-            TokenType.GreaterThanGreaterThan => ExpressionType.RightShift,
-            TokenType.LessThanLessThan => ExpressionType.LeftShift,
-            _ => throw new InvalidOperationException($"Unsupported token type: {tokenType}")
-        };
-    }
-}
-
-class ExpressionLexer(string expression)
+/// <summary>
+/// Lexer for parsing expressions into tokens.
+/// </summary>
+internal class ExpressionLexer(string expression)
 {
     private int position;
 
@@ -163,7 +27,7 @@ class ExpressionLexer(string expression)
         position += count;
     }
 
-    bool TryAdvance(char expected)
+    private bool TryAdvance(char expected)
     {
         if (Peek(1) == expected)
         {
@@ -182,6 +46,11 @@ class ExpressionLexer(string expression)
         }
     }
 
+    /// <summary>
+    /// Scans the expression and returns a list of tokens.
+    /// </summary>
+    /// <param name="expression">The expression to scan.</param>
+    /// <returns>A list of tokens.</returns>
     public static List<Token> Scan(string expression)
     {
         var lexer = new ExpressionLexer(expression);
@@ -189,6 +58,10 @@ class ExpressionLexer(string expression)
         return [.. lexer.Scan()];
     }
 
+    /// <summary>
+    /// Scans the expression and returns an enumerable of tokens.
+    /// </summary>
+    /// <returns>An enumerable of tokens.</returns>
     public IEnumerable<Token> Scan()
     {
         while (position < expression.Length)
@@ -418,7 +291,7 @@ class ExpressionLexer(string expression)
             var digit = Peek();
 
             int digitValue;
-            
+
             if (digit >= '0' && digit <= '9')
             {
                 digitValue = digit - '0';
@@ -645,7 +518,7 @@ class ExpressionLexer(string expression)
                         break;
                     case 'D':
                     case 'd':
-                    hasDSuffix = true;
+                        hasDSuffix = true;
                         Advance(1);
                         break;
                     case 'M':
@@ -754,7 +627,7 @@ class ExpressionLexer(string expression)
                     value.ValueKind = ValueKind.ULong;
                     value.UlongValue = val;
                 }
-            break;
+                break;
         }
 
         return value;

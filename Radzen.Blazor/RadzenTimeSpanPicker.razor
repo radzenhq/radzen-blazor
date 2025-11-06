@@ -26,7 +26,7 @@
                    placeholder="@Placeholder" tabindex="@(Disabled ? "-1" : TabIndex.ToString())" @attributes="@InputAttributes"
                    @onchange="@(args => SetValueFromInput(args.Value?.ToString()))"
                    @onclick="@(() => ClickInputField())" @onkeydown="@PressKey"
-                   @onkeydown:preventDefault="@_preventKeyPress" @onkeydown:stopPropagation />
+                   @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation />
         @if (ShowPopupButton)
         {
             <button type="button" aria-label="@TogglePopupAriaLabel" disabled="@Disabled"
@@ -39,7 +39,7 @@
         {
             <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
         }
-        <Popup @ref="@_popup" Lazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
+        <Popup @ref="@popup" Lazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
                    Open="@OnPopupOpen" Close="@OnPopupClose"
                    class="rz-timespanpicker-popup-container">
             @RenderPanel()
@@ -55,9 +55,9 @@
             <div class="rz-timespanpicker-panel"
                  @onkeydown="@PopupKeyDown" @onmousedown:stopPropagation>
                  <div class="rz-timespanpicker-panel-fieldcontainer">
-                    @if (_canBeEitherPositiveOrNegative && ReadOnly is false)
+                    @if (canBeEitherPositiveOrNegative && ReadOnly is false)
                     {
-                        <RadzenSelectBar TValue="bool" Value="@_isUnconfirmedValueNegative"
+                        <RadzenSelectBar TValue="bool" Value="@isUnconfirmedValueNegative"
                                          Orientation="Orientation.Vertical" Size="ButtonSize.Small"
                                          Disabled="@Disabled" class="rz-timespanpicker-signpicker"
                                          ValueChanged="@UpdateSign">
@@ -68,7 +68,7 @@
                         </RadzenSelectBar>
                     }
                     else {
-                        var signText = _isUnconfirmedValueNegative ? NegativeValueText : PositiveValueText;
+                        var signText = isUnconfirmedValueNegative ? NegativeValueText : PositiveValueText;
                         if (string.IsNullOrWhiteSpace(signText) is false)
                         {
                             <div class="rz-timespanpicker-sign">@signText</div>

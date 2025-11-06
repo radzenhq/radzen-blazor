@@ -8,7 +8,7 @@ namespace Radzen.Blazor
     /// </summary>
     public class RadzenStepsItem : RadzenComponent
     {
-        private string _text;
+        private string text;
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
@@ -18,13 +18,13 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _text;
+                return text;
             }
             set
             {
-                if (_text != value)
+                if (text != value)
                 {
-                    _text = value;
+                    text = value;
                     Steps?.Refresh();
                 }
             }
@@ -86,7 +86,7 @@ namespace Radzen.Blazor
         [Parameter]
         public bool Selected { get; set; }
 
-        bool _visible = true;
+        private bool visible = true;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenComponent" /> is visible.
         /// </summary>
@@ -96,19 +96,19 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _visible;
+                return visible;
             }
             set
             {
-                if (_visible != value)
+                if (visible != value)
                 {
-                    _visible = value;
+                    visible = value;
                     Steps?.Refresh();
                 }
             }
         }
 
-        bool _disabled;
+        private bool disabled;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenStepsItem"/> is disabled.
         /// </summary>
@@ -118,13 +118,13 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _disabled;
+                return disabled;
             }
             set
             {
-                if (_disabled != value)
+                if (disabled != value)
                 {
-                    _disabled = value;
+                    disabled = value;
                     Steps?.Refresh();
                 }
             }
@@ -137,7 +137,7 @@ namespace Radzen.Blazor
         [Parameter]
         public RenderFragment ChildContent { get; set; }
 
-        RadzenSteps _steps;
+        private RadzenSteps steps;
 
         /// <summary>
         /// Gets or sets the steps.
@@ -148,14 +148,14 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _steps;
+                return steps;
             }
             set
             {
-                if (_steps != value)
+                if (steps != value)
                 {
-                    _steps = value;
-                    _steps.AddStep(this);
+                    steps = value;
+                    steps.AddStep(this);
                 }
             }
         }

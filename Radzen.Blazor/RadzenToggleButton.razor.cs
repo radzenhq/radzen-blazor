@@ -47,7 +47,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string ToggleIcon { get; set; }
 
-        private string getIcon()
+        private string GetIcon()
         {
             return Value && !string.IsNullOrEmpty(ToggleIcon) ? ToggleIcon : Icon;
         }

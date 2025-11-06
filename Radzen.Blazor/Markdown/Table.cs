@@ -5,29 +5,6 @@ using System.Text.RegularExpressions;
 namespace Radzen.Blazor.Markdown;
 
 /// <summary>
-/// The alignment of a table cell.
-/// </summary>
-public enum TableCellAlignment
-{
-    /// <summary>
-    /// No alignment specified. Default alignment is left.
-    /// </summary>
-    None,
-    /// <summary>
-    /// Left alignment.
-    /// </summary>
-    Left,
-    /// <summary>
-    /// Center alignment.
-    /// </summary>
-    Center,
-    /// <summary>
-    /// Right alignment.
-    /// </summary>
-    Right
-}
-
-/// <summary>
 /// Represents a table in a Markdown document.
 /// </summary>
 public class Table : Leaf
@@ -227,7 +204,7 @@ public class Table : Leaf
             parser.CloseUnmatchedBlocks();
 
             // resolve reference links
-            while (paragraph.Value.Peek() == '[' && parser.TryParseLinkReference(paragraph.Value,  out var position))
+            while (paragraph.Value.Peek() == '[' && parser.TryParseLinkReference(paragraph.Value, out var position))
             {
                 paragraph.Value = paragraph.Value[position..];
             }
@@ -237,7 +214,6 @@ public class Table : Leaf
                 var table = new Table();
 
                 // Create header row
-                
                 var header = new TableHeaderRow();
                 table.rows.Add(header);
 
@@ -257,92 +233,5 @@ public class Table : Leaf
         }
 
         return BlockStart.Skip;
-    }
-}
-
-/// <summary>
-/// Represents a table header row in a Markdown table.
-/// </summary>
-public class TableHeaderRow : TableRow
-{
-    /// <inheritdoc />
-    public override void Accept(INodeVisitor visitor)
-    {
-        visitor.VisitTableHeaderRow(this);
-    }
-}
-
-/// <summary>
-/// Represents a table row in a Markdown table.
-/// </summary>
-public class TableRow : INode
-{
-    private readonly List<TableCell> children = [];
-
-    /// <summary>
-    /// /// Gets the cells of the table row.
-    /// </summary>
-
-    public IReadOnlyList<TableCell> Cells => children;
-
-    /// <summary>
-    /// Adds a cell to the table row.
-    /// </summary>
-    public void Add(string value, TableCellAlignment alignment = TableCellAlignment.None)
-    {
-        var cell = new TableCell(value, alignment);
-        children.Add(cell);
-    }
-
-    /// <inheritdoc />
-    public virtual void Accept(INodeVisitor visitor)
-    {
-        visitor.VisitTableRow(this);
-    }
-}
-
-/// <summary>
-/// Represents a table cell in a Markdown table.
-/// </summary>
-public class TableCell : INode, IBlockInlineContainer
-{
-    /// <summary>
-    /// Gets the alignment of the table cell.
-    /// </summary>
-    public TableCellAlignment Alignment { get; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TableCell"/> class.
-    /// </summary>
-    public TableCell(string value, TableCellAlignment alignment = TableCellAlignment.None)
-    {
-        Value = value;
-        Alignment = alignment;
-    }
-
-    /// <summary>
-    /// Gets or sets the inline content of the cell
-    /// </summary>
-    public string Value { get; set; }
-
-    /// <inheritdoc />
-    public void Accept(INodeVisitor visitor)
-    {
-        visitor.VisitTableCell(this);
-    }
-
-    private readonly List<Inline> children = [];
-
-    /// <summary>
-    /// Gets the children of the table cell.
-    /// </summary>
-    public IReadOnlyList<Inline> Children => children;
-
-    /// <summary>
-    /// Appends a child to table cell.
-    /// </summary>
-    public void Add(Inline node)
-    {
-        children.Add(node);
     }
 }

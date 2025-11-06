@@ -157,7 +157,7 @@ namespace Radzen.Blazor
             }
         }
 
-        int _selectedIndex = 0;
+        private int selectedIndex = 0;
         /// <summary>
         /// Gets or sets the selected index.
         /// </summary>
@@ -167,13 +167,13 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _selectedIndex;
+                return selectedIndex;
             }
             set
             {
-                if (_selectedIndex != value)
+                if (selectedIndex != value)
                 {
-                    _selectedIndex = value;
+                    selectedIndex = value;
                 }
             }
         }
@@ -211,7 +211,7 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<StepsCanChangeEventArgs> CanChange { get; set; }
 
-        private string _nextStep = "Next";
+        private string nextStep = "Next";
         /// <summary>
         /// Gets or sets the next button text.
         /// </summary>
@@ -221,20 +221,20 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextText ?? _nextStep;
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextText ?? nextStep;
             }
             set
             {
-                if (value != _nextStep)
+                if (value != nextStep)
                 {
-                    _nextStep = value;
+                    nextStep = value;
 
                     Refresh();
                 }
             }
         }
 
-        private string _previousText = "Previous";
+        private string previousText = "Previous";
         /// <summary>
         /// Gets or sets the previous button text.
         /// </summary>
@@ -244,20 +244,20 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousText ?? _previousText;
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousText ?? previousText;
             }
             set
             {
-                if (value != _previousText)
+                if (value != previousText)
                 {
-                    _previousText = value;
+                    previousText = value;
 
                     Refresh();
                 }
             }
         }
 
-        private string _nextTitle = "Go to the next step.";
+        private string nextTitle = "Go to the next step.";
         /// <summary>
         /// Gets or sets the next button title attribute.
         /// </summary>
@@ -267,19 +267,19 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextTitle ?? _nextTitle;
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextTitle ?? nextTitle;
             }
             set
             {
-                if (value != _nextTitle)
+                if (value != nextTitle)
                 {
-                    _nextTitle = value;
+                    nextTitle = value;
                     Refresh();
                 }
             }
         }
 
-        private string _previousTitle = "Go to the previous step.";
+        private string previousTitle = "Go to the previous step.";
         /// <summary>
         /// Gets or sets the previous button title attribute.
         /// </summary>
@@ -289,13 +289,13 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousTitle ?? _previousTitle;
+                return StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousTitle ?? previousTitle;
             }
             set
             {
-                if (value != _previousTitle)
+                if (value != previousTitle)
                 {
-                    _previousTitle = value;
+                    previousTitle = value;
                     Refresh();
                 }
             }

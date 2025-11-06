@@ -567,7 +567,7 @@ namespace Radzen.Blazor
 
                 pagedData = await Task.FromResult(query.Cast<object>().Skip(skip.HasValue ? skip.Value : 0).Take(args.Top.HasValue ? args.Top.Value : PageSize).ToList());
 
-                _internalView = query;
+                internalView = query;
 
                 if (prevOrder != args.OrderBy)
                 {
@@ -592,7 +592,7 @@ namespace Radzen.Blazor
 
         }
 
-        IEnumerable _internalView = Enumerable.Empty<object>();
+        private IEnumerable internalView = Enumerable.Empty<object>();
 
         /// <summary>
         /// Gets the view. The data with sorting, filtering and paging applied.
@@ -602,7 +602,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return _internalView;
+                return internalView;
             }
         }
 

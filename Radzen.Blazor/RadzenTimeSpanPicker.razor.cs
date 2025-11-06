@@ -24,30 +24,30 @@ namespace Radzen.Blazor
     public partial class RadzenTimeSpanPicker<TValue> : RadzenComponent, IRadzenFormComponent
     {
         #region Parameters: value
-        private TValue _value;
+        private TValue valueField;
         /// <summary>
         /// Specifies the value of the component.
         /// </summary>
         [Parameter]
         public TValue Value
         {
-            get => _value;
+            get => valueField;
             set
             {
-                if (EqualityComparer<object>.Default.Equals(value, _value))
+                if (EqualityComparer<object>.Default.Equals(valueField, value))
                 {
                     return;
                 }
 
-                _value = value;
+                valueField = value;
 
-                if (value is null)
+                if (valueField is null)
                 {
                     ConfirmedValue = null;
                     return;
                 }
 
-                ConfirmedValue = (TimeSpan?)(object)value;
+                ConfirmedValue = (TimeSpan?)(object)valueField;
             }
         }
         /// <summary>
@@ -330,21 +330,21 @@ namespace Radzen.Blazor
 
 
         #region Form fields
-        private IRadzenForm _form;
+        private IRadzenForm form;
         /// <summary>
         /// Specifies the form this component belongs to.
         /// </summary>
         [CascadingParameter]
         public IRadzenForm Form
         {
-            get => _form;
+            get => form;
             set
             {
-                if (_form == value || value is null)
+                if (form == value || value is null)
                     return;
 
-                _form = value;
-                _form.AddComponent(this);
+                form = value;
+                form.AddComponent(this);
             }
         }
 
@@ -426,44 +426,44 @@ namespace Radzen.Blazor
             }
         }
 
-        private TimeSpan _unconfirmedValue;
+        private TimeSpan unconfirmedValue;
         private TimeSpan UnconfirmedValue
         {
-            get => _unconfirmedValue;
+            get => unconfirmedValue;
             set
             {
                 _lastFieldInput.Value = null;
 
-                if (_unconfirmedValue == value)
+                if (unconfirmedValue == value)
                 {
                     return;
                 }
 
                 var newValue = AdjustToBounds(value);
 
-                if (_unconfirmedValue == newValue)
+                if (unconfirmedValue == newValue)
                 {
                     return;
                 }
 
-                if (newValue != TimeSpan.Zero || _canBeEitherPositiveOrNegative is false)
+                if (newValue != TimeSpan.Zero || canBeEitherPositiveOrNegative is false)
                 {
-                    _isUnconfirmedValueNegative = newValue < TimeSpan.Zero;
+                    isUnconfirmedValueNegative = newValue < TimeSpan.Zero;
                 }
 
-                _unconfirmedValue = newValue;
+                unconfirmedValue = newValue;
             }
         }
 
-        private bool _isUnconfirmedValueNegative = false;
-        private int UnconformedValueSign => _isUnconfirmedValueNegative ? -1 : 1;
+        private bool isUnconfirmedValueNegative = false;
+        private int UnconformedValueSign => isUnconfirmedValueNegative ? -1 : 1;
 
         private TimeSpan DefaultNonNullValue => AdjustToBounds(TimeSpan.Zero);
 
         private void ResetUnconfirmedValue()
         {
             UnconfirmedValue = ConfirmedValue ?? DefaultNonNullValue;
-            _isUnconfirmedValueNegative = UnconfirmedValue < TimeSpan.Zero;
+            isUnconfirmedValueNegative = UnconfirmedValue < TimeSpan.Zero;
         }
         private TimeSpan AdjustToBounds(TimeSpan value) => value < Min ? Min : value > Max ? Max : value;
         #endregion
@@ -478,11 +478,11 @@ namespace Radzen.Blazor
             base.OnInitialized();
         }
 
-        private bool _firstRender;
+        private bool firstRender;
         /// <inheritdoc />
         protected override Task OnAfterRenderAsync(bool firstRender)
         {
-            _firstRender = firstRender;
+            this.firstRender = firstRender;
             return base.OnAfterRenderAsync(firstRender);
         }
 
@@ -505,7 +505,7 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (shouldClose && !_firstRender && IsJSRuntimeAvailable)
+            if (shouldClose && !firstRender && IsJSRuntimeAvailable)
             {
                 await ClosePopup();
             }
@@ -669,7 +669,7 @@ namespace Radzen.Blazor
         private Task ClickInputField()
             => ShowPopupButton ? Task.CompletedTask : ClickPopupButton();
 
-        private bool _preventKeyPress = false;
+        private bool preventKeyPress = false;
         private async Task PressKey(KeyboardEventArgs args)
         {
             if (PreventPopupToggle)
@@ -692,13 +692,13 @@ namespace Radzen.Blazor
         #endregion
 
         #region Internal: popup general actions
-        private Popup _popup;
+        private Popup popup;
 
         private Task TogglePopup()
-            => Inline ? Task.CompletedTask : _popup?.ToggleAsync(Element) ?? Task.CompletedTask;
+            => Inline ? Task.CompletedTask : popup?.ToggleAsync(Element) ?? Task.CompletedTask;
 
         private Task ClosePopup()
-            => Inline ? Task.CompletedTask : _popup?.CloseAsync(Element) ?? Task.CompletedTask;
+            => Inline ? Task.CompletedTask : popup?.CloseAsync(Element) ?? Task.CompletedTask;
 
         private async Task PopupKeyDown(KeyboardEventArgs args)
         {
@@ -713,12 +713,12 @@ namespace Radzen.Blazor
         private void OnPopupOpen()
         {
             ResetUnconfirmedValue();
-            _preventKeyPress = true;
+            preventKeyPress = true;
         }
         private void OnPopupClose()
         {
             ResetUnconfirmedValue();
-            _preventKeyPress = false;
+            preventKeyPress = false;
         }
         #endregion
 
@@ -767,15 +767,15 @@ namespace Radzen.Blazor
         private Dictionary<TimeSpanUnit, int> _negativeTimeFieldsMaxValues = new(_timeUnitMaxAbsoluteValues);
         private Dictionary<TimeSpanUnit, int> _positiveTimeFieldsMaxValues = new(_timeUnitMaxAbsoluteValues);
         private Dictionary<TimeSpanUnit, int> TimeFieldsMaxValues
-            => _isUnconfirmedValueNegative ? _negativeTimeFieldsMaxValues : _positiveTimeFieldsMaxValues;
+            => isUnconfirmedValueNegative ? _negativeTimeFieldsMaxValues : _positiveTimeFieldsMaxValues;
 
-        private bool _canBeEitherPositiveOrNegative = true;
+        private bool canBeEitherPositiveOrNegative = true;
 
         private void SetPanelFieldsSetup(TimeSpan min, TimeSpan max)
         {
             var canBeNegative = min < TimeSpan.Zero;
             var canBePositive = max > TimeSpan.Zero;
-            _canBeEitherPositiveOrNegative = canBeNegative && canBePositive;
+            canBeEitherPositiveOrNegative = canBeNegative && canBePositive;
 
             _negativeTimeFieldsMaxValues = canBeNegative ? GetTimeUnitMaxValues(min) : new (_timeUnitZeroValues);
             _positiveTimeFieldsMaxValues = canBePositive ? GetTimeUnitMaxValues(max) : new(_timeUnitZeroValues);
@@ -844,7 +844,7 @@ namespace Radzen.Blazor
 
             if (UnconfirmedValue == TimeSpan.Zero)
             {
-                _isUnconfirmedValueNegative = isNegative;
+                isUnconfirmedValueNegative = isNegative;
                 return Task.CompletedTask;
             }
 

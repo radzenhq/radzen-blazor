@@ -1171,7 +1171,7 @@ namespace Radzen.Blazor
 
         string contentStyle = "display:none;";
 
-        private string getStyle()
+        private string GetStyle()
         {
             return $"{(Inline ? "overflow:auto;" : "")}{(Style != null ? Style : "")}";
         }

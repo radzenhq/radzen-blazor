@@ -410,8 +410,8 @@ namespace Radzen.Blazor
         private List<List<object>> _cachedColumnLeaves;
 
         // Filter functionality
-        private RadzenPivotField<TItem> _currentFilterField;
-        private Popup _filterPopup;
+        private RadzenPivotField<TItem> currentFilterField;
+        private Popup filterPopup;
 
         /// <summary>
         /// Gets the cached column header rows.
@@ -1593,14 +1593,14 @@ namespace Radzen.Blazor
             if (field == null || !AllowFiltering || !field.Filterable)
                 return;
 
-            _currentFilterField = field;
+            currentFilterField = field;
             StateHasChanged();
 
             await Task.Yield();
 
-            if (_filterPopup != null)
+            if (filterPopup != null)
             {
-                await _filterPopup.ToggleAsync(FilterIconRef[field]);
+                await filterPopup.ToggleAsync(FilterIconRef[field]);
             }
         }
 
@@ -1761,14 +1761,14 @@ namespace Radzen.Blazor
         /// </summary>
         private async Task ApplyFilter()
         {
-            if (_currentFilterField != null)
+            if (currentFilterField != null)
             {
                 // Trigger filter change event
                 await OnFilterChanged();
                 
-                if (_filterPopup != null)
+                if (filterPopup != null)
                 {
-                    await _filterPopup.CloseAsync(FilterIconRef[_currentFilterField]);
+                    await filterPopup.CloseAsync(FilterIconRef[currentFilterField]);
                 }
             }
         }
@@ -1778,17 +1778,17 @@ namespace Radzen.Blazor
         /// </summary>
         private async Task ClearFilter()
         {
-            if (_currentFilterField != null)
+            if (currentFilterField != null)
             {
-                _currentFilterField.ClearFilterValues();
+                currentFilterField.ClearFilterValues();
                 StateHasChanged();
                 
                 // Trigger filter change event
                 await OnFilterChanged();
                 
-                if (_filterPopup != null)
+                if (filterPopup != null)
                 {
-                    await _filterPopup.CloseAsync(FilterIconRef[_currentFilterField]);
+                    await filterPopup.CloseAsync(FilterIconRef[currentFilterField]);
                 }
             }
         }
@@ -1801,9 +1801,9 @@ namespace Radzen.Blazor
             var key = args.Code ?? args.Key;
             if (key == "Escape")
             {
-                if (_filterPopup != null && _currentFilterField != null)
+                if (filterPopup != null && currentFilterField != null)
                 {
-                    await _filterPopup.CloseAsync(FilterIconRef[_currentFilterField]);
+                    await filterPopup.CloseAsync(FilterIconRef[currentFilterField]);
                 }
             }
         }
