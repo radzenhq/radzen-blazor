@@ -177,6 +177,10 @@
                     @EmptyTemplate
                 }
             </div>
+            @if(FooterTemplate != null)
+            {
+                @FooterTemplate
+            }
         </div>
         @if (AllowClear && (!Multiple && HasValue || Multiple && selectedItems.Count > 0))
         {

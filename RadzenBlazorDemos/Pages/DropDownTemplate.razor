@@ -5,12 +5,18 @@
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="0.5rem" class="rz-p-sm-12">
     <RadzenLabel Text="Select Value" Component="DropDownTemplate" />
     <RadzenDropDown @bind-Value=@value Data=@customers TextProperty="@nameof(Customer.CompanyName)" ValueProperty="@nameof(Customer.CustomerID)" Style="width: 400px;" Name="DropDownTemplate">
+        <HeaderTemplate>
+            <b>Select a Customer</b>
+        </HeaderTemplate>
         <Template>
             Company: @((context as Customer).CompanyName)
         </Template>
         <ValueTemplate>
             Company: @((context as Customer).CompanyName)
         </ValueTemplate>
+        <FooterTemplate>
+            <i>Total Customers: @customers.Count()</i>
+        </FooterTemplate>
     </RadzenDropDown>
 </RadzenStack>
 

@@ -67,6 +67,13 @@ namespace Radzen.Blazor
         public RenderFragment EmptyTemplate { get; set; }
 
         /// <summary>
+        /// Gets or sets the footer template.
+        /// </summary>
+        /// <value>The footer template.</value>
+        [Parameter]
+        public RenderFragment FooterTemplate { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the dropdown popup should automatically open when the input receives focus.
         /// Useful for improving user experience by reducing clicks needed to interact with the dropdown.
         /// </summary>
