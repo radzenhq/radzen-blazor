@@ -108,7 +108,7 @@ namespace Radzen.Blazor
             if (ValidateOnComponentValueChange && (valueChanged || visibleChanged) && !firstRender && Visible)
             {
                 var component = Form.FindComponent(Component);
-                if (component != null)
+                if (component != null && component.FieldIdentifier.FieldName != null)
                 {
                     IsValid = Validate(component);
 

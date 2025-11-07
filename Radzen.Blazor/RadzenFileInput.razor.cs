@@ -147,7 +147,7 @@ namespace Radzen.Blazor
                 }
 
                 await ValueChanged.InvokeAsync(Value);
-                EditContext?.NotifyFieldChanged(FieldIdentifier);
+                if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
                 await Change.InvokeAsync(Value);
 
                 StateHasChanged();
@@ -252,7 +252,7 @@ namespace Radzen.Blazor
             FileName = null;
 
             await ValueChanged.InvokeAsync(Value);
-            EditContext?.NotifyFieldChanged(FieldIdentifier);
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
 
             await FileSizeChanged.InvokeAsync(FileSize);

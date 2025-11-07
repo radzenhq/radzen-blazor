@@ -284,7 +284,10 @@ namespace Radzen.Blazor
 
                 await ValueChanged.InvokeAsync(Html);
 
-                EditContext?.NotifyFieldChanged(FieldIdentifier);
+                if (FieldIdentifier.FieldName != null)
+                {
+                    EditContext?.NotifyFieldChanged(FieldIdentifier);
+                }
 
                 await Change.InvokeAsync(Html);
             }

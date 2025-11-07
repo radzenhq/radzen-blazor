@@ -745,7 +745,7 @@ namespace Radzen.Blazor
             selectedItems.Clear();
 
             await ValueChanged.InvokeAsync((TValue)internalValue);
-            EditContext?.NotifyFieldChanged(FieldIdentifier);
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(internalValue);
 
             if (!Multiple)
