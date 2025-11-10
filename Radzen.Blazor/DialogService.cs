@@ -312,7 +312,7 @@ namespace Radzen
         /// Closes the side dialog
         /// </summary>
         /// <param name="result">The result of the Dialog</param>
-        public void CloseSide(dynamic result = null)
+        public virtual void CloseSide(dynamic result = null)
         {
             if (sideDialogResultTask?.Task.IsCompleted == false)
             {
