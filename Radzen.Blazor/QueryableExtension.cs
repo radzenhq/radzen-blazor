@@ -162,7 +162,7 @@ namespace Radzen
                 var name = string.Join(" ", nameAndOrder.Split(' ').Where(i => !sortStrings.Contains(i.Trim()))).Trim();
                 var order = nameAndOrder.Split(' ').FirstOrDefault(i => sortStrings.Contains(i.Trim())) ?? sortStrings.First();
 
-                Expression property = !string.IsNullOrEmpty(nameAndOrder) ?
+                Expression property = !string.IsNullOrEmpty(name) && name != "x" && name != "it" ?
                         GetNestedPropertyExpression(parameters.FirstOrDefault(), name) : parameters.FirstOrDefault();
 
                 expression = Expression.Call(
