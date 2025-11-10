@@ -43,8 +43,8 @@ namespace Radzen.Blazor
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
 
         /// <summary>
-        /// Gets or sets whether the dropdown is read-only and cannot be opened or changed by user interaction.
-        /// When true, the dropdown displays the selected value but prevents opening the popup or changing the selection.
+        /// Gets or sets whether the dropdown is read-only and cannot be changed by user interaction.
+        /// When true, the dropdown displays the selected value but prevents changing the selection.
         /// </summary>
         /// <value><c>true</c> if the dropdown is read-only; otherwise, <c>false</c>. Default is <c>false</c>.</value>
         [Parameter]
