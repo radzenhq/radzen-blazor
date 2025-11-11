@@ -74,7 +74,7 @@ var forwardingOptions = new ForwardedHeadersOptions()
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 };
-forwardingOptions.KnownNetworks.Clear();
+forwardingOptions.KnownIPNetworks.Clear();
 forwardingOptions.KnownProxies.Clear();
 
 app.UseForwardedHeaders(forwardingOptions);
