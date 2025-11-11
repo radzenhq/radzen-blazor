@@ -3,7 +3,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <NoWarn>BL9993;BL0007;BL0005</NoWarn>
-    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
+    <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <RazorLangVersion>7.0</RazorLangVersion>
     <LangVersion>latest</LangVersion>
     <OutputType>Library</OutputType>
@@ -34,6 +34,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net8.0'" Version="8.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net9.0'" Version="9.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net10.0'" Version="10.*-*" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Condition="'$(TargetFramework)' == 'net10.0'" Version="10.*-*" />
     <PackageReference Include="Radzen.Terser.MSBuild" Version="0.0.4" PrivateAssets="All" />
   </ItemGroup>
 
@@ -55,10 +57,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Sass Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" Condition="'$(TargetFramework)' == 'net9.0'" />
+    <Sass Include="$(MSBuildProjectDirectory)/themes/*.scss" Exclude="$(MSBuildProjectDirectory)/themes/_*.scss" Condition="'$(TargetFramework)' == 'net10.0'" />
   </ItemGroup>
 
- <Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net9.0'">
+ <Target Name="Sass" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net10.0'">
     <PropertyGroup>
       <_SassFileList>@(Sass->'&quot;%(FullPath)&quot;', ' ')</_SassFileList>
       <DartSassBuilderArgs>files $(_SassFileList) --outputstyle $(DartSassOutputStyle) --level $(DartSassOutputLevel)</DartSassBuilderArgs>
@@ -67,14 +69,14 @@
     <Message Text="Converted SassFile list to argument" Importance="$(DartSassMessageLevel)" />
   </Target>
 
-  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net9.0'">
+  <Target Name="MoveCss" AfterTargets="AfterCompile" Condition="'$(TargetFramework)' == 'net10.0'">
     <ItemGroup>
         <CssFile Include="$(MSBuildProjectDirectory)/themes/*.css" />
     </ItemGroup>
     <Move SourceFiles="@(CssFile)" DestinationFolder="$(MSBuildProjectDirectory)/wwwroot/css/" />
   </Target>
 
-  <Target Name="MinifyTest" BeforeTargets="Build" Condition="'$(TargetFramework)' == 'net9.0'">
+  <Target Name="MinifyTest" BeforeTargets="Build" Condition="'$(TargetFramework)' == 'net10.0'">
     <TerserMinify InputFile="wwwroot\Radzen.Blazor.js" OutputFile="wwwroot\Radzen.Blazor.min.js" />
   </Target>
 

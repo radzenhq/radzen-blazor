@@ -87,10 +87,9 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
         var assistantResponse = new StringBuilder();
 
-        while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
+        string line;
+        while ((line = await reader.ReadLineAsync()) is not null && !cancellationToken.IsCancellationRequested)
         {
-            var line = await reader.ReadLineAsync();
-
             if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data:"))
             {
                 continue;

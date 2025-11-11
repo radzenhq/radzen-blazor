@@ -22,7 +22,7 @@ namespace Radzen.Blazor.Tests
         public Guid Id { get; set; }
         public TimeOnly StartTime { get; set; }
         public DateOnly BirthDate { get; set; }
-        public int[] Scores { get; set; }
+        public List<int> Scores { get; set; }
         public List<string> Tags { get; set; }
         public List<TestEntity> Children { get; set; }
         public Address Address { get; set; }
