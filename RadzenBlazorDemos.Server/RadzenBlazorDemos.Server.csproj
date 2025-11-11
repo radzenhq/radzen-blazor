@@ -8,6 +8,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RadzenBlazorDemos.Host\RadzenBlazorDemos.Host.csproj" />
+    <ProjectReference Include="..\RadzenBlazorDemos\RadzenBlazorDemos.csproj" />
   </ItemGroup>
 </Project>
