@@ -385,7 +385,8 @@ namespace Radzen
             }
             else
             {
-                member = Expression.PropertyOrField(expression, currentPart);
+                var p = expression.Type.GetProperty(currentPart, BindingFlags.Public | BindingFlags.Instance);
+                member = p != null ? Expression.Property(expression, p) : Expression.PropertyOrField(expression, currentPart);
             }
 
             if (expression.Type.IsValueType && Nullable.GetUnderlyingType(expression.Type) == null)
