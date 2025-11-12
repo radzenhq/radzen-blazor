@@ -67,7 +67,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>An enumerable collection of CSS color values for segment backgrounds.</value>
         [Parameter]
-        public IEnumerable<string> Fills { get; set; }
+        public IEnumerable<string>? Fills { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of stroke (border) colors applied to individual pie segments in sequence.
@@ -75,7 +75,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>An enumerable collection of CSS color values for segment borders.</value>
         [Parameter]
-        public IEnumerable<string> Strokes { get; set; }
+        public IEnumerable<string>? Strokes { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the pie segment borders in pixels.
@@ -108,7 +108,11 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Radius ?? Math.Min(Chart.CategoryScale.Output.Mid, Chart.ValueScale.Output.Mid);
+                if (Chart?.CategoryScale?.Output != null && Chart?.ValueScale?.Output != null)
+                {
+                    return Radius ?? Math.Min(Chart.CategoryScale.Output.Mid, Chart.ValueScale.Output.Mid);
+                }
+                return Radius ?? 0;
             }
         }
 
@@ -119,7 +123,11 @@ namespace Radzen.Blazor
         {
             get
             {
-                return X ?? Chart.CategoryScale.Output.Mid + 8;
+                if (Chart?.CategoryScale?.Output != null)
+                {
+                    return X ?? Chart.CategoryScale.Output.Mid + 8;
+                }
+                return X ?? 0;
             }
         }
 
@@ -130,7 +138,11 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Y ?? Chart.ValueScale.Output.Mid;
+                if (Chart?.ValueScale?.Output != null)
+                {
+                    return Y ?? Chart.ValueScale.Output.Mid;
+                }
+                return Y ?? 0;
             }
         }
         /// <inheritdoc />
@@ -172,16 +184,18 @@ namespace Radzen.Blazor
                     builder.AddAttribute(3, nameof(LegendItem.MarkerSize), MarkerSize);
                     builder.AddAttribute(4, nameof(LegendItem.MarkerType), MarkerType);
                     builder.AddAttribute(5, nameof(LegendItem.Color), PickColor(Items.IndexOf(data), Fills));
-                    builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, () => OnLegendClick(data)));
+                    builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, () => OnLegendClick(data!)));
                     builder.AddAttribute(7, nameof(LegendItem.Clickable), clickable);
                     builder.CloseComponent();
-                };
+                }
+                ;
             };
         }
 
         private async Task OnLegendClick(object data)
         {
-            if (Chart.LegendClick.HasDelegate)
+            var chart = RequireChart();
+            if (chart != null && chart.LegendClick.HasDelegate)
             {
                 var args = new LegendClickEventArgs
                 {
@@ -190,7 +204,7 @@ namespace Radzen.Blazor
                     IsVisible = true,
                 };
 
-                await Chart.LegendClick.InvokeAsync(args);
+                await chart.LegendClick.InvokeAsync(args);
             }
         }
         /// <inheritdoc />
@@ -211,7 +225,7 @@ namespace Radzen.Blazor
         {
             if (!Contains(x, y, 0))
             {
-                return (null, null);
+                return (default!, new Point());
             }
 
             var angle = Math.Atan2(CenterY - y, x - CenterX) * 180 / Math.PI;
@@ -239,13 +253,13 @@ namespace Radzen.Blazor
                 if ((startAngle >= endAngle && angle <= startAngle && angle >= endAngle) ||
                     (startAngle <= endAngle && (angle <= startAngle || angle >= endAngle)))
                 {
-                    return (data, new Point() { X = x, Y = y });
+                    return (data!, new Point() { X = x, Y = y });
                 }
 
                 startAngle = endAngle;
             }
 
-            return (null, null);
+            return (default!, new Point());
         }
 
 
@@ -403,12 +417,16 @@ namespace Radzen.Blazor
                     x = CenterX + hyp * Math.Cos(phi);
                     y = CenterY + hyp * Math.Sin(phi);
 
-                    list.Add(new ChartDataLabel
+                    var chart = RequireChart();
+                    if (chart != null)
                     {
-                        TextAnchor = textAnchor,
-                        Position = new Point { X = x, Y = y },
-                        Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
-                    });
+                        list.Add(new ChartDataLabel
+                        {
+                            TextAnchor = textAnchor,
+                            Position = new Point { X = x, Y = y },
+                            Text = chart.ValueAxis.Format(chart.ValueScale, Value(d))
+                        });
+                    }
                 }
             }
 

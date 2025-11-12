@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Collections.Generic;
 
@@ -39,7 +40,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The gap spacing as a CSS length value. Default is null (no gap).</value>
         [Parameter]
-        public string Gap { get; set; }
+        public string? Gap { get; set; }
 
         /// <summary>
         /// Gets or sets the vertical spacing between wrapped rows when columns wrap to multiple lines.
@@ -48,14 +49,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The row gap spacing as a CSS length value. Default is null (no row gap).</value>
         [Parameter]
-        public string RowGap { get; set; }
+        public string? RowGap { get; set; }
 
         /// <summary>
         /// Gets the final CSS style rendered by the component. Combines it with a <c>style</c> custom attribute.
         /// </summary>
         protected string GetStyle()
         {
-            if (Attributes != null && Attributes.TryGetValue("style", out var style) && !string.IsNullOrEmpty(Convert.ToString(@style)))
+            if (Attributes != null && Attributes.TryGetValue("style", out var style) && !string.IsNullOrEmpty(Convert.ToString(@style, CultureInfo.InvariantCulture)))
             {
                 return $"{GetComponentStyle()} {@style}";
             }
@@ -80,7 +81,7 @@ namespace Radzen.Blazor
                 list.Add($"--rz-row-gap:{(RowGap.All(char.IsDigit) ? RowGap + "px" : RowGap)}");
             }
 
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{string.Join(";", list)}";
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';') ? ";" : "")}{string.Join(";", list)}";
         }
 
         /// <inheritdoc />

@@ -33,14 +33,14 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenAutoComplete : DataBoundFormComponent<string>
     {
-        object selectedItem = null;
+        object? selectedItem;
 
         /// <summary>
         /// Gets or sets the selected item.
         /// </summary>
         /// <value>The selected item.</value>
         [Parameter]
-        public object SelectedItem
+        public object? SelectedItem
         {
             get
             {
@@ -67,7 +67,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenAutoComplete"/> is multiline.
@@ -95,7 +95,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The template.</value>
         [Parameter]
-        public RenderFragment<dynamic> Template { get; set; }
+        public RenderFragment<dynamic>? Template { get; set; }
 
         /// <summary>
         /// Gets or sets the minimum length.
@@ -135,15 +135,17 @@ namespace Radzen.Blazor
         /// </summary>
         protected ElementReference list;
 
-        string customSearchText;
+        string? customSearchText;
         int selectedIndex = -1;
 
         /// <summary>
-        /// Handles the <see cref="E:FilterKeyPress" /> event.
+        /// Handles the FilterKeyPress event.
         /// </summary>
         /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
         protected async Task OnFilterKeyPress(KeyboardEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
+
             var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>())).OfType<object>();
 
             var key = args.Code != null ? args.Code : args.Key;
@@ -152,7 +154,10 @@ namespace Radzen.Blazor
             {
                 try
                 {
-                    selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown", selectedIndex);
+                    if (JSRuntime != null)
+                    {
+                        selectedIndex = await JSRuntime.InvokeAsync<int>("Radzen.focusListItem", search, list, key == "ArrowDown", selectedIndex);
+                    }
                 }
                 catch (Exception)
                 {
@@ -167,12 +172,12 @@ namespace Radzen.Blazor
                     selectedIndex = -1;
                 }
 
-                if (key == "Tab")
+                if (key == "Tab" && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
                 }
             }
-            else if (key == "Escape")
+            else if (key == "Escape" && JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
@@ -186,6 +191,7 @@ namespace Radzen.Blazor
 
         async Task DebounceFilter()
         {
+            if (JSRuntime == null) return;
             var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", search);
 
             value = $"{value}";
@@ -218,7 +224,10 @@ namespace Radzen.Blazor
 
         private async Task OnSelectItem(object item)
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+            }
 
             await SelectItem(item);
         }
@@ -227,7 +236,7 @@ namespace Radzen.Blazor
         /// Gets the IQueryable.
         /// </summary>
         /// <value>The IQueryable.</value>
-        protected override IQueryable Query
+        protected override IQueryable? Query
         {
             get
             {
@@ -239,13 +248,13 @@ namespace Radzen.Blazor
         /// Gets the view - the Query with filtering applied.
         /// </summary>
         /// <value>The view.</value>
-        protected override IEnumerable View
+        protected override IEnumerable? View
         {
             get
             {
                 if (Query != null)
                 {
-                    return Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
+                    return TextProperty != null ? Query.Where(TextProperty, searchText ?? string.Empty, FilterOperator, FilterCaseSensitivity) : Query;
                 }
 
                 return null;
@@ -253,11 +262,13 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Handles the <see cref="E:Change" /> event.
+        /// Handles the Change event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
+
             Value = args.Value?.ToString();
 
             await ValueChanged.InvokeAsync($"{Value}");
@@ -309,10 +320,12 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (IsJSRuntimeAvailable)
+            if (IsJSRuntimeAvailable && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
             }
+
+            GC.SuppressFinalize(this);
         }
 
         private bool firstRender = true;
@@ -356,7 +369,7 @@ namespace Radzen.Blazor
                 Value = parameters.GetValueOrDefault<string>(nameof(Value));
             }
 
-            if (shouldClose && !firstRender)
+            if (shouldClose && !firstRender && JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.destroyPopup", PopupID);
             }

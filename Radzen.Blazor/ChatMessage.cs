@@ -39,5 +39,5 @@ public class ChatMessage
     /// <summary>
     /// Gets or sets the role associated with the message (e.g., "user", "assistant").
     /// </summary>
-    public string Role { get; set; }
+    public string? Role { get; set; }
 }

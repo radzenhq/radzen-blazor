@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor.Markdown;
@@ -12,6 +13,7 @@ public class ThematicBreak : Block
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitThematicBreak(this);
     }
 

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
+using System.Globalization;
 
 namespace Radzen.Blazor
 {
@@ -222,56 +223,56 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The column order (0-12, "first", or "last"). Default is null (document order).</value>
         [Parameter]
-        public string Order { get; set; }
+        public string? Order { get; set; }
 
         /// <summary>
         /// Gets or sets the column order for extra small screens (breakpoint &lt; 576px).
         /// </summary>
         /// <value>The column order (0-12, "first", or "last") on XS screens.</value>
         [Parameter]
-        public string OrderXS { get; set; }
+        public string? OrderXS { get; set; }
 
         /// <summary>
         /// Gets or sets the column order for small screens (breakpoint ≥ 576px).
         /// </summary>
         /// <value>The column order (0-12, "first", or "last") on SM screens.</value>
         [Parameter]
-        public string OrderSM { get; set; }
+        public string? OrderSM { get; set; }
 
         /// <summary>
         /// Gets or sets the column order for medium screens (breakpoint ≥ 768px).
         /// </summary>
         /// <value>The column order (0-12, "first", or "last") on MD screens.</value>
         [Parameter]
-        public string OrderMD { get; set; }
+        public string? OrderMD { get; set; }
 
         /// <summary>
         /// Gets or sets the column order for large screens (breakpoint ≥ 1024px).
         /// </summary>
         /// <value>The column order (0-12, "first", or "last") on LG screens.</value>
         [Parameter]
-        public string OrderLG { get; set; }
+        public string? OrderLG { get; set; }
 
         /// <summary>
         /// Gets or sets the column order for extra large screens (breakpoint ≥ 1280px).
         /// </summary>
         /// <value>The column order (0-12, "first", or "last") on XL screens.</value>
         [Parameter]
-        public string OrderXL { get; set; }
+        public string? OrderXL { get; set; }
 
         /// <summary>
         /// Gets or sets the column order for extra extra large screens (breakpoint ≥ 1536px).
         /// </summary>
         /// <value>The column order (0-12, "first", or "last") on XX screens.</value>
         [Parameter]
-        public string OrderXX { get; set; }
+        public string? OrderXX { get; set; }
 
         /// <summary>
         /// Gets the final CSS style rendered by the component. Combines it with a <c>style</c> custom attribute.
         /// </summary>
         protected string GetStyle()
         {
-            if (Attributes != null && Attributes.TryGetValue("style", out var style) && !string.IsNullOrEmpty(Convert.ToString(@style)))
+            if (Attributes != null && Attributes.TryGetValue("style", out var style) && !string.IsNullOrEmpty(Convert.ToString(@style, CultureInfo.InvariantCulture)))
             {
                 return $"{GetComponentStyle()} {@style}";
             }
@@ -284,7 +285,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected string GetComponentStyle()
         {
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}";
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';') ? ";" : "")}";
         }
 
         /// <inheritdoc />
@@ -304,13 +305,13 @@ namespace Radzen.Blazor
                 .AddSize("offset", nameof(OffsetLG), "lg", OffsetLG)
                 .AddSize("offset", nameof(OffsetXL), "xl", OffsetXL)
                 .AddSize("offset", nameof(OffsetXX), "xx", OffsetXX)
-                .AddOrder("order", nameof(Order), Order)
-                .AddOrder("order", nameof(OrderXS), "xs", OrderXS)
-                .AddOrder("order", nameof(OrderSM), "sm", OrderSM)
-                .AddOrder("order", nameof(OrderMD), "md", OrderMD)
-                .AddOrder("order", nameof(OrderLG), "lg", OrderLG)
-                .AddOrder("order", nameof(OrderXL), "xl", OrderXL)
-                .AddOrder("order", nameof(OrderXX), "xx", OrderXX)
+                .AddOrder("order", nameof(Order), Order ?? string.Empty)
+                .AddOrder("order", nameof(OrderXS), "xs", OrderXS ?? string.Empty)
+                .AddOrder("order", nameof(OrderSM), "sm", OrderSM ?? string.Empty)
+                .AddOrder("order", nameof(OrderMD), "md", OrderMD ?? string.Empty)
+                .AddOrder("order", nameof(OrderLG), "lg", OrderLG ?? string.Empty)
+                .AddOrder("order", nameof(OrderXL), "xl", OrderXL ?? string.Empty)
+                .AddOrder("order", nameof(OrderXX), "xx", OrderXX ?? string.Empty)
                 .ToString();
     }
 }

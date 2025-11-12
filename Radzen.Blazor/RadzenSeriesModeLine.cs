@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -35,7 +35,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Series.GetMode();
+                return Series?.GetMode() ?? 0;
             }
             set
             {

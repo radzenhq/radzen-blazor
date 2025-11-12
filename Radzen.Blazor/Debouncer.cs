@@ -6,9 +6,9 @@ namespace Radzen;
 /// <summary>
 /// Utility class for debouncing and throttling function calls.
 /// </summary>
-internal class Debouncer
+internal class Debouncer : IDisposable
 {
-    private System.Timers.Timer timer;
+    private System.Timers.Timer? timer;
     private DateTime timerStarted { get; set; } = DateTime.UtcNow.AddYears(-1);
 
     /// <summary>
@@ -85,5 +85,16 @@ internal class Debouncer
 
         timer.Start();
         timerStarted = curTime;
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if(timer != null)
+        {
+            timer.Stop();
+            timer.Dispose();
+            timer = null;
+        }
     }
 }

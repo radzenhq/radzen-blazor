@@ -43,7 +43,7 @@
 
     string PointerStyle(RadzenRadialGaugeScalePointer pointer)
     {
-        return $"left: {pointer.Scale.CurrentCenter.X.ToInvariantString()}px; top: {pointer.Scale.CurrentCenter.Y.ToInvariantString()}px";
+        return $"left: {pointer.Scale?.CurrentCenter?.X.ToInvariantString() ?? "0"}px; top: {pointer.Scale?.CurrentCenter?.Y.ToInvariantString() ?? "0"}px";
     }
 
     internal void AddPointer(RadzenRadialGaugeScalePointer pointer)

@@ -79,7 +79,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The Material icon name.</value>
         [Parameter]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets a custom color for the header icon.
@@ -87,7 +87,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon color as a CSS color value.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets the text displayed in the panel header.
@@ -104,7 +104,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The header template render fragment.</value>
         [Parameter]
-        public RenderFragment HeaderTemplate { get; set; }
+        public RenderFragment? HeaderTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the summary content displayed when the panel is collapsed.
@@ -113,7 +113,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The summary template render fragment.</value>
         [Parameter]
-        public RenderFragment SummaryTemplate { get; set; } = null;
+        public RenderFragment? SummaryTemplate { get; set; } = null;
 
         /// <summary>
         /// Gets or sets the footer content displayed at the bottom of the panel.
@@ -121,7 +121,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The footer template render fragment.</value>
         [Parameter]
-        public RenderFragment FooterTemplate { get; set; }
+        public RenderFragment? FooterTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the callback invoked when the panel is expanded from a collapsed state.
@@ -158,14 +158,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The aria-label attribute value of the expand button.</value>
         [Parameter]
-        public string ExpandAriaLabel { get; set; } = null;
+        public string? ExpandAriaLabel { get; set; } = null;
         
         /// <summary>
         /// Gets or sets the aria-label attribute of the collapse button.
         /// </summary>
         /// <value>The aria-label attribute value of the collapse button.</value>
         [Parameter]
-        public string CollapseAriaLabel { get; set; } = null;
+        public string? CollapseAriaLabel { get; set; } = null;
         
         async Task Toggle(MouseEventArgs args)
         {
@@ -210,7 +210,7 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        bool preventKeyPress = false;
+        bool preventKeyPress;
         async Task OnKeyPress(KeyboardEventArgs args, Task task)
         {
             var key = args.Code != null ? args.Code : args.Key;

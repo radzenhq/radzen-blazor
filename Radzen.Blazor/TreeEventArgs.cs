@@ -8,11 +8,11 @@ public class TreeEventArgs
     /// <summary>
     /// Gets the <see cref="Radzen.Blazor.RadzenTreeItem.Text" /> the selected RadzenTreeItem.
     /// </summary>
-    public string Text { get; set; }
+    public string? Text { get; set; }
 
     /// <summary>
     /// Gets the <see cref="Radzen.Blazor.RadzenTreeItem.Value" /> the selected RadzenTreeItem.
     /// </summary>
-    public object Value { get; set; }
+    public object? Value { get; set; }
 }
 

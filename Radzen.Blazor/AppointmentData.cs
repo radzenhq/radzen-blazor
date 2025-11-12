@@ -22,19 +22,19 @@ namespace Radzen.Blazor
         /// Gets or sets the text of the appointment.
         /// </summary>
         /// <value>The text.</value>
-        public string Text { get; set; }
+        public string? Text { get; set; }
         /// <summary>
         /// Gets or sets the data associated with the appointment
         /// </summary>
         /// <value>The data.</value>
-        public object Data { get; set; }
+        public object? Data { get; set; }
 
         /// <summary>
         /// Determines whether the specified object is equal to this instance. Used to check if two appointments are equal.
         /// </summary>
         /// <param name="obj">The object to compare with this instance.</param>
         /// <returns><c>true</c> if the specified is equal to this instance; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is AppointmentData data &&
                    Start == data.Start &&

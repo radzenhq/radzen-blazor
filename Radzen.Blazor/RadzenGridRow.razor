@@ -7,18 +7,18 @@
 </tr>
 @code {
     [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+    public IReadOnlyDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
-    public string CssClass { get; set; }
+    public string CssClass { get; set; } = string.Empty;
 
     [Parameter]
     public bool InEditMode { get; set; }
 
-    List<IRadzenFormComponent> components;
+    List<IRadzenFormComponent> components = new();
 
     public void AddComponent(IRadzenFormComponent component)
     {
@@ -47,6 +47,6 @@
 
     public IRadzenFormComponent FindComponent(string name)
     {
-        return components.Where(component => component.Name == name).FirstOrDefault();
+        return components.Where(component => component.Name == name).FirstOrDefault()!;
     }
 }

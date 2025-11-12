@@ -104,26 +104,26 @@ namespace Radzen
         /// </summary>
         /// <value>The template.</value>
         [Parameter]
-        public RenderFragment<T> Template { get; set; }
+        public RenderFragment<T>? Template { get; set; }
 
         /// <summary>
         /// Gets or sets the loading template.
         /// </summary>
         /// <value>The loading template.</value>
         [Parameter]
-        public RenderFragment LoadingTemplate { get; set; }
+        public RenderFragment? LoadingTemplate { get; set; }
 
         /// <summary>
         /// The data
         /// </summary>
-        IEnumerable<T> _data;
+        IEnumerable<T>? _data;
 
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
-        public IEnumerable<T> Data
+        public IEnumerable<T>? Data
         {
             get
             {
@@ -149,7 +149,7 @@ namespace Radzen
         /// <summary>
         /// Called when INotifyCollectionChanged CollectionChanged is raised.
         /// </summary>
-        protected virtual void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
+        protected virtual void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs args)
         {
 
         }
@@ -163,6 +163,11 @@ namespace Radzen
             {
                 ((INotifyCollectionChanged)_data).CollectionChanged -= OnCollectionChanged;
             }
+
+            topPager?.Dispose();
+            bottomPager?.Dispose();
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -170,14 +175,14 @@ namespace Radzen
         /// </summary>
         /// <value>The page size options.</value>
         [Parameter]
-        public IEnumerable<int> PageSizeOptions { get; set; }
+        public IEnumerable<int>? PageSizeOptions { get; set; }
 
         /// <summary>
         /// Gets or sets the page size description text.
         /// </summary>
         /// <value>The page size description text.</value>
         [Parameter]
-        public string PageSizeText { get; set; } = "items per page";
+        public string? PageSizeText { get; set; } = "items per page";
         
         /// <summary>
         /// Gets or sets the pager summary visibility.
@@ -191,7 +196,7 @@ namespace Radzen
         /// </summary>
         /// <value>The pager summary format.</value>
         [Parameter]
-        public string PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
+        public string? PagingSummaryFormat { get; set; } = "Page {0} of {1} ({2} items)";
 
 #nullable enable
         /// <summary>
@@ -205,75 +210,75 @@ namespace Radzen
         /// Gets or sets the pager's first page button's title attribute.
         /// </summary>
         [Parameter]
-        public string FirstPageTitle { get; set; } = "First page.";
+        public string? FirstPageTitle { get; set; } = "First page.";
 
         /// <summary>
         /// Gets or sets the pager's first page button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string FirstPageAriaLabel { get; set; } = "Go to first page.";
+        public string? FirstPageAriaLabel { get; set; } = "Go to first page.";
 
         /// <summary>
         /// Gets or sets the pager's optional previous page button's label text.
         /// </summary>
         [Parameter]
-        public string PrevPageLabel { get; set; }
+        public string? PrevPageLabel { get; set; }
 
         /// <summary>
         /// Gets or sets the pager's previous page button's title attribute.
         /// </summary>
         [Parameter]
-        public string PrevPageTitle { get; set; } = "Previous page";
+        public string? PrevPageTitle { get; set; } = "Previous page";
 
         /// <summary>
         /// Gets or sets the pager's previous page button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string PrevPageAriaLabel { get; set; } = "Go to previous page.";
+        public string? PrevPageAriaLabel { get; set; } = "Go to previous page.";
 
         /// <summary>
         /// Gets or sets the pager's last page button's title attribute.
         /// </summary>
         [Parameter]
-        public string LastPageTitle { get; set; } = "Last page";
+        public string? LastPageTitle { get; set; } = "Last page";
 
         /// <summary>
         /// Gets or sets the pager's last page button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string LastPageAriaLabel { get; set; } = "Go to last page.";
+        public string? LastPageAriaLabel { get; set; } = "Go to last page.";
 
         /// <summary>
         /// Gets or sets the pager's optional next page button's label text.
         /// </summary>
         [Parameter]
-        public string NextPageLabel { get; set; }
+        public string? NextPageLabel { get; set; }
 
         /// <summary>
         /// Gets or sets the pager's next page button's title attribute.
         /// </summary>
         [Parameter]
-        public string NextPageTitle { get; set; } = "Next page";
+        public string? NextPageTitle { get; set; } = "Next page";
 
         /// <summary>
         /// Gets or sets the pager's next page button's aria-label attribute.
         /// </summary>
         [Parameter]
-        public string NextPageAriaLabel { get; set; } = "Go to next page.";
+        public string? NextPageAriaLabel { get; set; } = "Go to next page.";
         
         /// <summary>
         /// Gets or sets the pager's numeric page number buttons' title attributes.
         /// </summary>
         [Parameter]
-        public string PageTitleFormat { get; set; } = "Page {0}";
+        public string? PageTitleFormat { get; set; } = "Page {0}";
         
         /// <summary>
         /// Gets or sets the pager's numeric page number buttons' aria-label attributes.
         /// </summary>
         [Parameter]
-        public string PageAriaLabelFormat { get; set; } = "Go to page {0}.";
+        public string? PageAriaLabelFormat { get; set; } = "Go to page {0}.";
         
-        internal IQueryable<T> _view = null;
+        internal IQueryable<T>? _view;
         /// <summary>
         /// Gets the paged view.
         /// </summary>
@@ -424,11 +429,11 @@ namespace Radzen
         /// <summary>
         /// The top pager
         /// </summary>
-        protected RadzenPager topPager;
+        protected RadzenPager topPager = default!;
         /// <summary>
         /// The bottom pager
         /// </summary>
-        protected RadzenPager bottomPager;
+        protected RadzenPager bottomPager = default!;
 
         /// <summary>
         /// Gets or sets the page callback.
@@ -438,11 +443,12 @@ namespace Radzen
         public EventCallback<PagerEventArgs> Page { get; set; }
 
         /// <summary>
-        /// Handles the <see cref="E:PageChanged" /> event.
+        /// Handles the page changed event.
         /// </summary>
         /// <param name="args">The <see cref="PagerEventArgs"/> instance containing the event data.</param>
         protected async Task OnPageChanged(PagerEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
             skip = args.Skip;
             CurrentPage = args.PageIndex;
 

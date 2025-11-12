@@ -1,4 +1,4 @@
-﻿@using Radzen
+@using Radzen
 @using System.Linq
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
@@ -31,7 +31,7 @@
         else if (selectedItem != null && !Multiple)
         {
             <span class="rz-dropdown-label rz-inputtext">
-                @GetItemOrValueFromProperty(selectedItem, TextProperty)
+                @GetItemOrValueFromProperty(selectedItem, TextProperty ?? string.Empty)
             </span>
         }
         else if (Chips && selectedItems.Count > 0 && selectedItems.Count < MaxSelectedLabels)
@@ -51,10 +51,10 @@
                             }
                             else
                             {
-                                @GetItemOrValueFromProperty(item, TextProperty)
+                                @GetItemOrValueFromProperty(item, TextProperty ?? string.Empty)
                             }
                         </span>
-                        <button tabindex="0" title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty))" type=button class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                        <button tabindex="0" title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))" type=button class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
                     </div>
                 }
             </div>
@@ -66,7 +66,7 @@
                 {
                     @if (Template == null && ValueTemplate == null)
                     {
-                        @(string.Join(Separator, selectedItems.Select(i => GetItemOrValueFromProperty(i, TextProperty))))
+                        @(string.Join(Separator, selectedItems.Select(i => GetItemOrValueFromProperty(i, TextProperty ?? ""))))
                     }
                     else
                     {

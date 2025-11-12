@@ -35,7 +35,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>A dictionary of custom HTML attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
         /// Gets or sets whether the checkbox supports three states: checked (true), unchecked (false), and indeterminate (null).
@@ -90,7 +90,7 @@ namespace Radzen.Blazor
             {
                 if (TriState)
                 {
-                    Value = default;
+                    Value = default(TValue);
                 }
                 else
                 {

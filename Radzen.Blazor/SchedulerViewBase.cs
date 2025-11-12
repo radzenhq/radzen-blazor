@@ -32,7 +32,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The scheduler.</value>
         [CascadingParameter]
-        public IScheduler Scheduler { get; set; }
+        public IScheduler? Scheduler { get; set; }
 
 
         /// <summary>
@@ -41,6 +41,7 @@ namespace Radzen.Blazor
         public void Dispose()
         {
             Scheduler?.RemoveView(this);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -59,7 +60,10 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            await Scheduler.AddView(this);
+            if (Scheduler != null)
+            {
+                await Scheduler.AddView(this);
+            }
         }
 
         /// <summary>
@@ -97,7 +101,10 @@ namespace Radzen.Blazor
         /// <returns></returns>
         public async Task OnAppointmentMove(SchedulerAppointmentMoveEventArgs data)
         {
-            await Scheduler.AppointmentMove.InvokeAsync(data);
+            if (Scheduler != null)
+            {
+                await Scheduler.AppointmentMove.InvokeAsync(data);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
@@ -46,7 +46,7 @@ namespace Radzen.Blazor
     /// </example>
     public partial class RadzenSplitter : RadzenComponent
     {
-        private int sizeAutoPanes = 0;
+        private int sizeAutoPanes;
 
         /// <summary>
         /// Gets or sets the panes to display within the splitter.
@@ -54,7 +54,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The panes render fragment containing RadzenSplitterPane definitions.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the layout direction of the splitter.
@@ -72,6 +72,7 @@ namespace Radzen.Blazor
         /// <param name="pane">The pane.</param>
         public void AddPane(RadzenSplitterPane pane)
         {
+            ArgumentNullException.ThrowIfNull(pane);
             if (Panes.IndexOf(pane) != -1 || !pane.Visible)
                 return;
 
@@ -100,9 +101,8 @@ namespace Radzen.Blazor
         /// <param name="pane">The pane.</param>
         public void RemovePane(RadzenSplitterPane pane)
         {
-            if (Panes.Contains(pane))
+            if (Panes.Remove(pane))
             {
-                Panes.Remove(pane);
                 try
                 {
                     InvokeAsync(StateHasChanged);
@@ -137,6 +137,7 @@ namespace Radzen.Blazor
             var paneNextResizable = Panes.Skip(paneIndex + 1).FirstOrDefault(o => o.Resizable && !o.GetCollapsed());
 
 
+            if (JSRuntime == null) return Task.CompletedTask;
             return JSRuntime.InvokeVoidAsync("Radzen.startSplitterResize",
                 UniqueID,
                 Reference,
@@ -202,14 +203,15 @@ namespace Radzen.Blazor
             {
                 var paneNext = Panes[paneNextIndex.Value];
 
-                if (Expand.HasDelegate)
+                if (Expand.HasDelegate && sizeNextNew.HasValue)
                 {
                     var arg = new RadzenSplitterResizeEventArgs { PaneIndex = paneNext.Index, Pane = paneNext, NewSize = sizeNextNew.Value };
                     await Resize.InvokeAsync(arg);
                     //cancel omitted because it is managed by the parent panel
                 }
 
-                paneNext.SizeRuntine = sizeNextNew.Value.ToString("0.##", CultureInfo.InvariantCulture) + "%";
+                if (sizeNextNew.HasValue)
+                    paneNext.SizeRuntine = sizeNextNew.Value.ToString("0.##", CultureInfo.InvariantCulture) + "%";
             }
 
             StateHasChanged();
@@ -285,7 +287,8 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return $"rz-splitter rz-splitter-{Enum.GetName(typeof(Orientation), Orientation).ToLowerInvariant()}";
+            var enumName = Enum.GetName<Orientation>(Orientation);
+            return $"rz-splitter rz-splitter-{(enumName ?? Orientation.ToString()).ToLowerInvariant()}";
         }
 
         /// <summary>

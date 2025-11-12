@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
@@ -19,54 +20,54 @@ namespace Radzen.Blazor
         /// Gets or sets the tooltip service.
         /// </summary>
         [Inject]
-        public TooltipService TooltipService { get; set; }
+        public TooltipService? TooltipService { get; set; }
         /// <summary>
         /// Gets or sets the data. Each item represents a link/flow in the diagram.
         /// </summary>
         [Parameter]
-        public IEnumerable<TItem> Data { get; set; }
+        public IEnumerable<TItem>? Data { get; set; }
 
         /// <summary>
         /// Specifies the property of <typeparamref name="TItem" /> which provides the source node ID.
         /// </summary>
         [Parameter]
-        public string SourceProperty { get; set; }
+        public string? SourceProperty { get; set; }
 
         /// <summary>
         /// Specifies the property of <typeparamref name="TItem" /> which provides the target node ID.
         /// </summary>
         [Parameter]
-        public string TargetProperty { get; set; }
+        public string? TargetProperty { get; set; }
 
         /// <summary>
         /// Specifies the property of <typeparamref name="TItem" /> which provides the flow value.
         /// </summary>
         [Parameter]
-        public string ValueProperty { get; set; }
+        public string? ValueProperty { get; set; }
 
         /// <summary>
         /// Specifies the property of <typeparamref name="TItem" /> which provides the source node label.
         /// </summary>
         [Parameter]
-        public string SourceLabelProperty { get; set; }
+        public string? SourceLabelProperty { get; set; }
 
         /// <summary>
         /// Specifies the property of <typeparamref name="TItem" /> which provides the target node label.
         /// </summary>
         [Parameter]
-        public string TargetLabelProperty { get; set; }
+        public string? TargetLabelProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the node fill colors. If not specified, uses color scheme.
         /// </summary>
         [Parameter]
-        public IList<string> NodeFills { get; set; }
+        public IList<string>? NodeFills { get; set; }
 
         /// <summary>
         /// Gets or sets the link fill colors. If not specified, inherits from source node.
         /// </summary>
         [Parameter]
-        public IList<string> LinkFills { get; set; }
+        public IList<string>? LinkFills { get; set; }
 
         /// <summary>
         /// Gets or sets the color scheme of the chart.
@@ -108,7 +109,7 @@ namespace Radzen.Blazor
         /// Gets or sets the value formatter for tooltip display.
         /// </summary>
         [Parameter]
-        public Func<double, string> ValueFormatter { get; set; }
+        public Func<double, string>? ValueFormatter { get; set; }
 
         /// <summary>
         /// Gets or sets the tooltip text for "Value".
@@ -138,7 +139,7 @@ namespace Radzen.Blazor
         /// Gets or sets the CSS style of the tooltip.
         /// </summary>
         [Parameter]
-        public string TooltipStyle { get; set; }
+        public string? TooltipStyle { get; set; }
 
         /// <summary>
         /// Gets or sets whether to animate the flow in the links.
@@ -147,30 +148,30 @@ namespace Radzen.Blazor
         public bool Animated { get; set; }
 
         // Node and link sort functions are internal implementation details
-        internal Func<SankeyNode, SankeyNode, int> NodeSort { get; set; }
-        internal Func<SankeyLink, SankeyLink, int> LinkSort { get; set; }
+        internal Func<SankeyNode, SankeyNode, int>? NodeSort { get; set; }
+        internal Func<SankeyLink, SankeyLink, int>? LinkSort { get; set; }
 
         /// <summary>
         /// Gets the computed nodes with layout.
         /// </summary>
-        internal IList<ComputedSankeyNode> ComputedNodes { get; private set; }
+        internal IList<ComputedSankeyNode>? ComputedNodes { get; private set; }
 
         /// <summary>
         /// Gets the computed links with paths.
         /// </summary>
-        internal IList<ComputedSankeyLink> ComputedLinks { get; private set; }
+        internal IList<ComputedSankeyLink>? ComputedLinks { get; private set; }
 
         // Property accessors
-        private Func<TItem, string> sourceGetter;
-        private Func<TItem, string> targetGetter;
-        private Func<TItem, double> valueGetter;
-        private Func<TItem, string> sourceLabelGetter;
-        private Func<TItem, string> targetLabelGetter;
+        private Func<TItem, string>? sourceGetter;
+        private Func<TItem, string>? targetGetter;
+        private Func<TItem, double>? valueGetter;
+        private Func<TItem, string>? sourceLabelGetter;
+        private Func<TItem, string>? targetLabelGetter;
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            var colorScheme = ColorScheme.ToString().ToLower();
+            var colorScheme = ColorScheme.ToString().ToLower(CultureInfo.InvariantCulture);
             return $"rz-sankey-diagram rz-scheme-{colorScheme}";
         }
 
@@ -309,7 +310,7 @@ namespace Radzen.Blazor
                 return;
             }
 
-            if (firstRender || !Width.HasValue || !Height.HasValue)
+            if ((firstRender || !Width.HasValue || !Height.HasValue) && JSRuntime != null)
             {
                 var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createResizable", Element, Reference);
                 
@@ -470,9 +471,10 @@ namespace Radzen.Blazor
                 // Assign colors to nodes
                 if (ComputedNodes != null)
                 {
-                    for (int i = 0; i < ComputedNodes.Count; i++)
+                    var nodes = ComputedNodes;
+                    for (int i = 0; i < nodes.Count; i++)
                     {
-                        var node = ComputedNodes[i];
+                        var node = nodes[i];
 
                         // Use explicit color if provided, otherwise use color scheme
                         if (NodeFills != null && i < NodeFills.Count)
@@ -493,9 +495,9 @@ namespace Radzen.Blazor
             }
         }
 
-        internal string GetNodeFill(ComputedSankeyNode node)
+        internal string? GetNodeFill(ComputedSankeyNode node)
         {
-            if (NodeFills != null)
+            if (NodeFills != null && ComputedNodes != null)
             {
                 var index = ComputedNodes.IndexOf(node);
                 if (index >= 0 && index < NodeFills.Count)
@@ -506,11 +508,12 @@ namespace Radzen.Blazor
             return null;
         }
 
-        internal string GetLinkFill(ComputedSankeyLink link)
+        internal string? GetLinkFill(ComputedSankeyLink link)
         {
-            if (LinkFills != null)
+            if (LinkFills != null && ComputedLinks != null)
             {
-                var index = ComputedLinks.IndexOf(link);
+                var links = ComputedLinks;
+                var index = links.IndexOf(link);
                 if (index >= 0 && index < LinkFills.Count)
                 {
                     return LinkFills[index];
@@ -551,7 +554,7 @@ namespace Radzen.Blazor
                     contentBuilder.CloseElement();
                     contentBuilder.CloseElement();
                     
-                    if (node.SourceLinks.Any())
+                    if (node.SourceLinks.Count > 0)
                     {
                         var outgoingValue = node.SourceLinks.Sum(l => l.Value);
                         var outgoingStr = ValueFormatter != null ? ValueFormatter(outgoingValue) : $"{outgoingValue:N0}";
@@ -565,7 +568,7 @@ namespace Radzen.Blazor
                         contentBuilder.CloseElement();
                     }
                     
-                    if (node.TargetLinks.Any())
+                    if (node.TargetLinks.Count > 0)
                     {
                         var incomingValue = node.TargetLinks.Sum(l => l.Value);
                         var incomingStr = ValueFormatter != null ? ValueFormatter(incomingValue) : $"{incomingValue:N0}";
@@ -629,17 +632,18 @@ namespace Radzen.Blazor
         }
         
         // Track current tooltip to prevent flickering
-        private ComputedSankeyNode currentTooltipNode;
-        private ComputedSankeyLink currentTooltipLink;
+        private ComputedSankeyNode? currentTooltipNode;
+        private ComputedSankeyLink? currentTooltipLink;
 
         /// <inheritdoc />
         public override void Dispose()
         {
             if (IsJSRuntimeAvailable)
             {
+                if (JSRuntime == null) return;
                 try
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", Element);
+                    _ = JSRuntime.InvokeVoidAsync("Radzen.destroyResizable", Element);
                 }
                 catch (Exception)
                 {
@@ -648,6 +652,8 @@ namespace Radzen.Blazor
             }
 
             base.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

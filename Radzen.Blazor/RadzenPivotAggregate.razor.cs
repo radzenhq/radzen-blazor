@@ -26,43 +26,43 @@ namespace Radzen.Blazor
         /// Gets or sets the format string.
         /// </summary>
         [Parameter]
-        public string FormatString { get; set; }
+        public string? FormatString { get; set; }
 
         /// <summary>
         /// Gets or sets the IFormatProvider used for FormatString.
         /// </summary>
         [Parameter]
-        public IFormatProvider FormatProvider { get; set; }
+        public IFormatProvider? FormatProvider { get; set; }
 
         /// <summary>
         /// Gets or sets the column cell template rendered.
         /// </summary>
         [Parameter]
-        public RenderFragment<object> Template { get; set; }
+        public RenderFragment<object>? Template { get; set; }
 
         /// <summary>
         /// Gets or sets the column total template rendered in the column footer.
         /// </summary>
         [Parameter]
-        public RenderFragment<object> ColumnTotalTemplate { get; set; }
+        public RenderFragment<object>? ColumnTotalTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the column total template rendered in the column footer.
         /// </summary>
         [Parameter]
-        public RenderFragment<RadzenPivotAggreateContext<TItem>> RowTotalTemplate { get; set; }
+        public RenderFragment<RadzenPivotAggreateContext<TItem>>? RowTotalTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the header template.
         /// </summary>
         /// <value>The header template.</value>
         [Parameter]
-        public RenderFragment HeaderTemplate { get; set; }
+        public RenderFragment? HeaderTemplate { get; set; }
 
         /// <summary>
         /// Formats a value using the FormatString and FormatProvider.
         /// </summary>
-        public string FormatValue(object value)
+        public string? FormatValue(object value)
         {
             if (value == null)
                 return "";
@@ -96,6 +96,8 @@ namespace Radzen.Blazor
             base.Dispose();
 
             PivotGrid?.RemovePivotAggregate(this);
+
+            GC.SuppressFinalize(this);
         }
     }
 } 

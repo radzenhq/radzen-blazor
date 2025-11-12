@@ -29,6 +29,8 @@ namespace Radzen.Blazor
             base.Dispose();
 
             PivotGrid?.RemovePivotRow(this);
+
+            GC.SuppressFinalize(this);
         }
     }
 } 

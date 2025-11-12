@@ -39,8 +39,30 @@ namespace Radzen
         /// AutoCompleteType.</value>
         public virtual string AutoCompleteAttribute
         {
-            get => Attributes != null && Attributes.ContainsKey("AutoComplete") && $"{Attributes["AutoComplete"]}".ToLower() == "false" ? DefaultAutoCompleteAttribute :
-                Attributes != null && Attributes.ContainsKey("AutoComplete") ? Attributes["AutoComplete"] as string ?? AutoCompleteType.GetAutoCompleteValue() : AutoCompleteType.GetAutoCompleteValue();
+            get
+            {
+                if (Attributes != null && Attributes.TryGetValue("AutoComplete", out var value))
+                {
+                    var v = (object?)value;
+                    var autoCompleteValue = v switch
+                    {
+                        bool boolValue => boolValue
+                            ? AutoCompleteType.GetAutoCompleteValue()
+                            : DefaultAutoCompleteAttribute,
+                        string stringValue when bool.TryParse(stringValue, out var boolValue) => boolValue
+                            ? AutoCompleteType.GetAutoCompleteValue()
+                            : DefaultAutoCompleteAttribute,
+                        AutoCompleteType typeValue => typeValue.GetAutoCompleteValue(),
+                        _ => value != null ? value.ToString() ?? AutoCompleteType.GetAutoCompleteValue() : AutoCompleteType.GetAutoCompleteValue()
+                    };
+
+                    return string.Equals(autoCompleteValue, "false", StringComparison.OrdinalIgnoreCase)
+                        ? DefaultAutoCompleteAttribute
+                        : autoCompleteValue;
+                }
+
+                return AutoCompleteType.GetAutoCompleteValue();
+            }
         }
 
         /// <summary>
@@ -48,7 +70,7 @@ namespace Radzen
         /// </summary>
         public virtual string DefaultAutoCompleteAttribute { get; set; } = "off";
 
-        object ariaAutoComplete;
+        object? ariaAutoComplete;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -56,10 +78,10 @@ namespace Radzen
             parameters = parameters.TryGetValue("aria-autocomplete", out ariaAutoComplete) ?
                 ParameterView.FromDictionary(parameters
                     .ToDictionary().Where(i => i.Key != "aria-autocomplete").ToDictionary(i => i.Key, i => i.Value)
-                    .ToDictionary(i => i.Key, i => i.Value))
+                    .ToDictionary(i => i.Key, i => (object?)i.Value))
                 : parameters;
 
-            await base.SetParametersAsync(parameters);
+            await base.SetParametersAsync(parameters).ConfigureAwait(false);
         }
 
         /// <summary>
@@ -70,9 +92,11 @@ namespace Radzen
         /// <summary>
         /// Gets the aria-autocomplete attribute's string value.
         /// </summary>
-        public virtual string AriaAutoCompleteAttribute
+        public virtual string? AriaAutoCompleteAttribute
         {
-            get => AutoCompleteAttribute == DefaultAutoCompleteAttribute ? DefaultAriaAutoCompleteAttribute : ariaAutoComplete as string;
+            get => string.Equals(AutoCompleteAttribute, DefaultAutoCompleteAttribute, StringComparison.Ordinal)
+                ? DefaultAriaAutoCompleteAttribute
+                : ariaAutoComplete as string;
         }
 
     }
@@ -96,7 +120,7 @@ namespace Radzen
         /// </summary>
         /// <value>The component name.</value>
         [Parameter]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the tab order index for keyboard navigation.
@@ -112,7 +136,7 @@ namespace Radzen
         /// </summary>
         /// <value>The placeholder.</value>
         [Parameter]
-        public string Placeholder { get; set; }
+        public string? Placeholder { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="FormComponent{T}"/> is disabled.
@@ -124,21 +148,21 @@ namespace Radzen
         /// <summary>
         /// The form
         /// </summary>
-        IRadzenForm _form;
+        IRadzenForm? _form;
 
         /// <summary>
         /// Gets or sets the edit context.
         /// </summary>
         /// <value>The edit context.</value>
         [CascadingParameter]
-        public EditContext EditContext { get; set; }
+        public EditContext? EditContext { get; set; }
 
         /// <summary>
         /// Gets or sets the form.
         /// </summary>
         /// <value>The form.</value>
         [CascadingParameter]
-        public IRadzenForm Form
+        public IRadzenForm? Form
         {
             get
             {
@@ -189,14 +213,14 @@ namespace Radzen
         /// <summary>
         /// The value
         /// </summary>
-        protected T _value;
+        protected T? _value;
 
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
         [Parameter]
-        public virtual T Value
+        public virtual T? Value
         {
             get
             {
@@ -230,7 +254,7 @@ namespace Radzen
         /// </summary>
         /// <value>The value expression.</value>
         [Parameter]
-        public Expression<Func<T>> ValueExpression { get; set; }
+        public Expression<Func<T>>? ValueExpression { get; set; }
         /// <summary>
         /// Sets the parameters asynchronous.
         /// </summary>
@@ -262,7 +286,7 @@ namespace Radzen
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="ValidationStateChangedEventArgs"/> instance containing the event data.</param>
-        private void ValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
+        private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
         {
             StateHasChanged();
         }
@@ -280,19 +304,21 @@ namespace Radzen
             }
 
             Form?.RemoveComponent(this);
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
         /// Gets the value.
         /// </summary>
         /// <returns>System.Object.</returns>
-        public object GetValue()
+        public object? GetValue()
         {
             return Value;
         }
 
         /// <summary>
-        /// Handles the <see cref="E:ContextMenu" /> event.
+        /// Handles the ContextMenu event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         /// <returns>Task.</returns>
@@ -318,10 +344,10 @@ namespace Radzen
 
         /// <summary> Provides support for RadzenFormField integration. </summary>
         [CascadingParameter]
-        public IFormFieldContext FormFieldContext { get; set; }
+        public IFormFieldContext? FormFieldContext { get; set; }
 
         /// <summary> Gets the current placeholder. Returns empty string if this component is inside a RadzenFormField.</summary>
-        protected string CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
+        protected string? CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
 
         /// <inheritdoc/>
         public virtual async ValueTask FocusAsync()

@@ -10,6 +10,6 @@ public class FormInvalidSubmitEventArgs
     /// <summary>
     /// Gets the validation errors.
     /// </summary>
-    public IEnumerable<string> Errors { get; set; }
+    public IEnumerable<string>? Errors { get; set; }
 }
 

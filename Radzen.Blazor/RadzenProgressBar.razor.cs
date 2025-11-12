@@ -47,7 +47,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The custom content template render fragment.</value>
         [Parameter]
-        public RenderFragment Template { get; set; }
+        public RenderFragment? Template { get; set; }
 
         /// <summary>
         /// Gets or sets the progress bar mode determining the visual behavior.
@@ -102,7 +102,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value changed callback.</value>
         [Parameter]
-        public Action<double> ValueChanged { get; set; }
+        public Action<double>? ValueChanged { get; set; }
 
         /// <summary>
         /// Gets or sets the semantic color style of the progress bar.
@@ -118,7 +118,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The ARIA label text for screen readers.</value>
         [Parameter]
-        public string AriaLabel { get; set; }
+        public string? AriaLabel { get; set; }
 
         /// <summary>
         /// Progress in range from 0 to 1.

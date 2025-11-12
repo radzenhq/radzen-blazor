@@ -8,6 +8,6 @@ public class UploadErrorEventArgs
     /// <summary>
     /// Gets a message telling what caused the error.
     /// </summary>
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }
 

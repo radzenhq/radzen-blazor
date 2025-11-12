@@ -5,16 +5,16 @@
 @foreach (var menu in menus)
 {
     <div id="@UniqueID" oncontextmenu="event.preventDefault()" class="rz-tooltip" style="display: none; top: 0px; left: 0px; z-index: 1001; position: absolute;">
-        @if (menu.Options.ChildContent != null)
+        @if (menu.Options?.ChildContent != null)
         {
             <div class="rz-context-menu">
-                @menu.Options.ChildContent(Service)
+                @menu?.Options?.ChildContent(Service!)
             </div>
         }
-        else if (menu.Options.Items != null && menu.Options.Items.Any())
+        else if (menu?.Options?.Items != null && menu.Options.Items.Any())
         {
             <div class="rz-context-menu">
-                <RadzenMenu Click="@(args => { if (menu.Options.Click != null) { menu.Options.Click(args); } })" Responsive="false">
+                <RadzenMenu Click="@(args => { if (menu?.Options?.Click != null) { menu.Options.Click(args); } })" Responsive="false">
                     @foreach (var item in menu.Options.Items)
                     {
                         <RadzenMenuItem Text="@item.Text" Value="@item.Value" Icon="@item.Icon" IconColor="@item.IconColor" Image="@item.Image" ImageStyle="@item.ImageStyle" Disabled=@item.Disabled></RadzenMenuItem>

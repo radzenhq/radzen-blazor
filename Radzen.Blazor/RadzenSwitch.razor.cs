@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -52,9 +53,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>A dictionary of custom HTML attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
-        private string ValueAsString => Value.ToString().ToLower();
+        private string ValueAsString => Value.ToString(CultureInfo.InvariantCulture).ToLower(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Programmatically toggles the switch between on (true) and off (false) states.

@@ -24,6 +24,6 @@ public class HtmlEditorExecuteEventArgs
     /// <summary>
     /// Gets the name of the command which RadzenHtmlEditor is executing.
     /// </summary>
-    public string CommandName { get; set; }
+    public string? CommandName { get; set; }
 }
 

@@ -42,11 +42,11 @@ public class TreeItemRenderEventArgs
     /// <summary>
     /// Gets tree item.
     /// </summary>
-    public object Value { get; internal set; }
+    public object? Value { get; internal set; }
 
     /// <summary>
     /// Gets child items.
     /// </summary>
-    public IEnumerable Data { get; internal set; }
+    public IEnumerable? Data { get; internal set; }
 }
 

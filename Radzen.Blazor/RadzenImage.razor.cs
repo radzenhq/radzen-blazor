@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using System;
+using System.Globalization;
 
 namespace Radzen.Blazor
 {
@@ -35,7 +36,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The image source path, URL, or data URL.</value>
         [Parameter]
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
         /// <summary>
         /// Gets or sets the alternate text describing the image for accessibility and when the image fails to load.
@@ -55,7 +56,7 @@ namespace Radzen.Blazor
         public EventCallback<MouseEventArgs> Click { get; set; }
 
         /// <summary>
-        /// Handles the <see cref="E:Click" /> event.
+        /// Handles the click event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
@@ -65,7 +66,7 @@ namespace Radzen.Blazor
 
         string GetAlternateText()
         {
-            if (Attributes != null && Attributes.TryGetValue("alt", out var @alt) && !string.IsNullOrEmpty(Convert.ToString(@alt)))
+            if (Attributes != null && Attributes.TryGetValue("alt", out var @alt) && !string.IsNullOrEmpty(Convert.ToString(@alt, CultureInfo.InvariantCulture)))
             {
                 return $"{AlternateText} {@alt}";
             }

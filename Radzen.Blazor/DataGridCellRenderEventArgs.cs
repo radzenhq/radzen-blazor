@@ -6,11 +6,11 @@ namespace Radzen;
 /// Supplies information about a <see cref="RadzenDataGrid{TItem}.CellRender" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class DataGridCellRenderEventArgs<T> : RowRenderEventArgs<T>
+public class DataGridCellRenderEventArgs<T> : RowRenderEventArgs<T> where T : notnull
 {
     /// <summary>
     /// Gets the RadzenDataGridColumn which this cells represents.
     /// </summary>
-    public RadzenDataGridColumn<T> Column { get; internal set; }
+    public RadzenDataGridColumn<T>? Column { get; internal set; }
 }
 

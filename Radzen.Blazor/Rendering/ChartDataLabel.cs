@@ -8,18 +8,18 @@ namespace  Radzen.Blazor.Rendering
         /// <summary>
         /// The position of the label.
         /// </summary>
-        public Point Position { get; set; }
+        public Point Position { get; set; } = new Point();
         /// <summary>
         /// The text of the label.
         /// </summary>
-        public string Text { get; set; }
+        public string Text { get; set; } = string.Empty;
         /// <summary>
         /// The text anchor of the label.
         /// </summary>
-        public string TextAnchor { get; set; }
+        public string TextAnchor { get; set; } = string.Empty;
         /// <summary>
         /// Defines the fill color of the component.
         /// </summary>
-        public string Fill { get; set; }
+        public string Fill { get; set; } = string.Empty;
     }
 }

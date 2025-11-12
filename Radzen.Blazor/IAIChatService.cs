@@ -23,14 +23,14 @@ public interface IAIChatService
     /// <param name="apiKey">Optional API key to override the configured API key.</param>
     /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
     /// <returns>An async enumerable that yields streaming response chunks from the AI model.</returns>
-    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string sessionId = null, CancellationToken cancellationToken = default, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null, string endpoint = null, string proxy = null, string apiKey = null, string apiKeyHeader = null);
+    IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null);
 
     /// <summary>
     /// Gets or creates a conversation session.
     /// </summary>
     /// <param name="sessionId">The session ID. If null, a new session will be created.</param>
     /// <returns>The conversation session.</returns>
-    ConversationSession GetOrCreateSession(string sessionId = null);
+    ConversationSession GetOrCreateSession(string? sessionId = null);
 
     /// <summary>
     /// Clears the conversation history for a specific session.

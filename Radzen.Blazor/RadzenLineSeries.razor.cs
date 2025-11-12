@@ -41,7 +41,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The line color as a CSS color value.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the line in pixels.
@@ -84,7 +84,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Stroke;
+                return Stroke ?? string.Empty;
             }
         }
 
@@ -111,8 +111,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            var category = ComposeCategory(Chart.CategoryScale);
-            var value = ComposeValue(Chart.ValueScale);
+            var chart = RequireChart();
+            var category = ComposeCategory(chart.CategoryScale);
+            var value = ComposeValue(chart.ValueScale);
 
             var points = Items.Select(item => new Point { X = category(item), Y = value(item) }).ToArray();
 

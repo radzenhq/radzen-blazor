@@ -20,14 +20,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The scale.</value>
         [CascadingParameter]
-        public RadzenArcGaugeScale Scale { get; set; }
+        public RadzenArcGaugeScale? Scale { get; set; }
 
         /// <summary>
         /// Gets or sets the stroke.
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string Stroke { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the width of the stroke.
@@ -41,7 +41,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The fill.</value>
         [Parameter]
-        public string Fill { get; set; }
+        public string Fill { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets a value indicating whether to show value.
@@ -55,28 +55,28 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The format string.</value>
         [Parameter]
-        public string FormatString { get; set; }
+        public string FormatString { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the template.
         /// </summary>
         /// <value>The template.</value>
         [Parameter]
-        public RenderFragment<RadzenArcGaugeScaleValue> Template { get; set; }
+        public RenderFragment<RadzenArcGaugeScaleValue>? Template { get; set; }
 
         /// <summary>
         /// Gets or sets the gauge.
         /// </summary>
         /// <value>The gauge.</value>
         [CascadingParameter]
-        public RadzenArcGauge Gauge { get; set; }
+        public RadzenArcGauge? Gauge { get; set; }
 
         /// <inheritdoc />
         protected override void OnInitialized()
         {
             base.OnInitialized();
 
-            Gauge.AddValue(this);
+            Gauge?.AddValue(this);
         }
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -92,7 +92,7 @@ namespace Radzen.Blazor
 
             if (shouldRefresh)
             {
-                Gauge.Reload();
+                Gauge?.Reload();
             }
         }
     }

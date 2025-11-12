@@ -55,7 +55,10 @@ namespace Radzen.Blazor
             theme = ThemeService.Theme ?? GetCurrentTheme();
             wcag = ThemeService.Wcag ?? Wcag;
 
-            ThemeService.SetTheme(theme, true);
+            if (theme != null)
+            {
+                ThemeService.SetTheme(theme, true);
+            }
 
             theme = theme?.ToLowerInvariant();
 
@@ -91,7 +94,7 @@ namespace Radzen.Blazor
         {
             var requiresChange = false;
 
-            var newTheme = ThemeService.Theme.ToLowerInvariant();
+            var newTheme = ThemeService.Theme?.ToLowerInvariant() ?? "";
 
             if (theme != newTheme)
             {
@@ -124,6 +127,8 @@ namespace Radzen.Blazor
             }
 
             persistingSubscription?.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

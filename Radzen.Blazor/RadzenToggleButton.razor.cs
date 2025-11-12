@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
@@ -24,30 +24,30 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
         /// <value>The name.</value>
         [Parameter]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the placeholder.
         /// </summary>
         /// <value>The placeholder.</value>
         [Parameter]
-        public string Placeholder { get; set; }
+        public string? Placeholder { get; set; }
 
         /// <summary>
         /// Gets or sets the toggle icon.
         /// </summary>
         /// <value>The toggle icon.</value>
         [Parameter]
-        public string ToggleIcon { get; set; }
+        public string? ToggleIcon { get; set; }
 
-        private string GetIcon()
+        private string? GetIcon()
         {
             return Value && !string.IsNullOrEmpty(ToggleIcon) ? ToggleIcon : Icon;
         }
@@ -55,21 +55,21 @@ namespace Radzen.Blazor
         /// <summary>
         /// The form
         /// </summary>
-        IRadzenForm _form;
+        IRadzenForm? _form;
 
         /// <summary>
         /// Gets or sets the edit context.
         /// </summary>
         /// <value>The edit context.</value>
         [CascadingParameter]
-        public EditContext EditContext { get; set; }
+        public EditContext? EditContext { get; set; }
 
         /// <summary>
         /// Gets or sets the form.
         /// </summary>
         /// <value>The form.</value>
         [CascadingParameter]
-        public IRadzenForm Form
+        public IRadzenForm? Form
         {
             get
             {
@@ -157,7 +157,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value expression.</value>
         [Parameter]
-        public Expression<Func<bool>> ValueExpression { get; set; }
+        public Expression<Func<bool>>? ValueExpression { get; set; }
         /// <summary>
         /// Sets the parameters asynchronous.
         /// </summary>
@@ -189,7 +189,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="ValidationStateChangedEventArgs"/> instance containing the event data.</param>
-        private void ValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
+        private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
         {
             StateHasChanged();
         }
@@ -207,6 +207,8 @@ namespace Radzen.Blazor
             }
 
             Form?.RemoveComponent(this);
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -219,7 +221,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Handles the <see cref="E:ContextMenu" /> event.
+        /// Handles the context menu event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         /// <returns>Task.</returns>
@@ -235,10 +237,10 @@ namespace Radzen.Blazor
 
         /// <summary> Provides support for RadzenFormField integration. </summary>
         [CascadingParameter]
-        public IFormFieldContext FormFieldContext { get; set; }
+        public IFormFieldContext? FormFieldContext { get; set; }
 
         /// <summary> Gets the current placeholder. Returns empty string if this component is inside a RadzenFormField.</summary>
-        protected string CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
+        protected string CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder ?? "";
 
         /// <inheritdoc/>
         public virtual async ValueTask FocusAsync()
@@ -305,6 +307,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The aria-label attribute.</value>
         [Parameter]
-        public string AriaLabel { get; set; }
+        public string? AriaLabel { get; set; }
     }
 }

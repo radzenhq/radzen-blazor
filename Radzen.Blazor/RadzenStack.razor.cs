@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -60,7 +61,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The gap spacing as a CSS length value. Default is null (no gap).</value>
         [Parameter]
-        public string Gap { get; set; }
+        public string? Gap { get; set; }
 
         /// <summary>
         /// Gets or sets whether to reverse the display order of child elements.
@@ -76,7 +77,7 @@ namespace Radzen.Blazor
         /// </summary>
         protected string GetStyle()
         {
-            if (Attributes != null && Attributes.TryGetValue("style", out var style) && !string.IsNullOrEmpty(Convert.ToString(@style)))
+            if (Attributes != null && Attributes.TryGetValue("style", out var style) && !string.IsNullOrEmpty(Convert.ToString(@style, CultureInfo.InvariantCulture)))
             {
                 return $"{GetComponentStyle()} {@style}";
             }
@@ -104,7 +105,7 @@ namespace Radzen.Blazor
                 wrap = "flex-wrap:wrap-reverse;";
             }
 
-            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(";") ? ";" : "")}{(!string.IsNullOrEmpty(Gap) ? "--rz-gap:" + Gap + (Gap.All(c => Char.IsDigit(c)) ? "px;" : ";") : "")}{wrap}";
+            return $"{Style}{(!string.IsNullOrEmpty(Style) && !Style.EndsWith(';') ? ";" : "")}{(!string.IsNullOrEmpty(Gap) ? "--rz-gap:" + Gap + (Gap.All(c => Char.IsDigit(c)) ? "px;" : ";") : "")}{wrap}";
         }
 
         /// <inheritdoc />

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen;
 
@@ -25,7 +26,7 @@ public class UploadProgressArgs
     /// <summary>
     /// Gets a collection of files that are being uploaded.
     /// </summary>
-    public IEnumerable<FileInfo> Files { get; set; }
+    public IEnumerable<FileInfo> Files { get; set; } = Enumerable.Empty<FileInfo>();
 
     /// <summary>
     /// Gets or sets a flag indicating whether the underlying XMLHttpRequest should be aborted.

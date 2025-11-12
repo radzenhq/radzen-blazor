@@ -1,24 +1,24 @@
 @if (PreventBlur)
 {
-<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled || !EnabledModes.HasFlag(Editor.GetMode())) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@GetTitle()>
+<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor?.Disabled == true || Disabled || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design)) @onmousedown=@Empty @onmousedown:preventDefault @onclick:preventDefault title=@GetTitle()>
     <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
 </button>
 }
 else
 {
-<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor.Disabled || Disabled || !EnabledModes.HasFlag(Editor.GetMode())) title=@GetTitle()>
+<button type="button" tabindex="-1" @onclick=@OnClick class=@Class disabled=@(Editor?.Disabled == true || Disabled || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design)) title=@GetTitle()>
     <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
 </button>
 }
 @code {
     [CascadingParameter]
-    public RadzenHtmlEditor Editor { get; set; }
+    public RadzenHtmlEditor? Editor { get; set; }
 
     [Parameter]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [Parameter]
-    public string Shortcut { get; set; }
+    public string? Shortcut { get; set; }
 
     [Parameter]
     public bool Disabled { get; set; }
@@ -30,14 +30,14 @@ else
     public bool Selected { get; set; }
 
     [Parameter]
-    public string Icon { get; set; }
+    public string? Icon { get; set; }
 
     /// <summary>
     /// Gets or sets the icon color.
     /// </summary>
     /// <value>The icon color.</value>
     [Parameter]
-    public string IconColor { get; set; }
+    public string? IconColor { get; set; }
 
     [Parameter]
     public HtmlEditorMode EnabledModes { get; set; } = HtmlEditorMode.Design;
@@ -50,10 +50,10 @@ else
         await Click.InvokeAsync(null);
     }
 
-    string GetTitle() => !string.IsNullOrEmpty(Shortcut) ? $"{Title} ({Shortcut})" : Title;
+    string? GetTitle() => !string.IsNullOrEmpty(Shortcut) ? $"{Title} ({Shortcut})" : Title;
 
     string Class => ClassList.Create("rz-html-editor-button")
-        .Add("rz-selected", Selected && !Editor.Disabled && EnabledModes.HasFlag(Editor.GetMode()))
+        .Add("rz-selected", Selected && Editor?.Disabled != true && EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design))
         .ToString();
 
     void Empty()

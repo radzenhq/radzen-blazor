@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor.Markdown;
@@ -47,6 +48,7 @@ public class TableCell : INode, IBlockInlineContainer
     /// <inheritdoc />
     public void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitTableCell(this);
     }
 }

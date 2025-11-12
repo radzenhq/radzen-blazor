@@ -19,6 +19,7 @@ public class Table : Leaf
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitTable(this);
     }
 
@@ -137,7 +138,7 @@ public class Table : Leaf
 
         // Check if the line contains a pipe character to be more specific about table delimiters
         // This helps avoid misinterpreting heading delimiters as table delimiters
-        if (!line.Contains('|') && !line.Contains(':'))
+        if (!line.Contains('|', StringComparison.Ordinal) && !line.Contains(':', StringComparison.Ordinal))
         {
             return BlockStart.Skip;
         }

@@ -12,7 +12,7 @@ public class SchedulerAppointmentMoveEventArgs
     /// <summary>
     /// Gets or sets the appointment data.
     /// </summary>
-    public AppointmentData Appointment { get; set; }
+    public AppointmentData? Appointment { get; set; }
 
     /// <summary>
     /// Gets or sets the time span which represents the difference between slot start and appointment start.

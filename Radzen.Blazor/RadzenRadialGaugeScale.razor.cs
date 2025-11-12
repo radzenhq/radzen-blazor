@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -15,14 +16,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The gauge.</value>
         [CascadingParameter]
-        public RadzenRadialGauge Gauge { get; set; }
+        public RadzenRadialGauge? Gauge { get; set; }
 
         /// <summary>
         /// Gets or sets the stroke.
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the stroke.
@@ -36,7 +37,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the length of the tick.
@@ -64,14 +65,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The format string.</value>
         [Parameter]
-        public string FormatString { get; set; }
+        public string? FormatString { get; set; }
 
         /// <summary>
         /// Gets or sets the formatter function.
         /// </summary>
         /// <value>The formatter function.</value>
         [Parameter]
-        public Func<double, string> Formatter { get; set; } = value => value.ToString();
+        public Func<double, string> Formatter { get; set; } = value => value.ToString(CultureInfo.InvariantCulture);
 
         /// <summary>
         /// Gets or sets the start angle.
@@ -179,13 +180,15 @@ namespace Radzen.Blazor
         {
             get
             {
+                if (Gauge == null || Gauge.Width == null || Gauge.Height == null)
+                    return 0;
                 var radius = Math.Min(Gauge.Width.Value, Gauge.Height.Value) / 2 - Margin * 2;
 
                 radius *= Radius;
 
                 if (TickPosition == GaugeTickPosition.Outside)
                 {
-                    radius -= TextMeasurer.TextWidth(Max.ToString(), 16);
+                    radius -= TextMeasurer.TextWidth(Max.ToString(CultureInfo.InvariantCulture), 16);
                 }
 
                 return radius;
@@ -200,6 +203,8 @@ namespace Radzen.Blazor
         {
             get
             {
+                if (Gauge == null || Gauge.Width == null || Gauge.Height == null)
+                    return new Point { X = 0, Y = 0 };
                 var x = X * Gauge.Width;
                 var y = Y * Gauge.Height;
 
@@ -219,7 +224,7 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (shouldRefresh)
+            if (shouldRefresh && Gauge != null)
             {
                 Gauge.Reload();
             }

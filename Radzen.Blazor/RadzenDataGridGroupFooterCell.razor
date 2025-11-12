@@ -21,25 +21,25 @@ else
 }
 @code {
     [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+    public IReadOnlyDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
     [Parameter]
-    public Group Group { get; set; }
+    public Group Group { get; set; } = new Group();
 
     [Parameter]
-    public RadzenDataGridColumn<TItem> Column { get; set; }
+    public RadzenDataGridColumn<TItem> Column { get; set; } = default!;
 
     [Parameter]
     public int RowIndex { get; set; }
 
     [Parameter]
-    public RadzenDataGrid<TItem> Grid { get; set; }
+    public RadzenDataGrid<TItem> Grid { get; set; } = default!;
 
     [Parameter]
-    public string CssClass { get; set; }
+    public string CssClass { get; set; } = string.Empty;
 
     [Parameter]
-    public string Style { get; set; }
+    public string Style { get; set; } = string.Empty;
 
     private string GetStyle()
     {
@@ -47,7 +47,11 @@ else
 
         if (Attributes?.TryGetValue("style", out var styleAttribute) == true)
         {
-            styles.Add(Convert.ToString(styleAttribute));
+            var styleValue = Convert.ToString(styleAttribute);
+            if (styleValue != null)
+            {
+                styles.Add(styleValue);
+            }
         }
 
         var finalStyle = string.Join(";",

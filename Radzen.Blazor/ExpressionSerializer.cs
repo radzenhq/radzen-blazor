@@ -30,6 +30,7 @@ public class ExpressionSerializer : ExpressionVisitor
     /// <inheritdoc/>
     protected override Expression VisitLambda<T>(Expression<T> node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         if (node.Parameters.Count > 1)
         {
             _sb.Append("(");
@@ -52,6 +53,7 @@ public class ExpressionSerializer : ExpressionVisitor
     /// <inheritdoc/>
     protected override Expression VisitParameter(ParameterExpression node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         _sb.Append(node.Name);
         return node;
     }
@@ -59,10 +61,11 @@ public class ExpressionSerializer : ExpressionVisitor
     /// <inheritdoc/>
     protected override Expression VisitMember(MemberExpression node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         if (node.Expression != null)
         {
             Visit(node.Expression);
-            _sb.Append($".{node.Member.Name}");
+            _sb.Append(CultureInfo.InvariantCulture, $".{node.Member.Name}");
         }
         else
         {
@@ -74,14 +77,15 @@ public class ExpressionSerializer : ExpressionVisitor
     /// <inheritdoc/>
     protected override Expression VisitMethodCall(MethodCallExpression node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         if (node.Method.IsStatic && node.Arguments.Count > 0 &&
-            (node.Method.DeclaringType == typeof(Enumerable) || 
+            (node.Method.DeclaringType == typeof(Enumerable) ||
                 node.Method.DeclaringType == typeof(Queryable)))
         {
             Visit(node.Arguments[0]);
-            _sb.Append($".{node.Method.Name}(");
+            _sb.Append(CultureInfo.InvariantCulture, $".{node.Method.Name}(");
 
-            for (int i = 1; i < node.Arguments.Count; i++) 
+            for (int i = 1; i < node.Arguments.Count; i++)
             {
                 if (i > 1) _sb.Append(", ");
 
@@ -99,7 +103,7 @@ public class ExpressionSerializer : ExpressionVisitor
         }
         else if (node.Method.IsStatic)
         {
-            _sb.Append($"{node.Method.DeclaringType.Name}.{node.Method.Name}(");
+            _sb.Append(CultureInfo.InvariantCulture, $"{node.Method.DeclaringType?.Name}.{node.Method.Name}(");
 
             for (int i = 0; i < node.Arguments.Count; i++)
             {
@@ -114,11 +118,11 @@ public class ExpressionSerializer : ExpressionVisitor
             if (node.Object != null)
             {
                 Visit(node.Object);
-                _sb.Append($".{node.Method.Name}(");
+                _sb.Append(CultureInfo.InvariantCulture, $".{node.Method.Name}(");
             }
             else
             {
-                _sb.Append($"{node.Method.Name}(");
+                _sb.Append(CultureInfo.InvariantCulture, $"{node.Method.Name}(");
             }
 
             for (int i = 0; i < node.Arguments.Count; i++)
@@ -136,17 +140,18 @@ public class ExpressionSerializer : ExpressionVisitor
     /// <inheritdoc/>
     protected override Expression VisitUnary(UnaryExpression node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         if (node.NodeType == ExpressionType.Not)
         {
             _sb.Append("(!(");
             Visit(node.Operand);
             _sb.Append("))");
         }
-        else if (node.NodeType == ExpressionType.Convert) 
+        else if (node.NodeType == ExpressionType.Convert)
         {
             if (node.Operand is IndexExpression indexExpr)
             {
-                _sb.Append($"({node.Type.DisplayName(true).Replace("+",".")})");
+                _sb.Append(CultureInfo.InvariantCulture, $"({node.Type.DisplayName(true).Replace("+", ".", StringComparison.Ordinal)})");
 
                 Visit(indexExpr.Object);
 
@@ -175,20 +180,18 @@ public class ExpressionSerializer : ExpressionVisitor
     /// <inheritdoc/>
     protected override Expression VisitConstant(ConstantExpression node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         _sb.Append(FormatValue(node.Value));
         return node;
     }
 
-    internal static string FormatValue(object value)
+    internal static string? FormatValue(object? value)
     {
-        if (value == null)
-            return "null";
-
         return value switch
         {
-            string s when s == string.Empty => @"""""",
+            string s when s.Length == 0 => @"""""",
             null => "null",
-            string s => @$"""{s.Replace("\"", "\\\"")}""",
+            string s => @$"""{s.Replace("\"", "\\\"", StringComparison.Ordinal)}""",
             char c => $"'{c}'",
             bool b => b.ToString().ToLowerInvariant(),
             DateTime dt => FormatDateTime(dt),
@@ -198,7 +201,7 @@ public class ExpressionSerializer : ExpressionVisitor
             Guid guid => $"Guid.Parse(\"{guid.ToString("D", CultureInfo.InvariantCulture)}\")",
             IEnumerable enumerable when value is not string => FormatEnumerable(enumerable),
             _ => value.GetType().IsEnum
-                ? $"({value.GetType().FullName.Replace("+", ".")})" + Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()), CultureInfo.InvariantCulture).ToString()
+                ? $"({value.GetType()?.FullName?.Replace("+", ".", StringComparison.Ordinal)})" + Convert.ChangeType(value, Enum.GetUnderlyingType(value.GetType()), CultureInfo.InvariantCulture).ToString()
                 : Convert.ToString(value, CultureInfo.InvariantCulture)
         };
     }
@@ -214,14 +217,15 @@ public class ExpressionSerializer : ExpressionVisitor
     private static string FormatEnumerable(IEnumerable enumerable)
     {
         var arrayType = enumerable.AsQueryable().ElementType;
-        
+
         var items = enumerable.Cast<object>().Select(FormatValue);
-        return $"new {(Nullable.GetUnderlyingType(arrayType) != null ? arrayType.DisplayName(true).Replace("+", ".") : "")}[] {{ {string.Join(", ", items)} }}";
+        return $"new {(Nullable.GetUnderlyingType(arrayType) != null ? arrayType.DisplayName(true).Replace("+", ".", StringComparison.Ordinal) : "")}[] {{ {string.Join(", ", items)} }}";
     }
 
     /// <inheritdoc/>
     protected override Expression VisitNewArray(NewArrayExpression node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         bool needsParentheses = node.NodeType == ExpressionType.NewArrayInit &&
                                 (node.Expressions.Count > 1 || node.Expressions[0].NodeType != ExpressionType.Constant);
 
@@ -245,9 +249,10 @@ public class ExpressionSerializer : ExpressionVisitor
     /// <inheritdoc/>
     protected override Expression VisitBinary(BinaryExpression node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         _sb.Append("(");
         Visit(node.Left);
-        _sb.Append($" {GetOperator(node.NodeType)} ");
+        _sb.Append(CultureInfo.InvariantCulture, $" {GetOperator(node.NodeType)} ");
         Visit(node.Right);
         _sb.Append(")");
         return node;
@@ -256,6 +261,7 @@ public class ExpressionSerializer : ExpressionVisitor
     /// <inheritdoc/>
     protected override Expression VisitConditional(ConditionalExpression node)
     {
+        ArgumentNullException.ThrowIfNull(node);
         _sb.Append("(");
         Visit(node.Test);
         _sb.Append(" ? ");
@@ -290,7 +296,7 @@ public class ExpressionSerializer : ExpressionVisitor
             ExpressionType.Coalesce => "??",
             _ => throw new NotSupportedException($"Unsupported operator: {type}")
         };
-    }  
+    }
 }
 
 /// <summary>
@@ -333,6 +339,7 @@ public static class SharedTypeExtensions
     /// <returns>A string representing the type name.</returns>
     public static string DisplayName(this Type type, bool fullName = true, bool compilable = false)
     {
+        ArgumentNullException.ThrowIfNull(type);
         var stringBuilder = new StringBuilder();
         ProcessType(stringBuilder, type, fullName, compilable);
         return stringBuilder.ToString();
@@ -443,7 +450,7 @@ public static class SharedTypeExtensions
             }
         }
 
-        var genericPartIndex = type.Name.IndexOf('`');
+        var genericPartIndex = type.Name.IndexOf('`', StringComparison.Ordinal);
         if (genericPartIndex <= 0)
         {
             builder.Append(type.Name);

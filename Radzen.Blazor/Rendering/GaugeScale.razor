@@ -26,7 +26,7 @@
     public double StartAngle { get; set; }
 
     [Parameter]
-    public string Stroke { get; set; }
+    public string Stroke { get; set; } = string.Empty;
 
     [Parameter]
     public double StrokeWidth { get; set; }
@@ -47,7 +47,7 @@
     public double Radius { get; set; }
 
     [Parameter]
-    public Point Center { get; set; }
+    public Point Center { get; set; } = new Point();
 
     [Parameter]
     public double Min { get; set; }
@@ -68,10 +68,10 @@
     public GaugeTickPosition TickPosition { get; set; }
 
     [Parameter]
-    public string FormatString { get; set; }
+    public string FormatString { get; set; } = string.Empty;
 
     [Parameter]
-    public Func<double, string> Formatter { get; set; }
+    public Func<double, string> Formatter { get; set; } = value => value.ToInvariantString();
 
     [Parameter]
     public double Step { get; set; }
@@ -79,26 +79,26 @@
     [Parameter]
     public double MinorStep { get; set; }
 
-    private string Path { get; set; }
+    private string Path { get; set; } = string.Empty;
 
     class Tick
     {
-        public Point Start { get; set; }
-        public Point End { get; set; }
-        public Point Text { get; set; }
+        public Point? Start { get; set; }
+        public Point? End { get; set; }
+        public Point? Text { get; set; }
 
-        public string Value { get; set; }
+        public string? Value { get; set; }
         public string Path
         {
             get
             {
-                return $"M {Start.Render()} L {End.Render()}";
+                return $"M {Start?.Render() ?? ""} L {End?.Render() ?? ""}";
             }
         }
     }
 
-    private IList<Tick> Ticks { get; set; }
-    private IList<Tick> MinorTicks { get; set; }
+    private IList<Tick> Ticks { get; set; } = new List<Tick>();
+    private IList<Tick> MinorTicks { get; set; } = new List<Tick>();
 
     protected override void OnParametersSet()
     {

@@ -116,16 +116,17 @@ namespace Radzen.Blazor
         class RadzenTextAnchor : ComponentBase, IDisposable
         {
             [Inject]
-            NavigationManager NavigationManager { get; set; }
+            NavigationManager? NavigationManager { get; set; }
 
             [Inject]
-            IJSRuntime JSRuntime { get; set; }
+            IJSRuntime? JSRuntime { get; set; }
 
             [Parameter]
-            public string Path { get; set; }
+            public string? Path { get; set; }
 
             private string GetAnchor()
             {
+                if (string.IsNullOrEmpty(Path)) return "";
                 var fragments = Path.Split('#');
 
                 return fragments.Length > 1 ? fragments[1] : fragments[0];
@@ -135,12 +136,15 @@ namespace Radzen.Blazor
 
             protected override void OnInitialized()
             {
-                NavigationManager.LocationChanged += OnLocationChanged;
+                if (NavigationManager != null)
+                {
+                    NavigationManager.LocationChanged += OnLocationChanged;
+                }
             }
 
-            void OnLocationChanged(object sender, LocationChangedEventArgs e)
+            void OnLocationChanged(object? sender, LocationChangedEventArgs e)
             {
-                if (e.Location.EndsWith(GetAnchor(), StringComparison.InvariantCultureIgnoreCase))
+                if (e != null && e.Location.EndsWith(GetAnchor(), StringComparison.InvariantCultureIgnoreCase) && JSRuntime != null)
                 {
                     JSRuntime.InvokeVoidAsync("Element.prototype.scrollIntoView.call", element);
                 }
@@ -148,6 +152,7 @@ namespace Radzen.Blazor
 
             private string GetPath()
             {
+                if (NavigationManager == null) return "";
                 var uri = new Uri(NavigationManager.Uri);
 
                 var anchor = GetAnchor();
@@ -157,6 +162,7 @@ namespace Radzen.Blazor
 
             protected override void BuildRenderTree(RenderTreeBuilder builder)
             {
+                ArgumentNullException.ThrowIfNull(builder);
                 builder.OpenElement(1, "a");
                 builder.AddAttribute(2, "id", GetAnchor());
                 builder.AddAttribute(3, "href", GetPath());
@@ -172,7 +178,10 @@ namespace Radzen.Blazor
 
             void IDisposable.Dispose()
             {
-                NavigationManager.LocationChanged -= OnLocationChanged;
+                if (NavigationManager != null)
+                {
+                    NavigationManager.LocationChanged -= OnLocationChanged;
+                }
             }
         }
 
@@ -183,7 +192,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The text content to display.</value>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
         /// Gets or sets the child content (markup) to display.
@@ -191,7 +200,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content render fragment.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the typography style that determines the text size, weight, and appearance.
@@ -226,11 +235,12 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The anchor identifier for heading links.</value>
         [Parameter]
-        public string Anchor { get; set; }
+        public string? Anchor { get; set; }
 
         /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
+            ArgumentNullException.ThrowIfNull(builder);
             var tagName = "span";
             var className = "";
             var alignClassName = "";

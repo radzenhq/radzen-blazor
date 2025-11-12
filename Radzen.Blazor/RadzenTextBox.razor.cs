@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 
@@ -68,6 +69,7 @@ namespace Radzen.Blazor
         /// <returns>A task representing the asynchronous operation.</returns>
         protected async Task OnChange(ChangeEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
             Value = $"{args.Value}";
 
             if (Trim)
@@ -92,7 +94,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetId()
+        protected override string? GetId()
         {
             return Name ?? base.GetId();
         }

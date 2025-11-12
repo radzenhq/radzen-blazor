@@ -33,7 +33,7 @@ namespace Radzen.Blazor
         /// Sets the child content.
         /// </summary>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Specifies the placeholder displayed to the user. Set to <c>"Font"</c> by default.
@@ -51,11 +51,14 @@ namespace Radzen.Blazor
         /// The RadzenHtmlEditor component which this tool is part of.
         /// </summary>
         [CascadingParameter]
-        public RadzenHtmlEditor Editor { get; set; }
+        public RadzenHtmlEditor? Editor { get; set; }
 
         async Task OnChange(string value)
         {
-            await Editor.ExecuteCommandAsync("fontName", value);
+            if (Editor != null)
+            {
+                await Editor.ExecuteCommandAsync("fontName", value);
+            }
         }
     }
 }

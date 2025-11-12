@@ -10,12 +10,12 @@ public class DataGridSettings
     /// <summary>
     /// Columns.
     /// </summary>
-    public IEnumerable<DataGridColumnSettings> Columns { get; set; }
+    public IEnumerable<DataGridColumnSettings> Columns { get; set; } = System.Array.Empty<DataGridColumnSettings>();
 
     /// <summary>
     /// Groups.
     /// </summary>
-    public IEnumerable<GroupDescriptor> Groups { get; set; }
+    public IEnumerable<GroupDescriptor> Groups { get; set; } = System.Array.Empty<GroupDescriptor>();
 
     /// <summary>
     /// CurrentPage.

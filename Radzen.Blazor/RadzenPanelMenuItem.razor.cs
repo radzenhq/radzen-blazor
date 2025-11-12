@@ -24,7 +24,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The target.</value>
         [Parameter]
-        public string Target { get; set; }
+        public string? Target { get; set; }
 
         /// <summary>
         /// Gets or sets the expanded changed callback.
@@ -45,21 +45,21 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
         [Parameter]
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         /// <summary>
         /// Gets or sets the path.
         /// </summary>
         /// <value>The path.</value>
         [Parameter]
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
         /// <summary>
         /// Gets or sets the navigation link match.
@@ -73,28 +73,28 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon.</value>
         [Parameter]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets the icon color.
         /// </summary>
         /// <value>The icon color.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets the image.
         /// </summary>
         /// <value>The image.</value>
         [Parameter]
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
         /// <summary>
         /// Gets or sets the template.
         /// </summary>
         /// <value>The template.</value>
         [Parameter]
-        public RenderFragment Template { get; set; }
+        public RenderFragment? Template { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenPanelMenuItem"/> is expanded.
@@ -119,7 +119,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenPanelMenuItem"/> is disabled.
@@ -130,7 +130,7 @@ namespace Radzen.Blazor
 
         internal async Task Toggle()
         {
-            if (!expanded && !Parent.Multiple)
+            if (!expanded && Parent?.Multiple != true)
             {
                 var itemsToSkip = new List<RadzenPanelMenuItem>();
 
@@ -143,7 +143,10 @@ namespace Radzen.Blazor
                     p = p.ParentItem;
                 }
 
-                await Parent.CollapseAllAsync(itemsToSkip);
+                if (Parent != null)
+                {
+                    await Parent.CollapseAllAsync(itemsToSkip);
+                }
             }
 
             expanded = !expanded;
@@ -188,14 +191,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The parent item.</value>
         [CascadingParameter]
-        public RadzenPanelMenuItem ParentItem { get; set;}
+        public RadzenPanelMenuItem? ParentItem { get; set;}
 
         /// <summary>
         /// Gets or sets the parent.
         /// </summary>
         /// <value>The parent.</value>
         [CascadingParameter]
-        public RadzenPanelMenu Parent { get; set; }
+        public RadzenPanelMenu? Parent { get; set; }
 
         internal List<RadzenPanelMenuItem> items = new List<RadzenPanelMenuItem>();
 
@@ -232,7 +235,7 @@ namespace Radzen.Blazor
         }
 
         [Inject]
-        NavigationManager NavigationManager { get; set; }
+        NavigationManager? NavigationManager { get; set; }
 
         /// <inheritdoc />
         protected override void OnInitialized()
@@ -243,7 +246,10 @@ namespace Radzen.Blazor
 
             selected = Selected;
 
-            NavigationManager.LocationChanged += OnLocationChanged;
+            if (NavigationManager != null)
+            {
+                NavigationManager.LocationChanged += OnLocationChanged;
+            }
 
             if (ParentItem != null)
             {
@@ -265,9 +271,9 @@ namespace Radzen.Blazor
             .Add("rz-navigation-item-link-active", selected)
             .ToString();
 
-        private bool selected = false;
+        private bool selected;
 
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+        private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
         {
             SyncWithNavigationManager();
         }
@@ -293,8 +299,8 @@ namespace Radzen.Blazor
                 return false;
             }
 
-            var currentAbsoluteUrl = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).AbsoluteUri;
-            var absoluteUrl = NavigationManager.ToAbsoluteUri(Path).AbsoluteUri;
+            var currentAbsoluteUrl = NavigationManager?.ToAbsoluteUri(NavigationManager.Uri)?.AbsoluteUri ?? string.Empty;
+            var absoluteUrl = NavigationManager?.ToAbsoluteUri(Path)?.AbsoluteUri ?? string.Empty;
 
             if (EqualsHrefExactlyOrIfTrailingSlashAdded(absoluteUrl, currentAbsoluteUrl))
             {
@@ -306,7 +312,7 @@ namespace Radzen.Blazor
                 return false;
             }
 
-            var match = Match != NavLinkMatch.Prefix ? Match : Parent.Match;
+            var match = Match != NavLinkMatch.Prefix ? Match : Parent?.Match ?? NavLinkMatch.Prefix;
 
             if (match == NavLinkMatch.Prefix && IsStrictlyPrefixWithSeparator(currentAbsoluteUrl, absoluteUrl))
             {
@@ -383,11 +389,12 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Handles the <see cref="E:Click" /> event.
+        /// Handles the Click event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         public async Task OnClick(MouseEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
             if (Parent != null)
             {
                 var eventArgs = new MenuItemEventArgs
@@ -422,12 +429,17 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            NavigationManager.LocationChanged -= OnLocationChanged;
+            if (NavigationManager != null)
+            {
+                NavigationManager.LocationChanged -= OnLocationChanged;
+            }
 
             if (Parent != null)
             {
                 Parent.RemoveItem(this);
             }
+
+            GC.SuppressFinalize(this);
         }
     }
 }

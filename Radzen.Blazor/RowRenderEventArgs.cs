@@ -16,7 +16,7 @@ public class RowRenderEventArgs<T>
     /// <summary>
     /// Gets the data item which the current row represents.
     /// </summary>
-    public T Data { get; internal set; }
+    public T? Data { get; internal set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether this row is expandable.

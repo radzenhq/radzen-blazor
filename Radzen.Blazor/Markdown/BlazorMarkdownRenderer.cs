@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -194,7 +195,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     /// <inheritdoc />
     public override void VisitLink(Link link)
     {
-        if (link.Destination.StartsWith("#"))
+        if (link.Destination?.StartsWith('#') == true)
         {
             builder.OpenComponent<RadzenAnchor>(0);
             builder.AddAttribute(0, "href", link.Destination);
@@ -210,7 +211,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
         {
             builder.OpenComponent<RadzenLink>(0);
 
-            if (!HtmlSanitizer.IsDangerousUrl(link.Destination))
+            if (!string.IsNullOrEmpty(link.Destination) && !HtmlSanitizer.IsDangerousUrl(link.Destination))
             {
                 builder.AddAttribute(1, nameof(RadzenLink.Path), link.Destination);
             }
@@ -230,7 +231,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     {
         builder.OpenComponent<RadzenImage>(0);
 
-        if (!HtmlSanitizer.IsDangerousUrl(image.Destination))
+        if (!string.IsNullOrEmpty(image.Destination) && !HtmlSanitizer.IsDangerousUrl(image.Destination))
         {
             builder.AddAttribute(1, nameof(RadzenImage.Path), image.Destination);
         }
@@ -291,7 +292,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
 
         if (match.Success)
         {
-            var markerId = Convert.ToInt32(match.Groups[1].Value);
+            var markerId = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
             outlet(builder, markerId);
         }
         else if (options.AllowHtml)
@@ -349,11 +350,12 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
     /// <inheritdoc />
     public override void VisitHtmlInline(HtmlInline htmlInline)
     {
+        if (htmlInline.Value == null) return;
         var match = OutletRegex.Match(htmlInline.Value);
 
         if (match.Success)
         {
-            var markerId = Convert.ToInt32(match.Groups[1].Value);
+            var markerId = Convert.ToInt32(match.Groups[1].Value, CultureInfo.InvariantCulture);
             outlet(builder, markerId);
             return;
         }
@@ -406,7 +408,7 @@ internal class BlazorMarkdownRenderer(BlazorMarkdownRendererOptions options, Ren
                 }
             }
 
-            if (html.EndsWith("/>") || IsVoidElement(tagName))
+            if (html.EndsWith("/>", StringComparison.Ordinal) || IsVoidElement(tagName))
             {
                 builder.CloseElement();
             }

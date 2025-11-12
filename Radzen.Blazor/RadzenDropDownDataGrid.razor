@@ -55,10 +55,10 @@
                                 }
                                 else
                                 {
-                                    @GetItemOrValueFromProperty(item, TextProperty)
+                                    @GetItemOrValueFromProperty(item!, TextProperty ?? string.Empty)
                                 }
                             </span>
-                            <button tabindex="0" title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty))" type="button" class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                            <button tabindex="0" title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item!, TextProperty ?? string.Empty))" type="button" class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
                         </div>
                     }
                 </div>

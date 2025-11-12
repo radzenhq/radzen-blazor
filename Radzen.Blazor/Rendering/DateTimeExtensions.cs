@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Globalization;
 
 namespace Radzen.Blazor.Rendering
@@ -23,6 +24,7 @@ namespace Radzen.Blazor.Rendering
         /// <returns>DateTime.</returns>
         public static DateTime StartOfWeek(this DateTime date, CultureInfo info)
         {
+            ArgumentNullException.ThrowIfNull(info);
             var diff = date.DayOfWeek - info.DateTimeFormat.FirstDayOfWeek;
 
             if (diff < 0)

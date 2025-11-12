@@ -9,13 +9,13 @@ public class Group
     /// Gets or sets the data.
     /// </summary>
     /// <value>The data.</value>
-    public GroupResult Data { get; set; }
+    public GroupResult Data { get; set; } = new GroupResult();
 
     /// <summary>
     /// Gets or sets the group descriptor.
     /// </summary>
     /// <value>The group descriptor.</value>
-    public GroupDescriptor GroupDescriptor { get; set; }
+    public GroupDescriptor? GroupDescriptor { get; set; }
 
     /// <summary>
     /// Gets or sets the level.

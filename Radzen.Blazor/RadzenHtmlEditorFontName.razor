@@ -1,6 +1,6 @@
 @using Radzen.Blazor.Rendering
 
-<EditorDropDown Title=@Title Value=@Editor.State.FontName Change=@OnChange Placeholder="@Placeholder"
+<EditorDropDown Title=@Title Value=@(Editor?.State?.FontName) Change=@OnChange Placeholder="@Placeholder"
     PopupStyle="width: 200px; max-height: 200px; overflow: auto;">
     <CascadingValue Value=@this>
         @if (ChildContent != null)

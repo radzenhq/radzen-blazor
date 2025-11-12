@@ -1,4 +1,4 @@
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
-<EditorButton Title=@Title Click=@OnClick Icon="subscript" Selected=@Editor.State.Subscript />
+<EditorButton Title=@Title Click=@OnClick Icon="subscript" Selected=@(Editor?.State.Subscript ?? false) />

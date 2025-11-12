@@ -44,12 +44,12 @@ namespace Radzen
         /// <summary>
         /// Gets or sets a value indicating whether to use secure cookies.
         /// </summary>
-        public bool IsSecure { get; set; } = false;
+        public bool IsSecure { get; set; }
 
         /// <summary>
         /// Gets or sets the SameSite attribute for the cookie.
         /// </summary>
-        public CookieSameSiteMode? SameSite { get; set; } = null;
+        public CookieSameSiteMode? SameSite { get; set; }
     }
 
     /// <summary>
@@ -64,13 +64,16 @@ namespace Radzen
         /// <summary>
         /// Initializes a new instance of the <see cref="CookieThemeService" /> class.
         /// </summary>
-        public CookieThemeService(IJSRuntime jsRuntime, ThemeService themeService, IOptions<CookieThemeServiceOptions> options)
+        public CookieThemeService(IJSRuntime jsRuntime, ThemeService themeService, IOptions<CookieThemeServiceOptions>? options)
         {
             this.jsRuntime = jsRuntime;
             this.themeService = themeService;
-            this.options = options.Value;
+            this.options = options?.Value ?? new CookieThemeServiceOptions();
 
-            themeService.ThemeChanged += OnThemeChanged;
+            if (themeService != null)
+            {
+                themeService.ThemeChanged += OnThemeChanged;
+            }
 
             _ = InitializeAsync();
         }

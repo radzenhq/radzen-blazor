@@ -31,8 +31,12 @@ public partial class RadzenTable : RadzenComponentWithChildren
     /// <summary>
     /// Gets the table CSS classes.
     /// </summary>
-    protected virtual string GetTableCssClass() => ClassList.Create("rz-grid-table rz-grid-table-fixed")
-        .Add("rz-grid-table-striped", AllowAlternatingRows)
-        .Add($"rz-grid-gridlines-{Enum.GetName(typeof(DataGridGridLines), GridLines).ToLowerInvariant()}", GridLines != DataGridGridLines.Default)
-        .ToString();
+    protected virtual string GetTableCssClass()
+    {
+        var enumName = Enum.GetName<DataGridGridLines>(GridLines);
+        return ClassList.Create("rz-grid-table rz-grid-table-fixed")
+            .Add("rz-grid-table-striped", AllowAlternatingRows)
+            .Add($"rz-grid-gridlines-{(enumName ?? GridLines.ToString()).ToLowerInvariant()}", GridLines != DataGridGridLines.Default)
+            .ToString();
+    }
 }

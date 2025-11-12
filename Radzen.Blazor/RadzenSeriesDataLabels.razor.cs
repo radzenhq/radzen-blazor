@@ -44,7 +44,7 @@ namespace Radzen.Blazor
 
         /// <summary>Defines the fill color of the component.</summary>
         [Parameter]
-        public string Fill { get; set; }
+        public string? Fill { get; set; }
 
         /// <summary>
         /// Gets the CSS class for the data labels.

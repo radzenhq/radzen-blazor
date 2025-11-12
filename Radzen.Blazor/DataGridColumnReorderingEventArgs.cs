@@ -6,17 +6,17 @@ namespace Radzen;
 /// Supplies information about a <see cref="RadzenDataGrid{TItem}.ColumnReordering" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class DataGridColumnReorderingEventArgs<T>
+public class DataGridColumnReorderingEventArgs<T> where T : notnull
 {
     /// <summary>
     /// Gets the reordered RadzenDataGridColumn.
     /// </summary>
-    public RadzenDataGridColumn<T> Column { get; internal set; }
+    public RadzenDataGridColumn<T>? Column { get; internal set; }
 
     /// <summary>
     /// Gets the reordered to RadzenDataGridColumn.
     /// </summary>
-    public RadzenDataGridColumn<T> ToColumn { get; internal set; }
+    public RadzenDataGridColumn<T>? ToColumn { get; internal set; }
 
     /// <summary>
     /// Gets or sets a value which will cancel the event.

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -48,7 +48,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The validation error message(s).</value>
         [Parameter]
-        public override string Text { get; set; }
+        public override string Text { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the text used to join multiple validation error messages.
@@ -62,11 +62,13 @@ namespace Radzen.Blazor
         /// Service provider injected from the Dependency Injection (DI) container.
         /// </summary>
         [Inject]
-        public IServiceProvider ServiceProvider { get; set; }
+        public IServiceProvider? ServiceProvider { get; set; }
 
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
+            ArgumentNullException.ThrowIfNull(component);
+
             var validationResults = new List<ValidationResult>();
 
             var model = component.FieldIdentifier.Model;
