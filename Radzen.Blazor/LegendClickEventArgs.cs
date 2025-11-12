@@ -10,13 +10,13 @@ public class LegendClickEventArgs
     /// <summary>
     /// Gets the data at the clicked location.
     /// </summary>
-    public object Data { get; set; }
+    public object? Data { get; set; }
 
     /// <summary>
     /// Gets the title of the clicked series. Determined by <see cref="CartesianSeries{TItem}.Title" />.
     /// </summary>
     /// <value>The title.</value>
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     /// <summary>
     /// Gets the visibility of the clicked legend. Determined by <see cref="CartesianSeries{TItem}.IsVisible" />. Always visible for Pie Charts.

@@ -20,10 +20,10 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon.</value>
         [Parameter]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
-        /// Handles the <see cref="E:Click" /> event.
+        /// Handles the click event.
         /// </summary>
         /// <param name="args">The <see cref="EventArgs"/> instance containing the event data.</param>
         public async System.Threading.Tasks.Task OnClick(EventArgs args)

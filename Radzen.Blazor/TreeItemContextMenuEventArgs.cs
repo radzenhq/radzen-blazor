@@ -8,11 +8,11 @@ public class TreeItemContextMenuEventArgs : Microsoft.AspNetCore.Components.Web.
     /// <summary>
     /// Gets the tree item text.
     /// </summary>
-    public string Text { get; internal set; }
+    public string? Text { get; internal set; }
 
     /// <summary>
     /// Gets the tree item value.
     /// </summary>
-    public object Value { get; internal set; }
+    public object? Value { get; internal set; }
 }
 

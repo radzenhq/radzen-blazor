@@ -19,6 +19,6 @@ namespace Radzen.Blazor
         /// The custom color to add.
         /// </summary>
         [Parameter]
-        public string Value { get; set; }
+        public string? Value { get; set; }
     }
 }

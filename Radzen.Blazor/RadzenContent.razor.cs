@@ -12,7 +12,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The container.</value>
         [Parameter]
-        public string Container { get; set; }
+        public string? Container { get; set; }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()

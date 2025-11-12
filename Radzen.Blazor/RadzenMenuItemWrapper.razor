@@ -2,7 +2,7 @@
 @using Microsoft.JSInterop
 @inherits RadzenComponentWithChildren
 
-@if (Item.Parent.ClickToOpen)
+@if (Item?.Parent?.ClickToOpen == true)
 {
     <li style=@Style @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
         @ChildContent
@@ -10,7 +10,7 @@
 }
 else
 {
-    if (Item.ChildContent != null)
+    if (Item?.ChildContent != null)
     {
         <li style=@Style @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true, false)" onmouseleave="Radzen.toggleMenuItem(this, event, false, false)">
             @ChildContent
@@ -18,7 +18,7 @@ else
     }
     else
     {
-        <li style=@Style @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
+        <li style=@Style @attributes="@Attributes" @onclick="@(Item!.OnClick)" @onclick:stopPropagation>
             @ChildContent
         </li>
     }
@@ -31,5 +31,5 @@ else
     /// </summary>
     /// <value>The menu item.</value>
     [Parameter]
-    public RadzenMenuItem Item { get; set; }
+    public RadzenMenuItem? Item { get; set; }
 }

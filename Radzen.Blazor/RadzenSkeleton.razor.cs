@@ -66,7 +66,7 @@ namespace Radzen.Blazor
         /// Gets the final style string including component-specific styles.
         /// </summary>
         /// <returns>The style string.</returns>
-        protected string GetStyle()
+        protected string? GetStyle()
         {
             return Style;
         }

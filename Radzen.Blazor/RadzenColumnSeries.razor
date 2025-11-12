@@ -10,19 +10,20 @@
 @code {
     public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
+        var chart = RequireChart();
         var category = ComposeCategory(categoryScale);
         var value = ComposeValue(valueScale);
-        var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-        var y0 = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
-        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+        var ticks = chart.ValueScale.Ticks(chart.ValueAxis.TickDistance);
+        var y0 = chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
         var columnSeries = VisibleColumnSeries;
         var index = columnSeries.IndexOf(this);
-        var padding = Chart.ColumnOptions.Margin;
+        var padding = chart.ColumnOptions.Margin;
 
         var bandWidth = BandWidth;
         var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();;
-        var className = $"rz-column-series rz-series-{Chart.Series.IndexOf(this)}";
+        var className = $"rz-column-series rz-series-{chart.Series.IndexOf(this)}";
 
         return
         @<g class="@className">
@@ -31,7 +32,7 @@
                 var x = category(data) - bandWidth / 2 + index * width + index * padding;
                 var y = value(data);
                 var itemValue = Value(data);
-                var radius = Chart.ColumnOptions.Radius;
+                var radius = chart.ColumnOptions.Radius;
                 var height = Math.Abs(y0 - y);
 
                 if (radius > width / 2 || radius > height)

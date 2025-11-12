@@ -1,4 +1,4 @@
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
-<EditorButton Title=@Title Click=@OnClick Icon="link_off" Disabled=@(!Editor.State.Unlink) />
+<EditorButton Title=@Title Click=@OnClick Icon="link_off" Disabled=@(!(Editor?.State.Unlink ?? false)) />

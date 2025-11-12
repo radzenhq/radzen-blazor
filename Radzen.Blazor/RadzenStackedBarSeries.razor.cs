@@ -17,28 +17,28 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The fill.</value>
         [Parameter]
-        public string Fill { get; set; }
+        public string? Fill { get; set; }
 
         /// <summary>
         /// Specifies a list of colors that will be used to set the individual bar backgrounds.
         /// </summary>
         /// <value>The fills.</value>
         [Parameter]
-        public IEnumerable<string> Fills { get; set; }
+        public IEnumerable<string>? Fills { get; set; }
 
         /// <summary>
         /// Specifies the stroke (border color) of the bar series.
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Specifies a list of colors that will be used to set the individual bar borders.
         /// </summary>
         /// <value>The strokes.</value>
         [Parameter]
-        public IEnumerable<string> Strokes { get; set; }
+        public IEnumerable<string>? Strokes { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the stroke (border).
@@ -59,27 +59,29 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The color range of the fill.</value>
         [Parameter]
-        public IList<SeriesColorRange> FillRange { get; set; }
+        public IList<SeriesColorRange>? FillRange { get; set; }
 
         /// <summary>
         /// Gets or sets the color range of the stroke.
         /// </summary>
         /// <value>The color range of the stroke.</value>
         [Parameter]
-        public IList<SeriesColorRange> StrokeRange { get; set; }
+        public IList<SeriesColorRange>? StrokeRange { get; set; }
 
         /// <inheritdoc />
         public override string Color
         {
             get
             {
-                return Fill;
+                return Fill ?? string.Empty;
             }
         }
 
         /// <inheritdoc />
         public override ScaleBase TransformCategoryScale(ScaleBase scale)
         {
+            ArgumentNullException.ThrowIfNull(scale);
+
             if (Items.Any())
             {
                 var stackedBarSeries = BarSeries.Cast<IChartStackedBarSeries>();
@@ -101,6 +103,8 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override ScaleBase TransformValueScale(ScaleBase scale)
         {
+            ArgumentNullException.ThrowIfNull(scale);
+
             return base.TransformCategoryScale(scale);
         }
 
@@ -110,7 +114,7 @@ namespace Radzen.Blazor
             return base.GetCategories().Reverse().ToList();
         }
 
-        private IList<IChartSeries> BarSeries => Chart.Series.Where(series => series is IChartStackedBarSeries).Cast<IChartSeries>().ToList();
+        private IList<IChartSeries> BarSeries => Chart?.Series?.Where(series => series is IChartStackedBarSeries).Cast<IChartSeries>().ToList() ?? new List<IChartSeries>();
 
         private IList<IChartSeries> VisibleBarSeries => BarSeries.Where(series => series.Visible).ToList();
 
@@ -142,25 +146,32 @@ namespace Radzen.Blazor
             {
                 var barSeries = VisibleBarSeries;
 
-                if (Chart.BarOptions.Height.HasValue)
+                if (Chart?.BarOptions?.Height.HasValue == true)
                 {
                     return Chart.BarOptions.Height.Value * barSeries.Count;
                 }
-                else
+                else if (Chart != null)
                 {
                     var availableHeight = Chart.ValueScale.OutputSize; // - (Chart.ValueAxis.Padding * 2);
                     var bands = barSeries.Cast<IChartStackedBarSeries>().Max(series => series.Count) + 2;
                     return availableHeight / bands;
                 }
+
+                return 0;
             }
         }
 
-        double BarHeight => Chart.BarOptions.Height ?? BandHeight - Chart.BarOptions.Margin;
+        double BarHeight => Chart?.BarOptions?.Height ?? (Chart != null ? BandHeight - Chart.BarOptions.Margin : 0);
 
         int BarIndex => VisibleBarSeries.IndexOf(this);
 
-        private double GetBarTop(TItem item, Func<TItem, double> category = null)
+        private double GetBarTop(TItem item, Func<TItem, double>? category = null)
         {
+            if (Chart == null)
+            {
+                return 0;
+            }
+
             category = category ?? ComposeCategory(Chart.ValueScale);
 
             return category(item) - BarHeight / 2;
@@ -178,6 +189,11 @@ namespace Radzen.Blazor
             var value = Value(item);
             var (positiveSum, negativeSum) = Sum(barIndex, stackedBarSeries, category(item));
 
+            if (Chart == null)
+            {
+                return 0;
+            }
+
             if (value >= 0)
             {
                 var y = Chart.CategoryScale.Scale(value + positiveSum);
@@ -194,6 +210,11 @@ namespace Radzen.Blazor
         {
             var value = Value(item);
             var (positiveSum, negativeSum) = Sum(barIndex, stackedBarSeries, category(item));
+
+            if (Chart == null)
+            {
+                return 0;
+            }
 
             if (value >= 0)
             {
@@ -228,7 +249,7 @@ namespace Radzen.Blazor
 
         IEnumerable<double> IChartStackedBarSeries.ValuesForCategory(double value)
         {
-            if (Items == null)
+            if (Items == null || Chart == null)
             {
                 return Enumerable.Empty<double>();
             }
@@ -240,7 +261,7 @@ namespace Radzen.Blazor
 
         IEnumerable<object> IChartStackedBarSeries.ItemsForCategory(double value)
         {
-            if (Items == null)
+            if (Items == null || Chart == null)
             {
                 return Enumerable.Empty<object>();
             }
@@ -259,6 +280,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
+            if (Chart == null)
+            {
+                return 0;
+            }
+
             var category = ComposeCategory(Chart.ValueScale);
 
             return GetBarRight(item, BarIndex, category, StackedBarSeries);
@@ -267,12 +293,22 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string TooltipValue(TItem item)
         {
+            if (Chart == null)
+            {
+                return "";
+            }
+
             return Chart.ValueAxis.Format(Chart.CategoryScale, Chart.CategoryScale.Value(Value(item)));
         }
 
         /// <inheritdoc />
         protected override string TooltipTitle(TItem item)
         {
+            if (Chart == null)
+            {
+                return "";
+            }
+
             var category = Category(Chart.ValueScale);
             return Chart.CategoryAxis.Format(Chart.ValueScale, Chart.ValueScale.Value(category(item)));
         }
@@ -280,6 +316,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override (object, Point) DataAt(double x, double y)
         {
+            if (Chart == null)
+            {
+                return (default!, new Point());
+            }
+
             var category = ComposeCategory(Chart.ValueScale);
             var barSeries = VisibleBarSeries;
             var barIndex = BarIndex;
@@ -289,17 +330,22 @@ namespace Radzen.Blazor
                 var startY = GetBarTop(data, category);
                 var endY = startY + BandHeight;
                 var dataX = GetBarRight(data, barIndex, category, StackedBarSeries);
+                if (Chart == null)
+                {
+                    continue;
+                }
+
                 var x0 = GetBarLeft(data, barIndex, category, StackedBarSeries);
                 var startX = Math.Min(dataX, x0);
                 var endX = Math.Max(dataX, x0);
 
                 if (startX <= x && x <= endX && startY <= y && y <= endY)
                 {
-                    return (data, new Point() { X = x, Y = y });
+                    return (data!, new Point() { X = x, Y = y });
                 }
             }
 
-            return (null, null);
+            return (default!, new Point());
         }
 
         /// <inheritdoc />
@@ -311,6 +357,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override IEnumerable<ChartDataLabel> GetDataLabels(double offsetX, double offsetY)
         {
+            if (Chart == null)
+            {
+                return Enumerable.Empty<ChartDataLabel>();
+            }
+
             var category = ComposeCategory(Chart.ValueScale);
             var list = new List<ChartDataLabel>();
             var barIndex = BarIndex;

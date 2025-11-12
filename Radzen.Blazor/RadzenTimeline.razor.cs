@@ -59,7 +59,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The items render fragment containing timeline event definitions.</value>
         [Parameter]
-        public RenderFragment Items { get; set; }
+        public RenderFragment? Items { get; set; }
 
         /// <summary>
         /// Gets or sets the layout direction of the timeline.

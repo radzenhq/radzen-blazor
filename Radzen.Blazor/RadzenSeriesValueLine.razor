@@ -1,4 +1,4 @@
-﻿@using Radzen.Blazor.Rendering
+@using Radzen.Blazor.Rendering
 @inherits RadzenGridLines
 @implements IChartSeriesOverlay
 @implements IDisposable
@@ -13,41 +13,51 @@
     public virtual double Value { get; set; }
 
     [Parameter]
-    public RenderFragment<double> TooltipTemplate { get; set; }
+    public RenderFragment<double>? TooltipTemplate { get; set; }
 
-    IChartSeries series;
+    IChartSeries? series;
     [CascadingParameter]
-    protected IChartSeries Series
+    protected IChartSeries? Series
     {
         get
         {
             return series;
         }
-        set
-        {
-            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            set
             {
-                throw new ArgumentException($"Series must use Cartesian coordinate system");
+                if (value == null)
+                {
+                    series = null;
+                    return;
+                }
+                if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+                {
+                    throw new ArgumentException($"Series must use Cartesian coordinate system");
+                }
+                series = value;
+                if (!series.Overlays.Contains(this))
+                {
+                    series.Overlays.Add(this);
+                }
             }
-            series = value;
-            if (!series.Overlays.Contains(this))
-            {
-                series.Overlays.Add(this);
-            }
-        }
     }
 
     protected virtual string Name => "Value";
 
     public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
+        if (Chart == null)
+        {
+            return null!;
+        }
+
         double x1, x2, y1, y2;
         if (Chart.ShouldInvertAxes())
         {
             x1 = x2 = categoryScale.Scale(Value);
             if (x1 < 0 || x1 > Chart.CategoryScale.OutputSize)
             {
-                return null;
+                return null!;
             }
             y1 = 0; y2 = Chart.ValueScale.OutputSize;
         }
@@ -56,7 +66,7 @@
             y1 = y2 = valueScale.Scale(Value);
             if (y1 < 0 || y1 > Chart.ValueScale.OutputSize)
             {
-                return null;
+                return null!;
             }
             x1 = 0; x2 = Chart.CategoryScale.OutputSize;
         }
@@ -64,14 +74,14 @@
         var path = $"M{x1.ToInvariantString()} {y1.ToInvariantString()} L{x2.ToInvariantString()} {y2.ToInvariantString()}";
         return
     @<g>
-        <Path @key="@($"{path}-{Chart.Series.IndexOf(series)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
+        <Path @key="@($"{path}-{(series != null ? Chart.Series.IndexOf(series) : -1)}")" D="@path" Stroke="@Stroke" StrokeWidth="@StrokeWidth" LineType="@LineType" />
     </g>
     ;
     }
 
     public bool Contains(double mouseX, double mouseY, int tolerance)
     {
-        if (double.IsNaN(Value))
+        if (double.IsNaN(Value) || Chart == null)
         {
             return false;
         }
@@ -90,6 +100,11 @@
 
     public RenderFragment RenderTooltip(double mouseX, double mouseY)
     {
+        if (Chart == null)
+        {
+            return null!;
+        }
+
         string text;
         if (Chart.ShouldInvertAxes())
         {
@@ -106,7 +121,7 @@
 
             builder.AddAttribute(1, nameof(ChartTooltip.ChildContent), TooltipTemplate?.Invoke(Value));
 
-            builder.AddAttribute(6, nameof(ChartTooltip.Title), series.GetTitle());
+            builder.AddAttribute(6, nameof(ChartTooltip.Title), series?.GetTitle());
             builder.AddAttribute(2, nameof(ChartTooltip.Label), Name);
             builder.AddAttribute(3, nameof(ChartTooltip.Value), text);
 
@@ -120,6 +135,11 @@
     /// <inheritdoc />
     public Point GetTooltipPosition(double mouseX, double mouseY)
     {
+        if (Chart == null)
+        {
+            return new Point { X = mouseX, Y = mouseY };
+        }
+
         if (Chart.ShouldInvertAxes())
         {
             mouseX = Chart.CategoryScale.Scale(Value);

@@ -2,18 +2,24 @@
 @using Radzen.Blazor.Rendering
 
 <g class="rz-arc-gauge-scale-value">
-    <GaugeBand 
-        From=@Scale.Min
-        To=@Value
-        Fill=@Fill
-        Stroke=@Stroke
-        StrokeWidth=@StrokeWidth
-        Radius=@Scale.CurrentRadius
-        Center=@Scale.CurrentCenter
-        StartAngle=@Scale.StartAngle
-        EndAngle=@Scale.EndAngle
-        Min=@Scale.Min
-        Max=@Scale.Max
-        Size=@Scale.CurrentSize
-    />
+@{
+    var scale = Scale;
+}
+@if (scale != null)
+    {
+        <GaugeBand 
+        From=@scale.Min
+            To=@Value
+            Fill=@Fill
+            Stroke=@Stroke
+            StrokeWidth=@StrokeWidth
+        Radius=@scale.CurrentRadius
+        Center=@scale.CurrentCenter
+        StartAngle=@scale.StartAngle
+        EndAngle=@scale.EndAngle
+        Min=@scale.Min
+        Max=@scale.Max
+        Size=@scale.CurrentSize
+        />
+    }
 </g>

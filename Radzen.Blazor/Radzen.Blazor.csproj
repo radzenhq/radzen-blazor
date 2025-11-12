@@ -3,6 +3,7 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <NoWarn>BL9993;BL0007;BL0005</NoWarn>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <TargetFrameworks>net6.0;net7.0;net8.0;net9.0;net10.0</TargetFrameworks>
     <RazorLangVersion>7.0</RazorLangVersion>
     <LangVersion>latest</LangVersion>

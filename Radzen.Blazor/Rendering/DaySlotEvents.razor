@@ -30,7 +30,7 @@
     foreach (var appointment in Layout())
     {
         <Appointment Data=@(appointment.Appointment) Top=@appointment.Top Left=@appointment.Left Width=@appointment.Width Height=@appointment.Height Click=@OnAppointmentSelect
-                CssClass="@(CurrentDate.Date >= appointment.Start.Date && CurrentDate.Date <= appointment.End.Date && object.Equals(Appointments.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),appointment.Appointment) ? " rz-state-focused" : "" )"
+                CssClass="@(CurrentDate.Date >= appointment.Start.Date && CurrentDate.Date <= appointment.End.Date && object.Equals(Appointments?.Where(i => i.Start.Date == CurrentDate.Date).OrderBy(i => i.Start).ThenByDescending(i => i.End).ElementAtOrDefault(CurrentAppointment),appointment.Appointment) ? " rz-state-focused" : "" )"
                 DragStart=@OnAppointmentDragStart />
     }
 }
@@ -44,7 +44,7 @@
     public DateTime CurrentDate { get; set; }
 
     [CascadingParameter]
-    public IScheduler Scheduler { get; set; }
+    public IScheduler? Scheduler { get; set; }
 
     [Parameter]
     public DateTime StartDate { get; set; }
@@ -59,7 +59,7 @@
     public EventCallback<AppointmentData> AppointmentDragStart { get; set; }
 
     [Parameter]
-    public IList<AppointmentData> Appointments { get; set; }
+    public IList<AppointmentData>? Appointments { get; set; }
 
     private RenderedAppointment[] Layout()
     {
@@ -74,15 +74,22 @@
         }
         else
         {
-            appointments = Appointments.Where(item => Scheduler.IsAppointmentInRange(item, StartDate, EndDate)).OrderBy(item => item.Start).ThenByDescending(item => item.End).Select(n => new RenderedAppointment(n)).ToArray();
+            if (Scheduler != null)
+            {
+                appointments = Appointments?.Where(item => Scheduler.IsAppointmentInRange(item, StartDate, EndDate)).OrderBy(item => item.Start).ThenByDescending(item => item.End).Select(n => new RenderedAppointment(n)).ToArray() ?? Array.Empty<RenderedAppointment>();
+            }
+            else
+            {
+                appointments = Array.Empty<RenderedAppointment>();
+            }
 
             // Part 1 - Assign column
             foreach (var appointment in appointments)
             {
                 var assignedAppointments = appointments.Where(app => app.Column > 0);
-                var firstAvailableColumn = assignedAppointments.GroupBy(g => g.Column).Select(s => s.OrderByDescending(o => o.End).FirstOrDefault()).Where(w => w.Appointment.End <= appointment.Appointment.Start).FirstOrDefault();
+                var firstAvailableColumn = assignedAppointments.GroupBy(g => g.Column).Select(s => s.OrderByDescending(o => o.End).FirstOrDefault()).Where(w => w?.Appointment?.End != null && appointment?.Appointment?.Start != null && w.Appointment.End <= appointment.Appointment.Start).FirstOrDefault();
 
-                appointment.Column = firstAvailableColumn != null ? firstAvailableColumn.Column : assignedAppointments.Count() > 0 ? assignedAppointments.Max(m => m.Column) + 1 : 1;
+                appointment.Column = firstAvailableColumn != null ? firstAvailableColumn.Column : (assignedAppointments.Any() ? (assignedAppointments.Max(m => m.Column) + 1) : 1);
                 appointment.Start = appointment.Appointment.Start < StartDate ? StartDate : appointment.Appointment.Start;
                 appointment.End = appointment.Appointment.End > EndDate ? EndDate : appointment.Appointment.End;
                 appointment.Top = 1.5 * (appointment.Start.Subtract(StartDate).TotalMinutes / MinutesPerSlot);
@@ -109,7 +116,10 @@
 
     async Task OnAppointmentSelect(AppointmentData data)
     {
-        await Scheduler.SelectAppointment(data);
+        if (Scheduler != null)
+        {
+            await Scheduler.SelectAppointment(data);
+        }
     }
 
     private RenderedAppointment[] OverlappingAppointments(RenderedAppointment[] appointments, DateTime start, DateTime end)
@@ -119,7 +129,8 @@
             return Array.Empty<RenderedAppointment>();
         }
 
-        return appointments.Where(item => Scheduler.IsAppointmentInRange(item.Appointment, start, end)).OrderBy(item => item.Appointment.Start).ThenByDescending(item => item.Appointment.End).ToArray();
+        if (Scheduler == null) return Array.Empty<RenderedAppointment>();
+        return appointments?.Where(item => Scheduler.IsAppointmentInRange(item.Appointment, start, end)).OrderBy(item => item.Appointment.Start).ThenByDescending(item => item.Appointment.End).ToArray() ?? Array.Empty<RenderedAppointment>();
     }
 
     public async Task OnAppointmentDragStart(AppointmentData Data)

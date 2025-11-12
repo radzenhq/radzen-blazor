@@ -1,4 +1,6 @@
 using System;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -60,7 +62,7 @@ namespace Radzen.Blazor
         /// Gets or sets the step.
         /// </summary>
         /// <value>The step.</value>
-        public object Step { get; set; }
+        public object? Step { get; set; }
 
         /// <summary>
         /// Resizes the scale to the specified values.
@@ -71,13 +73,13 @@ namespace Radzen.Blazor
         {
             if (min != null)
             {
-                Input.Start = Convert.ToDouble(min);
+                Input.Start = Convert.ToDouble(min, CultureInfo.InvariantCulture);
                 Round = false;
             }
 
             if (max != null)
             {
-                Input.End = Convert.ToDouble(max);
+                Input.End = Convert.ToDouble(max, CultureInfo.InvariantCulture);
                 Round = false;
             }
         }
@@ -166,6 +168,7 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if the scales are equal; otherwise, <c>false</c>.</returns>
         public bool IsEqualTo(ScaleBase scale)
         {
+            ArgumentNullException.ThrowIfNull(scale);
             if (GetType() != scale.GetType())
             {
                 return false;

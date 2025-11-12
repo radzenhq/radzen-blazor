@@ -12,6 +12,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The name.</value>
         [Parameter]
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 }

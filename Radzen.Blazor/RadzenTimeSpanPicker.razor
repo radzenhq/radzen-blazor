@@ -24,7 +24,7 @@
         <input @ref="@input" type="text" name="@Name" id="@Name" value="@FormattedValue"
                    disabled="@Disabled" readonly="@IsInputAllowed" autocomplete="off" class="@GetInputClass()"
                    placeholder="@Placeholder" tabindex="@(Disabled ? "-1" : TabIndex.ToString())" @attributes="@InputAttributes"
-                   @onchange="@(args => SetValueFromInput(args.Value?.ToString()))"
+                   @onchange="@(args => { var value = args.Value?.ToString(); if (value != null) _ = SetValueFromInput(value); })"
                    @onclick="@(() => ClickInputField())" @onkeydown="@PressKey"
                    @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation />
         @if (ShowPopupButton)
@@ -75,20 +75,20 @@
                         }
                     }
 
-                    @RenderUnitField(TimeSpanUnit.Day, DaysUnitText, "d", UnconfirmedValue.Days, DaysStep, null)
+                    @RenderUnitField(TimeSpanUnit.Day, DaysUnitText, "d", UnconfirmedValue.Days, DaysStep ?? "", null)
 
-                    @RenderUnitField(TimeSpanUnit.Hour, HoursUnitText, "h", UnconfirmedValue.Hours, HoursStep, "00")
+                    @RenderUnitField(TimeSpanUnit.Hour, HoursUnitText, "h", UnconfirmedValue.Hours, HoursStep ?? "", "00")
 
-                    @RenderUnitField(TimeSpanUnit.Minute, MinutesUnitText, "min", UnconfirmedValue.Minutes, MinutesStep, "00")
+                    @RenderUnitField(TimeSpanUnit.Minute, MinutesUnitText, "min", UnconfirmedValue.Minutes, MinutesStep ?? "", "00")
 
-                    @RenderUnitField(TimeSpanUnit.Second, SecondsUnitText, "s", UnconfirmedValue.Seconds, SecondsStep, "00")
+                    @RenderUnitField(TimeSpanUnit.Second, SecondsUnitText, "s", UnconfirmedValue.Seconds, SecondsStep ?? "", "00")
 
-                    @RenderUnitField(TimeSpanUnit.Millisecond, MillisecondsUnitText, "ms", UnconfirmedValue.Milliseconds, MillisecondsStep, "000")
+                    @RenderUnitField(TimeSpanUnit.Millisecond, MillisecondsUnitText, "ms", UnconfirmedValue.Milliseconds, MillisecondsStep ?? "", "000")
 
                     @{
                     #if NET7_0_OR_GREATER
                         {
-                            @RenderUnitField(TimeSpanUnit.Microsecond, MicrosecondsUnitText, "us", UnconfirmedValue.Microseconds, MicrosecondsStep, "000")
+                            @RenderUnitField(TimeSpanUnit.Microsecond, MicrosecondsUnitText, "us", UnconfirmedValue.Microseconds, MicrosecondsStep ?? "", "000")
                         }
                     #endif
                     }
@@ -106,7 +106,7 @@
         };
     }
 
-    private RenderFragment RenderUnitField(TimeSpanUnit unit, string label, string unitSymbol, int value, string step, string valuePaddingFormat)
+    private RenderFragment RenderUnitField(TimeSpanUnit unit, string label, string unitSymbol, int value, string step, string? valuePaddingFormat)
     {
         return __builder =>
         {

@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
@@ -18,7 +19,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
-        public RenderFragment ChildContent
+        public RenderFragment? ChildContent
         {
             get; set;
         }
@@ -38,7 +39,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// The width and height are set
         /// </summary>
-        bool widthAndHeightAreSet = false;
+        bool widthAndHeightAreSet;
         /// <summary>
         /// The first render
         /// </summary>
@@ -57,7 +58,7 @@ namespace Radzen.Blazor
             {
                 visibleChanged = false;
 
-                if (Visible)
+                if (Visible && JSRuntime != null)
                 {
                     var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.createGauge", Element, Reference);
 
@@ -117,23 +118,20 @@ namespace Radzen.Blazor
             double width = 0;
             double height = 0;
 
-            if (CurrentStyle.ContainsKey("height"))
+            if (CurrentStyle.TryGetValue("height", out var pixelHeight))
             {
-                var pixelHeight = CurrentStyle["height"];
-
-                if (pixelHeight.EndsWith("px"))
+                if (pixelHeight.EndsWith("px", StringComparison.Ordinal))
                 {
-                    height = Convert.ToDouble(pixelHeight.TrimEnd("px".ToCharArray()));
+                    height = Convert.ToDouble(pixelHeight.TrimEnd("px".ToCharArray()), CultureInfo.InvariantCulture);
                 }
             }
 
-            if (CurrentStyle.ContainsKey("width"))
+            if (CurrentStyle.TryGetValue("width", out var pixelWidth))
             {
-                var pixelWidth = CurrentStyle["width"];
 
-                if (pixelWidth.EndsWith("px"))
+                if (pixelWidth.EndsWith("px", StringComparison.Ordinal))
                 {
-                    width = Convert.ToDouble(pixelWidth.TrimEnd("px".ToCharArray()));
+                    width = Convert.ToDouble(pixelWidth.TrimEnd("px".ToCharArray()), CultureInfo.InvariantCulture);
                 }
             }
 
@@ -149,7 +147,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// The visible changed
         /// </summary>
-        private bool visibleChanged = false;
+        private bool visibleChanged;
 
         /// <summary>
         /// Set parameters as an asynchronous operation.
@@ -166,7 +164,7 @@ namespace Radzen.Blazor
 
             if (visibleChanged && !firstRender)
             {
-                if (Visible == false)
+                if (Visible == false && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.destroyGauge", Element);
                 }
@@ -185,10 +183,12 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (Visible)
+            if (Visible && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyGauge", Element);
             }
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>

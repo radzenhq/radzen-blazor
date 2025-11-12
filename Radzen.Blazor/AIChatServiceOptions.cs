@@ -13,7 +13,7 @@ public class AIChatServiceOptions
     /// <summary>
     /// Gets or sets the proxy URL for the AI service, if any. If set, this will override the Endpoint.
     /// </summary>
-    public string Proxy { get; set; } = null;
+    public string? Proxy { get; set; }
 
     /// <summary>
     /// Gets or sets the API key for authentication with the AI service.
@@ -28,7 +28,7 @@ public class AIChatServiceOptions
     /// <summary>
     /// Gets or sets the model name to use for executing chat completions (e.g., 'gpt-3.5-turbo').
     /// </summary>
-    public string Model { get; set; }
+    public string? Model { get; set; }
 
     /// <summary>
     /// Gets or sets the system prompt for the AI assistant.

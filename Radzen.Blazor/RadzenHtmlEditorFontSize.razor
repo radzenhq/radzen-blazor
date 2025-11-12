@@ -1,6 +1,6 @@
 @using Radzen.Blazor.Rendering
 
-<EditorDropDown Title=@Title Value=@Editor.State.FontSize Change=@OnChange Placeholder="@Placeholder">
+<EditorDropDown Title=@Title Value=@(Editor?.State?.FontSize) Change=@OnChange Placeholder="@Placeholder">
     <EditorDropDownItem Text="10px" Value="1" style="font-size: x-small" />
     <EditorDropDownItem Text="13px" Value="2" style="font-size: small" />
     <EditorDropDownItem Text="16px" Value="3" style="font-size: medium" />

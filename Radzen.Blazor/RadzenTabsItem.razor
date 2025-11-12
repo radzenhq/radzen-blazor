@@ -1,10 +1,10 @@
 ﻿@using Radzen.Blazor.Rendering
 @implements IDisposable
-@if (Tabs.RenderMode == TabRenderMode.Server ? Visible : true)
+@if ((Tabs?.RenderMode == TabRenderMode.Server ? Visible : true))
 {
     <li role="tab" @attributes=@Attributes style=@getStyle() class=@Class>
-    <a @onclick=@OnClick @onclick:preventDefault="true" id="@($"{Tabs.Id}-tabpanel-{Index}-label")"
-        aria-selected=@(IsSelected? "true" : "false") aria-controls="@($"{Tabs.Id}-tabpanel-{Index}")" @onkeydown:stopPropagation>
+    <a @onclick=@OnClick @onclick:preventDefault="true" id="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}-label")"
+        aria-selected=@(IsSelected? "true" : "false") aria-controls="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}")" @onkeydown:stopPropagation>
         @if (!string.IsNullOrEmpty(Icon))
         {
             <span class="notranslate rzi rz-tabview-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</span>

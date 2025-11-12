@@ -11,7 +11,7 @@ namespace Radzen.Blazor
         /// Specifies the color of the grid lines.
         /// </summary>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Specifies the pixel width of the grid lines. Set to <c>1</c> by default.
@@ -35,11 +35,12 @@ namespace Radzen.Blazor
         /// The axis which this configuration applies to.
         /// </summary>
         [CascadingParameter]
-        public IChartAxis ChartAxis
+        public IChartAxis? ChartAxis
         {
             set
             {
-                value.GridLines = this;
+                if (value != null)
+                    value.GridLines = this;
             }
         }
 

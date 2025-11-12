@@ -35,25 +35,25 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The select all text.</value>
         [Parameter]
-        public string SelectAllText { get; set; }
+        public string? SelectAllText { get; set; }
 
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
         /// <value>The attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
         /// Gets or sets the row render callback. Use it to set row attributes.
         /// </summary>
         /// <value>The row render callback.</value>
         [Parameter]
-        public Action<ListBoxItemRenderEventArgs<TValue>> ItemRender { get; set; }
+        public Action<ListBoxItemRenderEventArgs<TValue>>? ItemRender { get; set; }
 
         internal ListBoxItemRenderEventArgs<TValue> ItemAttributes(RadzenListBoxItem<TValue> item)
         {
-            var disabled = !string.IsNullOrEmpty(DisabledProperty) ? GetItemOrValueFromProperty(item.Item, DisabledProperty) : false;
+            var disabled = !string.IsNullOrEmpty(DisabledProperty) && item.Item != null ? GetItemOrValueFromProperty(item.Item, DisabledProperty) : false;
 
             var args = new ListBoxItemRenderEventArgs<TValue>()
             {
@@ -86,17 +86,18 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Handles the <see cref="E:KeyDown" /> event.
+        /// Handles the key down event.
         /// </summary>
         /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnKeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
             if (Disabled)
                 return;
 
             var key = $"{args.Key}".Trim();
 
-            if (AllowFiltering && key.Length == 1)
+            if (AllowFiltering && key.Length == 1 && JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.focusElement", SearchID);
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, key);
@@ -105,8 +106,8 @@ namespace Radzen.Blazor
             await OnKeyPress(args, false);
         }
 
-        private bool visibleChanged = false;
-        private bool disabledChanged = false;
+        private bool visibleChanged;
+        private bool disabledChanged;
         private bool firstRender = true;
 
         /// <inheritdoc />
@@ -147,7 +148,7 @@ namespace Radzen.Blazor
                         reload = true;
                     }
 
-                    if (!Disabled)
+                    if (!Disabled && JSRuntime != null)
                     {
                         await JSRuntime.InvokeVoidAsync("Radzen.preventArrows", Element);
                         reload = true;

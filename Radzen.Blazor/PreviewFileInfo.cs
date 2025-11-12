@@ -25,6 +25,6 @@ public class PreviewFileInfo : FileInfo
     /// <summary>
     /// Gets the URL of the previewed file.
     /// </summary>
-    public string Url { get; set; }
+    public string? Url { get; set; }
 }
 

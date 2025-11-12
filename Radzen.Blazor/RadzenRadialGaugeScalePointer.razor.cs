@@ -13,7 +13,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The fill.</value>
         [Parameter]
-        public string Fill { get; set; }
+        public string? Fill { get; set; }
 
         /// <summary>
         /// Gets or sets the value.
@@ -63,13 +63,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The format string.</value>
         [Parameter]
-        public string FormatString { get; set; }
+        public string? FormatString { get; set; }
 
         double CurrentLength
         {
             get
             {
-                return Scale.CurrentRadius * Length;
+                return (Scale?.CurrentRadius ?? 0) * Length;
             }
         }
 
@@ -78,7 +78,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the stroke.
@@ -92,28 +92,28 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The scale.</value>
         [CascadingParameter]
-        public RadzenRadialGaugeScale Scale { get; set; }
+        public RadzenRadialGaugeScale? Scale { get; set; }
 
         /// <summary>
         /// Gets or sets the template.
         /// </summary>
         /// <value>The template.</value>
         [Parameter]
-        public RenderFragment<RadzenRadialGaugeScalePointer> Template { get; set; }
+        public RenderFragment<RadzenRadialGaugeScalePointer>? Template { get; set; }
 
         /// <summary>
         /// Gets or sets the gauge.
         /// </summary>
         /// <value>The gauge.</value>
         [CascadingParameter]
-        public RadzenRadialGauge Gauge { get; set; }
+        public RadzenRadialGauge? Gauge { get; set; }
 
         /// <inheritdoc />
         protected override void OnInitialized()
         {
             base.OnInitialized();
 
-            Gauge.AddPointer(this);
+            Gauge?.AddPointer(this);
         }
 
         /// <inheritdoc />
@@ -130,7 +130,7 @@ namespace Radzen.Blazor
 
             if (shouldRefresh)
             {
-                Gauge.Reload();
+                Gauge?.Reload();
             }
         }
     }

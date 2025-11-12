@@ -8,14 +8,14 @@ namespace Radzen.Blazor
     /// </summary>
     public abstract class RadzenChartComponentBase : ComponentBase
     {
-        private RadzenChart chart;
+        private RadzenChart? chart;
 
         /// <summary>
         /// Used to inject the RadzenChart instance. Invokes <see cref="Initialize" />.
         /// </summary>
         /// <value>The chart.</value>
         [CascadingParameter]
-        public RadzenChart Chart
+        public RadzenChart? Chart
         {
             get
             {
@@ -54,7 +54,7 @@ namespace Radzen.Blazor
 
             ValidateParameters();
 
-            if (shouldRefresh)
+            if (shouldRefresh && Chart != null)
             {
                 await Chart.Refresh();
             }

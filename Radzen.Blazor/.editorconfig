@@ -6,6 +6,48 @@ root = true
 
 #### Core EditorConfig Options ####
 
+dotnet_diagnostic.CA1002.severity = none
+dotnet_diagnostic.CA1003.severity = none
+dotnet_diagnostic.CA1024.severity = none
+dotnet_diagnostic.CA1030.severity = none
+dotnet_diagnostic.CA1031.severity = none
+dotnet_diagnostic.CA1033.severity = none
+dotnet_diagnostic.CA1044.severity = none
+dotnet_diagnostic.CA1050.severity = none
+dotnet_diagnostic.CA1051.severity = none
+dotnet_diagnostic.CA1052.severity = none
+dotnet_diagnostic.CA1054.severity = none
+dotnet_diagnostic.CA1055.severity = none
+dotnet_diagnostic.CA1056.severity = none
+dotnet_diagnostic.CA1063.severity = none
+dotnet_diagnostic.CA1068.severity = none
+dotnet_diagnostic.CA1308.severity = none
+dotnet_diagnostic.CA1708.severity = none
+dotnet_diagnostic.CA1711.severity = none
+dotnet_diagnostic.CA1716.severity = none
+dotnet_diagnostic.CA1720.severity = none
+dotnet_diagnostic.CA1721.severity = none
+dotnet_diagnostic.CA1724.severity = none
+dotnet_diagnostic.CA1725.severity = none
+dotnet_diagnostic.CA1802.severity = none
+dotnet_diagnostic.CA1814.severity = none
+dotnet_diagnostic.CA1815.severity = none
+dotnet_diagnostic.CA1816.severity = none
+dotnet_diagnostic.CA1819.severity = none
+dotnet_diagnostic.CA1822.severity = none
+dotnet_diagnostic.CA1827.severity = none
+dotnet_diagnostic.CA1834.severity = none
+dotnet_diagnostic.CA1845.severity = none
+dotnet_diagnostic.CA1849.severity = none
+dotnet_diagnostic.CA1851.severity = none
+dotnet_diagnostic.CA1859.severity = none
+dotnet_diagnostic.CA1863.severity = none
+dotnet_diagnostic.CA1869.severity = none
+dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.CA2012.severity = none
+dotnet_diagnostic.CA2211.severity = none
+dotnet_diagnostic.CA2227.severity = none
+
 # Indentation and spacing
 indent_size = 4
 indent_style = space

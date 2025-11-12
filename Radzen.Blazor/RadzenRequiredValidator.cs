@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor
@@ -46,6 +47,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
+            ArgumentNullException.ThrowIfNull(component);
             return component.HasValue && !object.Equals(DefaultValue, component.GetValue());
         }
 
@@ -56,6 +58,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value to treat as empty/invalid. Default is null.</value>
         [Parameter]
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
     }
 }

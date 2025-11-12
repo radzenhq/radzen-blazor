@@ -2,8 +2,8 @@
 @using Radzen.Blazor.Rendering
 @implements IDisposable
 @{var itemArgs = Tree?.ItemAttributes(this); }
-<li class="rz-treenode" @attributes="@(itemArgs.Item1.Attributes.Any() ? itemArgs.Item1.Attributes : Attributes)" 
-    @oncontextmenu="OnContextMenu" @oncontextmenu:preventDefault="@Tree.ItemContextMenu.HasDelegate" @oncontextmenu:stopPropagation>
+<li class="rz-treenode" @attributes="@(itemArgs?.Item1.Attributes.Any() == true ? itemArgs.Item1.Attributes : Attributes)" 
+    @oncontextmenu="OnContextMenu" @oncontextmenu:preventDefault="@(Tree?.ItemContextMenu.HasDelegate ?? false)" @oncontextmenu:stopPropagation>
     <div class=@ContentClass @onclick="@Select">
         @if (ChildContent != null || HasChildren)
         {
@@ -11,7 +11,7 @@
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {
-            <RadzenCheckBox TabIndex=-1 Name="@($"{GetHashCode()}")" TValue="bool?" Disabled="@(!Checkable)" Value="@(itemArgs.Item1.CheckedSet() ? itemArgs.Item1.Checked : IsChecked())" Change="@CheckedChange" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Tree.SelectItemAriaLabel }})" />
+            <RadzenCheckBox TabIndex=-1 Name="@($"{GetHashCode()}")" TValue="bool?" Disabled="@(!Checkable)" Value="@(itemArgs?.Item1.CheckedSet() == true ? itemArgs.Item1.Checked : IsChecked())" Change="@CheckedChange" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Tree?.SelectItemAriaLabel ?? "" }})" />
         }
         @if (Template != null)
         {

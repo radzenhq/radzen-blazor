@@ -43,7 +43,13 @@
 
     string ValueStyle(RadzenArcGaugeScaleValue value)
     {
-        return $"left: {value.Scale.CurrentCenter.X.ToInvariantString()}px; top: {value.Scale.CurrentCenter.Y.ToInvariantString()}px";
+        var scale = value?.Scale;
+        if (scale == null)
+        {
+            return "left: 0px; top: 0px";
+        }
+
+        return $"left: {scale.CurrentCenter.X.ToInvariantString()}px; top: {scale.CurrentCenter.Y.ToInvariantString()}px";
     }
 
     internal void AddValue(RadzenArcGaugeScaleValue value)

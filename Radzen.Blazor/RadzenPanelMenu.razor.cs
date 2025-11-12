@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using System;
 using System.Linq;
@@ -100,12 +100,12 @@ namespace Radzen.Blazor
         }
 
         [Inject]
-        NavigationManager NavigationManager { get; set; }
+        NavigationManager? NavigationManager { get; set; }
 
         internal int focusedIndex = -1;
-        List<RadzenPanelMenuItem> currentItems;
+        List<RadzenPanelMenuItem>? currentItems;
 
-        bool preventKeyPress = false;
+        bool preventKeyPress;
 
         async Task OnKeyPress(KeyboardEventArgs args)
         {
@@ -117,28 +117,35 @@ namespace Radzen.Blazor
             {
                 preventKeyPress = true;
 
-                if (key == "ArrowUp" && focusedIndex == 0 && currentItems.Any(i => i.ParentItem != null))
+                if (key == "ArrowUp" && focusedIndex == 0 && currentItems.Exists(i => i.ParentItem != null))
                 {
-                    var parentItem = currentItems.FirstOrDefault().ParentItem;
-                    currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent.items).ToList();
-                    focusedIndex = currentItems.IndexOf(parentItem);
+                    var firstItem = currentItems.FirstOrDefault();
+                    var parentItem = firstItem?.ParentItem;
+                    if (parentItem != null)
+                    {
+                        currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent?.items ?? new List<RadzenPanelMenuItem>()).ToList();
+                        focusedIndex = currentItems.IndexOf(parentItem);
+                    }
                 }
                 else if (key == "ArrowDown" && currentItems.ElementAtOrDefault(focusedIndex) != null &&
-                    currentItems.ElementAtOrDefault(focusedIndex).IsExpanded && currentItems.ElementAtOrDefault(focusedIndex).items.Any())
+                    currentItems.ElementAtOrDefault(focusedIndex)!.IsExpanded && currentItems.ElementAtOrDefault(focusedIndex)!.items.Count > 0)
                 {
-                    currentItems = currentItems.ElementAtOrDefault(focusedIndex).items.Where(i => i.Visible).ToList();
+                    currentItems = currentItems.ElementAtOrDefault(focusedIndex)!.items.Where(i => i.Visible).ToList();
                     focusedIndex = 0;
                 }
                 else if (key == "ArrowDown" && focusedIndex == currentItems.Count - 1)
                 {
-                    var parentItem = currentItems.FirstOrDefault().ParentItem;
-                    currentItems = (parentItem?.ParentItem != null ? parentItem.ParentItem.items : parentItem != null ? parentItem.Parent.items : items).Where(i => i.Visible).ToList();
+                    var firstItem = currentItems.FirstOrDefault();
+                    var parentItem = firstItem?.ParentItem;
+                    var targetItems = parentItem?.ParentItem != null ? parentItem.ParentItem.items :
+                        parentItem != null ? parentItem.Parent?.items : items;
+                    currentItems = (targetItems ?? Enumerable.Empty<RadzenPanelMenuItem>()).Where(i => i.Visible).ToList();
                     focusedIndex = parentItem != null ? currentItems.IndexOf(parentItem) + 1 : focusedIndex;
                 }
                 else if (key == "ArrowUp" && currentItems.ElementAtOrDefault(focusedIndex - 1) != null &&
-                    currentItems.ElementAtOrDefault(focusedIndex - 1).IsExpanded && currentItems.ElementAtOrDefault(focusedIndex - 1).items.Any())
+                    currentItems.ElementAtOrDefault(focusedIndex - 1)!.IsExpanded && currentItems.ElementAtOrDefault(focusedIndex - 1)!.items.Count > 0)
                 {
-                    currentItems = currentItems.ElementAtOrDefault(focusedIndex - 1).items.Where(i => i.Visible).ToList();
+                    currentItems = currentItems.ElementAtOrDefault(focusedIndex - 1)!.items.Where(i => i.Visible).ToList();
                     focusedIndex = currentItems.Count - 1;
                 }
                 else
@@ -146,6 +153,7 @@ namespace Radzen.Blazor
                     focusedIndex = Math.Clamp(focusedIndex + (key == "ArrowUp" ? -1 : 1), 0, currentItems.Count - 1);
                 }
 
+                if (JSRuntime == null) return;
                 try
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.scrollIntoViewIfNeeded", currentItems[focusedIndex].Element);
@@ -165,9 +173,10 @@ namespace Radzen.Blazor
                     {
                         await item.Toggle();
 
-                        currentItems = (item.IsExpanded ?
-                                item.items :
-                                item.ParentItem != null ? item.ParentItem.items : item.Parent.items).Where(i => i.Visible).ToList();
+                    var targetItems = item.IsExpanded ? item.items :
+                        item.ParentItem != null ? item.ParentItem.items : item.Parent?.items;
+
+                    currentItems = (targetItems ?? Enumerable.Empty<RadzenPanelMenuItem>()).Where(i => i.Visible).ToList();
 
                         focusedIndex = item.IsExpanded ? 0 : currentItems.IndexOf(item);
                     }
@@ -175,7 +184,7 @@ namespace Radzen.Blazor
                     {
                         if (item.Path != null)
                         {
-                            NavigationManager.NavigateTo(item.Path);
+                            NavigationManager?.NavigateTo(item.Path);
                         }
                         else
                         {

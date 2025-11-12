@@ -10,12 +10,12 @@ public class UploadCompleteEventArgs
     /// <summary>
     /// Gets the JSON response which the server returned after the upload.
     /// </summary>
-    public JsonDocument JsonResponse { get; set; }
+    public JsonDocument? JsonResponse { get; set; }
 
     /// <summary>
     /// Gets the raw server response.
     /// </summary>
-    public string RawResponse { get; set; }
+    public string? RawResponse { get; set; }
 
     /// <summary>
     /// Gets a boolean value indicating if the upload was cancelled by the user.

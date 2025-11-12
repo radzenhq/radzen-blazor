@@ -24,7 +24,7 @@ namespace Radzen.Blazor.Rendering
         /// <returns>System.String.</returns>
         public static string ToInvariantString(this double? value)
         {
-            return value.Value.ToInvariantString();
+            return value.HasValue ? value.Value.ToInvariantString() : string.Empty;
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace Radzen.Blazor.Rendering
         /// <returns>System.String.</returns>
         public static string ToInvariantString(this decimal? value)
         {
-            return value.Value.ToInvariantString();
+            return value.HasValue ? value.Value.ToInvariantString() : string.Empty;
         }
     }
 }

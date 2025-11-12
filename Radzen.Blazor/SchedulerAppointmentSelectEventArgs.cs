@@ -21,6 +21,6 @@ namespace Radzen
         /// The data item for which the appointment is created.
         /// </summary>
         /// <value>The data.</value>
-        public TItem Data { get; set; }
+        public TItem? Data { get; set; }
     }
 }

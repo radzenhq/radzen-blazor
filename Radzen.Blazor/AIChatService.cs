@@ -21,13 +21,16 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     private readonly Dictionary<string, ConversationSession> sessions = new();
     private readonly object sessionsLock = new();
 
+    // Add this static field to cache the JsonSerializerOptions instance
+    private static readonly JsonSerializerOptions CachedJsonSerializerOptions = new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull };
+
     /// <summary>
     /// Gets the configuration options for the chat streaming service.
     /// </summary>
     public AIChatServiceOptions Options => options.Value;
 
     /// <inheritdoc />
-    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string sessionId = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null, string endpoint = null, string proxy = null, string apiKey = null, string apiKeyHeader = null)
+    public async IAsyncEnumerable<string> GetCompletionsAsync(string userInput, string? sessionId = null, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken cancellationToken = default, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
     {
         if (string.IsNullOrWhiteSpace(userInput))
         {
@@ -57,13 +60,18 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
             stream = true
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, url)
+        using var request = new HttpRequestMessage(HttpMethod.Post, url)
         {
-            Content = new StringContent(JsonSerializer.Serialize(payload, new JsonSerializerOptions { DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull }), Encoding.UTF8, "application/json")
+            Content = new StringContent(JsonSerializer.Serialize(payload, CachedJsonSerializerOptions), Encoding.UTF8, "application/json")
         };
 
         if (!string.IsNullOrEmpty(effectiveApiKey))
         {
+            if (string.IsNullOrWhiteSpace(effectiveApiKeyHeader))
+            {
+                throw new InvalidOperationException("API key header must be specified when an API key is provided.");
+            }
+
             if (string.Equals(effectiveApiKeyHeader, "Authorization", StringComparison.OrdinalIgnoreCase))
             {
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", effectiveApiKey);
@@ -75,22 +83,22 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
         }
 
         var httpClient = serviceProvider.GetRequiredService<HttpClient>();
-        var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+        var response = await httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
         {
-            throw new Exception($"Chat stream failed: {await response.Content.ReadAsStringAsync(cancellationToken)}");
+            throw new HttpRequestException($"Chat stream failed: {await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false)}");
         }
 
-        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
         using var reader = new StreamReader(stream);
 
         var assistantResponse = new StringBuilder();
 
-        string line;
+        string? line;
         while ((line = await reader.ReadLineAsync()) is not null && !cancellationToken.IsCancellationRequested)
         {
-            if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data:"))
+            if (string.IsNullOrWhiteSpace(line) || !line.StartsWith("data:", StringComparison.Ordinal))
             {
                 continue;
             }
@@ -118,7 +126,7 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
     }
 
     /// <inheritdoc />
-    public ConversationSession GetOrCreateSession(string sessionId = null)
+    public ConversationSession GetOrCreateSession(string? sessionId = null)
     {
         lock (sessionsLock)
         {
@@ -182,9 +190,14 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
     private static string ParseStreamingResponse(string json)
     {
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return string.Empty;
+        }
+
         try
         {
-            var doc = JsonDocument.Parse(json);
+            using var doc = JsonDocument.Parse(json);
             var root = doc.RootElement;
 
             if (!root.TryGetProperty("choices", out var choices) || choices.GetArrayLength() == 0)
@@ -206,7 +219,11 @@ public class AIChatService(IServiceProvider serviceProvider, IOptions<AIChatServ
 
             return string.Empty;
         }
-        catch
+        catch (JsonException)
+        {
+            return string.Empty;
+        }
+        catch (FormatException)
         {
             return string.Empty;
         }

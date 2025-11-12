@@ -51,7 +51,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
-        public RenderFragment ButtonContent { get; set; }
+        public RenderFragment? ButtonContent { get; set; }
 
         /// <summary>
         /// Gets or sets the text.
@@ -72,21 +72,21 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon.</value>
         [Parameter]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets the icon color.
         /// </summary>
         /// <value>The icon color.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets the image.
         /// </summary>
         /// <value>The image.</value>
         [Parameter]
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
         /// <summary>
         /// Gets or sets the button style.
@@ -184,21 +184,24 @@ namespace Radzen.Blazor
         public ButtonType ButtonType { get; set; } = ButtonType.Button;
 
         /// <summary>
-        /// Handles the <see cref="E:Click" /> event.
+        /// Handles the click event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         public async System.Threading.Tasks.Task OnClick(MouseEventArgs args)
         {
             if (!Disabled)
             {
-                if (AlwaysOpenPopup)
+                if (JSRuntime != null)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
-                }
-                else
-                {
-                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
-                    await Click.InvokeAsync(null);
+                    if (AlwaysOpenPopup)
+                    {
+                        await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+                    }
+                    else
+                    {
+                        await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+                        await Click.InvokeAsync(null);
+                    }
                 }
             }
         }
@@ -208,7 +211,10 @@ namespace Radzen.Blazor
         /// </summary>
         public void Close()
         {
-            JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+            if (JSRuntime != null)
+            {
+                JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
+            }
         }
 
         /// <summary>
@@ -261,10 +267,12 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (IsJSRuntimeAvailable)
+            if (IsJSRuntimeAvailable && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyPopup", PopupID);
             }
+
+            GC.SuppressFinalize(this);
         }
 
         internal int focusedIndex = -1;
@@ -279,7 +287,10 @@ namespace Radzen.Blazor
 
                 focusedIndex = focusedIndex == -1 ? 0 : focusedIndex;
 
-                await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+                if (JSRuntime != null)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID);
+                }
             }
             else if (key == "ArrowUp" || key == "ArrowDown")
             {
@@ -345,7 +356,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal string SplitButtonId()
+        internal string? SplitButtonId()
         {
             return GetId();
         }

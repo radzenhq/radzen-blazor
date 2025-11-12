@@ -1,0 +1,73 @@
+<Project>
+  <!-- 
+    Common build properties for all projects in the Radzen.Blazor solution.
+    
+    To use this file:
+    1. Rename to Directory.Build.props (remove .sample extension)
+    2. Adjust settings based on your needs
+    3. Review the analyzer settings in .editorconfig
+    
+    This file will be automatically imported by all projects in subdirectories.
+  -->
+
+  <PropertyGroup Label="Language Configuration">
+    <!-- Use latest C# language features -->
+    <LangVersion>latest</LangVersion>
+    
+    <!-- Do NOT enable implicit usings - explicit imports preferred for library code -->
+    <ImplicitUsings>disable</ImplicitUsings>
+    
+    <Nullable>enable</Nullable>
+    <NoWarn>CA2007</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Code Analysis Configuration">
+    <!-- Enable .NET code analyzers -->
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    
+    <!-- Run analyzers during build and in IDE -->
+    <RunAnalyzersDuringBuild>true</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>true</RunAnalyzersDuringLiveAnalysis>
+    
+    <!-- Don't enforce code style in build (yet) - just show warnings -->
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    
+    <!-- Don't treat warnings as errors (yet) - too many to fix immediately -->
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    
+    <!-- Report all analyzer diagnostics -->
+    <AnalysisMode>All</AnalysisMode>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Build Quality">
+    <!-- Enable deterministic builds for reproducibility -->
+    <Deterministic>true</Deterministic>
+    
+    <!-- Enable deterministic builds in CI/CD -->
+    <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
+    
+    <!-- Embed source files for better debugging -->
+    <EmbedAllSources>true</EmbedAllSources>
+    <DebugType>embedded</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Demos and Tests Project Configuration" Condition="$(MSBuildProjectName.Contains('Demos')) OR $(MSBuildProjectName.Contains('Tests'))">
+    <!-- Demo projects and Tests should not be packable -->
+    <IsPackable>false</IsPackable>
+    
+    <!-- DISABLE ALL ANALYZERS FOR DEMO PROJECTS AND TESTS -->
+    <EnableNETAnalyzers>false</EnableNETAnalyzers>
+    <RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+    <RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Performance">
+    <!-- Optimize startup time -->
+    <TieredCompilation>true</TieredCompilation>
+    <TieredCompilationQuickJit>true</TieredCompilationQuickJit>
+  </PropertyGroup>
+
+</Project>
+

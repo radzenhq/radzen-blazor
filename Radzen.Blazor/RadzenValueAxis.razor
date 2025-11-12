@@ -25,12 +25,15 @@
     {
         get
         {
-            return Measure(Chart);
+            return Chart != null ? Measure(Chart) : 0;
         }
     }
 
     protected override void Initialize()
     {
-        Chart.ValueAxis = this;
+        if (Chart != null)
+        {
+            Chart.ValueAxis = this;
+        }
     }
 }

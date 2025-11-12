@@ -1,4 +1,4 @@
-﻿@implements IAsyncDisposable
+@implements IAsyncDisposable
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 
@@ -10,7 +10,7 @@
             {
                 <div>@tooltip.Options.Text</div>
             }
-            else if (tooltip.Options.ChildContent != null)
+            else if (tooltip.Options.ChildContent != null && Service != null)
             {
                 @tooltip.Options.ChildContent(Service)
             }
@@ -21,12 +21,14 @@
 @code {
     string getCssClass(Tooltip tooltip)
     {
-        return $"rz-{Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant()}-tooltip-content";
+        if (tooltip?.Options == null) return "rz-tooltip-content";
+        var enumName = Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position);
+        return $"rz-{(enumName ?? tooltip.Options.Position.ToString()).ToLowerInvariant()}-tooltip-content";
     }
 
-    public string UniqueID { get; set; }
+    public string? UniqueID { get; set; }
 
-    [Inject] private TooltipService Service { get; set; }
+    [Inject] private TooltipService? Service { get; set; }
 
     List<Tooltip> tooltips = new List<Tooltip>();
 
@@ -50,19 +52,20 @@
 
         if (tooltip != null)
         {
+            var enumName = Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position);
             await JSRuntime.InvokeVoidAsync("Radzen.openTooltip",
                 tooltip.Element,
                 UniqueID,
                 tooltip.Options.Delay,
                 tooltip.Options.Duration,
-                Enum.GetName(typeof(TooltipPosition), tooltip.Options.Position).ToLowerInvariant(),
+                (enumName ?? tooltip.Options.Position.ToString()).ToLowerInvariant(),
                 tooltip.Options.CloseTooltipOnDocumentClick,
                 Reference,
                 "RadzenTooltip.CloseTooltip");
         }
     }
 
-    private DotNetObjectReference<RadzenTooltip> reference;
+private DotNetObjectReference<RadzenTooltip>? reference;
 
     /// <summary>
     /// Gets the reference for the current component.
@@ -85,11 +88,11 @@
     /// Closes this instance.
     /// </summary>
     [JSInvokable("RadzenTooltip.CloseTooltip")]
-    public async Task CloseTooltip(string position = null)
+    public async Task CloseTooltip(string? position = null)
     {
         if (position == null)
         {
-            Service.Close();
+            Service?.Close();
         }
         else
         {
@@ -147,18 +150,24 @@
             }
         }
 
-        Service.OnOpen -= OnOpen;
-        Service.OnClose -= OnClose;
-        Service.OnNavigate -= OnNavigate;
+        if (Service != null)
+        {
+            Service.OnOpen -= OnOpen;
+            Service.OnClose -= OnClose;
+            Service.OnNavigate -= OnNavigate;
+        }
     }
 
     protected override void OnInitialized()
     {
         UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
 
-        Service.OnOpen += OnOpen;
-        Service.OnClose += OnClose;
-        Service.OnNavigate += OnNavigate;
+        if (Service != null)
+        {
+            Service.OnOpen += OnOpen;
+            Service.OnClose += OnClose;
+            Service.OnNavigate += OnNavigate;
+        }
     }
 
     void OnOpen(ElementReference element, Type type, TooltipOptions options)

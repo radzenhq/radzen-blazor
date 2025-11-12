@@ -26,14 +26,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The fill.</value>
         [Parameter]
-        public string Fill { get; set; }
+        public string? Fill { get; set; }
 
         /// <summary>
         /// Gets or sets the stroke.
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the stroke.
@@ -54,7 +54,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The scale.</value>
         [CascadingParameter]
-        public RadzenRadialGaugeScale Scale
+        public RadzenRadialGaugeScale? Scale
         {
             get; set;
         }

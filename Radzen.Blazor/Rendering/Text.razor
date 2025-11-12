@@ -1,17 +1,17 @@
 <text class=@Class fill=@Fill alignment-baseline="middle" text-anchor=@TextAnchor x=@Position.X.ToInvariantString() y=@Position.Y.ToInvariantString()>@Value</text>
 @code {
     [Parameter]
-    public string Class { get; set; }
+    public string Class { get; set; } = string.Empty;
 
     [Parameter]
-    public string Value { get; set; }
+    public string Value { get; set; } = string.Empty;
 
     [Parameter]
-    public Point Position { get; set; }
+    public Point Position { get; set; } = new Point();
 
     [Parameter]
     public string TextAnchor { get; set; } = "middle";
 
     [Parameter]
-    public string Fill { get; set; }
+    public string Fill { get; set; } = string.Empty;
 }

@@ -83,21 +83,21 @@ namespace Radzen.Blazor
             return "rz-login";
         }
 
-        string username;
+        string? username;
         /// <summary>
         /// Gets or sets the username.
         /// </summary>
         /// <value>The username.</value>
         [Parameter]
-        public string Username { get; set; }
+        public string? Username { get; set; }
 
-        string password;
+        string? password;
         /// <summary>
         /// Gets or sets the password.
         /// </summary>
         /// <value>The password.</value>
         [Parameter]
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         private bool rememberMe;
         /// <summary> Sets the initial value of the remember me switch.</summary>
@@ -259,7 +259,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Handles the <see cref="E:Reset" /> event.
+        /// Handles the reset event.
         /// </summary>
         /// <param name="args">The <see cref="EventArgs"/> instance containing the event data.</param>
         protected async Task OnReset(EventArgs args)

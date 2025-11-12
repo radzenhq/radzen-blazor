@@ -47,14 +47,14 @@ namespace Radzen
         /// </summary>
         /// <value>The name.</value>
         [Parameter]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the placeholder.
         /// </summary>
         /// <value>The placeholder.</value>
         [Parameter]
-        public string Placeholder { get; set; }
+        public string? Placeholder { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="DataBoundFormComponent{T}"/> is disabled.
@@ -80,36 +80,36 @@ namespace Radzen
         /// <summary>
         /// The form
         /// </summary>
-        IRadzenForm _form;
+        IRadzenForm? form;
 
         /// <summary>
         /// Gets or sets the form.
         /// </summary>
         /// <value>The form.</value>
         [CascadingParameter]
-        public IRadzenForm Form
+        public IRadzenForm? Form
         {
             get
             {
-                return _form;
+                return form;
             }
             set
             {
-                _form = value;
-                _form?.AddComponent(this);
+                form = value;
+                form?.AddComponent(this);
             }
         }
 
         /// <summary>
         /// The value
         /// </summary>
-        private T _value = default;
+        private T? _value;
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
         [Parameter]
-        public T Value
+        public T? Value
         {
             get
             {
@@ -167,18 +167,18 @@ namespace Radzen
         /// </summary>
         /// <value>The text property.</value>
         [Parameter]
-        public string TextProperty { get; set; }
+        public string? TextProperty { get; set; }
 
         /// <summary>
         /// The data
         /// </summary>
-        IEnumerable _data = null;
+        IEnumerable? _data;
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
-        public virtual IEnumerable Data
+        public virtual IEnumerable? Data
         {
             get
             {
@@ -208,7 +208,7 @@ namespace Radzen
         /// Gets the query.
         /// </summary>
         /// <value>The query.</value>
-        protected virtual IQueryable Query
+        protected virtual IQueryable? Query
         {
             get
             {
@@ -220,7 +220,7 @@ namespace Radzen
         /// Gets or sets the search text
         /// </summary>
         [Parameter]
-        public string SearchText
+        public string? SearchText
         {
             get
             {
@@ -245,29 +245,30 @@ namespace Radzen
         /// <summary>
         /// The search text
         /// </summary>
-        internal string searchText;
+        internal string? searchText;
 
         /// <summary>
         /// The view
         /// </summary>
-        protected IQueryable _view = null;
+        protected IQueryable? _view;
         /// <summary>
         /// Gets the view.
         /// </summary>
         /// <value>The view.</value>
-        protected virtual IEnumerable View
+        protected virtual IEnumerable? View
         {
             get
             {
-                if (_view == null && Query != null)
+                var query = Query;
+                if (_view == null && query != null)
                 {
-                    if (!string.IsNullOrEmpty(searchText))
+                    if (!string.IsNullOrEmpty(searchText) && !string.IsNullOrEmpty(TextProperty))
                     {
-                        _view = Query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
+                        _view = query.Where(TextProperty, searchText, FilterOperator, FilterCaseSensitivity);
                     }
                     else
                     {
-                        _view = (typeof(IQueryable).IsAssignableFrom(Data.GetType())) ? Query.Cast<object>().ToList().AsQueryable() : Query;
+                        _view = Data is IQueryable ? query.Cast<object>().ToList().AsQueryable() : query;
                     }
                 }
 
@@ -275,14 +276,14 @@ namespace Radzen
             }
         }
 
-        internal IEnumerable GetView() => View;
+        internal IEnumerable? GetView() => View;
 
         /// <summary>
         /// Gets or sets the edit context.
         /// </summary>
         /// <value>The edit context.</value>
         [CascadingParameter]
-        public EditContext EditContext { get; set; }
+        public EditContext? EditContext { get; set; }
 
         /// <summary>
         /// Gets the field identifier.
@@ -296,7 +297,7 @@ namespace Radzen
         /// </summary>
         /// <value>The value expression.</value>
         [Parameter]
-        public Expression<Func<T>> ValueExpression { get; set; }
+        public Expression<Func<T>>? ValueExpression { get; set; }
         /// <summary>
         /// Set parameters as an asynchronous operation.
         /// </summary>
@@ -338,7 +339,7 @@ namespace Radzen
         /// </summary>
         /// <param name="sender">The sender.</param>
         /// <param name="e">The <see cref="ValidationStateChangedEventArgs"/> instance containing the event data.</param>
-        private void ValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
+        private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
         {
             StateHasChanged();
         }
@@ -356,13 +357,15 @@ namespace Radzen
             }
 
             Form?.RemoveComponent(this);
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
         /// Gets the value.
         /// </summary>
         /// <returns>System.Object.</returns>
-        public virtual object GetValue()
+        public virtual object? GetValue()
         {
             return Value;
         }
@@ -386,13 +389,13 @@ namespace Radzen
 
         /// <summary> Provides support for RadzenFormField integration. </summary>
         [CascadingParameter]
-        public IFormFieldContext FormFieldContext { get; set; }
+        public IFormFieldContext? FormFieldContext { get; set; }
 
         /// <summary> Gets the current placeholder. Returns empty string if this component is inside a RadzenFormField.</summary>
-        protected string CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
+        protected string? CurrentPlaceholder => FormFieldContext?.AllowFloatingLabel == true ? " " : Placeholder;
 
         /// <summary>
-        /// Handles the <see cref="E:ContextMenu" /> event.
+        /// Handles the ContextMenu event.
         /// </summary>
         /// <param name="args">The <see cref="MouseEventArgs"/> instance containing the event data.</param>
         /// <returns>Task.</returns>

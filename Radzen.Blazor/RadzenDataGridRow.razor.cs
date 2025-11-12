@@ -3,7 +3,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenDataGridRow.
     /// </summary>
-    public partial class RadzenDataGridRow<TItem>
+    public partial class RadzenDataGridRow<TItem> where TItem : notnull
     {
     }
 }

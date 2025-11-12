@@ -10,16 +10,16 @@ public class MenuItemEventArgs : MouseEventArgs
     /// <summary>
     /// Gets text of the clicked item.
     /// </summary>
-    public string Text { get; internal set; }
+    public string? Text { get; internal set; }
 
     /// <summary>
     /// Gets the value of the clicked item.
     /// </summary>
-    public object Value { get; internal set; }
+    public object? Value { get; internal set; }
 
     /// <summary>
     /// Gets the path path of the clicked item.
     /// </summary>
-    public string Path { get; internal set; }
+    public string? Path { get; internal set; }
 }
 

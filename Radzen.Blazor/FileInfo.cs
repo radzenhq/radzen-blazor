@@ -17,7 +17,7 @@ public class FileInfo : IBrowserFile
         //
     }
 
-    private IBrowserFile source;
+    private IBrowserFile? source;
 
     /// <summary>
     /// Creates FileInfo with IBrowserFile as source.
@@ -28,7 +28,9 @@ public class FileInfo : IBrowserFile
         this.source = source;
     }
 
-    private string name;
+    private string? name;
+    private DateTimeOffset? lastModified;
+    private string? contentType;
 
     /// <summary>
     /// Gets the name of the selected file.
@@ -37,7 +39,7 @@ public class FileInfo : IBrowserFile
     {
         get
         {
-            return name ?? source.Name;
+                return name ?? source?.Name ?? string.Empty;
         }
         set
         {
@@ -65,17 +67,25 @@ public class FileInfo : IBrowserFile
     /// <summary>
     /// Gets the IBrowserFile source.
     /// </summary>
-    public IBrowserFile Source => source;
+    public IBrowserFile? Source => source;
 
     /// <summary>
     /// Gets the LastModified.
     /// </summary>
-    public DateTimeOffset LastModified => source.LastModified;
+    public DateTimeOffset LastModified
+    {
+        get => lastModified ?? source?.LastModified ?? default;
+        set => lastModified = value;
+    }
 
     /// <summary>
     /// Gets the ContentType.
     /// </summary>
-    public string ContentType => source.ContentType;
+    public string ContentType
+    {
+        get => contentType ?? source?.ContentType ?? string.Empty;
+        set => contentType = value;
+    }
 
     /// <summary>
     /// Open read stream.
@@ -85,6 +95,11 @@ public class FileInfo : IBrowserFile
     /// <returns>The stream.</returns>
     public System.IO.Stream OpenReadStream(long maxAllowedSize = 512000, CancellationToken cancellationToken = default)
     {
+        if (source == null)
+        {
+            throw new InvalidOperationException("No underlying browser file is associated with this FileInfo instance.");
+        }
+
         return source.OpenReadStream(maxAllowedSize, cancellationToken);
     }
 }

@@ -3,7 +3,7 @@
 @if (Visible)
 {
     <button @ref="@Element" style="@Style" disabled="@IsDisabled"
-            type="@Enum.GetName(typeof(ButtonType), ButtonType).ToLower()"
+            type="@((Enum.GetName(typeof(ButtonType), ButtonType) ?? ButtonType.ToString()).ToLower())"
             @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
             @onclick="@OnClick" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
             aria-label="@AriaLabel">

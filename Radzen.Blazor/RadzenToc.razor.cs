@@ -39,7 +39,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
 
     internal async Task SelectItemAsync(RadzenTocItem item)
     {
-        if (!string.IsNullOrEmpty(item.Selector))
+        if (!string.IsNullOrEmpty(item.Selector) && JSRuntime != null)
         {
             await JSRuntime.InvokeVoidAsync("Radzen.navigateTo", item.Selector, true);
         }
@@ -109,7 +109,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
 
     private async Task RegisterScrollListenerAsync()
     {
-        if (IsJSRuntimeAvailable)
+        if (IsJSRuntimeAvailable && JSRuntime != null)
         {
             try
             {
@@ -123,7 +123,7 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
 
     private async Task UnregisterScrollListenerAsync()
     {
-        if (IsJSRuntimeAvailable)
+        if (IsJSRuntimeAvailable && JSRuntime != null)
         {
             try
             {

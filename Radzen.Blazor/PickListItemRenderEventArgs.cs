@@ -10,7 +10,7 @@ public class PickListItemRenderEventArgs<TItem>
     /// <summary>
     /// Gets the data item.
     /// </summary>
-    public TItem Item { get; internal set; }
+    public TItem? Item { get; internal set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether this item is visible.

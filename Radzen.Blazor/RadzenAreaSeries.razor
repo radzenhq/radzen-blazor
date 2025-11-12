@@ -8,6 +8,7 @@
 @code {
   public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
   {
+    var chart = RequireChart();
     var category = ComposeCategory(categoryScale);
 
     var value = ComposeValue(valueScale);
@@ -22,8 +23,8 @@
       return new Point<TItem> { X = x, Y = y, Data = item };
     });
 
-    var ticks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
-    var index = Chart.Series.IndexOf(this);
+    var ticks = chart.CategoryScale.Ticks(chart.CategoryAxis.TickDistance);
+    var index = chart.Series.IndexOf(this);
     var className = $"rz-area-series rz-series-{index}";
 
     return
@@ -32,10 +33,10 @@
       {
         var x1 = category(Items.First()).ToInvariantString();
         var x2 = category(Items.Last()).ToInvariantString();
-        var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        var valueTicks = chart.ValueScale.Ticks(chart.ValueAxis.TickDistance);
         var start = Math.Max(0, valueTicks.Start);
-        var y = Chart.ValueScale.Scale(start).ToInvariantString();
-        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+        var y = chart.ValueScale.Scale(start).ToInvariantString();
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
         var path = pathGenerator.Path(data);
         var area = $"M {x1} {y} {path} L {x2} {y}";
         var line = $"M {path}";

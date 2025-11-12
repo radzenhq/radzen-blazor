@@ -21,14 +21,14 @@ namespace Radzen.Blazor
     {
 
         [Inject]
-        IJSRuntime JSRuntime { get; set; }
+        IJSRuntime? JSRuntime { get; set; }
         
 
         /// <summary>
         /// The CSS media query this component will listen for.
         /// </summary>
         [Parameter]
-        public string Query { get; set; }
+        public string? Query { get; set; }
 
         /// <summary>
         /// A callback that will be invoked when the status of the media query changes - to either match or not.
@@ -46,9 +46,9 @@ namespace Radzen.Blazor
         }
 
         bool initialized;
-        private DotNetObjectReference<RadzenMediaQuery> reference;
+        private DotNetObjectReference<RadzenMediaQuery>? reference;
 
-        private DotNetObjectReference<RadzenMediaQuery> Reference
+        private DotNetObjectReference<RadzenMediaQuery>? Reference
         {
             get
             {
@@ -69,6 +69,7 @@ namespace Radzen.Blazor
             if (firstRender)
             {
                 initialized = true;
+                if (JSRuntime == null) return;
                 try
                 {
                     var matches = await JSRuntime.InvokeAsync<bool>("Radzen.mediaQuery", Query, Reference);
@@ -89,9 +90,10 @@ namespace Radzen.Blazor
         {
             if (initialized)
             {
+                if (JSRuntime == null) return;
                 try
                 {
-                    JSRuntime.InvokeVoidAsync("Radzen.mediaQuery", Reference);
+                    _ = JSRuntime.InvokeVoidAsync("Radzen.mediaQuery", Reference);
                 }
                 catch
                 {
@@ -101,6 +103,8 @@ namespace Radzen.Blazor
 
             reference?.Dispose();
             reference = null;
+
+            GC.SuppressFinalize(this);
         }
     }
 }

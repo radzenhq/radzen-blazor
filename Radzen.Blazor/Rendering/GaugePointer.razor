@@ -5,10 +5,10 @@
 </g>
 @code {
     [Parameter]
-    public string Stroke { get; set; }
+    public string Stroke { get; set; } = string.Empty;
 
     [Parameter]
-    public string Fill { get; set; }
+    public string Fill { get; set; } = string.Empty;
 
     [Parameter]
     public double Radius { get; set; }
@@ -35,13 +35,13 @@
     public double Length { get; set; }
 
     [Parameter]
-    public Point Center { get; set; }
+    public Point Center { get; set; } = new Point();
 
     [Parameter]
 
     public double Value { get; set; }
 
-    private string Path { get; set; }
+    private string Path { get; set; } = string.Empty;
 
     double Clip(double v) => Math.Max(Min, Math.Min(v, Max));
 

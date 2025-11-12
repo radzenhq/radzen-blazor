@@ -34,7 +34,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon color.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets the icon displayed while recording.
@@ -72,7 +72,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon.</value>
         [Parameter]
-        public string Language { get; set; }
+        public string? Language { get; set; }
 
         private bool recording;
 
@@ -92,7 +92,10 @@ namespace Radzen.Blazor
         {
             recording = !recording;
 
-            await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", Reference, Language);
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.toggleDictation", Reference, Language);
+            }
         }
 
         /// <summary>

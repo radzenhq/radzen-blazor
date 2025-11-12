@@ -16,7 +16,7 @@ public class RadzenSplitterEventArgs
     /// Gets the pane which the event applies to.
     /// </summary>
     /// <value>The pane.</value>
-    public RadzenSplitterPane Pane { get; set; }
+    public RadzenSplitterPane? Pane { get; set; }
 
     /// <summary>
     /// Gets or sets a value which will cancel the event.

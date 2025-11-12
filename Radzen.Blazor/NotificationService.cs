@@ -31,10 +31,7 @@ namespace Radzen
         /// <param name="message">The message.</param>
         public void Notify(NotificationMessage message)
         {
-            if (message is null)
-            {
-                throw new ArgumentNullException(nameof(message));
-            }
+            ArgumentNullException.ThrowIfNull(message);
 
             if (!Messages.Contains(message))
             {
@@ -51,7 +48,7 @@ namespace Radzen
         /// <param name="duration">The duration.</param>
         /// <param name="click">The click event.</param>
         public void Notify(NotificationSeverity severity, string summary,
-            string detail, TimeSpan duration, Action<NotificationMessage> click = null)
+            string detail, TimeSpan duration, Action<NotificationMessage>? click = null)
         {
             Notify(severity, summary, detail, duration.TotalMilliseconds, click);
         }
@@ -67,7 +64,7 @@ namespace Radzen
         /// <param name="closeOnClick">If true, then the notification will be closed when clicked on.</param>
         /// <param name="payload">Used to store a custom payload that can be retreived later in the click event handler.</param>
         /// <param name="close">Action to be executed on close.</param>
-        public void Notify(NotificationSeverity severity = NotificationSeverity.Info, string summary = "", string detail = "", double duration = 3000, Action<NotificationMessage> click = null, bool closeOnClick = false, object payload = null, Action<NotificationMessage> close = null)
+        public void Notify(NotificationSeverity severity = NotificationSeverity.Info, string summary = "", string detail = "", double duration = 3000, Action<NotificationMessage>? click = null, bool closeOnClick = false, object? payload = null, Action<NotificationMessage>? close = null)
         {
             var newMessage = new NotificationMessage()
             {
@@ -122,11 +119,11 @@ namespace Radzen
         /// Gets or sets the click event.
         /// </summary>
         /// <value>This event handler is called when the notification is clicked on.</value>
-        public Action<NotificationMessage> Click { get; set; }
+        public Action<NotificationMessage>? Click { get; set; }
         /// <summary>
         /// Get or set the event for when the notification is closed
         /// </summary>
-        public Action<NotificationMessage> Close { get; set; }
+        public Action<NotificationMessage>? Close { get; set; }
         /// <summary>
         /// Gets or sets click on close action.
         /// </summary>
@@ -136,7 +133,7 @@ namespace Radzen
         /// Gets or sets notification payload.
         /// </summary>
         /// <value>Used to store a custom payload that can be retreived later in the click event handler.</value>
-        public object Payload { get; set; }
+        public object? Payload { get; set; }
 
         /// <summary>
         /// Gets or sets if progress should be shown during duration.
@@ -148,12 +145,12 @@ namespace Radzen
         /// Gets or sets the detail content.
         /// </summary>
         /// <value>The detail content.</value>
-        public RenderFragment<NotificationService> DetailContent { get; set; }
+        public RenderFragment<NotificationService>? DetailContent { get; set; }
         /// <summary>
         /// Gets or sets the summary content.
         /// </summary>
         /// <value>The summary content.</value>
-        public RenderFragment<NotificationService> SummaryContent { get; set; }
+        public RenderFragment<NotificationService>? SummaryContent { get; set; }
 
 
         #region Implementation of IEquatable<NotificationMessage> and operators overloading
@@ -163,7 +160,7 @@ namespace Radzen
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        public bool Equals(NotificationMessage other)
+        public bool Equals(NotificationMessage? other)
         {
             if(other == null) return false;
 
@@ -187,7 +184,7 @@ namespace Radzen
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(object obj) => Equals(obj as NotificationMessage);
+        public override bool Equals(object? obj) => Equals(obj as NotificationMessage);
 
         /// <summary>
         ///  Return a hash code for the current object
@@ -201,7 +198,7 @@ namespace Radzen
         /// <param name="message"></param>
         /// <param name="otherMessage"></param>
         /// <returns></returns>
-        public static bool operator ==(NotificationMessage message, NotificationMessage otherMessage)
+        public static bool operator ==(NotificationMessage? message, NotificationMessage? otherMessage)
         {
             if (message is null)
             {
@@ -222,7 +219,7 @@ namespace Radzen
         /// <param name="message"></param>
         /// <param name="otherMessage"></param>
         /// <returns></returns>
-        public static bool operator !=(NotificationMessage message, NotificationMessage otherMessage)
+        public static bool operator !=(NotificationMessage? message, NotificationMessage? otherMessage)
         {
             return !(message == otherMessage);
         }

@@ -30,6 +30,6 @@ namespace Radzen.Blazor
         /// Specifies the shortcut for the command. Set to <c>"Ctrl+I"</c> by default.
         /// </summary>
         [Parameter]
-        public override string Shortcut { get; set; } = "Ctrl+I";
+        public override string? Shortcut { get; set; } = "Ctrl+I";
     }
 }

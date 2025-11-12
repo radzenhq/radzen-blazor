@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -16,13 +17,13 @@ namespace Radzen.Blazor
         /// Gets or sets the property name.
         /// </summary>
         [Parameter]
-        public string Property { get; set; }
+        public string? Property { get; set; }
 
         /// <summary>
         /// Gets or sets the title.
         /// </summary>
         [Parameter]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Gets or sets the sort order.
@@ -52,13 +53,13 @@ namespace Radzen.Blazor
         /// Gets or sets the filter value.
         /// </summary>
         [Parameter]
-        public object FilterValue { get; set; }
+        public object? FilterValue { get; set; }
 
         /// <summary>
         /// Gets or sets the second filter value.
         /// </summary>
         [Parameter]
-        public object SecondFilterValue { get; set; }
+        public object? SecondFilterValue { get; set; }
 
         /// <summary>
         /// Gets or sets the filter operator.
@@ -92,19 +93,19 @@ namespace Radzen.Blazor
         /// Gets or sets the filter template.
         /// </summary>
         [Parameter]
-        public RenderFragment<RadzenPivotField<TItem>> FilterTemplate { get; set; }
+        public RenderFragment<RadzenPivotField<TItem>>? FilterTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the filter value template.
         /// </summary>
         [Parameter]
-        public RenderFragment<RadzenPivotField<TItem>> FilterValueTemplate { get; set; }
+        public RenderFragment<RadzenPivotField<TItem>>? FilterValueTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the second filter value template.
         /// </summary>
         [Parameter]
-        public RenderFragment<RadzenPivotField<TItem>> SecondFilterValueTemplate { get; set; }
+        public RenderFragment<RadzenPivotField<TItem>>? SecondFilterValueTemplate { get; set; }
 
         private SortOrder? internalSortOrder;
 
@@ -132,15 +133,15 @@ namespace Radzen.Blazor
             internalSortOrder = null;
         }
 
-        private object internalFilterValue;
-        private object internalSecondFilterValue;
+        private object? internalFilterValue;
+        private object? internalSecondFilterValue;
         private FilterOperator? internalSecondFilterOperator;
         private LogicalFilterOperator? internalLogicalFilterOperator;
 
         /// <summary>
         /// Gets the current filter value (internal state).
         /// </summary>
-        public object GetFilterValue()
+        public object? GetFilterValue()
         {
             return internalFilterValue ?? FilterValue;
         }
@@ -148,7 +149,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Sets the internal filter value.
         /// </summary>
-        internal void SetFilterValueInternal(object filterValue)
+        internal void SetFilterValueInternal(object? filterValue)
         {
             internalFilterValue = filterValue;
         }
@@ -156,7 +157,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the current second filter value (internal state).
         /// </summary>
-        public object GetSecondFilterValue()
+        public object? GetSecondFilterValue()
         {
             return internalSecondFilterValue ?? SecondFilterValue;
         }
@@ -164,7 +165,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Sets the internal second filter value.
         /// </summary>
-        internal void SetSecondFilterValueInternal(object filterValue)
+        internal void SetSecondFilterValueInternal(object? filterValue)
         {
             internalSecondFilterValue = filterValue;
         }
@@ -220,7 +221,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the filter property name.
         /// </summary>
-        public string GetFilterProperty()
+        public string? GetFilterProperty()
         {
             return Property;
         }
@@ -245,16 +246,10 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the column title.
         /// </summary>
-        public string GetTitle()
+        public string? GetTitle()
         {
             return !string.IsNullOrEmpty(Title) ? Title : Property;
         }
-
-        /// <summary>
-        /// Gets or sets the parent pivot data grid component.
-        /// </summary>
-        [CascadingParameter]
-        public RadzenPivotDataGrid<TItem> PivotGrid { get; set; }
 
         /// <summary>
         /// Called when initialized.
@@ -355,38 +350,53 @@ namespace Radzen.Blazor
         /// </summary>
         public void SetFilterValue(object value, bool isFirst = true)
         {
-            if ((FilterPropertyType == typeof(DateTimeOffset) || FilterPropertyType == typeof(DateTimeOffset?)) && value != null && value is DateTime?)
+            var filterPropertyType = FilterPropertyType;
+
+            if (filterPropertyType == null)
             {
-                DateTimeOffset? offset = DateTime.SpecifyKind((DateTime)value, ((DateTime?)value).Value.Kind);
+                if (isFirst)
+                {
+                    filterValue = value;
+                }
+                else
+                {
+                    secondFilterValue = value;
+                }
+                return;
+            }
+
+            if ((filterPropertyType == typeof(DateTimeOffset) || filterPropertyType == typeof(DateTimeOffset?)) && value is DateTime dateTimeValue)
+            {
+                DateTimeOffset offset = DateTime.SpecifyKind(dateTimeValue, dateTimeValue.Kind);
                 value = offset;
             }
 
-            if ((FilterPropertyType == typeof(TimeOnly) || FilterPropertyType == typeof(TimeOnly?)) && value != null && value is string)
+            if ((filterPropertyType == typeof(TimeOnly) || filterPropertyType == typeof(TimeOnly?)) && value is string stringValue)
             {
-                var v = TimeOnly.Parse($"{value}");
-                value = FilterPropertyType == typeof(TimeOnly) ? v : (TimeOnly?)v;
+                var v = TimeOnly.Parse(stringValue, CultureInfo.InvariantCulture);
+                value = filterPropertyType == typeof(TimeOnly) ? v : (TimeOnly?)v;
             }
 
-            if ((FilterPropertyType == typeof(Guid) || FilterPropertyType == typeof(Guid?)) && value != null && value is string)
+            if ((filterPropertyType == typeof(Guid) || filterPropertyType == typeof(Guid?)) && value is string guidString)
             {
-                var v = Guid.Parse($"{value}");
-                value = FilterPropertyType == typeof(Guid) ? v : (Guid?)v;
+                var v = Guid.Parse(guidString);
+                value = filterPropertyType == typeof(Guid) ? v : (Guid?)v;
             }
 
-            if (!QueryableExtension.IsEnumerable(value?.GetType() ?? typeof(object)) && (PropertyAccess.IsEnum(FilterPropertyType) || (PropertyAccess.IsNullableEnum(FilterPropertyType))))
+            if (!QueryableExtension.IsEnumerable(value?.GetType() ?? typeof(object)) && (PropertyAccess.IsEnum(filterPropertyType) || PropertyAccess.IsNullableEnum(filterPropertyType)))
             {
-                Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(FilterPropertyType) ?? FilterPropertyType);
-                value = value is not null ? Convert.ChangeType(value, enumType) : null;
+                Type enumType = Enum.GetUnderlyingType(Nullable.GetUnderlyingType(filterPropertyType) ?? filterPropertyType);
+                value = value is not null ? Convert.ChangeType(value, enumType, CultureInfo.InvariantCulture) : null!;
             }
 
             if (isFirst)
             {
-                filterValue = CanSetCurrentValue(value) ? value :
+                filterValue = value != null && CanSetCurrentValue(value) ? value :
                     GetFilterOperator() == FilterOperator.IsEmpty || GetFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
             }
             else
             {
-                secondFilterValue = CanSetCurrentValue(value, false) ? value :
+                secondFilterValue = value != null && CanSetCurrentValue(value, false) ? value :
                     GetSecondFilterOperator() == FilterOperator.IsEmpty || GetSecondFilterOperator() == FilterOperator.IsNotEmpty ? string.Empty : null;
             }
         }
@@ -397,20 +407,20 @@ namespace Radzen.Blazor
         }
 
         FilterOperator? _filterOperator;
-        Func<TItem, object> propertyValueGetter;
-        object filterValue;
+        Func<TItem, object>? propertyValueGetter;
+        object? filterValue;
         FilterOperator? filterOperator;
-        object secondFilterValue;
+        object? secondFilterValue;
         FilterOperator? secondFilterOperator;
         LogicalFilterOperator? logicalFilterOperator;
-        Type _propertyType;
-        internal Type PropertyType => _propertyType;
-        Type _filterPropertyType;
+        Type? _propertyType;
+        internal Type? PropertyType => _propertyType;
+        Type? _filterPropertyType;
 
         /// <summary>
         /// Gets the filter property type.
         /// </summary>
-        public Type FilterPropertyType
+        public Type? FilterPropertyType
         {
             get
             {
@@ -423,7 +433,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The data type.</value>
         [Parameter]
-        public Type Type { get; set; }
+        public Type? Type { get; set; }
+
+        /// <summary>
+        /// Gets or sets the parent pivot data grid component.
+        /// </summary>
+        [CascadingParameter]
+        public RadzenPivotDataGrid<TItem>? PivotGrid { get; set; }
 
         /// <summary>
         /// Disposes the component and removes it from the parent pivot grid.
@@ -447,7 +463,10 @@ namespace Radzen.Blazor
                 if (FilterTemplate != null || FilterValueTemplate != null)
                 {
                     FilterValue = filterValue;
-                    await PivotGrid.Reload();
+                    if (PivotGrid != null)
+                    {
+                        await PivotGrid.Reload();
+                    }
 
                     return;
                 }
@@ -460,7 +479,10 @@ namespace Radzen.Blazor
                 if (FilterTemplate != null || SecondFilterValueTemplate != null)
                 {
                     SecondFilterValue = secondFilterValue;
-                    await PivotGrid.Reload();
+                    if (PivotGrid != null)
+                    {
+                        await PivotGrid.Reload();
+                    }
 
                     return;
                 }

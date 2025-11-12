@@ -11,16 +11,16 @@ public class TreeExpandEventArgs
     /// <summary>
     /// Gets the <see cref="Radzen.Blazor.RadzenTreeItem.Value" /> the expanded RadzenTreeItem.
     /// </summary>
-    public object Value { get; set; }
+    public object? Value { get; set; }
 
     /// <summary>
     /// Gets the <see cref="Radzen.Blazor.RadzenTreeItem.Text" /> the expanded RadzenTreeItem.
     /// </summary>
-    public string Text { get; set; }
+    public string? Text { get; set; }
 
     /// <summary>
     /// Gets or sets the children of the expanded RadzenTreeItem.
     /// </summary>
-    public TreeItemSettings Children { get; set; }
+    public TreeItemSettings? Children { get; set; }
 }
 

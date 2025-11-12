@@ -12,12 +12,12 @@ public class DataGridLoadChildDataEventArgs<T>
     /// Gets or sets the data.
     /// </summary>
     /// <value>The data.</value>
-    public IEnumerable<T> Data { get; set; }
+    public IEnumerable<T>? Data { get; set; }
 
     /// <summary>
     /// Gets the item.
     /// </summary>
     /// <value>The item.</value>
-    public T Item { get; internal set; }
+    public T? Item { get; internal set; }
 }
 

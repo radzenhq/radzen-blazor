@@ -4,31 +4,31 @@
  <CascadingValue Value=@EditContext>
     <CascadingValue Value=this>
 @{var rowArgs = Grid?.RowAttributes(Item, Index); }
-@{var firstLevel = Grid.AllowCompositeDataCells ? 0 : Grid.deepestChildColumnLevel; }
-@for(var i = firstLevel; Grid.AllowCompositeDataCells ? i <= Grid.deepestChildColumnLevel + 1 : i < Grid.deepestChildColumnLevel  + 1; i++)
+@{var firstLevel = Grid?.AllowCompositeDataCells == true ? 0 : (Grid?.deepestChildColumnLevel ?? 0); }
+@for(var i = firstLevel; (Grid?.AllowCompositeDataCells == true ? i <= (Grid?.deepestChildColumnLevel ?? 0) + 1 : i < (Grid?.deepestChildColumnLevel ?? 0) + 1); i++)
 {
-<tr class="@(Grid.RowStyle(Item, Index))" @attributes="@rowArgs.Item2">
-    @if (Grid.ShowGroupExpandColumn)
+<tr class="@(Grid?.RowStyle(Item, Index) ?? "")" @attributes="@(rowArgs?.Item2)">
+    @if (Grid?.ShowGroupExpandColumn == true)
     {
         @foreach(var g in Grid.Groups)
         {
             @if (i == firstLevel)
             {
-              <td class="rz-col-icon" rowspan="@(Grid.AllowCompositeDataCells ? (Grid.deepestChildColumnLevel + 1) : 1)">
+              <td class="rz-col-icon" rowspan="@((Grid?.AllowCompositeDataCells == true ? ((Grid?.deepestChildColumnLevel ?? 0) + 1) : 1))">
                   <span class="rz-column-title"></span>
               </td>
             }
            
         }
     }
-    @if (Grid.Template != null && Grid.ShowExpandColumn && i == firstLevel)
+    @if (Grid?.Template != null && Grid?.ShowExpandColumn == true && i == firstLevel)
     {
-        <td class="rz-col-icon" rowspan="@(Grid.AllowCompositeDataCells ? (Grid.deepestChildColumnLevel + 1) : 1)">
+        <td class="rz-col-icon" rowspan="@((Grid?.AllowCompositeDataCells == true ? ((Grid?.deepestChildColumnLevel ?? 0) + 1) : 1))">
             <span class="rz-column-title"></span>
-            @if (rowArgs.Item1.Expandable && !Grid.LoadChildData.HasDelegate)
+            @if (rowArgs?.Item1.Expandable == true && !(Grid?.LoadChildData.HasDelegate ?? false))
             {
-                <a id="@(Grid.GridId() + Item.GetHashCode())" aria-label="@Grid.ExpandChildItemAriaLabel" @onclick:preventDefault="true" @onclick="@(_ => Grid.ExpandItem(Item))" @onclick:stopPropagation>
-                    <span class="@(Grid.ExpandedItemStyle(Item))"></span>
+                <a id="@((Grid?.GridId() ?? "") + Item.GetHashCode())" aria-label="@(Grid?.ExpandChildItemAriaLabel ?? "")" @onclick:preventDefault="true" @onclick="@(_ => Grid?.ExpandItem(Item)!)" @onclick:stopPropagation>
+                    <span class="@(Grid?.ExpandedItemStyle(Item) ?? "")"></span>
                 </a>
             }
         </td>
@@ -36,7 +36,7 @@
 
         @for (var j = 0; j < Columns.Count; j++)
         {
-            if (Grid.rowSpans.ContainsKey(j))
+            if (Grid?.rowSpans != null && Grid.rowSpans.ContainsKey(j))
             {
                 Grid.rowSpans[j] = Grid.rowSpans[j] - 1;
 
@@ -51,31 +51,34 @@
             }
 
             var column = Columns[j];
-            var cellAttr = Grid.CellAttributes(Item, column);
+            var cellAttr = Grid?.CellAttributes(Item, column);
 
-            object colspan;
-            cellAttr.TryGetValue("colspan", out colspan);
+            object? colspan = null;
+            cellAttr?.TryGetValue("colspan", out colspan);
 
             if (colspan != null)
             {
                 j = j + (int)Convert.ChangeType(colspan, TypeCode.Int32) - 1;
             }
 
-            object rowspan;
-            cellAttr.TryGetValue("rowspan", out rowspan);
+            object? rowspan = null;
+            cellAttr?.TryGetValue("rowspan", out rowspan);
 
-            if (rowspan != null)
+            if (rowspan != null && Grid != null)
             {
                 Grid.rowSpans.Add(j, (int)Convert.ChangeType(rowspan, TypeCode.Int32));
             }
 
-            @Grid.RenderCell(column, Item, cellAttr, rowArgs, i);
+            @if (Grid != null && cellAttr != null && rowArgs != null)
+            {
+                @Grid.RenderCell(column, Item, cellAttr, rowArgs, i);
+            }
         }
 
 </tr>
 }
 
-@if (Grid.expandedItems.Keys.Contains(Item))
+@if (Grid != null && Grid.expandedItems.Keys.Contains(Item))
 {
     @if (Grid.IsRowInEditMode(Item) && Grid.EditTemplate != null)
     {
@@ -106,33 +109,33 @@
 </CascadingValue>
 @code {
         [Parameter]
-        public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
+        public IList<RadzenDataGridColumn<TItem>> Columns { get; set; } = new List<RadzenDataGridColumn<TItem>>();
 
         [Parameter]
-        public TItem Item { get; set; }
+        public TItem Item { get; set; } = default!;
 
         [Parameter]
         public int Index { get; set; }
 
         [Parameter]
-        public RadzenDataGrid<TItem> Grid { get; set; }
+        public RadzenDataGrid<TItem> Grid { get; set; } = default!;
 
         [Parameter(CaptureUnmatchedValues = true)]
-        public IReadOnlyDictionary<string, object> Attributes { get; set; }
+        public IReadOnlyDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         [Parameter]
-        public string CssClass { get; set; }
+        public string CssClass { get; set; } = string.Empty;
 
         [Parameter]
         public bool InEditMode { get; set; }
 
         [Parameter]
-        public EditContext EditContext { get; set; }
+        public EditContext? EditContext { get; set; }
 
-        List<IRadzenFormComponent> components;
+        List<IRadzenFormComponent> components = new();
 
         public void AddComponent(IRadzenFormComponent component)
         {
@@ -161,6 +164,6 @@
 
         public IRadzenFormComponent FindComponent(string name)
         {
-            return components.Where(component => component.Name == name).FirstOrDefault();
+            return components.Where(component => component.Name == name).FirstOrDefault()!;
         }
 }

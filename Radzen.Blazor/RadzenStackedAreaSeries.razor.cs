@@ -16,14 +16,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Specifies the fill (background color) of the area series.
         /// </summary>
         /// <value>The fill.</value>
         [Parameter]
-        public string Fill { get; set; }
+        public string? Fill { get; set; }
 
         /// <summary>
         /// Gets or sets the pixel width of the line. Set to <c>2</c> by default.
@@ -59,7 +59,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Stroke;
+                return Stroke ?? string.Empty;
             }
         }
 
@@ -86,6 +86,16 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
+            if (Chart == null)
+            {
+                return false;
+            }
+
+            if (Chart == null)
+            {
+                return false;
+            }
+
             var category = ComposeCategory(Chart.CategoryScale);
             var value = ComposeValue(Chart.ValueScale);
 
@@ -169,7 +179,7 @@ namespace Radzen.Blazor
                 return GetPointsAt(index - 1, category, value, valueScale).Reverse();
             }
 
-            var valueTicks = valueScale.Ticks(Chart.ValueAxis.TickDistance);
+            var valueTicks = Chart?.ValueAxis != null ? valueScale.Ticks(Chart.ValueAxis.TickDistance) : default;
             var start = Math.Max(0, valueTicks.Start);
 
             return Items.Select(item =>
@@ -190,6 +200,11 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipY(TItem item)
         {
+            if (Chart == null)
+            {
+                return 0;
+            }
+
             var category = ComposeCategory(Chart.CategoryScale);
             var value = ComposeValue(Chart.ValueScale);
             var x = category(item);
@@ -214,13 +229,15 @@ namespace Radzen.Blazor
                     throw new NotSupportedException($"Interpolation {Interpolation} is not supported yet.");
             }
         }
-        private IList<IChartSeries> AreaSeries => Chart.Series.Where(series => series is IChartStackedAreaSeries).Cast<IChartSeries>().ToList();
+        private IList<IChartSeries> AreaSeries => Chart?.Series?.Where(series => series is IChartStackedAreaSeries).Cast<IChartSeries>().ToList() ?? new List<IChartSeries>();
         private IList<IChartSeries> VisibleColumnSeries => AreaSeries.Where(series => series.Visible).ToList();
         private IList<IChartStackedAreaSeries> StackedAreaSeries => VisibleColumnSeries.Cast<IChartStackedAreaSeries>().ToList();
 
         /// <inheritdoc />
         public override ScaleBase TransformValueScale(ScaleBase scale)
         {
+            ArgumentNullException.ThrowIfNull(scale);
+
             if (Items.Any())
             {
                 var stackedAreaSeries = StackedAreaSeries;
@@ -252,7 +269,7 @@ namespace Radzen.Blazor
                     return 0;
                 }
 
-                return Items.Count();
+                return Items.Count;
             }
         }
 
@@ -263,7 +280,7 @@ namespace Radzen.Blazor
                 return Enumerable.Empty<double>();
             }
 
-            var category = ComposeCategory(Chart.CategoryScale);
+            var category = Chart != null ? ComposeCategory(Chart.CategoryScale) : (Func<TItem, double>)(item => 0);
 
             return Items.Where(item => category(item) == value).Select(Value);
         }

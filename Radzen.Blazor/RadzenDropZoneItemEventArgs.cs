@@ -11,22 +11,22 @@ public class RadzenDropZoneItemEventArgs<TItem>
     /// <summary>
     /// Gets the dragged item zone.
     /// </summary>
-    public RadzenDropZone<TItem> FromZone { get; internal set; }
+    public RadzenDropZone<TItem>? FromZone { get; internal set; }
 
     /// <summary>
     /// Gets the drop zone.
     /// </summary>
-    public RadzenDropZone<TItem> ToZone { get; internal set; }
+    public RadzenDropZone<TItem>? ToZone { get; internal set; }
 
     /// <summary>
     /// Gets the dragged item.
     /// </summary>
-    public TItem Item { get; internal set; }
+    public TItem? Item { get; internal set; }
 
     /// <summary>
     /// Gets the dropped item.
     /// </summary>
-    public TItem ToItem { get; internal set; }
+    public TItem? ToItem { get; internal set; }
 
     /// <summary>
     /// The data that underlies a drag-and-drop operation, known as the drag data store.

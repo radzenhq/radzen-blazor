@@ -27,16 +27,16 @@
     [Parameter]
     public double Radius { get; set; } = 0;
 
-    private string Path { get; set; }
+    private string Path { get; set; } = string.Empty;
 
     [Parameter]
-    public Point Center { get; set; }
+    public Point Center { get; set; } = new Point();
 
     [Parameter]
     public string Stroke { get; set; } = "none";
 
     [Parameter]
-    public string Fill { get; set; }
+    public string Fill { get; set; } = string.Empty;
 
     [Parameter]
     public double Size { get; set; }

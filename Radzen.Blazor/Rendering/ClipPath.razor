@@ -1,14 +1,19 @@
 @inherits RadzenChartComponentBase
 <defs>
-    <clipPath id="@Chart.ClipPath">
+    <clipPath id="@(Chart?.ClipPath ?? "")">
         <path d="@Path"></path>
     </clipPath>
 </defs>
 @code {
-    string Path { get; set; }
+    string? Path { get; set; }
 
     protected override void Initialize()
     {
+        if (Chart == null)
+        {
+            return;
+        }
+
         var categoryTicks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
         var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
 

@@ -16,7 +16,7 @@ namespace Radzen.Blazor.Rendering
         /// Gets or sets the chars.
         /// </summary>
         /// <value>The chars.</value>
-        public IDictionary<char, double> Chars { get; set; }
+        public IDictionary<char, double>? Chars { get; set; }
     }
 
     /// <summary>
@@ -309,7 +309,7 @@ namespace Radzen.Blazor.Rendering
         /// <returns>System.Double.</returns>
         public static double TextWidth(string text, double fontSize = 14, string fontFamily = "Roboto")
         {
-            if (!fonts.TryGetValue(fontFamily, out FontData font))
+            if (!fonts.TryGetValue(fontFamily, out var font))
             {
                 font = fonts["Roboto"];
             }
@@ -321,7 +321,10 @@ namespace Radzen.Blazor.Rendering
             {
                 var width = font.Average;
 
-                font.Chars.TryGetValue(ch, out width);
+                if (font.Chars != null)
+                {
+                    font.Chars.TryGetValue(ch, out width);
+                }
 
                 result += width;
             }

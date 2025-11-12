@@ -34,7 +34,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The Material icon name.</value>
         [Parameter]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets a custom color for the icon.
@@ -43,7 +43,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon color as a CSS color value.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets the visual style variant of the icon.

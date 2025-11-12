@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Radzen.Blazor.Rendering
@@ -18,6 +19,8 @@ namespace Radzen.Blazor.Rendering
         /// <returns>System.String.</returns>
         public string Path(IEnumerable<Point> data)
         {
+            ArgumentNullException.ThrowIfNull(data);
+
             var path = new StringBuilder();
             var start = true;
 
@@ -35,7 +38,7 @@ namespace Radzen.Blazor.Rendering
                     path.Append("L ");
                 }
 
-                path.Append($"{x.ToInvariantString()} {y.ToInvariantString()} ");
+                path.Append(CultureInfo.InvariantCulture, $"{x.ToInvariantString()} {y.ToInvariantString()} ");
             }
 
             return path.ToString();

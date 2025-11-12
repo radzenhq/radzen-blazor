@@ -24,7 +24,7 @@ namespace Radzen
         /// </summary>
         /// <value>The unmatched attributes dictionary.</value>
         [Parameter(CaptureUnmatchedValues = true)]
-        public IReadOnlyDictionary<string, object> Attributes { get; set; }
+        public IReadOnlyDictionary<string, object>? Attributes { get; set; }
 
         /// <summary>
         /// Gets a reference to the HTML element rendered by this component.
@@ -80,9 +80,9 @@ namespace Radzen
         /// </summary>
         /// <value>The cascaded default culture.</value>
         [CascadingParameter(Name = nameof(DefaultCulture))]
-        public CultureInfo DefaultCulture { get; set; }
+        public CultureInfo? DefaultCulture { get; set; }
 
-        private CultureInfo culture;
+        private CultureInfo? culture;
 
         /// <summary>
         /// Raises <see cref="MouseEnter" />.
@@ -114,7 +114,7 @@ namespace Radzen
         /// </summary>
         /// <value>The style.</value>
         [Parameter]
-        public virtual string Style { get; set; }
+        public virtual string? Style { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenComponent"/> is visible. Invisible components are not rendered.
@@ -128,7 +128,7 @@ namespace Radzen
         /// </summary>
         protected string GetCssClass()
         {
-            if (Attributes != null && Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
+            if (Attributes != null && Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class, Culture)))
             {
                 return $"{GetComponentCssClass()} {@class}";
             }
@@ -140,9 +140,9 @@ namespace Radzen
         /// Gets the unique identifier. 
         /// </summary>
         /// <returns>Returns the <c>id</c> attribute (if specified) or generates a random one.</returns>
-        protected virtual string GetId()
+        protected virtual string? GetId()
         {
-            if (Attributes != null && Attributes.TryGetValue("id", out var id) && !string.IsNullOrEmpty(Convert.ToString(@id)))
+            if (Attributes != null && Attributes.TryGetValue("id", out var id) && !string.IsNullOrEmpty(Convert.ToString(@id, Culture)))
             {
                 return $"{@id}";
             }
@@ -158,7 +158,7 @@ namespace Radzen
             return "";
         }
 
-        Debouncer debouncer = new Debouncer();
+        Debouncer? debouncer = new Debouncer();
 
         /// <summary>
         /// Debounces the specified action.
@@ -167,21 +167,21 @@ namespace Radzen
         /// <param name="milliseconds">The milliseconds.</param>
         protected void Debounce(Func<Task> action, int milliseconds = 500)
         {
-            debouncer.Debounce(milliseconds, action);
+            debouncer?.Debounce(milliseconds, action);
         }
 
         /// <summary>
         /// Gets or sets the unique identifier.
         /// </summary>
         /// <value>The unique identifier.</value>
-        public string UniqueID { get; set; }
+        public string? UniqueID { get; set; }
 
         /// <summary>
         /// Gets or sets the js runtime.
         /// </summary>
         /// <value>The js runtime.</value>
         [Inject]
-        protected IJSRuntime JSRuntime { get; set; }
+        protected IJSRuntime? JSRuntime { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether <see cref="JSRuntime" /> is available.
@@ -193,10 +193,10 @@ namespace Radzen
         /// </summary>
         protected override void OnInitialized()
         {
-            UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
+            UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-", StringComparison.Ordinal).Replace("+", "-", StringComparison.Ordinal).Substring(0, 10);
         }
 
-        private bool visibleChanged = false;
+        private bool visibleChanged;
         private bool firstRender = true;
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace Radzen
             }
         }
 
-        private DotNetObjectReference<RadzenComponent> reference;
+        private DotNetObjectReference<RadzenComponent>? reference;
 
         /// <summary>
         /// Gets the reference for the current component.
@@ -250,7 +250,7 @@ namespace Radzen
             {
                 visibleChanged = false;
 
-                if (Visible)
+                if (Visible && JSRuntime != null)
                 {
                     await AddContextMenu();
 
@@ -297,7 +297,7 @@ namespace Radzen
         /// </summary>
         protected virtual async System.Threading.Tasks.Task AddContextMenu()
         {
-            if (ContextMenu.HasDelegate)
+            if (ContextMenu.HasDelegate && JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.addContextMenu", GetId(), Reference);
             }
@@ -315,7 +315,7 @@ namespace Radzen
             }
         }
 
-        internal bool disposed = false;
+        internal bool disposed;
 
         /// <summary>
         /// Detaches event handlers and disposes <see cref="Reference" />.
@@ -324,10 +324,12 @@ namespace Radzen
         {
             disposed = true;
 
+            debouncer?.Dispose();
+            debouncer = null;
             reference?.Dispose();
             reference = null;
 
-            if (IsJSRuntimeAvailable)
+            if (IsJSRuntimeAvailable && JSRuntime != null && !string.IsNullOrEmpty(UniqueID))
             {
                 if (ContextMenu.HasDelegate)
                 {

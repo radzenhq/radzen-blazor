@@ -14,9 +14,9 @@
 
     var pathGenerator = GetPathGenerator();
 
-    var ticks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
+    var ticks = Chart?.CategoryScale?.Ticks(Chart.CategoryAxis.TickDistance);
 
-    var index = Chart.Series.IndexOf(this);
+    var index = Chart?.Series.IndexOf(this);
 
     var topPoints = GetTopPoints(category, value, valueScale);
     var bottomPoints = GetBottomPoints(category, value, valueScale);
@@ -29,10 +29,10 @@
       {
         var x1 = category(Items.First()).ToInvariantString();
         var x2 = category(Items.Last()).ToInvariantString();
-        var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        var valueTicks = Chart?.ValueScale?.Ticks(Chart?.ValueAxis?.TickDistance ?? 0) ?? (Start: 0.0, End: 0.0, Step: 0.0);
         var start = Math.Max(0, valueTicks.Start);
-        var y = Chart.ValueScale.Scale(start).ToInvariantString();
-        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+        var y = Chart?.ValueScale.Scale(start).ToInvariantString();
+        var style = $"clip-path: url(#{Chart?.ClipPath}); -webkit-clip-path: url(#{Chart?.ClipPath});";
         var topPath = pathGenerator.Path(topPoints);
         var bottomPath = pathGenerator.Path(bottomPoints);
         var area = $"M {x1} {y} {topPath} L {x2} {y} {bottomPath}";

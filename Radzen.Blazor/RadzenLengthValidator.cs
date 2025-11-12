@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -48,14 +49,15 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
-            string value = component.GetValue() as string;
+            ArgumentNullException.ThrowIfNull(component);
+            string? value = component.GetValue() as string;
 
-            if (Min.HasValue && ((value != null && value.Length < Min) || value == null))
+            if (Min.HasValue && (string.IsNullOrEmpty(value) || value.Length < Min))
             {
                 return false;
             }
 
-            if (Max.HasValue && (value != null && value.Length > Max))
+            if (Max.HasValue && value != null && value.Length > Max)
             {
                 return false;
             }

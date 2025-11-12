@@ -26,12 +26,15 @@ public class RadzenFlexComponent : RadzenComponentWithChildren
     internal string GetFlexCSSClass<T>(Enum v)
     {
         var value = ToDashCase(Enum.GetName(typeof(T), v));
-        return value == "start" || value == "end" ? $"flex-{value}" : value;
+        return value == "start" || value == "end" ? $"flex-{value}" : value ?? "";
     }
 
-    internal string ToDashCase(string value)
+    internal string ToDashCase(string? value)
     {
         var sb = new StringBuilder();
+
+        if (value == null)
+            return string.Empty;
 
         foreach (var ch in value)
         {

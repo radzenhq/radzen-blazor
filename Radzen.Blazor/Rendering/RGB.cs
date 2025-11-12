@@ -188,7 +188,7 @@ namespace Radzen.Blazor.Rendering
         /// </summary>
         /// <param name="color">The color.</param>
         /// <returns>RGB.</returns>
-        public static RGB Parse(string color)
+        public static RGB? Parse(string color)
         {
             if (string.IsNullOrEmpty(color))
             {
@@ -201,9 +201,9 @@ namespace Radzen.Blazor.Rendering
 
             if (match.Success)
             {
-                var red = int.Parse(match.Groups["r"].Value);
-                var green = int.Parse(match.Groups["g"].Value);
-                var blue = int.Parse(match.Groups["b"].Value);
+                var red = int.Parse(match.Groups["r"].Value, CultureInfo.InvariantCulture);
+                var green = int.Parse(match.Groups["g"].Value, CultureInfo.InvariantCulture);
+                var blue = int.Parse(match.Groups["b"].Value, CultureInfo.InvariantCulture);
 
                 return new RGB { Red = red, Green = green, Blue = blue };
             }
@@ -214,9 +214,9 @@ namespace Radzen.Blazor.Rendering
 
             if (match.Success)
             {
-                var red = int.Parse(match.Groups["r"].Value);
-                var green = int.Parse(match.Groups["g"].Value);
-                var blue = int.Parse(match.Groups["b"].Value);
+                var red = int.Parse(match.Groups["r"].Value, CultureInfo.InvariantCulture);
+                var green = int.Parse(match.Groups["g"].Value, CultureInfo.InvariantCulture);
+                var blue = int.Parse(match.Groups["b"].Value, CultureInfo.InvariantCulture);
                 var alpha = double.Parse(match.Groups["a"].Value, CultureInfo.InvariantCulture);
 
                 return new RGB { Red = red, Green = green, Blue = blue, Alpha = alpha };
@@ -228,9 +228,9 @@ namespace Radzen.Blazor.Rendering
 
             if (match.Success)
             {
-                var red = int.Parse($"{match.Groups["r"].Value}", NumberStyles.HexNumber);
-                var green = int.Parse($"{match.Groups["g"].Value}", NumberStyles.HexNumber);
-                var blue = int.Parse($"{match.Groups["b"].Value}", NumberStyles.HexNumber);
+                var red = int.Parse($"{match.Groups["r"].Value}", NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                var green = int.Parse($"{match.Groups["g"].Value}", NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                var blue = int.Parse($"{match.Groups["b"].Value}", NumberStyles.HexNumber, CultureInfo.InvariantCulture);
 
                 return new RGB { Red = red, Green = green, Blue = blue };
             }
@@ -252,7 +252,7 @@ namespace Radzen.Blazor.Rendering
             var red = Convert.ToInt32(Red);
             var green = Convert.ToInt32(Green);
             var blue = Convert.ToInt32(Blue);
-            return $"{red.ToString("X2")}{green.ToString("X2")}{blue.ToString("X2")}";
+            return $"{red.ToString("X2", CultureInfo.InvariantCulture)}{green.ToString("X2", CultureInfo.InvariantCulture)}{blue.ToString("X2", CultureInfo.InvariantCulture)}";
         }
 
         /// <summary>

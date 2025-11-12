@@ -39,7 +39,7 @@ static class DynamicTypeFactory
                       "set_" + propertyNames[i],
                       MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.HideBySig,
                       null,
-                      [propertyTypes[i]]);
+                      new[] { propertyTypes[i] });
 
             var setterIl = setterMethod.GetILGenerator();
             setterIl.Emit(OpCodes.Ldarg_0);
@@ -51,6 +51,10 @@ static class DynamicTypeFactory
         }
 
         var dynamicType = typeBuilder.CreateType();
+        if (dynamicType == null)
+        {
+            throw new InvalidOperationException("Failed to create dynamic type.");
+        }
         return dynamicType;
     }
 }

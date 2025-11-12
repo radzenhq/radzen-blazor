@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Blazor.Markdown;
 
 /// <summary>
@@ -13,6 +15,7 @@ public class Text(string value) : Inline
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitText(this);
     }
 }

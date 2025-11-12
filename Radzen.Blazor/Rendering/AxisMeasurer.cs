@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Components;
 using System;
+using System.ComponentModel;
 
 namespace Radzen.Blazor.Rendering
 {
@@ -16,6 +18,10 @@ namespace Radzen.Blazor.Rendering
         /// <returns>System.Double.</returns>
         public static double YAxis(ScaleBase scale, AxisBase axis, RadzenAxisTitle title)
         {
+            ArgumentNullException.ThrowIfNull(scale);
+            ArgumentNullException.ThrowIfNull(axis);
+            ArgumentNullException.ThrowIfNull(title);
+
             var ticks = scale.Ticks(axis.TickDistance);
 
             double length = 0;
@@ -46,6 +52,10 @@ namespace Radzen.Blazor.Rendering
         /// <returns>System.Double.</returns>
         public static double XAxis(ScaleBase scale, AxisBase axis, RadzenAxisTitle title)
         {
+            ArgumentNullException.ThrowIfNull(axis);
+            ArgumentNullException.ThrowIfNull(scale);
+            ArgumentNullException.ThrowIfNull(title);
+
             var size = 16 * 0.875 + 12;
 
             var angle = axis.LabelRotation ?? axis.LabelAutoRotation;

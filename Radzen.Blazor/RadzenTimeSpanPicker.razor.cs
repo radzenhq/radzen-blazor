@@ -24,12 +24,12 @@ namespace Radzen.Blazor
     public partial class RadzenTimeSpanPicker<TValue> : RadzenComponent, IRadzenFormComponent
     {
         #region Parameters: value
-        private TValue valueField;
+        private TValue? valueField;
         /// <summary>
         /// Specifies the value of the component.
         /// </summary>
         [Parameter]
-        public TValue Value
+        public TValue? Value
         {
             get => valueField;
             set
@@ -105,25 +105,25 @@ namespace Radzen.Blazor
         /// Specifies the popup toggle button CSS classes, separated with spaces.
         /// </summary>
         [Parameter]
-        public string PopupButtonClass { get; set; }
+        public string? PopupButtonClass { get; set; }
 
         /// <summary>
         /// Specifies additional custom attributes that will be rendered by the input.
         /// </summary>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
         /// Specifies the input CSS classes, separated with spaces.
         /// </summary>
         [Parameter]
-        public string InputClass { get; set; }
+        public string? InputClass { get; set; }
 
         /// <summary>
         /// Specifies the name of the input field.
         /// </summary>
         [Parameter]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Specifies the tab index.
@@ -139,14 +139,14 @@ namespace Radzen.Blazor
         /// time span format strings.
         /// </summary>
         [Parameter]
-        public string TimeSpanFormat { get; set; }
+        public string? TimeSpanFormat { get; set; }
 
         /// <summary>
         /// Specifies custom function to parse the input.
         /// If it's not defined or the function it returns <c>null</c>, a built-in parser us used instead.
         /// </summary>
         [Parameter]
-        public Func<string, TimeSpan?> ParseInput { get; set; }
+        public Func<string, TimeSpan?>? ParseInput { get; set; }
         #endregion
 
         #region Parameters: input field texts
@@ -154,7 +154,7 @@ namespace Radzen.Blazor
         /// Specifies the input placeholder.
         /// </summary>
         [Parameter]
-        public string Placeholder { get; set; }
+        public string? Placeholder { get; set; }
 
         /// <summary>
         /// Specifies the aria label for the toggle popup button.
@@ -201,38 +201,38 @@ namespace Radzen.Blazor
         /// Specifies the step of the days field in the picker panel.
         /// </summary>
         [Parameter]
-        public string DaysStep { get; set; }
+        public string? DaysStep { get; set; }
 
         /// <summary>
         /// Specifies the step of the hours field in the picker panel.
         /// </summary>
         [Parameter]
-        public string HoursStep { get; set; }
+        public string? HoursStep { get; set; }
 
         /// <summary>
         /// Specifies the step of the minutes field in the picker panel.
         /// </summary>
         [Parameter]
-        public string MinutesStep { get; set; }
+        public string? MinutesStep { get; set; }
 
         /// <summary>
         /// Specifies the step of the seconds field in the picker panel.
         /// </summary>
         [Parameter]
-        public string SecondsStep { get; set; }
+        public string? SecondsStep { get; set; }
 
         /// <summary>
         /// Specifies the step of the milliseconds field in the picker panel.
         /// </summary>
         [Parameter]
-        public string MillisecondsStep { get; set; }
+        public string? MillisecondsStep { get; set; }
 
         #if NET7_0_OR_GREATER
         /// <summary>
         /// Specifies the step of the microseconds field in the picker panel.
         /// </summary>
         [Parameter]
-        public string MicrosecondsStep { get; set; }
+        public string? MicrosecondsStep { get; set; }
 #endif
         #endregion
 
@@ -311,7 +311,7 @@ namespace Radzen.Blazor
         /// Specifies the value expression used while creating the <see cref="FieldIdentifier"/>.
         /// </summary>
         [Parameter]
-        public Expression<Func<TValue>> ValueExpression { get; set; }
+        public Expression<Func<TValue>>? ValueExpression { get; set; }
         #endregion
 
         #region Parameters: events
@@ -330,12 +330,12 @@ namespace Radzen.Blazor
 
 
         #region Form fields
-        private IRadzenForm form;
+        private IRadzenForm? form;
         /// <summary>
         /// Specifies the form this component belongs to.
         /// </summary>
         [CascadingParameter]
-        public IRadzenForm Form
+        public IRadzenForm? Form
         {
             get => form;
             set
@@ -352,12 +352,12 @@ namespace Radzen.Blazor
         /// Specifies the edit context of this component.
         /// </summary>
         [CascadingParameter]
-        public EditContext EditContext { get; set; }
+        public EditContext? EditContext { get; set; }
 
         /// <summary>
         /// Specifies the <see cref="RadzenFormField"/> context of this component.
         /// </summary>
-        public IFormFieldContext FormFieldContext { get; set; } = null;
+        public IFormFieldContext? FormFieldContext { get; set; }
         #endregion
 
 
@@ -417,7 +417,14 @@ namespace Radzen.Blazor
                 }
                 _confirmedValue = newValue;
 
-                Value = (TValue) (object)_confirmedValue;
+                if (_isNullable)
+                {
+                    Value = _confirmedValue != null ? (TValue)(object)_confirmedValue : default(TValue)!;
+                }
+                else
+                {
+                    Value = (TValue)(object)(_confirmedValue ?? DefaultNonNullValue);
+                }
 
                 if (ShowConfirmationButton is false)
                 {
@@ -455,7 +462,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private bool isUnconfirmedValueNegative = false;
+        private bool isUnconfirmedValueNegative;
         private int UnconformedValueSign => isUnconfirmedValueNegative ? -1 : 1;
 
         private TimeSpan DefaultNonNullValue => AdjustToBounds(TimeSpan.Zero);
@@ -474,7 +481,8 @@ namespace Radzen.Blazor
         protected override void OnInitialized()
         {
             // initial synchronization: necessary when T is not nullable and Value is default(T)
-            ConfirmedValue = (TimeSpan?)(object)Value;
+            ConfirmedValue = (Value as TimeSpan?) ?? default;
+
             base.OnInitialized();
         }
 
@@ -529,6 +537,8 @@ namespace Radzen.Blazor
             }
 
             Form?.RemoveComponent(this);
+
+            GC.SuppressFinalize(this);
         }
 
         private async Task OnChange()
@@ -543,7 +553,7 @@ namespace Radzen.Blazor
             await Change.InvokeAsync(ConfirmedValue);
         }
 
-        private void ValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
+        private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
         {
             StateHasChanged();
         }
@@ -580,7 +590,7 @@ namespace Radzen.Blazor
         /// Gets the value of the component.
         /// </summary>
         /// <returns>System.Object.</returns>
-        public object GetValue() => Value;
+        public object? GetValue() => Value;
         #endregion
 
 
@@ -625,7 +635,7 @@ namespace Radzen.Blazor
 
                 await OnChange();
             }
-            else
+            else if (JSRuntime != null)
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
             }
@@ -675,7 +685,7 @@ namespace Radzen.Blazor
         private Task ClickInputField()
             => ShowPopupButton ? Task.CompletedTask : ClickPopupButton();
 
-        private bool preventKeyPress = false;
+        private bool preventKeyPress;
         private async Task PressKey(KeyboardEventArgs args)
         {
             if (PreventPopupToggle)
@@ -698,7 +708,7 @@ namespace Radzen.Blazor
         #endregion
 
         #region Internal: popup general actions
-        private Popup popup;
+        private Popup? popup;
 
         private Task TogglePopup()
             => Inline ? Task.CompletedTask : popup?.ToggleAsync(Element) ?? Task.CompletedTask;
@@ -857,12 +867,12 @@ namespace Radzen.Blazor
             return UpdateValueFromPanelFields(UnconfirmedValue.Negate());
         }
 
-        private (TimeSpanUnit Unit, string Value) _lastFieldInput = (TimeSpanUnit.Day, null);
+        private (TimeSpanUnit Unit, string? Value) _lastFieldInput = (TimeSpanUnit.Day, null);
 
-        private void SetLastFieldInput(TimeSpanUnit unit, string value)
+        private void SetLastFieldInput(TimeSpanUnit unit, string? value)
             => _lastFieldInput = (unit, value);
 
-        private Task UpdateValueOfUnit(TimeSpanUnit unit, string stringValue)
+        private Task UpdateValueOfUnit(TimeSpanUnit unit, string? stringValue)
         {
             if (string.IsNullOrEmpty(stringValue)
                 || int.TryParse(stringValue, NumberStyles.Any, Culture, out int value) is false)

@@ -6,7 +6,7 @@
 </div>
 @code {
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
     public EventCallback<DraggableEventArgs> DragStart { get; set; }
@@ -17,13 +17,16 @@
     [Parameter]
     public EventCallback<DraggableEventArgs> Drag { get; set; }
 
-    Rect Rect { get; set; }
+    Rect? Rect { get; set; }
 
     bool Touch { get; set; }
 
     async Task OnMouseUp(MouseEventArgs args)
     {
-        await JSRuntime.InvokeVoidAsync("Radzen.endDrag", Element);
+        if (JSRuntime != null)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.endDrag", Element);
+        }
 
         await DragEnd.InvokeAsync(new DraggableEventArgs
         {
@@ -35,7 +38,7 @@
 
     async Task OnMouseDown(MouseEventArgs args)
     {
-        if (!Touch)
+        if (!Touch && JSRuntime != null)
         {
             Rect = await JSRuntime.InvokeAsync<Rect>("Radzen.startDrag", Element, Reference, nameof(OnMove));
 

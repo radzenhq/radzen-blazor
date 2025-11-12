@@ -20,6 +20,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The title template.</value>
         [Parameter]
-        public RenderFragment TitleTemplate { get; set; }
+        public RenderFragment? TitleTemplate { get; set; }
     }
 }

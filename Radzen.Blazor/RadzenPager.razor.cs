@@ -61,7 +61,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's optional previous page button's label text.
         /// </summary>
         [Parameter]
-        public string PrevPageLabel { get; set; }
+        public string? PrevPageLabel { get; set; }
 
         /// <summary>
         /// Gets or sets the pager's previous page button's title attribute.
@@ -91,7 +91,7 @@ namespace Radzen.Blazor
         /// Gets or sets the pager's optional next page button's label text.
         /// </summary>
         [Parameter]
-        public string NextPageLabel { get; set; }
+        public string? NextPageLabel { get; set; }
 
         /// <summary>
         /// Gets or sets the pager's next page button's title attribute.
@@ -149,7 +149,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The page size options.</value>
         [Parameter]
-        public IEnumerable<int> PageSizeOptions { get; set; }
+        public IEnumerable<int>? PageSizeOptions { get; set; }
 
         /// <summary>
         /// Gets or sets the page size description text.
@@ -481,15 +481,16 @@ namespace Radzen.Blazor
             }
         }
 
-        bool preventKeyDown = false;
+        bool preventKeyDown;
         int focusedIndex = -3;
 
         /// <summary>
-        /// Handles the <see cref="E:KeyDown" /> event.
+        /// Handles the key down event.
         /// </summary>
         /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
         protected virtual async Task OnKeyDown(KeyboardEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
             var key = args.Code != null ? args.Code : args.Key;
 
             var numberOfDisplayedPages = Math.Min(endPage + 1, PageNumbersCount);
@@ -576,7 +577,7 @@ namespace Radzen.Blazor
         {
             await base.OnAfterRenderAsync(firstRender);
 
-            if (shouldFocus)
+            if (shouldFocus && JSRuntime != null)
             {
                 shouldFocus = false;
                 await JSRuntime.InvokeVoidAsync("Radzen.focusElement", GetId());

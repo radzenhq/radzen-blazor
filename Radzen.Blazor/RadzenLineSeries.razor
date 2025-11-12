@@ -23,8 +23,9 @@
       return new Point<TItem> { X = x, Y = y, Data = item };
     }).ToList();
 
-    var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
-    var index = Chart.Series.IndexOf(this);
+    var chart = RequireChart();
+    var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
+    var index = chart.Series.IndexOf(this);
     var className = $"rz-line-series rz-series-{index}";
 
     return

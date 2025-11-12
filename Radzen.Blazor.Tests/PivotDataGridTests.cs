@@ -605,7 +605,7 @@ namespace Radzen.Blazor.Tests
             Assert.True(grid.AllowFieldsPicking);
         }
 
-        private static IRenderedComponent<RadzenPivotDataGrid<SalesData>> RenderPivotDataGrid(TestContext ctx, Action<ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>>>? configure = null)
+        private static IRenderedComponent<RadzenPivotDataGrid<SalesData>> RenderPivotDataGrid(TestContext ctx, Action<ComponentParameterCollectionBuilder<RadzenPivotDataGrid<SalesData>>> configure = null)
         {
             return ctx.RenderComponent<RadzenPivotDataGrid<SalesData>>(parameters =>
             {

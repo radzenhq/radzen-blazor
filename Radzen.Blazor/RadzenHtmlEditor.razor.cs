@@ -76,13 +76,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Specifies custom headers that will be submit during uploads.
         /// </summary>
         [Parameter]
-        public IDictionary<string, string> UploadHeaders { get; set; }
+        public IDictionary<string, string>? UploadHeaders { get; set; }
 
         /// <summary>
         /// Gets or sets the input.
@@ -151,24 +151,23 @@ namespace Radzen.Blazor
         /// Specifies the URL to which RadzenHtmlEditor will submit files.
         /// </summary>
         [Parameter]
-        public string UploadUrl { get; set; }
+        public string? UploadUrl { get; set; }
 
         ElementReference ContentEditable { get; set; }
-        RadzenTextArea TextArea { get; set; }
+        RadzenTextArea? TextArea { get; set; }
 
         /// <summary>
         /// Focuses the editor.
         /// </summary>
         public override ValueTask FocusAsync()
         {
-
             if (mode == HtmlEditorMode.Design)
             {
                 return ContentEditable.FocusAsync();
             }
             else
             {
-                return TextArea.Element.FocusAsync();
+                return TextArea != null ? TextArea.Element.FocusAsync() : ValueTask.CompletedTask;
             }
         }
 
@@ -227,8 +226,9 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="value">The value.</param>
-        public async Task ExecuteCommandAsync(string name, string value = null)
+        public async Task ExecuteCommandAsync(string name, string? value = null)
         {
+            if (JSRuntime == null) return;
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.execCommand", ContentEditable, name, value);
 
             await OnExecuteAsync(name);
@@ -305,7 +305,10 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task SaveSelectionAsync()
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.saveSelection", ContentEditable);
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.saveSelection", ContentEditable);
+            }
         }
 
         /// <summary>
@@ -313,11 +316,15 @@ namespace Radzen.Blazor
         /// </summary>
         public async Task RestoreSelectionAsync()
         {
-            await JSRuntime.InvokeVoidAsync("Radzen.restoreSelection", ContentEditable);
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.restoreSelection", ContentEditable);
+            }
         }
 
         async Task UpdateCommandState()
         {
+            if (JSRuntime == null) return;
             State = await JSRuntime.InvokeAsync<RadzenHtmlEditorCommandState>("Radzen.queryCommands", ContentEditable);
 
             StateHasChanged();
@@ -328,10 +335,10 @@ namespace Radzen.Blazor
             await OnChange();
         }
 
-        bool htmlChanged = false;
-        bool sourceChanged = false;
+        bool htmlChanged;
+        bool sourceChanged;
 
-        bool visibleChanged = false;
+        bool visibleChanged;
         bool firstRender = true;
 
         /// <summary>
@@ -343,6 +350,7 @@ namespace Radzen.Blazor
         /// <returns>A task that represents the asynchronous operation, returning the attributes as an object of type T.</returns>
         public ValueTask<T> GetSelectionAttributes<T>(string selector, string[] attributes)
         {
+            if (JSRuntime == null) return ValueTask.FromResult<T>(default!);
             return JSRuntime.InvokeAsync<T>("Radzen.selectionAttributes", selector, attributes, ContentEditable);
         }
 
@@ -355,7 +363,7 @@ namespace Radzen.Blazor
 
             if (firstRender || visibleChanged)
             {
-                if (Visible)
+                if (Visible && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference, shortcuts.Keys);
                 }
@@ -385,7 +393,7 @@ namespace Radzen.Blazor
                 }
             }
 
-            if (requiresUpdate)
+            if (requiresUpdate && JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.innerHTML", ContentEditable, Html);
             }
@@ -406,7 +414,7 @@ namespace Radzen.Blazor
             return mode;
         }
 
-        string Html { get; set; }
+        string? Html { get; set; }
 
         /// <inheritdoc />
         protected override void OnInitialized()
@@ -446,7 +454,7 @@ namespace Radzen.Blazor
             return args.Html;
         }
 
-        bool valueChanged = false;
+        bool valueChanged;
 
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
@@ -465,7 +473,7 @@ namespace Radzen.Blazor
 
             await base.SetParametersAsync(parameters);
 
-            if (visibleChanged && !firstRender && !Visible)
+            if (visibleChanged && !firstRender && !Visible && JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.destroyEditor", ContentEditable);
             }
@@ -482,10 +490,12 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (Visible && IsJSRuntimeAvailable)
+            if (Visible && IsJSRuntimeAvailable && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyEditor", ContentEditable);
             }
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -507,7 +517,7 @@ namespace Radzen.Blazor
         [JSInvokable("OnUploadComplete")]
         public async Task OnUploadComplete(string response)
         {
-            System.Text.Json.JsonDocument doc = null;
+            System.Text.Json.JsonDocument? doc = null;
 
             if (!string.IsNullOrEmpty(response))
             {

@@ -12,7 +12,7 @@ class InlineParser
         public char Char { get; set; }
         public int Length { get; set; }
         public int Position { get; set; }
-        public Text Node { get; set; }
+        public Text? Node { get; set; }
         public bool CanOpen { get; set; }
         public bool CanClose { get; set; }
         public bool Active { get; set; } = true;
@@ -296,7 +296,7 @@ class InlineParser
 
         var url = destination.ToString();
 
-        if (url.Contains(Space))
+        if (url.Contains(Space, StringComparison.Ordinal))
         {
             return false;
         }
@@ -778,7 +778,7 @@ class InlineParser
 
     private void ReplaceOpener(int openerIndex, InlineContainer parent)
     {
-        var startIndex = inlines.FindIndex(delimiters[openerIndex].Node.Equals);
+        var startIndex = delimiters[openerIndex].Node != null ? inlines.FindIndex(node => node.Equals(delimiters[openerIndex].Node)) : -1;
 
         ParseEmphasisAndStrong(openerIndex);
 
@@ -815,7 +815,7 @@ class InlineParser
 
         AddTextNode();
 
-        var startIndex = inlines.FindIndex(delimiters[openerIndex].Node.Equals);
+        var startIndex = delimiters[openerIndex].Node != null ? inlines.FindIndex(node => node.Equals(delimiters[openerIndex].Node)) : -1;
 
         var endIndex = inlines.Count - startIndex;
 
@@ -878,8 +878,8 @@ class InlineParser
             {
                 var closer = delimiters[closerIndex];
                 var opener = delimiters[openerIndex];
-                var startIndex = inlines.FindIndex(opener.Node.Equals);
-                var endIndex = inlines.FindIndex(closer.Node.Equals);
+                var startIndex = opener.Node != null ? inlines.FindIndex(opener.Node.Equals) : -1;
+                var endIndex = closer.Node != null ? inlines.FindIndex(closer.Node.Equals) : -1;
 
                 if (startIndex >= 0 && endIndex >= 0)
                 {
@@ -896,7 +896,7 @@ class InlineParser
 
                     opener.Length -= charsToConsume;
 
-                    if (opener.Length > 0)
+                    if (opener.Length > 0 && opener.Node != null)
                     {
                         opener.Node.Value = opener.Node.Value[..^charsToConsume];
                         startIndex += 1;
@@ -904,7 +904,7 @@ class InlineParser
 
                     closer.Length -= charsToConsume;
 
-                    if (closer.Length > 0)
+                    if (closer.Length > 0 && closer.Node != null)
                     {
                         closer.Node.Value = closer.Node.Value[..^charsToConsume];
                         endIndex -= 1;

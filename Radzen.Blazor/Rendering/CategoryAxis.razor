@@ -1,17 +1,17 @@
 @inherits RadzenChartComponentBase
 
-@if (XAxis.Visible)
+@if (XAxis?.Visible == true)
 {
     <g class="rz-axis rz-category-axis">
-    <Line class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@XAxis.Stroke" StrokeWidth="@XAxis.StrokeWidth" LineType="@XAxis.LineType" />
+    <Line class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@(XAxis?.Stroke)" StrokeWidth="@(XAxis?.StrokeWidth ?? 0)" LineType="@(XAxis?.LineType ?? LineType.Solid)" />
     @for (var idx = start; idx <= end; idx += step)
     {
-        var value = Chart.CategoryScale.Value((double)idx);
-        var x = Chart.CategoryScale.Scale((double)idx, true);
+        var value = Chart?.CategoryScale?.Value((double)idx) ?? 0;
+        var x = Chart?.CategoryScale?.Scale((double)idx, true) ?? 0;
 
-        var text = XAxis.Format(Chart.CategoryScale, value);
+        var text = XAxis != null && Chart?.CategoryScale != null ? XAxis.Format(Chart.CategoryScale, value) : "";
 
-        if (XAxis.Ticks.Template != null)
+        if (XAxis?.Ticks?.Template != null)
         {
             var context = new TickTemplateContext { Text = text, Value = value, X = x, Y = y1 } ;
 
@@ -21,17 +21,17 @@
         }
         else if (!String.IsNullOrEmpty(text))
         {
-            <CategoryAxisTick Rotate=@rotate X="@x" Y="@y1" Text="@text" Stroke="@(XAxis.Ticks.Stroke ?? XAxis.Stroke)" StrokeWidth="@XAxis.Ticks.StrokeWidth" LineType="@XAxis.Ticks.LineType"/>
+            <CategoryAxisTick Rotate=@rotate X="@x" Y="@y1" Text="@text" Stroke="@(XAxis?.Ticks?.Stroke ?? XAxis?.Stroke)" StrokeWidth="@(XAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(XAxis?.Ticks?.LineType ?? LineType.Solid)"/>
         }
 
-        if (XAxis.GridLines.Visible && idx > start)
+        if (XAxis?.GridLines?.Visible == true && idx > start)
         {
-            <Line class="rz-grid-line" X1="@x" Y1="@y1" X2="@x" Y2="@y2" Stroke="@XAxis.GridLines.Stroke" StrokeWidth="@XAxis.GridLines.StrokeWidth" LineType="@XAxis.GridLines.LineType" />
+            <Line class="rz-grid-line" X1="@x" Y1="@y1" X2="@x" Y2="@y2" Stroke="@(XAxis.GridLines.Stroke ?? "")" StrokeWidth="@(XAxis?.GridLines.StrokeWidth ?? 0)" LineType="@(XAxis?.GridLines.LineType ?? LineType.Solid)" />
         }
     }
-    @if (!String.IsNullOrEmpty(XAxis.Title.Text))
+    @if (!String.IsNullOrEmpty(XAxis?.Title?.Text))
     {
-        <CategoryAxisTitle X="@((x2 - x1)/2)" Y="@(y1 + Chart.CategoryAxis.Size - XAxis.Title.Size)" Text="@XAxis.Title.Text" />
+        <CategoryAxisTitle X="@((x2 - x1)/2)" Y="@(y1 + (Chart?.CategoryAxis?.Size ?? 0) - (XAxis?.Title?.Size ?? 0))" Text="@(XAxis?.Title?.Text ?? "")" />
     }
     </g>
 }
@@ -44,13 +44,18 @@
     double y1;
     double y2;
 
-    private AxisBase XAxis { get; set; }
-    private AxisBase YAxis { get; set; }
+    private AxisBase? XAxis { get; set; }
+    private AxisBase? YAxis { get; set; }
 
     private double? rotate;
 
     protected override void OnParametersSet()
     {
+        if (Chart == null)
+        {
+            return;
+        }
+
         XAxis = Chart.CategoryAxis;
         YAxis = Chart.ValueAxis;
 
@@ -60,7 +65,7 @@
             YAxis = Chart.CategoryAxis;
         }
 
-        var ticks = Chart.CategoryScale.Ticks(XAxis.TickDistance);
+        var ticks = Chart.CategoryScale.Ticks(XAxis?.TickDistance ?? 0);
         start = (decimal)ticks.Start;
         end = (decimal)ticks.End;
         step = (decimal)ticks.Step;
@@ -68,15 +73,15 @@
         x1 = Chart.CategoryScale.Scale(ticks.Start);
         x2 = Chart.CategoryScale.Scale(ticks.End);
 
-        var valueTicks = Chart.ValueScale.Ticks(YAxis.TickDistance);
+        var valueTicks = Chart.ValueScale.Ticks(YAxis?.TickDistance ?? 0);
         y1 = Chart.ValueScale.Scale(valueTicks.Start);
         y2 = Chart.ValueScale.Scale(valueTicks.End);
 
-        if (XAxis.LabelRotation != null)
+        if (XAxis?.LabelRotation != null)
         {
             rotate = XAxis.LabelRotation;
         }
-        else if (XAxis.LabelAutoRotation != null)
+        else if (XAxis?.LabelAutoRotation != null)
         {
             rotate = null;
 
@@ -85,13 +90,13 @@
             for (var idx = start; idx <= end; idx += step)
             {
                 var value = Chart.CategoryScale.Value((double)idx);
-                var text = XAxis.Format(Chart.CategoryScale, value);
+                var text = XAxis != null ? XAxis.Format(Chart.CategoryScale, value) : "";
 
                 var textWidth = TextMeasurer.TextWidth(text) - 8;
 
                 if (textWidth > tickWidth)
                 {
-                    rotate = XAxis.LabelAutoRotation;
+                    rotate = XAxis?.LabelAutoRotation;
                     break;
                 }
             }

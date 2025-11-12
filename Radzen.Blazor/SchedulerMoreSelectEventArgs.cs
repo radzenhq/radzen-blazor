@@ -20,11 +20,11 @@ namespace Radzen
         /// <summary>
         /// List of appointments.
         /// </summary>
-        public IEnumerable<AppointmentData> Appointments { get; set; }
+        public IEnumerable<AppointmentData>? Appointments { get; set; }
         /// <summary>
         /// Current View.
         /// </summary>
-        public ISchedulerView View { get; set; }
+        public ISchedulerView? View { get; set; }
         /// <summary>
         /// Has default action been prevented from occuring.
         /// </summary>

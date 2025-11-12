@@ -41,8 +41,8 @@ namespace Radzen
     /// </example>
     public class DialogService : IDisposable
     {
-        private DotNetObjectReference<DialogService> reference;
-        internal DotNetObjectReference<DialogService> Reference
+        private DotNetObjectReference<DialogService>? reference;
+        internal DotNetObjectReference<DialogService>? Reference
         {
             get
             {
@@ -59,15 +59,15 @@ namespace Radzen
         /// Gets or sets the URI helper.
         /// </summary>
         /// <value>The URI helper.</value>
-        NavigationManager UriHelper { get; set; }
-        IJSRuntime JSRuntime { get; set; }
+        NavigationManager? UriHelper { get; set; }
+        IJSRuntime? JSRuntime { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DialogService"/> class.
         /// </summary>
         /// <param name="uriHelper">The URI helper.</param>
         /// <param name="jsRuntime">IJSRuntime instance.</param>
-        public DialogService(NavigationManager uriHelper, IJSRuntime jsRuntime)
+        public DialogService(NavigationManager? uriHelper, IJSRuntime? jsRuntime)
         {
             UriHelper = uriHelper;
             JSRuntime = jsRuntime;
@@ -78,9 +78,9 @@ namespace Radzen
             }
         }
 
-        private void UriHelper_OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+        private void UriHelper_OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
-            while (dialogs.Any())
+            while (dialogs.Count > 0)
             {
                 Close();
             }
@@ -94,27 +94,27 @@ namespace Radzen
         /// <summary>
         /// Raises the Close event.
         /// </summary>
-        public event Action<dynamic> OnClose;
+        public event Action<dynamic>? OnClose;
 
         /// <summary>
         /// Occurs when [on refresh].
         /// </summary>
-        public event Action OnRefresh;
+        public event Action? OnRefresh;
 
         /// <summary>
         /// Occurs when a new dialog is open.
         /// </summary>
-        public event Action<string, Type, Dictionary<string, object>, DialogOptions> OnOpen;
+        public event Action<string?, Type, Dictionary<string, object>, DialogOptions>? OnOpen;
 
         /// <summary>
         /// Raises the Close event for the side dialog
         /// </summary>
-        public event Action<dynamic> OnSideClose;
+        public event Action<dynamic>? OnSideClose;
 
         /// <summary>
         /// Raises the Open event for the side dialog
         /// </summary>
-        public event Action<Type, Dictionary<string, object>, SideDialogOptions> OnSideOpen;
+        public event Action<Type, Dictionary<string, object>, SideDialogOptions>? OnSideOpen;
 
         /// <summary>
         /// Opens a dialog with the specified arguments.
@@ -123,7 +123,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="parameters">The dialog parameters.</param>
         /// <param name="options">The dialog options.</param>
-        public virtual void Open<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
+        public virtual void Open<T>(string title, Dictionary<string, object>? parameters = null, DialogOptions? options = null) where T : ComponentBase
         {
             OpenDialog<T>(title, parameters, options);
         }
@@ -135,7 +135,7 @@ namespace Radzen
         /// <param name="componentType">The type of the component to be displayed in the dialog. Must inherit from <see cref="ComponentBase"/>.</param>
         /// <param name="parameters">The dialog parameters.</param>
         /// <param name="options">The dialog options.</param>
-        public virtual void Open(string title, Type componentType, Dictionary<string, object> parameters = null, DialogOptions options = null)
+        public virtual void Open(string title, Type componentType, Dictionary<string, object>? parameters = null, DialogOptions? options = null)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(componentType))
             {
@@ -143,8 +143,12 @@ namespace Radzen
             }
 
             var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.NonPublic);
+            if (method == null)
+            {
+                throw new InvalidOperationException("OpenDialog method not found.");
+            }
 
-            method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters, options });
+            method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters!, options! });
         }
 
         /// <summary>
@@ -159,7 +163,7 @@ namespace Radzen
         /// The tasks
         /// </summary>
         protected List<TaskCompletionSource<dynamic>> tasks = new List<TaskCompletionSource<dynamic>>();
-        private TaskCompletionSource<dynamic> sideDialogResultTask;
+        private TaskCompletionSource<dynamic>? sideDialogResultTask;
 
         /// <summary>
         /// Opens a dialog with the specified arguments.
@@ -169,7 +173,7 @@ namespace Radzen
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
         /// <param name="options">The dialog options.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public virtual Task<dynamic> OpenAsync<T>(string title, Dictionary<string, object> parameters = null, DialogOptions options = null) where T : ComponentBase
+        public virtual Task<dynamic> OpenAsync<T>(string title, Dictionary<string, object>? parameters = null, DialogOptions? options = null) where T : ComponentBase
         {
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
@@ -188,7 +192,7 @@ namespace Radzen
         /// <param name="options">The dialog options.</param>
         /// <returns>A task that represents the result passed as an argument to <see cref="Close"/>.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
-        public virtual Task<dynamic> OpenAsync(string title, Type componentType, Dictionary<string, object> parameters = null, DialogOptions options = null)
+        public virtual Task<dynamic> OpenAsync(string title, Type componentType, Dictionary<string, object>? parameters = null, DialogOptions? options = null)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(componentType))
             {
@@ -199,8 +203,12 @@ namespace Radzen
             tasks.Add(task);
 
             var method = GetType().GetMethod(nameof(OpenDialog), BindingFlags.Instance | BindingFlags.NonPublic);
+            if (method == null)
+            {
+                throw new InvalidOperationException("OpenDialog method not found.");
+            }
 
-            method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters, options });
+            method.MakeGenericMethod(componentType).Invoke(this, new object[] { title, parameters!, options! });
 
             return task.Task;
         }
@@ -214,7 +222,7 @@ namespace Radzen
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T"/></param>
         /// <param name="options">The side dialog options.</param>
         /// <returns>A task that completes when the dialog is closed or a new one opened</returns>
-        public Task<dynamic> OpenSideAsync<T>(string title, Dictionary<string, object> parameters = null, SideDialogOptions options = null)
+        public Task<dynamic> OpenSideAsync<T>(string title, Dictionary<string, object>? parameters = null, SideDialogOptions? options = null)
             where T : ComponentBase
         {
             CloseSide();
@@ -238,7 +246,7 @@ namespace Radzen
         /// <param name="options">The side dialog options.</param>
         /// <returns>A task that represents the result passed as an argument to <see cref="CloseSide"/>.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
-        public Task<dynamic> OpenSideAsync(string title, Type componentType, Dictionary<string, object> parameters = null, SideDialogOptions options = null)
+        public Task<dynamic> OpenSideAsync(string title, Type componentType, Dictionary<string, object>? parameters = null, SideDialogOptions? options = null)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(componentType))
             {
@@ -267,7 +275,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the side dialog.</param>
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T"/></param>
         /// <param name="options">The side dialog options.</param>
-        public void OpenSide<T>(string title, Dictionary<string, object> parameters = null, SideDialogOptions options = null)
+        public void OpenSide<T>(string title, Dictionary<string, object>? parameters = null, SideDialogOptions? options = null)
             where T : ComponentBase
         {
             CloseSide();
@@ -289,7 +297,7 @@ namespace Radzen
         /// <param name="parameters">The dialog parameters, passed as property values of the specified component.</param>
         /// <param name="options">The side dialog options.</param>
         /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
-        public void OpenSide(string title, Type componentType, Dictionary<string, object> parameters = null, SideDialogOptions options = null)
+        public void OpenSide(string title, Type componentType, Dictionary<string, object>? parameters = null, SideDialogOptions? options = null)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(componentType))
             {
@@ -312,7 +320,7 @@ namespace Radzen
         /// Closes the side dialog
         /// </summary>
         /// <param name="result">The result of the Dialog</param>
-        public virtual void CloseSide(dynamic result = null)
+        public virtual void CloseSide(dynamic? result = null)
         {
             if (sideDialogResultTask?.Task.IsCompleted == false)
             {
@@ -322,7 +330,7 @@ namespace Radzen
             OnSideClose?.Invoke(result);
         }
 
-        private TaskCompletionSource sideDialogCloseTask;
+        private TaskCompletionSource? sideDialogCloseTask;
 
         internal void OnSideCloseComplete()
         {
@@ -334,7 +342,7 @@ namespace Radzen
         /// Closes the side dialog and waits for the closing animation to finish.
         /// </summary>
         /// <param name="result">The result of the Dialog</param>
-        public async Task CloseSideAsync(dynamic result = null)
+        public async Task CloseSideAsync(dynamic? result = null)
         {
             sideDialogCloseTask = new TaskCompletionSource();
 
@@ -351,7 +359,7 @@ namespace Radzen
         /// <param name="options">The dialog options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public virtual Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions options = null, CancellationToken? cancellationToken = null)
+        public virtual Task<dynamic> OpenAsync(string title, RenderFragment<DialogService> childContent, DialogOptions? options = null, CancellationToken? cancellationToken = null)
         {
             var task = new TaskCompletionSource<dynamic>();
 
@@ -377,7 +385,7 @@ namespace Radzen
         /// <param name="options">The dialog options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public virtual Task<dynamic> OpenAsync(RenderFragment<DialogService> titleContent, RenderFragment<DialogService> childContent, DialogOptions options = null, CancellationToken? cancellationToken = null)
+        public virtual Task<dynamic> OpenAsync(RenderFragment<DialogService> titleContent, RenderFragment<DialogService> childContent, DialogOptions? options = null, CancellationToken? cancellationToken = null)
         {
             var task = new TaskCompletionSource<dynamic>();
 
@@ -402,7 +410,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="childContent">The content displayed in the dialog.</param>
         /// <param name="options">The dialog options.</param>
-        public virtual void Open(string title, RenderFragment<DialogService> childContent, DialogOptions options = null)
+        public virtual void Open(string title, RenderFragment<DialogService> childContent, DialogOptions? options = null)
         {
             options = options ?? new DialogOptions();
 
@@ -416,12 +424,13 @@ namespace Radzen
         /// </summary>
         protected List<object> dialogs = new List<object>();
 
-        internal void OpenDialog<T>(string title, Dictionary<string, object> parameters, DialogOptions options)
+        internal void OpenDialog<T>(string? title, Dictionary<string, object>? parameters, DialogOptions? options)
         {
             dialogs.Add(new object());
 
             // Validate and set default values for the dialog options
             options ??= new();
+            parameters ??= new Dictionary<string, object>();
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "600px";
             options.Left = !String.IsNullOrEmpty(options.Left) ? options.Left : "";
             options.Top = !String.IsNullOrEmpty(options.Top) ? options.Top : "";
@@ -440,7 +449,7 @@ namespace Radzen
         /// </summary>
         /// <param name="result">The result.</param>
         [JSInvokable("DialogService.Close")]
-        public virtual void Close(dynamic result = null)
+        public virtual void Close(dynamic? result = null)
         {
             var dialog = dialogs.LastOrDefault();
 
@@ -464,7 +473,7 @@ namespace Radzen
             reference?.Dispose();
             reference = null;
 
-            UriHelper.LocationChanged -= UriHelper_OnLocationChanged;
+            UriHelper?.LocationChanged -= UriHelper_OnLocationChanged;
         }
 
         /// <summary>
@@ -475,7 +484,7 @@ namespace Radzen
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions options = null, CancellationToken? cancellationToken = null)
+        public virtual async Task<bool?> Confirm(string message = "Confirm?", string title = "Confirm", ConfirmOptions? options = null, CancellationToken? cancellationToken = null)
         {
             // Validate and set default values for the dialog options
             options ??= new();
@@ -524,7 +533,7 @@ namespace Radzen
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Confirm(RenderFragment message, string title = "Confirm", ConfirmOptions options = null, CancellationToken? cancellationToken = null)
+        public virtual async Task<bool?> Confirm(RenderFragment message, string title = "Confirm", ConfirmOptions? options = null, CancellationToken? cancellationToken = null)
         {
             // Validate and set default values for the dialog options
             options ??= new();
@@ -573,7 +582,7 @@ namespace Radzen
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions options = null, CancellationToken? cancellationToken = null)
+        public virtual async Task<bool?> Alert(string message = "", string title = "Message", AlertOptions? options = null, CancellationToken? cancellationToken = null)
         {
             // Validate and set default values for the dialog options
             options ??= new();
@@ -616,7 +625,7 @@ namespace Radzen
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns><c>true</c> if the user clicked the OK button, <c>false</c> otherwise.</returns>
-        public virtual async Task<bool?> Alert(RenderFragment message, string title = "Message", AlertOptions options = null, CancellationToken? cancellationToken = null)
+        public virtual async Task<bool?> Alert(RenderFragment message, string title = "Message", AlertOptions? options = null, CancellationToken? cancellationToken = null)
         {
             // Validate and set default values for the dialog options
             options ??= new();
@@ -660,7 +669,7 @@ namespace Radzen
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Raises the <see cref="PropertyChanged" /> event.
@@ -707,12 +716,12 @@ namespace Radzen
             }
         }
 
-        private string width;
+        private string? width;
         /// <summary>
         /// Gets or sets the width of the dialog.
         /// </summary>
         /// <value>The width.</value>
-        public string Width
+        public string? Width
         {
             get => width;
             set
@@ -725,12 +734,12 @@ namespace Radzen
             }
         }
 
-        private string height;
+        private string? height;
         /// <summary>
         /// Gets or sets the height of the dialog.
         /// </summary>
         /// <value>The height.</value>
-        public string Height
+        public string? Height
         {
             get => height;
             set
@@ -743,12 +752,12 @@ namespace Radzen
             }
         }
 
-        private string style;
+        private string? style;
         /// <summary>
         /// Gets or sets the CSS style of the dialog
         /// </summary>
         /// <value>The style.</value>
-        public string Style
+        public string? Style
         {
             get => style;
             set
@@ -761,7 +770,7 @@ namespace Radzen
             }
         }
 
-        private bool closeDialogOnOverlayClick = false;
+        private bool closeDialogOnOverlayClick;
         /// <summary>
         /// Gets or sets a value indicating whether the dialog should be closed by clicking the overlay.
         /// </summary>
@@ -779,11 +788,11 @@ namespace Radzen
             }
         }
 
-        private string cssClass;
+        private string? cssClass;
         /// <summary>
         /// Gets or sets dialog box custom class
         /// </summary>
-        public string CssClass
+        public string? CssClass
         {
             get => cssClass;
             set
@@ -796,11 +805,11 @@ namespace Radzen
             }
         }
 
-        private string wrapperCssClass;
+        private string? wrapperCssClass;
         /// <summary>
         /// Gets or sets the CSS classes added to the dialog's wrapper element.
         /// </summary>
-        public string WrapperCssClass
+        public string? WrapperCssClass
         {
             get => wrapperCssClass;
             set
@@ -813,11 +822,11 @@ namespace Radzen
             }
         }
 
-        private string contentCssClass;
+        private string? contentCssClass;
         /// <summary>
         /// Gets or sets the CSS classes added to the dialog's content element.
         /// </summary>
-        public string ContentCssClass
+        public string? ContentCssClass
         {
             get => contentCssClass;
             set
@@ -830,7 +839,7 @@ namespace Radzen
             }
         }
 
-        private int closeTabIndex = 0;
+        private int closeTabIndex;
         /// <summary>
         /// Gets or sets a value the dialog escape tabindex. Set to <c>0</c> by default.
         /// </summary>
@@ -847,14 +856,14 @@ namespace Radzen
             }
         }
 
-        private RenderFragment<DialogService> titleContent;
+        private RenderFragment<DialogService>? titleContent;
         private bool resizable;
 
         /// <summary>
         /// Gets or sets the title content.
         /// </summary>
         /// <value>The title content.</value>
-        public RenderFragment<DialogService> TitleContent
+        public RenderFragment<DialogService>? TitleContent
         {
             get => titleContent;
             set
@@ -890,12 +899,12 @@ namespace Radzen
     /// </summary>
     public class SideDialogOptions : DialogOptionsBase
     {
-        private string title;
+        private string? title;
 
         /// <summary>
         /// The title displayed on the dialog.
         /// </summary>
-        public string Title
+        public string? Title
         {
             get => title;
             set
@@ -945,7 +954,7 @@ namespace Radzen
             }
         }
 
-        private bool autoFocusFirstElement = false;
+        private bool autoFocusFirstElement;
 
         /// <summary>
         /// Gets or sets a value indicating whether to focus the first focusable HTML element. Set to <c>true</c> by default.
@@ -1061,26 +1070,26 @@ namespace Radzen
         /// </summary>
         /// <value>The icon.</value>
 
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
         /// <summary>
         /// Gets or sets the icon color in Title.
         /// </summary>
         /// <value>The icon color.</value>
 
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets the CSS style of the Icon in Title.
         /// </summary>
         public string IconStyle { get; set; } = "margin-right: 0.75rem";
 
-        private Action<Size> resize;
+        private Action<Size>? resize;
 
         /// <summary>
         /// Gets or sets the change.
         /// </summary>
         /// <value>The change.</value>
-        public Action<Size> Resize
+        public Action<Size>? Resize
         {
             get => resize;
             set
@@ -1112,13 +1121,13 @@ namespace Radzen
             }
         }
 
-        private Action<Point> drag;
+        private Action<Point>? drag;
 
         /// <summary>
         /// Gets or sets the change.
         /// </summary>
         /// <value>The change.</value>
-        public Action<Point> Drag
+        public Action<Point>? Drag
         {
             get => drag;
             set
@@ -1131,13 +1140,13 @@ namespace Radzen
             }
         }
 
-        private string left;
+        private string? left;
 
         /// <summary>
         /// Gets or sets the X coordinate of the dialog. Maps to the <c>left</c> CSS attribute.
         /// </summary>
         /// <value>The left.</value>
-        public string Left
+        public string? Left
         {
             get => left;
             set
@@ -1150,13 +1159,13 @@ namespace Radzen
             }
         }
 
-        private string top;
+        private string? top;
 
         /// <summary>
         /// Gets or sets the Y coordinate of the dialog. Maps to the <c>top</c> CSS attribute.
         /// </summary>
         /// <value>The top.</value>
-        public string Top
+        public string? Top
         {
             get => top;
             set
@@ -1169,13 +1178,13 @@ namespace Radzen
             }
         }
 
-        private string bottom;
+        private string? bottom;
 
         /// <summary>
         /// Specifies the <c>bottom</c> CSS attribute.
         /// </summary>
         /// <value>The bottom.</value>
-        public string Bottom
+        public string? Bottom
         {
             get => bottom;
             set
@@ -1188,13 +1197,13 @@ namespace Radzen
             }
         }
 
-        private RenderFragment<DialogService> childContent;
+        private RenderFragment<DialogService>? childContent;
 
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>
-        public RenderFragment<DialogService> ChildContent
+        public RenderFragment<DialogService>? ChildContent
         {
             get => childContent;
             set
@@ -1251,12 +1260,12 @@ namespace Radzen
     /// </summary>
     public class AlertOptions : DialogOptions
     {
-        private string okButtonText;
+        private string? okButtonText;
 
         /// <summary>
         /// Gets or sets the text of the OK button.
         /// </summary>
-        public string OkButtonText
+        public string? OkButtonText
         {
             get => okButtonText;
             set
@@ -1275,12 +1284,12 @@ namespace Radzen
     /// </summary>
     public class ConfirmOptions : AlertOptions
     {
-        private string cancelButtonText;
+        private string? cancelButtonText;
 
         /// <summary>
         /// Gets or sets the text of the Cancel button.
         /// </summary>
-        public string CancelButtonText
+        public string? CancelButtonText
         {
             get => cancelButtonText;
             set
@@ -1299,13 +1308,13 @@ namespace Radzen
     /// </summary>
     public class Dialog : INotifyPropertyChanged
     {
-        private string title;
+        private string? title;
 
         /// <summary>
         /// Gets or sets the title.
         /// </summary>
         /// <value>The title.</value>
-        public string Title
+        public string? Title
         {
             get => title;
             set
@@ -1318,13 +1327,13 @@ namespace Radzen
             }
         }
 
-        private Type type;
+        private Type? type;
 
         /// <summary>
         /// Gets or sets the type.
         /// </summary>
         /// <value>The type.</value>
-        public Type Type
+        public Type? Type
         {
             get => type;
             set
@@ -1337,13 +1346,13 @@ namespace Radzen
             }
         }
 
-        private Dictionary<string, object> parameters;
+        private Dictionary<string, object>? parameters;
 
         /// <summary>
         /// Gets or sets the parameters.
         /// </summary>
         /// <value>The parameters.</value>
-        public Dictionary<string, object> Parameters
+        public Dictionary<string, object>? Parameters
         {
             get => parameters;
             set
@@ -1356,13 +1365,13 @@ namespace Radzen
             }
         }
 
-        private DialogOptions options;
+        private DialogOptions? options;
 
         /// <summary>
         /// Gets or sets the options.
         /// </summary>
         /// <value>The options.</value>
-        public DialogOptions Options
+        public DialogOptions? Options
         {
             get => options;
             set
@@ -1378,7 +1387,7 @@ namespace Radzen
         /// <summary>
         /// Occurs when a property value changes.
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         /// <summary>
         /// Raises the <see cref="PropertyChanged"/> event.

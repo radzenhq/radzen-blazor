@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Components.RenderTree;
 using Radzen.Blazor.Markdown;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Radzen.Blazor;
@@ -106,7 +107,9 @@ public partial class RadzenMarkdown : RadzenComponent
     {
         if (string.IsNullOrEmpty(Text))
         {
+#pragma warning disable CA2000 // RenderTreeBuilder is a struct and doesn't need disposal
             var buffer = new RenderTreeBuilder();
+#pragma warning restore CA2000
 
             ChildContent?.Invoke(buffer);
 
@@ -184,7 +187,7 @@ public partial class RadzenMarkdown : RadzenComponent
                     else
                     {
                         // Insert a marker for this element and skip its subtree
-                        var marker = string.Format(BlazorMarkdownRenderer.Outlet, markerId);
+                        var marker = string.Format(CultureInfo.InvariantCulture, BlazorMarkdownRenderer.Outlet, markerId);
                         markdown.Append(marker);
 
                         var subtreeLength = frame.ElementSubtreeLength;
@@ -196,7 +199,7 @@ public partial class RadzenMarkdown : RadzenComponent
                 else if (frame.FrameType == RenderTreeFrameType.Component)
                 {
                     // Insert a marker for this component and skip its subtree
-                    var marker = string.Format(BlazorMarkdownRenderer.Outlet, markerId);
+                    var marker = string.Format(Culture, BlazorMarkdownRenderer.Outlet, markerId);
                     markdown.Append(marker);
 
                     var subtreeLength = frame.ComponentSubtreeLength;

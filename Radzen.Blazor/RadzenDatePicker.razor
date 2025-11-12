@@ -41,10 +41,10 @@
                             <div class="rz-calendar-title">
                                 <RadzenDropDown @ref="monthDropDown" class="rz-calendar-month-dropdown" TabIndex="@TabIndex"
                                                 TValue="int" Value="@CurrentDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
-                                                Change="@((args) => { SetMonth(int.Parse(args.ToString())); })"/>
+                                                Change="@((args) => { var argStr = args?.ToString(); if (!string.IsNullOrEmpty(argStr)) SetMonth(int.Parse(argStr!)); })"/>
                                 <RadzenDropDown @ref="yearDropDown" class="rz-calendar-year-dropdown" TabIndex="@TabIndex"
                                                 TValue="int" Value="@CurrentDate.Year" Disabled="@Disabled" Data="@years" TextProperty="Name" ValueProperty="Value"
-                                                Change="@((args) => { SetYear(int.Parse(args.ToString())); })" />
+                                                Change="@((args) => { var argStr = args?.ToString(); if (!string.IsNullOrEmpty(argStr)) SetYear(int.Parse(argStr!)); })" />
                             </div>
                         </div>
                         @if(ShowDays)

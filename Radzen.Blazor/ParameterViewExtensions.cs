@@ -18,7 +18,7 @@ public static class ParameterViewExtensions
     /// <returns><c>true</c> if the parameter value has changed, <c>false</c> otherwise.</returns>
     public static bool DidParameterChange<T>(this ParameterView parameters, string parameterName, T parameterValue)
     {
-        if (parameters.TryGetValue(parameterName, out T value))
+        if (parameters.TryGetValue(parameterName, out T? value))
         {
             return !EqualityComparer<T>.Default.Equals(value, parameterValue);
         }

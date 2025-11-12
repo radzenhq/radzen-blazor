@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -37,7 +38,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
-        public IEnumerable<RadzenGoogleMapMarker> Data { get; set; }
+        public IEnumerable<RadzenGoogleMapMarker>? Data { get; set; }
 
         /// <summary>
         /// Gets or sets the map click callback.
@@ -58,21 +59,21 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The Google API key.</value>
         [Parameter]
-        public string ApiKey { get; set; }
+        public string? ApiKey { get; set; }
 
         /// <summary>
         /// Gets or sets the Google Map Id.
         /// </summary>
         /// <value>The Google Map Id.</value>
         [Parameter]
-        public string MapId { get; set; }
+        public string? MapId { get; set; }
 
         /// <summary>
         /// Gets or sets the Google map options: https://developers.google.com/maps/documentation/javascript/reference/map#MapOptions.
         /// </summary>
         /// <value>The Google map options.</value>
         [Parameter]
-        public Dictionary<string, object> Options { get; set; }
+        public Dictionary<string, object>? Options { get; set; }
 
         double zoom = 8;
         /// <summary>
@@ -128,7 +129,7 @@ namespace Radzen.Blazor
 
         async Task UpdateMap()
         {
-            if (!firstRender)
+            if (!firstRender && JSRuntime != null)
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, ApiKey, Zoom, Center);
             }
@@ -139,7 +140,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The markers.</value>
         [Parameter]
-        public RenderFragment Markers { get; set; }
+        public RenderFragment? Markers { get; set; }
 
         List<RadzenGoogleMapMarker> markers = new List<RadzenGoogleMapMarker>();
 
@@ -174,7 +175,7 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
-        /// Handles the <see cref="E:MapClick" /> event.
+        /// Handles the MapClick event.
         /// </summary>
         /// <param name="args">The <see cref="GoogleMapClickEventArgs"/> instance containing the event data.</param>
         [JSInvokable("RadzenGoogleMap.OnMapClick")]
@@ -204,15 +205,18 @@ namespace Radzen.Blazor
 
             var data = Data != null ? Data : markers;
 
-            if (firstRender)
+            if (JSRuntime != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, MapId, Zoom, Center,
-                     data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
-            }
-            else
-            {
-                await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, ApiKey, null, null,
-                             data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
+                if (firstRender)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.createMap", Element, Reference, UniqueID, ApiKey, MapId, Zoom, Center,
+                         data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
+                }
+                else
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.updateMap", UniqueID, ApiKey, null, null,
+                                 data.Select(m => new { Title = m.Title, Label = m.Label, Position = m.Position }), Options, FitBoundsToMarkersOnUpdate, Culture.TwoLetterISOLanguageName);
+                }
             }
         }
 
@@ -221,10 +225,12 @@ namespace Radzen.Blazor
         {
             base.Dispose();
 
-            if (IsJSRuntimeAvailable)
+            if (IsJSRuntimeAvailable && JSRuntime != null && UniqueID != null)
             {
                 JSRuntime.InvokeVoid("Radzen.destroyMap", UniqueID);
             }
+
+            GC.SuppressFinalize(this);
         }
     }
 }

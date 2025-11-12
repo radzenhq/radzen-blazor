@@ -67,7 +67,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The alert title.</value>
         [Parameter]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Gets or sets the body text of the alert.
@@ -75,7 +75,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The alert text content.</value>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
         /// Gets or sets a custom Material icon name to display instead of the default contextual icon.
@@ -84,7 +84,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The custom Material icon name.</value>
         [Parameter]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets a custom color for the alert icon.
@@ -92,7 +92,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon color as a CSS color value.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets the semantic style/severity of the alert.
@@ -193,12 +193,27 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetComponentCssClass() => ClassList.Create("rz-alert")
-                                                                     .Add($"rz-alert-{GetAlertSize()}")
-                                                                     .AddVariant(Variant)
-                                                                     .Add($"rz-{Enum.GetName(typeof(AlertStyle), AlertStyle).ToLowerInvariant()}")
-                                                                     .AddShade(Shade)
-                                                                     .ToString();
+        protected override string GetComponentCssClass()
+        {
+            var classList = ClassList.Create("rz-alert")
+                                     .Add($"rz-alert-{GetAlertSize()}")
+                                     .AddVariant(Variant)
+                                     .AddShade(Shade);
+
+            var alertStyleClass = GetAlertStyleClass();
+            if (!string.IsNullOrEmpty(alertStyleClass))
+            {
+                classList.Add(alertStyleClass);
+            }
+
+            return classList.ToString();
+        }
+
+        string? GetAlertStyleClass()
+        {
+            var styleName = Enum.GetName<AlertStyle>(AlertStyle);
+            return !string.IsNullOrEmpty(styleName) ? $"rz-{styleName.ToLowerInvariant()}" : null;
+        }
 
         string GetIcon() => !string.IsNullOrEmpty(Icon)
                 ? Icon

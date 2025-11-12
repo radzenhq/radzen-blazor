@@ -50,7 +50,10 @@ namespace Radzen.Blazor
         /// </summary>
         protected override void Initialize()
         {
-            Chart.Legend = this;
+            if (Chart != null)
+            {
+                Chart.Legend = this;
+            }
         }
 
         /// <summary>

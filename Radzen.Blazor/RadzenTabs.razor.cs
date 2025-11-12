@@ -96,7 +96,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The tabs render fragment containing tab definitions.</value>
         [Parameter]
-        public RenderFragment Tabs { get; set; }
+        public RenderFragment? Tabs { get; set; }
 
         List<RadzenTabsItem> tabs = new List<RadzenTabsItem>();
 
@@ -106,6 +106,7 @@ namespace Radzen.Blazor
         /// <param name="tab">The tab.</param>
         public async Task AddTab(RadzenTabsItem tab)
         {
+            ArgumentNullException.ThrowIfNull(tab);
             if (!tabs.Contains(tab))
             {
                 tabs.Add(tab);
@@ -126,7 +127,7 @@ namespace Radzen.Blazor
             }
         }
 
-        internal string Id
+        internal string? Id
         {
             get
             {
@@ -138,7 +139,7 @@ namespace Radzen.Blazor
         /// Gets the currently selected RadzenTabsItem based on the selectedIndex.
         /// </summary>
 
-        public RadzenTabsItem SelectedTab
+        public RadzenTabsItem? SelectedTab
         {
             get
             {
@@ -152,10 +153,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenTabsItem item)
         {
-            if (tabs.Contains(item))
+            if (tabs.Remove(item))
             {
-                tabs.Remove(item);
-
                 if (!disposed)
                 {
                     try { InvokeAsync(StateHasChanged); } catch { }
@@ -262,7 +261,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (RenderMode == TabRenderMode.Client && previousSelectedIndex != selectedIndex)
+            if (JSRuntime != null && RenderMode == TabRenderMode.Client && previousSelectedIndex != selectedIndex)
             {
                 previousSelectedIndex = selectedIndex;
                 await JSRuntime.InvokeVoidAsync("Radzen.selectTab", $"{GetId()}-tabpanel-{selectedIndex}", selectedIndex);
@@ -283,7 +282,7 @@ namespace Radzen.Blazor
         internal async System.Threading.Tasks.Task SelectTabOnClient(RadzenTabsItem tab)
         {
             var index = IndexOf(tab);
-            if (index != selectedIndex)
+            if (index != selectedIndex && JSRuntime != null)
             {
                 selectedIndex = index;
                 previousSelectedIndex = selectedIndex;
@@ -298,9 +297,9 @@ namespace Radzen.Blazor
             }
         }
 
-        internal RadzenTabsItem FirstVisibleTab()
+        internal RadzenTabsItem? FirstVisibleTab()
         {
-            return tabs.Where(t => t.Visible).FirstOrDefault();
+            return tabs?.Where(t => t.Visible).FirstOrDefault();
         }
 
         internal int focusedIndex = -1;

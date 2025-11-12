@@ -1,3 +1,5 @@
+using System;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor.Markdown;
@@ -12,6 +14,7 @@ public class ListItem : BlockContainer
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitListItem(this);
     }
 
@@ -126,7 +129,7 @@ public class ListItem : BlockContainer
                 var list = new OrderedList
                 {
                     MarkerOffset = parser.Indent,
-                    Start = int.Parse(match.Groups[1].Value),
+                    Start = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture),
                     Delimiter = match.Groups[2].Value
                 };
                 data = list;

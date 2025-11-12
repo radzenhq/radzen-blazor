@@ -11,7 +11,7 @@
         <CascadingValue Value=this>
             @ChildContent
         </CascadingValue>
-        @if (Data != null && Levels.Any())
+        @if (Data != null && Levels != null && Levels.Any())
             {
                 <CascadingValue Value=this>
                     @RenderChildren(Data, 0)

@@ -10,12 +10,12 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the node identifier.
         /// </summary>
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// Gets or sets the node label.
         /// </summary>
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
         /// <summary>
         /// Gets or sets the node value (optional).
@@ -31,12 +31,12 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the source node identifier.
         /// </summary>
-        public string Source { get; set; }
+        public string? Source { get; set; }
 
         /// <summary>
         /// Gets or sets the target node identifier.
         /// </summary>
-        public string Target { get; set; }
+        public string? Target { get; set; }
 
         /// <summary>
         /// Gets or sets the link value.
@@ -103,17 +103,17 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the SVG path.
         /// </summary>
-        public string Path { get; set; }
+        public string? Path { get; set; }
 
         /// <summary>
         /// Gets or sets the source node.
         /// </summary>
-        public ComputedSankeyNode SourceNode { get; set; }
+        public ComputedSankeyNode? SourceNode { get; set; }
 
         /// <summary>
         /// Gets or sets the target node.
         /// </summary>
-        public ComputedSankeyNode TargetNode { get; set; }
+        public ComputedSankeyNode? TargetNode { get; set; }
 
         /// <summary>
         /// Gets or sets the Y position at source.

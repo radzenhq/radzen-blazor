@@ -9,7 +9,7 @@ public class GroupDescriptor
     /// Gets or sets the property to group by.
     /// </summary>
     /// <value>The property.</value>
-    public string Property { get; set; }
+    public string Property { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the sort order.
@@ -21,13 +21,13 @@ public class GroupDescriptor
     /// Gets or sets the title displayed in the group.
     /// </summary>
     /// <value>The title.</value>
-    public string Title { get; set; }
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the format string used to display the key in the group.
     /// </summary>
     /// <value>The format string.</value>
-    public string FormatString { get; set; }
+    public string FormatString { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets a value indicating whether to show the footer for the group.

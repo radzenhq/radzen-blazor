@@ -2,18 +2,21 @@
 @using System.Collections.Specialized
 
 <div aria-live="polite" class="rz-notification" style="@Style">
-@for (var i = 0; i < Service.Messages.Count; i++)
+@if (Service?.Messages != null)
 {
-    <div @key="Service.Messages[i]">
-        @DrawMessage(i, Service.Messages[i])
-    </div>
+    @for (var i = 0; i < Service.Messages.Count; i++)
+    {
+        <div @key="Service.Messages[i]">
+            @DrawMessage(i, Service.Messages[i])
+        </div>
+    }
 }
 </div>
 @code {
-    [Inject] private NotificationService Service { get; set; }
+    [Inject] private NotificationService? Service { get; set; }
 
     [Parameter]
-    public string Style { get; set; }
+    public string? Style { get; set; }
 
     RenderFragment DrawMessage(int index, NotificationMessage m)
     {
@@ -27,18 +30,24 @@
         });
     }
 
-    void Update(object sender, NotifyCollectionChangedEventArgs args)
+    void Update(object? sender, NotifyCollectionChangedEventArgs args)
     {
         InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        Service.Messages.CollectionChanged -= Update;
+        if (Service?.Messages != null)
+        {
+            Service.Messages.CollectionChanged -= Update;
+        }
     }
 
     protected override void OnInitialized()
     {
-        Service.Messages.CollectionChanged += Update;
+        if (Service?.Messages != null)
+        {
+            Service.Messages.CollectionChanged += Update;
+        }
     }
 }

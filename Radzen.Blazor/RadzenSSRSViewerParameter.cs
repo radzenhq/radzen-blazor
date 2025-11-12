@@ -9,14 +9,14 @@ namespace Radzen.Blazor
     /// </summary>
     public class RadzenSSRSViewerParameter : ComponentBase
     {
-        string _parameterName;
+        string? _parameterName;
 
         /// <summary>
         /// Gets or sets the name of the parameter.
         /// </summary>
         /// <value>The name of the parameter.</value>
         [Parameter]
-        public string ParameterName
+        public string? ParameterName
         {
             get
             {
@@ -35,14 +35,14 @@ namespace Radzen.Blazor
             }
         }
 
-        string _value;
+        string? _value;
 
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
         [Parameter]
-        public string Value
+        public string? Value
         {
             get
             {
@@ -61,14 +61,14 @@ namespace Radzen.Blazor
             }
         }
 
-        RadzenSSRSViewer _viewer;
+        RadzenSSRSViewer? _viewer;
 
         /// <summary>
         /// Gets or sets the viewer.
         /// </summary>
         /// <value>The viewer.</value>
         [CascadingParameter]
-        public RadzenSSRSViewer Viewer
+        public RadzenSSRSViewer? Viewer
         {
             get
             {
@@ -76,7 +76,7 @@ namespace Radzen.Blazor
             }
             set
             {
-                if (_viewer != value)
+                if (_viewer != value && value != null)
                 {
                     _viewer = value;
                     _viewer.AddParameter(this);

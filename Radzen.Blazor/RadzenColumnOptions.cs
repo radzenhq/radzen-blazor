@@ -31,7 +31,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void Initialize()
         {
-            Chart.ColumnOptions = this;
+            if (Chart != null)
+            {
+                Chart.ColumnOptions = this;
+            }
         }
 
         /// <inheritdoc />

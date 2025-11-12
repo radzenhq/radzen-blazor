@@ -10,7 +10,7 @@ namespace Radzen.Blazor.Rendering;
 /// </summary>
 public readonly struct ClassList
 {
-    private ClassList(string className = null)
+    private ClassList(string? className = null)
     {
         Add(className);
     }
@@ -22,14 +22,14 @@ public readonly struct ClassList
     /// </summary>
     /// <param name="className">Name of the class.</param>
     /// <returns>ClassList.</returns>
-    public static ClassList Create(string className = null) => new(className);
+    public static ClassList Create(string? className = null) => new(className);
 
     /// <summary>
     /// Adds the specified class name if the condition is true. The class name is added only if it is not null or empty.
     /// </summary>
     /// <param name="className">Name of the class.</param>
     /// <param name="condition">if set to <c>true</c> the class name is added.</param>
-    public ClassList Add(string className, bool condition = true)
+    public ClassList Add(string? className, bool condition = true)
     {
         if (condition && !string.IsNullOrWhiteSpace(className))
         {
@@ -48,7 +48,7 @@ public readonly struct ClassList
     /// Checks if the provided attributes contain a class name and adds it to the list.
     /// </summary>
     /// <param name="attributes">The attributes.</param>
-    public ClassList Add(IDictionary<string, object> attributes)
+    public ClassList Add(IDictionary<string, object>? attributes)
     {
         if (attributes != null && attributes.TryGetValue("class", out var value) && value is string @class)
         {
@@ -62,7 +62,7 @@ public readonly struct ClassList
     /// Checks if the provided attributes contain a class name and adds it to the list.
     /// </summary>
     /// <param name="attributes">The attributes.</param>
-    public ClassList Add(IReadOnlyDictionary<string, object> attributes)
+    public ClassList Add(IReadOnlyDictionary<string, object>? attributes)
     {
         if (attributes != null && attributes.TryGetValue("class", out var value) && value is string @class)
         {
@@ -77,7 +77,7 @@ public readonly struct ClassList
     /// </summary>
     /// <param name="field">The field.</param>
     /// <param name="context">The context.</param>
-    public ClassList Add(FieldIdentifier field, EditContext context)
+    public ClassList Add(FieldIdentifier field, EditContext? context)
     {
         if (field.FieldName != null && context != null)
         {

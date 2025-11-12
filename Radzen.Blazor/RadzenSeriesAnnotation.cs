@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 
@@ -36,13 +36,13 @@ namespace Radzen.Blazor
         /// The data item from the series this annotation applies to.
         /// </summary>
         [Parameter]
-        public TItem Data { get; set; }
+        public TItem? Data { get; set; }
 
         /// <summary>
         /// The text to display in the annotation.
         /// </summary>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary> Horizontal offset from the default position. </summary>
         [Parameter]
@@ -54,17 +54,17 @@ namespace Radzen.Blazor
 
         /// <summary> The color of the annotation text. </summary>
         [Parameter]
-        public string Fill { get; set; }
+        public string? Fill { get; set; }
 
         /// <summary> Determines whether the annotation is visible. Set to <c>true</c> by default.</summary>
         [Parameter]
         public bool Visible { get; set; } = true;
 
-        CartesianSeries<TItem> series;
+        CartesianSeries<TItem>? series;
 
         /// <summary> The series this annotation applies to. Set to <c>true</c> by default.</summary>
         [CascadingParameter]
-        protected CartesianSeries<TItem> Series
+        protected CartesianSeries<TItem>? Series
         {
             get
             {
@@ -72,7 +72,7 @@ namespace Radzen.Blazor
             }
             set
             {
-                if (!value.Overlays.Contains(this))
+                if (value != null && !value.Overlays.Contains(this))
                 {
                     series = value;
                     series.Overlays.Add(this);
@@ -83,8 +83,9 @@ namespace Radzen.Blazor
         /// <inheritdoc/>
         public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
         {
-            double x = series.TooltipX(Data);
-            double y = series.TooltipY(Data);
+            if (series == null) return _ => { };
+            double x = Data != null ? series.TooltipX(Data) : 0;
+            double y = Data != null ? series.TooltipY(Data) : 0;
 
             var coordinateSystem = series.CoordinateSystem;
 
@@ -100,9 +101,8 @@ namespace Radzen.Blazor
                 case Radzen.CoordinateSystem.Polar:
                     double orgX;
                     double orgY;
-                    if (series is RadzenPieSeries<TItem>)
+                    if (series is RadzenPieSeries<TItem> pieSeries)
                     {
-                        var pieSeries = series as RadzenPieSeries<TItem>;
                         orgX = pieSeries.CenterX;
                         orgY = pieSeries.CenterY;
                     }
@@ -138,7 +138,8 @@ namespace Radzen.Blazor
                 builder.AddAttribute(3, nameof(Rendering.Text.Position), new Point{ X = x, Y = y });
                 builder.AddAttribute(4, nameof(Rendering.Text.TextAnchor), textAnchor);
                 builder.AddAttribute(5, nameof(Rendering.Text.Fill), Fill);
-                builder.SetKey($"{Text}-{Chart.Series.IndexOf(series)}");
+                var chart = series?.Chart;
+                builder.SetKey($"{Text}-{(chart != null ? chart.Series.IndexOf(series!) : -1)}");
                 builder.CloseComponent();
                 builder.CloseElement();
             };
@@ -159,7 +160,7 @@ namespace Radzen.Blazor
         /// <inheritdoc/>
         public RenderFragment RenderTooltip(double mouseX, double mouseY)
         {
-            return null;
+            return null!;
         }
 
         /// <inheritdoc />
@@ -169,6 +170,10 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc/>
-        public void Dispose() => series?.Overlays.Remove(this);
+        public void Dispose()
+        {
+            series?.Overlays.Remove(this);
+            GC.SuppressFinalize(this);
+        }
     }
 }

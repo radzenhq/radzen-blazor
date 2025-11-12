@@ -52,7 +52,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The items.</value>
         [Parameter]
-        public RenderFragment Items { get; set; }
+        public RenderFragment? Items { get; set; }
 
         internal List<RadzenCarouselItem> items = new List<RadzenCarouselItem>();
 
@@ -76,10 +76,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenCarouselItem item)
         {
-            if (items.Contains(item))
+            if (items.Remove(item))
             {
-                items.Remove(item);
-
                 if (!disposed)
                 {
                     try { InvokeAsync(StateHasChanged); } catch { }
@@ -123,7 +121,10 @@ namespace Radzen.Blazor
                 selectedIndex = index;
                 await SelectedIndexChanged.InvokeAsync(selectedIndex);
                 await Change.InvokeAsync(selectedIndex);
-                await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
+                if (JSRuntime != null)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
+                }
                 StateHasChanged();
             }
         }
@@ -205,7 +206,10 @@ namespace Radzen.Blazor
 
             if (shouldUpdate)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
+                if (JSRuntime != null)
+                {
+                    await JSRuntime.InvokeVoidAsync("Radzen.scrollCarouselItem", items[selectedIndex].element);
+                }
             }
         }
 
@@ -306,7 +310,7 @@ namespace Radzen.Blazor
         [Parameter]
         public string PrevIcon { get; set; } = "arrow_back_ios_new";
 
-        System.Threading.Timer timer;
+        System.Threading.Timer? timer;
 
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -331,6 +335,8 @@ namespace Radzen.Blazor
                 timer.Dispose();
                 timer = null;
             }
+
+            GC.SuppressFinalize(this);
         }
 
         double? x;

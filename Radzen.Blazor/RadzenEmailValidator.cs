@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
 
@@ -47,6 +48,8 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
+            ArgumentNullException.ThrowIfNull(component);
+
             var value = component.GetValue();
             var valueAsString = value as string;
 

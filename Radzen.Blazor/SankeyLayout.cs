@@ -15,8 +15,8 @@ namespace Radzen.Blazor
         public double NodeWidth { get; set; } = 24;
         public double NodePadding { get; set; } = 8;
         public SankeyAlignment NodeAlignment { get; set; } = SankeyAlignment.Justify;
-        public Func<SankeyNode, SankeyNode, int> NodeSort { get; set; }
-        public Func<SankeyLink, SankeyLink, int> LinkSort { get; set; }
+        public Func<SankeyNode, SankeyNode, int>? NodeSort { get; set; }
+        public Func<SankeyLink, SankeyLink, int>? LinkSort { get; set; }
 
         private const int MaxIterations = 32;
 
@@ -34,7 +34,7 @@ namespace Radzen.Blazor
             }).ToList();
 
             // Create node lookup
-            var nodeById = computedNodes.ToDictionary(n => n.Id);
+            var nodeById = computedNodes.ToDictionary(n => n.Id ?? throw new InvalidOperationException("Sankey node Id cannot be null."));
 
             // Create computed links
             var computedLinks = links.Select(l => new ComputedSankeyLink
@@ -42,13 +42,15 @@ namespace Radzen.Blazor
                 Source = l.Source,
                 Target = l.Target,
                 Value = l.Value,
-                SourceNode = nodeById[l.Source],
-                TargetNode = nodeById[l.Target]
+                SourceNode = nodeById[l.Source ?? throw new InvalidOperationException("Sankey link Source cannot be null.")],
+                TargetNode = nodeById[l.Target ?? throw new InvalidOperationException("Sankey link Target cannot be null.")]
             }).ToList();
 
             // Connect nodes and links
             foreach (var link in computedLinks)
             {
+                if (link.SourceNode == null || link.TargetNode == null)
+                    continue;
                 link.SourceNode.SourceLinks.Add(link);
                 link.TargetNode.TargetLinks.Add(link);
             }
@@ -93,7 +95,7 @@ namespace Radzen.Blazor
         private void ComputeNodeLayers(List<ComputedSankeyNode> nodes)
         {
             // Find nodes with no incoming links
-            var sources = nodes.Where(n => !n.TargetLinks.Any()).ToList();
+            var sources = nodes.Where(n => n.TargetLinks.Count == 0).ToList();
             var visited = new HashSet<ComputedSankeyNode>();
             var layers = new List<List<ComputedSankeyNode>>();
 
@@ -112,7 +114,7 @@ namespace Radzen.Blazor
                 foreach (var link in node.SourceLinks)
                 {
                     var target = link.TargetNode;
-                    if (!visited.Contains(target))
+                    if (target != null && !visited.Contains(target))
                     {
                         target.Layer = node.Layer + 1;
                         visited.Add(target);
@@ -120,7 +122,8 @@ namespace Radzen.Blazor
                     }
                     else
                     {
-                        target.Layer = Math.Max(target.Layer, node.Layer + 1);
+                        if (target != null)
+                            target.Layer = Math.Max(target.Layer, node.Layer + 1);
                     }
                 }
             }
@@ -284,7 +287,7 @@ namespace Radzen.Blazor
             {
                 if (node.TargetLinks.Count > 0)
                 {
-                    var y = node.TargetLinks.Sum(l => (l.SourceNode.Y + l.Y0) * l.Value) / node.ComputedValue;
+                    var y = node.TargetLinks.Sum(l => (l.SourceNode?.Y ?? 0 + l.Y0) * l.Value) / node.ComputedValue;
                     node.Y += (y - node.Y) * alpha;
                 }
             }
@@ -350,7 +353,7 @@ namespace Radzen.Blazor
             {
                 if (node.SourceLinks.Count > 0)
                 {
-                    var y = node.SourceLinks.Sum(l => (l.TargetNode.Y + l.Y1) * l.Value) / node.ComputedValue;
+                    var y = node.SourceLinks.Sum(l => (l.TargetNode?.Y ?? 0 + l.Y1) * l.Value) / node.ComputedValue;
                     node.Y += (y - node.Y) * alpha;
                 }
             }
@@ -419,7 +422,7 @@ namespace Radzen.Blazor
                 if (outgoingSum > 0)
                 {
                     var y0 = 0.0;
-                    var sortedSourceLinks = node.SourceLinks.OrderBy(l => l.TargetNode.Y).ToList();
+                    var sortedSourceLinks = node.SourceLinks.OrderBy(l => l.TargetNode?.Y ?? 0).ToList();
                     foreach (var link in sortedSourceLinks)
                     {
                         link.Y0 = y0;
@@ -437,7 +440,7 @@ namespace Radzen.Blazor
                 if (incomingSum > 0)
                 {
                     var y1 = 0.0;
-                    var sortedTargetLinks = node.TargetLinks.OrderBy(l => l.SourceNode.Y).ToList();
+                    var sortedTargetLinks = node.TargetLinks.OrderBy(l => l.SourceNode?.Y ?? 0).ToList();
                     foreach (var link in sortedTargetLinks)
                     {
                         link.Y1 = y1;
@@ -452,6 +455,8 @@ namespace Radzen.Blazor
         {
             foreach (var link in links)
             {
+                if (link.SourceNode == null || link.TargetNode == null)
+                    continue;
                 var x0 = link.SourceNode.X + link.SourceNode.Width;
                 var x1 = link.TargetNode.X;
                 var y0 = link.SourceNode.Y + link.Y0;

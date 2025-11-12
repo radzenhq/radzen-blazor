@@ -25,13 +25,13 @@ public interface IRadzenFormComponent
     /// Gets the value of the component.
     /// </summary>
     /// <returns>the value of the component - for example the text of RadzenTextBox.</returns>
-    object GetValue();
+    object? GetValue();
 
     /// <summary>
     /// Gets or sets the name of the component.
     /// </summary>
     /// <value>The name.</value>
-    string Name { get; set; }
+    string? Name { get; set; }
 
     /// <summary>
     /// Gets the field identifier.
@@ -58,6 +58,6 @@ public interface IRadzenFormComponent
     /// <summary>
     /// Sets the FormFieldContext of the component
     /// </summary>
-    IFormFieldContext FormFieldContext { get; }
+    IFormFieldContext? FormFieldContext { get; }
 }
 

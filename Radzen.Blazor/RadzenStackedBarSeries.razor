@@ -14,14 +14,14 @@
    {
         var value = ComposeValue(categoryScale);
         var category = ComposeCategory(valueScale);
-        var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
-        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+        var ticks = Chart?.CategoryScale?.Ticks(Chart?.ValueAxis?.TickDistance ?? 0);
+        var style = $"clip-path: url(#{Chart?.ClipPath}); -webkit-clip-path: url(#{Chart?.ClipPath});";
 
         var barSeries = StackedBarSeries;
         var barIndex = BarIndex;
         var height = BarHeight;
 
-        var className = $"rz-bar-series rz-series-{Chart.Series.IndexOf(this)}";
+        var className = $"rz-bar-series rz-series-{Chart?.Series.IndexOf(this)}";
 
         return
         @<g class="@className">
@@ -30,7 +30,7 @@
                 var y = GetBarTop(data, category);
                 var x = GetBarRight(data, barIndex, category, barSeries);
                 var itemValue = Value(data);
-                var radius = Chart.BarOptions.Radius;
+                var radius = Chart?.BarOptions.Radius;
                 var x0 = GetBarLeft(data, barIndex, category, barSeries);
 
                 if (itemValue < 0)

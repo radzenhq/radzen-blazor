@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace Radzen.Blazor;
@@ -158,15 +159,15 @@ internal static class RadzenQREncoder
         int px = vb * moduleSize;
 
         var sb = new StringBuilder(n * n + 1024);
-        sb.Append($"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{px}\" height=\"{px}\" viewBox=\"0 0 {vb} {vb}\" shape-rendering=\"crispEdges\">");
-        sb.Append($"<rect x=\"0\" y=\"0\" width=\"{vb}\" height=\"{vb}\" fill=\"{background}\"/>");
+        sb.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{px}\" height=\"{px}\" viewBox=\"0 0 {vb} {vb}\" shape-rendering=\"crispEdges\">");
+        sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{vb}\" height=\"{vb}\" fill=\"{background}\"/>");
 
         for (int r = 0; r < n; r++)
         {
             for (int c = 0; c < n; c++)
             {
                 if (modules[r, c])
-                    sb.Append($"<rect x=\"{c + 4}\" y=\"{r + 4}\" width=\"1\" height=\"1\" fill=\"{foreground}\"/>");
+                    sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{c + 4}\" y=\"{r + 4}\" width=\"1\" height=\"1\" fill=\"{foreground}\"/>");
             }
         }
         sb.Append("</svg>");
@@ -459,9 +460,6 @@ internal static class RadzenQREncoder
     }
 
     const int GF_POLY = 0x11D;
-    const int GF_SIZE = 256;
-    const int GF_GEN = 2;
-
     static byte GfMul(byte x, byte y)
     {
         int r = 0;
@@ -757,7 +755,6 @@ internal static class RadzenQREncoder
     }
 
     private static readonly int[][][] EcTable = BuildEcTable();
-
     private static int[][][] BuildEcTable()
     {
         // To keep this file reasonable, the table is still large but compact.

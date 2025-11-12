@@ -21,10 +21,10 @@ namespace Radzen.Blazor
     {
         class LinkAttributes
         {
-            public string InnerText { get; set; }
-            public string InnerHtml { get; set; }
-            public string Href { get; set; }
-            public string Target { get; set; }
+            public string? InnerText { get; set; }
+            public string? InnerHtml { get; set; }
+            public string? Href { get; set; }
+            public string? Target { get; set; }
         }
 
         /// <summary>
@@ -67,6 +67,6 @@ namespace Radzen.Blazor
         /// Specifies the shortcut for the command. Set to <c>"Ctrl+K"</c> by default.
         /// </summary>
         [Parameter]
-        public override string Shortcut { get; set; } = "Ctrl+K";
+        public override string? Shortcut { get; set; } = "Ctrl+K";
     }
 }

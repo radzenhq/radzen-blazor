@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor.Markdown;
@@ -12,6 +13,7 @@ public class HtmlBlock : Leaf
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitHtmlBlock(this);
     }
 

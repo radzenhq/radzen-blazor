@@ -16,13 +16,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value.</value>
         [Parameter]
-        public string Value { get; set; }
+        public string Value { get; set; } = string.Empty;
 
-        string Background
+        string? Background
         {
             get
             {
-                RGB rgb = RGB.Parse(Value);
+                RGB? rgb = RGB.Parse(Value);
 
                 return rgb?.ToCSS();
             }
@@ -33,15 +33,18 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The color picker.</value>
         [CascadingParameter]
-        public RadzenColorPicker ColorPicker { get; set; }
+        public RadzenColorPicker? ColorPicker { get; set; }
 
         private bool isSelected;
 
         /// <inheritdoc/>
         protected override Task OnInitializedAsync()
         {
-            ColorPicker.SelectedColorChanged += ColorPickerColorChanged;
-            isSelected = ColorPicker.Value == Background;
+            if (ColorPicker != null)
+            {
+                ColorPicker.SelectedColorChanged += ColorPickerColorChanged;
+                isSelected = ColorPicker.Value == Background;
+            }
             return base.OnInitializedAsync();
         }
 
@@ -56,7 +59,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private void ColorPickerColorChanged(object colorPicker, string newValue)
+        private void ColorPickerColorChanged(object? colorPicker, string newValue)
         {
             var shouldBeSelected = newValue == Background;
             if (isSelected != shouldBeSelected)
@@ -68,10 +71,13 @@ namespace Radzen.Blazor
 
         async Task OnClick()
         {
-            await ColorPicker.SelectColor(Value);
+            if (ColorPicker != null)
+            {
+                await ColorPicker.SelectColor(Value);
+            }
         }
 
-        bool preventKeyPress = false;
+        bool preventKeyPress;
         async Task OnKeyPress(KeyboardEventArgs args, Task task)
         {
             var key = args.Code != null ? args.Code : args.Key;
@@ -84,7 +90,10 @@ namespace Radzen.Blazor
             }
             else if (key == "Escape")
             {
-                await ColorPicker.ClosePopup();
+                if (ColorPicker != null)
+                {
+                    await ColorPicker.ClosePopup();
+                }
             }
             else
             {

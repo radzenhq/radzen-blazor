@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor.Markdown;
@@ -11,32 +12,56 @@ public abstract class NodeVisitorBase : INodeVisitor
     /// <summary>
     /// Visits a block quote by visiting its children.
     /// </summary>
-    public virtual void VisitBlockQuote(BlockQuote blockQuote) => VisitChildren(blockQuote.Children);
+    public virtual void VisitBlockQuote(BlockQuote blockQuote)
+    {
+        ArgumentNullException.ThrowIfNull(blockQuote);
+        VisitChildren(blockQuote.Children);
+    }
 
     /// <summary>
     /// Visits a document by visiting its children.
     /// </summary>
-    public virtual void VisitDocument(Document document) => VisitChildren(document.Children);
+    public virtual void VisitDocument(Document document)
+    {
+        ArgumentNullException.ThrowIfNull(document);
+        VisitChildren(document.Children);
+    }
 
     /// <summary>
     /// Visits a heading by visiting its children.
     /// </summary>
-    public virtual void VisitHeading(Heading heading) => VisitChildren(heading.Children);
+    public virtual void VisitHeading(Heading heading)
+    {
+        ArgumentNullException.ThrowIfNull(heading);
+        VisitChildren(heading.Children);
+    }
 
     /// <summary>
     /// Visits a list item by visiting its children.
     /// </summary>
-    public virtual void VisitListItem(ListItem listItem) => VisitChildren(listItem.Children);
+    public virtual void VisitListItem(ListItem listItem)
+    {
+        ArgumentNullException.ThrowIfNull(listItem);
+        VisitChildren(listItem.Children);
+    }
 
     /// <summary>
     /// Visits an ordered list by visiting its children.
     /// </summary>
-    public virtual void VisitOrderedList(OrderedList orderedList) => VisitChildren(orderedList.Children);
+    public virtual void VisitOrderedList(OrderedList orderedList)
+    {
+        ArgumentNullException.ThrowIfNull(orderedList);
+        VisitChildren(orderedList.Children);
+    }
 
     /// <summary>
     /// Visits a paragraph by visiting its children.
     /// </summary>
-    public virtual void VisitParagraph(Paragraph paragraph) => VisitChildren(paragraph.Children);
+    public virtual void VisitParagraph(Paragraph paragraph)
+    {
+        ArgumentNullException.ThrowIfNull(paragraph);
+        VisitChildren(paragraph.Children);
+    }
 
     /// <summary>
     /// Visits a thematic break.
@@ -83,27 +108,47 @@ public abstract class NodeVisitorBase : INodeVisitor
     /// <summary>
     /// Visits an ordered list by visiting its children.
     /// </summary>
-    public virtual void VisitUnorderedList(UnorderedList unorderedList) => VisitChildren(unorderedList.Children);
+    public virtual void VisitUnorderedList(UnorderedList unorderedList)
+    {
+        ArgumentNullException.ThrowIfNull(unorderedList);
+        VisitChildren(unorderedList.Children);
+    }
 
     /// <summary>
     /// Visits an emphasis by visiting its children.
     /// </summary>
-    public virtual void VisitEmphasis(Emphasis emphasis) => VisitChildren(emphasis.Children);
+    public virtual void VisitEmphasis(Emphasis emphasis)
+    {
+        ArgumentNullException.ThrowIfNull(emphasis);
+        VisitChildren(emphasis.Children);
+    }
 
     /// <summary>
     /// Visits a strong by visiting its children.
     /// </summary>
-    public virtual void VisitStrong(Strong strong) => VisitChildren(strong.Children);
+    public virtual void VisitStrong(Strong strong)
+    {
+        ArgumentNullException.ThrowIfNull(strong);
+        VisitChildren(strong.Children);
+    }
 
     /// <summary>
     /// Visits a link by visiting its children.
     /// </summary>
-    public virtual void VisitLink(Link link) => VisitChildren(link.Children);
+    public virtual void VisitLink(Link link)
+    {
+        ArgumentNullException.ThrowIfNull(link);
+        VisitChildren(link.Children);
+    }
 
     /// <summary>
     /// Visits an image by visiting its children.
     /// </summary>
-    public virtual void VisitImage(Image image) => VisitChildren(image.Children);
+    public virtual void VisitImage(Image image)
+    {
+        ArgumentNullException.ThrowIfNull(image);
+        VisitChildren(image.Children);
+    }
 
     /// <summary>
     /// Visits a code block.
@@ -129,28 +174,45 @@ public abstract class NodeVisitorBase : INodeVisitor
     /// <summary>
     /// Visits a table.
     /// </summary>
-    public virtual void VisitTable(Table table) => VisitChildren(table.Rows);
+    public virtual void VisitTable(Table table)
+    {
+        ArgumentNullException.ThrowIfNull(table);
+        VisitChildren(table.Rows);
+    }
 
     /// <summary>
     /// Visits a table header row by visiting its children.
     /// </summary>
-    public virtual void VisitTableHeaderRow(TableHeaderRow header) => VisitChildren(header.Cells);
+    public virtual void VisitTableHeaderRow(TableHeaderRow header)
+    {
+        ArgumentNullException.ThrowIfNull(header);
+        VisitChildren(header.Cells);
+    }
 
     /// <summary>
     /// Visits a table row by visiting its children.
     /// </summary>
-    public virtual void VisitTableRow(TableRow row) => VisitChildren(row.Cells);
+    public virtual void VisitTableRow(TableRow row)
+    {
+        ArgumentNullException.ThrowIfNull(row);
+        VisitChildren(row.Cells);
+    }
 
     /// <summary>
     /// Visits a table cell by visiting its children.
     /// </summary>
-    public virtual void VisitTableCell(TableCell cell) => VisitChildren(cell.Children);
+    public virtual void VisitTableCell(TableCell cell)
+    {
+        ArgumentNullException.ThrowIfNull(cell);
+        VisitChildren(cell.Children);
+    }
 
     /// <summary>
     /// Visits a collection of nodes.
     /// </summary>
     protected void VisitChildren(IEnumerable<INode> children)
     {
+        ArgumentNullException.ThrowIfNull(children);
         foreach (var node in children)
         {
             node.Accept(this);

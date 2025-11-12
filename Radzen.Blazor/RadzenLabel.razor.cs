@@ -32,7 +32,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The label content render fragment.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the input component this label is associated with.
@@ -41,7 +41,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The target component's name for label association.</value>
         [Parameter]
-        public string Component { get; set; }
+        public string? Component { get; set; }
 
         /// <summary>
         /// Gets or sets the label text to display.

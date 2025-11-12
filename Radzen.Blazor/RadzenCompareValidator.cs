@@ -75,7 +75,7 @@ namespace Radzen.Blazor
         /// Specifies the value to compare with.
         /// </summary>
         [Parameter]
-        public object Value { get; set; }
+        public object? Value { get; set; }
 
         /// <summary>
         /// Specifies the comparison operator. Set to <c>CompareOperator.Equal</c> by default.
@@ -90,9 +90,9 @@ namespace Radzen.Blazor
         [Parameter]
         public virtual bool ValidateOnComponentValueChange { get; set; } = true;
 
-        private int Compare(object componentValue) => componentValue switch
+        private int Compare(object? componentValue) => componentValue switch
         {
-            string stringValue => string.Compare(stringValue, (string)Value, false, Culture),
+            string stringValue => string.Compare(stringValue, Value as string, StringComparison.Ordinal),
             IComparable comparable => comparable.CompareTo(Value),
             _ => 0,
         };
@@ -107,7 +107,7 @@ namespace Radzen.Blazor
 
             if (ValidateOnComponentValueChange && (valueChanged || visibleChanged) && !firstRender && Visible)
             {
-                var component = Form.FindComponent(Component);
+                var component = Form?.FindComponent(Component);
                 if (component != null && component.FieldIdentifier.FieldName != null)
                 {
                     IsValid = Validate(component);
@@ -135,7 +135,9 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
-            var compareResult = Compare(component.GetValue());
+            ArgumentNullException.ThrowIfNull(component);
+            var componentValue = component.GetValue();
+            var compareResult = Compare(componentValue);
 
             return Operator switch
             {

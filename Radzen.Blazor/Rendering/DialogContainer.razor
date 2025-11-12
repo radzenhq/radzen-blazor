@@ -5,7 +5,7 @@
 @implements IDisposable
 <div class=@WrapperClass>
     <div @ref="dialog" class=@Class role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
-        @if (Dialog.Options.ShowTitle)
+        @if (Dialog?.Options?.ShowTitle == true)
         {
             <div class="rz-dialog-titlebar">
                 <div class="rz-dialog-title" id="rz-dialog-0-label">
@@ -15,7 +15,7 @@
                                     IconColor="@(string.IsNullOrEmpty(Dialog.Options.IconColor) ? null : Dialog.Options.IconColor)" 
                                     Style="@Dialog.Options.IconStyle" />
                     }
-                    @if (Dialog.Options.TitleContent != null)
+                    @if (Dialog.Options.TitleContent != null && Service != null)
                     {
                         @Dialog.Options.TitleContent(Service)
                     }
@@ -33,7 +33,7 @@
             </div>
         }
         <div class=@ContentClass>
-            @if (Dialog.Options.ChildContent != null)
+            @if (Dialog?.Options?.ChildContent != null && Service != null)
             {
                 @Dialog.Options.ChildContent(Service)
             }
@@ -46,7 +46,7 @@
 
     @if (ShowMask)
     {
-        @if (Dialog.Options.CloseDialogOnOverlayClick)
+        @if (Dialog?.Options?.CloseDialogOnOverlayClick == true)
         {
             <div @onclick="@Close" class="rz-dialog-mask"></div>
         }
@@ -70,10 +70,10 @@
 
     ElementReference dialog;
 
-    string left;
-    string top;
-    string height;
-    string width;
+    string? left;
+    string? top;
+    string? height;
+    string? width;
 
     /// <summary>
     /// Called when dragged.
@@ -85,7 +85,7 @@
     {
         shouldRender = false;
 
-        if (Dialog.Options.Drag != null)
+        if (Dialog?.Options?.Drag != null)
         {
             Dialog.Options.Drag(new System.Drawing.Point(Convert.ToInt32(l), Convert.ToInt32(t)));
         }
@@ -107,7 +107,7 @@
     {
         shouldRender = false;
 
-        if(Dialog.Options.Resize != null && w != 0 && h != 0)
+        if(Dialog?.Options?.Resize != null && w != 0 && h != 0)
         {
             Dialog.Options.Resize(new System.Drawing.Size(Convert.ToInt32(w), Convert.ToInt32(h)));
         }
@@ -125,7 +125,7 @@
     }
 
     [Parameter]
-    public Dialog Dialog { get; set; }
+    public Dialog? Dialog { get; set; }
 
     [Parameter]
     public bool ShowMask { get; set; } = true;
@@ -139,40 +139,42 @@
         builder.AddAttribute(2, "IsFixed", true);
         builder.AddAttribute(3, "ChildContent", (RenderFragment)((builder2) =>
         {
-            builder2.OpenComponent(0, Dialog.Type); // Open Dialog
-
-            if (Dialog.Parameters != null)
+            if (Dialog != null && Dialog.Type != null)
             {
-                foreach (var parameter in Dialog.Parameters)
+                builder2.OpenComponent(0, Dialog.Type); // Open Dialog
+
+                if (Dialog.Parameters != null)
                 {
-                    builder2.AddAttribute(1, parameter.Key, parameter.Value);
+                    foreach (var parameter in Dialog.Parameters)
+                    {
+                        builder2.AddAttribute(1, parameter.Key, parameter.Value);
+                    }
                 }
+
+                builder2.AddComponentReferenceCapture(2, component => reference = component); // Capture reference
+                builder2.CloseComponent(); // Close Dialog
             }
-
-            builder2.AddComponentReferenceCapture(2, component => reference = component); // Capture reference
-            builder2.CloseComponent(); // Close Dialog
-
         }));
         builder.CloseComponent(); // Close CascadingValue
     });
 
-    object reference;
+    object? reference;
 
     void Close()
     {
-        Service.Close();
+        Service?.Close();
     }
 
     string Class => ClassList.Create("rz-dialog rz-open")
-                             .Add(Dialog.Options.CssClass)
+                             .Add(Dialog?.Options?.CssClass)
                              .ToString();
 
     string WrapperClass => ClassList.Create("rz-dialog-wrapper")
-                                    .Add(Dialog.Options.WrapperCssClass)
+                                    .Add(Dialog?.Options?.WrapperCssClass)
                                     .ToString();
 
     string ContentClass => ClassList.Create("rz-dialog-content")
-                                    .Add(Dialog.Options.ContentCssClass)
+                                    .Add(Dialog?.Options?.ContentCssClass)
                                     .ToString();
 
     string Style
@@ -180,29 +182,35 @@
         get
         {
             var baseStyle = "";
-            var widthStyle = !string.IsNullOrEmpty(width) ? width : string.IsNullOrEmpty(Dialog.Options.Width) ? "" : $"width: {Dialog.Options.Width};";
-            var heightStyle = !string.IsNullOrEmpty(height) ? height : string.IsNullOrEmpty(Dialog.Options.Height) ? "" : $"height: {Dialog.Options.Height};";
-            var topStyle = !string.IsNullOrEmpty(top) ? top : string.IsNullOrEmpty(Dialog.Options.Top) ? "" : $"top: {Dialog.Options.Top};";
-            var leftStyle = !string.IsNullOrEmpty(left) ? left :string.IsNullOrEmpty(Dialog.Options.Left) ? "" : $"left: {Dialog.Options.Left};";
-            var bottomStyle = string.IsNullOrEmpty(Dialog.Options.Bottom) ? "" : $"bottom: {Dialog.Options.Bottom};";
-            var resizeStyle = Dialog.Options.Resizable ? "resize:both;" : "";
+            var widthStyle = !string.IsNullOrEmpty(width) ? width : string.IsNullOrEmpty(Dialog?.Options?.Width) ? "" : $"width: {Dialog?.Options?.Width};";
+            var heightStyle = !string.IsNullOrEmpty(height) ? height : string.IsNullOrEmpty(Dialog?.Options?.Height) ? "" : $"height: {Dialog?.Options?.Height};";
+            var topStyle = !string.IsNullOrEmpty(top) ? top : string.IsNullOrEmpty(Dialog?.Options?.Top) ? "" : $"top: {Dialog?.Options?.Top};";
+            var leftStyle = !string.IsNullOrEmpty(left) ? left :string.IsNullOrEmpty(Dialog?.Options?.Left) ? "" : $"left: {Dialog?.Options?.Left};";
+            var bottomStyle = string.IsNullOrEmpty(Dialog?.Options?.Bottom) ? "" : $"bottom: {Dialog.Options.Bottom};";
+            var resizeStyle = Dialog?.Options?.Resizable == true ? "resize:both;" : "";
 
-            return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}{bottomStyle}{resizeStyle}{Dialog.Options.Style}";
+            return $"{baseStyle}{widthStyle}{heightStyle}{topStyle}{leftStyle}{bottomStyle}{resizeStyle}{Dialog?.Options?.Style ?? ""}";
         }
     }
 
     [Inject] 
-    DialogService Service { get; set; }
+    DialogService? Service { get; set; }
 
     protected override void OnInitialized()
     {
-        Service.OnRefresh += OnRefresh;
+        if (Service != null)
+        {
+            Service.OnRefresh += OnRefresh;
+        }
 
 		// Subscribe to PropertyChanged event to auto refresh the dialog when properties change
-        Dialog.PropertyChanged += OnPropertyChanged;
+        if (Dialog != null)
+        {
+            Dialog.PropertyChanged += OnPropertyChanged;
+        }
 
 		// Subscribe to PropertyChanged event to auto refresh the dialog when properties change
-		if (Dialog.Options != null)
+		if (Dialog?.Options != null)
 			Dialog.Options.PropertyChanged += OnPropertyChanged;
     }
 
@@ -211,7 +219,7 @@
     /// </summary>
     /// <param name="sender">The source of the event.</param>
     /// <param name="e">The <see cref="PropertyChangedEventArgs"/> instance containing the event data.</param>
-    void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+    void OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         OnRefresh();
     }
@@ -230,13 +238,19 @@
 
     public void Dispose()
     {
-        Service.OnRefresh -= OnRefresh;
+        if (Service != null)
+        {
+            Service.OnRefresh -= OnRefresh;
+        }
 
 		// Unsubscribe from PropertyChanged event
-        Dialog.PropertyChanged -= OnPropertyChanged;
+        if (Dialog != null)
+        {
+            Dialog.PropertyChanged -= OnPropertyChanged;
+        }
 
 		// Unsubscribe from PropertyChanged event
-        if (Dialog.Options != null)
+        if (Dialog?.Options != null)
             Dialog.Options.PropertyChanged -= OnPropertyChanged;
 
     }
@@ -247,7 +261,7 @@
 
         if (firstRender)
         {
-            var options = Dialog.Options;
+            var options = Dialog?.Options;
 
             var dialogOptions = new DialogOptions()
                 {
@@ -268,11 +282,14 @@
                     CloseTabIndex = options != null ? options.CloseTabIndex : 0,
                 };
 
-            await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference, DotNetReference);
+            if (Service?.Reference != null)
+            {
+                await JSRuntime.InvokeAsync<string>("Radzen.openDialog", dialogOptions, Service.Reference, DotNetReference);
+            }
         }
     }
 
-    private DotNetObjectReference<DialogContainer> dotNetReference;
+    private DotNetObjectReference<DialogContainer>? dotNetReference;
 
     /// <summary>
     /// Gets the reference for the current component.

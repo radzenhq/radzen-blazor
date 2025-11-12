@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using System.Threading;
 using System.Runtime.ExceptionServices;
+using System;
+using System.Globalization;
 
 namespace Radzen.Blazor
 {
@@ -21,7 +23,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The style.</value>
         [Parameter]
-        public override string Style { get; set; } = DefaultStyle;
+        public override string? Style { get; set; } = DefaultStyle;
 
         /// <inheritdoc />
         protected override string GetComponentCssClass() => ClassList.Create("rz-body")
@@ -42,7 +44,7 @@ namespace Radzen.Blazor
         /// The <see cref="RadzenLayout" /> this component is nested in.
         /// </summary>
         [CascadingParameter]
-        public RadzenLayout Layout { get; set; }
+        public RadzenLayout? Layout { get; set; }
 
         /// <summary>
         /// Gets the style.
@@ -57,10 +59,10 @@ namespace Radzen.Blazor
 
                 if (!string.IsNullOrEmpty(Style))
                 {
-                    var marginLeftStyle = Style.Split(';').Where(i => i.Split(':')[0].Contains("margin-left")).FirstOrDefault();
-                    if (!string.IsNullOrEmpty(marginLeftStyle) && marginLeftStyle.Contains("px"))
+                    var marginLeftStyle = Style.Split(';').Where(i => i.Split(':')[0].Contains("margin-left", StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+                    if (!string.IsNullOrEmpty(marginLeftStyle) && marginLeftStyle.Contains("px", StringComparison.OrdinalIgnoreCase))
                     {
-                        marginLeft = int.Parse(marginLeftStyle.Split(':')[1].Trim().Replace("px", "").Split('.')[0].Trim());
+                        marginLeft = int.Parse(marginLeftStyle.Split(':')[1].Trim().Replace("px", "", StringComparison.OrdinalIgnoreCase).Split('.')[0].Trim(), CultureInfo.InvariantCulture);
                     }
                 }
 
@@ -72,7 +74,7 @@ namespace Radzen.Blazor
 
                 if (!string.IsNullOrEmpty(style))
                 {
-                    style = style.Replace(DefaultStyle, "");
+                    style = style.Replace(DefaultStyle, "", StringComparison.Ordinal);
                 }
 
                 return $"{style}";
@@ -94,30 +96,38 @@ namespace Radzen.Blazor
         public EventCallback<bool> ExpandedChanged { get; set; }
 
         [Inject]
-        NavigationManager NavigationManager { get; set; }
+        NavigationManager? NavigationManager { get; set; }
 
         /// <inheritdoc />
         protected override Task OnInitializedAsync()
         {
-            NavigationManager.LocationChanged += OnLocationChanged;
+            if (NavigationManager != null)
+            {
+                NavigationManager.LocationChanged += OnLocationChanged;
+            }
 
             return base.OnInitializedAsync();
         }
 
-        private void OnLocationChanged(object sender, LocationChangedEventArgs e)
+        private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
         {
-            if (IsJSRuntimeAvailable && Layout != null)
+            if (IsJSRuntimeAvailable && Layout != null && JSRuntime != null)
             {
-                JSRuntime.InvokeVoidAsync("eval", $"try{{document.getElementById('{GetId()}').scrollTop = 0}}catch(e){{}}");
+                _ = JSRuntime.InvokeVoidAsync("eval", $"try{{document.getElementById('{GetId()}').scrollTop = 0}}catch(e){{}}");
             }
         }
 
         /// <inheritdoc />
         public override void Dispose()
         {
-            NavigationManager.LocationChanged -= OnLocationChanged;
+            if (NavigationManager != null)
+            {
+                NavigationManager.LocationChanged -= OnLocationChanged;
+            }
 
             base.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

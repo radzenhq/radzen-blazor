@@ -1,4 +1,4 @@
-﻿@using Radzen.Blazor.Rendering
+@using Radzen.Blazor.Rendering
 @inherits RadzenGridLines
 @implements IChartSeriesOverlay
 @implements IDisposable
@@ -9,35 +9,46 @@
         Visible = true;
     }
 
-    IChartSeries series;
+    IChartSeries? series;
     [CascadingParameter]
-    protected IChartSeries Series
+    protected IChartSeries? Series
     {
         get
         {
             return series;
         }
-        set
-        {
-            if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+            set
             {
-                throw new ArgumentException($"Series must use Cartesian coordinate system");
+                if (value == null)
+                {
+                    series = null;
+                    return;
+                }
+                if (value.CoordinateSystem != CoordinateSystem.Cartesian)
+                {
+                    throw new ArgumentException($"Series must use Cartesian coordinate system");
+                }
+                series = value;
+                if (!series.Overlays.Contains(this))
+                {
+                    series.Overlays.Add(this);
+                }
             }
-            series = value;
-            if (!series.Overlays.Contains(this))
-            {
-                series.Overlays.Add(this);
-            }
-        }
     }
 
     public RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
+        if (series == null) return null!;
         (double a, double b) = series.GetTrend();
 
         if (double.IsNaN(a) || double.IsNaN(b))
         {
-            return null;
+            return null!;
+        }
+
+        if (Chart == null)
+        {
+            return null!;
         }
 
         double x1, x2, y1, y2;
@@ -75,7 +86,7 @@
 
     public RenderFragment RenderTooltip(double mouseX, double mouseY)
     {
-        return null;
+        return null!;
     }
 
     /// <inheritdoc />

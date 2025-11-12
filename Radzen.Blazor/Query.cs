@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Encodings.Web;
 
@@ -10,9 +11,9 @@ namespace Radzen;
 /// </summary>
 public class Query
 {
-    private Func<string> getFilter;
+    private Func<string>? getFilter;
 
-    internal Func<string> GetFilter
+    internal Func<string>? GetFilter
     {
         get
         {
@@ -25,19 +26,19 @@ public class Query
         }
     }
 
-    private string filter;
+    private string? filter;
 
     /// <summary>
     /// Gets the filter expression as a string.
     /// </summary>
     /// <value>The filter.</value>
-    public string Filter
+    public string? Filter
     {
         get
         {
             if (filter == null && GetFilter != null)
             {
-                filter = GetFilter();
+                filter = GetFilter?.Invoke();
             }
             return filter;
         }
@@ -51,37 +52,37 @@ public class Query
     /// Gets the filter expression as a collection of filter descriptors.
     /// </summary>
     /// <value>The filter parameters.</value>
-    public IEnumerable<FilterDescriptor> Filters { get; set; }
+    public IEnumerable<FilterDescriptor>? Filters { get; set; }
 
     /// <summary>
     /// Gets the sort expression as a collection of sort descriptors.
     /// </summary>
     /// <value>The sorts.</value>
-    public IEnumerable<SortDescriptor> Sorts { get; set; }
+    public IEnumerable<SortDescriptor>? Sorts { get; set; }
 
     /// <summary>
     /// Gets or sets the filter parameters.
     /// </summary>
     /// <value>The filter parameters.</value>
-    public object[] FilterParameters { get; set; }
+    public object[]? FilterParameters { get; set; }
 
     /// <summary>
     /// Gets or sets the order by.
     /// </summary>
     /// <value>The order by.</value>
-    public string OrderBy { get; set; }
+    public string? OrderBy { get; set; }
 
     /// <summary>
     /// Gets or sets the expand.
     /// </summary>
     /// <value>The expand.</value>
-    public string Expand { get; set; }
+    public string? Expand { get; set; }
 
     /// <summary>
     /// Gets or sets the select.
     /// </summary>
     /// <value>The select.</value>
-    public string Select { get; set; }
+    public string? Select { get; set; }
 
     /// <summary>
     /// Gets or sets the skip.
@@ -134,7 +135,7 @@ public class Query
             queryParameters.Add("$select", Select);
         }
 
-        return string.Format("{0}{1}", url, queryParameters.Any() ? "?" + string.Join("&", queryParameters.Select(a => $"{a.Key}={a.Value}")) : "");
+        return string.Format(CultureInfo.InvariantCulture, "{0}{1}", url, queryParameters.Count > 0 ? "?" + string.Join("&", queryParameters.Select(a => $"{a.Key}={a.Value}")) : "");
     }
 }
 

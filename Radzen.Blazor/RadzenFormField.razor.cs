@@ -28,7 +28,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Notifies the form field that the disabled state of the component has changed.
         /// </summary>
-        public Action<bool> DisabledChanged { get; set; }
+        public Action<bool> DisabledChanged { get; set; } = null!;
         /// <summary>
         /// Gets or sets a value indicating whether the label is floating or fixed on top.
         /// </summary>
@@ -82,7 +82,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The input component render fragment.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets content to render before (leading position of) the input field.
@@ -91,7 +91,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The start content render fragment.</value>
         [Parameter]
-        public RenderFragment Start { get; set; }
+        public RenderFragment? Start { get; set; }
 
         /// <summary>
         /// Gets or sets content to render after (trailing position of) the input field.
@@ -100,7 +100,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The end content render fragment.</value>
         [Parameter]
-        public RenderFragment End { get; set; }
+        public RenderFragment? End { get; set; }
 
         /// <summary>
         /// Gets or sets content to render below the input field.
@@ -109,19 +109,19 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The helper content render fragment.</value>
         [Parameter]
-        public RenderFragment Helper { get; set; }
+        public RenderFragment? Helper { get; set; }
         /// <summary>
         /// Gets or sets the custom content for the label using a Razor template.
         /// When provided, this template will be rendered instead of the plain text specified in the Text parameter.
         /// </summary>
 
         [Parameter]
-        public RenderFragment TextTemplate { get; set; }
+        public RenderFragment? TextTemplate { get; set; }
         /// <summary>
         /// Gets or sets the label text.
         /// </summary>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the label is floating or fixed on top.
@@ -134,7 +134,7 @@ namespace Radzen.Blazor
         /// Gets or sets the name of the form field. Used to associate the label with a component.
         /// </summary>
         [Parameter]
-        public string Component { get; set; }
+        public string? Component { get; set; }
 
         /// <summary>
         /// Gets or sets the design variant of the form field.

@@ -6,12 +6,12 @@ namespace Radzen;
 /// Supplies information about a <see cref="RadzenDataGrid{TItem}.Render" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class DataGridRenderEventArgs<T>
+public class DataGridRenderEventArgs<T> where T : notnull
 {
     /// <summary>
     /// Gets the instance of the RadzenDataGrid component which has rendered.
     /// </summary>
-    public RadzenDataGrid<T> Grid { get; internal set; }
+    public RadzenDataGrid<T>? Grid { get; internal set; }
 
     /// <summary>
     /// Gets a value indicating whether this is the first time the RadzenDataGrid has rendered.

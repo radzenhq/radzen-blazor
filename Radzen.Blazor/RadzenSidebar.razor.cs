@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
@@ -46,7 +47,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The CSS style string. Default is "top:51px;bottom:57px;width:250px;".</value>
         [Parameter]
-        public override string Style { get; set; } = DefaultStyle;
+        public override string? Style { get; set; } = DefaultStyle;
 
         /// <summary>
         /// Gets or sets whether the sidebar should automatically collapse on small screens (responsive mode).
@@ -80,7 +81,7 @@ namespace Radzen.Blazor
         /// The <see cref="RadzenLayout" /> this component is nested in.
         /// </summary>
         [CascadingParameter]
-        public RadzenLayout Layout { get; set; }
+        public RadzenLayout? Layout { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum width, in pixels, at which the component switches to a responsive layout.
@@ -96,7 +97,7 @@ namespace Radzen.Blazor
                                                           .Add("rz-sidebar-collapsed", expanded == false)
                                                           .Add("rz-sidebar-responsive", IsResponsive)
                                                           .Add("rz-sidebar-fullheight", FullHeight)
-                                                          .Add($"rz-sidebar-{Position.Value.ToString().ToLower()}")
+                                                          .Add($"rz-sidebar-{(Position?.ToString() ?? "left").ToLower(CultureInfo.InvariantCulture)}")
                                                           .ToString();
         }
 
@@ -115,13 +116,13 @@ namespace Radzen.Blazor
         /// Gets the style.
         /// </summary>
         /// <returns>System.String.</returns>
-        protected string GetStyle()
+        protected string? GetStyle()
         {
             var style = Style;
 
             if (Layout != null && !string.IsNullOrEmpty(style))
             {
-                style = style.Replace(DefaultStyle, "");
+                style = style.Replace(DefaultStyle, "", StringComparison.Ordinal);
             }
 
             if (Layout != null)

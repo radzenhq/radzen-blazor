@@ -8,12 +8,12 @@ public class DataGridColumnSettings
     /// <summary>
     /// Property.
     /// </summary>
-    public string UniqueID { get; set; }
+    public string UniqueID { get; set; } = string.Empty;
 
     /// <summary>
     /// Property.
     /// </summary>
-    public string Property { get; set; }
+    public string Property { get; set; } = string.Empty;
 
     /// <summary>
     /// Visible.
@@ -23,7 +23,7 @@ public class DataGridColumnSettings
     /// <summary>
     /// Width.
     /// </summary>
-    public string Width { get; set; }
+    public string Width { get; set; } = string.Empty;
 
     /// <summary>
     /// OrderIndex.
@@ -43,7 +43,7 @@ public class DataGridColumnSettings
     /// <summary>
     /// FilterValue.
     /// </summary>
-    public object FilterValue { get; set; }
+    public object? FilterValue { get; set; }
 
     /// <summary>
     /// FilterOperator.
@@ -53,7 +53,7 @@ public class DataGridColumnSettings
     /// <summary>
     /// SecondFilterValue.
     /// </summary>
-    public object SecondFilterValue { get; set; }
+    public object? SecondFilterValue { get; set; }
 
     /// <summary>
     /// SecondFilterOperator.
@@ -68,7 +68,7 @@ public class DataGridColumnSettings
     /// <summary>
     /// CustomFilterExpression.
     /// </summary>
-    public string CustomFilterExpression { get; set; }
+    public string CustomFilterExpression { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the mode that determines whether the filter applies to any or all items in a collection.

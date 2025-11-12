@@ -51,26 +51,31 @@ namespace Radzen
         /// <exception cref="ArgumentException"></exception>
         public IComponent CreateInstance(Type componentType)
         {
+            ArgumentNullException.ThrowIfNull(componentType);
+
             if (!typeof(IComponent).IsAssignableFrom(componentType))
             {
                 throw new ArgumentException($"The type {componentType.FullName} does not implement {nameof(IComponent)}.", nameof(componentType));
             }
 
-            if (replacedTypes.ContainsKey(componentType))
+            if (replacedTypes.TryGetValue(componentType, out var replacedType))
             {
-                componentType = replacedTypes[componentType];
+                componentType = replacedType;
             }
             else if (componentType.IsGenericType)
             {
                 var genericTypeDefinition = componentType.GetGenericTypeDefinition();
 
-                if (replacedTypes.ContainsKey(genericTypeDefinition))
+                if (replacedTypes.TryGetValue(genericTypeDefinition, out var replacedGenericType))
                 {
-                    componentType = replacedTypes[genericTypeDefinition].MakeGenericType(componentType.GetGenericArguments());
+                    componentType = replacedGenericType.MakeGenericType(componentType.GetGenericArguments());
                 }
             }
 
-            return (IComponent)Activator.CreateInstance(componentType);
+        var instance = Activator.CreateInstance(componentType)
+            ?? throw new InvalidOperationException($"Unable to create an instance of '{componentType.FullName}'.");
+
+        return (IComponent)instance;
         }
     }
 }

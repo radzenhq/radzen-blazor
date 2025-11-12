@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Radzen.Blazor
@@ -38,7 +39,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The email address.</value>
         [Parameter]
-        public string Email { get; set; }
+        public string? Email { get; set; }
 
         /// <summary>
         /// Gets or sets the alternate text describing the avatar for accessibility.
@@ -73,7 +74,7 @@ namespace Radzen.Blazor
 
         string GetAlternateText()
         {
-            if (Attributes != null && Attributes.TryGetValue("alt", out var @alt) && !string.IsNullOrEmpty(Convert.ToString(@alt)))
+            if (Attributes != null && Attributes.TryGetValue("alt", out var @alt) && !string.IsNullOrEmpty(Convert.ToString(@alt, CultureInfo.InvariantCulture)))
             {
                 return $"{AlternateText} {@alt}";
             }

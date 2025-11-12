@@ -9,6 +9,6 @@ public class DataGridRowMouseEventArgs<T> : Microsoft.AspNetCore.Components.Web.
     /// <summary>
     /// Gets the data item which the clicked DataGrid row represents.
     /// </summary>
-    public T Data { get; internal set; }
+    public T? Data { get; internal set; }
 }
 

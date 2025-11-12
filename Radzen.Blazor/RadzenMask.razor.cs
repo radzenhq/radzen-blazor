@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -59,7 +60,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The mask pattern string where * represents input positions.</value>
         [Parameter]
-        public string Mask { get; set; }
+        public string? Mask { get; set; }
 
         /// <summary>
         /// Gets or sets a regular expression pattern for removing invalid characters from user input.
@@ -68,7 +69,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The regex pattern for invalid characters to remove.</value>
         [Parameter]
-        public string Pattern { get; set; }
+        public string? Pattern { get; set; }
 
         /// <summary>
         /// Gets or sets a regular expression pattern specifying which characters are valid for user input.
@@ -78,14 +79,15 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The regex pattern for valid input characters.</value>
         [Parameter]
-        public string CharacterPattern { get; set; }
+        public string? CharacterPattern { get; set; }
 
         /// <summary>
-        /// Handles the <see cref="E:Change" /> event.
+        /// Handles the change event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
             Value = $"{args.Value}";
 
             await ValueChanged.InvokeAsync(Value);
@@ -99,6 +101,11 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnInput(ChangeEventArgs args)
         {
+            if (JSRuntime == null)
+            {
+                return;
+            }
+
             await JSRuntime.InvokeVoidAsync("Radzen.mask", GetId(), Mask, Pattern, CharacterPattern);
 
             Value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", Element);
@@ -119,7 +126,7 @@ namespace Radzen.Blazor
         {
             base.OnAfterRender(firstRender);
 
-            if (firstRender)
+            if (firstRender && JSRuntime != null)
             {
                 JSRuntime.InvokeVoidAsync("eval", $"Radzen.mask('{GetId()}', '{Mask}', '{Pattern}', '{CharacterPattern}')");
             }

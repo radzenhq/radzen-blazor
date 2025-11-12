@@ -45,11 +45,11 @@ namespace Radzen.Blazor
     {
         private class RowHeaderCell
         {
-            public object Value { get; set; }
-            public string Title { get; set; }
+            public object? Value { get; set; }
+            public string? Title { get; set; }
             public int RowSpan { get; set; } = 1;
             public bool IsCollapsed { get; set; }
-            public string PathKey { get; set; }
+            public string? PathKey { get; set; }
             public bool HasChildren { get; set; }
         }
 
@@ -57,19 +57,19 @@ namespace Radzen.Blazor
         /// Gets or sets the columns collection for pivot columns.
         /// </summary>
         [Parameter]
-        public RenderFragment Columns { get; set; }
+        public RenderFragment? Columns { get; set; }
 
         /// <summary>
         /// Gets or sets the rows collection for pivot rows.
         /// </summary>
         [Parameter]
-        public RenderFragment Rows { get; set; }
+        public RenderFragment? Rows { get; set; }
 
         /// <summary>
         /// Gets or sets the aggregates collection for pivot aggregates/measures.
         /// </summary>
         [Parameter]
-        public RenderFragment Aggregates { get; set; }
+        public RenderFragment? Aggregates { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether to show column totals.
@@ -100,7 +100,7 @@ namespace Radzen.Blazor
         /// Gets or sets the empty template shown when Data is empty collection.
         /// </summary>
         [Parameter]
-        public RenderFragment EmptyTemplate { get; set; }
+        public RenderFragment? EmptyTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the grid lines style.
@@ -120,7 +120,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The fields picker header template.</value>
         [Parameter]
-        public RenderFragment FieldsPickerHeaderTemplate { get; set; }
+        public RenderFragment? FieldsPickerHeaderTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the fields picker header text.
@@ -385,7 +385,7 @@ namespace Radzen.Blazor
         /// Gets or sets the enum filter translation function.
         /// </summary>
         [Parameter]
-        public Func<object, string> EnumFilterTranslationFunc { get; set; }
+        public Func<object, string>? EnumFilterTranslationFunc { get; set; }
 
         /// <summary>
         /// Gets or sets whether to allow filter date input.
@@ -405,13 +405,13 @@ namespace Radzen.Blazor
         private Dictionary<string, bool> _collapsedColumnGroups = new Dictionary<string, bool>();
         private Dictionary<string, bool> _collapsedRowGroups = new Dictionary<string, bool>();
 
-        private List<List<ColumnHeaderCell>> _columnHeaderRows;
-        private List<PivotBodyRow> _cachedPivotRows;
-        private List<List<object>> _cachedColumnLeaves;
+        private List<List<ColumnHeaderCell>>? _columnHeaderRows;
+        private List<PivotBodyRow>? _cachedPivotRows;
+        private List<List<object>>? _cachedColumnLeaves;
 
         // Filter functionality
-        private RadzenPivotField<TItem> currentFilterField;
-        private Popup filterPopup;
+        private RadzenPivotField<TItem>? currentFilterField;
+        private Popup? filterPopup;
 
         /// <summary>
         /// Gets the columns collection.
@@ -461,7 +461,7 @@ namespace Radzen.Blazor
                     var root = BuildColumnHeaderTree();
                     _columnHeaderRows = FlattenColumnHeaderTree(root);
                 }
-                return _columnHeaderRows;
+                return _columnHeaderRows!;
             }
         }
 
@@ -476,7 +476,7 @@ namespace Radzen.Blazor
                 {
                     _cachedPivotRows = GetPivotRowHierarchy();
                 }
-                return _cachedPivotRows;
+                return _cachedPivotRows!;
             }
         }
 
@@ -491,14 +491,14 @@ namespace Radzen.Blazor
                 {
                     _cachedColumnLeaves = GetColumnHeaderLeaves();
                 }
-                return _cachedColumnLeaves;
+                return _cachedColumnLeaves!;
             }
         }
 
         ColumnHeaderNode BuildColumnHeaderTree()
         {
             var root = new ColumnHeaderNode { Level = 0, Title = null };
-            if (!pivotColumns.Any() || Data == null)
+            if (pivotColumns.Count == 0 || Data == null)
                 return root;
 
             BuildColumnHeaderTreeRecursive(root, PagedView, 0, new List<object>());
@@ -511,7 +511,7 @@ namespace Radzen.Blazor
             if (level >= pivotColumns.Count)
                 return;
             var col = pivotColumns[level];
-            var groups = items.GroupByMany(new string[] { col.Property });
+            var groups = items.GroupByMany(new string[] { col.Property! });
             foreach (var group in groups)
             {
                 var currentPath = new List<object>(path) { group.Key };
@@ -532,7 +532,7 @@ namespace Radzen.Blazor
 
                 if (!isCollapsed)
                 {
-                    BuildColumnHeaderTreeRecursive(child, group.Items.Cast<TItem>().AsQueryable(), level + 1, currentPath);
+                    BuildColumnHeaderTreeRecursive(child, group.Items?.Cast<TItem>().AsQueryable() ?? Enumerable.Empty<TItem>().AsQueryable(), level + 1, currentPath);
                 }
                 node.Children.Add(child);
             }
@@ -760,9 +760,8 @@ namespace Radzen.Blazor
 
         internal void RemovePivotColumn(RadzenPivotColumn<TItem> column)
         {
-            if (allPivotColumns.Contains(column))
+            if (allPivotColumns.Remove(column))
             {
-                allPivotColumns.Remove(column);
                 pivotColumns.Remove(column);
                 _columnHeaderRows = null;
                 _cachedPivotRows = null;
@@ -773,9 +772,8 @@ namespace Radzen.Blazor
 
         internal void RemovePivotRow(RadzenPivotRow<TItem> row)
         {
-            if (allPivotRows.Contains(row))
+            if (allPivotRows.Remove(row))
             {
-                allPivotRows.Remove(row);
                 pivotRows.Remove(row);
                 _columnHeaderRows = null;
                 _cachedPivotRows = null;
@@ -786,9 +784,8 @@ namespace Radzen.Blazor
 
         internal void RemovePivotField(RadzenPivotField<TItem> row)
         {
-            if (pivotFields.Contains(row))
+            if (pivotFields.Remove(row))
             {
-                pivotFields.Remove(row);
                 _columnHeaderRows = null;
                 _cachedPivotRows = null;
                 _cachedColumnLeaves = null;
@@ -798,9 +795,8 @@ namespace Radzen.Blazor
 
         internal void RemovePivotAggregate(RadzenPivotAggregate<TItem> aggregate)
         {
-            if (allPivotAggregates.Contains(aggregate))
+            if (allPivotAggregates.Remove(aggregate))
             {
-                allPivotAggregates.Remove(aggregate);
                 pivotAggregates.Remove(aggregate);
                 _columnHeaderRows = null;
                 _cachedPivotRows = null;
@@ -816,7 +812,7 @@ namespace Radzen.Blazor
         {
             return new RenderFragment(builder =>
             {
-                if (Data == null || !pivotRows.Any() || !pivotAggregates.Any())
+                if (Data == null || pivotRows.Count == 0 || pivotAggregates.Count == 0)
                 {
                     builder.OpenElement(0, "tr");
                     builder.AddAttribute(1, "class", "rz-pivot-empty-row");
@@ -844,9 +840,9 @@ namespace Radzen.Blazor
                     foreach (var rowHeaderCell in pivotRow.RowHeaderCells)
                     {
                         // Check if this column position has an active rowspan from a previous row
-                        if (activeRowSpans.ContainsKey(colIndex))
+                        if (activeRowSpans.TryGetValue(colIndex, out var rowSpan))
                         {
-                            activeRowSpans[colIndex]--;
+                            activeRowSpans[colIndex] = rowSpan - 1;
                             if (activeRowSpans[colIndex] <= 0)
                             {
                                 activeRowSpans.Remove(colIndex);
@@ -911,13 +907,13 @@ namespace Radzen.Blazor
                             {
                                 var cellValue = pivotRow.ValueCells[valueIndex];
 
-                                if (aggregate.Template != null)
+                                if (aggregate.Template != null && cellValue != null)
                                 {
                                     builder.AddContent(11, aggregate.Template(cellValue));
                                 }
                                 else
                                 {
-                                    builder.AddContent(11, aggregate.FormatValue(cellValue));
+                                    builder.AddContent(11, aggregate.FormatValue(cellValue!));
                                 }
                             }
                             
@@ -952,7 +948,7 @@ namespace Radzen.Blazor
                             }
                             else
                             {
-                                builder.AddContent(15, aggregate.FormatValue(rowTotal));
+                                builder.AddContent(15, aggregate.FormatValue(rowTotal!));
                             }
                             
                             builder.CloseElement();
@@ -979,8 +975,9 @@ namespace Radzen.Blazor
                 int seq = 2;
                 var pivotRowData = CachedPivotRows;
                 PadRowHeaderCells(pivotRowData); // Ensure all rows have the same number of row header cells
-                var count = pivotRowData.FirstOrDefault() != null ?
-                    pivotRowData.FirstOrDefault().RowHeaderCells.Count : pivotRows.Count;
+                var firstRow = pivotRowData.FirstOrDefault();
+                var count = firstRow != null ?
+                    firstRow.RowHeaderCells.Count : pivotRows.Count;
                 for (int i = 0; i < count; i++)
                 {
                     builder.OpenElement(seq++, "td");
@@ -1000,22 +997,26 @@ namespace Radzen.Blazor
 
                         var items = PagedView;
 
-                        for (int i = 0; i < colPath.Count; i++)
+                        for (int i = 0; i < colPath.Count && i < pivotColumns.Count; i++)
                         {
-                            var property = pivotColumns[i].Property;
-                            var value = ExpressionSerializer.FormatValue(colPath[i]);
-                            items = property.Contains("it[") ? 
-                                items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
+                            var pivotColumn = pivotColumns[i];
+                            if (pivotColumn?.Property != null)
+                            {
+                                var property = pivotColumn.Property;
+                                var value = ExpressionSerializer.FormatValue(colPath[i]) ?? "";
+                                items = property.Contains("it[", StringComparison.Ordinal) ? 
+                                    items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
+                            }
 
                         }
 
                         var total = GetAggregateValue(items, aggregate);
 
-                        if (aggregate.ColumnTotalTemplate != null)
+                        if (aggregate.ColumnTotalTemplate != null && total != null)
                         {
                             builder.AddContent(seq++, aggregate.ColumnTotalTemplate(total));
                         }
-                        else
+                        else if (total != null)
                         {
                             builder.AddContent(seq++, aggregate.FormatValue(total));
                         }
@@ -1047,7 +1048,7 @@ namespace Radzen.Blazor
                         }
                         else
                         {
-                            builder.AddContent(seq++, aggregate.FormatValue(total));
+                            builder.AddContent(seq++, aggregate.FormatValue(total!));
                         }
                         
                         builder.CloseElement();
@@ -1065,7 +1066,7 @@ namespace Radzen.Blazor
         /// <returns>The items for this row.</returns>
         private IQueryable<TItem> GetRowItems(PivotBodyRow pivotRow)
         {
-            if (Data == null || !pivotRows.Any())
+            if (Data == null || pivotRows.Count == 0)
                 return Enumerable.Empty<TItem>().AsQueryable();
 
             var items = PagedView;
@@ -1079,10 +1080,14 @@ namespace Radzen.Blazor
                     continue; // Skip padding cells added to align depths
                 }
 
-                var property = pivotRows[i].Property;
-                var value = ExpressionSerializer.FormatValue(cell.Value);
-                items = property.Contains("it[") ?
-                       items.Where($@"it => {property} == {value}") : items.Where($@"i => i.{property} == {value}");
+                var pr = pivotRows[i];
+                if (pr?.Property != null)
+                {
+                    var property = pr.Property;
+                    var value = ExpressionSerializer.FormatValue(cell.Value ?? "") ?? "";
+                    items = property.Contains("it[", StringComparison.Ordinal) ?
+                           items.Where($@"it => {property} == {value}") : items.Where($@"i => i.{property} == {value}");
+                }
             }
 
             return items;
@@ -1096,9 +1101,9 @@ namespace Radzen.Blazor
         {
             if (!AllowDrillDown) return;
 
-            if (_collapsedColumnGroups.ContainsKey(pathKey))
+            if (_collapsedColumnGroups.TryGetValue(pathKey, out var isCollapsed))
             {
-                _collapsedColumnGroups[pathKey] = !_collapsedColumnGroups[pathKey];
+                _collapsedColumnGroups[pathKey] = !isCollapsed;
             }
             else
             {
@@ -1121,9 +1126,9 @@ namespace Radzen.Blazor
         {
             if (!AllowDrillDown) return;
 
-            if (_collapsedRowGroups.ContainsKey(pathKey))
+            if (_collapsedRowGroups.TryGetValue(pathKey, out var isRowCollapsed))
             {
-                _collapsedRowGroups[pathKey] = !_collapsedRowGroups[pathKey];
+                _collapsedRowGroups[pathKey] = !isRowCollapsed;
             }
             else
             {
@@ -1145,8 +1150,10 @@ namespace Radzen.Blazor
         /// <param name="aggregate">The aggregate configuration.</param>
         /// <param name="isCollapsed">Whether the group is collapsed.</param>
         /// <returns>The aggregated value.</returns>
-        private object GetAggregateValue(IQueryable<TItem> items, RadzenPivotAggregate<TItem> aggregate, bool isCollapsed = false)
+        private object? GetAggregateValue(IQueryable<TItem> items, RadzenPivotAggregate<TItem> aggregate, bool isCollapsed = false)
         {
+            ArgumentNullException.ThrowIfNull(aggregate);
+
             if (items == null || !items.Any())
                 return null;
 
@@ -1166,51 +1173,53 @@ namespace Radzen.Blazor
         /// <param name="items">The items to aggregate.</param>
         /// <param name="aggregate">The aggregate configuration.</param>
         /// <returns>The aggregated value.</returns>
-        public object GetAggregateValue(IQueryable<TItem> items, RadzenPivotAggregate<TItem> aggregate)
+        public object? GetAggregateValue(IQueryable<TItem> items, RadzenPivotAggregate<TItem> aggregate)
         {
+            ArgumentNullException.ThrowIfNull(aggregate);
+
             if (items == null || !items.Any())
                 return null;
 
             try
             {
-                var propertyType = PropertyAccess.GetPropertyType(typeof(TItem), aggregate.Property);
-                var isNumeric = PropertyAccess.IsNumeric(propertyType);
+                var propertyType = aggregate.Property != null ? PropertyAccess.GetPropertyType(typeof(TItem), aggregate.Property) : typeof(object);
+                var isNumeric = propertyType != null && PropertyAccess.IsNumeric(propertyType);
 
                 IQueryable values;
 
                 if (propertyType == typeof(short))
                 {
-                    values = ((IQueryable<short>)items.Select(aggregate.Property)).Select(i => (int)i);
+                    values = aggregate.Property != null ? ((IQueryable<short>)items.Select(aggregate.Property)).Select(i => (int)i) : Enumerable.Empty<int>().AsQueryable();
                     propertyType = typeof(int);
                 }
                 else if (propertyType == typeof(short?))
                 {
-                    values = ((IQueryable<short?>)items.Select(aggregate.Property)).Select(i => (int?)i);
+                    values = aggregate.Property != null ? ((IQueryable<short?>)items.Select(aggregate.Property)).Select(i => (int?)i) : Enumerable.Empty<int?>().AsQueryable();
                     propertyType = typeof(int?);
                 }
                 else
                 {
-                    values = propertyType != null ? items.Select(aggregate.Property).Cast(propertyType) : items.Select(aggregate.Property);
+                    values = propertyType != null && aggregate.Property != null ? items.Select(aggregate.Property).Cast(propertyType) : (aggregate.Property != null ? items.Select(aggregate.Property) : Enumerable.Empty<object>().AsQueryable());
                 }
 
                 switch (aggregate.Aggregate)
                 {
                     case AggregateFunction.Sum:
-                        return isNumeric ? values.Sum(propertyType) : items.Count();
+                        return isNumeric && propertyType != null ? values.Sum(propertyType) : items.Count();
                     case AggregateFunction.Average:
-                        return isNumeric ? values.Average(propertyType) : items.Count();
+                        return isNumeric && propertyType != null ? values.Average(propertyType) : items.Count();
                     case AggregateFunction.Count:
                         return items.Count();
                     case AggregateFunction.Min:
-                        return isNumeric ? values.Min(propertyType) : items.FirstOrDefault();
+                        return isNumeric && propertyType != null ? values.Min(propertyType) : items.FirstOrDefault();
                     case AggregateFunction.Max:
-                        return isNumeric ? values.Max(propertyType) : items.LastOrDefault();
+                        return isNumeric && propertyType != null ? values.Max(propertyType) : items.LastOrDefault();
                     case AggregateFunction.First:
                         return values.FirstOrDefault();
                     case AggregateFunction.Last:
                         return values.LastOrDefault();
                     default:
-                        return isNumeric ? values.Sum(propertyType) : items.Count();
+                        return isNumeric && propertyType != null ? values.Sum(propertyType) : items.Count();
                 }
             }
             catch
@@ -1226,7 +1235,7 @@ namespace Radzen.Blazor
         {
             return ClassList.Create("rz-grid-table rz-grid-table-fixed")
                 .Add("rz-grid-table-striped", AllowAlternatingRows)
-                .Add($"rz-grid-gridlines-{Enum.GetName(typeof(DataGridGridLines), GridLines).ToLowerInvariant()}", GridLines != DataGridGridLines.Default)
+                .Add($"rz-grid-gridlines-{Enum.GetName<DataGridGridLines>(GridLines)?.ToLowerInvariant() ?? "default"}", GridLines != DataGridGridLines.Default)
                 .ToString();
         }
 
@@ -1242,7 +1251,7 @@ namespace Radzen.Blazor
         private RowHeaderNode BuildRowHeaderTree()
         {
             var root = new RowHeaderNode { Level = 0, Title = null };
-            if (!pivotRows.Any() || Data == null)
+            if (pivotRows.Count == 0 || Data == null)
                 return root;
 
             BuildRowHeaderTreeRecursive(root, PagedView, 0, new List<object>());
@@ -1257,7 +1266,7 @@ namespace Radzen.Blazor
                 return;
             }
             var row = pivotRows[level];
-            var groups = items.GroupByMany(new string[]{ row.Property});
+            var groups = items.GroupByMany(new string[]{ row.Property! });
             foreach (var group in groups)
             {
                 var currentPath = new List<object>(path) { group.Key };
@@ -1275,7 +1284,7 @@ namespace Radzen.Blazor
 
                 if (!isCollapsed)
                 {
-                    BuildRowHeaderTreeRecursive(child, group.Items.Cast<TItem>().AsQueryable(), level + 1, currentPath);
+                    BuildRowHeaderTreeRecursive(child, group.Items?.Cast<TItem>().AsQueryable() ?? Enumerable.Empty<TItem>().AsQueryable(), level + 1, currentPath);
                 }
                 node.Children.Add(child);
             }
@@ -1308,12 +1317,16 @@ namespace Radzen.Blazor
                         var items = node.Items;
                         for (int i = 0; i < colPath.Count; i++)
                         {
-                            var property = pivotColumns[i].Property;
-                            var value = ExpressionSerializer.FormatValue(colPath[i]);
-                            items = property.Contains("it[") ?
-                                items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
+                            var pivotColumn = pivotColumns[i];
+                            if (pivotColumn?.Property != null)
+                            {
+                                var property = pivotColumn.Property;
+                                var value = ExpressionSerializer.FormatValue(colPath[i]) ?? "";
+                                items = property.Contains("it[", StringComparison.Ordinal) ?
+                                    items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
+                            }
                         }
-                        row.ValueCells.Add(items.Count() > 0 ? GetAggregateValue(items, aggregate) : null);
+                        row.ValueCells.Add(items.Count() > 0 ? GetAggregateValue(items, aggregate) : null!); // Explicitly allow null in list
                     }
                     row.VisibleColumnLeaves.Add(colPath);
                 }
@@ -1351,20 +1364,28 @@ namespace Radzen.Blazor
                                 // Filter by row path
                                 for (int i = 0; i < newPrefix.Count && i < pivotRows.Count; i++)
                                 {
-                                    var property = pivotRows[i].Property;
-                                    var value = ExpressionSerializer.FormatValue(newPrefix[i].Value);
-                                    items = property.Contains("it[") ?
-                                        items.Where($@"it => {property} == {value}") : items.Where($@"i => i.{property} == {value}");
+                                    var pivotRow = pivotRows[i];
+                                    if (pivotRow?.Property != null)
+                                    {
+                                        var property = pivotRow.Property;
+                                        var value = ExpressionSerializer.FormatValue(newPrefix[i].Value) ?? "";
+                                        items = property.Contains("it[", StringComparison.Ordinal) ?
+                                            items.Where($@"it => {property} == {value}") : items.Where($@"i => i.{property} == {value}");
+                                    }
                                 }
                                 // Filter by column path
                                 for (int i = 0; i < colPath.Count; i++)
                                 {
-                                    var property = pivotColumns[i].Property;
-                                    var value = ExpressionSerializer.FormatValue(colPath[i]);
-                                    items = property.Contains("it[") ?
-                                        items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
+                                    var pivotColumn = pivotColumns[i];
+                                    if (pivotColumn?.Property != null)
+                                    {
+                                        var property = pivotColumn.Property;
+                                        var value = ExpressionSerializer.FormatValue(colPath[i]) ?? "";
+                                        items = property.Contains("it[", StringComparison.Ordinal) ?
+                                            items.Where($"it => {property} == {value}") : items.Where($"i => i.{property} == {value}");
+                                    }
                                 }
-                                collapsedRow.ValueCells.Add(items.Count() > 0 ? GetAggregateValue(items, aggregate) : null);
+                                collapsedRow.ValueCells.Add(items?.Count() > 0 ? GetAggregateValue(items!, aggregate) : null!);
                             }
                             collapsedRow.VisibleColumnLeaves.Add(colPath);
                         }
@@ -1386,7 +1407,7 @@ namespace Radzen.Blazor
             GetColumnHeaderLeavesRecursive(tree, new List<object>(), leaves);
             return leaves;
         }
-        private void GetColumnHeaderLeavesRecursive(ColumnHeaderNode node, List<object> path, List<List<object>> leaves)
+        private static void GetColumnHeaderLeavesRecursive(ColumnHeaderNode node, List<object> path, List<List<object>> leaves)
         {
             if (node.Children.Count == 0 && path.Count > 0)
             {
@@ -1394,7 +1415,10 @@ namespace Radzen.Blazor
             }
             foreach (var child in node.Children)
             {
-                path.Add(child.Value);
+                if (child.Value != null)
+                {
+                    path.Add(child.Value);
+                }
                 GetColumnHeaderLeavesRecursive(child, path, leaves);
                 path.RemoveAt(path.Count - 1);
             }
@@ -1406,7 +1430,7 @@ namespace Radzen.Blazor
             return node.Children.Sum(GetLeafCount);
         }
 
-        private string GetWidthForColumnPath(List<object> colPath)
+        private string? GetWidthForColumnPath(List<object> colPath)
         {
             if (colPath.Count == 0 || pivotColumns.Count == 0)
                 return null;
@@ -1421,7 +1445,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="columnIndex">The column index of the row header.</param>
         /// <returns>The CSS class string for frozen row headers.</returns>
-        private string GetFrozenRowHeaderClass(int columnIndex)
+        private static string GetFrozenRowHeaderClass(int columnIndex)
         {
             if (columnIndex == 0)
             {
@@ -1437,7 +1461,7 @@ namespace Radzen.Blazor
         /// Gets the frozen cell class for total headers.
         /// </summary>
         /// <returns>The CSS class string for frozen total headers.</returns>
-        private string GetFrozenTotalHeaderClass()
+        private static string GetFrozenTotalHeaderClass()
         {
             return "rz-frozen-cell rz-frozen-cell-right rz-frozen-cell-right-end";
         }
@@ -1446,63 +1470,63 @@ namespace Radzen.Blazor
         /// Gets the frozen cell class for total cells.
         /// </summary>
         /// <returns>The CSS class string for frozen total cells.</returns>
-        private string GetFrozenTotalCellClass()
+        private static string GetFrozenTotalCellClass()
         {
             return "rz-frozen-cell rz-frozen-cell-right";
         }
 
         private class ColumnHeaderCell
         {
-            public object Value { get; set; }
-            public string Title { get; set; }
+            public object? Value { get; set; }
+            public string? Title { get; set; }
             public int ColSpan { get; set; } = 1;
             public int RowSpan { get; set; } = 1;
             public int Level { get; set; }
-            public string Width { get; set; }
+            public string? Width { get; set; }
             public bool IsCollapsed { get; set; }
-            public string PathKey { get; set; }
+            public string? PathKey { get; set; }
             public bool HasChildren { get; set; }
-            public RenderFragment<GroupResult> HeaderTemplate { get; set; }
-            public GroupResult Group { get; set; }
+            public RenderFragment<GroupResult>? HeaderTemplate { get; set; }
+            public GroupResult? Group { get; set; }
         }
 
         private class ColumnHeaderNode
         {
-            public object Value { get; set; }
-            public string Title { get; set; }
+            public object? Value { get; set; }
+            public string? Title { get; set; }
             public List<ColumnHeaderNode> Children { get; set; } = new List<ColumnHeaderNode>();
             public int Level { get; set; }
             public int ColSpan { get; set; } = 1;
             public int RowSpan { get; set; } = 1;
-            public string Width { get; set; }
+            public string? Width { get; set; }
             public bool IsCollapsed { get; set; }
-            public string PathKey { get; set; }
+            public string? PathKey { get; set; }
             public bool HasChildren { get; set; }
-            public RenderFragment<GroupResult> HeaderTemplate { get; set; }
-            public GroupResult Group { get; set; }
+            public RenderFragment<GroupResult>? HeaderTemplate { get; set; }
+            public GroupResult? Group { get; set; }
         }
 
         private class RowHeaderNode
         {
-            public object Value { get; set; }
-            public string Title { get; set; }
+            public object? Value { get; set; }
+            public string? Title { get; set; }
             public List<RowHeaderNode> Children { get; set; } = new List<RowHeaderNode>();
             public IQueryable<TItem> Items { get; set; } = Enumerable.Empty<TItem>().AsQueryable();
             public int Level { get; set; }
             public bool IsCollapsed { get; set; }
-            public string PathKey { get; set; }
+            public string? PathKey { get; set; }
             public bool HasChildren { get; set; }
         }
 
         private class PivotBodyRow
         {
             public List<RowHeaderCell> RowHeaderCells { get; set; } = new List<RowHeaderCell>();
-            public List<object> ValueCells { get; set; } = new List<object>();
+            public List<object?> ValueCells { get; set; } = new List<object?>();
             public List<List<object>> VisibleColumnLeaves { get; set; } = new List<List<object>>();
         }
 
         // Returns the union of all visible column leaves for the current view
-        private List<List<object>> GetVisibleColumnLeaves(List<PivotBodyRow> rows)
+        private static List<List<object>> GetVisibleColumnLeaves(List<PivotBodyRow> rows)
         {
             var set = new HashSet<string>();
             var result = new List<List<object>>();
@@ -1521,7 +1545,7 @@ namespace Radzen.Blazor
         }
 
         // Pads all PivotBodyRow.RowHeaderCells to the maximum depth among all rows
-        private void PadRowHeaderCells(List<PivotBodyRow> rows)
+        private static void PadRowHeaderCells(List<PivotBodyRow> rows)
         {
             int maxDepth = rows.Count > 0 ? rows.Max(r => r.RowHeaderCells.Count) : 0;
             foreach (var row in rows)
@@ -1598,7 +1622,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the column for a header cell.
         /// </summary>
-        private RadzenPivotColumn<TItem> GetColumnForHeaderCell(ColumnHeaderCell cell)
+        private RadzenPivotColumn<TItem>? GetColumnForHeaderCell(ColumnHeaderCell cell)
         {
             if (cell.Level < pivotColumns.Count)
             {
@@ -1610,7 +1634,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Handles keyboard events for sorting.
         /// </summary>
-        private async Task OnSortKeyPressed(KeyboardEventArgs args)
+        private static Task OnSortKeyPressed(KeyboardEventArgs args)
         {
             var key = args.Code ?? args.Key;
             if (key == "Enter" || key == " ")
@@ -1619,13 +1643,13 @@ namespace Radzen.Blazor
                 // This is just for keyboard accessibility
             }
 
-            await Task.CompletedTask;
+            return Task.CompletedTask;
         }
 
         /// <summary>
         /// Gets the filter icon CSS class for a field.
         /// </summary>
-        private string GetFilterIconCss(RadzenPivotField<TItem> field)
+        private static string GetFilterIconCss(RadzenPivotField<TItem> field)
         {
             var additionalStyle = field?.HasActiveFilter() == true ? "rz-grid-filter-active" : "";
             return $"notranslate rzi rz-grid-filter-icon {additionalStyle}";
@@ -1658,7 +1682,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the filter property type for a field.
         /// </summary>
-        private Type GetFilterPropertyType(RadzenPivotField<TItem> field)
+        private static Type GetFilterPropertyType(RadzenPivotField<TItem> field)
         {
             if (field == null || string.IsNullOrEmpty(field.Property))
                 return typeof(string);
@@ -1669,7 +1693,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the filter operators for a field.
         /// </summary>
-        private IEnumerable<FilterOperator> GetFilterOperators(RadzenPivotField<TItem> field)
+        private static List<FilterOperator> GetFilterOperators(RadzenPivotField<TItem> field)
         {
             var propertyType = GetFilterPropertyType(field);
             var operators = new List<FilterOperator>();
@@ -1743,7 +1767,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Checks if a field can set filter value.
         /// </summary>
-        private bool CanSetFilterValue(RadzenPivotField<TItem> field, bool isFirst = true)
+        private static bool CanSetFilterValue(RadzenPivotField<TItem> field, bool isFirst = true)
         {
             if (field == null)
                 return false;
@@ -1791,10 +1815,16 @@ namespace Radzen.Blazor
         /// <summary>
         /// Sets the filter value for a field.
         /// </summary>
-        private void SetFilterValue(RadzenPivotField<TItem> field, object value, bool isFirst = true)
+        private void SetFilterValue(RadzenPivotField<TItem> field, object? value, bool isFirst = true)
         {
             if (field != null)
             {
+                if ((field.FilterPropertyType == typeof(DateOnly) || field.FilterPropertyType == typeof(DateOnly?)) && value != null && value is DateTime?)
+                {
+                    var v = PropertyAccess.DateOnlyFromDateTime((DateTime)value);
+                    value = v;
+                }
+
                 if (isFirst)
                 {
                     field.SetFilterValueInternal(value);
@@ -1902,11 +1932,16 @@ namespace Radzen.Blazor
                     action = args => { SetFilterValue(field, args, isFirst); };
                 }
 
-                var eventCallbackGenericCreate = typeof(NumericFilterEventCallback).GetMethod("Create").MakeGenericMethod(type);
-                var eventCallbackGenericAction = typeof(NumericFilterEventCallback).GetMethod("Action").MakeGenericMethod(type);
+                var createMethod = typeof(NumericFilterEventCallback).GetMethod("Create");
+                var actionMethod = typeof(NumericFilterEventCallback).GetMethod("Action");
+                if (createMethod != null && actionMethod != null)
+                {
+                    var eventCallbackGenericCreate = createMethod.MakeGenericMethod(type);
+                    var eventCallbackGenericAction = actionMethod.MakeGenericMethod(type);
 
-                builder.AddAttribute(3, "Change", eventCallbackGenericCreate.Invoke(this,
-                    new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action }) }));
+                    builder.AddAttribute(3, "Change", eventCallbackGenericCreate.Invoke(this,
+                    new object[] { this, eventCallbackGenericAction.Invoke(this, new object[] { action })! })!);
+                }
 
                 builder.AddAttribute(4, "Disabled", !field.CanSetFilterValue());
 
@@ -1928,7 +1963,7 @@ namespace Radzen.Blazor
 
             public static Action<T> Action<T>(Action<object> action)
             {
-                return args => action(args);
+                return args => { if (args != null) action(args); };
             }
         }
 
@@ -2011,7 +2046,7 @@ namespace Radzen.Blazor
 
                     var innerFilterExpressions = new List<CompositeFilterDescriptor>();
 
-                    var filterExpression = BuildFilterExpression(property, filterValue, filterOperator, column.Type);
+                    var filterExpression = BuildFilterExpression(property, filterValue, filterOperator, column.Type ?? typeof(object));
                     innerFilterExpressions.Add(filterExpression);
 
                     if (secondFilterValue != null)
@@ -2067,14 +2102,19 @@ namespace Radzen.Blazor
         /// <summary>
         /// Builds a filter expression for a property and value.
         /// </summary>
-        private CompositeFilterDescriptor BuildFilterExpression(string property, object value, FilterOperator filterOperator, Type type)
+        private CompositeFilterDescriptor BuildFilterExpression(string property, object? value, FilterOperator filterOperator, Type? type)
         {
+            if (string.IsNullOrEmpty(property))
+            {
+                return new CompositeFilterDescriptor();
+            }
+
             return new CompositeFilterDescriptor
             {
                 Property = property,
                 FilterValue = value,
                 FilterOperator = filterOperator,
-                Type = type
+                Type = type ?? typeof(object)
             };
         }
 
@@ -2090,7 +2130,7 @@ namespace Radzen.Blazor
                 var filters = GetFilters();
                 var orderBy = GetOrderBy();
                 
-                if (filters.Any())
+                if (filters.Count > 0)
                 {
                     baseView = baseView.Where(filters, LogicalFilterOperator, FilterCaseSensitivity);
                 }
@@ -2108,10 +2148,10 @@ namespace Radzen.Blazor
         List<string> selectedColumns = new();
         List<RadzenPivotAggregate<TItem>> selectedAggregates = new();
 
-        IEnumerable<AggregateFunction> allAggregates =>
-            Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>();
+        private static readonly List<AggregateFunction> AllAggregates =
+            Enum.GetValues<AggregateFunction>().ToList();
 
-        IEnumerable<AggregateFunction> numericAggregates = new[]
+        private static readonly AggregateFunction[] NumericAggregates = new[]
         {
             AggregateFunction.Sum,
             AggregateFunction.Average,
@@ -2121,8 +2161,9 @@ namespace Radzen.Blazor
 
         IEnumerable<AggregateFunction> GetAggregates(string propertyName)
         {
-            return PropertyAccess.IsNumeric(PropertyAccess.GetPropertyType(typeof(TItem), propertyName)) ?
-                allAggregates : allAggregates.Except(numericAggregates);
+            var propertyType = propertyName != null ? PropertyAccess.GetPropertyType(typeof(TItem), propertyName) : null;
+            return propertyType != null && PropertyAccess.IsNumeric(propertyType) ?
+                AllAggregates : AllAggregates.Except(NumericAggregates);
         }
 
         async Task UpdateAggregates(object value)
@@ -2141,7 +2182,7 @@ namespace Radzen.Blazor
             await UpdateFieldsFromSelected();
         }
 
-        async Task UpdateAggregate(string property, object value)
+        async Task UpdateAggregate(string property, object? value)
         {
             var aggregate = selectedAggregates.FirstOrDefault(a => a.Property == property);
             if (aggregate != null)
@@ -2160,8 +2201,8 @@ namespace Radzen.Blazor
 
         void UpdateSelected()
         {
-            selectedRows = allPivotRows.Select(r => r.Property).ToList();
-            selectedColumns = allPivotColumns.Select(c => c.Property).ToList();
+            selectedRows = allPivotRows.Select(r => r.Property).Where(p => p != null).Cast<string>().ToList();
+            selectedColumns = allPivotColumns.Select(c => c.Property).Where(p => p != null).Cast<string>().ToList();
             selectedAggregates = allPivotAggregates.ToList();
         }
 
@@ -2178,8 +2219,8 @@ namespace Radzen.Blazor
                 var field = pivotFields.FirstOrDefault(r => r.Property == sr);
                 return new RadzenPivotRow<TItem>
                 {
-                    Property = field.Property,
-                    Title = field.Title
+                    Property = field?.Property ?? sr,
+                    Title = field?.Title ?? sr
                 };
             }).ToList();
 
@@ -2193,8 +2234,8 @@ namespace Radzen.Blazor
                 var field = pivotFields.FirstOrDefault(c => c.Property == sc);
                 return new RadzenPivotColumn<TItem>
                 {
-                    Property = field.Property,
-                    Title = field.Title
+                    Property = field?.Property ?? sc,
+                    Title = field?.Title ?? sc
                 };
             }).ToList();
 
@@ -2209,9 +2250,9 @@ namespace Radzen.Blazor
                 var field = pivotFields.FirstOrDefault(c => c.Property == sa.Property);
                 return new RadzenPivotAggregate<TItem>
                 {
-                    Property = field.Property,
-                    Title = field.Title,
-                    Aggregate = GetAggregates(field.Property).FirstOrDefault()
+                    Property = field?.Property,
+                    Title = field?.Title,
+                    Aggregate = field?.Property != null ? GetAggregates(field.Property).FirstOrDefault() : default(AggregateFunction)
                 };
             }).ToList();
 

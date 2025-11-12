@@ -55,13 +55,13 @@ namespace Radzen.Blazor
         /// Specifies the model of the form. Required to support validation.
         /// </summary>
         [Parameter]
-        public TItem Data { get; set; }
+        public TItem? Data { get; set; }
 
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         [Parameter]
-        public RenderFragment<EditContext> ChildContent { get; set; }
+        public RenderFragment<EditContext>? ChildContent { get; set; }
 
         /// <summary>
         /// A callback that will be invoked when the user submits the form and <see cref="IsValid" /> is <c>true</c>.
@@ -94,7 +94,7 @@ namespace Radzen.Blazor
         /// Obsolete. Use <see cref="InvalidSubmit" /> instead.
         /// </summary>
         [Parameter]
-        [Obsolete]
+        [Obsolete("Use InvalidSubmit instead.")]
         public EventCallback<FormInvalidSubmitEventArgs> OnInvalidSubmit
         {
             get
@@ -146,7 +146,7 @@ namespace Radzen.Blazor
         /// </code>
         /// </example>
         [Parameter]
-        public string Method { get; set; }
+        public string? Method { get; set; }
 
         /// <summary>
         /// Specifies the form <c>action</c> attribute. When set the form submits to the specified URL.
@@ -160,7 +160,7 @@ namespace Radzen.Blazor
         /// </code>
         /// </example>
         [Parameter]
-        public string Action { get; set; }
+        public string? Action { get; set; }
 
         private readonly Func<Task> handleSubmitDelegate;
 
@@ -185,7 +185,7 @@ namespace Radzen.Blazor
                 {
                     await Submit.InvokeAsync(Data);
 
-                    if (Action != null)
+                    if (Action != null && JSRuntime != null)
                     {
                         await JSRuntime.InvokeVoidAsync($"Radzen.submit", Element);
                     }
@@ -197,7 +197,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                if (Action != null)
+                if (Action != null && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync($"Radzen.submit", Element);
                 }
@@ -224,7 +224,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public IRadzenFormComponent FindComponent(string name)
         {
-            return components.Where(component => component.Name == name).FirstOrDefault();
+            return components.Where(component => component.Name == name).FirstOrDefault()!;
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The edit context.</value>
         [Parameter]
-        public EditContext EditContext { get; set; }
+        public EditContext? EditContext { get; set; }
 
         /// <inheritdoc />
         protected override void OnParametersSet()
@@ -252,6 +252,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
+            ArgumentNullException.ThrowIfNull(builder);
             if (Visible)
             {
                 if (EditContext != null)
@@ -281,7 +282,10 @@ namespace Radzen.Blazor
                     contentBuilder.OpenComponent<CascadingValue<EditContext>>(0);
                     contentBuilder.AddAttribute(1, "IsFixed", true);
                     contentBuilder.AddAttribute(2, "Value", EditContext);
-                    contentBuilder.AddAttribute(3, "ChildContent", ChildContent?.Invoke(EditContext));
+                    if (EditContext != null)
+                    {
+                        contentBuilder.AddAttribute(3, "ChildContent", ChildContent?.Invoke(EditContext));
+                    }
                     contentBuilder.CloseComponent();
                 }));
 

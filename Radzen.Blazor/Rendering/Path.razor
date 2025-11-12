@@ -2,7 +2,7 @@
 <path class="@Class" d="@D" stroke-linecap="@StrokeLineCap" stroke-dasharray="@StrokeDashArray" style="@CurrentStyle()"></path>
 @code {
     [Parameter]
-    public string Style { get; set; }
+    public string Style { get; set; } = string.Empty;
 
     private string CurrentStyle()
     {
@@ -36,13 +36,13 @@
     }
 
     [Parameter]
-    public string D { get; set; }
+    public string D { get; set; } = string.Empty;
 
     [Parameter]
-    public string Stroke { get; set; }
+    public string Stroke { get; set; } = string.Empty;
 
     [Parameter]
-    public string Fill { get; set; }
+    public string Fill { get; set; } = string.Empty;
 
     [Parameter]
     public double StrokeWidth { get; set; }
@@ -51,9 +51,9 @@
     public LineType LineType { get; set; }
 
     [Parameter]
-    public string Class { get; set;}
+    public string Class { get; set;} = string.Empty;
 
-    private string StrokeLineCap
+    private string? StrokeLineCap
     {
         get
         {
@@ -67,7 +67,7 @@
         }
     }
 
-    private string StrokeDashArray
+    private string? StrokeDashArray
     {
         get
         {

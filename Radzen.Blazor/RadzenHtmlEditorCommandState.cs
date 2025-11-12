@@ -69,17 +69,17 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the name of the currently selected font.
         /// </summary>
-        public string FontName { get; set; }
+        public string? FontName { get; set; }
 
         /// <summary>
         /// Gets or sets the size of the currently selected font.
         /// </summary>
-        public string FontSize { get; set; }
+        public string? FontSize { get; set; }
 
         /// <summary>
         /// Gets or sets the current formatting block (e.g., paragraph, heading).
         /// </summary>
-        public string FormatBlock { get; set; }
+        public string? FormatBlock { get; set; }
 
         /// <summary>
         /// Indicates whether the unlink command is currently available.
@@ -89,6 +89,6 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the current HTML content of the editor.
         /// </summary>
-        public string Html { get; set; }
+        public string? Html { get; set; }
     }
 }

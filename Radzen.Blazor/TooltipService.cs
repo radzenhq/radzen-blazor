@@ -39,7 +39,7 @@ namespace Radzen
         /// Gets or sets the navigation manager.
         /// </summary>
         /// <value>The navigation manager.</value>
-        NavigationManager navigationManager { get; set; }
+        NavigationManager? navigationManager { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TooltipService"/> class.
@@ -60,7 +60,7 @@ namespace Radzen
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs"/> instance containing the event data.</param>
-        private void UriHelper_OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+        private void UriHelper_OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
             if (this.OnNavigate != null)
             {
@@ -71,22 +71,22 @@ namespace Radzen
         /// <summary>
         /// Occurs when [on navigate].
         /// </summary>
-        public event Action OnNavigate;
+        public event Action? OnNavigate;
 
         /// <summary>
         /// Raises the Close event.
         /// </summary>
-        public event Action OnClose;
+        public event Action? OnClose;
 
         /// <summary>
         /// Occurs when [on open].
         /// </summary>
-        public event Action<ElementReference, Type, TooltipOptions> OnOpen;
+        public event Action<ElementReference, Type, TooltipOptions>? OnOpen;
 
         /// <summary>
         /// Occurs when [on open chart tooltip].
         /// </summary>
-        internal event Action<ElementReference, double, double, ChartTooltipOptions> OnOpenChartTooltip;
+        internal event Action<ElementReference, double, double, ChartTooltipOptions>? OnOpenChartTooltip;
 
         /// <summary>
         /// Opens a tooltip with custom HTML content near the specified element.
@@ -95,7 +95,7 @@ namespace Radzen
         /// <param name="element">The HTML element reference near which the tooltip will be displayed.</param>
         /// <param name="childContent">A render fragment that defines the custom HTML content of the tooltip. Receives the TooltipService as context.</param>
         /// <param name="options">Optional tooltip configuration including position, duration, delay, and styling. If null, default options are used.</param>
-        public void Open(ElementReference element, RenderFragment<TooltipService> childContent, TooltipOptions options = null)
+        public void Open(ElementReference element, RenderFragment<TooltipService> childContent, TooltipOptions? options = null)
         {
             var tooltipOptions = options ?? new TooltipOptions();
 
@@ -111,7 +111,7 @@ namespace Radzen
         /// <param name="element">The HTML element reference near which the tooltip will be displayed.</param>
         /// <param name="text">The text content to display in the tooltip.</param>
         /// <param name="options">Optional tooltip configuration including position, duration, delay, and styling. If null, default options are used.</param>
-        public void Open(ElementReference element, string text, TooltipOptions options = null)
+        public void Open(ElementReference element, string text, TooltipOptions? options = null)
         {
             var tooltipOptions = options ?? new TooltipOptions();
 
@@ -127,7 +127,7 @@ namespace Radzen
         /// <param name="element">The HTML element reference above which the tooltip will be displayed.</param>
         /// <param name="text">The text content to display in the tooltip.</param>
         /// <param name="options">Optional additional tooltip configuration. The Position will be set to Top regardless of the value in options.</param>
-        public void OpenOnTheTop(ElementReference element, string text, TooltipOptions options = null)
+        public void OpenOnTheTop(ElementReference element, string text, TooltipOptions? options = null)
         {
             var tooltipOptions = options ?? new TooltipOptions();
 
@@ -143,7 +143,7 @@ namespace Radzen
         /// <param name="element">The element.</param>
         /// <param name="text">The text.</param>
         /// <param name="o">The o.</param>
-        public void OpenOnTheBottom(ElementReference element, string text, TooltipOptions o = null)
+        public void OpenOnTheBottom(ElementReference element, string text, TooltipOptions? o = null)
         {
             var options = o ?? new TooltipOptions();
 
@@ -159,7 +159,7 @@ namespace Radzen
         /// <param name="element">The element.</param>
         /// <param name="text">The text.</param>
         /// <param name="o">The o.</param>
-        public void OpenOnTheLeft(ElementReference element, string text, TooltipOptions o = null)
+        public void OpenOnTheLeft(ElementReference element, string text, TooltipOptions? o = null)
         {
             var options = o ?? new TooltipOptions();
 
@@ -175,7 +175,7 @@ namespace Radzen
         /// <param name="element">The element.</param>
         /// <param name="text">The text.</param>
         /// <param name="o">The o.</param>
-        public void OpenOnTheRight(ElementReference element, string text, TooltipOptions o = null)
+        public void OpenOnTheRight(ElementReference element, string text, TooltipOptions? o = null)
         {
             var options = o ?? new TooltipOptions();
 
@@ -193,7 +193,7 @@ namespace Radzen
         /// <param name="y"></param>
         /// <param name="childContent">Content of the chart tooltip.</param>
         /// <param name="o">The options of the chart tooltip.</param>
-        internal void OpenChartTooltip(ElementReference element, double x, double y, RenderFragment<TooltipService> childContent, ChartTooltipOptions o = null)
+        internal void OpenChartTooltip(ElementReference element, double x, double y, RenderFragment<TooltipService> childContent, ChartTooltipOptions? o = null)
         {
             var options = o ?? new ChartTooltipOptions();
 
@@ -226,7 +226,8 @@ namespace Radzen
         /// </summary>
         public void Dispose()
         {
-            navigationManager.LocationChanged -= UriHelper_OnLocationChanged;
+            navigationManager?.LocationChanged -= UriHelper_OnLocationChanged;
+            GC.SuppressFinalize(this);
         }
     }
 
@@ -282,22 +283,22 @@ namespace Radzen
         /// Gets or sets the style.
         /// </summary>
         /// <value>The style.</value>
-        public string Style { get; set; }
+        public string? Style { get; set; }
         /// <summary>
         /// Gets or sets the CSS class.
         /// </summary>
         /// <value>The CSS class.</value>
-        public string CssClass { get; set; }
+        public string? CssClass { get; set; }
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
-        public string Text { get; set; }
+        public string? Text { get; set; }
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>
-        public RenderFragment<TooltipService> ChildContent { get; set; }
+        public RenderFragment<TooltipService>? ChildContent { get; set; }
     }
 
     /// <summary>
@@ -309,12 +310,12 @@ namespace Radzen
         /// Gets or sets the type.
         /// </summary>
         /// <value>The type.</value>
-        public Type Type { get; set; }
+        public Type? Type { get; set; }
         /// <summary>
         /// Gets or sets the options.
         /// </summary>
         /// <value>The options.</value>
-        public TooltipOptions Options { get; set; }
+        public TooltipOptions Options { get; set; } = new TooltipOptions();
         /// <summary>
         /// Gets or sets the element.
         /// </summary>
@@ -333,6 +334,6 @@ namespace Radzen
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>
-        public RenderFragment<TooltipService> ChildContent { get; set; }
+        public RenderFragment<TooltipService>? ChildContent { get; set; }
     }
 }

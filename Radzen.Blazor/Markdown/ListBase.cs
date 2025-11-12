@@ -17,7 +17,7 @@ public abstract class List : BlockContainer
     /// </summary>
     public bool Tight { get; set; } = true;
     internal int Padding { get; set; }
-    internal string Delimiter { get; set; }
+    internal string? Delimiter { get; set; }
 
     internal override BlockMatch Matches(BlockParser parser)
     {

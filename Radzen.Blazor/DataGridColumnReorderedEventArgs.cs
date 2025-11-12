@@ -6,12 +6,12 @@ namespace Radzen;
 /// Supplies information about a <see cref="RadzenDataGrid{TItem}.ColumnReordered" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class DataGridColumnReorderedEventArgs<T>
+public class DataGridColumnReorderedEventArgs<T> where T : notnull
 {
     /// <summary>
     /// Gets the reordered RadzenDataGridColumn.
     /// </summary>
-    public RadzenDataGridColumn<T> Column { get; internal set; }
+    public RadzenDataGridColumn<T>? Column { get; internal set; }
 
     /// <summary>
     /// Gets the old index of the column.

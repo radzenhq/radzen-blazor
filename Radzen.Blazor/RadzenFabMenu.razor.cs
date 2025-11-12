@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using System;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor;
@@ -21,8 +22,8 @@ public partial class RadzenFabMenu : RadzenComponent
     /// Gets or sets the child content.
     /// </summary>
     /// <value>The child content.</value>
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
+        [Parameter]
+        public RenderFragment? ChildContent { get; set; }
 
     private bool isOpen;
 
@@ -108,21 +109,21 @@ public partial class RadzenFabMenu : RadzenComponent
     /// </summary>
     /// <value>The button class.</value>
     [Parameter]
-    public string ButtonClass { get; set; }
+    public string? ButtonClass { get; set; }
 
     /// <summary>
     /// Gets or sets the button style CSS.
     /// </summary>
     /// <value>The button style CSS.</value>
     [Parameter]
-    public string ButtonStyleCss { get; set; }
+    public string? ButtonStyleCss { get; set; }
 
     /// <summary>
     /// Gets or sets the aria-label for the toggle button.
     /// </summary>
     /// <value>The aria-label for the toggle button.</value>
     [Parameter]
-    public string AriaLabel { get; set; }
+    public string? AriaLabel { get; set; }
 
     /// <summary>
     /// Gets or sets the gap.
@@ -136,7 +137,7 @@ public partial class RadzenFabMenu : RadzenComponent
     /// </summary>
     /// <value>The items style.</value>
     [Parameter]
-    public string ItemsStyle { get; set; }
+    public string? ItemsStyle { get; set; }
 
     /// <summary>
     /// Gets or sets the direction in which the menu items expand.
@@ -186,13 +187,16 @@ public partial class RadzenFabMenu : RadzenComponent
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        if (isOpen)
+        if (JSRuntime != null)
         {
-            JSRuntime.InvokeVoid("Radzen.registerFabMenu", Element, Reference);
-        }
-        else
-        {
-            JSRuntime.InvokeVoid("Radzen.unregisterFabMenu", Element);
+            if (isOpen)
+            {
+                JSRuntime.InvokeVoid("Radzen.registerFabMenu", Element, Reference);
+            }
+            else
+            {
+                JSRuntime.InvokeVoid("Radzen.unregisterFabMenu", Element);
+            }
         }
     }
 
@@ -251,7 +255,7 @@ public partial class RadzenFabMenu : RadzenComponent
     {
         try
         {
-            if (IsOpen)
+            if (IsOpen && JSRuntime != null)
             {
                 JSRuntime.InvokeVoid("Radzen.unregisterFabMenu", Element);
             }
@@ -259,5 +263,7 @@ public partial class RadzenFabMenu : RadzenComponent
         catch { }
 
         base.Dispose();
+
+        GC.SuppressFinalize(this);
     }
 }
