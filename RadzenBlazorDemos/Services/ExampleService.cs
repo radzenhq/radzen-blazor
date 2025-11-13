@@ -1037,6 +1037,14 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Dynamic data",
+                    Path = "/pivot-data-grid-dynamic",
+                    Title = "Blazor Pivot DataGrid Component - dynamic data sets | Free UI Components by Radzen",
+                    Description = "Bind RadzenPivotDataGrid to schema-less IDictionary<string, object> records and configure fields dynamically.",
+                    Tags = new [] { "pivot", "dynamic", "dictionary", "analysis", "aggregation", "drill-down", "datagrid", "table" }
+                },
+                new Example
+                {
                     Name = "OData",
                     Path = "/pivot-data-grid-odata",
                     Title = "Blazor Pivot DataGrid custom data-binding to OData service.",

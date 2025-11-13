@@ -1,0 +1,20 @@
+@page "/pivot-data-grid-dynamic"
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    PivotDataGrid <strong>dynamic</strong> data support
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Schema-less datasets are common when data comes from external APIs. This demo shows how to build a pivot table on top of
+    <code>IDictionary&lt;string, object&gt;</code> records without defining C# models.
+</RadzenText>
+
+<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
+    The example generates 200 rows with dynamic columns (year, region, category, product, quantity, unit price, discount, total sales) and uses
+    <code>PropertyAccess.GetDynamicPropertyExpression</code> to configure pivot rows, columns, and aggregates at runtime while enabling totals, drill-down,
+    filtering, sorting, and field picking.
+</RadzenText>
+
+<RadzenExample ComponentName="PivotDataGrid" Example="PivotDataGridDynamicData">
+    <PivotDataGridDynamicData />
+</RadzenExample>
+

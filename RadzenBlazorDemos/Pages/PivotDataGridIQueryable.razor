@@ -7,23 +7,23 @@
 
 <RadzenCard Variant="Variant.Outlined" class="rz-my-4">
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin:1rem">
-        <RadzenSwitch @bind-Value=@showColumnsTotals Name="ShowColumnsTotals" TValue="bool" />
+        <RadzenSwitch @bind-Value=@showColumnsTotals Name="ShowColumnsTotals" />
         <RadzenLabel Text="Show columns totals" Component="ShowColumnsTotals" />
-        <RadzenSwitch @bind-Value=@showRowsTotals Name="ShowRowsTotals" TValue="bool" />
+        <RadzenSwitch @bind-Value=@showRowsTotals Name="ShowRowsTotals" />
         <RadzenLabel Text="Show rows totals" Component="ShowRowsTotals" />
-        <RadzenSwitch @bind-Value=@allowDrillDown Name="AllowDrillDown" TValue="bool" />
+        <RadzenSwitch @bind-Value=@allowDrillDown Name="AllowDrillDown" />
         <RadzenLabel Text="Allow drill-down" Component="AllowDrillDown" />
-        <RadzenSwitch @bind-Value=@allowPaging Name="AllowPaging" TValue="bool" />
+        <RadzenSwitch @bind-Value=@allowPaging Name="AllowPaging" />
         <RadzenLabel Text="AllowPaging" Component="AllowPaging" />
         <RadzenDropDown @bind-Value="@pagerPosition" Visible="@allowPaging" TextProperty="Text" Name="PagerPosition" ValueProperty="Value"
                         Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin:1rem">
-        <RadzenSwitch @bind-Value=@allowFieldsPicking Name="AllowFieldsPicking" TValue="bool" />
+        <RadzenSwitch @bind-Value=@allowFieldsPicking Name="AllowFieldsPicking" />
         <RadzenLabel Text="Allow fields picking" Component="AllowFieldsPicking" />
-        <RadzenSwitch @bind-Value=@allowSorting Name="AllowSorting" TValue="bool" Visible=@allowFieldsPicking />
+        <RadzenSwitch @bind-Value=@allowSorting Name="AllowSorting" Visible=@allowFieldsPicking />
         <RadzenLabel Text="Allow sorting" Component="AllowSorting" Visible=@allowFieldsPicking />
-        <RadzenSwitch @bind-Value=@allowFiltering Name="AllowFiltering" TValue="bool" Visible=@allowFieldsPicking />
+        <RadzenSwitch @bind-Value=@allowFiltering Name="AllowFiltering" Visible=@allowFieldsPicking />
         <RadzenLabel Text="Allow filtering" Component="AllowFiltering" Visible=@allowFieldsPicking />
     </RadzenStack>
 </RadzenCard>

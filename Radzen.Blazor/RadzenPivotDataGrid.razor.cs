@@ -950,7 +950,14 @@ namespace Radzen.Blazor
 
                         for (int i = 0; i < colPath.Count; i++)
                         {
-                            items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                            if (pivotColumns[i].Property.Contains("it["))
+                            {
+                                items = items.Where($"it => {pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                            }
+                            else
+                            {
+                                items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                            }
                         }
 
                         var total = GetAggregateValue(items, aggregate);
@@ -1023,7 +1030,14 @@ namespace Radzen.Blazor
                     continue; // Skip padding cells added to align depths
                 }
 
-                items = items.Where($@"i => i.{pivotRows[i].Property} == {ExpressionSerializer.FormatValue(cell.Value)}");
+                if (pivotRows[i].Property.Contains("it["))
+                {
+                    items = items.Where($@"it => {pivotRows[i].Property} == {ExpressionSerializer.FormatValue(cell.Value)}");
+                }
+                else
+                {
+                    items = items.Where($@"i => i.{pivotRows[i].Property} == {ExpressionSerializer.FormatValue(cell.Value)}");
+                }
             }
 
             return items;
@@ -1131,7 +1145,7 @@ namespace Radzen.Blazor
                 }
                 else
                 {
-                    values = items.Select(aggregate.Property).Cast(propertyType);
+                    values = propertyType != null ? items.Select(aggregate.Property).Cast(propertyType) : items.Select(aggregate.Property);
                 }
 
                 switch (aggregate.Aggregate)
@@ -1249,7 +1263,14 @@ namespace Radzen.Blazor
                         var items = node.Items;
                         for (int i = 0; i < colPath.Count; i++)
                         {
-                            items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                            if (pivotColumns[i].Property.Contains("it["))
+                            {
+                                items = items.Where($"it => {pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                            }
+                            else
+                            {
+                                items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                            }
                         }
                         row.ValueCells.Add(items.Count() > 0 ? GetAggregateValue(items, aggregate) : null);
                     }
@@ -1289,12 +1310,26 @@ namespace Radzen.Blazor
                                 // Filter by row path
                                 for (int i = 0; i < newPrefix.Count && i < pivotRows.Count; i++)
                                 {
-                                    items = items.Where($@"i => i.{pivotRows[i].Property} == {ExpressionSerializer.FormatValue(newPrefix[i].Value)}");
+                                    if (pivotRows[i].Property.Contains("it["))
+                                    {
+                                        items = items.Where($@"it => {pivotRows[i].Property} == {ExpressionSerializer.FormatValue(newPrefix[i].Value)}");
+                                    }
+                                    else
+                                    {
+                                        items = items.Where($@"i => i.{pivotRows[i].Property} == {ExpressionSerializer.FormatValue(newPrefix[i].Value)}");
+                                    }
                                 }
                                 // Filter by column path
                                 for (int i = 0; i < colPath.Count; i++)
                                 {
-                                    items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                                    if (pivotColumns[i].Property.Contains("it["))
+                                    {
+                                        items = items.Where($"it => {pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                                    }
+                                    else
+                                    {
+                                        items = items.Where($"i => i.{pivotColumns[i].Property} == {ExpressionSerializer.FormatValue(colPath[i])}");
+                                    }
                                 }
                                 collapsedRow.ValueCells.Add(items.Count() > 0 ? GetAggregateValue(items, aggregate) : null);
                             }
@@ -1960,12 +1995,12 @@ namespace Radzen.Blazor
 
                     var innerFilterExpressions = new List<CompositeFilterDescriptor>();
 
-                    var filterExpression = BuildFilterExpression(property, filterValue, filterOperator);
+                    var filterExpression = BuildFilterExpression(property, filterValue, filterOperator, column.Type);
                     innerFilterExpressions.Add(filterExpression);
 
                     if (secondFilterValue != null)
                     {
-                        var secondFilterExpression = BuildFilterExpression(property, secondFilterValue, secondFilterOperator);
+                        var secondFilterExpression = BuildFilterExpression(property, secondFilterValue, secondFilterOperator, column.Type);
                         innerFilterExpressions.Add(secondFilterExpression);
                     }
 
@@ -1992,12 +2027,12 @@ namespace Radzen.Blazor
 
                     var innerFilterExpressions = new List<CompositeFilterDescriptor>();
 
-                    var filterExpression = BuildFilterExpression(property, filterValue, filterOperator);
+                    var filterExpression = BuildFilterExpression(property, filterValue, filterOperator, row.Type);
                     innerFilterExpressions.Add(filterExpression);
 
                     if (secondFilterValue != null)
                     {
-                        var secondFilterExpression = BuildFilterExpression(property, secondFilterValue, secondFilterOperator);
+                        var secondFilterExpression = BuildFilterExpression(property, secondFilterValue, secondFilterOperator, row.Type);
                         innerFilterExpressions.Add(secondFilterExpression);
                     }
 
@@ -2016,13 +2051,14 @@ namespace Radzen.Blazor
         /// <summary>
         /// Builds a filter expression for a property and value.
         /// </summary>
-        private CompositeFilterDescriptor BuildFilterExpression(string property, object value, FilterOperator filterOperator)
+        private CompositeFilterDescriptor BuildFilterExpression(string property, object value, FilterOperator filterOperator, Type type)
         {
             return new CompositeFilterDescriptor
             {
                 Property = property,
                 FilterValue = value,
-                FilterOperator = filterOperator
+                FilterOperator = filterOperator,
+                Type = type
             };
         }
 

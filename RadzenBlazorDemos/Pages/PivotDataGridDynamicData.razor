@@ -1,0 +1,161 @@
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using Microsoft.EntityFrameworkCore
+@using Radzen
+@using Radzen.Blazor
+@inherits RadzenBlazorDemos.Shared.DbContextPage
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin:1rem">
+        <RadzenSwitch @bind-Value="@showColumnTotals" Name="ShowColumnTotals" />
+        <RadzenLabel Text="Show column totals" Component="ShowColumnTotals" />
+        <RadzenSwitch @bind-Value="@showRowTotals" Name="ShowRowTotals" />
+        <RadzenLabel Text="Show row totals" Component="ShowRowTotals" />
+        <RadzenSwitch @bind-Value="@allowDrillDown" Name="AllowDrillDown" />
+        <RadzenLabel Text="Allow drill-down" Component="AllowDrillDown" />
+        <RadzenSwitch @bind-Value="@allowPaging" Name="AllowPaging" />
+        <RadzenLabel Text="Allow paging" Component="AllowPaging" />
+        <RadzenDropDown @bind-Value="@pagerPosition"
+                        Visible="@allowPaging"
+                        TextProperty="Text"
+                        ValueProperty="Value"
+                        Data="@(Enum.GetValues(typeof(PagerPosition)).Cast<PagerPosition>().Select(t => new { Text = $"{t}", Value = t }))" />
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center" Style="margin:1rem">
+        <RadzenSwitch @bind-Value="@allowFieldsPicking" Name="AllowFieldsPicking" />
+        <RadzenLabel Text="Allow fields picking" Component="AllowFieldsPicking" />
+        <RadzenSwitch @bind-Value="@allowSorting" Name="AllowSorting" Visible="@allowFieldsPicking" />
+        <RadzenLabel Text="Allow sorting" Component="AllowSorting" Visible="@allowFieldsPicking" />
+        <RadzenSwitch @bind-Value="@allowFiltering" Name="AllowFiltering" Visible="@allowFieldsPicking" />
+        <RadzenLabel Text="Allow filtering" Component="AllowFiltering" Visible="@allowFieldsPicking" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenPivotDataGrid Data="@data"
+                     TItem="IDictionary<string, object>"
+                     AllowSorting="@allowSorting"
+                     AllowFiltering="@allowFiltering"
+                     AllowDrillDown="@allowDrillDown"
+                     AllowFieldsPicking="@allowFieldsPicking"
+                     ShowColumnsTotals="@showColumnTotals"
+                     ShowRowsTotals="@showRowTotals"
+                     AllowPaging="@allowPaging"
+                     PagerPosition="@pagerPosition"
+                     PageSize="20"
+                     AllowAlternatingRows="true"
+                     GridLines="Radzen.DataGridGridLines.Default"
+                     Style="height: 700px;">
+    <Columns>
+        @foreach (var field in columnFields)
+        {
+            <RadzenPivotColumn @key="@field.Property"
+                               Title="@field.Title"
+                               Width="@field.Width"
+                               Type="@field.Type"
+                               Property="@PropertyAccess.GetDynamicPropertyExpression(field.Property, field.Type)" />
+        }
+    </Columns>
+    <Rows>
+        @foreach (var field in rowFields)
+        {
+            <RadzenPivotRow @key="@field.Property"
+                            Title="@field.Title"
+                            Type="@field.Type"
+                            Property="@PropertyAccess.GetDynamicPropertyExpression(field.Property, field.Type)" />
+        }
+    </Rows>
+    <Aggregates>
+        @foreach (var aggregate in aggregateFields)
+        {
+            <RadzenPivotAggregate @key="@aggregate.Property"
+                                  Title="@aggregate.Title"
+                                  Type="@aggregate.Type"
+                                  Property="@PropertyAccess.GetDynamicPropertyExpression(aggregate.Property, aggregate.Type)"
+                                  Aggregate="@aggregate.Aggregate"
+                                  FormatString="@aggregate.FormatString"
+                                  TextAlign="@aggregate.TextAlign" />
+        }
+    </Aggregates>
+</RadzenPivotDataGrid>
+
+@code {
+    private readonly IReadOnlyList<PivotFieldDescriptor> columnFields = new[]
+    {
+        new PivotFieldDescriptor("OrderYear", "Order Year", typeof(int?), "140px"),
+        new PivotFieldDescriptor("ShipCountry", "Ship Country", typeof(string), "180px")
+    };
+
+    private readonly IReadOnlyList<PivotFieldDescriptor> rowFields = new[]
+    {
+        new PivotFieldDescriptor("Category", "Category", typeof(string)),
+        new PivotFieldDescriptor("Product", "Product", typeof(string))
+    };
+
+    private readonly IReadOnlyList<PivotAggregateDescriptor> aggregateFields = new[]
+    {
+        new PivotAggregateDescriptor("TotalSales", "Total Sales", typeof(double), AggregateFunction.Sum, "{0:C}", TextAlign.Right),
+        new PivotAggregateDescriptor("Quantity", "Quantity", typeof(int), AggregateFunction.Sum, "{0:N0}", TextAlign.Right),
+        new PivotAggregateDescriptor("Discount", "Average Discount", typeof(double), AggregateFunction.Average, "{0:P1}", TextAlign.Right),
+        new PivotAggregateDescriptor("UnitPrice", "Average Unit Price", typeof(double), AggregateFunction.Average, "{0:C}", TextAlign.Right)
+    };
+
+    private List<IDictionary<string, object>> data = new List<IDictionary<string, object>>();
+    private bool allowDrillDown = true;
+    private bool allowFieldsPicking = true;
+    private bool allowSorting = true;
+    private bool allowFiltering = true;
+    private bool allowPaging = true;
+    private bool showColumnTotals = true;
+    private bool showRowTotals = true;
+    private PagerPosition pagerPosition = PagerPosition.Bottom;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var sales = await (from od in dbContext.OrderDetails
+                           join o in dbContext.Orders on od.OrderID equals o.OrderID
+                           join p in dbContext.Products on od.ProductID equals p.ProductID
+                           join c in dbContext.Categories on p.CategoryID equals c.CategoryID
+                           select new
+                           {
+                               CategoryName = c.CategoryName,
+                               ProductName = p.ProductName,
+                               OrderYear = o.OrderDate.HasValue ? o.OrderDate.Value.Year : 0,
+                               ShipCountry = o.ShipCountry,
+                               UnitPrice = od.UnitPrice ?? 0,
+                               Quantity = od.Quantity ?? 0,
+                               Discount = od.Discount ?? 0,
+                               TotalAmount = (od.UnitPrice ?? 0) * (od.Quantity ?? 0) * (1 - (od.Discount ?? 0))
+                           }).ToListAsync();
+
+        data = sales.Select(result =>
+        {
+            var row = new Dictionary<string, object>
+            {
+                ["OrderYear"] = result.OrderYear,
+                ["ShipCountry"] = string.IsNullOrEmpty(result.ShipCountry) ? "Unknown" : result.ShipCountry,
+                ["Category"] = result.CategoryName ?? "(no category)",
+                ["Product"] = result.ProductName ?? "(no product)",
+                ["Quantity"] = result.Quantity,
+                ["UnitPrice"] = result.UnitPrice,
+                ["Discount"] = result.Discount,
+                ["TotalSales"] = result.TotalAmount
+            };
+
+            return (IDictionary<string, object>)row;
+        }).ToList();
+    }
+
+
+    private sealed record PivotFieldDescriptor(string Property, string Title, Type Type, string? Width = null);
+
+    private sealed record PivotAggregateDescriptor(string Property,
+                                                   string Title,
+                                                   Type Type,
+                                                   AggregateFunction Aggregate,
+                                                   string? FormatString,
+                                                   TextAlign TextAlign);
+}
+
