@@ -1787,7 +1787,7 @@ namespace Radzen.Blazor
                 {
                     field.SetSecondFilterValueInternal(value);
                 }
-                StateHasChanged();
+                InvokeAsync(OnFilterChanged);
             }
         }
 
