@@ -633,6 +633,7 @@ namespace Radzen.Blazor
                             else if (value is TimeOnly timeOnly)
                             {
                                 _dateTimeValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
+                                _currentDate = _dateTimeValue.Value;
                             }
 #endif
                             else
