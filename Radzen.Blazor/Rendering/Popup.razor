@@ -14,27 +14,53 @@
     bool open;
     ElementReference target;
 
+    /// <summary>
+    /// Determines whether the popup content is rendered only when open.
+    /// </summary>
     [Parameter]
     public bool Lazy { get; set; }
 
+    /// <summary>
+    /// Specifies whether to prevent the default action on mouse down.
+    /// </summary>
     [Parameter]
     public bool PreventDefault { get; set; }
 
+    /// <summary>
+    /// Specifies whether the first element in the popup should be automatically focused.
+    /// </summary>
     [Parameter]
     public bool AutoFocusFirstElement { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets the content to be rendered inside the popup.
+    /// </summary>
     [Parameter]
     public RenderFragment ChildContent { get; set; }
 
+    /// <summary>
+    /// Event callback triggered when the popup is opened.
+    /// </summary>
     [Parameter]
     public EventCallback Open { get; set; }
 
+    /// <summary>
+    /// Event callback triggered when the popup is closed.
+    /// </summary>
     [Parameter]
     public EventCallback Close { get; set; }
 
+    /// <summary>
+    /// Specifies whether the popup should close when clicking outside of it.
+    /// </summary>
     [Parameter]
     public bool CloseOnClickOutside { get; set; } = true;
 
+    /// <summary>
+    /// Toggles the popup open or closed.
+    /// </summary>
+    /// <param name="target">The target element reference.</param>
+    /// <param name="disableSmartPosition">Whether to disable smart positioning.</param>
     public async Task ToggleAsync(ElementReference target, bool disableSmartPosition = false)
     {
         open = !open;
@@ -53,7 +79,7 @@
                 null,
                 Reference,
                 nameof(OnClose),
-                CloseOnClickOutside,      // <-- mapped to closeOnDocumentClick
+                CloseOnClickOutside,
                 AutoFocusFirstElement,
                 disableSmartPosition
             );
@@ -64,6 +90,10 @@
         }
     }
 
+    /// <summary>
+    /// Closes the popup and sets the target element.
+    /// </summary>
+    /// <param name="target">The target element reference.</param>
     public async Task CloseAsync(ElementReference target)
     {
         open = false;
@@ -72,6 +102,9 @@
         await CloseAsync();
     }
 
+    /// <summary>
+    /// Invoked from JavaScript to close the popup.
+    /// </summary>
     [JSInvokable]
     public async Task OnClose()
     {
@@ -80,6 +113,9 @@
         await Close.InvokeAsync(null);
     }
 
+    /// <summary>
+    /// Closes the popup.
+    /// </summary>
     public async Task CloseAsync()
     {
         await JSRuntime.InvokeVoidAsync("Radzen.closePopup", GetId(), Reference, nameof(OnClose));
