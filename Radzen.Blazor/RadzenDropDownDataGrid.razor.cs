@@ -66,6 +66,13 @@ namespace Radzen.Blazor
         public Action<DataGridCellRenderEventArgs<object>> CellRender { get; set; }
 
         /// <summary>
+        /// Gets or sets the cell LoadChildData callback. Use it to set Child data collection & attributes.
+        /// </summary>
+        /// <value>The Load child data callback.</value>
+        [Parameter]
+        public Action<DataGridLoadChildDataEventArgs<object>> OnLoadChildData { get; set; }
+        
+        /// <summary>
         /// Gets or sets the footer template.
         /// </summary>
         /// <value>The footer template.</value>
