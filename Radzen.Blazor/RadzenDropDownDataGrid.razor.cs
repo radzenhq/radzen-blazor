@@ -128,11 +128,19 @@ namespace Radzen.Blazor
         [Parameter]
         public bool OpenOnFocus { get; set; }
 
+        /// <summary>
+        /// Gets or sets the keyboard key that triggers opening the popup when <see cref="OpenOnFocus"/> is enabled.
+        /// Default is <c>"Enter"</c>.
+        /// </summary>
+        /// <value>The keyboard key used to open the popup.</value>
+        [Parameter]
+        public string OpenPopupKey { get; set; } = "Enter";
+
         private async Task OnFocus()
         {
             if (OpenOnFocus)
             {
-                await OpenPopup("Enter", false);
+                await OpenPopup(OpenPopupKey, false);
             }
         }
 
