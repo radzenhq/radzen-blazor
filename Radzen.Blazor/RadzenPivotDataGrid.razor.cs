@@ -637,7 +637,11 @@ namespace Radzen.Blazor
             }
         }
 
-        internal void AddPivotField(RadzenPivotField<TItem> field)
+        /// <summary>
+        /// Adds a pivot field to the pivot grid if it does not already exist.
+        /// </summary>
+        /// <param name="field">The pivot field to add.</param>
+        public void AddPivotField(RadzenPivotField<TItem> field)
         {
             if (!pivotFields.Any(f => f.Property == field.Property))
             {
@@ -652,7 +656,11 @@ namespace Radzen.Blazor
             }
         }
 
-        internal void AddPivotColumn(RadzenPivotColumn<TItem> column)
+        /// <summary>
+        /// Adds a pivot column to the pivot grid if it does not already exist.
+        /// </summary>
+        /// <param name="column">The pivot column to add.</param>
+        public void AddPivotColumn(RadzenPivotColumn<TItem> column)
         {
             if (!allPivotColumns.Contains(column))
             {
@@ -670,7 +678,11 @@ namespace Radzen.Blazor
             }
         }
 
-        internal void AddPivotRow(RadzenPivotRow<TItem> row)
+        /// <summary>
+        /// Adds a pivot row to the pivot grid if it does not already exist.
+        /// </summary>
+        /// <param name="row">The pivot row to add.</param>
+        public void AddPivotRow(RadzenPivotRow<TItem> row)
         {
             if (!allPivotRows.Contains(row))
             {
@@ -2183,4 +2195,4 @@ namespace Radzen.Blazor
             await Reload();
         }
     }
-} 
+}
