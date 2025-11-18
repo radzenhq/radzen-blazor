@@ -1,4 +1,5 @@
-<li class=@GetCssClass() @attributes=@Attributes role="presentation">
+@inherits RadzenComponentWithChildren
+<li role="presentation" @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()>
     <div class=@WrapperClass>
         <a href=@Selector class=@LinkClass @onclick:preventDefault @onclick=@OnClickAsync>@if (Template is null) {@Text} else {@Template}</a>
     </div>

@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 namespace Radzen.Blazor;
 
@@ -11,23 +9,8 @@ namespace Radzen.Blazor;
 /// <summary>
 /// Represents a table of contents item.
 /// </summary>
-public partial class RadzenTocItem : ComponentBase, IAsyncDisposable
+public partial class RadzenTocItem : RadzenComponentWithChildren, IAsyncDisposable
 {
-    /// <summary>
-    /// Gets or sets a dictionary of additional HTML attributes that will be applied to the component's root element.
-    /// Any attributes not explicitly defined as parameters will be captured here and rendered on the element.
-    /// Use this to add data-* attributes, ARIA attributes, or any custom HTML attributes.
-    /// </summary>
-    /// <value>The unmatched attributes dictionary.</value>
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object> Attributes { get; set; } = new ReadOnlyDictionary<string, object>(new Dictionary<string, object>());
-
-    /// <summary>
-    /// Gets or sets the child content.
-    /// </summary>
-    [Parameter]
-    public RenderFragment? ChildContent { get; set; }
-
     /// <summary>
     /// Gets or sets the text displayed in the table of contents.
     /// </summary>
@@ -54,25 +37,13 @@ public partial class RadzenTocItem : ComponentBase, IAsyncDisposable
 
     private bool selected;
 
-    /// <summary>
-    /// Gets the final CSS class rendered by the component. Combines it with a <c>class</c> custom attribute.
-    /// </summary>
-    protected string GetCssClass()
+    /// <inheritdoc />
+    protected override string GetComponentCssClass()
     {
-        if (Attributes != null && Attributes.TryGetValue("class", out var @class) && !string.IsNullOrEmpty(Convert.ToString(@class)))
-        {
-            return $"{GetComponentCssClass()} {@class}";
-        }
-
-        return GetComponentCssClass();
-    }
-
-    /// <summary>
-    /// Gets the component CSS class.
-    /// </summary>
-    protected string GetComponentCssClass() => ClassList.Create("rz-toc-item")
+        return ClassList.Create("rz-toc-item")
         .Add("rz-toc-item-selected", selected)
         .ToString();
+    }
 
     private string WrapperClass => ClassList.Create("rz-toc-item-wrapper")
         .Add(Level switch
