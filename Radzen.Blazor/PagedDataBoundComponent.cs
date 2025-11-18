@@ -475,12 +475,14 @@ namespace Radzen
             {
                 topPager.SetCount(Count);
                 topPager.SetCurrentPage(CurrentPage);
+                topPager.ChangeState();
             }
 
             if (bottomPager != null)
             {
                 bottomPager.SetCount(Count);
                 bottomPager.SetCurrentPage(CurrentPage);
+                bottomPager.ChangeState();
             }
         }
 

@@ -406,6 +406,11 @@ namespace Radzen.Blazor
             }
         }
 
+        internal void ChangeState()
+        {
+            StateHasChanged();
+        }
+
         internal void SetCurrentPage(int page)
         {
             if (CurrentPage != page)
