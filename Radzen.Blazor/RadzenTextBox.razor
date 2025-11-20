@@ -4,7 +4,7 @@
     if (Immediate)
     {
     <input @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-        placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" @oninput="@OnChange" />
+        placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@CurrentValue" @oninput="@OnChange" />
     }
     else
     {

@@ -67,12 +67,48 @@ namespace Radzen.Blazor
         public bool Immediate { get; set; }
 
         /// <summary>
+        /// Gets or sets the debounce delay in milliseconds when Immediate is true.
+        /// This controls how long to wait after the user stops typing before triggering the value update.
+        /// Only applies when Immediate is true. Set to 0 to disable debouncing.
+        /// </summary>
+        /// <value>The debounce delay in milliseconds. Default is 0, aka disabled</value>
+        [Parameter]
+        public int DebounceDelay { get; set; } = 0;
+
+        /// <summary>
+        /// Gets the current input value, which may be the intermediate value while typing or the bound Value.
+        /// </summary>
+        protected string CurrentValue => _currentValueBuffer ?? Value;
+        private string _currentValueBuffer;
+
+        /// <summary>
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async Task OnChange(ChangeEventArgs args)
         {
-            Value = $"{args.Value}";
+            var newValue = $"{args.Value}";
+            _currentValueBuffer = newValue;
+            await DebounceValueUpdate(newValue);
+        }
+
+        private Task DebounceValueUpdate(string value)
+        {
+            //if immediate is not set, or there is no debounce delay, update value immediately
+            if (!Immediate || DebounceDelay <= 0)
+                return SetValue(value);
+
+            Debounce(() => InvokeAsync(() => SetValue(value)), DebounceDelay);
+
+            //return empty task so the event is handled. the task above will execute the update later
+            return Task.CompletedTask;
+        }
+
+
+        private async Task SetValue(string newValue)
+        {
+            _currentValueBuffer = null;
+            Value = newValue;
 
             await ValueChanged.InvokeAsync(Value);
 
