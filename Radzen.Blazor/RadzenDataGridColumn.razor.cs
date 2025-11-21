@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -1420,7 +1421,15 @@ namespace Radzen.Blazor
             {
                 await headerCell.CloseFilter();
             }
-            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.closePopup", $"{Grid.PopupID}{GetFilterProperty()}");
+            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.closePopup", $"{GetColumnPopupID()}");
+        }
+
+        internal string GetColumnPopupID()
+        {
+            var fiterProperty = Property != FilterProperty && !string.IsNullOrEmpty(FilterProperty) ?
+                $"{Property}{GetFilterProperty()}" : GetFilterProperty();
+
+            return $"{Grid.PopupID}{(string.IsNullOrEmpty(fiterProperty) ? Grid.allColumns.IndexOf(this).ToString() : fiterProperty)}";
         }
 
         string runtimeWidth;

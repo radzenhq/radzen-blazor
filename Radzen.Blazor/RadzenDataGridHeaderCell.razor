@@ -65,7 +65,7 @@
                     @Grid.FilterIcon
                 </i>
 
-                <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{getColumnPopupID()}")" class="rz-overlaypanel"
+                <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{Column.GetColumnPopupID()}")" class="rz-overlaypanel"
                 style="display:none;min-width:250px;" @onkeydown="OnFilterPopupKeyPressed">
                     <div class="rz-overlaypanel-content">
                         @if (Column.FilterTemplate != null)
@@ -74,7 +74,7 @@
                         }
                         else
                         {
-                            <form id="@($"{getColumnPopupID()}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
+                            <form id="@($"{Column.GetColumnPopupID()}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
                                 @if (filterMode == FilterMode.Advanced)
                                 {
                                     <span class="rz-grid-filter-label">@Grid.FilterText</span>
@@ -108,7 +108,7 @@
                                     }
                                     else
                                     {
-                                        <RadzenTextBox Disabled="@(!Column.CanSetFilterValue())" id="@($"{getColumnPopupID()}-sf")" aria-label=@(Column.Title + Grid.FilterValueAriaLabel + Column.GetFilterValue()) Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
+                                        <RadzenTextBox Disabled="@(!Column.CanSetFilterValue())" id="@($"{Column.GetColumnPopupID()}-sf")" aria-label=@(Column.Title + Grid.FilterValueAriaLabel + Column.GetFilterValue()) Value="@($"{Column.GetFilterValue()}")" Change="@(args => Column.SetFilterValue(args))" />
                                     }
 
                                     <RadzenDropDown @onclick:preventDefault="true" TextProperty="Text" ValueProperty="Value" Style="width: 90px" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", Column.Title + Grid.LogicalOperatorAriaLabel + (Column.LogicalFilterOperator == LogicalFilterOperator.And ? Grid.AndOperatorText : Grid.OrOperatorText) }})"
@@ -142,7 +142,7 @@
                                     }
                                     else
                                     {
-                                        <RadzenTextBox Disabled="@(!Column.CanSetFilterValue(false))" id="@($"{getColumnPopupID()}-sf2")" aria-label=@(Column.Title + Grid.SecondFilterValueAriaLabel + Column.GetSecondFilterValue()) Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
+                                        <RadzenTextBox Disabled="@(!Column.CanSetFilterValue(false))" id="@($"{Column.GetColumnPopupID()}-sf2")" aria-label=@(Column.Title + Grid.SecondFilterValueAriaLabel + Column.GetSecondFilterValue()) Value="@($"{Column.GetSecondFilterValue()}")" Change="@(args => Column.SetFilterValue(args, false))" />
                                     }
                                 }
                                 else
@@ -180,7 +180,7 @@
                     {
                         <div class="rz-grid-filter-buttons">
                             <RadzenButton ButtonStyle="ButtonStyle.Base" class="rz-clear-filter" Click="@ClearFilter" Text=@Grid.ClearFilterText title="@Grid.ClearFilterText" />
-                            <RadzenButton onmousedown="@getBlur()" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{getColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
+                            <RadzenButton onmousedown="@getBlur()" ButtonStyle="ButtonStyle.Primary" class="rz-apply-filter" form="@($"{Column.GetColumnPopupID()}-form")" ButtonType="ButtonType.Submit" Text=@Grid.ApplyFilterText title="@Grid.ApplyFilterText" />
                         </div>
                     }
                 </Popup>
@@ -340,7 +340,7 @@ else
 
     string getFilterOpen()
     {
-        return Grid.FilterPopupRenderMode == PopupRenderMode.Initial ? $"Radzen.togglePopup(this, '{getColumnPopupID()}', false, null, null, true, true)" : "";
+        return Grid.FilterPopupRenderMode == PopupRenderMode.Initial ? $"Radzen.togglePopup(this, '{Column.GetColumnPopupID()}', false, null, null, true, true)" : "";
     }
 
     async Task ToggleFilter()
@@ -464,14 +464,6 @@ else
         return Task.CompletedTask;
     }
 
-    string getColumnPopupID()
-    {
-        var fiterProperty = Column.Property != Column.FilterProperty && !string.IsNullOrEmpty(Column.FilterProperty) ? 
-            $"{Column.Property}{Column.GetFilterProperty()}" : Column.GetFilterProperty();
-
-        return $"{Grid.PopupID}{(string.IsNullOrEmpty(fiterProperty) ? Grid.allColumns.IndexOf(Column).ToString() : fiterProperty)}";
-    }
-
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
@@ -514,7 +506,7 @@ else
         }
         else
         {
-            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.togglePopup", filterButton, getColumnPopupID(), false, null, null, true, true);
+            await Grid.GetJSRuntime().InvokeVoidAsync("Radzen.togglePopup", filterButton, Column.GetColumnPopupID(), false, null, null, true, true);
         }
     }
 
