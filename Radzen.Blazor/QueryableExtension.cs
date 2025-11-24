@@ -789,7 +789,8 @@ namespace Radzen
                 : (string)Convert.ChangeType(filterValue is DateTimeOffset ?
                             ((DateTimeOffset)filterValue).UtcDateTime : filterValue is DateOnly ?
                                 ((DateOnly)filterValue).ToString("yyy-MM-dd", CultureInfo.InvariantCulture) :
-                                    filterValue, typeof(string), CultureInfo.InvariantCulture);
+                                    filterValue is Guid ? ((Guid)filterValue).ToString() : 
+                                        filterValue, typeof(string), CultureInfo.InvariantCulture);
 
             if (column.Grid.FilterCaseSensitivity == FilterCaseSensitivity.CaseInsensitive && column.FilterPropertyType == typeof(string))
             {
