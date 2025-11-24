@@ -455,7 +455,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The min-width.</value>
         [Parameter]
-        public string MinWidth { get; set; } = 80px;
+        public string MinWidth { get; set; } = "80px";
 
 
         /// <summary>
