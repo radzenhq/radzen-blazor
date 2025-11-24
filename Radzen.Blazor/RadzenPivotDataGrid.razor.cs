@@ -414,6 +414,42 @@ namespace Radzen.Blazor
         private Popup filterPopup;
 
         /// <summary>
+        /// Gets the columns collection.
+        /// </summary>
+        /// <value>The columns collection.</value>
+        public IList<RadzenPivotColumn<TItem>> ColumnsCollection
+        {
+            get
+            {
+                return pivotColumns;
+            }
+        }
+
+        /// <summary>
+        /// Gets the rows collection.
+        /// </summary>
+        /// <value>The rows collection.</value>
+        public IList<RadzenPivotRow<TItem>> RowsCollection
+        {
+            get
+            {
+                return pivotRows;
+            }
+        }
+
+        /// <summary>
+        /// Gets the aggregates collection.
+        /// </summary>
+        /// <value>The aggregates collection.</value>
+        public IList<RadzenPivotAggregate<TItem>> AggregatesCollection
+        {
+            get
+            {
+                return pivotAggregates;
+            }
+        }
+
+        /// <summary>
         /// Gets the cached column header rows.
         /// </summary>
         private List<List<ColumnHeaderCell>> ColumnHeaderRows
