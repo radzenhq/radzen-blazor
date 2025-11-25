@@ -52,7 +52,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <DartSassOutputStyle>expanded</DartSassOutputStyle>
+    <DartSassOutputStyle>compressed</DartSassOutputStyle>
     <EnableDefaultSassItems>false</EnableDefaultSassItems>
   </PropertyGroup>
 
