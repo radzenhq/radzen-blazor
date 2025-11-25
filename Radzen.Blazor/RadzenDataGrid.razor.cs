@@ -1016,7 +1016,7 @@ namespace Radzen.Blazor
 
                 var property = column.GetSortProperty();
 
-                SetColumnSortOrder(column);
+                SetNextColumnSortOrder(column);
                 await Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
 
@@ -3153,7 +3153,20 @@ namespace Radzen.Blazor
 
         internal List<SortDescriptor> sorts = new List<SortDescriptor>();
 
-        internal void SetColumnSortOrder(RadzenDataGridColumn<TItem> column)
+        internal void SetNextColumnSortOrder(RadzenDataGridColumn<TItem> column)
+        {
+            var sequence = column.SortOrderSequence;
+
+            var pos = Array.IndexOf(sequence, column.GetSortOrder());
+
+            var nextSortOrder = pos == -1 || pos + 1 >= sequence.Length
+                ? sequence.FirstOrDefault()
+                : sequence[pos + 1];
+
+            SetColumnSortOrder(column, nextSortOrder);
+        }
+
+        private void SetColumnSortOrder(RadzenDataGridColumn<TItem> column, SortOrder? sortOrder)
         {
             if (!AllowMultiColumnSorting)
             {
@@ -3165,35 +3178,33 @@ namespace Radzen.Blazor
             }
 
             var descriptor = sorts.Where(d => d.Property == column?.GetSortProperty()).FirstOrDefault();
-            if (descriptor == null)
-            {
-                descriptor = new SortDescriptor() { Property = column.GetSortProperty() };
-            }
 
-            if (column.GetSortOrder() == null)
+            column.SetSortOrderInternal(sortOrder);
+
+            if (!sortOrder.HasValue)
             {
-                column.SetSortOrderInternal(SortOrder.Ascending);
-                descriptor.SortOrder = SortOrder.Ascending;
-            }
-            else if (column.GetSortOrder() == SortOrder.Ascending)
-            {
-                column.SetSortOrderInternal(SortOrder.Descending);
-                descriptor.SortOrder = SortOrder.Descending;
-            }
-            else if (column.GetSortOrder() == SortOrder.Descending)
-            {
-                column.SetSortOrderInternal(null);
-                if (sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
+                if (descriptor != null)
                 {
                     sorts.Remove(descriptor);
                 }
-                descriptor = null;
+
+                return;
             }
 
-            if (descriptor != null && !sorts.Where(d => d.Property == column?.GetSortProperty()).Any())
+            if (descriptor == null)
             {
+                descriptor = new SortDescriptor()
+                {
+                    Property = column.GetSortProperty(),
+                    SortOrder = sortOrder,
+                };
+
                 sorts.Add(descriptor);
+
+                return;
             }
+
+            descriptor.SortOrder = sortOrder;
         }
 
         void GroupsCollectionChanged(object sender, NotifyCollectionChangedEventArgs args)
@@ -3377,7 +3388,7 @@ namespace Radzen.Blazor
 
             if (column != null)
             {
-                SetColumnSortOrder(column);
+                SetColumnSortOrder(column, SortOrder.Ascending);
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
             }
@@ -3403,9 +3414,7 @@ namespace Radzen.Blazor
 
             if (column != null)
             {
-                column.SetSortOrderInternal(SortOrder.Ascending);
-                SetColumnSortOrder(column);
-
+                SetColumnSortOrder(column, SortOrder.Descending);
                 Sort.InvokeAsync(new DataGridColumnSortEventArgs<TItem>() { Column = column, SortOrder = column.GetSortOrder() });
                 SaveSettings();
             }

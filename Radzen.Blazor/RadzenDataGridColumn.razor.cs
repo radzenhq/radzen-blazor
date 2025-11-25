@@ -278,6 +278,12 @@ namespace Radzen.Blazor
         [Parameter]
         public SortOrder? SortOrder { get; set; }
 
+        /// <summary>
+        /// Gets or sets the sequence of the <see cref="Radzen.SortOrder"/>s to use when sorting the column interactively.
+        /// </summary>
+        [Parameter]
+        public SortOrder?[] SortOrderSequence { get; set; } = [Radzen.SortOrder.Ascending, Radzen.SortOrder.Descending, null];
+
         bool visible = true;
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenDataGridColumn{TItem}"/> is visible.

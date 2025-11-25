@@ -1537,39 +1537,19 @@ namespace Radzen.Blazor
         }
 
         /// <summary>
+        /// Handles aggregate click for sorting.
+        /// </summary>
+        internal async Task OnAggregateSort(EventArgs args, RadzenPivotAggregate<TItem> aggregate)
+        {
+            await HandleFieldSort(pivotAggregates, aggregate);
+        }
+
+        /// <summary>
         /// Handles column header click for sorting.
         /// </summary>
-        internal async Task OnColumnSort(EventArgs args, RadzenPivotField<TItem> column)
+        internal async Task OnColumnSort(EventArgs args, RadzenPivotColumn<TItem> column)
         {
-            if (AllowSorting && column.Sortable)
-            {
-                // Toggle sort order: None -> Ascending -> Descending -> None
-                if (column.GetSortOrder() == null)
-                {
-                    column.SetSortOrderInternal(SortOrder.Ascending);
-                }
-                else if (column.GetSortOrder() == SortOrder.Ascending)
-                {
-                    column.SetSortOrderInternal(SortOrder.Descending);
-                }
-                else
-                {
-                    column.SetSortOrderInternal(null);
-                }
-
-                // Clear other column sorts if single column sorting
-                if (column.GetSortOrder() != null)
-                {
-                    foreach (var col in pivotColumns.Where(c => c != column))
-                    {
-                        col.SetSortOrderInternal(null);
-                    }
-                }
-
-                await Reload();
-            }
-
-            await Task.CompletedTask;
+            await HandleFieldSort(pivotColumns, column);
         }
 
         /// <summary>
@@ -1577,28 +1557,31 @@ namespace Radzen.Blazor
         /// </summary>
         internal async Task OnRowSort(EventArgs args, RadzenPivotRow<TItem> row)
         {
-            if (AllowSorting && row.Sortable)
-            {
-                // Toggle sort order: None -> Ascending -> Descending -> None
-                if (row.GetSortOrder() == null)
-                {
-                    row.SetSortOrderInternal(SortOrder.Ascending);
-                }
-                else if (row.GetSortOrder() == SortOrder.Ascending)
-                {
-                    row.SetSortOrderInternal(SortOrder.Descending);
-                }
-                else
-                {
-                    row.SetSortOrderInternal(null);
-                }
+            await HandleFieldSort(pivotRows, row);
+        }
 
-                // Clear other row sorts if single row sorting
-                if (row.GetSortOrder() != null)
+        private async Task HandleFieldSort<T>(List<T> allFields, T sortedField)
+            where T : RadzenPivotField<TItem>
+        {
+            if (AllowSorting && sortedField.Sortable)
+            {
+                // Toggle sort order
+                var sequence = sortedField.SortOrderSequence;
+
+                var pos = Array.IndexOf(sequence, sortedField.GetSortOrder());
+
+                var nextSortOrder = pos == -1 || pos + 1 >= sequence.Length
+                    ? sequence.FirstOrDefault()
+                    : sequence[pos + 1];
+
+                sortedField.SetSortOrderInternal(nextSortOrder);
+
+                // Clear other column sorts if single column sorting
+                if (sortedField.GetSortOrder() != null)
                 {
-                    foreach (var r in pivotRows.Where(r => r != row))
+                    foreach (var col in allFields.Where(c => c != sortedField))
                     {
-                        r.SetSortOrderInternal(null);
+                        col.SetSortOrderInternal(null);
                     }
                 }
 
