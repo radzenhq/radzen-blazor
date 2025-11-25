@@ -44,7 +44,8 @@ public class ConversationSession
         Messages.Add(new ChatMessage
         {
             UserId = role,
-            IsUser = role != "system",
+            Role = role,
+            IsUser = role == "user",
             Content = content,
             Timestamp = DateTime.Now
         });
@@ -82,7 +83,7 @@ public class ConversationSession
         // Add conversation messages
         foreach (var message in Messages)
         {
-            messages.Add(new { role = message.IsUser ? "user" : "system", content = message.Content });
+            messages.Add(new { role = message.Role, content = message.Content });
         }
 
         return messages;

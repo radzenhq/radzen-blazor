@@ -36,4 +36,8 @@ public class ChatMessage
     /// Gets or sets whether this message is currently streaming.
     /// </summary>
     public bool IsStreaming { get; set; }
+    /// <summary>
+    /// Gets or sets the role associated with the message (e.g., "user", "assistant").
+    /// </summary>
+    public string Role { get; set; }
 }
