@@ -198,7 +198,7 @@
                                 <tr class="rz-pivot-header-row">
                                 <th class="rz-pivot-column-header @(isSortable ? "rz-sortable-column" : "")" style="width:100%;margin-top:5px;">
                                     <div class="rz-pivot-header-content-wrapper">
-                                        <div @onclick="@(args => OnColumnSort(args, column))"
+                                        <div @onclick="@(args => OnAggregateSort(args, column))"
                                                 @onkeydown="@(isSortable ? OnSortKeyPressed : (Func<KeyboardEventArgs, Task>)null)"
                                                 class="rz-pivot-header-content @(isSortable ? "rz-sortable" : "")"
                                                 tabindex="@(isSortable ? "0" : null)"
