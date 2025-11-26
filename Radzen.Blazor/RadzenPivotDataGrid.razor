@@ -89,6 +89,7 @@
                                 var isFilterable = AllowFiltering && row?.Filterable == true;
                                 var sortOrder = row?.GetSortOrder();
                                 var hasActiveFilter = row?.HasActiveFilter() == true;
+                                var filterIconRefKey = $"row{row.GetFilterProperty()}";
                                 <tr class="rz-pivot-header-row">
                                 <th class="rz-pivot-row-header @(isSortable ? "rz-sortable-column" : "")" style="width:100%;margin-top:5px;">
                                     <div class="rz-pivot-header-content-wrapper">
@@ -117,8 +118,8 @@
                                         </div>
                                         @if (isFilterable)
                                         {
-                                            <i @ref="FilterIconRef[row]" @onclick:stopPropagation="true" 
-                                                @onmousedown="@(() => ToggleFilter(row))"
+                                            <i @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true" 
+                                                @onmousedown="@(() => ToggleFilter(row, filterIconRefKey))"
                                                 class="@GetFilterIconCss(row)"
                                                 title="Filter">
                                                 @FilterIcon
@@ -141,7 +142,7 @@
                                 var isFilterable = AllowFiltering && column?.Filterable == true;
                                 var sortOrder = column?.GetSortOrder();
                                 var hasActiveFilter = column?.HasActiveFilter() == true;
-
+                                var filterIconRefKey = $"col{column.GetFilterProperty()}";
                                 <tr class="rz-pivot-header-row">
                                 <th class="rz-pivot-column-header @(isSortable ? "rz-sortable-column" : "")" style="width:100%;margin-top:5px;">
                                     <div class="rz-pivot-header-content-wrapper">
@@ -170,8 +171,8 @@
                                         </div>
                                         @if (isFilterable)
                                         {
-                                            <i @ref="FilterIconRef[column]" @onclick:stopPropagation="true" 
-                                                @onmousedown="@(() => ToggleFilter(column))"
+                                            <i @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true" 
+                                                @onmousedown="@(() => ToggleFilter(column, filterIconRefKey))"
                                                 class="@GetFilterIconCss(column)"
                                                 title="Filter">
                                                 @FilterIcon
@@ -194,7 +195,7 @@
                                 var isFilterable = AllowFiltering && column?.Filterable == true;
                                 var sortOrder = column?.GetSortOrder();
                                 var hasActiveFilter = column?.HasActiveFilter() == true;
-
+                                var filterIconRefKey = $"agg{column.GetFilterProperty()}";
                                 <tr class="rz-pivot-header-row">
                                 <th class="rz-pivot-column-header @(isSortable ? "rz-sortable-column" : "")" style="width:100%;margin-top:5px;">
                                     <div class="rz-pivot-header-content-wrapper">
@@ -223,8 +224,8 @@
                                         </div>
                                         @if (isFilterable)
                                         {
-                                            <i @ref="FilterIconRef[column]" @onclick:stopPropagation="true" 
-                                                @onmousedown="@(() => ToggleFilter(column))"
+                                            <i @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true" 
+                                                @onmousedown="@(() => ToggleFilter(column, filterIconRefKey))"
                                                 class="@GetFilterIconCss(column)"
                                                 title="Filter">
                                                 @FilterIcon
@@ -427,8 +428,10 @@
     <!-- Filter Popup -->
     @if (AllowFiltering && currentFilterField != null)
     {
+        var prefix = currentFilterField is RadzenPivotColumn<TItem> ? "col" : currentFilterField is RadzenPivotRow<TItem> ? "row" : "agg";
+        var filterIconRefKey = $"{prefix}{currentFilterField.GetFilterProperty()}";
         <Popup @ref="filterPopup" id="@($"pivot-filter-{currentFilterField.Property}")" class="rz-overlaypanel"
-               style="display:none;min-width:250px;" @onkeydown="OnFilterPopupKeyPressed">
+               style="display:none;min-width:250px;" @onkeydown=@(args => OnFilterPopupKeyPressed(args, filterIconRefKey))>
             <div class="rz-overlaypanel-content">
                 @if (currentFilterField.FilterTemplate != null)
                 {
@@ -436,7 +439,7 @@
                 }
                 else
                 {
-                    <form id="@($"pivot-filter-{currentFilterField.Property}-form")" @onsubmit="@(args => ApplyFilter())" class="rz-grid-filter">
+                    <form id="@($"pivot-filter-{currentFilterField.Property}-form")" @onsubmit="@(args => ApplyFilter(filterIconRefKey))" class="rz-grid-filter">
                         <span class="rz-grid-filter-label">@FilterText</span>
                         <RadzenDropDown InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", FilterOperatorAriaLabel + GetFilterOperatorText(currentFilterField.GetSecondFilterOperator()) }})"
                                         @onclick:preventDefault="true" Data="@(GetFilterOperators(currentFilterField).Select(t => new { Value = GetFilterOperatorText(t), Key = t }))" TextProperty="Value" ValueProperty="Key" TValue="FilterOperator?" Value="@currentFilterField.GetFilterOperator()" Change="@(args => SetFilterOperator(currentFilterField, (FilterOperator)args))" />
@@ -505,7 +508,7 @@
                     </form>
                     <div class="rz-grid-filter-buttons">
                         <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text="@ApplyText" class="rz-button-sm" />
-                        <RadzenButton ButtonStyle="ButtonStyle.Light" Text="@ClearText" Click="@ClearFilter" class="rz-button-sm" />
+                        <RadzenButton ButtonStyle="ButtonStyle.Light" Text="@ClearText" Click="@(args => ClearFilter(filterIconRefKey))" class="rz-button-sm" />
                     </div>
                 }
             </div>

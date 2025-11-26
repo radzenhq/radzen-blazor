@@ -1630,12 +1630,12 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the current filter icon reference.
         /// </summary>
-        private Dictionary<RadzenPivotField<TItem>, ElementReference> FilterIconRef = new();
+        private Dictionary<string, ElementReference> FilterIconRef = new();
 
         /// <summary>
         /// Toggles the filter popup for a field.
         /// </summary>
-        private async Task ToggleFilter(RadzenPivotField<TItem> field)
+        private async Task ToggleFilter(RadzenPivotField<TItem> field, string filterIconRefKey)
         {
             if (field == null || !AllowFiltering || !field.Filterable)
                 return;
@@ -1647,7 +1647,7 @@ namespace Radzen.Blazor
 
             if (filterPopup != null)
             {
-                await filterPopup.ToggleAsync(FilterIconRef[field]);
+                await filterPopup.ToggleAsync(FilterIconRef[filterIconRefKey]);
             }
         }
 
@@ -1806,7 +1806,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Applies the current filter.
         /// </summary>
-        private async Task ApplyFilter()
+        private async Task ApplyFilter(string filterIconRefKey)
         {
             if (currentFilterField != null)
             {
@@ -1815,7 +1815,7 @@ namespace Radzen.Blazor
                 
                 if (filterPopup != null)
                 {
-                    await filterPopup.CloseAsync(FilterIconRef[currentFilterField]);
+                    await filterPopup.CloseAsync(FilterIconRef[filterIconRefKey]);
                 }
             }
         }
@@ -1823,7 +1823,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Clears the current filter.
         /// </summary>
-        private async Task ClearFilter()
+        private async Task ClearFilter(string filterIconRefKey)
         {
             if (currentFilterField != null)
             {
@@ -1835,7 +1835,7 @@ namespace Radzen.Blazor
                 
                 if (filterPopup != null)
                 {
-                    await filterPopup.CloseAsync(FilterIconRef[currentFilterField]);
+                    await filterPopup.CloseAsync(FilterIconRef[filterIconRefKey]);
                 }
             }
         }
@@ -1843,14 +1843,14 @@ namespace Radzen.Blazor
         /// <summary>
         /// Handles filter popup key pressed events.
         /// </summary>
-        private async Task OnFilterPopupKeyPressed(KeyboardEventArgs args)
+        private async Task OnFilterPopupKeyPressed(KeyboardEventArgs args, string filterIconRefKey)
         {
             var key = args.Code ?? args.Key;
             if (key == "Escape")
             {
                 if (filterPopup != null && currentFilterField != null)
                 {
-                    await filterPopup.CloseAsync(FilterIconRef[currentFilterField]);
+                    await filterPopup.CloseAsync(FilterIconRef[filterIconRefKey]);
                 }
             }
         }
