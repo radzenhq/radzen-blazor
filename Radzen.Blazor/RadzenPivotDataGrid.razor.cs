@@ -735,8 +735,12 @@ namespace Radzen.Blazor
                 StateHasChanged();
             }
         }
-
-        internal void AddPivotAggregate(RadzenPivotAggregate<TItem> aggregate)
+        
+        /// <summary>
+        /// Adds a pivot aggregate to the pivot grid if it does not already exist.
+        /// </summary>
+        /// <param name="aggregate">The pivot aggregate to add.</param>
+        public void AddPivotAggregate(RadzenPivotAggregate<TItem> aggregate)
         {
             if (!allPivotAggregates.Contains(aggregate))
             {
