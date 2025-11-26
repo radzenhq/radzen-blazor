@@ -1450,7 +1450,9 @@ window.Radzen = {
       }, 500);
   },
   initSideDialogResize: function(handle, sideDialog){
-        const dir = (handle.dataset.dir || 'right').toLowerCase();
+        const dirPrefix = 'rz-dialog-side-position-';
+        const dirClass = Array.from(sideDialog.classList || []).find(c => c.startsWith(dirPrefix));
+        const dir = (dirClass ? dirClass.slice(dirPrefix.length) : 'right').toLowerCase();
         const cs = window.getComputedStyle(sideDialog);
         const parent = sideDialog.parentNode;
         const parentIsFlex = parent && getComputedStyle(parent).display.includes('flex');
