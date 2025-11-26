@@ -1449,55 +1449,56 @@ window.Radzen = {
           }
       }, 500);
   },
-  initSideDialogResize: function(handle, sideDialog){
-        const dirPrefix = 'rz-dialog-side-position-';
-        const dirClass = Array.from(sideDialog.classList || []).find(c => c.startsWith(dirPrefix));
-        const dir = (dirClass ? dirClass.slice(dirPrefix.length) : 'right').toLowerCase();
-        const cs = window.getComputedStyle(sideDialog);
-        const parent = sideDialog.parentNode;
-        const parentIsFlex = parent && getComputedStyle(parent).display.includes('flex');
-        const toPixels = (v, axis) => {
-            if (!v || v === 'none') return NaN;
-            if (v.endsWith && v.endsWith('px')) return parseFloat(v);
-            if (v.endsWith && v.endsWith('%')) {
-                const base = axis === 'y' ? window.innerHeight : window.innerWidth;
-                const p = parseFloat(v);
-                return Number.isFinite(p) ? (base * p / 100) : NaN;
+  initSideDialogResize: function(handle, sideDialog, options){
+        const normalizeDir = (value) => {
+            if (typeof value === 'string' && value.length) {
+                return value.toLowerCase();
             }
-            const n = parseFloat(v);
-            return Number.isFinite(n) ? n : NaN;
+            if (typeof value === 'number') {
+                const positions = ['right', 'left', 'top', 'bottom'];
+                return positions[value] || 'right';
+            }
+            return 'right';
+        };
+        
+        const dir = normalizeDir(options?.position);
+        
+        const hasMinWidthOption = options && typeof options.resizalbeMinWidth === 'number' && Number.isFinite(options.resizalbeMinWidth);
+        const hasMinHeightOption = options && typeof options.resizableMinHeight === 'number' && Number.isFinite(options.resizableMinHeight);
+        const fallbackMinWidth = hasMinWidthOption ? options.resizalbeMinWidth : 300;
+        const fallbackMinHeight = hasMinHeightOption ? options.resizableMinHeight : 200;
+        
+        const parseLength = (value, fallback) => {
+            if (!value) {
+                return fallback;
+            }
+            const numeric = parseFloat(value);
+            return Number.isFinite(numeric) ? numeric : fallback;
         };
 
-        let MIN_W = toPixels(cs.minWidth, 'x') || 300;
-        let MAX_W = toPixels(cs.maxWidth, 'x') || Infinity;
-        let MIN_H = toPixels(cs.minHeight, 'y') || 200;
-        let MAX_H = toPixels(cs.maxHeight, 'y') || Infinity;
-
-        // Guard against invalid ranges caused by percentage max being smaller than min
-        if (Number.isFinite(MIN_W) && Number.isFinite(MAX_W) && MAX_W < MIN_W) MAX_W = Infinity;
-        if (Number.isFinite(MIN_H) && Number.isFinite(MAX_H) && MAX_H < MIN_H) MAX_H = Infinity;
+        const limits = {
+            minWidth: parseLength(sideDialog.style.minWidth, fallbackMinWidth),
+            maxWidth: parseLength(sideDialog.style.maxWidth, Infinity),
+            minHeight: parseLength(sideDialog.style.minHeight, fallbackMinHeight),
+            maxHeight: parseLength(sideDialog.style.maxHeight, Infinity)
+        };
 
         let start = null;
 
         const onDown = (e) => {
             e.preventDefault();
-            handle.setPointerCapture?.(e.pointerId);
 
-            const rect = sideDialog.getBoundingClientRect();
-            start = { x: e.clientX, y: e.clientY, w: rect.width, h: rect.height };
+            start = { x: e.clientX, y: e.clientY, w: sideDialog.clientWidth, h: sideDialog.clientHeight };
 
             document.addEventListener('pointermove', onMove);
             document.addEventListener('pointerup', onUp, { once: true });
-            document.body.classList.add('dragging');
+            document.addEventListener('pointercancel', onUp, { once: true});
         };
 
         const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
         const applyWidth = (w) => {
-            if (parentIsFlex)
-                sideDialog.style.flexBasis = Math.round(w) + 'px';
-            else
-                sideDialog.style.width = Math.round(w) + 'px';
+            sideDialog.style.width = Math.round(w) + 'px';
         };
         const applyHeight = (h) => {
             sideDialog.style.height = `${Math.round(h)}px`;
@@ -1510,18 +1511,16 @@ window.Radzen = {
             const dy = e.clientY - start.y;
 
             switch (dir) {
-                case 'right': applyWidth(clamp(start.w - dx, MIN_W, MAX_W)); break;
-                case 'left': applyWidth(clamp(start.w + dx, MIN_W, MAX_W)); break;
-                case 'bottom': applyHeight(clamp(start.h - dy, MIN_H, MAX_H)); break;
-                case 'top': applyHeight(clamp(start.h + dy, MIN_H, MAX_H)); break;
+                case 'right': applyWidth(clamp(start.w - dx, limits.minWidth, limits.maxWidth)); break;
+                case 'left': applyWidth(clamp(start.w + dx, limits.minWidth, limits.maxWidth)); break;
+                case 'bottom': applyHeight(clamp(start.h - dy, limits.minHeight, limits.maxHeight)); break;
+                case 'top': applyHeight(clamp(start.h + dy, limits.minHeight, limits.maxHeight)); break;
             }
         };
 
         const onUp = (e) => {
-            handle.releasePointerCapture?.(e.pointerId);
             start = null;
             document.removeEventListener('pointermove', onMove);
-            document.body.classList.remove('dragging');
         };
 
         handle.addEventListener('pointerdown', onDown);
@@ -1530,7 +1529,6 @@ window.Radzen = {
             dispose() {
                 handle.removeEventListener('pointerdown', onDown);
                 document.removeEventListener('pointermove', onMove);
-                document.body.classList.remove('dragging');
             }
         };
   },

@@ -31,6 +31,6 @@
 
     async Task OpenSideDialog()
     {
-        await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { CloseDialogOnOverlayClick = closeDialogOnOverlayClick, Resizable = resizable, Position = position, ShowMask = showMask });
+        await DialogService.OpenSideAsync<DialogSideContent>("Side Panel", options: new SideDialogOptions { CloseDialogOnOverlayClick = closeDialogOnOverlayClick, Resizable = resizable, Position = position, ShowMask = showMask ,ResizableMinHeight = 250.0, ResizableMinWidth = 350.0 });
     }
 }

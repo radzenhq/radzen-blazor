@@ -962,6 +962,38 @@ namespace Radzen
                 }
             }
         }
+
+        private double? resizableMinWidth;
+
+        /// <summary>
+        /// Gets or sets the minimum width (in pixels) enforced while resizing the side dialog.
+        /// </summary>
+        public double? ResizableMinWidth
+        {
+            get => resizableMinWidth;
+            set
+            {
+                if (Nullable.Equals(value, resizableMinWidth)) return;
+                resizableMinWidth = value;
+                OnPropertyChanged(nameof(ResizableMinWidth));
+            }
+        }
+
+        private double? resizableMinHeight;
+
+        /// <summary>
+        /// Gets or sets the minimum height (in pixels) enforced while resizing the side dialog.
+        /// </summary>
+        public double? ResizableMinHeight
+        {
+            get => resizableMinHeight;
+            set
+            {
+                if (Nullable.Equals(value, resizableMinHeight)) return;
+                resizableMinHeight = value;
+                OnPropertyChanged(nameof(ResizableMinHeight));
+            }
+        }
     }
 
     /// <summary>

@@ -264,8 +264,14 @@
         string heightStyle = string.IsNullOrEmpty(sideDialogOptions?.Height)
             ? string.Empty
             : $"height: {sideDialogOptions.Height};";
+        string minWidthStyle = sideDialogOptions?.ResizableMinWidth is double minWidth
+            ? $"min-width: {minWidth}px;"
+            : string.Empty;
+        string minHeightStyle = sideDialogOptions?.ResizableMinHeight is double minHeight
+            ? $"min-height: {minHeight}px;"
+            : string.Empty;
 
-        return $"{widthStyle}{heightStyle}{sideDialogOptions?.Style}";
+        return $"{widthStyle}{heightStyle}{minWidthStyle}{minHeightStyle}{sideDialogOptions?.Style}";
     }
 
     /// <inheritdoc />
@@ -281,7 +287,7 @@
             {
                 sideDialogResizeHandleJsModule =
                     await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.initSideDialogResize",
-                        resizeBarElement, sideDialogElement);
+                        resizeBarElement, sideDialogElement, sideDialogOptions);
             }
         }
     }
