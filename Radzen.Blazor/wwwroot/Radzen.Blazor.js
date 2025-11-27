@@ -1462,12 +1462,7 @@ window.Radzen = {
         };
         
         const dir = normalizeDir(options?.position);
-        
-        const hasMinWidthOption = options && typeof options.resizalbeMinWidth === 'number' && Number.isFinite(options.resizalbeMinWidth);
-        const hasMinHeightOption = options && typeof options.resizableMinHeight === 'number' && Number.isFinite(options.resizableMinHeight);
-        const fallbackMinWidth = hasMinWidthOption ? options.resizalbeMinWidth : 300;
-        const fallbackMinHeight = hasMinHeightOption ? options.resizableMinHeight : 200;
-        
+
         const parseLength = (value, fallback) => {
             if (!value) {
                 return fallback;
@@ -1477,9 +1472,9 @@ window.Radzen = {
         };
 
         const limits = {
-            minWidth: parseLength(sideDialog.style.minWidth, fallbackMinWidth),
+            minWidth: parseLength(sideDialog.style.minWidth, options.resizalbeMinWidth),
             maxWidth: parseLength(sideDialog.style.maxWidth, Infinity),
-            minHeight: parseLength(sideDialog.style.minHeight, fallbackMinHeight),
+            minHeight: parseLength(sideDialog.style.minHeight, options.resizableMinHeight),
             maxHeight: parseLength(sideDialog.style.maxHeight, Infinity)
         };
 

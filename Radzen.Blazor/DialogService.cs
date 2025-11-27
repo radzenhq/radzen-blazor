@@ -963,33 +963,33 @@ namespace Radzen
             }
         }
 
-        private double? resizableMinWidth;
+        private double resizableMinWidth = 300.0;
 
         /// <summary>
         /// Gets or sets the minimum width (in pixels) enforced while resizing the side dialog.
         /// </summary>
-        public double? ResizableMinWidth
+        public double ResizableMinWidth
         {
             get => resizableMinWidth;
             set
             {
-                if (Nullable.Equals(value, resizableMinWidth)) return;
+                if (Equals(value, resizableMinWidth)) return;
                 resizableMinWidth = value;
                 OnPropertyChanged(nameof(ResizableMinWidth));
             }
         }
 
-        private double? resizableMinHeight;
+        private double resizableMinHeight = 200.0;
 
         /// <summary>
         /// Gets or sets the minimum height (in pixels) enforced while resizing the side dialog.
         /// </summary>
-        public double? ResizableMinHeight
+        public double ResizableMinHeight
         {
             get => resizableMinHeight;
             set
             {
-                if (Nullable.Equals(value, resizableMinHeight)) return;
+                if (Equals(value, resizableMinHeight)) return;
                 resizableMinHeight = value;
                 OnPropertyChanged(nameof(ResizableMinHeight));
             }
