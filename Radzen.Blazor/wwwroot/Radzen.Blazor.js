@@ -1449,83 +1449,91 @@ window.Radzen = {
           }
       }, 500);
   },
-  initSideDialogResize: function(handle, sideDialog, options){
-        const normalizeDir = (value) => {
-            if (typeof value === 'string' && value.length) {
-                return value.toLowerCase();
-            }
-            if (typeof value === 'number') {
-                const positions = ['right', 'left', 'top', 'bottom'];
-                return positions[value] || 'right';
-            }
-            return 'right';
-        };
-        
-        const dir = normalizeDir(options?.position);
+  initSideDialogResize: function(handle, sideDialog, options) {
+      const normalizeDir = (value) => {
+          if (typeof value === 'string' && value.length) {
+              return value.toLowerCase();
+          }
+          if (typeof value === 'number') {
+              const positions = ['right', 'left', 'top', 'bottom'];
+              return positions[value] || 'right';
+          }
+          return 'right';
+      };
 
-        const parseLength = (value, fallback) => {
-            if (!value) {
-                return fallback;
-            }
-            const numeric = parseFloat(value);
-            return Number.isFinite(numeric) ? numeric : fallback;
-        };
+      const dir = normalizeDir(options?.position);
 
-        const limits = {
-            minWidth: parseLength(sideDialog.style.minWidth, options.resizalbeMinWidth),
-            maxWidth: parseLength(sideDialog.style.maxWidth, Infinity),
-            minHeight: parseLength(sideDialog.style.minHeight, options.resizableMinHeight),
-            maxHeight: parseLength(sideDialog.style.maxHeight, Infinity)
-        };
+      const parseLength = (value, fallback) => {
+          if (!value) {
+              return fallback;
+          }
+          const numeric = parseFloat(value);
+          return Number.isFinite(numeric) ? numeric : fallback;
+      };
 
-        let start = null;
+      const limits = {
+          minWidth: parseLength(sideDialog.style.minWidth, options.resizalbeMinWidth),
+          maxWidth: parseLength(sideDialog.style.maxWidth, Infinity),
+          minHeight: parseLength(sideDialog.style.minHeight, options.resizableMinHeight),
+          maxHeight: parseLength(sideDialog.style.maxHeight, Infinity)
+      };
 
-        const onDown = (e) => {
-            e.preventDefault();
+      let start = null;
 
-            start = { x: e.clientX, y: e.clientY, w: sideDialog.clientWidth, h: sideDialog.clientHeight };
+      const onDown = (e) => {
+          e.preventDefault();
 
-            document.addEventListener('pointermove', onMove);
-            document.addEventListener('pointerup', onUp, { once: true });
-            document.addEventListener('pointercancel', onUp, { once: true});
-        };
+          start = {x: e.clientX, y: e.clientY, w: sideDialog.clientWidth, h: sideDialog.clientHeight};
 
-        const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+          document.addEventListener('pointermove', onMove);
+          document.addEventListener('pointerup', onUp, {once: true});
+          document.addEventListener('pointercancel', onUp, {once: true});
+      };
 
-        const applyWidth = (w) => {
-            sideDialog.style.width = Math.round(w) + 'px';
-        };
-        const applyHeight = (h) => {
-            sideDialog.style.height = `${Math.round(h)}px`;
-        };
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
 
-        const onMove = (e) => {
-            if (!start) return;
+      const applyWidth = (w) => {
+          sideDialog.style.width = Math.round(w) + 'px';
+      };
+      const applyHeight = (h) => {
+          sideDialog.style.height = `${Math.round(h)}px`;
+      };
 
-            const dx = e.clientX - start.x;
-            const dy = e.clientY - start.y;
+      const onMove = (e) => {
+          if (!start) return;
 
-            switch (dir) {
-                case 'right': applyWidth(clamp(start.w - dx, limits.minWidth, limits.maxWidth)); break;
-                case 'left': applyWidth(clamp(start.w + dx, limits.minWidth, limits.maxWidth)); break;
-                case 'bottom': applyHeight(clamp(start.h - dy, limits.minHeight, limits.maxHeight)); break;
-                case 'top': applyHeight(clamp(start.h + dy, limits.minHeight, limits.maxHeight)); break;
-            }
-        };
+          const dx = e.clientX - start.x;
+          const dy = e.clientY - start.y;
 
-        const onUp = (e) => {
-            start = null;
-            document.removeEventListener('pointermove', onMove);
-        };
+          switch (dir) {
+              case 'right':
+                  applyWidth(clamp(start.w - dx, limits.minWidth, limits.maxWidth));
+                  break;
+              case 'left':
+                  applyWidth(clamp(start.w + dx, limits.minWidth, limits.maxWidth));
+                  break;
+              case 'bottom':
+                  applyHeight(clamp(start.h - dy, limits.minHeight, limits.maxHeight));
+                  break;
+              case 'top':
+                  applyHeight(clamp(start.h + dy, limits.minHeight, limits.maxHeight));
+                  break;
+          }
+      };
 
-        handle.addEventListener('pointerdown', onDown);
+      const onUp = (e) => {
+          start = null;
+          document.removeEventListener('pointermove', onMove);
+      };
 
-        return {
-            dispose() {
-                handle.removeEventListener('pointerdown', onDown);
-                document.removeEventListener('pointermove', onMove);
-            }
-        };
+      handle.addEventListener('pointerdown', onDown);
+
+      return {
+          dispose() {
+              handle.removeEventListener('pointerdown', onDown);
+              document.removeEventListener('pointermove', onMove);
+          }
+      };
   },
   openDialog: function (options, dialogService, dialog) {
     if (Radzen.closeAllPopups) {
