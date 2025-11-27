@@ -1463,21 +1463,6 @@ window.Radzen = {
 
       const dir = normalizeDir(options?.position);
 
-      const parseLength = (value, fallback) => {
-          if (!value) {
-              return fallback;
-          }
-          const numeric = parseFloat(value);
-          return Number.isFinite(numeric) ? numeric : fallback;
-      };
-
-      const limits = {
-          minWidth: parseLength(sideDialog.style.minWidth, options.resizalbeMinWidth),
-          maxWidth: parseLength(sideDialog.style.maxWidth, Infinity),
-          minHeight: parseLength(sideDialog.style.minHeight, options.resizableMinHeight),
-          maxHeight: parseLength(sideDialog.style.maxHeight, Infinity)
-      };
-
       let start = null;
 
       const onDown = (e) => {
@@ -1507,16 +1492,16 @@ window.Radzen = {
 
           switch (dir) {
               case 'right':
-                  applyWidth(clamp(start.w - dx, limits.minWidth, limits.maxWidth));
+                  applyWidth(clamp(start.w - dx, options.resizableMinWidth, Infinity));
                   break;
               case 'left':
-                  applyWidth(clamp(start.w + dx, limits.minWidth, limits.maxWidth));
+                  applyWidth(clamp(start.w + dx, options.resizableMinWidth, Infinity));
                   break;
               case 'bottom':
-                  applyHeight(clamp(start.h - dy, limits.minHeight, limits.maxHeight));
+                  applyHeight(clamp(start.h - dy, options.resizableMinHeight, Infinity));
                   break;
               case 'top':
-                  applyHeight(clamp(start.h + dy, limits.minHeight, limits.maxHeight));
+                  applyHeight(clamp(start.h + dy, options.resizableMinHeight, Infinity));
                   break;
           }
       };
