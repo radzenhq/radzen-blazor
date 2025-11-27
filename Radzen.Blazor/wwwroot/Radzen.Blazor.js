@@ -1492,16 +1492,16 @@ window.Radzen = {
 
           switch (dir) {
               case 'right':
-                  applyWidth(clamp(start.w - dx, options.resizableMinWidth, Infinity));
+                  applyWidth(clamp(start.w - dx, options.minWidth, Infinity));
                   break;
               case 'left':
-                  applyWidth(clamp(start.w + dx, options.resizableMinWidth, Infinity));
+                  applyWidth(clamp(start.w + dx, options.minWidth, Infinity));
                   break;
               case 'bottom':
-                  applyHeight(clamp(start.h - dy, options.resizableMinHeight, Infinity));
+                  applyHeight(clamp(start.h - dy, options.minHeight, Infinity));
                   break;
               case 'top':
-                  applyHeight(clamp(start.h + dy, options.resizableMinHeight, Infinity));
+                  applyHeight(clamp(start.h + dy, options.minHeight, Infinity));
                   break;
           }
       };
