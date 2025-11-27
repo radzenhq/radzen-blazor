@@ -20,7 +20,7 @@
         {
             <div @ref="resizeBarElement"
                  class="@GetResizeBarCssClass()"
-                 title="Drag to resize" aria-label="Resize side dialog">
+                 title="@sideDialogOptions?.ResizeBarTitle" aria-label="@sideDialogOptions?.ResizeBarAriaLabel">
                 <span class="rz-resize" aria-hidden="true"></span>
             </div>
 

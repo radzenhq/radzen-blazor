@@ -994,6 +994,38 @@ namespace Radzen
                 OnPropertyChanged(nameof(ResizableMinHeight));
             }
         }
+
+        private string resizeBarTitle = "Drag to resize";
+
+        /// <summary>
+        /// Gets or sets the title of the resize bar.
+        /// </summary>
+        public string ResizeBarTitle
+        {
+            get => resizeBarTitle;
+            set
+            {
+                if (value == resizeBarTitle) return;
+                resizeBarTitle = value;
+                OnPropertyChanged(nameof(ResizeBarTitle));
+            }
+        }
+
+        private string resizeBarAriaLabel = "Resize side dialog";
+
+        /// <summary>
+        /// Gets or sets the aria label of the resize bar.
+        /// </summary>
+        public string ResizeBarAriaLabel
+        {
+            get => resizeBarAriaLabel;
+            set
+            {
+                if (value == resizeBarAriaLabel) return;
+                resizeBarAriaLabel = value;
+                OnPropertyChanged(nameof(ResizeBarAriaLabel));
+            }
+        }
     }
 
     /// <summary>
