@@ -280,7 +280,7 @@
             if (sideDialogOptions is { Resizable: true } && resizeBarElement.HasValue)
             {
                 sideDialogResizeHandleJsModule =
-                    await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.initSideDialogResize",
+                    await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSideDialogResizer",
                         resizeBarElement, sideDialogElement, sideDialogOptions);
             }
         }

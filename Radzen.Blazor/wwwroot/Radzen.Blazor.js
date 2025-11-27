@@ -1449,7 +1449,7 @@ window.Radzen = {
           }
       }, 500);
   },
-  initSideDialogResize: function(handle, sideDialog, options) {
+  createSideDialogResizer: function(handle, sideDialog, options) {
       const normalizeDir = (value) => {
           if (typeof value === 'string' && value.length) {
               return value.toLowerCase();
