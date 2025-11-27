@@ -264,14 +264,8 @@
         string heightStyle = string.IsNullOrEmpty(sideDialogOptions?.Height)
             ? string.Empty
             : $"height: {sideDialogOptions.Height};";
-        string minWidthStyle = sideDialogOptions?.ResizableMinWidth is double minWidth
-            ? $"min-width: {minWidth}px;"
-            : string.Empty;
-        string minHeightStyle = sideDialogOptions?.ResizableMinHeight is double minHeight
-            ? $"min-height: {minHeight}px;"
-            : string.Empty;
 
-        return $"{widthStyle}{heightStyle}{minWidthStyle}{minHeightStyle}{sideDialogOptions?.Style}";
+        return $"{widthStyle}{heightStyle}{sideDialogOptions?.Style}";
     }
 
     /// <inheritdoc />
