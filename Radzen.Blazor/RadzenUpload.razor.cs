@@ -324,7 +324,7 @@ namespace Radzen.Blazor
         protected async System.Threading.Tasks.Task OnRemove(PreviewFileInfo file, bool fireChangeEvent = true)
         {
             files.Remove(file);
-            await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromUpload", Reference, file.Name, Name ?? GetId());
+            await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromUpload", file.Name, Name ?? GetId());
             if (fireChangeEvent) await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
         }
 

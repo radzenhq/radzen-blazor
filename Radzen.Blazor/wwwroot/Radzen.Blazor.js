@@ -838,8 +838,8 @@ window.Radzen = {
       }
     }
   },
-  removeFileFromUpload: function (ref, name, id) {
-    var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[ref];
+  removeFileFromUpload: function (name, id) {
+    var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[id];
     if (!uploadComponent) return;
     var file = uploadComponent.files.find(function (f) { return f.name == name; })
     if (!file) { return; }
