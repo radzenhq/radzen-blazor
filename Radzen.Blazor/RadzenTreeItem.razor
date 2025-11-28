@@ -15,7 +15,7 @@
         }
         @if (Template != null)
         {
-            <div class=@LabelClass @onkeydown:stopPropagation>@Template(this)</div>
+            <div class=@LabelClass @onkeydown:stopPropagation @onclick="@OnTemplateClick">@Template(this)</div>
         } else
         {
             <label for="@(GetHashCode())" class=@LabelClass>@Text</label>

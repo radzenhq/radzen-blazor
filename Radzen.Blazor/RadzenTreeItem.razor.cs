@@ -487,5 +487,14 @@ namespace Radzen.Blazor
                 ShiftKey = args.ShiftKey
             });
         }
+
+        internal async Task OnTemplateClick(MouseEventArgs args)
+        {
+            if (Tree != null && Tree.AllowCheckBoxes && Checkable)
+            {
+                var currentValue = IsChecked();
+                await CheckedChange(currentValue == true ? false : true);
+            }
+        }
     }
 }
