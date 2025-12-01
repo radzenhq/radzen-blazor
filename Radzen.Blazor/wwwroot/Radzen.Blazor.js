@@ -21,6 +21,7 @@ var rejectCallbacks = [];
 var radzenRecognition;
 
 window.Radzen = {
+    selectedNavigationSelector: undefined,
     isRTL: function (el) {
         return el && getComputedStyle(el).direction == 'rtl';
     },
@@ -2562,8 +2563,9 @@ window.Radzen = {
 
       if (scroll) {
         const target = document.querySelector(selector);
-        if (target) {
-          target.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
+          if (target) {
+            this.selectedNavigationSelector = selector;
+            target.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
         }
       }
     },
@@ -2579,14 +2581,26 @@ window.Radzen = {
         // store last scroll position on the element so we can determine direction
         let lastScrollPosition = getScrollPosition();
 
+        let timeoutId = null;
+        const debounce = (callback, wait) => {
+            return () => {
+                window.clearTimeout(timeoutId);
+                timeoutId = window.setTimeout(() => {
+                    callback();
+                }, wait);
+            };
+        }
+
         element.scrollHandler = () => {
             const containerRect = container && container.tagName === 'HTML'
                 ? { top: 0, bottom: window.innerHeight, height: window.innerHeight, clientHeight: window.innerHeight }
                 : container.getBoundingClientRect();
 
             const scrollTop = getScrollPosition();
-            //When loading the page always look at the top of the container
-            const isDown = lastScrollPosition !=0 && scrollTop > lastScrollPosition;
+            //When loading the page or when no scrolling has been execute -> always look at the top of the container
+            const isDown = lastScrollPosition != 0 && scrollTop > lastScrollPosition;
+            // determine threshold based on scroll direction with a small offset
+            const threshold = isDown ? containerRect.bottom - 5 : containerRect.top + 5;
             lastScrollPosition = scrollTop;
             let min = Number.MAX_SAFE_INTEGER;
             let match;
@@ -2595,8 +2609,6 @@ window.Radzen = {
                 if (!elm) continue;
 
                 const rect = elm.getBoundingClientRect();
-                // determine threshold based on scroll direction with a small offset
-                const threshold = isDown ? containerRect.bottom -1 : containerRect.top +1;
                 const diff = Math.abs(rect.top - threshold);
 
                 if (!match && rect.top < threshold) {
@@ -2610,13 +2622,19 @@ window.Radzen = {
                 if (diff < min) {
                     match = selectors[i];
                     min = diff;
-                }
+                }                
             }
 
             if (match && match !== currentSelector) {
                 currentSelector = match;
+                if (!this.selectedNavigationSelector || (match === this.selectedNavigationSelector)) {
                     this.navigateTo(currentSelector, false);
                     ref.invokeMethodAsync('ScrollIntoView', currentSelector);
+                }
+            }
+            // clear selected navigation selector after scroll completes
+            if (this.selectedNavigationSelector && match === this.selectedNavigationSelector) {
+                debounce(() => { this.selectedNavigationSelector = undefined; }, 100)();
             }
         };
 
