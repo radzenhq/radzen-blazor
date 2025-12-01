@@ -131,7 +131,9 @@ internal static class RadzenQREncoder
                 PlaceData(m, reserved, final);
 
                 // Choose best mask and apply
-                int bestMask = 0;
+                int bestMask = ChooseBestMask(m, reserved);
+                ApplyMask(m, reserved, bestMask);
+                WriteFormatInfo(m, reserved, ecc, bestMask);
 
                 ApplyMask(m, reserved, bestMask);
 
@@ -275,14 +277,71 @@ internal static class RadzenQREncoder
     private static void ReserveVersion(bool[,] res)
     {
         int n = res.GetLength(0);
-        // bottom-left
-        for (int i = 0; i < 6; i++)
-            for (int j = 0; j < 3; j++)
-                res[n - 11 + j, i] = true;
-        // top-right
-        for (int i = 0; i < 3; i++)
-            for (int j = 0; j < 6; j++)
-                res[i, n - 11 + j] = true;
+
+        // Bottom-left version info block: 3 rows x 6 columns
+        // Rows: n-11, n-10, n-9
+        // Cols: 0..5
+        for (int r = n - 11; r <= n - 9; r++)
+            for (int c = 0; c <= 5; c++)
+                res[r, c] = true;
+
+        // Top-right version info block: 6 rows x 3 columns
+        // Rows: 0..5
+        // Cols: n-11, n-10, n-9
+        for (int r = 0; r <= 5; r++)
+            for (int c = n - 11; c <= n - 9; c++)
+                res[r, c] = true;
+    }
+
+    private static void WriteVersionInfo(bool[,] m, bool[,] res, int ver)
+    {
+        // BCH(18,6) with generator 0x1F25
+        int bits = BchEncode(ver, 0x1F25, 18, 6);
+        int n = m.GetLength(0);
+
+        // ---- Bottom-left block (3 tall x 6 wide) ----
+        // Thonky table:
+        //   00 03 06 09 12 15
+        //   01 04 07 10 13 16
+        //   02 05 08 11 14 17
+        //
+        // Our bit index i = 0..17 is LSB-first, matching "0 is least significant bit".
+        // Map: bitIndex = row + col*3
+        for (int col = 0; col < 6; col++)
+        {
+            for (int row = 0; row < 3; row++)
+            {
+                int bitIndex = row + col * 3; // 0..17
+                bool bit = ((bits >> bitIndex) & 1) != 0;
+
+                int r = n - 11 + row; // rows n-11..n-9
+                int c = col;          // cols 0..5
+                Set(m, res, r, c, bit);
+            }
+        }
+
+        // ---- Top-right block (6 tall x 3 wide) ----
+        // Thonky table:
+        //   00 01 02
+        //   03 04 05
+        //   06 07 08
+        //   09 10 11
+        //   12 13 14
+        //   15 16 17
+        //
+        // Map: bitIndex = row*3 + col
+        for (int row = 0; row < 6; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
+                int bitIndex = row * 3 + col; // 0..17
+                bool bit = ((bits >> bitIndex) & 1) != 0;
+
+                int r = row;               // rows 0..5
+                int c = n - 11 + col;      // cols n-11..n-9
+                Set(m, res, r, c, bit);
+            }
+        }
     }
 
     // ---------- Data & EC ----------
@@ -600,32 +659,6 @@ internal static class RadzenQREncoder
         for (int i = 7; i <= 14; i++) Set(m, res, 8, n - 15 + i, GetBit(i));
     }
 
-
-    private static void WriteVersionInfo(bool[,] m, bool[,] res, int ver)
-    {
-        // BCH(18,6) with generator 0x1F25
-        int bits = BchEncode(ver, 0x1F25, 18, 6);
-        int n = m.GetLength(0);
-
-        // Bottom-left area: 6 rows x 3 cols (rows n-11..n-6, cols 0..2)
-        for (int i = 0; i < 18; i++)
-        {
-            bool bit = ((bits >> i) & 1) != 0;               // LSB-first
-            int r = n - 11 + (i / 3);
-            int c = i % 3;
-            Set(m, res, r, c, bit);
-        }
-
-        // Top-right area: 3 rows x 6 cols (rows 0..2, cols n-11..n-6)
-        for (int i = 0; i < 18; i++)
-        {
-            bool bit = ((bits >> i) & 1) != 0;
-            int r = i % 3;
-            int c = n - 11 + (i / 3);
-            Set(m, res, r, c, bit);
-        }
-    }
-
     private static int BchEncode(int data, int gen, int totalBits, int dataBits)
     {
         int d = data << (totalBits - dataBits);
@@ -694,92 +727,33 @@ internal static class RadzenQREncoder
     }
 
     // Error correction parameters for each version & ECC:
-    // Returns (total data codewords, ec per block, #grp1, grp1 data cw, #grp2, grp2 data cw)
     // Returns (totalDataCw, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw)
-    static (int, int, int, int, int, int) EcParams(int ver, RadzenQREcc ecc)
+    static (int totalDataCw, int ecPerBlock, int grp1Blocks, int grp1DataCw, int grp2Blocks, int grp2DataCw)
+        EcParams(int ver, RadzenQREcc ecc)
     {
-        if (ver < 1 || ver > 40) throw new ArgumentOutOfRangeException(nameof(ver));
-        // Verified rows for V1..V10 (L,M,Q,H). Extend if you need >V10.
-        // Format: { ecPerBlock, g1Blocks, g1DataCw, g2Blocks, g2DataCw }
-        // Source: ISO/IEC 18004 tables.
-        ReadOnlySpan<int> row = ver switch
+        if (ver < 1 || ver > 40)
+            throw new ArgumentOutOfRangeException(nameof(ver), "Version must be 1..40");
+
+        int eccIndex = ecc switch
         {
-            1 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 7, 1, 19, 0, 0 },
-                RadzenQREcc.Medium => new[] { 10, 1, 16, 0, 0 }, // <-- V1-M: 16 data cw
-                RadzenQREcc.Quartile => new[] { 13, 1, 13, 0, 0 },
-                _ => new[] { 17, 1, 9, 0, 0 },
-            },
-            2 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 10, 1, 34, 0, 0 },
-                RadzenQREcc.Medium => new[] { 16, 1, 28, 0, 0 },
-                RadzenQREcc.Quartile => new[] { 22, 1, 22, 0, 0 },
-                _ => new[] { 28, 1, 16, 0, 0 },
-            },
-            3 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 15, 1, 55, 0, 0 },
-                RadzenQREcc.Medium => new[] { 26, 1, 44, 0, 0 },
-                RadzenQREcc.Quartile => new[] { 18, 2, 17, 0, 0 },
-                _ => new[] { 22, 2, 13, 0, 0 },
-            },
-            4 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 20, 1, 80, 0, 0 },
-                RadzenQREcc.Medium => new[] { 18, 2, 32, 0, 0 },
-                RadzenQREcc.Quartile => new[] { 26, 2, 24, 0, 0 },
-                _ => new[] { 16, 4, 9, 0, 0 },
-            },
-            5 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 26, 1, 108, 0, 0 },
-                RadzenQREcc.Medium => new[] { 24, 2, 43, 0, 0 },
-                RadzenQREcc.Quartile => new[] { 18, 2, 15, 2, 16 },
-                _ => new[] { 22, 2, 11, 2, 12 },
-            },
-            6 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 18, 2, 68, 0, 0 },
-                RadzenQREcc.Medium => new[] { 16, 4, 27, 0, 0 },
-                RadzenQREcc.Quartile => new[] { 24, 4, 19, 0, 0 },
-                _ => new[] { 28, 4, 15, 0, 0 },
-            },
-            7 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 20, 2, 78, 0, 0 },
-                RadzenQREcc.Medium => new[] { 18, 4, 31, 0, 0 },
-                RadzenQREcc.Quartile => new[] { 18, 2, 14, 4, 15 },
-                _ => new[] { 26, 4, 13, 1, 14 },
-            },
-            8 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 24, 2, 97, 0, 0 },
-                RadzenQREcc.Medium => new[] { 22, 2, 38, 2, 39 },
-                RadzenQREcc.Quartile => new[] { 22, 4, 18, 2, 19 },
-                _ => new[] { 26, 4, 14, 2, 15 },
-            },
-            9 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 30, 2, 116, 0, 0 },
-                RadzenQREcc.Medium => new[] { 22, 3, 36, 2, 37 },
-                RadzenQREcc.Quartile => new[] { 20, 4, 16, 4, 17 },
-                _ => new[] { 24, 4, 12, 4, 13 },
-            },
-            10 => ecc switch
-            {
-                RadzenQREcc.Low => new[] { 18, 2, 68, 2, 69 },
-                RadzenQREcc.Medium => new[] { 26, 4, 43, 1, 44 },
-                RadzenQREcc.Quartile => new[] { 24, 6, 19, 2, 20 },
-                _ => new[] { 28, 6, 15, 2, 16 },
-            },
-            _ => throw new NotSupportedException("Extend EcParams table beyond V10 as needed.")
+            RadzenQREcc.Low => 0, // L
+            RadzenQREcc.Medium => 1, // M
+            RadzenQREcc.Quartile => 2, // Q
+            RadzenQREcc.High => 3, // H
+            _ => throw new ArgumentOutOfRangeException(nameof(ecc))
         };
 
-        int ec = row[0], g1 = row[1], g1dcw = row[2], g2 = row[3], g2dcw = row[4];
-        int totalData = g1 * g1dcw + g2 * g2dcw;
-        return (totalData, ec, g1, g1dcw, g2, g2dcw);
+        // EcTable[ver-1][eccIndex] = { ecPerBlock, g1Blocks, g1DataCw, g2Blocks, g2DataCw }
+        var row = EcTable[ver - 1][eccIndex];
+
+        int ecPerBlock = row[0];
+        int grp1Blocks = row[1];
+        int grp1DataCw = row[2];
+        int grp2Blocks = row[3];
+        int grp2DataCw = row[4];
+
+        int totalDataCw = grp1Blocks * grp1DataCw + grp2Blocks * grp2DataCw;
+        return (totalDataCw, ecPerBlock, grp1Blocks, grp1DataCw, grp2Blocks, grp2DataCw);
     }
 
     private static readonly int[][][] EcTable = BuildEcTable();

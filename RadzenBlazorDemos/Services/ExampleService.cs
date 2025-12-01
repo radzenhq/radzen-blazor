@@ -2062,7 +2062,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Basic", Anchor = "#basic" }, new () { Text = "Styled", Anchor = "#styled" } ],
+                    Toc = [ new () { Text = "Basic", Anchor = "#basic" }, new () { Text = "Large", Anchor = "#large" }, new () { Text = "Styled", Anchor = "#styled" } ],
                     Name = "QRCode",
                     Description = "Generate and display QR codes as SVG using RadzenQRCode.",
                     Path = "qrcode",
