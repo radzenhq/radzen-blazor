@@ -21,6 +21,7 @@ var rejectCallbacks = [];
 var radzenRecognition;
 
 window.Radzen = {
+    selectedNavigationSelector: undefined,
     isRTL: function (el) {
         return el && getComputedStyle(el).direction == 'rtl';
     },
@@ -2562,53 +2563,83 @@ window.Radzen = {
 
       if (scroll) {
         const target = document.querySelector(selector);
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'start' });
+          if (target) {
+            this.selectedNavigationSelector = selector;
+            target.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'start' });
         }
       }
     },
     registerScrollListener: function (element, ref, selectors, selector) {
-      let currentSelector;
-      const container = selector ? document.querySelector(selector) : document.documentElement;
-      const elements = selectors.map(document.querySelector, document);
+        let currentSelector;
+        const container = selector ? document.querySelector(selector) : document.documentElement;
+        const elements = selectors.map(document.querySelector, document);
 
-      this.unregisterScrollListener(element);
-      element.scrollHandler = () => {
-        const center = (container.tagName === 'HTML' ? 0 : container.getBoundingClientRect().top) + container.clientHeight / 2;
+        this.unregisterScrollListener(element);
 
-        let min = Number.MAX_SAFE_INTEGER;
-        let match;
+        // helper to get current scroll position of container
+        const getScrollPosition = () => container && container.tagName === 'HTML' ? (window.scrollY || document.documentElement.scrollTop) : (container ? container.scrollTop : 0);
+        // store last scroll position on the element so we can determine direction
+        let lastScrollPosition = getScrollPosition();
 
-        for (let i = 0; i < elements.length; i++) {
-          const element = elements[i];
-          if (!element) continue;
-
-          const rect = element.getBoundingClientRect();
-          const diff = Math.abs(rect.top - center);
-
-          if (!match && rect.top < center) {
-            match = selectors[i];
-            min = diff;
-            continue;
-          }
-
-          if (match && rect.top >= center) continue;
-
-          if (diff < min) {
-            match = selectors[i];
-            min = diff;
-          }
+        let timeoutId = null;
+        const debounce = (callback, wait) => {
+            return () => {
+                window.clearTimeout(timeoutId);
+                timeoutId = window.setTimeout(() => {
+                    callback();
+                }, wait);
+            };
         }
 
-        if (match !== currentSelector) {
-          currentSelector = match;
-          this.navigateTo(currentSelector, false);
-          ref.invokeMethodAsync('ScrollIntoView', currentSelector);
-        }
-      };
+        element.scrollHandler = () => {
+            const containerRect = container && container.tagName === 'HTML'
+                ? { top: 0, bottom: window.innerHeight, height: window.innerHeight, clientHeight: window.innerHeight }
+                : container.getBoundingClientRect();
 
-      document.addEventListener('scroll', element.scrollHandler, true);
-      window.addEventListener('resize', element.scrollHandler, true);
+            const scrollTop = getScrollPosition();
+            //When loading the page or when no scrolling has been execute -> always look at the top of the container
+            const isDown = lastScrollPosition != 0 && scrollTop > lastScrollPosition;
+            // determine threshold based on scroll direction with a small offset
+            const threshold = isDown ? containerRect.bottom - 5 : containerRect.top + 5;
+            lastScrollPosition = scrollTop;
+            let min = Number.MAX_SAFE_INTEGER;
+            let match;
+            for (let i = 0; i < elements.length; i++) {
+                const elm = elements[i];
+                if (!elm) continue;
+
+                const rect = elm.getBoundingClientRect();
+                const diff = Math.abs(rect.top - threshold);
+
+                if (!match && rect.top < threshold) {
+                    match = selectors[i];
+                    min = diff;
+                    continue;
+                }
+
+                if (match && rect.top > threshold) continue;
+
+                if (diff < min) {
+                    match = selectors[i];
+                    min = diff;
+                }                
+            }
+
+            if (match && match !== currentSelector) {
+                currentSelector = match;
+                if (!this.selectedNavigationSelector || (match === this.selectedNavigationSelector)) {
+                    this.navigateTo(currentSelector, false);
+                    ref.invokeMethodAsync('ScrollIntoView', currentSelector);
+                }
+            }
+            // clear selected navigation selector after scroll completes
+            if (this.selectedNavigationSelector && match === this.selectedNavigationSelector) {
+                debounce(() => { this.selectedNavigationSelector = undefined; }, 100)();
+            }
+        };
+
+        document.addEventListener('scroll', element.scrollHandler, true);
+        window.addEventListener('resize', element.scrollHandler, true);
     },
     unregisterScrollListener: function (element) {
       document.removeEventListener('scroll', element.scrollHandler, true);
