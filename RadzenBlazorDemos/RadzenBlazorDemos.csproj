@@ -53,7 +53,9 @@
   
   <!-- Generate llms.txt from demo pages -->
   <!-- Usage: dotnet build -p:GenerateLlmsTxt=true -->
-  <Target Name="GenerateLlmsTxt" BeforeTargets="Build" Condition="$(Configuration)' == 'Release' || '$(GenerateLlmsTxt)' == 'true'">
+  <Target Name="GenerateLlmsTxt"
+         BeforeTargets="Build"
+         Condition="'$(Configuration)' == 'Release' OR '$(GenerateLlmsTxt)' == 'true'">
     <PropertyGroup>
       <LlmsTxtOutputPath>$(ProjectDir)wwwroot\llms.txt</LlmsTxtOutputPath>
       <LlmsTxtToolPath>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\RadzenBlazorDemos.Tools.csproj</LlmsTxtToolPath>
