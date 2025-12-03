@@ -19,6 +19,12 @@ $dialog-border-radius: var(--rz-border-radius) !default;
 $dialog-mask-zindex: 1000 !default;
 $dialog-zindex: 1001 !default;
 $dialog-transition: .1s ease-in-out !default;
+$dialog-resize-bar-color: var(--rz-splitter-bar-color);
+$dialog-resize-bar-background-color: var(--rz-splitter-bar-background-color);
+$dialog-resize-bar-hover-opacity: var(--rz-splitter-bar-hover-opacity);
+$dialog-resize-bar-thickness: 8px;
+$dialog-resize-bar-length: 100%;
+$dialog-resize-bar-handle-size: 16px;
 
 .rz-dialog-wrapper {
   box-sizing: border-box;
@@ -56,6 +62,80 @@ $dialog-transition: .1s ease-in-out !default;
   box-shadow: var(--rz-dialog-shadow);
   border-radius: var(--rz-dialog-border-radius);
   overflow-y: auto;
+
+  > .rz-dialog-resize-bar {
+    flex: 0 0 auto;
+    position: absolute;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--rz-dialog-resize-bar-color);
+    background-color: var(--rz-dialog-resize-bar-background-color);
+    opacity: 0.4;
+    user-select: none;
+
+    > .rz-resize {
+      pointer-events: none;
+      border: 1px solid var(--rz-dialog-resize-bar-color);
+      border-radius: 1px;
+    }
+
+    &:hover {
+      background-color: var(--rz-dialog-resize-bar-background-color);
+      opacity: var(--rz-dialog-resize-bar-hover-opacity);
+    }
+  }
+
+  &-position-right,
+  &-position-left {
+    flex-direction: row;
+
+    > .rz-dialog-resize-bar {
+      width: var(--rz-dialog-resize-bar-thickness);
+      height: var(--rz-dialog-resize-bar-length);
+      cursor: col-resize;
+      flex-direction: column;
+
+      > .rz-resize {
+        height: var(--rz-dialog-resize-bar-handle-size);
+        margin: 2px 0;
+      }
+    }
+  }
+
+  &-position-top,
+  &-position-bottom {
+    flex-direction: column;
+
+    > .rz-dialog-resize-bar {
+      width: var(--rz-dialog-resize-bar-length);
+      height: var(--rz-dialog-resize-bar-thickness);
+      cursor: row-resize;
+      flex-direction: row;
+
+      > .rz-resize {
+        width: var(--rz-dialog-resize-bar-handle-size);
+        margin: 0 2px;
+      }
+    }
+  }
+
+  &-position-right > .rz-dialog-resize-bar {
+      left: 0;
+  }
+
+  &-position-left > .rz-dialog-resize-bar {
+      right: 0;
+  }
+
+  &-position-bottom > .rz-dialog-resize-bar {
+      top: 0;
+  }
+
+  &-position-top > .rz-dialog-resize-bar {
+      bottom: 0;
+  }
 }
 
 .rz-dialog-titlebar,

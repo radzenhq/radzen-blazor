@@ -1450,6 +1450,77 @@ window.Radzen = {
           }
       }, 500);
   },
+  createSideDialogResizer: function(handle, sideDialog, options) {
+      const normalizeDir = (value) => {
+          if (typeof value === 'string' && value.length) {
+              return value.toLowerCase();
+          }
+          if (typeof value === 'number') {
+              const positions = ['right', 'left', 'top', 'bottom'];
+              return positions[value] || 'right';
+          }
+          return 'right';
+      };
+
+      const dir = normalizeDir(options?.position);
+
+      let start = null;
+
+      const onDown = (e) => {
+          e.preventDefault();
+
+          start = {x: e.clientX, y: e.clientY, w: sideDialog.clientWidth, h: sideDialog.clientHeight};
+
+          document.addEventListener('pointermove', onMove);
+          document.addEventListener('pointerup', onUp, {once: true});
+          document.addEventListener('pointercancel', onUp, {once: true});
+      };
+
+      const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+      const applyWidth = (w) => {
+          sideDialog.style.width = Math.round(w) + 'px';
+      };
+      const applyHeight = (h) => {
+          sideDialog.style.height = `${Math.round(h)}px`;
+      };
+
+      const onMove = (e) => {
+          if (!start) return;
+
+          const dx = e.clientX - start.x;
+          const dy = e.clientY - start.y;
+
+          switch (dir) {
+              case 'right':
+                  applyWidth(clamp(start.w - dx, options.minWidth, Infinity));
+                  break;
+              case 'left':
+                  applyWidth(clamp(start.w + dx, options.minWidth, Infinity));
+                  break;
+              case 'bottom':
+                  applyHeight(clamp(start.h - dy, options.minHeight, Infinity));
+                  break;
+              case 'top':
+                  applyHeight(clamp(start.h + dy, options.minHeight, Infinity));
+                  break;
+          }
+      };
+
+      const onUp = (e) => {
+          start = null;
+          document.removeEventListener('pointermove', onMove);
+      };
+
+      handle.addEventListener('pointerdown', onDown);
+
+      return {
+          dispose() {
+              handle.removeEventListener('pointerdown', onDown);
+              document.removeEventListener('pointermove', onMove);
+          }
+      };
+  },
   openDialog: function (options, dialogService, dialog) {
     if (Radzen.closeAllPopups) {
         Radzen.closeAllPopups();

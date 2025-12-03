@@ -383,6 +383,12 @@
   --rz-dialog-mask-zindex: #{$dialog-mask-zindex};
   --rz-dialog-zindex: #{$dialog-zindex};
   --rz-dialog-transition: #{$dialog-transition};
+  --rz-dialog-resize-bar-color: #{$dialog-resize-bar-color};
+  --rz-dialog-resize-bar-background-color: #{$dialog-resize-bar-background-color};
+  --rz-dialog-resize-bar-hover-opacity: #{$dialog-resize-bar-hover-opacity};
+  --rz-dialog-resize-bar-thickness: #{$dialog-resize-bar-thickness};
+  --rz-dialog-resize-bar-length: #{$dialog-resize-bar-length};
+  --rz-dialog-resize-bar-handle-size: #{$dialog-resize-bar-handle-size};
 
   /* DropDown */
   --rz-dropdown-trigger-icon-width: #{$dropdown-trigger-icon-width};

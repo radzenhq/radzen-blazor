@@ -1,11 +1,15 @@
-﻿using System;
+﻿using Bunit;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
 namespace Radzen.Blazor.Tests
 {
-	public class DialogServiceTests
+	public class DialogServiceTests : ComponentBase
 	{
 		public class OpenDialogTests
 		{
@@ -124,13 +128,81 @@ namespace Radzen.Blazor.Tests
                 var openTask = dialogService.OpenAsync("Dynamic Open", typeof(RadzenButton), []);
                 dialogService.Close();
                 await openTask;
-                
+
                 // Assert
                 Assert.Equal("Dynamic Open", resultingTitle);
                 Assert.Equal(typeof(RadzenButton), resultingType);
             }
 		}
 
+        public class OpenSideDialogTests
+        {
+            [Fact(DisplayName = "SideDialogOptions resizable option is retained after OpenSideDialog call")]
+            public void SideDialogOptions_Resizable_AreRetained_AfterOpenSideDialogCall()
+            {
+                // Arrange
+                var options = new SideDialogOptions { Resizable = true };
+                SideDialogOptions resultingOptions = null;
+                var dialogService = new DialogService(null, null);
+                dialogService.OnSideOpen += (_, _, sideOptions) => resultingOptions = sideOptions;
+
+                // Act
+                dialogService.OpenSide<DialogServiceTests>("Test", [], options);
+
+                // Assert
+                Assert.NotNull(resultingOptions);
+                Assert.Same(options, resultingOptions);
+                Assert.True(resultingOptions.Resizable);
+            }
+
+            [Fact(DisplayName = "Side dialog shows resize bar when Resizable is true")]
+            public void SideDialog_Resizable_ShowsResizeBar()
+            {
+                using var ctx = new TestContext();
+                ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+                ctx.Services.AddScoped<DialogService>();
+
+                // Render the dialog host
+                var cut = ctx.RenderComponent<RadzenDialog>();
+
+                // Open a side dialog with Resizable=true
+                var dialogService = ctx.Services.GetRequiredService<DialogService>();
+                cut.InvokeAsync(() => dialogService.OpenSide("Test", typeof(RadzenButton),
+                    new Dictionary<string, object>(), new SideDialogOptions { Resizable = true }));
+
+                // Assert: the resize bar element is present
+                cut.WaitForAssertion(() =>
+                {
+                    var markup = cut.Markup;
+                    Assert.Contains("rz-dialog-resize-bar", markup);
+                    // Optionally ensure the inner handle exists too
+                    Assert.Contains("rz-resize", markup);
+                });
+            }
+
+            [Fact(DisplayName = "Side dialog hides resize bar when Resizable is false")]
+            public void SideDialog_NonResizable_HidesResizeBar()
+            {
+                using var ctx = new TestContext();
+                ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+                ctx.Services.AddScoped<DialogService>();
+
+                // Render the dialog host
+                var cut = ctx.RenderComponent<RadzenDialog>();
+
+                // Open a side dialog with Resizable=false
+                var dialogService = ctx.Services.GetRequiredService<DialogService>();
+                cut.InvokeAsync(() => dialogService.OpenSide("Test", typeof(RadzenButton),
+                    new Dictionary<string, object>(), new SideDialogOptions()));
+
+                // Assert: the resize bar element is not present
+                cut.WaitForAssertion(() =>
+                {
+                    var markup = cut.Markup;
+                    Assert.DoesNotContain("rz-dialog-resize-bar", markup);
+                });
+            }
+        }
 		public class ConfirmTests
 		{
 			[Fact(DisplayName = "ConfirmOptions is null and default values are set correctly")]
