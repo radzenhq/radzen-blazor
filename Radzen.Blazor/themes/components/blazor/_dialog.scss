@@ -19,12 +19,12 @@ $dialog-border-radius: var(--rz-border-radius) !default;
 $dialog-mask-zindex: 1000 !default;
 $dialog-zindex: 1001 !default;
 $dialog-transition: .1s ease-in-out !default;
-$dialog-side-resize-bar-color: var(--rz-splitter-bar-color);
-$dialog-side-resize-bar-background-color: var(--rz-splitter-bar-background-color);
-$dialog-side-resize-bar-hover-opacity: var(--rz-splitter-bar-hover-opacity);
-$dialog-side-resize-bar-thickness: 8px;
-$dialog-side-resize-bar-length: 100%;
-$dialog-side-resize-bar-handle-size: 16px;
+$dialog-resize-bar-color: var(--rz-splitter-bar-color);
+$dialog-resize-bar-background-color: var(--rz-splitter-bar-background-color);
+$dialog-resize-bar-hover-opacity: var(--rz-splitter-bar-hover-opacity);
+$dialog-resize-bar-thickness: 8px;
+$dialog-resize-bar-length: 100%;
+$dialog-resize-bar-handle-size: 16px;
 
 .rz-dialog-wrapper {
   box-sizing: border-box;
@@ -70,20 +70,20 @@ $dialog-side-resize-bar-handle-size: 16px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: $dialog-side-resize-bar-color;
-    background-color: $dialog-side-resize-bar-background-color;
+    color: var(--rz-dialog-resize-bar-color);
+    background-color: var(--rz-dialog-resize-bar-background-color);
     opacity: 0.4;
     user-select: none;
 
     > .rz-resize {
       pointer-events: none;
-      border: 1px solid $dialog-side-resize-bar-color;
+      border: 1px solid var(--rz-dialog-resize-bar-color);
       border-radius: 1px;
     }
 
     &:hover {
-      background-color: $dialog-side-resize-bar-background-color;
-      opacity: $dialog-side-resize-bar-hover-opacity;
+      background-color: var(--rz-dialog-resize-bar-background-color);
+      opacity: var(--rz-dialog-resize-bar-hover-opacity);
     }
   }
 
@@ -92,13 +92,13 @@ $dialog-side-resize-bar-handle-size: 16px;
     flex-direction: row;
 
     > .rz-dialog-resize-bar {
-      width: $dialog-side-resize-bar-thickness;
-      height: $dialog-side-resize-bar-length;
+      width: var(--rz-dialog-resize-bar-thickness);
+      height: var(--rz-dialog-resize-bar-length);
       cursor: col-resize;
       flex-direction: column;
 
       > .rz-resize {
-        height: $dialog-side-resize-bar-handle-size;
+        height: var(--rz-dialog-resize-bar-handle-size);
         margin: 2px 0;
       }
     }
@@ -109,13 +109,13 @@ $dialog-side-resize-bar-handle-size: 16px;
     flex-direction: column;
 
     > .rz-dialog-resize-bar {
-      width: $dialog-side-resize-bar-length;
-      height: $dialog-side-resize-bar-thickness;
+      width: var(--rz-dialog-resize-bar-length);
+      height: var(--rz-dialog-resize-bar-thickness);
       cursor: row-resize;
       flex-direction: row;
 
       > .rz-resize {
-        width: $dialog-side-resize-bar-handle-size;
+        width: var(--rz-dialog-resize-bar-handle-size);
         margin: 0 2px;
       }
     }
