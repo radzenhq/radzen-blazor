@@ -73,6 +73,27 @@ namespace Radzen.Blazor
         public EventCallback<Radzen.DataGridLoadChildDataEventArgs<object>> LoadChildData { get; set; }
 
         /// <summary>
+        /// Gets or sets the column resized callback.
+        /// </summary>
+        /// <value>The column resized callback.</value>
+        [Parameter]
+        public EventCallback<DataGridColumnResizedEventArgs<object>> ColumnResized { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column reordering callback.
+        /// </summary>
+        /// <value>The column reordering callback.</value>
+        [Parameter]
+        public EventCallback<DataGridColumnReorderingEventArgs<object>> ColumnReordering { get; set; }
+
+        /// <summary>
+        /// Gets or sets the column reordered callback.
+        /// </summary>
+        /// <value>The column reordered callback.</value>
+        [Parameter]
+        public EventCallback<DataGridColumnReorderedEventArgs<object>> ColumnReordered { get; set; }
+
+        /// <summary>
         /// Gets or sets the footer template.
         /// </summary>
         /// <value>The footer template.</value>
