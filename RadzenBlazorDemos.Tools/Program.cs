@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace RadzenBlazorDemos.Tools;
 
@@ -100,13 +101,17 @@ class Program
             var relativePath = Path.GetRelativePath(pagesPath, page).Replace('\\', '/');
             var fileName = Path.GetFileNameWithoutExtension(page);
             var fileContent = File.ReadAllText(page, Encoding.UTF8);
+            var extractedContent = ExtractDescriptionsAndExamples(fileContent, page);
+            
+            if (string.IsNullOrWhiteSpace(extractedContent))
+                continue;
             
             sb.AppendLine($"### {fileName}");
             sb.AppendLine();
             sb.AppendLine($"**Path:** `{relativePath}`");
             sb.AppendLine();
             sb.AppendLine("```razor");
-            sb.AppendLine(fileContent);
+            sb.AppendLine(extractedContent);
             sb.AppendLine("```");
             sb.AppendLine();
             sb.AppendLine("---");
@@ -205,6 +210,140 @@ class Program
             .Replace(".", "-")
             .Replace("(", "")
             .Replace(")", "");
+    }
+
+    static string ExtractDescriptionsAndExamples(string razorContent, string pagePath)
+    {
+        var result = new StringBuilder();
+        var pagesDirectory = Path.GetDirectoryName(pagePath) ?? "";
+        
+        // Extract descriptions from RadzenText components (preserve HTML formatting)
+        var textMatches = Regex.Matches(razorContent, 
+            @"<RadzenText[^>]*>([\s\S]*?)</RadzenText>", 
+            RegexOptions.IgnoreCase | RegexOptions.Multiline);
+        
+        foreach (Match match in textMatches)
+        {
+            var textContent = match.Groups[1].Value.Trim();
+            if (!string.IsNullOrWhiteSpace(textContent))
+            {
+                // Keep HTML tags like <strong>, <code> but remove RadzenText wrapper
+                textContent = CleanTextContent(textContent);
+                if (!string.IsNullOrWhiteSpace(textContent))
+                {
+                    result.AppendLine(textContent);
+                    result.AppendLine();
+                }
+            }
+        }
+        
+        // Extract component example references from RadzenExample components
+        var exampleMatches = Regex.Matches(razorContent, 
+            @"<RadzenExample[^>]*Example=[""]?([^""\s>]+)[""]?[^>]*>([\s\S]*?)</RadzenExample>", 
+            RegexOptions.IgnoreCase | RegexOptions.Multiline);
+        
+        foreach (Match match in exampleMatches)
+        {
+            var exampleName = match.Groups[1].Value.Trim();
+            var inlineContent = match.Groups[2].Value.Trim();
+            
+            // Try to load the example component file
+            var exampleFilePath = Path.Combine(pagesDirectory, $"{exampleName}.razor");
+            if (File.Exists(exampleFilePath))
+            {
+                var exampleContent = File.ReadAllText(exampleFilePath, Encoding.UTF8);
+                // Remove @code blocks and directives, keep just the component markup
+                exampleContent = CleanExampleFile(exampleContent);
+                
+                if (!string.IsNullOrWhiteSpace(exampleContent))
+                {
+                    result.AppendLine();
+                    result.AppendLine("Example:");
+                    result.AppendLine(exampleContent);
+                    result.AppendLine();
+                }
+            }
+            else if (!string.IsNullOrWhiteSpace(inlineContent))
+            {
+                // Fallback: use inline content if example file not found
+                inlineContent = CleanExampleContent(inlineContent);
+                if (!string.IsNullOrWhiteSpace(inlineContent))
+                {
+                    result.AppendLine();
+                    result.AppendLine("Example:");
+                    result.AppendLine(inlineContent);
+                    result.AppendLine();
+                }
+            }
+        }
+        
+        return result.ToString().Trim();
+    }
+
+    static string CleanTextContent(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return string.Empty;
+        
+        var result = content;
+        
+        // Remove @ expressions (like @variable, @ExampleService) but keep HTML tags like <strong>, <code>
+        result = Regex.Replace(result, @"@[A-Za-z0-9_.()]+", "");
+        
+        // Clean up multiple spaces but preserve single newlines for readability
+        result = Regex.Replace(result, @"[ \t]+", " ");
+        
+        // Clean up multiple newlines (max 2 consecutive)
+        result = Regex.Replace(result, @"(\r?\n){3,}", Environment.NewLine + Environment.NewLine);
+        
+        return result.Trim();
+    }
+
+    static string CleanExampleContent(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return string.Empty;
+        
+        var result = content;
+        
+        // Remove nested RadzenExample tags if any
+        result = Regex.Replace(result, 
+            @"<RadzenExample[^>]*>[\s\S]*?</RadzenExample>", 
+            "", 
+            RegexOptions.IgnoreCase);
+        
+        // Trim each line and remove empty lines
+        var lines = result.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
+            .Select(l => l.Trim())
+            .Where(l => !string.IsNullOrWhiteSpace(l))
+            .ToList();
+        
+        return string.Join(Environment.NewLine, lines);
+    }
+
+    static string CleanExampleFile(string content)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return string.Empty;
+        
+        var result = content;
+        
+        // Remove @code blocks
+        result = Regex.Replace(result, 
+            @"@code\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", 
+            "", 
+            RegexOptions.Singleline | RegexOptions.IgnoreCase);
+        
+        // Remove @using, @inject, @page directives
+        result = Regex.Replace(result, 
+            @"@(using|inject|page|layout|namespace|implements)[^\r\n]*", 
+            "", 
+            RegexOptions.IgnoreCase | RegexOptions.Multiline);
+        
+        // Clean up multiple blank lines
+        result = Regex.Replace(result, @"(\r?\n\s*){3,}", Environment.NewLine + Environment.NewLine);
+        
+        return result.Trim();
     }
 }
 
