@@ -110,9 +110,7 @@ class Program
             sb.AppendLine();
             sb.AppendLine($"**Path:** `{relativePath}`");
             sb.AppendLine();
-            sb.AppendLine("```razor");
             sb.AppendLine(extractedContent);
-            sb.AppendLine("```");
             sb.AppendLine();
             sb.AppendLine("---");
             sb.AppendLine();
@@ -259,7 +257,9 @@ class Program
                 {
                     result.AppendLine();
                     result.AppendLine("Example:");
+                    result.AppendLine("```razor");
                     result.AppendLine(exampleContent);
+                    result.AppendLine("```");
                     result.AppendLine();
                 }
             }
@@ -271,7 +271,9 @@ class Program
                 {
                     result.AppendLine();
                     result.AppendLine("Example:");
+                    result.AppendLine("```razor");
                     result.AppendLine(inlineContent);
+                    result.AppendLine("```");
                     result.AppendLine();
                 }
             }
@@ -287,7 +289,10 @@ class Program
         
         var result = content;
         
-        // Remove @ expressions (like @variable, @ExampleService) but keep HTML tags like <strong>, <code>
+        // Remove all HTML tags (including <strong>, <code>, <Radzen*>, etc.)
+        result = Regex.Replace(result, @"<[^>]+>", "");
+        
+        // Remove @ expressions (like @variable, @ExampleService)
         result = Regex.Replace(result, @"@[A-Za-z0-9_.()]+", "");
         
         // Clean up multiple spaces but preserve single newlines for readability
