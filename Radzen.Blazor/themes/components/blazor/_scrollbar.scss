@@ -32,7 +32,7 @@ $scrollbar-size: 16px !default;
 }
 
 
-.rz-layout,
+body:not(.rz-default-scrollbars) .rz-layout,
 .rz-scrollbars {
   &::-webkit-scrollbar,
   ::-webkit-scrollbar {
