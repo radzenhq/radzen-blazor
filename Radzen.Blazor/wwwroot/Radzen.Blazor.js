@@ -839,9 +839,10 @@ window.Radzen = {
       }
     }
   },
-  removeFileFromUpload: function (name, id) {
-    var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[id];
+  removeFileFromUpload: function (ref, name, id) {
+    var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[ref] ?? Radzen.uploadComponents[id];
     if (!uploadComponent) return;
+    if (!uploadComponent.files) return;
     var file = uploadComponent.files.find(function (f) { return f.name == name; })
     if (!file) { return; }
     var localFile = uploadComponent.localFiles.find(function (f) { return f.Name == name; });
