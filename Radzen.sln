@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos.Host", "R
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos.Server", "RadzenBlazorDemos.Server\RadzenBlazorDemos.Server.csproj", "{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RadzenBlazorDemos.Tools", "RadzenBlazorDemos.Tools\RadzenBlazorDemos.Tools.csproj", "{8726EFA9-554D-41D4-8B99-27744DCC7017}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{972C3730-C322-4A6F-A106-18D53BF8E08D}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -44,6 +46,10 @@ Global
 		{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EC869401-304A-45BC-93CA-C1CDFAAA7F7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8726EFA9-554D-41D4-8B99-27744DCC7017}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8726EFA9-554D-41D4-8B99-27744DCC7017}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8726EFA9-554D-41D4-8B99-27744DCC7017}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8726EFA9-554D-41D4-8B99-27744DCC7017}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

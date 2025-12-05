@@ -50,4 +50,32 @@
     <Copy SourceFiles="@(DemoSharedRazor)" DestinationFiles="@(DemoSharedRazor->'$(ProjectDir)wwwroot\demos\Shared\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(DemoHostControllersCs)" DestinationFiles="@(DemoHostControllersCs->'$(ProjectDir)wwwroot\demos\Controllers\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
   </Target>
+  
+  <!-- Generate llms.txt from demo pages -->
+  <!-- Usage: dotnet build -p:GenerateLlmsTxt=true -->
+  <Target Name="GenerateLlmsTxt"
+         BeforeTargets="Build"
+         Condition="'$(Configuration)' == 'Release' OR '$(GenerateLlmsTxt)' == 'true'">
+    <PropertyGroup>
+      <LlmsTxtOutputPath>$(ProjectDir)wwwroot\llms.txt</LlmsTxtOutputPath>
+      <LlmsTxtToolPath>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\RadzenBlazorDemos.Tools.csproj</LlmsTxtToolPath>
+      <LlmsTxtToolDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\bin\$(Configuration)\net8.0\</LlmsTxtToolDir>
+      <LlmsTxtToolExe Condition="'$(OS)' == 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools.exe</LlmsTxtToolExe>
+      <LlmsTxtToolExe Condition="'$(OS)' != 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools</LlmsTxtToolExe>
+    </PropertyGroup>
+    
+    <Message Text="Generating llms.txt..." Importance="high" />
+    
+    <!-- Build the tool first -->
+    <Exec Command="dotnet build &quot;$(LlmsTxtToolPath)&quot; --configuration $(Configuration) --no-incremental"
+          ContinueOnError="false"
+          Condition="Exists('$(LlmsTxtToolPath)')" />
+    
+    <!-- Run the tool -->
+    <Exec Command="&quot;$(LlmsTxtToolExe)&quot; &quot;$(LlmsTxtOutputPath)&quot; &quot;$(ProjectDir)Pages&quot; &quot;$(ProjectDir)Services&quot; &quot;$(ProjectDir)Models&quot;"
+          ContinueOnError="false"
+          Condition="Exists('$(LlmsTxtToolExe)')" />
+    
+    <Message Text="llms.txt generated at: $(LlmsTxtOutputPath)" Importance="high" />
+  </Target>
 </Project>
