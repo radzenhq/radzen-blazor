@@ -840,7 +840,7 @@ window.Radzen = {
     }
   },
   removeFileFromUpload: function (ref, name, id) {
-    var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[ref] ?? Radzen.uploadComponents[id];
+    var uploadComponent = (Radzen.uploadComponents && Radzen.uploadComponents[ref]) ?? Radzen.uploadComponents[id];
     if (!uploadComponent) return;
     if (!uploadComponent.files) return;
     var file = uploadComponent.files.find(function (f) { return f.name == name; })
