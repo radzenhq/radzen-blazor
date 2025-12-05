@@ -3,6 +3,7 @@ using Microsoft.JSInterop;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using System.Globalization;
 using System.Linq;
@@ -246,6 +247,20 @@ namespace Radzen.Blazor
                     UniqueID ??= $"{Property}.{FilterProperty}"; // To be sure the column uniqueID is unique even when filtering on sub property.
                 else
                     UniqueID ??= Property ?? FilterProperty;
+                
+                if (UseDisplayName && !string.IsNullOrEmpty(Property))
+                {
+                    var propInfo = typeof(TItem).GetProperty(Property);
+                    if (propInfo != null)
+                    {
+                        var displayAttr = propInfo.GetCustomAttributes(typeof(DisplayAttribute), true)
+                            .FirstOrDefault() as DisplayAttribute;
+                        if (displayAttr?.Name != null)
+                        {
+                            Title = displayAttr.Name;
+                        }
+                    }
+                }
             }
         }
         
@@ -350,6 +365,13 @@ namespace Radzen.Blazor
         /// <value>The title.</value>
         [Parameter]
         public string Title { get; set; }
+
+        /// <summary>
+        /// Indicates whether the column should automatically use the <see cref="DisplayAttribute.Name"/>
+        /// of the bound property as the header.
+        /// </summary>
+        [Parameter]
+        public bool UseDisplayName { get; set; }
 
         string _title;
 
