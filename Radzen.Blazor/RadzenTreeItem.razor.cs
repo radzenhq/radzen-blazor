@@ -135,7 +135,7 @@ namespace Radzen.Blazor
         /// <remarks>This method has no effect if the tree does not support checkboxes or if the node is
         /// not checkable.</remarks>
         /// <returns>A task that represents the asynchronous toggle operation.</returns>
-        public async Task ToggleCheckboxSelection()
+        public async Task ToggleChecked()
         {
             if (Tree != null && Tree.AllowCheckBoxes && Checkable)
             {
