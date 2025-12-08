@@ -141,6 +141,8 @@ namespace Radzen.Blazor
             {
                 var currentValue = IsChecked();
                 await CheckedChange(currentValue == true ? false : true);
+
+                Select();
             }
         }
 
@@ -502,15 +504,6 @@ namespace Radzen.Blazor
                 ScreenY = args.ScreenY,
                 ShiftKey = args.ShiftKey
             });
-        }
-
-        internal async Task OnTemplateClick(MouseEventArgs args)
-        {
-            if (Tree != null && Tree.AllowCheckBoxes && Checkable)
-            {
-                var currentValue = IsChecked();
-                await CheckedChange(currentValue == true ? false : true);
-            }
         }
     }
 }
