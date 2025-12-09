@@ -128,6 +128,24 @@ namespace Radzen.Blazor
 
         internal List<RadzenTreeItem> items = new List<RadzenTreeItem>();
 
+        /// <summary>
+        /// Toggles the checked state of the tree node in response to a mouse event, if checkboxes are enabled and the
+        /// node is checkable.
+        /// </summary>
+        /// <remarks>This method has no effect if the tree does not support checkboxes or if the node is
+        /// not checkable.</remarks>
+        /// <returns>A task that represents the asynchronous toggle operation.</returns>
+        public async Task ToggleChecked()
+        {
+            if (Tree != null && Tree.AllowCheckBoxes && Checkable)
+            {
+                var currentValue = IsChecked();
+                await CheckedChange(currentValue == true ? false : true);
+
+                Select();
+            }
+        }
+
         internal void AddItem(RadzenTreeItem item)
         {
             if (items.IndexOf(item) == -1)
