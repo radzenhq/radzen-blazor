@@ -753,9 +753,7 @@ namespace Radzen
             else if (args.Key.Length == 1 && !args.CtrlKey && !args.AltKey && !args.ShiftKey)
             {
                 // searching for element
-                var filteredItems = (!string.IsNullOrEmpty(TextProperty) ?
-                    Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive) :
-                    Query)
+                var filteredItems = Query.Where(TextProperty, args.Key, StringFilterOperator.StartsWith, FilterCaseSensitivity.CaseInsensitive)
                     .Cast(Query.ElementType).Cast<dynamic>().ToList();
 
 
