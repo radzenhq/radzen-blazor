@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.Extensions.Primitives;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -41,6 +40,15 @@ namespace Radzen.Blazor
         /// <value>A dictionary of custom HTML attributes.</value>
         [Parameter]
         public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the component should update the bound value immediately as the user types (oninput event),
+        /// rather than waiting for the input to lose focus (onchange event).
+        /// This enables real-time value updates but may trigger more frequent change events.
+        /// </summary>
+        /// <value><c>true</c> for immediate updates; <c>false</c> for deferred updates. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Immediate { get; set; }
 
         /// <summary>
         /// Gets input reference.
@@ -201,7 +209,7 @@ namespace Radzen.Blazor
                 newValue = ConvertFromDecimal(newValueToUpdate);
             }
 
-            if(object.Equals(newValue, Value))
+            if (object.Equals(newValue, Value))
                 return;
 
             Value = newValue;
@@ -345,17 +353,17 @@ namespace Radzen.Blazor
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+        protected async Task OnChange(ChangeEventArgs args)
         {
             stringValue = $"{args.Value}";
-            await InternalValueChanged(args.Value);
+            await InternalValueChanged(args.Value, Immediate);
         }
 
         string stringValue;
-        async Task SetValue(string value)
+        private async Task SetValue(string value)
         {
             stringValue = value;
-            await InternalValueChanged(value);
+            await InternalValueChanged(value, Immediate);
         }
 
         private string RemoveNonNumericCharacters(object value)
@@ -367,7 +375,7 @@ namespace Radzen.Blazor
             if (!string.IsNullOrEmpty(Format))
             {
                 string formattedStringWithoutPlaceholder = Format.Replace("#", "").Trim();
-                
+
                 if (valueStr.Contains(Format))
                 {
                     string currencyDecimalSeparator = Culture.NumberFormat.CurrencyDecimalSeparator;
@@ -377,7 +385,7 @@ namespace Radzen.Blazor
                     int lengthDifference = splitValueString[0].Length - splitFormatString[0].Length;
                     formattedStringWithoutPlaceholder = formattedStringWithoutPlaceholder.PadLeft(formattedStringWithoutPlaceholder.Length + lengthDifference, '0');
                 }
-                
+
                 valueStr = valueStr.Replace(formattedStringWithoutPlaceholder, "");
             }
 
@@ -412,7 +420,15 @@ namespace Radzen.Blazor
         [Parameter]
         public Func<string, TValue> ConvertValue { get; set; }
 
-        private async System.Threading.Tasks.Task InternalValueChanged(object value)
+        private async Task ValidateInput()
+        {
+            var newValue = ApplyMinMax(Value);
+
+            if (newValue != null && !newValue.Equals(Value))
+                await InternalValueChanged(newValue);
+        }
+
+        private async Task InternalValueChanged(object value, bool onInput = false)
         {
             TValue newValue;
             try
@@ -435,16 +451,17 @@ namespace Radzen.Blazor
                 newValue = default(TValue);
             }
 
-            newValue = ApplyMinMax(newValue);
-
-            stringValue = $"{newValue}";
-
-            if (EqualityComparer<TValue>.Default.Equals(Value, newValue))
+            if (!onInput)
             {
-                await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
-                return;
+                newValue = ApplyMinMax(newValue);
+                if (EqualityComparer<TValue>.Default.Equals(Value, newValue))
+                {
+                    await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", input, FormattedValue);
+                    return;
+                }
             }
 
+            stringValue = $"{newValue}";
             Value = newValue;
             if (!ValueChanged.HasDelegate)
             {
@@ -455,7 +472,7 @@ namespace Radzen.Blazor
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
         }
-        
+
         private TValue ApplyMinMax(TValue newValue)
         {
             if (Max == null && Min == null || newValue == null)
@@ -522,7 +539,7 @@ namespace Radzen.Blazor
             {
                 return (TValue)converter.ConvertFrom(null, Culture, input);
             }
-            
+
             return (TValue)ConvertType.ChangeType(input, typeof(TValue), Culture);
         }
 

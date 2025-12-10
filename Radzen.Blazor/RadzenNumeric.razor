@@ -28,23 +28,47 @@
 #if NET7_0_OR_GREATER
         return __builder => {
             <text>
-                <input @ref="@input" inputmode="decimal" @attributes="InputAttributes" type="text" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
-                       class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
-                       placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" @bind:get="FormattedValue" @bind:set="SetValue"
-                       onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
-                       onblur="@GetOnInput()" onpaste="@GetOnPaste()" maxlength="@MaxLength"
-                       @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
+                @if(Immediate)
+                {
+                    <input @ref="@input" inputmode="decimal" @attributes="InputAttributes" type="text" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
+                           class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
+                           placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" @bind:event="oninput" @bind:get="FormattedValue" @bind:set="SetValue" @onchange=@ValidateInput
+                           onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
+                           onblur="@GetOnInput()" onpaste="@GetOnPaste()" maxlength="@MaxLength"
+                           @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
+                }
+                else
+                {
+                    <input @ref="@input" inputmode="decimal" @attributes="InputAttributes" type="text" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
+                           class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
+                           placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" @bind:get="FormattedValue" @bind:set="SetValue"
+                           onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
+                           onblur="@GetOnInput()" onpaste="@GetOnPaste()" maxlength="@MaxLength"
+                           @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
+                }
             </text>
         };
 #else
         return __builder => {
             <text>
-                <input @ref="@input" inputmode="decimal" @attributes="InputAttributes" type="text" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
+                @if(Immediate)
+                {
+                    <input @ref="@input" inputmode="decimal" @attributes="InputAttributes" type="text" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
+                       class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
+                       placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@FormattedValue" @oninput="@OnChange" @onchange=@ValidateInput
+                       onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
+                       onblur="@GetOnInput()" onpaste="@GetOnPaste()" maxlength="@MaxLength"
+                       @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
+                }
+                else
+                {
+                    <input @ref="@input" inputmode="decimal" @attributes="InputAttributes" type="text" name="@Name" disabled="@Disabled" readonly="@ReadOnly"
                        class="@GetInputCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@Name"
                        placeholder="@CurrentPlaceholder" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@FormattedValue" @onchange="@OnChange"
                        onkeypress="Radzen.numericKeyPress(event, @IsInteger().ToString().ToLower(), '@Culture.NumberFormat.NumberDecimalSeparator')"
                        onblur="@GetOnInput()" onpaste="@GetOnPaste()" maxlength="@MaxLength"
                        @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation />
+                }
             </text>
         };
 #endif

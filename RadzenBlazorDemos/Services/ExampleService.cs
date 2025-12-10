@@ -1732,7 +1732,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Get and Set the value of Numeric", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Numeric using Value and Change event", Anchor = "#value-and-change-event" }, new () { Text = "Min set to 1 and Max set to 10", Anchor = "#min-max" }, new () { Text = "Placeholder and 0.5 step", Anchor = "#placeholder-and-step" }, new () { Text = "Without Up/Down", Anchor = "#without-up-down" }, new () { Text = "Formatted value", Anchor = "#formatted-value" }, new () { Text = "Align value", Anchor = "#align-value" }, new () { Text = "Custom Value convert", Anchor = "#custom-value-convert" }, new () { Text = "Custom Numeric Type Support", Anchor = "#custom-numeric-type" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Get and Set the value of Numeric", Anchor = "#get-set-value" }, new () { Text = "Get and Set the value of Numeric using Value and Change event", Anchor = "#value-and-change-event" }, new() { Text = "Change on every input", Anchor = "#immediate" }, new () { Text = "Min set to 1 and Max set to 10", Anchor = "#min-max" }, new () { Text = "Placeholder and 0.5 step", Anchor = "#placeholder-and-step" }, new () { Text = "Without Up/Down", Anchor = "#without-up-down" }, new () { Text = "Formatted value", Anchor = "#formatted-value" }, new () { Text = "Align value", Anchor = "#align-value" }, new () { Text = "Custom Value convert", Anchor = "#custom-value-convert" }, new () { Text = "Custom Numeric Type Support", Anchor = "#custom-numeric-type" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "Numeric",
                     Path = "numeric",
                     Description = "Demonstration and configuration of the Radzen Blazor numeric textbox component.",
@@ -1854,18 +1854,18 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [  
-                        new () { Text = "Upload files", Anchor = "#change" }, 
-                        new () { Text = "Upload files to server", Anchor = "#url" }, 
-                        new () { Text = "Upload multiple files", Anchor = "#multiple" }, 
-                        new () { Text = "Trigger from code", Anchor = "#from-code" }, 
-                        new () { Text = "File filter", Anchor = "#filter" }, 
-                        new () { Text = "Use parameters", Anchor = "#parameters" }, 
-                        new () { Text = "Show upload progress", Anchor = "#progress" }, 
-                        new () { Text = "Drag and drop to upload", Anchor = "#drag-drop" }, 
-                        new () { Text = "Custom HTTP headers", Anchor = "#custom-headers" }, 
-                        new () { Text = "Specify parameter name", Anchor = "#parameter-name" }, 
-                        new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } 
+                    Toc = [
+                        new () { Text = "Upload files", Anchor = "#change" },
+                        new () { Text = "Upload files to server", Anchor = "#url" },
+                        new () { Text = "Upload multiple files", Anchor = "#multiple" },
+                        new () { Text = "Trigger from code", Anchor = "#from-code" },
+                        new () { Text = "File filter", Anchor = "#filter" },
+                        new () { Text = "Use parameters", Anchor = "#parameters" },
+                        new () { Text = "Show upload progress", Anchor = "#progress" },
+                        new () { Text = "Drag and drop to upload", Anchor = "#drag-drop" },
+                        new () { Text = "Custom HTTP headers", Anchor = "#custom-headers" },
+                        new () { Text = "Specify parameter name", Anchor = "#parameter-name" },
+                        new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" }
                     ],
                     Name = "Upload",
                     Description = "Demonstration and configuration of the Radzen Blazor Upload component.",
