@@ -38,7 +38,7 @@ window.Radzen = {
             }
         };
     },
-    mask: function (id, mask, pattern, characterPattern) {
+    mask: function (id, mask, pattern, characterPattern, immediate) {
       var el = document.getElementById(id);
       if (el) {
           var format = function (value, mask, pattern, characterPattern) {
@@ -70,6 +70,10 @@ window.Radzen = {
           var end = el.selectionEnd != el.value.length ? el.selectionEnd : -1;
 
           el.value = format(el.value, mask, pattern, characterPattern);
+
+          if (immediate) {
+              el.dispatchEvent(new Event('change'));
+          }
 
           el.selectionStart = start != -1 ? start : el.selectionStart;
           el.selectionEnd = end != -1 ? end : el.selectionEnd;

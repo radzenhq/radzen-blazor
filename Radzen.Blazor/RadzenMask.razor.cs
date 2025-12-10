@@ -87,21 +87,14 @@ namespace Radzen.Blazor
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async Task OnChange(ChangeEventArgs args)
         {
-            Value = $"{args.Value}";
+            var newValue = $"{args.Value}";
+            if (Value == newValue)
+                return;
+            Value = newValue;
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
-        }
-
-        /// <summary>
-        /// Handles the <see cref="E:Input" /> event.
-        /// </summary>
-        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected async Task OnInput(ChangeEventArgs args)
-        {
-            await JSRuntime.InvokeVoidAsync("Radzen.mask", GetId(), Mask, Pattern, CharacterPattern);
-            await OnChange(args);
         }
 
         /// <inheritdoc />
@@ -117,7 +110,7 @@ namespace Radzen.Blazor
 
             if (firstRender)
             {
-                JSRuntime.InvokeVoidAsync("eval", $"Radzen.mask('{GetId()}', '{Mask}', '{Pattern}', '{CharacterPattern}')");
+                JSRuntime.InvokeVoidAsync("eval", $"Radzen.mask('{GetId()}', '{Mask}', '{Pattern}', '{CharacterPattern}', {Immediate})");
             }
         }
     }
