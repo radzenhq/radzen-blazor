@@ -74,7 +74,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Persist the Theme", Anchor = "#persist" }, new () { Text = "Changing themes at runtime in Radzen Blazor Studio", Anchor = "#video-changing-themes-at-runtime" } ],
+                    Toc = [ new () { Text = "Persist the Theme", Anchor = "#persist" }, new () { Text = "Video: Changing themes at runtime in Radzen Blazor Studio", Anchor = "#video-changing-themes-at-runtime" } ],
                     Name = "ThemeService",
                     Path = "theme-service",
                     Title = "ThemeService",
@@ -84,7 +84,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Switch between light and dark mode", Anchor = "#light-dark-mode" }, new () { Text = "RadzenAppearanceToggle in Radzen Blazor Studio", Anchor = "#video-radzen-blazor-studio-config" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                    Toc = [ new () { Text = "Switch between light and dark mode", Anchor = "#light-dark-mode" }, new () { Text = "Video: AppearanceToggle in Radzen Blazor Studio", Anchor = "#video-radzen-blazor-studio-config" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                     Name = "AppearanceToggle",
                     Path = "appearance-toggle",
                     Title = "Blazor Themes | Free UI Components by Radzen",
@@ -94,7 +94,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Theme Colors", Anchor = "#theme-colors" }, new () { Text = "Utility CSS Classes", Anchor = "#utility-css-classes" }, new () { Text = "Theme Colors in Radzen Blazor Studio", Anchor = "#video-theme-colors" } ],
+                    Toc = [ new () { Text = "Theme Colors", Anchor = "#theme-colors" }, new () { Text = "Utility CSS Classes", Anchor = "#utility-css-classes" }, new () { Text = "Video: Theme Colors in Radzen Blazor Studio", Anchor = "#video-theme-colors" } ],
                     Name = "Colors",
                     Path = "colors",
                     Title = "Blazor Color Utilities | Free UI Components by Radzen",
@@ -104,7 +104,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Text Style", Anchor = "#text-style" }, new () { Text = "Text Style and Tag Name", Anchor = "#text-tag-name" }, new () { Text = "Display headings", Anchor = "#text-display-headings" }, new () { Text = "Text Align", Anchor = "#text-align" }, new () { Text = "Text Functional Colors", Anchor = "#text-color" }, new () { Text = "Text Transform", Anchor = "#text-transform" }, new () { Text = "Text Wrap", Anchor = "#text-wrap" } ],
+                    Toc = [ new () { Text = "Text Style", Anchor = "#text-style" }, new () { Text = "Text Style and Tag Name", Anchor = "#text-tag-name" }, new () { Text = "Display headings", Anchor = "#text-display-headings" }, new () { Text = "Text Align", Anchor = "#text-align" }, new () { Text = "Text Functional Colors", Anchor = "#text-color" }, new () { Text = "Text Transform", Anchor = "#text-transform" }, new () { Text = "Text Wrap", Anchor = "#text-wrap" }, new () { Text = "Video: How Typography Works in Radzen Blazor Studio", Anchor = "#video-radzen-text" } ],
                     Name = "Typography",
                     Path = "typography",
                     Title = "Blazor Text Component | Free UI Components by Radzen",
@@ -114,7 +114,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Material Icons", Anchor = "#material-icons" }, new () { Text = "Icon color", Anchor = "#icon-color" }, new () { Text = "Filled icons", Anchor = "#filled-icons" }, new () { Text = "Syled icons", Anchor = "#styled-icons" }, new () { Text = "Using RadzenIcon with other icon fonts", Anchor = "#icons-width-other-fonts" } ],
+                    Toc = [ new () { Text = "Material Icons", Anchor = "#material-icons" }, new () { Text = "Icon color", Anchor = "#icon-color" }, new () { Text = "Filled icons", Anchor = "#filled-icons" }, new () { Text = "Styled icons", Anchor = "#styled-icons" }, new () { Text = "Using RadzenIcon with other icon fonts", Anchor = "#icons-width-other-fonts" } ],
                     Name = "Icons",
                     Path = "icon",
                     Updated = true,
