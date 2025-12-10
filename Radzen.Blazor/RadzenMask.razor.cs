@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -72,16 +73,35 @@ namespace Radzen.Blazor
         public string CharacterPattern { get; set; }
 
         /// <summary>
+        /// Gets or sets whether the component should update the bound value immediately as the user types (oninput event),
+        /// rather than waiting for the input to lose focus (onchange event).
+        /// This enables real-time value updates but may trigger more frequent change events.
+        /// </summary>
+        /// <value><c>true</c> for immediate updates; <c>false</c> for deferred updates. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Immediate { get; set; }
+
+        /// <summary>
         /// Handles the <see cref="E:Change" /> event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
-        protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
+        protected async Task OnChange(ChangeEventArgs args)
         {
             Value = $"{args.Value}";
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
             await Change.InvokeAsync(Value);
+        }
+
+        /// <summary>
+        /// Handles the <see cref="E:Input" /> event.
+        /// </summary>
+        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
+        protected async Task OnInput(ChangeEventArgs args)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.mask", GetId(), Mask, Pattern, CharacterPattern);
+            await OnChange(args);
         }
 
         /// <inheritdoc />

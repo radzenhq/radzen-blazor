@@ -4,7 +4,16 @@
 @inherits FormComponentWithAutoComplete<string>
 @if (Visible)
 {
+    @if(Immediate)
+    {
     <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-           placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" @onchange="@OnChange" id="@GetId()"
-           oninput="Radzen.mask('@GetId()', '@Mask', '@Pattern', '@CharacterPattern')"/>
+           placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" id="@GetId()"
+           @oninput=@OnInput/>
+    }
+    else
+    {
+        <input @ref="@Element" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+               placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" @onchange="@OnChange" id="@GetId()"
+               oninput="Radzen.mask('@GetId()', '@Mask', '@Pattern', '@CharacterPattern')" />
+    }
 }
