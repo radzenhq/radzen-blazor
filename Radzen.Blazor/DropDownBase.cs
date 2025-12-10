@@ -1195,7 +1195,7 @@ namespace Radzen
                     }
                     else
                     {
-                        await ValueChanged.InvokeAsync((T)internalValue);
+                        await ValueChanged.InvokeAsync(internalValue != null ? (T)internalValue : default);
                     }
                 }
 
