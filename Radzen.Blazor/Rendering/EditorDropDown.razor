@@ -1,26 +1,35 @@
 @inherits RadzenComponent
 @using Microsoft.JSInterop
-<div title=@Title @ref=@Element class=@Class @onclick=@Toggle @onmousedown:preventDefault @attributes=@Attributes disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))>
-    <div class="rz-html-editor-dropdown-value">
-        @if (SelectedItem != null)
-        {
-            @SelectedItem.Text
-        }
-        else
-        {
-            @Placeholder
-        }
-    </div>
-    <button @onclick:preventDefault tabindex="-1" class="rz-html-editor-dropdown-trigger" disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))><i class="notranslate rzi" /></button>
-    <Popup @ref=Popup class="rz-html-editor-dropdown-items" Style=@PopupStyle PreventDefault=true>
-        <CascadingValue Value=@this>
-            @ChildContent
-        </CascadingValue>
-    </Popup>
-</div>
+<button tabindex="-1" type="button" aria-controls=@PopupId aria-expanded=@(open ? "true" : "false") aria-haspopup="listbox" title=@Title @ref=@Element class=@Class @onclick=@Toggle @onmousedown:preventDefault @attributes=@Attributes disabled=@IsDisabled>
+    <span class="rz-html-editor-dropdown-value">@(SelectedItem?.Text ?? Placeholder)</span>
+    <i class="notranslate rzi" aria-hidden="true" />
+</button>
+<Popup id=@PopupId role="listbox" Open=@OnPopupOpen Close=@OnPopupClose @ref=Popup class="rz-html-editor-dropdown-items" Style=@PopupStyle PreventDefault=true>
+    <CascadingValue Value=@this ChildContent=@ChildContent />
+</Popup>
 @code {
     [CascadingParameter]
     public RadzenHtmlEditor Editor { get; set; }
+
+    private bool IsDisabled => Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode());
+
+    bool open = false;
+
+    void OnPopupOpen()
+    {
+        open = true;
+
+        StateHasChanged();
+    }
+
+    void OnPopupClose()
+    {
+        open = false;
+
+        StateHasChanged();
+    }
+
+    private string PopupId => $"{GetId()}-popup";
 
     Popup Popup { get; set; }
 
@@ -77,5 +86,6 @@
 
     string Class => ClassList.Create("rz-html-editor-dropdown")
         .Add("rz-disabled", Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode()))
+        .Add("rz-html-editor-dropdown-trigger", true)
         .ToString();
 }

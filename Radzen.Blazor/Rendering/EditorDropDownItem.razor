@@ -1,4 +1,4 @@
-<div class=@Class @onclick=@Select @attributes=@Attributes>
+<div class=@Class @onclick=@Select @attributes=@Attributes role="option" aria-selected=@(IsSelected ? "true" : "false")>
     @if (ChildContent != null)
     {
         @ChildContent(this)
@@ -37,7 +37,9 @@
         }
     }
 
+    bool IsSelected => DropDown.Value == Value;
+
     string Class => ClassList.Create("rz-html-editor-dropdown-item")
-        .Add("rz-selected", DropDown.Value == Value)
+        .Add("rz-selected", IsSelected)
         .ToString();
 }
