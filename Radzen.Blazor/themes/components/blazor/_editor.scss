@@ -147,6 +147,8 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
   padding: var(--rz-editor-button-padding);
   align-items: center;
   cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
 
   &.rz-disabled {
     color: var(--rz-input-disabled-color);
@@ -175,9 +177,6 @@ $editor-focus-outline-offset: calc(-1 * var(--rz-outline-width)) !default;
 .rz-html-editor-dropdown-trigger {
   border: none;
   appearance: none;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
   color: inherit;
   background-color: inherit;
 
