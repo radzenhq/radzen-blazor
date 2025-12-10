@@ -622,6 +622,28 @@ namespace Radzen.Blazor
                     }
                     return;
                 }
+                else if (Template != null && (key == "ArrowLeft" || key == "ArrowRight"))
+                {
+                    var pagedViewIndex = focusedIndex - 1;
+                    if (FilterRowActive)
+                    {
+                        pagedViewIndex = pagedViewIndex - 1;
+                    }
+                    var item = PagedView.ElementAtOrDefault(pagedViewIndex);
+                    if (item != null)
+                    {
+                        if (key == "ArrowLeft")
+                        {
+                            await CollapseItem(item);
+                            return;
+                        }
+                        else if (key == "ArrowRight")
+                        {
+                            await ExpandItem(item);
+                            return;
+                        }
+                    }
+                }
 
                 await FocusRow(key);
             }
