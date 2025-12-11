@@ -35,6 +35,15 @@ namespace Radzen.Blazor
     public partial class RadzenNumeric<TValue> : FormComponentWithAutoComplete<TValue>
     {
         /// <summary>
+        /// Gets or sets whether the component should update the bound value immediately as the user types (oninput event),
+        /// rather than waiting for the input to lose focus (onchange event).
+        /// This enables real-time value updates but may trigger more frequent change events.
+        /// </summary>
+        /// <value><c>true</c> for immediate updates; <c>false</c> for deferred updates. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Immediate { get; set; }
+
+        /// <summary>
         /// Gets or sets additional HTML attributes to be applied to the underlying input element.
         /// This allows passing custom attributes like data-* attributes, aria-* attributes, or other HTML attributes directly to the input.
         /// </summary>
@@ -576,6 +585,15 @@ namespace Radzen.Blazor
                 {
                     await UpdateValueWithStep(false);
                 }
+
+                preventKeyPress = false;
+            }
+            else if (Immediate && args.Key.Length == 1 && char.IsDigit(args.Key[0]) && !args.CtrlKey && !args.AltKey && !args.ShiftKey)
+            {
+                preventKeyPress = true;
+
+                var value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", input);
+                await SetValue(value);
 
                 preventKeyPress = false;
             }

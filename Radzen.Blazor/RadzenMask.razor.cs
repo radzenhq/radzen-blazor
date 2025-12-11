@@ -28,6 +28,15 @@ namespace Radzen.Blazor
     public partial class RadzenMask : FormComponentWithAutoComplete<string>
     {
         /// <summary>
+        /// Gets or sets whether the component should update the bound value immediately as the user types (oninput event),
+        /// rather than waiting for the input to lose focus (onchange event).
+        /// This enables real-time value updates but may trigger more frequent change events.
+        /// </summary>
+        /// <value><c>true</c> for immediate updates; <c>false</c> for deferred updates. Default is <c>false</c>.</value>
+        [Parameter]
+        public bool Immediate { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the masked input is read-only and cannot be edited.
         /// When true, displays the formatted value but prevents user input.
         /// </summary>
@@ -78,6 +87,21 @@ namespace Radzen.Blazor
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
             Value = $"{args.Value}";
+
+            await ValueChanged.InvokeAsync(Value);
+            if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
+            await Change.InvokeAsync(Value);
+        }
+
+        /// <summary>
+        /// Handles the oninput event when Immediate="true".
+        /// </summary>
+        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
+        protected async System.Threading.Tasks.Task OnInput(ChangeEventArgs args)
+        {
+            await JSRuntime.InvokeVoidAsync("Radzen.mask", GetId(), Mask, Pattern, CharacterPattern);
+
+            Value = await JSRuntime.InvokeAsync<string>("Radzen.getInputValue", Element);
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null) { EditContext?.NotifyFieldChanged(FieldIdentifier); }
