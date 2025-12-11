@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
@@ -54,7 +54,7 @@
   <!-- Generate llms.txt from demo pages -->
   <!-- Usage: dotnet build -p:GenerateLlmsTxt=true -->
   <Target Name="GenerateLlmsTxt"
-         BeforeTargets="Build"
+         BeforeTargets="ResolveStaticWebAssetsInputs;ProcessStaticWebAssets;ComputeFilesToPublish;Build"
          Condition="'$(Configuration)' == 'Release' OR '$(GenerateLlmsTxt)' == 'true'">
     <PropertyGroup>
       <LlmsTxtOutputPath>$(ProjectDir)wwwroot\llms.txt</LlmsTxtOutputPath>

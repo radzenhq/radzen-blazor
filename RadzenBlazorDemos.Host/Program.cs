@@ -15,6 +15,7 @@ using Radzen;
 using RadzenBlazorDemos;
 using RadzenBlazorDemos.Data;
 using RadzenBlazorDemos.Services;
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -117,6 +118,14 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseRouting();
 app.UseAntiforgery();
+app.MapGet("/llms.txt", () =>
+{
+    var path = Path.Combine(app.Environment.WebRootPath, "llms.txt");
+
+    return File.Exists(path)
+        ? Results.File(path, "text/plain")
+        : Results.NotFound();
+});
 app.MapRazorPages();
 app.MapRazorComponents<RadzenBlazorDemos.Host.App>()
     .AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly);
