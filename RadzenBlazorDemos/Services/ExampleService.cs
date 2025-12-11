@@ -114,7 +114,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
-                    Toc = [ new () { Text = "Material Icons", Anchor = "#material-icons" }, new () { Text = "Icon color", Anchor = "#icon-color" }, new () { Text = "Filled icons", Anchor = "#filled-icons" }, new () { Text = "Styled icons", Anchor = "#styled-icons" }, new () { Text = "Using RadzenIcon with other icon fonts", Anchor = "#icons-width-other-fonts" } ],
+                    Toc = [ new () { Text = "Material Icons", Anchor = "#material-icons" }, new () { Text = "Icon color", Anchor = "#icon-color" }, new () { Text = "Filled icons", Anchor = "#filled-icons" }, new () { Text = "Styled icons", Anchor = "#styled-icons" }, new () { Text = "Using RadzenIcon with other icon fonts", Anchor = "#icons-width-other-fonts" }, new () { Text = "Video: RadzenIcon in Radzen Blazor Studio", Anchor = "#video-icons" } ],
                     Name = "Icons",
                     Path = "icon",
                     Updated = true,
