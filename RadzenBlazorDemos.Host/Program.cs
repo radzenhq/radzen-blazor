@@ -106,7 +106,6 @@ app.UseRequestLocalization(new RequestLocalizationOptions
 app.UseStatusCodePagesWithReExecute("/not-found");
 app.UseHttpsRedirection();
 app.UseDefaultFiles();
-app.UseStaticFiles();
 app.MapStaticAssets();
 if (!app.Environment.IsDevelopment())
 {
