@@ -54,7 +54,7 @@
   <!-- Generate llms.txt from demo pages -->
   <!-- Usage: dotnet build -p:GenerateLlmsTxt=true -->
   <Target Name="GenerateLlmsTxt"
-         BeforeTargets="ResolveStaticWebAssetsInputs;ProcessStaticWebAssets;ComputeFilesToPublish;Build"
+         BeforeTargets="Build"
          Condition="'$(Configuration)' == 'Release' OR '$(GenerateLlmsTxt)' == 'true'">
     <PropertyGroup>
       <LlmsTxtOutputPath>$(ProjectDir)wwwroot\llms.txt</LlmsTxtOutputPath>
