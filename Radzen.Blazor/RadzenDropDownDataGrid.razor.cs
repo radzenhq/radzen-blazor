@@ -466,21 +466,26 @@ namespace Radzen.Blazor
 
                 StateHasChanged();
 
-                if (!Multiple && grid != null && SelectedItem != null)
-                {
-                    var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (pagedData != null ? pagedData : Enumerable.Empty<object>())).OfType<object>().ToList();
-                    if (items.Any())
-                    {
-                        selectedIndex = items.IndexOf(SelectedItem);
-                        if (selectedIndex >= 0)
-                        {
-                            await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", selectedIndex - 1, null);
-                        }
-                    }
-                }
+                await FocusItem();
             }
 
             await base.OnAfterRenderAsync(firstRender);
+        }
+
+        async Task FocusItem()
+        {
+            if (!Multiple && grid != null && SelectedItem != null)
+            {
+                var items = (LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (pagedData != null ? pagedData : Enumerable.Empty<object>())).OfType<object>().ToList();
+                if (items.Any())
+                {
+                    selectedIndex = items.IndexOf(SelectedItem);
+                    if (selectedIndex >= 0)
+                    {
+                        await JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", selectedIndex - 1, null);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -1049,6 +1054,7 @@ namespace Radzen.Blazor
             if (AllowRowSelectOnRowClick)
             {
                 await SelectItem(item);
+                await FocusItem();
             }
         }
         /// <summary>
