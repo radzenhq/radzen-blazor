@@ -108,7 +108,7 @@
                         <tr>
                             @if (i == 0) // Only add the th elements for the first row
                             {
-                             @if (ShowGroupExpandColumn)
+                                @if (ShowGroupExpandColumn)
                                 {
                                     @foreach (var g in Groups)
                                     {
@@ -117,12 +117,23 @@
                                         </th>
                                     }
                                 }
-                                    @if (Template != null && ShowExpandColumn && i == 0)
-                                    {
-                                        <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
-                                            <span class="rz-column-title"><span style="visibility:hidden">EC</span></span>
-                                        </th>
-                                    }
+                                @if (Template != null && ShowExpandColumn && i == 0)
+                                {
+                                    <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
+                                        <span class="rz-column-title">
+                                            @if(ShowExpandAllRowsButton && ExpandMode == DataGridExpandMode.Multiple)
+                                            {
+                                                <a title=@TitleAttribute() aria-label="@TitleAttribute()" @onclick:preventDefault="true" @onclick="_ => this.ToggleAllRowsExpand()" @onclick:stopPropagation="true">
+                                                    <span class="@(allRowsExpanded ? "rz-row-toggler rzi-chevron-circle-right" : "rzi-chevron-circle-down")"></span>
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span style="visibility:hidden">EC</span>
+                                            }
+                                        </span>
+                                    </th>
+                                }
                             }
                             @for (var j = 0; j < visibleColumns.Count; j++)
                             {

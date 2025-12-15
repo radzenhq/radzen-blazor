@@ -1239,6 +1239,14 @@ namespace Radzen.Blazor
         public bool ShowExpandColumn { get; set; } = true;
 
         /// <summary>
+        /// Gets or sets a value indicating whether all rows can be expanded at once from the header.
+        /// Setting is only available when <see cref="ExpandMode"/> is set to DataGridExpandMode.Multiple.
+        /// </summary>
+        /// <value>The expandAll button in header visibility indicator</value>
+        [Parameter]
+        public bool ShowExpandAllRowsButton { get; set; }
+
+        /// <summary>
         /// Gets or sets the edit mode.
         /// </summary>
         /// <value>The edit mode.</value>
@@ -2754,6 +2762,36 @@ namespace Radzen.Blazor
         /// <value><c>true</c> if want to show left column with group visibility toggle, otherwise <c>false</c>.</value>
         [Parameter]
         public bool ShowGroupExpandColumn { get; set; } = true;
+
+        /// <summary>
+        /// Gets or sets the title attribute of the expand all button.
+        /// </summary>
+        /// <value>The title attribute value of the expand all button.</value>
+        [Parameter]
+        public string ExpandAllTitle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the title attribute of the collapse all button.
+        /// </summary>
+        /// <value>The title attribute value of the collapse all button.</value>
+        [Parameter]
+        public string CollapseAllTitle { get; set; }
+
+        private bool allRowsExpanded = false;
+        private async Task ToggleAllRowsExpand()
+        {
+            await (allRowsExpanded ? CollapseRows(PagedView) : ExpandRows(PagedView));
+            allRowsExpanded = !allRowsExpanded;
+        }
+
+        private string TitleAttribute()
+        {
+            if (!allRowsExpanded)
+            {
+                return string.IsNullOrWhiteSpace(ExpandAllTitle) ? "Expand all" : ExpandAllTitle;
+            }
+            return string.IsNullOrWhiteSpace(CollapseAllTitle) ? "Collapse all" : CollapseAllTitle;
+        }
 
         /// <summary>
         /// Gets or sets the grid lines.
