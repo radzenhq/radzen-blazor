@@ -364,8 +364,7 @@ namespace Radzen.Blazor
             {
                 if (!Multiple && !isFromKey)
                 {
-                    isOpen = false;
-                    await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID, Reference, nameof(OnClose));
+                    await ClosePopup("Enter");
                 }
 
                 if (ClearSearchAfterSelection)
