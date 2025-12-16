@@ -91,6 +91,11 @@ class HtmlSanitizer
             return string.Empty;
         }
 
+        if ((value.StartsWith('\'') && value.EndsWith('\'')) || (value.StartsWith('"') && value.EndsWith('"')))
+        {
+            value = value[1..^1];
+        }
+
         if (name == "style")
         {
             var decoded = HtmlDecode(value).ToLowerInvariant();
@@ -104,11 +109,6 @@ class HtmlSanitizer
         if (UriAttributes.Contains(name) && IsDangerousUrl(value))
         {
             return string.Empty;
-        }
-
-        if ((value.StartsWith('\'') && value.EndsWith('\'')) || (value.StartsWith('"') && value.EndsWith('"')))
-        {
-            value = value[1..^1];
         }
 
         return $" {name}=\"{value}\"";
