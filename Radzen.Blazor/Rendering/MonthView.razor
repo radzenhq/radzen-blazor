@@ -153,6 +153,12 @@
                         // Overlap, we cannot place the appointment in this band
                         continue;
                     }
+                    
+                    if(lastAppointmentInBand.Data.Start < slot.Start && lastAppointmentInBand.Data.End > slot.End)
+                    {
+                        // Overlap, we cannot place the appointment in this band
+                        continue;
+					}
 
                     // No overlap, we can add the appointment to this band if there is space for it. A band can contain appointments whose total duration is less than one week.
                     var bandDuration = band.Sum(a => a.Data.End.Subtract(days[a.DayIndex].Start).TotalDays);
