@@ -2218,6 +2218,7 @@ window.Radzen = {
         if (ref) {
             ref.removeEventListener('input', ref.inputListener);
             ref.removeEventListener('paste', ref.pasteListener);
+            ref.removeEventListener('drop', ref.dropListener);
             ref.removeEventListener('keydown', ref.keydownListener);
             ref.removeEventListener('click', ref.clickListener);
             document.removeEventListener('selectionchange', ref.selectionChangeListener);
