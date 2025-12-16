@@ -2000,7 +2000,7 @@ window.Radzen = {
         }
     }
   },
-  createEditor: function (ref, uploadUrl, paste, drop, instance, shortcuts) {
+  createEditor: function (ref, uploadUrl, paste, instance, shortcuts) {
     ref.inputListener = function () {
       instance.invokeMethodAsync('OnChange', ref.innerHTML);
     };
@@ -2048,18 +2048,18 @@ window.Radzen = {
         instance.invokeMethodAsync('OnSelectionChange');
       }
     };
-    ref.handleInsert = function (e, transfer, hasDelegate, callbackName) {
+    ref.handleInsert = function (e, transfer, hasDelegate) {
 
       if (transfer.files.length > 0) {
         for (const file of transfer.files) {
-          ref.handleFileInsert(e, file, hasDelegate, callbackName);
+          ref.handleFileInsert(e, file, hasDelegate);
           }
       }
       else if (hasDelegate) {
-        ref.handleTextInsert(e, transfer, callbackName)
+        ref.handleTextInsert(e, transfer)
       }
     };
-    ref.handleFileInsert = function (event, file, hasDelegate, callbackName) {
+    ref.handleFileInsert = function (event, file, hasDelegate) {
       event.preventDefault();
 
       if (uploadUrl) {
@@ -2073,7 +2073,7 @@ window.Radzen = {
               var result = JSON.parse(xhr.responseText);
               var html = '<img src="' + result.url + '">';
               if (hasDelegate) {
-                instance.invokeMethodAsync(callbackName, html)
+                instance.invokeMethodAsync('OnPaste', html)
                   .then(function (html) {
                     document.execCommand("insertHTML", false, html);
                   });
@@ -2099,7 +2099,7 @@ window.Radzen = {
           var html = '<img src="' + e.target.result + '">';
 
           if (hasDelegate) {
-            instance.invokeMethodAsync(callbackName, html)
+            instance.invokeMethodAsync('OnPaste', html)
               .then(function (html) {
                 document.execCommand("insertHTML", false, html);
               });
@@ -2110,7 +2110,7 @@ window.Radzen = {
         reader.readAsDataURL(file);
       }
     }
-    ref.handleTextInsert = function (e, transfer, callbackName) {
+    ref.handleTextInsert = function (e, transfer) {
       e.preventDefault();
 
       var data = transfer.getData('text/html') || transfer.getData('text/plain');
@@ -2127,17 +2127,17 @@ window.Radzen = {
         data = data.substring(startIndex + startMarker.length, endIndex).trim();
       }
 
-      instance.invokeMethodAsync(callbackName, data)
+      instance.invokeMethodAsync('OnPaste', data)
         .then(ref.focus())
         .then(function (html) {
           document.execCommand("insertHTML", false, html);
         });
     }
     ref.pasteListener = function (e) {
-      ref.handleInsert(e, e.clipboardData, paste, 'OnPaste');
+      ref.handleInsert(e, e.clipboardData, paste);
     };
     ref.dropListener = function (e) {
-      ref.handleInsert(e, e.dataTransfer, drop, 'OnDrop');
+      ref.handleInsert(e, e.dataTransfer, paste);
     };
     ref.addEventListener('input', ref.inputListener);
     ref.addEventListener('paste', ref.pasteListener);

@@ -110,24 +110,6 @@ namespace Radzen.Blazor
         public EventCallback<HtmlEditorPasteEventArgs> Paste { get; set; }
 
         /// <summary>
-        /// A callback that will be invoked when the user drops content in the editor. Commonly used to filter unwanted HTML.
-        /// </summary>
-        /// <example>
-        /// <code>
-        /// &lt;RadzenHtmlEditor @bind-Value=@html Drop=@OnDrop /&gt;
-        /// @code {
-        ///   string html = "@lt;strong&gt;Hello&lt;/strong&gt; world!";
-        ///   void OnDrop(HtmlEditorPasteEventArgs args)
-        ///   {
-        ///     // Set args.Html to filter unwanted tags.
-        ///     args.Html = args.Html.Replace("&lt;br&gt;", "");
-        ///   }
-        /// </code>
-        /// </example>
-        [Parameter]
-        public EventCallback<HtmlEditorPasteEventArgs> Drop { get; set; }
-
-        /// <summary>
         /// A callback that will be invoked when there is an error during upload.
         /// </summary>
         [Parameter]
@@ -375,7 +357,7 @@ namespace Radzen.Blazor
             {
                 if (Visible)
                 {
-                    await JSRuntime.InvokeVoidAsync("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Drop.HasDelegate, Reference, shortcuts.Keys);
+                    await JSRuntime.InvokeVoidAsync("Radzen.createEditor", ContentEditable, UploadUrl, Paste.HasDelegate, Reference, shortcuts.Keys);
                 }
             }
 
@@ -460,20 +442,6 @@ namespace Radzen.Blazor
             var args = new HtmlEditorPasteEventArgs { Html = html };
 
             await Paste.InvokeAsync(args);
-
-            return args.Html;
-        }
-
-        /// <summary>
-        /// Invoked via interop when the user drops content in RadzenHtmlEditor. Invokes <see cref="Drop" />.
-        /// </summary>
-        /// <param name="html">The HTML.</param>
-        [JSInvokable]
-        public async Task<string> OnDrop(string html)
-        {
-            var args = new HtmlEditorPasteEventArgs { Html = html };
-
-            await Drop.InvokeAsync(args);
 
             return args.Html;
         }

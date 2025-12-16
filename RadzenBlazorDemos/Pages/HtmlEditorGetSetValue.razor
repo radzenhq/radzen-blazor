@@ -1,4 +1,4 @@
-﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput Change=@OnChange Paste=@OnPaste Drop=@OnDrop UploadComplete=@OnUploadComplete Execute=@OnExecute UploadUrl="upload/image" />
+﻿<RadzenHtmlEditor @bind-Value=@htmlValue style="height: 450px;" Input=@OnInput Change=@OnChange Paste=@OnPaste UploadComplete=@OnUploadComplete Execute=@OnExecute UploadUrl="upload/image" />
 
 <EventConsole @ref=@console />
 
@@ -16,11 +16,6 @@
     EventConsole console;
 
     void OnPaste(HtmlEditorPasteEventArgs args)
-    {
-        console.Log($"Paste: {args.Html}");
-    }
-
-    void OnDrop(HtmlEditorPasteEventArgs args)
     {
         console.Log($"Paste: {args.Html}");
     }
