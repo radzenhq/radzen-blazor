@@ -124,7 +124,7 @@
                                             @if(ShowExpandAllRowsButton && ExpandMode == DataGridExpandMode.Multiple)
                                             {
                                                 <a title=@TitleAttribute() aria-label="@TitleAttribute()" @onclick:preventDefault="true" @onclick="_ => this.ToggleAllRowsExpand()" @onclick:stopPropagation="true">
-                                                    <span class="@(allRowsExpanded ? "rz-row-toggler rzi-chevron-circle-right" : "rzi-chevron-circle-down")"></span>
+                                                        <span class="@(allRowsExpanded ? "rzi-chevron-circle-down" : "rzi-chevron-circle-right")"></span>
                                                 </a>
                                             }
                                             else
