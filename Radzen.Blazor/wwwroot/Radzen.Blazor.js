@@ -2000,7 +2000,7 @@ window.Radzen = {
         }
     }
   },
-  createEditor: function (ref, uploadUrl, paste, instance, shortcuts) {
+  createEditor: function (ref, uploadUrl, paste, drop, instance, shortcuts) {
     ref.inputListener = function () {
       instance.invokeMethodAsync('OnChange', ref.innerHTML);
     };
