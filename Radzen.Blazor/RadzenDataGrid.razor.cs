@@ -1244,7 +1244,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The expandAll button in header visibility indicator</value>
         [Parameter]
-        public bool ShowExpandAllRowsButton { get; set; }
+        public bool ShowExpandAll { get; set; }
 
         /// <summary>
         /// Gets or sets the edit mode.
@@ -2768,14 +2768,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The title attribute value of the expand all button.</value>
         [Parameter]
-        public string ExpandAllTitle { get; set; }
+        public string ExpandAllTitle { get; set; } = "Expand all";
 
         /// <summary>
         /// Gets or sets the title attribute of the collapse all button.
         /// </summary>
         /// <value>The title attribute value of the collapse all button.</value>
         [Parameter]
-        public string CollapseAllTitle { get; set; }
+        public string CollapseAllTitle { get; set; } = "Collapse all";
 
         private bool allRowsExpanded = false;
         private async Task ToggleAllRowsExpand()
@@ -2786,11 +2786,7 @@ namespace Radzen.Blazor
 
         private string TitleAttribute()
         {
-            if (!allRowsExpanded)
-            {
-                return string.IsNullOrWhiteSpace(ExpandAllTitle) ? "Expand all" : ExpandAllTitle;
-            }
-            return string.IsNullOrWhiteSpace(CollapseAllTitle) ? "Collapse all" : CollapseAllTitle;
+            return allRowsExpanded ? CollapseAllTitle : ExpandAllTitle;
         }
 
         /// <summary>

@@ -121,7 +121,7 @@
                                 {
                                     <th class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(deepestChildColumnLevel + 1)>
                                         <span class="rz-column-title">
-                                            @if(ShowExpandAllRowsButton && ExpandMode == DataGridExpandMode.Multiple)
+                                            @if(ShowExpandAll && ExpandMode == DataGridExpandMode.Multiple)
                                             {
                                                 <a title=@TitleAttribute() aria-label="@TitleAttribute()" @onclick:preventDefault="true" @onclick="_ => this.ToggleAllRowsExpand()" @onclick:stopPropagation="true">
                                                         <span class="@(allRowsExpanded ? "rzi-chevron-circle-down" : "rzi-chevron-circle-right")"></span>
