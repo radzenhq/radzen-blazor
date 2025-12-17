@@ -45,6 +45,18 @@
                     <CodeViewer ComponentName="@ComponentName" @bind-Value="@source" ComponentSource="@Source" PageName="@ExampleUrl" Compiled="OnCompiled" />
                 </div>
             </RadzenTabsItem>
+            <RadzenTabsItem Text="Split View" Title="Split view between example and source code">
+                <RadzenSplitter>
+                    <RadzenSplitterPane Size="50%">
+                        @(dynamicContent ?? ChildContent)
+                    </RadzenSplitterPane>
+                    <RadzenSplitterPane>
+                        <div class="source-tab-item rz-pb-2">
+                            <CodeViewer ComponentName="@ComponentName" @bind-Value="@source" ComponentSource="@Source" PageName="@ExampleUrl" Compiled="OnCompiled" />
+                        </div>
+                    </RadzenSplitterPane>
+                </RadzenSplitter>
+            </RadzenTabsItem>
             @foreach (var p in AdditionalSourceCodePages)
             {
             <RadzenTabsItem Text="@Path.GetFileName(p)" Icon="code">
@@ -133,7 +145,8 @@
             builder.CloseComponent();
         };
 
-        selectedIndex = 0;
+		// If split view was selected, stay in split view after recompilation
+        selectedIndex = selectedIndex & 2;
     }
 
     public void Dispose()
