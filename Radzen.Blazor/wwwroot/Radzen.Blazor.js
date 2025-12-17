@@ -2048,84 +2048,100 @@ window.Radzen = {
         instance.invokeMethodAsync('OnSelectionChange');
       }
     };
-    ref.pasteListener = function (e) {
-      var item = e.clipboardData.items[0];
+    ref.handleInsert = function (e, transfer, hasDelegate) {
 
-      if (item.kind == 'file') {
-        e.preventDefault();
-        var file = item.getAsFile();
+      if (transfer.files.length > 0) {
+        for (const file of transfer.files) {
+          ref.handleFileInsert(e, file, hasDelegate);
+          }
+      }
+      else if (hasDelegate) {
+        ref.handleTextInsert(e, transfer)
+      }
+    };
+    ref.handleFileInsert = function (event, file, hasDelegate) {
+      event.preventDefault();
 
-        if (uploadUrl) {
-            var xhr = new XMLHttpRequest();
-            var data = new FormData();
-            data.append("file", file);
-            xhr.onreadystatechange = function (e) {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    var status = xhr.status;
-                    if (status === 0 || (status >= 200 && status < 400)) {
-                        var result = JSON.parse(xhr.responseText);
-                        var html = '<img src="' + result.url + '">';
-                        if (paste) {
-                            instance.invokeMethodAsync('OnPaste', html)
-                                .then(function (html) {
-                                    document.execCommand("insertHTML", false, html);
-                                });
-                        } else {
-                          document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
-                        }
-                        instance.invokeMethodAsync('OnUploadComplete', xhr.responseText);
-                    } else {
-                        instance.invokeMethodAsync('OnError', xhr.responseText);
-                    }
-                }
-            }
-            instance.invokeMethodAsync('GetHeaders').then(function (headers) {
-                xhr.open('POST', uploadUrl, true);
-                for (var name in headers) {
-                    xhr.setRequestHeader(name, headers[name]);
-                }
-                xhr.send(data);
-            });
-        } else {
-            var reader = new FileReader();
-            reader.onload = function (e) {
-              var html = '<img src="' + e.target.result + '">';
-
-              if (paste) {
+      if (uploadUrl) {
+        var xhr = new XMLHttpRequest();
+        var data = new FormData();
+        data.append("file", file);
+        xhr.onreadystatechange = function (e) {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            var status = xhr.status;
+            if (status === 0 || (status >= 200 && status < 400)) {
+              var result = JSON.parse(xhr.responseText);
+              var html = '<img src="' + result.url + '">';
+              if (hasDelegate) {
                 instance.invokeMethodAsync('OnPaste', html)
                   .then(function (html) {
                     document.execCommand("insertHTML", false, html);
                   });
               } else {
-                document.execCommand("insertHTML", false, html);
+                document.execCommand("insertHTML", false, '<img src="' + result.url + '">');
               }
-            };
-            reader.readAsDataURL(file);
+              instance.invokeMethodAsync('OnUploadComplete', xhr.responseText);
+            } else {
+              instance.invokeMethodAsync('OnError', xhr.responseText);
+            }
+          }
         }
-      } else if (paste) {
-        e.preventDefault();
-        var data = e.clipboardData.getData('text/html') || e.clipboardData.getData('text/plain');
-        
-        const startMarker = "<!--StartFragment-->";
-        const endMarker = "<!--EndFragment-->";
+        instance.invokeMethodAsync('GetHeaders').then(function (headers) {
+          xhr.open('POST', uploadUrl, true);
+          for (var name in headers) {
+            xhr.setRequestHeader(name, headers[name]);
+          }
+          xhr.send(data);
+        });
+      } else {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var html = '<img src="' + e.target.result + '">';
 
-        const startIndex = data.indexOf(startMarker);
-        const endIndex = data.indexOf(endMarker);
-
-        // check if the pasted data contains fragment markers
-        if (startIndex != -1 || endIndex != -1 || endIndex > startIndex) {
-            // only paste the fragment
-            data = data.substring(startIndex + startMarker.length, endIndex).trim();
-        }
-
-        instance.invokeMethodAsync('OnPaste', data)
-          .then(function (html) {
-            document.execCommand("insertHTML", false, html);
-          });
+          if (hasDelegate) {
+            instance.invokeMethodAsync('OnPaste', html)
+              .then(function (html) {
+                document.execCommand("insertHTML", false, html);
+              });
+            } else {
+              document.execCommand("insertHTML", false, html);
+            }
+        };
+        reader.readAsDataURL(file);
       }
+    }
+    ref.handleTextInsert = function (e, transfer) {
+      e.preventDefault();
+
+      var data = transfer.getData('text/html') || transfer.getData('text/plain');
+
+      const startMarker = "<!--StartFragment-->";
+      const endMarker = "<!--EndFragment-->";
+
+      const startIndex = data.indexOf(startMarker);
+      const endIndex = data.indexOf(endMarker);
+
+      // check if the pasted data contains fragment markers
+      if (startIndex != -1 || endIndex != -1 || endIndex > startIndex) {
+        // only paste the fragment
+        data = data.substring(startIndex + startMarker.length, endIndex).trim();
+      }
+
+      instance.invokeMethodAsync('OnPaste', data)
+        .then(ref.focus())
+        .then(function (html) {
+          document.execCommand("insertHTML", false, html);
+        });
+    }
+    ref.pasteListener = function (e) {
+      ref.handleInsert(e, e.clipboardData, paste);
+    };
+    ref.dropListener = function (e) {
+      ref.handleInsert(e, e.dataTransfer, paste);
     };
     ref.addEventListener('input', ref.inputListener);
     ref.addEventListener('paste', ref.pasteListener);
+    ref.addEventListener('drop', ref.dropListener);
     ref.addEventListener('keydown', ref.keydownListener);
     ref.addEventListener('click', ref.clickListener);
     document.addEventListener('selectionchange', ref.selectionChangeListener);
@@ -2201,6 +2217,7 @@ window.Radzen = {
     if (ref) {
       ref.removeEventListener('input', ref.inputListener);
       ref.removeEventListener('paste', ref.pasteListener);
+      ref.removeEventListener('drop', ref.dropListener);
       ref.removeEventListener('keydown', ref.keydownListener);
       ref.removeEventListener('click', ref.clickListener);
       document.removeEventListener('selectionchange', ref.selectionChangeListener);
