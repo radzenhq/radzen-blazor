@@ -115,7 +115,14 @@ if (!app.Environment.IsDevelopment())
             Path.Combine(app.Environment.WebRootPath, "demos")),
         RequestPath = "/demos"
     });
+
+    app.UseStaticFiles(new StaticFileOptions {
+        FileProvider = new PhysicalFileProvider(
+            Path.Combine(app.Environment.WebRootPath)),
+        RequestPath = "/images"
+    });
 }
+
 app.UseRouting();
 app.UseAntiforgery();
 app.MapGet("/llms.txt", () =>

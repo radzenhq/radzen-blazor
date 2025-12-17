@@ -46,7 +46,7 @@ namespace RadzenBlazorDemos
                     file.CopyTo(stream);
 
                     // Return the URL of the file
-                    var url = Url.Content($"~/{fileName}");
+                    var url = Url.Content($"~/images/{fileName}");
 
                     return Ok(new { Url = url });
                 }
