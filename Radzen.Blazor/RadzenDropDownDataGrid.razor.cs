@@ -94,6 +94,15 @@ namespace Radzen.Blazor
         public EventCallback<DataGridColumnReorderedEventArgs<object>> ColumnReordered { get; set; }
 
         /// <summary>
+        /// Gets or sets the callback invoked when the user right-clicks the component.
+        /// Commonly used with <see cref="ContextMenuService"/> to display context menus.
+        /// Receives mouse event arguments containing click position.
+        /// </summary>
+        /// <value>The context menu (right-click) event callback.</value>
+        [Parameter]
+        public EventCallback<Microsoft.AspNetCore.Components.Web.MouseEventArgs> ContextMenuDataGrid { get; set; }
+
+        /// <summary>
         /// Gets or sets the footer template.
         /// </summary>
         /// <value>The footer template.</value>
