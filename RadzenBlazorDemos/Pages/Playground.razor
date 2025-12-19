@@ -4,7 +4,6 @@
 @using System.Text.RegularExpressions
 @using System.Text.Json
 @using System.Net.Http.Json
-@using Microsoft.AspNetCore.Components.WebAssembly.Services
 @using Microsoft.AspNetCore.Components.Forms
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
@@ -79,7 +78,7 @@
     private bool saveSuccess;
     private string currentUrl;
     private RenderFragment dynamicContent;
-    private ICompilerService compiler;
+    private CompilerServiceFactory compilerFactory;
     private string editToken;
 
     private const string DefaultSource = @"<RadzenButton Text=""Hello World!"" Click=""@OnClick"" />
@@ -171,7 +170,8 @@
 
             await Task.Yield();
 
-            await EnsureCompilerAsync();
+            compilerFactory ??= new CompilerServiceFactory(ServiceProvider, NavigationManager);
+            var compiler = await compilerFactory.GetCompilerAsync();
 
             var type = await compiler.CompileAsync(source);
 
@@ -285,36 +285,6 @@
         {
             // Ignore localStorage errors
         }
-    }
-
-    async Task EnsureCompilerAsync()
-    {
-        if (compiler != null)
-        {
-            return;
-        }
-
-        var assemblyLoader = ServiceProvider.GetService(typeof(LazyAssemblyLoader)) as LazyAssemblyLoader;
-
-        if (assemblyLoader != null)
-        {
-            await assemblyLoader.LoadAssembliesAsync(new[]
-            {
-                "Microsoft.CodeAnalysis.dll",
-                "Microsoft.CodeAnalysis.CSharp.dll",
-                "Microsoft.CodeAnalysis.Razor.dll",
-                "Microsoft.AspNetCore.Razor.Language.dll",
-                "Microsoft.AspNetCore.Mvc.Razor.Extensions.dll",
-                "MetadataReferenceService.BlazorWasm.dll",
-                "MetadataReferenceService.Abstractions.dll"
-            });
-        }
-
-        var compilerType = AppDomain.CurrentDomain.GetAssemblies()
-            .Select(a => a.GetType("RadzenBlazorDemos.CompilerService", false))
-            .FirstOrDefault(t => t != null);
-        
-        compiler = (ICompilerService)Activator.CreateInstance(compilerType, NavigationManager);
     }
 
     public void Dispose()
