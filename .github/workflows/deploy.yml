@@ -49,12 +49,9 @@ jobs:
           tags: ${{ steps.meta.outputs.image }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Deploy on Dokku (pull and run prebuilt image)
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Push to dokku
+        uses: dokku/github-action@master
         with:
-          host: ${{ secrets.DOKKU_HOST }}
-          username: dokku
-          key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
-          script: |
-            dokku git:from-image "${{ env.DOKKU_APP }}" "${{ steps.meta.outputs.image }}"
+          git_remote_url: ${{ secrets.DOKKU_REPO }}
+          ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+          deploy_docker_image: ${{ steps.meta.outputs.image }}
