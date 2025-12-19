@@ -1,0 +1,308 @@
+@page "/playground"
+@page "/playground/{Id}"
+@layout PlaygroundLayout
+@using System.Text.RegularExpressions
+@using System.Text.Json
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IServiceProvider ServiceProvider
+@inject AntiforgeryStateProvider AntiforgeryStateProvider
+@implements IDisposable
+
+<PageTitle>Playground | Radzen Blazor Components</PageTitle>
+
+<RadzenSplitter Orientation="Orientation.Horizontal" Style="flex: 1;">
+    <RadzenSplitterPane Size="50%" Min="300px">
+        <RadzenStack class="rz-p-0 playground" Orientation="Orientation.Vertical" Gap="0" Style="height: 100%;">
+            <RadzenRow Gap="0.5rem" RowGap="0" class="rz-p-2 rz-ps-lg-4 rz-border-bottom" AlignItems="AlignItems.Center" Style="min-height: 48px;">
+                <RadzenColumn>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0" >
+                        Source Code
+                    </RadzenText>
+                </RadzenColumn>
+                <RadzenColumn>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                        <RadzenButton IsBusy=@isSaving Disabled=@(isBusy || isSaving) Click="Save" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" />
+                        <RadzenButton IsBusy=@isBusy Disabled=@isBusy Click="Run" Text="Run" Icon="play_circle" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Small" />
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn Size="12">
+                    <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.Small" class="rz-mb-2">@error</RadzenAlert>
+                    <RadzenAlert Visible=@(saveSuccess) AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.Small" class="rz-mb-2">
+                        <RadzenText TextStyle="TextStyle.Subtitle1">Snippet saved! Share this URL:</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Subtitle2">@currentUrl</RadzenText>
+                        <RadzenButton Click="CopyUrl" Text="Copy" Icon="content_copy" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Variant="Variant.Flat" />
+                    </RadzenAlert>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <div style="flex: 1; min-height: 0;">
+                <Monaco @ref="monaco" Value="@source" ValueChanged="OnValueChanged" Language="razor" Style="height: 100%; width: 100%;" />
+            </div>
+        </RadzenStack>
+    </RadzenSplitterPane>
+    <RadzenSplitterPane Min="300px">
+        <RadzenStack class="rz-p-0 playground" Orientation="Orientation.Vertical" Gap="0" Style="height: 100%;">
+            <RadzenRow Gap="0.5rem" RowGap="0" class="rz-p-2 rz-ps-lg-4 rz-border-bottom" AlignItems="AlignItems.Center"  Style="min-height: 48px;">
+                <RadzenColumn>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0" >
+                        Preview
+                    </RadzenText>
+                </RadzenColumn>
+            </RadzenRow>
+            <div class="rz-p-4" style="flex: 1; overflow: auto;">
+                @if (dynamicContent != null)
+                {
+                    @dynamicContent
+                }
+                else
+                {
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-disabled-color">
+                        Click "Run" to preview your code.
+                    </RadzenText>
+                }
+            </div>
+        </RadzenStack>
+    </RadzenSplitterPane>
+</RadzenSplitter>
+
+@code {
+    private Monaco monaco;
+    private string source = DefaultSource;
+    private string error;
+    private bool isBusy;
+    private bool isSaving;
+    private bool saveSuccess;
+    private string currentUrl;
+    private RenderFragment dynamicContent;
+    private CompilerServiceFactory compilerFactory;
+    private string editToken;
+
+    private const string DefaultSource = @"<RadzenButton Text=""Hello World!"" Click=""@OnClick"" />
+<RadzenText TextStyle=""TextStyle.Body1"" class=""rz-mt-4"">@message</RadzenText>
+
+@code {
+    string message = ""Click the button above!"";
+
+    void OnClick()
+    {
+        message = $""Button clicked at {DateTime.Now:HH:mm:ss}"";
+    }
+}";
+
+    [Parameter]
+    public string Id { get; set; }
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string Example { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load from saved snippet if Id is provided
+        if (!string.IsNullOrEmpty(Id))
+        {
+            await LoadSnippetAsync(Id);
+        }
+        // Load from example if Example query param is provided
+        else if (!string.IsNullOrEmpty(Example))
+        {
+            await LoadExampleAsync(Example);
+        }
+    }
+
+    async Task LoadSnippetAsync(string id)
+    {
+        try
+        {
+            var response = await Http.GetAsync($"/api/playground/{id}");
+            if (response.IsSuccessStatusCode)
+            {
+                var snippet = await response.Content.ReadFromJsonAsync<SnippetResponse>();
+                if (snippet != null)
+                {
+                    source = snippet.Source;
+                    // Try to get the edit token from localStorage
+                    editToken = await GetEditTokenAsync(id);
+                }
+            }
+        }
+        catch
+        {
+            // Use default source if snippet cannot be loaded
+        }
+    }
+
+    async Task LoadExampleAsync(string example)
+    {
+        try
+        {
+            var exampleSource = await Http.GetStringAsync($"/demos/Pages/{example}.txt");
+            source = Clean(exampleSource);
+        }
+        catch
+        {
+            // Use default source if example cannot be loaded
+        }
+    }
+
+    string Clean(string source)
+    {
+        return Regex.Replace(source, "</?RadzenExample[^>]*>\n?", "");
+    }
+
+    void OnValueChanged(string value)
+    {
+        source = value;
+        saveSuccess = false;
+    }
+
+    async Task Run()
+    {
+        try
+        {
+            error = null;
+            isBusy = true;
+            StateHasChanged();
+
+            await Task.Yield();
+
+            compilerFactory ??= new CompilerServiceFactory(ServiceProvider, NavigationManager);
+            var compiler = await compilerFactory.GetCompilerAsync();
+
+            var type = await compiler.CompileAsync(source);
+
+            dynamicContent = builder =>
+            {
+                builder.OpenComponent(0, type);
+                builder.CloseComponent();
+            };
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            dynamicContent = null;
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    async Task Save()
+    {
+        try
+        {
+            error = null;
+            saveSuccess = false;
+            isSaving = true;
+            StateHasChanged();
+
+            var antiforgeryToken = AntiforgeryStateProvider.GetAntiforgeryToken();
+
+            var request = new
+            {
+                id = Id,
+                source = source,
+                editToken = editToken
+            };
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/playground/save");
+            httpRequest.Content = JsonContent.Create(request);
+            
+            if (antiforgeryToken?.Value != null)
+            {
+                httpRequest.Headers.Add("X-CSRF-TOKEN", antiforgeryToken.Value);
+            }
+
+            var response = await Http.SendAsync(httpRequest);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                throw new Exception($"Failed to save: {errorResponse}");
+            }
+
+            var result = await response.Content.ReadFromJsonAsync<SaveResponse>();
+            
+            if (result != null)
+            {
+                // Store the edit token in localStorage
+                await SetEditTokenAsync(result.Id, result.EditToken);
+                editToken = result.EditToken;
+
+                // Navigate to the new URL if it's a new snippet or clone
+                if (result.IsNew || Id != result.Id)
+                {
+                    Id = result.Id;
+                    NavigationManager.NavigateTo($"/playground/{result.Id}", replace: false);
+                }
+
+                currentUrl = NavigationManager.ToAbsoluteUri($"/playground/{result.Id}").ToString();
+                saveSuccess = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    async Task CopyUrl()
+    {
+        if (!string.IsNullOrEmpty(currentUrl))
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", currentUrl);
+        }
+    }
+
+    async Task<string> GetEditTokenAsync(string id)
+    {
+        try
+        {
+            return await JSRuntime.InvokeAsync<string>("localStorage.getItem", $"playground-token-{id}");
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    async Task SetEditTokenAsync(string id, string token)
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", $"playground-token-{id}", token);
+        }
+        catch
+        {
+            // Ignore localStorage errors
+        }
+    }
+
+    public void Dispose()
+    {
+        GC.Collect();
+    }
+
+    class SnippetResponse
+    {
+        public string Id { get; set; }
+        public string Source { get; set; }
+        public string ParentId { get; set; }
+    }
+
+    class SaveResponse
+    {
+        public string Id { get; set; }
+        public string EditToken { get; set; }
+        public bool IsNew { get; set; }
+    }
+}

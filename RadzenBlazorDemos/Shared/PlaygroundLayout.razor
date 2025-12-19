@@ -1,0 +1,61 @@
+@using Microsoft.AspNetCore.Components
+
+@using Radzen.Blazor
+@inherits LayoutComponentBase
+@inject ThemeService ThemeService
+@inject QueryStringThemeService QueryStringThemeService
+@inject ExampleService ExampleService
+@inject NavigationManager UriHelper
+@inject IJSRuntime JSRuntime
+@inject TooltipService TooltipService
+@inject DialogService DialogService
+
+<Canonical />
+
+<RadzenComponents />
+
+<RadzenLayout>
+<RadzenHeader class="rz-p-0">
+    <ChildContent>
+        <MainTopNav />
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav" Style="height: 42px;">
+            <RadzenColumn Size="12" SizeSM="5">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    <RadzenText Text="Radzen Blazor Components" title="Radzen Blazor Components" class="rz-mx-2 rz-mx-lg-4" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="7" class="rz-display-none rz-display-sm-block">
+                <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+                    <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
+                        <RadzenLink Path="/docs/api" Text="API Reference" title="Radzen Blazor Components API Reference" class="rz-mx-2 rz-mx-lg-4" target="_blank" />
+                        <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" Text="GitHub" title="Star Radzen Blazor Components on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
+                    </div>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </ChildContent>
+</RadzenHeader>
+<RadzenBody class="rz-p-0 rz-display-flex">
+    @Body
+</RadzenBody>
+</RadzenLayout>
+
+@if (!rendered)
+{
+<div class="rz-app-loading">
+    <div class="logo-loading"></div>
+</div>
+}
+
+@code {
+    bool rendered;
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender)
+        {
+            rendered = true;
+            StateHasChanged();
+        }
+    }
+}

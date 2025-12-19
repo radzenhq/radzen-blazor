@@ -4,7 +4,6 @@
 @using System.Reflection;
 @using Microsoft.Extensions.DependencyInjection;
 @using System.Linq;
-@using Microsoft.AspNetCore.Components.WebAssembly.Services
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
@@ -19,6 +18,7 @@
                 Copy
             </button>
             <RadzenButton Visible=@(!ReadOnly) Disabled=@isBusy Click="@Reset" Text="Reset" Icon="refresh" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-text-truncate" />
+            <RadzenLink Visible=@(!ReadOnly) Path="@($"/playground?example={Uri.EscapeDataString(Path.GetFileNameWithoutExtension(PageName))}")" Text="Open in Playground" target="_blank" class="rz-button rz-button-xs rz-variant-outlined rz-base rz-shade-default rz-text-truncate" Title="Open in Playground" />
         </RadzenStack>
     </RadzenColumn>
     <RadzenColumn>
@@ -56,7 +56,7 @@
     private string source;
     private string error;
     private string language = "razor";
-    private ICompilerService compiler;
+    private CompilerServiceFactory compilerFactory;
 
     [Parameter]
     public EventCallback<Type> Compiled { get; set; }
@@ -125,6 +125,8 @@
         await OnValueChanged(source);
     }
 
+
+
     bool isBusy;
 
     async Task Run()
@@ -137,7 +139,8 @@
 
             await Task.Yield();
 
-            await EnsureCompilerAsync();
+            compilerFactory ??= new CompilerServiceFactory(ServiceProvider, NavigationManager);
+            var compiler = await compilerFactory.GetCompilerAsync();
 
             var type = await compiler.CompileAsync(source);
 
@@ -151,32 +154,5 @@
 
         isBusy = false;
         await JSRuntime.InvokeVoidAsync("eval", $"instances['{monaco.Id}'].updateOptions({{domReadOnly: false, readOnly: false }})");
-    }
-
-    async Task EnsureCompilerAsync()
-    {
-        if (compiler != null)
-        {
-            return;
-        }
-
-        var assemblyLoader = ServiceProvider.GetService<LazyAssemblyLoader>();
-
-        if (assemblyLoader != null)
-        {
-            await assemblyLoader.LoadAssembliesAsync(new[]
-            {
-                "Microsoft.CodeAnalysis.dll",
-                "Microsoft.CodeAnalysis.CSharp.dll",
-                "Microsoft.CodeAnalysis.Razor.dll",
-                "Microsoft.AspNetCore.Razor.Language.dll",
-                "Microsoft.AspNetCore.Mvc.Razor.Extensions.dll",
-                "MetadataReferenceService.BlazorWasm.dll",
-                "MetadataReferenceService.Abstractions.dll"
-            });
-        }
-
-        var compilerType = AppDomain.CurrentDomain.GetAssemblies().Select(a => a.GetType("RadzenBlazorDemos.CompilerService", false)).FirstOrDefault(t => t != null);
-        compiler = (ICompilerService)Activator.CreateInstance(compilerType, NavigationManager);
     }
 }
