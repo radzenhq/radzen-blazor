@@ -15,6 +15,7 @@ using Radzen;
 using RadzenBlazorDemos;
 using RadzenBlazorDemos.Data;
 using RadzenBlazorDemos.Services;
+using RadzenBlazorDemos.Host.Services;
 using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,6 +54,9 @@ builder.Services.AddSingleton<GitHubService>();
 
 builder.Services.AddAIChatService(options =>
     builder.Configuration.GetSection("AIChatService").Bind(options));
+
+builder.Services.Configure<PlaygroundOptions>(builder.Configuration.GetSection("Playground"));
+builder.Services.AddSingleton<PlaygroundService>();
 
 builder.Services.AddLocalization();
 
