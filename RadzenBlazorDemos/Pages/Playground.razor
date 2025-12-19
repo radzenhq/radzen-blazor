@@ -33,8 +33,9 @@
                 <RadzenColumn Size="12">
                     <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.Small" class="rz-mb-2">@error</RadzenAlert>
                     <RadzenAlert Visible=@(saveSuccess) AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.Small" class="rz-mb-2">
-                        Snippet saved! Share this URL: @currentUrl
-                        <RadzenButton Click="CopyUrl" Text="Copy" Icon="content_copy" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-ms-2" />
+                        <RadzenText TextStyle="TextStyle.Subtitle1">Snippet saved! Share this URL:</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Subtitle2">@currentUrl</RadzenText>
+                        <RadzenButton Click="CopyUrl" Text="Copy" Icon="content_copy" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Variant="Variant.Flat" />
                     </RadzenAlert>
                 </RadzenColumn>
             </RadzenRow>
