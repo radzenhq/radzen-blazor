@@ -54,7 +54,7 @@ jobs:
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.DOKKU_HOST }}
-          username: github-actions
+          username: dokku
           key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
           script: |
             dokku git:from-image "${{ env.DOKKU_APP }}" "${{ steps.meta.outputs.image }}"
