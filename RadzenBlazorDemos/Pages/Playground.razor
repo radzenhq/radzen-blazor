@@ -1,0 +1,185 @@
+@page "/playground"
+@layout PlaygroundLayout
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@inject IJSRuntime JSRuntime
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@inject IServiceProvider ServiceProvider
+@implements IDisposable
+
+<PageTitle>Playground | Radzen Blazor Components</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Playground
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Edit and run Blazor code in real-time.
+</RadzenText>
+
+<RadzenRow class="rz-pb-4" Gap="0.5rem">
+    <RadzenColumn>
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0.5rem">
+            <RadzenButton IsBusy=@isBusy Disabled=@isBusy Click="Run" Text="Run" Icon="play_circle" ButtonStyle="ButtonStyle.Primary" />
+            <RadzenButton Disabled=@true Click="Save" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Secondary" />
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+<RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" class="rz-mb-4">@error</RadzenAlert>
+
+<RadzenSplitter Orientation="Orientation.Horizontal" style="height: calc(100vh - 300px); min-height: 400px; border: 1px solid var(--rz-border-color);">
+    <RadzenSplitterPane Size="50%" Min="300px">
+        <div class="rz-p-0" style="height: 100%; display: flex; flex-direction: column;">
+            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-p-2 rz-m-0" style="border-bottom: 1px solid var(--rz-border-color);">
+                Source Code
+            </RadzenText>
+            <div style="flex: 1; min-height: 0;">
+                <Monaco @ref="monaco" Value="@source" ValueChanged="OnValueChanged" Language="razor" Style="height: 100%; width: 100%;" />
+            </div>
+        </div>
+    </RadzenSplitterPane>
+    <RadzenSplitterPane Min="300px">
+        <div class="rz-p-0" style="height: 100%; display: flex; flex-direction: column; overflow: auto;">
+            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-p-2 rz-m-0" style="border-bottom: 1px solid var(--rz-border-color);">
+                Preview
+            </RadzenText>
+            <div class="rz-p-4" style="flex: 1; overflow: auto;">
+                @if (dynamicContent != null)
+                {
+                    @dynamicContent
+                }
+                else
+                {
+                    <RadzenText TextStyle="TextStyle.Body2" class="rz-text-disabled-color">
+                        Click "Run" to preview your code.
+                    </RadzenText>
+                }
+            </div>
+        </div>
+    </RadzenSplitterPane>
+</RadzenSplitter>
+
+@code {
+    private Monaco monaco;
+    private string source = DefaultSource;
+    private string error;
+    private bool isBusy;
+    private RenderFragment dynamicContent;
+    private ICompilerService compiler;
+
+    private const string DefaultSource = @"<RadzenButton Text=""Hello World!"" Click=""@OnClick"" />
+<RadzenText TextStyle=""TextStyle.Body1"" class=""rz-mt-4"">@message</RadzenText>
+
+@code {
+    string message = ""Click the button above!"";
+
+    void OnClick()
+    {
+        message = $""Button clicked at {DateTime.Now:HH:mm:ss}"";
+    }
+}";
+
+    [SupplyParameterFromQuery]
+    [Parameter]
+    public string Example { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrEmpty(Example))
+        {
+            try
+            {
+                var exampleSource = await Http.GetStringAsync($"/demos/Pages/{Example}.txt");
+                source = Clean(exampleSource);
+            }
+            catch
+            {
+                // Use default source if example cannot be loaded
+            }
+        }
+    }
+
+    string Clean(string source)
+    {
+        return Regex.Replace(source, "</?RadzenExample[^>]*>\n?", "");
+    }
+
+    void OnValueChanged(string value)
+    {
+        source = value;
+    }
+
+    async Task Run()
+    {
+        try
+        {
+            error = null;
+            isBusy = true;
+            StateHasChanged();
+
+            await Task.Yield();
+
+            await EnsureCompilerAsync();
+
+            var type = await compiler.CompileAsync(source);
+
+            dynamicContent = builder =>
+            {
+                builder.OpenComponent(0, type);
+                builder.CloseComponent();
+            };
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            dynamicContent = null;
+        }
+        finally
+        {
+            isBusy = false;
+        }
+    }
+
+    void Save()
+    {
+        // TODO: Implement save functionality
+    }
+
+    async Task EnsureCompilerAsync()
+    {
+        if (compiler != null)
+        {
+            return;
+        }
+
+        var assemblyLoader = ServiceProvider.GetService(typeof(LazyAssemblyLoader)) as LazyAssemblyLoader;
+
+        if (assemblyLoader != null)
+        {
+            await assemblyLoader.LoadAssembliesAsync(new[]
+            {
+                "Microsoft.CodeAnalysis.dll",
+                "Microsoft.CodeAnalysis.CSharp.dll",
+                "Microsoft.CodeAnalysis.Razor.dll",
+                "Microsoft.AspNetCore.Razor.Language.dll",
+                "Microsoft.AspNetCore.Mvc.Razor.Extensions.dll",
+                "MetadataReferenceService.BlazorWasm.dll",
+                "MetadataReferenceService.Abstractions.dll"
+            });
+        }
+
+        var compilerType = AppDomain.CurrentDomain.GetAssemblies()
+            .Select(a => a.GetType("RadzenBlazorDemos.CompilerService", false))
+            .FirstOrDefault(t => t != null);
+        
+        compiler = (ICompilerService)Activator.CreateInstance(compilerType, NavigationManager);
+    }
+
+    public void Dispose()
+    {
+        GC.Collect();
+    }
+}
+
+

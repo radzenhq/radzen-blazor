@@ -1,0 +1,71 @@
+@using Microsoft.AspNetCore.Components
+
+@using Radzen.Blazor
+@inherits LayoutComponentBase
+@inject ThemeService ThemeService
+@inject QueryStringThemeService QueryStringThemeService
+@inject ExampleService ExampleService
+@inject NavigationManager UriHelper
+@inject IJSRuntime JSRuntime
+@inject TooltipService TooltipService
+@inject DialogService DialogService
+
+<Canonical />
+
+<RadzenComponents />
+
+<RadzenLayout>
+<RadzenHeader class="rz-p-0">
+    <ChildContent>
+        <MainTopNav />
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav">
+            <RadzenColumn Size="5">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    <RadzenLink Path="/" Text="Radzen Blazor Components" title="Radzen Blazor Components" />
+                </RadzenStack>
+            </RadzenColumn>
+            <RadzenColumn Size="7">
+                <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+                    <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
+                        <RadzenLink Path="/docs/api" Text="API Reference" title="Radzen Blazor Components API Reference" class="rz-mx-2 rz-mx-lg-4" target="_blank" />
+                        <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" Text="GitHub" title="Star Radzen Blazor Components on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
+                    </div>
+                </RadzenStack>
+            </RadzenColumn>
+        </RadzenRow>
+    </ChildContent>
+</RadzenHeader>
+<RadzenBody>
+    @Body
+</RadzenBody>
+</RadzenLayout>
+
+@if (!rendered)
+{
+<div class="rz-app-loading">
+    <div class="logo-loading"></div>
+</div>
+}
+
+<style>
+    html[style*="--blazor-load-percentage: 100%"] .rz-app-loading {
+        display: none;
+    }
+</style>
+
+@code {
+    bool rendered;
+
+    protected override void OnInitialized()
+    {
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine($"OnAfterRender: {firstRender}");
+        if (firstRender)
+        {
+            rendered = true;
+        }
+    }
+}

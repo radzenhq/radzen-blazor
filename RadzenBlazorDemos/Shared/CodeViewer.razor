@@ -19,6 +19,7 @@
                 Copy
             </button>
             <RadzenButton Visible=@(!ReadOnly) Disabled=@isBusy Click="@Reset" Text="Reset" Icon="refresh" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-text-truncate" />
+            <RadzenButton Visible=@(!ReadOnly) Click="@OpenPlayground" Text="Playground" Icon="code" ButtonStyle="ButtonStyle.Base" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" Title="Open in Playground" class="rz-text-truncate" />
         </RadzenStack>
     </RadzenColumn>
     <RadzenColumn>
@@ -123,6 +124,12 @@
         source = Clean(source);
 
         await OnValueChanged(source);
+    }
+
+    void OpenPlayground()
+    {
+        var exampleName = Path.GetFileNameWithoutExtension(PageName);
+        NavigationManager.NavigateTo($"/playground?example={Uri.EscapeDataString(exampleName)}");
     }
 
     bool isBusy;
