@@ -34,6 +34,7 @@ namespace RadzenBlazorDemos.Host.Controllers
         }
 
         [HttpPost("save")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveSnippet([FromBody] SaveSnippetRequest request)
         {
             if (!playgroundService.IsConfigured)
@@ -52,4 +53,3 @@ namespace RadzenBlazorDemos.Host.Controllers
         }
     }
 }
-

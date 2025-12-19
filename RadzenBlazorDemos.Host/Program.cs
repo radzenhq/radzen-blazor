@@ -58,6 +58,11 @@ builder.Services.AddAIChatService(options =>
 builder.Services.Configure<PlaygroundOptions>(builder.Configuration.GetSection("Playground"));
 builder.Services.AddSingleton<PlaygroundService>();
 
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "X-CSRF-TOKEN";
+});
+
 builder.Services.AddLocalization();
 
 /* --> Uncomment to enable localization

@@ -5,10 +5,12 @@
 @using System.Text.Json
 @using System.Net.Http.Json
 @using Microsoft.AspNetCore.Components.WebAssembly.Services
+@using Microsoft.AspNetCore.Components.Forms
 @inject IJSRuntime JSRuntime
 @inject HttpClient Http
 @inject NavigationManager NavigationManager
 @inject IServiceProvider ServiceProvider
+@inject AntiforgeryStateProvider AntiforgeryStateProvider
 @implements IDisposable
 
 <PageTitle>Playground | Radzen Blazor Components</PageTitle>
@@ -198,6 +200,8 @@
             isSaving = true;
             StateHasChanged();
 
+            var antiforgeryToken = AntiforgeryStateProvider.GetAntiforgeryToken();
+
             var request = new
             {
                 id = Id,
@@ -205,7 +209,15 @@
                 editToken = editToken
             };
 
-            var response = await Http.PostAsJsonAsync("/api/playground/save", request);
+            var httpRequest = new HttpRequestMessage(HttpMethod.Post, "/api/playground/save");
+            httpRequest.Content = JsonContent.Create(request);
+            
+            if (antiforgeryToken?.Value != null)
+            {
+                httpRequest.Headers.Add("X-CSRF-TOKEN", antiforgeryToken.Value);
+            }
+
+            var response = await Http.SendAsync(httpRequest);
             
             if (!response.IsSuccessStatusCode)
             {
