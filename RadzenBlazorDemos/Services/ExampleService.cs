@@ -1887,7 +1887,7 @@ namespace RadzenBlazorDemos
                     Children = new [] {
                         new Example
                         {
-                            Toc = [ new () { Text = "Chart Series", Anchor = "#series" }, new () { Text = "Basic usage", Anchor = "#series" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
+                            Toc = [ new () { Text = "Chart Series", Anchor = "#series" }, new () { Text = "Basic usage", Anchor = "#basic-usage" }, new () { Text = "Keyboard Navigation", Anchor = "#keyboard-navigation" } ],
                             Name = "Series",
                             Path = "chart-series",
                             Title = "Blazor Chart Component - Series Configuration | Free UI Components by Radzen",
