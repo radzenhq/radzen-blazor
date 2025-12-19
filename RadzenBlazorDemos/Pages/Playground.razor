@@ -202,6 +202,8 @@
             StateHasChanged();
 
             var antiforgeryToken = AntiforgeryStateProvider.GetAntiforgeryToken();
+            
+            Console.WriteLine($"Antiforgery token: {antiforgeryToken?.Value ?? "NULL"}");
 
             var request = new
             {
@@ -216,6 +218,10 @@
             if (antiforgeryToken?.Value != null)
             {
                 httpRequest.Headers.Add("X-CSRF-TOKEN", antiforgeryToken.Value);
+            }
+            else
+            {
+                Console.WriteLine("WARNING: No antiforgery token available!");
             }
 
             var response = await Http.SendAsync(httpRequest);
