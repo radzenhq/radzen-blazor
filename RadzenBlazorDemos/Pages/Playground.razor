@@ -30,7 +30,10 @@
 </RadzenRow>
 
 <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" class="rz-mb-4">@error</RadzenAlert>
-<RadzenAlert Visible=@(saveSuccess) AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" class="rz-mb-4">Snippet saved! Share this URL: @currentUrl</RadzenAlert>
+<RadzenAlert Visible=@(saveSuccess) AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" class="rz-mb-4">
+    Snippet saved! Share this URL: @currentUrl
+    <RadzenButton Click="CopyUrl" Text="Copy" Icon="content_copy" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-ms-2" />
+</RadzenAlert>
 
 <RadzenSplitter Orientation="Orientation.Horizontal" style="height: calc(100vh - 300px); min-height: 400px; border: 1px solid var(--rz-border-color);">
     <RadzenSplitterPane Size="50%" Min="300px">
@@ -236,6 +239,14 @@
         finally
         {
             isSaving = false;
+        }
+    }
+
+    async Task CopyUrl()
+    {
+        if (!string.IsNullOrEmpty(currentUrl))
+        {
+            await JSRuntime.InvokeVoidAsync("navigator.clipboard.writeText", currentUrl);
         }
     }
 
