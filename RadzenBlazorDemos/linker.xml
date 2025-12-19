@@ -1,0 +1,10 @@
+<linker>
+	<!--  AntiforgeryRequestToken deserialization issues - https://github.com/dotnet/aspnetcore/issues/64693  -->
+	<assembly fullname="Microsoft.AspNetCore.Components.Web">
+		<type fullname="Microsoft.AspNetCore.Components.Forms.AntiforgeryRequestToken" preserve="all"/>
+	</assembly>
+	<assembly fullname="Microsoft.AspNetCore.Components.WebAssembly">
+		<type fullname="Microsoft.AspNetCore.Components.Forms.DefaultAntiforgeryStateProvider" preserve="all"/>
+	</assembly>
+</linker>
+

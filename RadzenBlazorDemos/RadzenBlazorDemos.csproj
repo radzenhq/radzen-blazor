@@ -14,6 +14,10 @@
     <PackageReference Include="MetadataReferenceService.BlazorWasm" Version="*" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Workaround for .NET 10 antiforgery token issue - https://github.com/dotnet/aspnetcore/issues/64693 -->
+    <TrimmerRootDescriptor Include="linker.xml" />
+  </ItemGroup>
+  <ItemGroup>
     <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.dll" />
     <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.CSharp.dll" />
     <BlazorWebAssemblyLazyLoad Include="Microsoft.CodeAnalysis.Razor.dll" />
