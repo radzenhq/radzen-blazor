@@ -21,7 +21,7 @@
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav" Style="height: 42px;">
             <RadzenColumn Size="12" SizeSM="5">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                    <RadzenLink Path="/playground" Text="Radzen Blazor Playground" title="Radzen Blazor Playground" class="rz-mx-2 rz-mx-lg-4" />
+                    <RadzenText Text="Radzen Blazor Components" title="Radzen Blazor Components" class="rz-mx-2 rz-mx-lg-4" />
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="7" class="rz-display-none rz-display-sm-block">
@@ -47,25 +47,15 @@
 </div>
 }
 
-<style>
-    html[style*="--blazor-load-percentage: 100%"] .rz-app-loading {
-        display: none;
-    }
-</style>
-
 @code {
     bool rendered;
 
-    protected override void OnInitialized()
-    {
-    }
-
     protected override void OnAfterRender(bool firstRender)
     {
-        Console.WriteLine($"OnAfterRender: {firstRender}");
         if (firstRender)
         {
             rendered = true;
+            StateHasChanged();
         }
     }
 }
