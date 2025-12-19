@@ -18,13 +18,13 @@
 <RadzenHeader class="rz-p-0">
     <ChildContent>
         <MainTopNav />
-        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav">
-            <RadzenColumn Size="5">
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav" Style="height: 42px;">
+            <RadzenColumn Size="12" SizeSM="5">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
-                    <RadzenLink Path="/" Text="Radzen Blazor Components" title="Radzen Blazor Components" />
+                    <RadzenLink Path="/playground" Text="Radzen Blazor Playground" title="Radzen Blazor Playground" class="rz-mx-2 rz-mx-lg-4" />
                 </RadzenStack>
             </RadzenColumn>
-            <RadzenColumn Size="7">
+            <RadzenColumn Size="7" class="rz-display-none rz-display-sm-block">
                 <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
                     <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
                         <RadzenLink Path="/docs/api" Text="API Reference" title="Radzen Blazor Components API Reference" class="rz-mx-2 rz-mx-lg-4" target="_blank" />
@@ -35,7 +35,7 @@
         </RadzenRow>
     </ChildContent>
 </RadzenHeader>
-<RadzenBody>
+<RadzenBody class="rz-p-0 rz-display-flex">
     @Body
 </RadzenBody>
 </RadzenLayout>

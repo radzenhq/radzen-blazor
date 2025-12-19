@@ -13,44 +13,44 @@
 
 <PageTitle>Playground | Radzen Blazor Components</PageTitle>
 
-<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
-    Playground
-</RadzenText>
-<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
-    Edit and run Blazor code in real-time.
-</RadzenText>
-
-<RadzenRow class="rz-pb-4" Gap="0.5rem">
-    <RadzenColumn>
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0.5rem">
-            <RadzenButton IsBusy=@isBusy Disabled=@isBusy Click="Run" Text="Run" Icon="play_circle" ButtonStyle="ButtonStyle.Primary" />
-            <RadzenButton IsBusy=@isSaving Disabled=@(isBusy || isSaving) Click="Save" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Secondary" />
-        </RadzenStack>
-    </RadzenColumn>
-</RadzenRow>
-
-<RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" class="rz-mb-4">@error</RadzenAlert>
-<RadzenAlert Visible=@(saveSuccess) AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" class="rz-mb-4">
-    Snippet saved! Share this URL: @currentUrl
-    <RadzenButton Click="CopyUrl" Text="Copy" Icon="content_copy" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-ms-2" />
-</RadzenAlert>
-
-<RadzenSplitter Orientation="Orientation.Horizontal" style="height: calc(100vh - 300px); min-height: 400px; border: 1px solid var(--rz-border-color);">
+<RadzenSplitter Orientation="Orientation.Horizontal" Style="flex: 1;">
     <RadzenSplitterPane Size="50%" Min="300px">
-        <div class="rz-p-0" style="height: 100%; display: flex; flex-direction: column;">
-            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-p-2 rz-m-0" style="border-bottom: 1px solid var(--rz-border-color);">
-                Source Code
-            </RadzenText>
+        <RadzenStack class="rz-p-0 playground" Orientation="Orientation.Vertical" Gap="0" Style="height: 100%;">
+            <RadzenRow Gap="0.5rem" RowGap="0" class="rz-p-2 rz-ps-lg-4 rz-border-bottom" AlignItems="AlignItems.Center" Style="min-height: 48px;">
+                <RadzenColumn>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0" >
+                        Source Code
+                    </RadzenText>
+                </RadzenColumn>
+                <RadzenColumn>
+                    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
+                        <RadzenButton IsBusy=@isSaving Disabled=@(isBusy || isSaving) Click="Save" Text="Save" Icon="save" ButtonStyle="ButtonStyle.Base" Variant="Variant.Flat" Size="ButtonSize.Small" />
+                        <RadzenButton IsBusy=@isBusy Disabled=@isBusy Click="Run" Text="Run" Icon="play_circle" ButtonStyle="ButtonStyle.Primary" Variant="Variant.Flat" Size="ButtonSize.Small" />
+                    </RadzenStack>
+                </RadzenColumn>
+                <RadzenColumn Size="12">
+                    <RadzenAlert Visible=@(error != null) AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.Small" class="rz-mb-2">@error</RadzenAlert>
+                    <RadzenAlert Visible=@(saveSuccess) AlertStyle="AlertStyle.Success" Variant="Variant.Flat" Shade="Shade.Lighter" Size="AlertSize.Small" class="rz-mb-2">
+                        Snippet saved! Share this URL: @currentUrl
+                        <RadzenButton Click="CopyUrl" Text="Copy" Icon="content_copy" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.ExtraSmall" Variant="Variant.Text" class="rz-ms-2" />
+                    </RadzenAlert>
+                </RadzenColumn>
+            </RadzenRow>
+
             <div style="flex: 1; min-height: 0;">
                 <Monaco @ref="monaco" Value="@source" ValueChanged="OnValueChanged" Language="razor" Style="height: 100%; width: 100%;" />
             </div>
-        </div>
+        </RadzenStack>
     </RadzenSplitterPane>
     <RadzenSplitterPane Min="300px">
-        <div class="rz-p-0" style="height: 100%; display: flex; flex-direction: column; overflow: auto;">
-            <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-p-2 rz-m-0" style="border-bottom: 1px solid var(--rz-border-color);">
-                Preview
-            </RadzenText>
+        <RadzenStack class="rz-p-0 playground" Orientation="Orientation.Vertical" Gap="0" Style="height: 100%;">
+            <RadzenRow Gap="0.5rem" RowGap="0" class="rz-p-2 rz-ps-lg-4 rz-border-bottom" AlignItems="AlignItems.Center"  Style="min-height: 48px;">
+                <RadzenColumn>
+                    <RadzenText TextStyle="TextStyle.Subtitle2" class="rz-m-0" >
+                        Preview
+                    </RadzenText>
+                </RadzenColumn>
+            </RadzenRow>
             <div class="rz-p-4" style="flex: 1; overflow: auto;">
                 @if (dynamicContent != null)
                 {
@@ -63,7 +63,7 @@
                     </RadzenText>
                 }
             </div>
-        </div>
+        </RadzenStack>
     </RadzenSplitterPane>
 </RadzenSplitter>
 
