@@ -49,6 +49,14 @@ jobs:
           tags: ${{ steps.meta.outputs.image }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Prune old containers
+        uses: actions/delete-package-versions@v5
+        with:
+          package-name: radzen-blazor
+          package-type: container
+          min-versions-to-keep: 1
+
       - name: Push to dokku
         uses: dokku/github-action@master
         with:
