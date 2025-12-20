@@ -13,12 +13,11 @@ jobs:
 
     permissions:
       contents: read
-      packages: write   # required for GHCR push
+      packages: write
 
     env:
-      DOKKU_APP: blazor.radzen.com
       REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }} # owner/repo
+      IMAGE: ghcr.io/radzenhq/radzen-blazor:latest
 
     steps:
       - name: Checkout
@@ -34,32 +33,27 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compute image tag
-        id: meta
-        run: |
-          IMAGE="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
-          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
-
-      - name: Build and push
+      - name: Build and push (latest only)
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.image }}
+          tags: ${{ env.IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-      - name: Prune old containers
+      - name: Push to dokku (deploy :latest)
+        uses: dokku/github-action@master
+        with:
+          git_remote_url: ${{ secrets.DOKKU_REPO }}
+          ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
+          deploy_docker_image: ${{ env.IMAGE }}
+
+      - name: Prune GHCR versions (keep 1)
         uses: actions/delete-package-versions@v5
         with:
           package-name: radzen-blazor
           package-type: container
           min-versions-to-keep: 1
-
-      - name: Push to dokku
-        uses: dokku/github-action@master
-        with:
-          git_remote_url: ${{ secrets.DOKKU_REPO }}
-          ssh_private_key: ${{ secrets.DOKKU_SSH_PRIVATE_KEY }}
-          deploy_docker_image: ${{ steps.meta.outputs.image }}
+          delete-only-pre-release-versions: false
