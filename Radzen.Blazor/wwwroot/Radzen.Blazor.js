@@ -940,21 +940,63 @@ window.Radzen = {
       : null;
     return uiCulture || 'en-US';
   },
-  numericOnPaste: function (e, min, max) {
-    if (e.clipboardData) {
-      var value = e.clipboardData.getData('text');
+  numericOnPaste: function (e, min, max, locale = navigator.language) {
+    if (!e.clipboardData) return;
 
-      if (value && !isNaN(+value)) {
-        var numericValue = +value;
-        if (min != null && numericValue >= min) {
-            return;
-        }
-        if (max != null && numericValue <= max) {
-            return;
-        }
-      }
+    let value = e.clipboardData.getData("text");
+    if (!value) {
+        e.preventDefault();
+        return;
+    }
 
-      e.preventDefault();
+    value = String(value).trim();
+
+    const parts = new Intl.NumberFormat(locale).formatToParts(1234567.89);
+
+    let group = ",";
+    let decimal = ".";
+
+    for (const p of parts) {
+        if (p.type === "group") group = p.value;
+        if (p.type === "decimal") decimal = p.value;
+    }
+
+    value = value.replace(/[\u00A0\u202F]/g, " ");
+
+    if (group) {
+        const escapedGroup = group.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        value = value.replace(new RegExp(escapedGroup, "g"), "");
+    }
+
+    if (group === " ") {
+        value = value.replace(/ /g, "");
+    }
+
+    if (decimal !== ".") {
+        const escapedDecimal = decimal.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+        value = value.replace(new RegExp(escapedDecimal, "g"), ".");
+    }
+
+    if (!/^[+-]?(\d+(\.\d*)?|\.\d+)$/.test(value)) {
+        e.preventDefault();
+        return;
+    }
+
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue)) {
+        e.preventDefault();
+        return;
+    }
+
+    if (min != null && numericValue < min) {
+        e.preventDefault();
+        return;
+    }
+
+    if (max != null && numericValue > max) {
+        e.preventDefault();
+        return;
     }
   },
   numericOnInput: function (e, min, max, isNullable) {

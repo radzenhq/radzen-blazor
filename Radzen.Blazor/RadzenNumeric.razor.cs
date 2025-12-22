@@ -83,7 +83,7 @@ namespace Radzen.Blazor
             object minArg = Min;
             object maxArg = Max;
 
-            return Min != null || Max != null ? $@"Radzen.numericOnPaste(event, {minArg ?? "null"}, {maxArg ?? "null"})" : "";
+            return (Min != null || Max != null) ? $@"Radzen.numericOnPaste(event, {minArg ?? "null"}, {maxArg ?? "null"})" : "";
         }
 
         bool? isNullable;
