@@ -899,7 +899,7 @@ class InlineParser
                     if (opener.Length > 0)
                     {
                         opener.Node.Value = opener.Node.Value[..^charsToConsume];
-                        startIndex += charsToConsume;
+                        startIndex += 1;
                     }
 
                     closer.Length -= charsToConsume;
@@ -907,16 +907,28 @@ class InlineParser
                     if (closer.Length > 0)
                     {
                         closer.Node.Value = closer.Node.Value[..^charsToConsume];
-                        endIndex -= charsToConsume;
+                        endIndex -= 1;
                     }
 
                     inlines.RemoveRange(startIndex, endIndex - startIndex + 1);
 
                     inlines.Insert(startIndex, parent);
-                }
 
-                delimiters.RemoveAt(closerIndex);
-                delimiters.RemoveAt(openerIndex);
+                    if (closer.Length == 0)
+                    {
+                        delimiters.RemoveAt(closerIndex);
+                    }
+
+                    if (opener.Length == 0)
+                    {
+                        delimiters.RemoveAt(openerIndex);
+                    }
+                }
+                else
+                {
+                    delimiters.RemoveAt(closerIndex);
+                    delimiters.RemoveAt(openerIndex);
+                }
             }
             else
             {

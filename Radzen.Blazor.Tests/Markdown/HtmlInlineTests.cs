@@ -141,4 +141,28 @@ foo <!---> foo -->
     {
         Assert.Equal(expected, ToXml(markdown));
     }
+
+    [Theory]
+    [InlineData("***foo bar***", @"<document>
+    <paragraph>
+        <emph>
+            <strong>
+                <text>foo bar</text>
+            </strong>
+        </emph>
+    </paragraph>
+</document>")]
+    [InlineData("___foo bar___", @"<document>
+    <paragraph>
+        <emph>
+            <strong>
+                <text>foo bar</text>
+            </strong>
+        </emph>
+    </paragraph>
+</document>")]
+    public void Parse_BoldAndItalic_ShouldNotThrowException(string markdown, string expected)
+    {
+        Assert.Equal(expected, ToXml(markdown));
+    }
 }
