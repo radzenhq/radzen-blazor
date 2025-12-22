@@ -706,7 +706,7 @@ namespace Radzen
                 }
                 else
                 {
-                    if (!Multiple && !isFilter)
+                    if (!Multiple && (!isFilter || key != "Space"))
                     {
                         await ClosePopup(key);
                     }
