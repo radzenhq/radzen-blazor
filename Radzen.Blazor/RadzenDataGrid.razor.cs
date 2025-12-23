@@ -2590,6 +2590,7 @@ namespace Radzen.Blazor
             {
                 if (settings != null && settingsChanged)
                 {
+                    settingsChanged = false;
                     await LoadSettingsInternal(settings);
                 }
 
