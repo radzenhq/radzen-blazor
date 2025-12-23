@@ -371,6 +371,7 @@ namespace Radzen.Blazor
                 {
                     await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", search, string.Empty);
                     searchText = null;
+                    _view = null;
                     await SearchTextChanged.InvokeAsync(searchText);
                     await OnFilter(null);
                 }
