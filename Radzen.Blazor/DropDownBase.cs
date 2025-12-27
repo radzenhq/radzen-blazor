@@ -683,6 +683,11 @@ namespace Radzen
             {
                 preventKeydown = true;
 
+                if (selectedIndex == -1 && items.Count() == 1)
+                {
+                    selectedIndex = 0;
+                }
+
                 if (selectedIndex >= 0 && selectedIndex <= items.Count() - 1)
                 {
                     var itemToSelect = items.ElementAtOrDefault(selectedIndex);
