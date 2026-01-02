@@ -102,6 +102,15 @@ namespace Radzen.Blazor
         public string Url { get; set; }
 
         /// <summary>
+        /// Http method for file uploading to the defined Url. If the Url parameter is not set, this parameter is ignored.
+        /// <br/>
+        /// Defaults to POST.
+        /// </summary>
+        /// <value>The method</value>
+        [Parameter]
+        public string Method { get; set; } = "POST";
+        
+        /// <summary>
         /// Gets or sets the parameter name. If not set 'file' parameter name will be used for single file and 'files' for multiple files.
         /// </summary>
         /// <value>The parameter name.</value>

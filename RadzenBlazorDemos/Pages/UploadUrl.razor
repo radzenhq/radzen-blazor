@@ -1,5 +1,9 @@
 ﻿<RadzenCard Variant="Variant.Outlined">
-    <RadzenUpload Url="upload/single" Style="width: 100%" Progress=@OnProgress 
+    <RadzenUpload 
+        Url="https://localhost:54380/upload/temp?X-Amz-Expires=300&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=minioadmin%2F20260102%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20260102T090111Z&X-Amz-SignedHeaders=host&X-Amz-Signature=b9682b0d3f7948dce9639fca039b346c1722f17ae2b978ddb56cb47793ee328b" 
+        Method="PUT" 
+        Style="width: 100%" 
+        Progress=@OnProgress 
         Complete=@OnComplete
         InputAttributes="@(new Dictionary<string,object>{ { "aria-label", "select file" }})" />
 </RadzenCard>

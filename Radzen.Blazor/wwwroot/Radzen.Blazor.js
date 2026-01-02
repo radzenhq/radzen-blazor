@@ -789,9 +789,9 @@ window.Radzen = {
 
     return [table.nextSelectedIndex, table.nextSelectedCellIndex];
   },
-  uploadInputChange: function (e, url, auto, multiple, clear, parameterName) {
+  uploadInputChange: function (e, url, auto, multiple, clear, parameterName, method = 'POST') {
       if (auto) {
-          Radzen.upload(e.target, url, multiple, clear, parameterName);
+          Radzen.upload(e.target, url, multiple, clear, parameterName, method);
           e.target.value = '';
       } else {
           Radzen.uploadChange(e.target);
@@ -861,7 +861,7 @@ window.Radzen = {
   removeFileFromFileInput: function (fileInput) {
     fileInput.value = '';
   },
-  upload: function (fileInput, url, multiple, clear, parameterName) {
+  upload: function (fileInput, url, multiple, clear, parameterName, method = 'POST') {
     var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
     if (!uploadComponent) { return; }
     if (!uploadComponent.files || clear) {
@@ -921,7 +921,7 @@ window.Radzen = {
       }
     };
     uploadComponent.invokeMethodAsync('GetHeaders').then(function (headers) {
-      xhr.open('POST', url, true);
+      xhr.open(method, url, true);
       for (var name in headers) {
         xhr.setRequestHeader(name, headers[name]);
       }

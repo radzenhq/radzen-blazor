@@ -26,6 +26,7 @@
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
     To upload files to a server set the <code>Url</code> property of the component. The URL should point to an action method in your server-side code that handles the file upload.
+    By default, upload uses method POST, but you can change it using the <code>Method</code> property.
 </RadzenText>
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadUrl)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadUrl />
