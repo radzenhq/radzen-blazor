@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Routing;
 using System.IO;
 using Radzen;
 using RadzenBlazorDemos;
@@ -144,6 +145,13 @@ app.MapGet("/llms.txt", () =>
 });
 app.MapRazorPages();
 app.MapRazorComponents<RadzenBlazorDemos.Host.App>()
-    .AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly);
+    .AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly)
+    .Add(e =>
+   {
+       if (e.Metadata.Any(m => m is HttpMethodMetadata http && http.HttpMethods.Contains(HttpMethods.Get)))
+       {
+           e.Metadata.Add(new HttpMethodMetadata([HttpMethods.Get, HttpMethods.Head]));
+       }
+   });
 app.MapControllers();
 app.Run();
