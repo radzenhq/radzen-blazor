@@ -16,7 +16,7 @@
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()"
         @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="true" tabindex=0
-        @onblur=@(args => JSRuntime.InvokeVoidAsync("Radzen.clearFocusedHeaderCell", UniqueID)) @oncontextmenu=OnContextMenu @oncontextmenu:preventDefault="@this.ContextMenu.HasDelegate">
+        @onblur=@(args => JSRuntime.InvokeVoidAsync("Radzen.clearFocusedHeaderCell", UniqueID)) @oncontextmenu=OnContextMenu @oncontextmenu:preventDefault="@this.ContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.ContextMenu.HasDelegate">
         @if (AllowGrouping || AllowColumnPicking)
         {
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
