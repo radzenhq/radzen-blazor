@@ -739,22 +739,13 @@ namespace Radzen.Blazor
                     {
                         SelectedItemChanged.InvokeAsync(SelectedItem);
                         selectedItems.Clear();
-                        if (SelectedItem != null)
-                        {
-                            if (SelectedItem != null)
-                            {
-                                selectedItems.Add(SelectedItem);
-                            }
-                        }
+                        selectedItems.Add(SelectedItem!);
                         try
                         {
-                            if (grid != null && !isFirstRender && JSRuntime != null && SelectedItem != null)
+                            if (grid != null && !isFirstRender && JSRuntime != null)
                             {
-                                if (SelectedItem != null)
-                                {
-                                    InvokeAsync(() => grid.SelectRow(SelectedItem, false));
-                                    JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", Items.ToList().IndexOf(SelectedItem!) - 1, null);
-                                }
+                                InvokeAsync(() => grid.SelectRow(SelectedItem!, false));
+                                JSRuntime.InvokeAsync<int[]>("Radzen.focusTableRow", grid.GridId(), "ArrowDown", Items.ToList().IndexOf(SelectedItem!) - 1, null);
                             }
                         }
                         catch { }
