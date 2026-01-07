@@ -149,13 +149,13 @@
     }
 
 
-    private sealed record PivotFieldDescriptor(string Property, string Title, Type Type, string? Width = null);
+    private sealed record PivotFieldDescriptor(string Property, string Title, Type Type, string Width = null);
 
     private sealed record PivotAggregateDescriptor(string Property,
                                                    string Title,
                                                    Type Type,
                                                    AggregateFunction Aggregate,
-                                                   string? FormatString,
+                                                   string FormatString,
                                                    TextAlign TextAlign);
 }
 

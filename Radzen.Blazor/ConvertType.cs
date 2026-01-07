@@ -18,15 +18,23 @@ public static class ConvertType
     /// <param name="type">The type.</param>
     /// <param name="culture">The culture.</param>
     /// <returns>System.Object</returns>
-    public static object ChangeType(object value, Type type, CultureInfo culture = null)
+    public static object? ChangeType(object value, Type type, CultureInfo? culture = null)
     {
+        ArgumentNullException.ThrowIfNull(type);
+
+        // CA1062: Validate 'value' is non-null before using it
+        if (value == null)
+        {
+            if (Nullable.GetUnderlyingType(type) != null)
+            {
+                return null;
+            }
+            throw new ArgumentNullException(nameof(value));
+        }
+
         if (culture == null)
         {
             culture = CultureInfo.CurrentCulture;
-        }
-        if (value == null && Nullable.GetUnderlyingType(type) != null)
-        {
-            return value;
         }
 
         if ((Nullable.GetUnderlyingType(type) ?? type) == typeof(Guid) && value is string)
@@ -34,9 +42,15 @@ public static class ConvertType
             return Guid.Parse((string)value);
         }
 
-        if (Nullable.GetUnderlyingType(type)?.IsEnum == true)
+        var underlyingEnumType = Nullable.GetUnderlyingType(type);
+        if (underlyingEnumType?.IsEnum == true)
         {
-            return Enum.Parse(Nullable.GetUnderlyingType(type), value.ToString());
+            var valueString = value.ToString();
+            if (valueString == null)
+            {
+                throw new ArgumentNullException(nameof(value), "Enum value cannot be null.");
+            }
+            return Enum.Parse(underlyingEnumType, valueString);
         }
 
         if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))

@@ -22,7 +22,7 @@
         @for (var dateheader = StartDate; dateheader <= StartDate.AddDays(NUMBER_DAYS_COLUMNS - 1); dateheader = dateheader.AddDays(1))
         {
             <div class="rz-slot-header">
-                @dateheader.ToString("dddd", Scheduler.Culture).Substring(0,3)
+                @dateheader.ToString("dddd", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Substring(0,3)
             </div>
         }
         <div class="rz-slot-header">
@@ -34,7 +34,7 @@
         int curYear = startyear + (offSetMonth <= month ? 1 : 0);
         realstart = new DateTime(curYear, offSetMonth, 1);
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
-        date = realstart.StartOfMonth().StartOfWeek(Scheduler.Culture);
+        date = realstart.StartOfMonth().StartOfWeek(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture);
         var startMonth = realstart;
 
         <div class="rz-month @(month == CurrentMonth ? "rz-state-focused" : "")">
@@ -88,7 +88,7 @@
                             var left = (slotIndex + 1) * slotWidth;
                             var top = ((MaxAppointmentsInSlot + 1) * 0.6) + 1.3;
                             var listDate = start;
-                            <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => OnListClick(listDate, appointments))>@String.Format(MoreText, excessCount)</a>
+                            <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => { if (appointments != null && MoreText != null) _ = OnListClick(listDate, appointments); })>@(MoreText != null ? String.Format(MoreText, excessCount) : "")</a>
                         }
                     }
                 }
@@ -96,7 +96,7 @@
             <div class="rz-slots">
                 <div @attributes=@Attributes(realstart, "rz-slot", false)>
                     <div class="rz-slot-header" @onclick=@(args => OnMonthClick(startMonth))>
-                        @realstart.ToString("MMM", Scheduler.Culture)
+                        @realstart.ToString("MMM", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                     </div>
                 </div>
 
@@ -127,7 +127,7 @@
                 }
                 <div @attributes=@Attributes(realstart, "rz-slot", false)>
                     <div class="rz-slot-header" @onclick=@(args => OnMonthClick(startMonth))>
-                        @realstart.ToString("MMM", Scheduler.Culture)
+                        @realstart.ToString("MMM", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                     </div>
                 </div>
 
@@ -158,16 +158,18 @@
     public int MaxAppointmentsInSlot { get; set; }
 
     [Parameter]
-    public string MoreText { get; set; }
+    public string? MoreText { get; set; }
 
     [CascadingParameter]
-    public IScheduler Scheduler { get; set; }
+    public IScheduler? Scheduler { get; set; }
 
     [Parameter]
-    public IEnumerable<AppointmentData> Appointments { get; set; }
+    public IEnumerable<AppointmentData>? Appointments { get; set; }
 
     IDictionary<string, object> Attributes(DateTime start, string className, bool slotInMonth)
     {
+        if (Scheduler == null)
+            return new Dictionary<string, object>();
         var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInRange(start, start.AddDays(1)));
         attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
         attributes["dropzone"] = "move";
@@ -180,7 +182,8 @@
 
     async Task OnSlotClick(DateTime date)
     {
-        await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInRange(date, date.AddDays(1)));
+        if (Scheduler != null)
+            await Scheduler.SelectSlot(date, date.AddDays(1), AppointmentsInRange(date, date.AddDays(1)));
     }
 
     double DetermineTop(HashSet<double> existingTops)
@@ -212,12 +215,13 @@
 
     async Task OnAppointmentClick(AppointmentData data)
     {
-        await Scheduler.SelectAppointment(data);
+        if (Scheduler != null)
+            await Scheduler.SelectAppointment(data);
     }
 
     private AppointmentData[] AppointmentsInRange(DateTime start, DateTime end)
     {
-        if (Appointments == null)
+        if (Appointments == null || Scheduler == null)
         {
             return Array.Empty<AppointmentData>();
         }
@@ -227,11 +231,13 @@
 
     async Task OnMonthClick(DateTime monthStart)
     {
-        await Scheduler.SelectMonth(monthStart, AppointmentsInRange(monthStart, monthStart.EndOfMonth()));
+        if (Scheduler != null)
+            await Scheduler.SelectMonth(monthStart, AppointmentsInRange(monthStart, monthStart.EndOfMonth()));
     }
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
+        if (Scheduler == null) return;
         bool preventDefault = await Scheduler.SelectMore(date, date.AddDays(1), appointments);
 
         if (!preventDefault)
@@ -307,7 +313,7 @@
         else if (key == "Space")
         {
             var appointment = AppointmentsInRange(CurrentDate, CurrentDate.AddDays(1)).FirstOrDefault();
-            if (appointment != null)
+            if (appointment != null && Scheduler != null)
             {
                 await Scheduler.SelectAppointment(appointment);
                 await view.FocusAsync();

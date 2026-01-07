@@ -19,7 +19,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The style.</value>
         [Parameter]
-        public string Style { get; set; }
+        public string? Style { get; set; }
 
         /// <summary>
         /// Enable or disable shared tooltips (one tooltip displaying data for all values for the same category). By default set to false (a separate tooltip is shown for each point in the category).
@@ -30,7 +30,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void Initialize()
         {
-            Chart.Tooltip = this;
+            if (Chart != null)
+            {
+                Chart.Tooltip = this;
+            }
         }
 
         /// <inheritdoc />

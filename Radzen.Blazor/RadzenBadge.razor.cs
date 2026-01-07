@@ -46,7 +46,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content render fragment.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the text content displayed in the badge.
@@ -54,7 +54,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The badge text.</value>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
         /// Gets or sets the semantic color style of the badge.

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -45,11 +46,12 @@ namespace Radzen.Blazor
         public bool Immediate { get; set; }
 
         /// <summary>
-        /// Handles the <see cref="E:Change" /> event.
+        /// Handles the change event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async System.Threading.Tasks.Task OnChange(ChangeEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
             Value = $"{args.Value}";
 
             await ValueChanged.InvokeAsync(Value);
@@ -67,7 +69,7 @@ namespace Radzen.Blazor
         public override string DefaultAutoCompleteAttribute { get; set; } = "new-password";
 
         /// <inheritdoc />
-        protected override string GetId()
+        protected override string? GetId()
         {
             return Name ?? base.GetId();
         }

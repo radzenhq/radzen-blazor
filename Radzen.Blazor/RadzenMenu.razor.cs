@@ -58,7 +58,7 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ClickToOpen { get; set; } = true;
 
-        private bool IsOpen { get; set; } = false;
+        private bool IsOpen { get; set; }
 
         /// <inheritdoc />
         protected override string GetComponentCssClass() => ClassList.Create("rz-menu")
@@ -79,16 +79,16 @@ namespace Radzen.Blazor
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
         [Inject]
-        NavigationManager NavigationManager { get; set; }
+        NavigationManager? NavigationManager { get; set; }
 
-        bool subMenuOpen = false;
+        bool subMenuOpen;
         internal int focusedIndex = -1;
         bool preventKeyPress = true;
         async Task OnKeyPress(KeyboardEventArgs args)
         {
             var key = args.Code != null ? args.Code : args.Key;
 
-            if (currentItems == null)
+            if (currentItems.Count == 0)
             {
                 currentItems = items.Where(i => i.Visible && !i.Disabled).ToList();
             }
@@ -107,7 +107,7 @@ namespace Radzen.Blazor
                     {
                         var item = currentItems[focusedIndex];
 
-                        if (item.items.Any())
+                        if (item.items.Count > 0)
                         {
                             currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
                             focusedIndex = -1;
@@ -124,8 +124,9 @@ namespace Radzen.Blazor
                 bool shouldOpenNextMenu = false;
                 if (subMenuOpen)
                 {
-                    var parentItem = currentItems.FirstOrDefault().ParentItem;
-                    if (parentItem != null)
+                    var firstItem = currentItems.FirstOrDefault();
+                    var parentItem = firstItem?.ParentItem;
+                    if (parentItem != null && parentItem.Parent != null)
                     {
                         currentItems = parentItem.Parent.items.Where(i => i.Visible && !i.Disabled).ToList();
                         focusedIndex = currentItems.IndexOf(parentItem);
@@ -143,7 +144,7 @@ namespace Radzen.Blazor
 
                     var item = currentItems[focusedIndex];
 
-                    if (item.items.Any())
+                    if (item.items.Count > 0)
                     {
                         currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
                         focusedIndex = -1;
@@ -160,7 +161,7 @@ namespace Radzen.Blazor
                 {
                     var item = currentItems[focusedIndex];
 
-                    if (item.items.Any())
+                    if (item.items.Count > 0)
                     {
                         currentItems = item.items.Where(i => i.Visible && !i.Disabled).ToList();
                         focusedIndex = -1;
@@ -171,7 +172,7 @@ namespace Radzen.Blazor
                     {
                         if (item.Path != null)
                         {
-                            NavigationManager.NavigateTo(item.Path);
+                            NavigationManager?.NavigateTo(item.Path);
                         }
                         else
                         {
@@ -186,10 +187,11 @@ namespace Radzen.Blazor
 
                 if (currentItems.Any(i => i.ParentItem != null))
                 {
-                    var parentItem = currentItems.FirstOrDefault().ParentItem;
+                    var firstItem = currentItems.FirstOrDefault();
+                    var parentItem = firstItem?.ParentItem;
                     if (parentItem != null)
                     {
-                        currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent.items).Where(i => i.Visible && !i.Disabled).ToList();
+                        currentItems = (parentItem.ParentItem != null ? parentItem.ParentItem.items : parentItem.Parent?.items ?? new List<RadzenMenuItem>()).Where(i => i.Visible && !i.Disabled).ToList();
                         focusedIndex = currentItems.IndexOf(parentItem);
                         subMenuOpen = false;
                         await parentItem.Close();
@@ -204,10 +206,10 @@ namespace Radzen.Blazor
 
         internal bool IsFocused(RadzenMenuItem item)
         {
-            return currentItems?.IndexOf(item) == focusedIndex && focusedIndex != -1;
+            return focusedIndex != -1 && currentItems.IndexOf(item) == focusedIndex;
         }
 
-        List<RadzenMenuItem> currentItems;
+        List<RadzenMenuItem> currentItems = new();
 
         internal List<RadzenMenuItem> items = new List<RadzenMenuItem>();
 
@@ -233,10 +235,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void OnInitialized()
         {
-            NavigationManager.LocationChanged += OnLocationChanged;
+            if (NavigationManager != null)
+            {
+                NavigationManager.LocationChanged += OnLocationChanged;
+            }
         }
 
-        private void OnLocationChanged(object sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+        private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
         {
             IsOpen = false;
             StateHasChanged();
@@ -246,7 +251,11 @@ namespace Radzen.Blazor
         public override void Dispose()
         {
             base.Dispose();
-            NavigationManager.LocationChanged -= OnLocationChanged;
+            if (NavigationManager != null)
+            {
+                NavigationManager.LocationChanged -= OnLocationChanged;
+            }
+            GC.SuppressFinalize(this);
         }
 
         void OnFocus()

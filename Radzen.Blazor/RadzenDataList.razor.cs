@@ -80,7 +80,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The empty state template render fragment.</value>
         [Parameter]
-        public RenderFragment EmptyTemplate { get; set; }
+        public RenderFragment? EmptyTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets whether items should wrap to multiple rows based on their width and the container size.
@@ -98,12 +98,12 @@ namespace Radzen.Blazor
         [Parameter]
         public bool AllowVirtualization { get; set; }
 
-        internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> virtualize;
+        internal Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>? virtualize;
 
         /// <summary>
         /// Gets Virtualize component reference.
         /// </summary>
-        public Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem> Virtualize
+        public Microsoft.AspNetCore.Components.Web.Virtualization.Virtualize<TItem>? Virtualize
         {
             get
             {
@@ -131,7 +131,7 @@ namespace Radzen.Blazor
 
             var virtualDataItems = (LoadData.HasDelegate ? Data : view.Skip(request.StartIndex).Take(top))?.ToList();
 
-            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems, totalItemsCount);
+            return new Microsoft.AspNetCore.Components.Web.Virtualization.ItemsProviderResult<TItem>(virtualDataItems ?? Enumerable.Empty<TItem>(), totalItemsCount);
         }
         RenderFragment DrawDataListRows()
         {
@@ -176,9 +176,13 @@ namespace Radzen.Blazor
 
         internal void DrawRows(Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder builder)
         {
-            foreach (var item in LoadData.HasDelegate ? Data : PagedView)
+            var items = LoadData.HasDelegate ? Data : PagedView;
+            if (items != null)
             {
-                DrawRow(builder, item);
+                foreach (var item in items)
+                {
+                    DrawRow(builder, item);
+                }
             }
         }
 

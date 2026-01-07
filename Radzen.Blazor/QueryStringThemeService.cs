@@ -39,20 +39,22 @@ namespace Radzen
         private readonly ThemeService themeService;
 
 #if NET7_0_OR_GREATER
-        private readonly IDisposable registration;
+        private readonly IDisposable? registration;
 #endif
-        private readonly QueryStringThemeServiceOptions options;
-        private readonly PropertyInfo hasAttachedJSRuntimeProperty;
+        private readonly QueryStringThemeServiceOptions? options;
+        private readonly PropertyInfo? hasAttachedJSRuntimeProperty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="QueryStringThemeService" /> class.
         /// </summary>
         public QueryStringThemeService(NavigationManager navigationManager, ThemeService themeService, IOptions<QueryStringThemeServiceOptions> options)
         {
+            ArgumentNullException.ThrowIfNull(navigationManager);
+            ArgumentNullException.ThrowIfNull(themeService);
+            ArgumentNullException.ThrowIfNull(options);
+
             this.navigationManager = navigationManager;
-
             this.themeService = themeService;
-
             this.options = options.Value;
 
             hasAttachedJSRuntimeProperty = navigationManager.GetType().GetProperty("HasAttachedJSRuntime");
@@ -84,7 +86,7 @@ namespace Radzen
 #endif
         }
 
-        private bool RequiresChange((string theme, bool? wcag, bool? rightToLeft) state) =>
+        private bool RequiresChange((string? theme, bool? wcag, bool? rightToLeft) state) =>
             (state.theme != null && !string.Equals(themeService.Theme, state.theme, StringComparison.OrdinalIgnoreCase)) ||
             themeService.Wcag != state.wcag || themeService.RightToLeft != state.rightToLeft;
 
@@ -104,36 +106,36 @@ namespace Radzen
         }
 #endif
 
-        private (string theme, bool? wcag, bool? rightToLeft) GetStateFromQueryString(string uri)
+        private (string? theme, bool? wcag, bool? rightToLeft) GetStateFromQueryString(string uri)
         {
-            var queryString = uri.Contains('?') ? uri[(uri.IndexOf('?') + 1)..] : string.Empty;
+            var queryString = uri.Contains('?', StringComparison.Ordinal) ? uri[(uri.IndexOf('?', StringComparison.Ordinal) + 1)..] : string.Empty;
 
-            var query = HttpUtility.ParseQueryString(queryString.Contains('#') ? queryString[..queryString.IndexOf('#')] : queryString);
+            var query = HttpUtility.ParseQueryString(queryString.Contains('#', StringComparison.Ordinal) ? queryString[..queryString.IndexOf('#', StringComparison.Ordinal)] : queryString);
 
-            bool? wcag = query.Get(options.WcagParameter) != null ? query.Get(options.WcagParameter) == "true" : null;
-            bool? rtl = query.Get(options.RightToLeftParameter) != null ? query.Get(options.RightToLeftParameter) == "true" : null;
+            bool? wcag = options?.WcagParameter != null ? (query.Get(options.WcagParameter) != null ? query.Get(options.WcagParameter) == "true" : null) : null;
+            bool? rtl = options?.RightToLeftParameter != null ? (query.Get(options.RightToLeftParameter) != null ? query.Get(options.RightToLeftParameter) == "true" : null) : null;
 
-            return (query.Get(options.ThemeParameter), wcag, rtl);
+            return (query?.Get(options?.ThemeParameter), wcag, rtl);
         }
 
         private string GetUriWithStateQueryParameters(string uri)
         {
-            var parameters = new Dictionary<string, object>
+            var parameters = new Dictionary<string, object?>
             {
-                { options.ThemeParameter, themeService.Theme.ToLowerInvariant() },
+                { options?.ThemeParameter ?? string.Empty, themeService?.Theme?.ToLowerInvariant() ?? string.Empty },
             };
 
-            if (themeService.Wcag.HasValue)
+            if (themeService?.Wcag != null && options?.WcagParameter != null)
             {
                 parameters.Add(options.WcagParameter, themeService.Wcag.Value ? "true" : "false");
             }
 
-            if (themeService.RightToLeft.HasValue)
+            if (themeService?.RightToLeft != null && options?.RightToLeftParameter != null)
             {
                 parameters.Add(options.RightToLeftParameter, themeService.RightToLeft.Value ? "true" : "false");
             }
 
-            return navigationManager.GetUriWithQueryParameters(uri, parameters);
+            return navigationManager.GetUriWithQueryParameters(uri, new Dictionary<string, object?>(parameters));
         }
 
         private void OnThemeChanged()
@@ -156,6 +158,8 @@ namespace Radzen
 #if NET7_0_OR_GREATER
             registration?.Dispose();
 #endif
+
+            GC.SuppressFinalize(this);
         }
     }
 

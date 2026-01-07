@@ -13,7 +13,7 @@ namespace Radzen.Blazor
         /// Gets or sets the width.
         /// </summary>
         [Parameter]
-        public string Width { get; set; }
+        public string? Width { get; set; }
 
         /// <summary>
         /// Called when the component is initialized. Registers this column with the parent pivot grid.
@@ -36,6 +36,8 @@ namespace Radzen.Blazor
             base.Dispose();
 
             PivotGrid?.RemovePivotColumn(this);
+
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -43,6 +45,6 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The header template.</value>
         [Parameter]
-        public RenderFragment<GroupResult> HeaderTemplate { get; set; }
+        public RenderFragment<GroupResult>? HeaderTemplate { get; set; }
     }
 } 

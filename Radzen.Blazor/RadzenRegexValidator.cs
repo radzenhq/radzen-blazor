@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Radzen.Blazor
@@ -46,11 +47,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The regex pattern string.</value>
         [Parameter]
-        public string Pattern { get; set; }
+        public string? Pattern { get; set; }
 
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
+            ArgumentNullException.ThrowIfNull(component);
+            ArgumentNullException.ThrowIfNull(Pattern);
+
             return new RegularExpressionAttribute(Pattern).IsValid(component.GetValue());
         }
     }

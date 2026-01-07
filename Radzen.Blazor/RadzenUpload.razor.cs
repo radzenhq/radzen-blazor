@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
@@ -59,7 +59,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
         /// Gets file input reference.
@@ -71,7 +71,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The name.</value>
         [Parameter]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> upload is automatic.
@@ -99,21 +99,21 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The URL.</value>
         [Parameter]
-        public string Url { get; set; }
+        public string? Url { get; set; }
 
         /// <summary>
         /// Gets or sets the parameter name. If not set 'file' parameter name will be used for single file and 'files' for multiple files.
         /// </summary>
         /// <value>The parameter name.</value>
         [Parameter]
-        public string ParameterName { get; set; }
+        public string? ParameterName { get; set; }
 
         /// <summary>
         /// Gets or sets the accepted MIME types.
         /// </summary>
         /// <value>The accepted MIME types.</value>
         [Parameter]
-        public string Accept { get; set; }
+        public string? Accept { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenUpload"/> is multiple.
@@ -127,14 +127,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon.</value>
         [Parameter]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets the icon color.
         /// </summary>
         /// <value>The icon color.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of files.
@@ -171,13 +171,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Uploads this instance selected files.
         /// </summary>
         public async Task Upload()
         {
+            if (JSRuntime == null) return;
             await JSRuntime.InvokeAsync<string>("Radzen.upload", fileUpload, Url, Multiple, false, ParameterName);
         }
 
@@ -199,7 +200,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private bool visibleChanged = false;
+        private bool visibleChanged;
         private bool firstRender = true;
 
         /// <inheritdoc />
@@ -229,7 +230,7 @@ namespace Radzen.Blazor
             {
                 visibleChanged = false;
 
-                if (Visible)
+                if (Visible && JSRuntime != null)
                 {
                     await JSRuntime.InvokeVoidAsync("Radzen.uploads", Reference, Name ?? GetId());
                 }
@@ -284,7 +285,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return files.Any();
+                return files.Count > 0;
             }
         }
 
@@ -323,8 +324,14 @@ namespace Radzen.Blazor
         /// <param name="fireChangeEvent">If the linked <see cref="Change" /> event should be fired as a result of this removal (default: true)</param>
         protected async System.Threading.Tasks.Task OnRemove(PreviewFileInfo file, bool fireChangeEvent = true)
         {
+            ArgumentNullException.ThrowIfNull(file);
             files.Remove(file);
-            await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromUpload", Reference, file.Name, Name ?? GetId());
+
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.removeFileFromUpload", Reference, file.Name, Name ?? GetId());
+            }
+
             if (fireChangeEvent) await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
         }
 
@@ -335,14 +342,16 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenUpload.OnChange")]
         public async System.Threading.Tasks.Task OnChange(IEnumerable<PreviewFileInfo> files)
         {
-            if (files == null || !files.Any())
+            var fileList = files?.ToList();
+
+            if (fileList == null || fileList.Count == 0)
             {
                 return;
             }
 
-            this.files = files.ToList();
+            this.files = fileList;
 
-            await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
+            await Change.InvokeAsync(CreateUploadChangeEventArgs(files ?? Enumerable.Empty<FileInfo>()));
 
             await InvokeAsync(StateHasChanged);
         }
@@ -372,7 +381,7 @@ namespace Radzen.Blazor
         [JSInvokable("RadzenUpload.OnComplete")]
         public async System.Threading.Tasks.Task OnComplete(string response, bool cancelled)
         {
-            System.Text.Json.JsonDocument doc = null;
+            System.Text.Json.JsonDocument? doc = null;
 
             if (!string.IsNullOrEmpty(response))
             {
@@ -431,7 +440,7 @@ namespace Radzen.Blazor
                 files = new FileInfo[] { new FileInfo(args.File) };
             }
 
-            this.files = files.Select(f => new PreviewFileInfo(f.Source) { Name = f.Name, Size = f.Size }).ToList();
+            this.files = files.Where(f => f.Source != null).Select(f => new PreviewFileInfo(f.Source!) { Name = f.Name, Size = f.Size }).ToList();
 
             await Change.InvokeAsync(CreateUploadChangeEventArgs(files));
 

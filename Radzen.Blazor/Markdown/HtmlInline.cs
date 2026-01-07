@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Blazor.Markdown;
 
 /// <summary>
@@ -8,12 +10,13 @@ public class HtmlInline : Inline
     /// <summary>
     /// Gets or sets the HTML element value.
     /// </summary>
-    public string Value { get; set; }
+    public string? Value { get; set; }
 
 
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitHtmlInline(this);
     }
 }

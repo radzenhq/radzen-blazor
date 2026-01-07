@@ -83,6 +83,8 @@ namespace Radzen.Blazor
         /// <param name="range">The range.</param>
         public void MergeWidth(ScaleRange range)
         {
+          ArgumentNullException.ThrowIfNull(range);
+
           Start = Math.Min(Start, range.Start);
           End = Math.Max(End, range.End);
         }
@@ -94,6 +96,8 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if the ranges are equal; otherwise, <c>false</c>.</returns>
         public bool IsEqualTo(ScaleRange range)
         {
+            ArgumentNullException.ThrowIfNull(range);
+
             return Start == range.Start && End == range.End;
         }
     }

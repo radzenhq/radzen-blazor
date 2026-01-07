@@ -44,7 +44,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The link content render fragment.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the target window or frame for the link navigation.
@@ -52,7 +52,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The target window/frame. Default is null (same window).</value>
         [Parameter]
-        public string Target { get; set; }
+        public string? Target { get; set; }
 
         /// <summary>
         /// Gets or sets the Material icon name to display before the link text.
@@ -60,7 +60,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The Material icon name.</value>
         [Parameter]
-        public string Icon { get; set; }
+        public string? Icon { get; set; }
 
         /// <summary>
         /// Gets or sets a custom color for the icon.
@@ -68,7 +68,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon color as a CSS color value.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Gets or sets a custom image URL to display before the link text instead of an icon.
@@ -76,7 +76,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The image URL or path.</value>
         [Parameter]
-        public string Image { get; set; }
+        public string? Image { get; set; }
 
         /// <summary>
         /// Gets or sets the link text to display.
@@ -120,7 +120,7 @@ namespace Radzen.Blazor
         /// Gets the path.
         /// </summary>
         /// <returns></returns>
-        protected string GetPath()
+        protected string? GetPath()
         {
             return !Disabled ? Path : null;
         }
@@ -129,7 +129,7 @@ namespace Radzen.Blazor
         /// Gets the target.
         /// </summary>
         /// <returns></returns>
-        protected string GetTarget()
+        protected string? GetTarget()
         {
             return !Disabled ? Target : null;
         }

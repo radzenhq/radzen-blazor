@@ -99,7 +99,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The items render fragment containing accordion item definitions.</value>
         [Parameter]
-        public RenderFragment Items { get; set; }
+        public RenderFragment? Items { get; set; }
 
         List<RadzenAccordionItem> items = new List<RadzenAccordionItem>();
 
@@ -109,6 +109,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void AddItem(RadzenAccordionItem item)
         {
+            ArgumentNullException.ThrowIfNull(item);
+
             if (items.IndexOf(item) == -1)
             {
                 if (item.GetSelected())
@@ -127,9 +129,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenAccordionItem item)
         {
-            if (items.Contains(item))
+            if (items.Remove(item))
             {
-                items.Remove(item);
                 if (!disposed)
                 {
                     try { InvokeAsync(StateHasChanged); } catch { }
@@ -158,6 +159,8 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if the specified index is selected; otherwise, <c>false</c>.</returns>
         protected bool IsSelected(int index, RadzenAccordionItem item)
         {
+            ArgumentNullException.ThrowIfNull(item);
+
             return item.GetSelected() == true;
         }
 
@@ -170,6 +173,8 @@ namespace Radzen.Blazor
         /// If the relevant title is null or whitespace this method returns "Expand" or "Collapse".</returns>
         protected string ItemTitle(int index, RadzenAccordionItem item)
         {
+            ArgumentNullException.ThrowIfNull(item);
+
             if (IsSelected(index, item))
             {
                 return string.IsNullOrWhiteSpace(item.CollapseTitle) ? "Collapse" : item.CollapseTitle;
@@ -186,6 +191,8 @@ namespace Radzen.Blazor
         /// If the relevant aria-label is null or whitespace this method returns "Expand" or "Collapse".</returns>
         protected string ItemAriaLabel(int index, RadzenAccordionItem item)
         {
+            ArgumentNullException.ThrowIfNull(item);
+
             if (IsSelected(index, item))
             {
                 return string.IsNullOrWhiteSpace(item.CollapseAriaLabel) ? "Collapse" : item.CollapseAriaLabel;

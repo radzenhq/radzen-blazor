@@ -1,41 +1,41 @@
-﻿@using System.Timers
+@using System.Timers
 @implements IDisposable
 
 @if (Visible)
 {
     var classes = GetMessageCssClasses();
 
-    <div aria-live="polite" class="rz-notification-item-wrapper rz-open @classes.Item1" style="@(Message.Click != null || Message.CloseOnClick ? "cursor: pointer;" : "") @Style">
+    <div aria-live="polite" class="rz-notification-item-wrapper rz-open @classes.Item1" style="@(Message?.Click != null || Message?.CloseOnClick == true ? "cursor: pointer;" : "") @Style">
         <div class="rz-notification-item">
             <div class="rz-notification-message-wrapper">
                 <span class="notranslate rzi rz-notification-icon @classes.Item2" @onclick="NotificationClicked"></span>
                 <div class="rz-notification-message" @onclick="NotificationClicked">
-                    <div class="rz-notification-title">@if (Message.SummaryContent != null) { @Message.SummaryContent(Service) } else { @Message.Summary }</div>
-                    <div class="rz-notification-content">@if (Message.DetailContent != null) { @Message.DetailContent(Service) } else { @Message.Detail }</div>
+                    <div class="rz-notification-title">@if (Message?.SummaryContent != null && Service != null) { @Message.SummaryContent(Service) } else { @Message?.Summary }</div>
+                    <div class="rz-notification-content">@if (Message?.DetailContent != null && Service != null) { @Message.DetailContent(Service) } else { @Message?.Detail }</div>
                 </div>
             </div>
             <div class="notranslate rzi rz-notification-close" @onclick="@Close"></div>
         </div>
-        <RadzenProgressBar ShowValue="false" Visible=@(Message.Duration != null && Message.ShowProgress)
-        Value=@progress Max="@Message.Duration.Value" ProgressBarStyle=@GetProgressBarStyle() />
+        <RadzenProgressBar ShowValue="false" Visible=@(Message?.Duration != null && Message.ShowProgress)
+        Value=@progress Max="@(Message?.Duration ?? 0)" ProgressBarStyle=@GetProgressBarStyle() />
     </div>
 }
 @code {
     Tuple<string, string> GetMessageCssClasses()
     {
-        if (Message.Severity == NotificationSeverity.Error)
+        if (Message?.Severity == NotificationSeverity.Error)
         {
             return new Tuple<string, string>("rz-notification-error", "notranslate rzi-times");
         }
-        else if (Message.Severity == NotificationSeverity.Info)
+        else if (Message?.Severity == NotificationSeverity.Info)
         {
             return new Tuple<string, string>("rz-notification-info", "notranslate rzi-info-circle");
         }
-        else if (Message.Severity == NotificationSeverity.Success)
+        else if (Message?.Severity == NotificationSeverity.Success)
         {
             return new Tuple<string, string>("rz-notification-success", "notranslate rzi-check");
         }
-        else if (Message.Severity == NotificationSeverity.Warning)
+        else if (Message?.Severity == NotificationSeverity.Warning)
         {
             return new Tuple<string, string>("rz-notification-warn", "notranslate rzi-exclamation-triangle");
         }
@@ -45,19 +45,19 @@
 
     ProgressBarStyle GetProgressBarStyle()
     {
-        if (Message.Severity == NotificationSeverity.Error)
+        if (Message?.Severity == NotificationSeverity.Error)
         {
             return ProgressBarStyle.Danger;
         }
-        else if (Message.Severity == NotificationSeverity.Info)
+        else if (Message?.Severity == NotificationSeverity.Info)
         {
             return ProgressBarStyle.Info;
         }
-        else if (Message.Severity == NotificationSeverity.Success)
+        else if (Message?.Severity == NotificationSeverity.Success)
         {
             return ProgressBarStyle.Success;
         }
-        else if (Message.Severity == NotificationSeverity.Warning)
+        else if (Message?.Severity == NotificationSeverity.Warning)
         {
             return ProgressBarStyle.Warning;
         }
@@ -65,28 +65,31 @@
         return ProgressBarStyle.Primary;
     }
 
-    [Inject] private NotificationService Service { get; set; }
+    [Inject] private NotificationService? Service { get; set; }
 
     public bool Visible { get; set; } = true;
 
     [Parameter]
-    public NotificationMessage Message { get; set; }
+    public NotificationMessage? Message { get; set; }
 
     [Parameter]
-    public string Style { get; set; }
+    public string? Style { get; set; }
 
     public void Close()
     {
-        Service.Messages.Remove(Message);
-        Message?.Close?.Invoke(Message);
+        if (Message != null && Service != null)
+        {
+            Service.Messages.Remove(Message);
+            Message?.Close?.Invoke(Message);
+        }
     }
 
     double progress = 0;
-    Timer timer;
+    Timer? timer;
 
     protected override void OnInitialized()
     {
-        if (Message.ShowProgress)
+        if (Message?.ShowProgress == true)
         {
             timer = new Timer() { Enabled = true };
             timer.Elapsed += (sender, args) =>
@@ -95,12 +98,12 @@
                 InvokeAsync(StateHasChanged);
             };
         }
-        System.Threading.Tasks.Task.Delay(Convert.ToInt32(Message.Duration ?? 3000)).ContinueWith(r => InvokeAsync(Close));
+        System.Threading.Tasks.Task.Delay(Convert.ToInt32(Message?.Duration ?? 3000)).ContinueWith(r => InvokeAsync(Close));
     }
 
     private void NotificationClicked()
     {
-      if (Message.CloseOnClick)
+      if (Message?.CloseOnClick == true)
          Close();
 
       Message?.Click?.Invoke(Message);

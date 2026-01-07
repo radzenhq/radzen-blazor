@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -11,6 +12,7 @@ public class IndentedCodeBlock : Leaf
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitIndentedCodeBlock(this);
     }
 

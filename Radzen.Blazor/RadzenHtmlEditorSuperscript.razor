@@ -1,4 +1,4 @@
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
-<EditorButton Title=@Title Click=@OnClick Icon="superscript" Selected=@Editor.State.Superscript />
+<EditorButton Title=@Title Click=@OnClick Icon="superscript" Selected=@(Editor?.State.Superscript ?? false) />

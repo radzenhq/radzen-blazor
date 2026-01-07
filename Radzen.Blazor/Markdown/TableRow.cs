@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor.Markdown;
@@ -28,6 +29,7 @@ public class TableRow : INode
     /// <inheritdoc />
     public virtual void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitTableRow(this);
     }
 }

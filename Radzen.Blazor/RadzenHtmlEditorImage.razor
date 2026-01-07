@@ -9,8 +9,10 @@
 @code {
     protected override async Task OnClick()
     {
+        if (Editor == null) return;
+        
         await Editor.SaveSelectionAsync();
-
+        
         var uploadHeaders = Editor.UploadHeaders ?? new Dictionary<string, string>();
 
         Attributes = await Editor.GetSelectionAttributes<ImageAttributes>("img", new[] {"src", "alt", "width", "height"});

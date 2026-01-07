@@ -1,49 +1,49 @@
-﻿@using Radzen
+@using Radzen
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @typeparam TValue
 @{var itemArgs = DropDown?.ItemAttributes(this); }
-@if (itemArgs.Visible)
+@if (itemArgs?.Visible == true)
 {
 Disabled = itemArgs.Disabled;
-@if (DropDown.Multiple)
+@if (DropDown?.Multiple == true)
 {
     <li class="@GetComponentCssClass("rz-multiselect")"
-        aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
+        aria-label="@(DropDown?.GetItemOrValueFromProperty(Item!, DropDown?.TextProperty ?? string.Empty) ?? "")"
         @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
         @onclick:preventDefault @onclick="args=>SelectItem(args,true)" 
-        @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
+        @attributes="@(itemArgs?.Attributes.Any() == true ? itemArgs.Attributes : Attributes)">
         <div class="rz-chkbox ">
-            <div class="@(DropDown.IsSelected(Item) ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
-                <span class="@(DropDown.IsSelected(Item) ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
+            <div class="@(DropDown?.IsSelected(Item) == true ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
+                <span class="@(DropDown?.IsSelected(Item) == true ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
             </div>
         </div>
         <span class="rz-multiselect-item-content">
-            @if (DropDown.Template != null)
+            @if (DropDown?.Template != null)
             {
                 @DropDown.Template(Item)
             }
             else
             {
-                @DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+                @(DropDown?.GetItemOrValueFromProperty(Item!, DropDown?.TextProperty ?? string.Empty) ?? "")
             }
         </span>
     </li>
 }
 else
 {
-    <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label="@DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)"
+    <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label="@(DropDown?.GetItemOrValueFromProperty(Item, DropDown?.TextProperty ?? "") ?? "")"
     @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
     @onclick:preventDefault @onclick="args=>SelectItem(args,true)"
-    @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
+    @attributes="@(itemArgs?.Attributes.Any() == true ? itemArgs.Attributes : Attributes)">
         <span>
-            @if (DropDown.Template != null)
+            @if (DropDown?.Template != null)
             {
                 @DropDown.Template(Item)
             }
             else
             {
-                @DropDown.GetItemOrValueFromProperty(Item, DropDown.TextProperty)
+                @(DropDown?.GetItemOrValueFromProperty(Item!, DropDown?.TextProperty ?? string.Empty) ?? "")
             }
        </span>
     </li>
@@ -51,33 +51,40 @@ else
 }
 @code {
     [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+    public IReadOnlyDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
     [Parameter]
-    public RadzenDropDown<TValue> DropDown { get; set; }
+    public RadzenDropDown<TValue> DropDown { get; set; } = default!;
 
     [Parameter]
     public bool Disabled { get; set; }
 
     [Parameter]
-    public object Item { get; set; }
+    public object Item { get; set; } = default!;
 
     async Task SelectItem(MouseEventArgs args,bool isclick)
     {
-        var condition = DropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(DropDown.searchText);
+        var dropDown = DropDown;
+        if (dropDown == null)
+        {
+            return;
+        }
+
+        var condition = dropDown.LoadData.HasDelegate && !string.IsNullOrEmpty(dropDown.searchText);
 
         if (!Disabled && isclick ? !condition : condition)
         {
-            await DropDown.OnSelectItemInternal(Item);
+            await dropDown.OnSelectItemInternal(Item);
         }
     }
 
     protected string GetComponentCssClass(string prefix)
     {
+        var dropDown = DropDown;
         string result = $"{prefix}-item ";
         if (Disabled)
             result += "rz-state-disabled ";
-        else if (DropDown.IsSelected(Item))
+        else if (dropDown != null && dropDown.IsSelected(Item))
             result += "rz-state-highlight ";
 
         return result;

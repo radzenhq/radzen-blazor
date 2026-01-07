@@ -37,7 +37,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The custom item template render fragment.</value>
         [Parameter]
-        public RenderFragment<RadzenBreadCrumbItem> Template { get; set; }
+        public RenderFragment<RadzenBreadCrumbItem>? Template { get; set; }
 
         /// <inheritdoc/>
         protected override string GetComponentCssClass()

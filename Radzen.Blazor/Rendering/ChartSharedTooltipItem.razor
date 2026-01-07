@@ -13,14 +13,14 @@ else
 </div>
 @code {
     [Parameter]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [Parameter]
-    public string Value { get; set; }
+    public string? Value { get; set; }
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
-    public RenderFragment LegendItem { get; set; }
+    public RenderFragment? LegendItem { get; set; }
 }

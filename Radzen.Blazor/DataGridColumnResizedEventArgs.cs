@@ -6,12 +6,12 @@ namespace Radzen;
 /// Supplies information about a <see cref="RadzenDataGrid{TItem}.ColumnResized" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class DataGridColumnResizedEventArgs<T>
+public class DataGridColumnResizedEventArgs<T> where T : notnull
 {
     /// <summary>
     /// Gets the resized RadzenDataGridColumn.
     /// </summary>
-    public RadzenDataGridColumn<T> Column { get; internal set; }
+    public RadzenDataGridColumn<T>? Column { get; internal set; }
 
     /// <summary>
     /// Gets the new width of the resized column.

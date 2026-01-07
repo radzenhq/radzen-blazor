@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -64,7 +65,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The edit context.</value>
         [CascadingParameter]
-        public EditContext EditContext { get; set; }
+        public EditContext? EditContext { get; set; }
 
         /// <summary>
         /// Gets the steps collection.
@@ -157,7 +158,7 @@ namespace Radzen.Blazor
             }
         }
 
-        private int selectedIndex = 0;
+        private int selectedIndex;
         /// <summary>
         /// Gets or sets the selected index.
         /// </summary>
@@ -305,20 +306,20 @@ namespace Radzen.Blazor
         /// Gets the next button aria-label attribute.
         /// </summary>
         /// <value>The next button aria-label attribute.</value>
-        public string NextAriaLabel => StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextAriaLabel;
+        public string? NextAriaLabel => StepsCollection.ElementAtOrDefault(SelectedIndex)?.NextAriaLabel;
 
         /// <summary>
         /// Gets the previous button aria-label attribute.
         /// </summary>
         /// <value>The previous button aria-label attribute.</value>
-        public string PreviousAriaLabel => StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousAriaLabel;
+        public string? PreviousAriaLabel => StepsCollection.ElementAtOrDefault(SelectedIndex)?.PreviousAriaLabel;
 
         /// <summary>
         /// Gets or sets the steps.
         /// </summary>
         /// <value>The steps.</value>
         [Parameter]
-        public RenderFragment Steps { get; set; }
+        public RenderFragment? Steps { get; set; }
 
         /// <summary>
         /// 
@@ -335,6 +336,7 @@ namespace Radzen.Blazor
         /// <param name="step">The step.</param>
         public void AddStep(RadzenStepsItem step)
         {
+            ArgumentNullException.ThrowIfNull(step);
             if (steps.IndexOf(step) == -1)
             {
                 if (step.Selected)
@@ -353,10 +355,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveStep(RadzenStepsItem item)
         {
-            if (steps.Contains(item))
+            if (steps.Remove(item))
             {
-                steps.Remove(item);
-
                 if (!disposed)
                 {
                     try { InvokeAsync(StateHasChanged); } catch { }
@@ -444,7 +444,7 @@ namespace Radzen.Blazor
             await base.SetParametersAsync(parameters);
         }
 
-        bool preventKeyPress = false;
+        bool preventKeyPress;
         async Task OnKeyPress(KeyboardEventArgs args, Task task)
         {
             var key = args.Code != null ? args.Code : args.Key;

@@ -141,6 +141,7 @@ namespace RadzenBlazorDemos
                  Array.Empty<SyntaxTree>(),
                  referenceAssemblies,
                  new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
+                 .WithNullableContextOptions(NullableContextOptions.Disable)
             );
 
             razorProjectEngine = RazorProjectEngine.Create(RazorConfiguration.Default, RazorProjectFileSystem.Create("/"), builder =>
@@ -190,7 +191,12 @@ namespace RadzenBlazorDemos
 
             var csharpDocument = codeDocument.GetCSharpDocument();
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(csharpDocument.GeneratedCode.Replace("<Radzen.Group>", "<global::Radzen.Group>"), CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp10));
+            var generatedCode = csharpDocument.GeneratedCode
+                .Replace("<Radzen.Group>", "<global::Radzen.Group>")
+                .Replace("#nullable enable", "#nullable disable")
+                .Replace("where TItem : , notnull", "where TItem : notnull");
+
+            var syntaxTree = CSharpSyntaxTree.ParseText(generatedCode, CSharpParseOptions.Default.WithLanguageVersion(LanguageVersion.CSharp10));
 
             compilation = compilation.RemoveAllSyntaxTrees().AddSyntaxTrees(syntaxTree);
 

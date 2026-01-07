@@ -29,9 +29,9 @@
 }
 @code {
     [Parameter]
-    public IList<RadzenDataGridColumn<TItem>> Columns { get; set; }
+    public IList<RadzenDataGridColumn<TItem>> Columns { get; set; } = new List<RadzenDataGridColumn<TItem>>();
 
-    GroupResult _groupResult;
+    GroupResult _groupResult = new GroupResult();
     [Parameter]
     public GroupResult GroupResult
     {
@@ -59,15 +59,15 @@
     }
 
     [Parameter]
-    public RadzenDataGrid<TItem> Grid { get; set; }
+    public RadzenDataGrid<TItem> Grid { get; set; } = default!;
 
     [Parameter]
-    public RadzenDataGridGroupRow<TItem> Parent { get; set; }
+    public RadzenDataGridGroupRow<TItem>? Parent { get; set; }
 
     [Parameter]
-    public Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder Builder { get; set; }
+    public Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder Builder { get; set; } = default!;
 
-    public Group Group { get; set; }
+    public Group Group { get; set; } = new Group();
 
     int GetLevel()
     {

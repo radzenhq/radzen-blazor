@@ -10,6 +10,6 @@ public class ListBoxItemRenderEventArgs<TValue> : DropDownBaseItemRenderEventArg
     /// <summary>
     /// Gets the ListBox.
     /// </summary>
-    public RadzenListBox<TValue> ListBox { get; internal set; }
+    public RadzenListBox<TValue>? ListBox { get; internal set; }
 }
 

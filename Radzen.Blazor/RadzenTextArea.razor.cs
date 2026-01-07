@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -67,11 +68,12 @@ namespace Radzen.Blazor
         public bool Immediate { get; set; }
 
         /// <summary>
-        /// Handles the <see cref="E:Change" /> event.
+        /// Handles the change event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async Task OnChange(ChangeEventArgs args)
         {
+            ArgumentNullException.ThrowIfNull(args);
             Value = $"{args.Value}";
 
             await ValueChanged.InvokeAsync(Value);
@@ -91,7 +93,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetId()
+        protected override string? GetId()
         {
             return Name ?? base.GetId();
         }

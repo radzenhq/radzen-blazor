@@ -35,14 +35,14 @@ namespace Radzen.Blazor
     public partial class RadzenLayout : RadzenComponentWithChildren
     {
         [Inject]
-        private IServiceProvider ServiceProvider { get; set; }
+        private IServiceProvider? ServiceProvider { get; set; }
 
-        private ThemeService themeService;
+        private ThemeService? themeService;
 
         /// <inheritdoc />
         protected override void OnInitialized()
         {
-            themeService = ServiceProvider.GetService<ThemeService>();
+            themeService = ServiceProvider?.GetService<ThemeService>();
 
             if (themeService != null)
             {

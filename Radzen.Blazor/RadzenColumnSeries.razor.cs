@@ -38,7 +38,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The fill color as a CSS color value.</value>
         [Parameter]
-        public string Fill { get; set; }
+        public string? Fill { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of fill colors to apply to individual columns in sequence.
@@ -47,7 +47,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>An enumerable collection of CSS color values.</value>
         [Parameter]
-        public IEnumerable<string> Fills { get; set; }
+        public IEnumerable<string>? Fills { get; set; }
 
         /// <summary>
         /// Gets or sets the stroke (border) color applied to all columns in the series.
@@ -55,7 +55,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The stroke color as a CSS color value.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of stroke colors to apply to individual column borders in sequence.
@@ -64,7 +64,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>An enumerable collection of CSS color values for borders.</value>
         [Parameter]
-        public IEnumerable<string> Strokes { get; set; }
+        public IEnumerable<string>? Strokes { get; set; }
 
         /// <summary>
         /// Gets or sets the width of the column border in pixels.
@@ -89,7 +89,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>A collection of value ranges and their associated fill colors.</value>
         [Parameter]
-        public IList<SeriesColorRange> FillRange { get; set; }
+        public IList<SeriesColorRange>? FillRange { get; set; }
 
         /// <summary>
         /// Gets or sets value-based color ranges that dynamically color column borders based on their values.
@@ -97,14 +97,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>A collection of value ranges and their associated stroke colors.</value>
         [Parameter]
-        public IList<SeriesColorRange> StrokeRange { get; set; }
+        public IList<SeriesColorRange>? StrokeRange { get; set; }
 
         /// <inheritdoc />
         public override string Color
         {
             get
             {
-                return Fill;
+                return Fill ?? string.Empty;
             }
         }
 
@@ -117,7 +117,7 @@ namespace Radzen.Blazor
                     return 0;
                 }
 
-                return Items.Count();
+                return Items.Count;
             }
         }
 
@@ -125,7 +125,8 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Chart.Series.Where(series => series is IChartColumnSeries).Cast<IChartSeries>().ToList();
+                var chart = RequireChart();
+                return chart.Series.Where(series => series is IChartColumnSeries).Cast<IChartSeries>().ToList();
             }
         }
 
@@ -163,13 +164,14 @@ namespace Radzen.Blazor
             {
                 var columnSeries = VisibleColumnSeries;
 
-                if (Chart.ColumnOptions.Width.HasValue)
+                var chart = RequireChart();
+                if (chart.ColumnOptions.Width.HasValue)
                 {
-                    return Chart.ColumnOptions.Width.Value * columnSeries.Count + Chart.ColumnOptions.Margin * (columnSeries.Count - 1);
+                    return chart.ColumnOptions.Width.Value * columnSeries.Count + chart.ColumnOptions.Margin * (columnSeries.Count - 1);
                 }
                 else
                 {
-                    var availableWidth = Chart.CategoryScale.OutputSize - (Chart.CategoryAxis.Padding * 2);
+                    var availableWidth = chart.CategoryScale.OutputSize - (chart.CategoryAxis.Padding * 2);
                     var bands = columnSeries.Cast<IChartColumnSeries>().Max(series => series.Count) + 2;
                     return availableWidth / bands;
                 }
@@ -185,12 +187,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         internal override double TooltipX(TItem item)
         {
+            var chart = RequireChart();
             var columnSeries = VisibleColumnSeries;
             var index = columnSeries.IndexOf(this);
-            var padding = Chart.ColumnOptions.Margin;
+            var padding = chart.ColumnOptions.Margin;
             var bandWidth = BandWidth;
-            var width = bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();
-            var category = ComposeCategory(Chart.CategoryScale);
+            var width = bandWidth / columnSeries.Count - padding + padding / columnSeries.Count;
+            var category = ComposeCategory(chart.CategoryScale);
             var x = category(item) - bandWidth / 2 + index * width + index * padding;
 
             return x + width / 2;
@@ -205,16 +208,17 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override (object, Point) DataAt(double x, double y)
         {
-            var category = ComposeCategory(Chart.CategoryScale);
-            var value = ComposeValue(Chart.ValueScale);
-            var ticks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-            var y0 = Chart.ValueScale.Scale(Math.Max(0, ticks.Start));
+            var chart = RequireChart();
+            var category = ComposeCategory(chart.CategoryScale);
+            var value = ComposeValue(chart.ValueScale);
+            var ticks = chart.ValueScale.Ticks(chart.ValueAxis.TickDistance);
+            var y0 = chart.ValueScale.Scale(Math.Max(0, ticks.Start));
 
             var columnSeries = VisibleColumnSeries;
             var index = columnSeries.IndexOf(this);
-            var padding = Chart.ColumnOptions.Margin;
+            var padding = chart.ColumnOptions.Margin;
             var bandWidth = BandWidth;
-            var width = Chart.ColumnOptions.Width ?? bandWidth / columnSeries.Count() - padding + padding / columnSeries.Count();
+            var width = chart.ColumnOptions.Width ?? bandWidth / columnSeries.Count - padding + padding / columnSeries.Count;
 
             foreach (var data in Items)
             {
@@ -226,11 +230,11 @@ namespace Radzen.Blazor
 
                 if (startX <= x && x <= endX && startY <= y && y <= endY)
                 {
-                    return (data, new Point() { X = x, Y = y });
+                    return (data!, new Point() { X = x, Y = y });
                 }
             }
 
-            return (null, null);
+            return (default!, new Point());
         }
 
         /// <inheritdoc />
@@ -240,16 +244,20 @@ namespace Radzen.Blazor
 
             int sign;
 
-            foreach (var d in Data)
+            var chart = RequireChart();
+            if (Data != null)
             {
-                sign = Value(d) < 0 ? -1 : Value(d) == 0 ? 0 : 1;
-
-                list.Add(new ChartDataLabel
+                foreach (var d in Data)
                 {
-                    Position = new Point() { X = TooltipX(d) + offsetX, Y = TooltipY(d) - offsetY - (16 * sign) },
-                    TextAnchor = "middle",
-                    Text = Chart.ValueAxis.Format(Chart.ValueScale, Value(d))
-                });
+                    sign = Value(d) < 0 ? -1 : Value(d) == 0 ? 0 : 1;
+
+                    list.Add(new ChartDataLabel
+                    {
+                        Position = new Point() { X = TooltipX(d) + offsetX, Y = TooltipY(d) - offsetY - (16 * sign) },
+                        TextAnchor = "middle",
+                        Text = chart.ValueAxis.Format(chart.ValueScale, Value(d))
+                    });
+                }
             }
 
             return list;

@@ -19,6 +19,6 @@ namespace Radzen.Blazor.Rendering
         /// Gets or sets the rect.
         /// </summary>
         /// <value>The rect.</value>
-        public Rect Rect { get; set; }
+        public Rect? Rect { get; set; }
     }
 }

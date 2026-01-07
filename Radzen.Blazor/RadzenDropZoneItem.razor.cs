@@ -10,21 +10,21 @@ namespace Radzen.Blazor
     public partial class RadzenDropZoneItem<TItem> : RadzenComponent
     {
         [CascadingParameter]
-        TItem Item { get; set; }
+        TItem Item { get; set; } = default!;
 
         [CascadingParameter]
-        RadzenDropZone<TItem> Zone { get; set; }
+        RadzenDropZone<TItem> Zone { get; set; } = default!;
 
         [CascadingParameter]
-        RadzenDropZoneContainer<TItem> Container { get; set; }
+        RadzenDropZoneContainer<TItem> Container { get; set; } = default!;
 
-        void EnsurePayload(DragEventArgs args = null)
+        void EnsurePayload(DragEventArgs? args = null)
         {
             Container.Payload = new RadzenDropZoneItemEventArgs<TItem>()
             {
                 FromZone = Zone,
                 Item = Item,
-                DataTransfer = args?.DataTransfer
+                DataTransfer = args?.DataTransfer ?? default!
             };
         }
 
@@ -36,18 +36,21 @@ namespace Radzen.Blazor
 
         void OnDragOver(DragEventArgs args)
         {
-            if (Container.Payload == null)
+            if (Container?.Payload == null)
             {
                 EnsurePayload(args);
             }
 
-            Container.Payload.ToItem = Item;
+            if (Container?.Payload != null)
+            {
+                Container.Payload.ToItem = Item;
+            }
 
-            var canDrop = Zone.CanDrop();
+            var canDrop = Zone?.CanDrop() ?? false;
             args.DataTransfer.DropEffect = canDrop ? "move" : "none";
             cssClass = canDrop ? "rz-can-drop" : "rz-no-drop";
 
-            Zone.OnDragOver(args);
+            Zone?.OnDragOver(args);
         }
 
         void OnDragLeave(DragEventArgs args)
@@ -62,17 +65,23 @@ namespace Radzen.Blazor
 
         async Task OnDrop(DragEventArgs args)
         {
-            if (Container.Payload == null)
+            if (Container?.Payload == null)
             {
                 EnsurePayload(args);
             }
             cssClass = "";
-            Container.Payload.ToItem = Item;
-            await Zone.OnDropInternal();
+            if (Container?.Payload != null)
+            {
+                Container.Payload.ToItem = Item;
+            }
+            if (Zone != null)
+            {
+                await Zone.OnDropInternal();
+            }
         }
 
-        string cssClass;
-        string dragCssClass;
+        string cssClass = string.Empty;
+        string dragCssClass = string.Empty;
 
         /// <inheritdoc />
         protected override string GetComponentCssClass()

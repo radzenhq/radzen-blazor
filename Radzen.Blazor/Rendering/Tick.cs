@@ -14,12 +14,12 @@ namespace Radzen.Blazor.Rendering
         public double Y { get; set; }
 
         /// <summary> Gets or sets the child content. </summary>
-        [Parameter]
-        public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
 
         /// <summary> Gets or sets the stroke (line color) of the tick. </summary>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary> Gets or sets the pixel width of the tick. </summary>
         [Parameter]
@@ -31,6 +31,6 @@ namespace Radzen.Blazor.Rendering
 
         /// <summary> Gets or sets the text of the tick. </summary>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
     }
 }

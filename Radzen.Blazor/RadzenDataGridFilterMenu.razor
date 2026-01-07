@@ -17,7 +17,7 @@
         style="display:none;" tabindex="0">
     <div class="rz-overlaypanel-content">
         <ul class="rz-listbox-list">
-            @if (QueryableExtension.IsEnumerable(Column.FilterPropertyType) || Column.FilterPropertyType == typeof(string))
+            @if (Column.FilterPropertyType != null && (QueryableExtension.IsEnumerable(Column.FilterPropertyType) || Column.FilterPropertyType == typeof(string)))
             {
                 @if (Column.GetFilterOperators().Contains(FilterOperator.Contains))
                 {
@@ -124,12 +124,12 @@
 </div>
 @code {
     [Parameter]
-    public RadzenDataGridColumn<TItem> Column { get; set; }
+    public RadzenDataGridColumn<TItem> Column { get; set; } = default!;
 
     [Parameter]
-    public RadzenDataGrid<TItem> Grid { get; set; }
+    public RadzenDataGrid<TItem> Grid { get; set; } = default!;
 
-    string filterId;
+    string filterId = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {

@@ -31,7 +31,10 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override void Initialize()
         {
-            Chart.BarOptions = this;
+            if (Chart != null)
+            {
+                Chart.BarOptions = this;
+            }
         }
 
         /// <inheritdoc />

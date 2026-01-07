@@ -34,7 +34,7 @@ namespace Radzen.Blazor
             var visibleSeries = Series.Where(series => series.Visible).ToList();
             var invisibleSeries = Series.Where(series => series.Visible == false).ToList();
 
-            if (!visibleSeries.Any() && invisibleSeries.Any())
+            if (visibleSeries.Count == 0 && invisibleSeries.Count > 0)
             {
                 visibleSeries.Add(invisibleSeries.Last());
             }
@@ -58,7 +58,7 @@ namespace Radzen.Blazor
                 CategoryScale.Padding = CategoryAxis.Padding;
             }
 
-            CategoryScale.Resize(xAxis.Min, xAxis.Max);
+            CategoryScale.Resize(xAxis.Min!, xAxis.Max!);
 
             if (xAxis.Step != null)
             {
@@ -66,7 +66,7 @@ namespace Radzen.Blazor
                 CategoryScale.Round = false;
             }
 
-            ValueScale.Resize(yAxis.Min, yAxis.Max);
+            ValueScale.Resize(yAxis.Min!, yAxis.Max!);
 
             if (yAxis.Step != null)
             {
@@ -114,8 +114,8 @@ namespace Radzen.Blazor
                 }
             }
 
-            CategoryScale.Output = new ScaleRange { Start = MarginLeft, End = Width.Value - MarginRight };
-            ValueScale.Output = new ScaleRange { Start = Height.Value - MarginBottom, End = MarginTop };
+            CategoryScale.Output = new ScaleRange { Start = MarginLeft, End = (Width ?? 0) - MarginRight };
+            ValueScale.Output = new ScaleRange { Start = (Height ?? 0) - MarginBottom, End = MarginTop };
 
             ValueScale.Fit(ValueAxis.TickDistance);
             CategoryScale.Fit(CategoryAxis.TickDistance);

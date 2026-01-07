@@ -11,16 +11,16 @@
 
 @code {
     [Parameter]
-    public string Color { get; set; }
+    public string Color { get; set; } = string.Empty;
 
     [Parameter]
-    public string Text { get; set; }
+    public string Text { get; set; } = string.Empty;
 
     [Parameter]
-    public string Class { get; set;}
+    public string Class { get; set;} = string.Empty;
 
     [Parameter]
-    public string Style { get; set; }
+    public string Style { get; set; } = string.Empty;
 
     [Parameter]
     public MarkerType MarkerType { get; set; }
@@ -37,7 +37,7 @@
     [Parameter]
     public int Index { get; set; }
 
-    bool preventKeyPress = false;
+    bool preventKeyPress;
 
     async Task OnClick()
     {

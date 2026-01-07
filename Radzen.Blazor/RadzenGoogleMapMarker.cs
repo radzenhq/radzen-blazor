@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System;
 
 namespace Radzen.Blazor
 {
@@ -19,23 +20,23 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The title.</value>
         [Parameter]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Gets or sets the label.
         /// </summary>
         /// <value>The label.</value>
         [Parameter]
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
-        RadzenGoogleMap _map;
+        RadzenGoogleMap? _map;
 
         /// <summary>
         /// Gets or sets the map.
         /// </summary>
         /// <value>The map.</value>
         [CascadingParameter]
-        public RadzenGoogleMap Map
+        public RadzenGoogleMap? Map
         {
             get
             {
@@ -43,7 +44,7 @@ namespace Radzen.Blazor
             }
             set
             {
-                if (_map != value)
+                if (_map != value && value != null)
                 {
                     _map = value;
                     _map.AddMarker(this);
@@ -58,6 +59,7 @@ namespace Radzen.Blazor
         {
             base.Dispose();
             Map?.RemoveMarker(this);
+            GC.SuppressFinalize(this);
         }
     }
 }

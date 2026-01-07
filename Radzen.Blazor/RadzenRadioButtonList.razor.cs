@@ -56,14 +56,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value property.</value>
         [Parameter]
-        public string ValueProperty { get; set; }
+        public string? ValueProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the text property.
         /// </summary>
         /// <value>The text property.</value>
         [Parameter]
-        public string TextProperty { get; set; }
+        public string? TextProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the content justify.
@@ -84,7 +84,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The spacing between items.</value>
         [Parameter]
-        public string Gap { get; set; }
+        public string? Gap { get; set; }
 
         /// <summary>
         /// Gets or sets the wrap.
@@ -98,24 +98,24 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The disabled property.</value>
         [Parameter]
-        public string DisabledProperty { get; set; }
+        public string? DisabledProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the visible property.
         /// </summary>
         /// <value>The visible property.</value>
         [Parameter]
-        public string VisibleProperty { get; set; }
+        public string? VisibleProperty { get; set; }
 
-        List<RadzenRadioButtonListItem<TValue>> allItems;
+        List<RadzenRadioButtonListItem<TValue>> allItems = new();
 
         void UpdateAllItems()
         {
             allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
             {
                 var item = new RadzenRadioButtonListItem<TValue>();
-                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
-                item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+                item.SetText((string?)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty ?? string.Empty) ?? string.Empty);
+                item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty ?? string.Empty)!);
 
                 if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
                 {
@@ -139,14 +139,14 @@ namespace Radzen.Blazor
             UpdateAllItems();
         }
 
-        private IEnumerable data = null;
+        private IEnumerable? data;
 
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
-        public virtual IEnumerable Data
+        public virtual IEnumerable? Data
         {
             get
             {
@@ -183,7 +183,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The items.</value>
         [Parameter]
-        public RenderFragment Items { get; set; }
+        public RenderFragment? Items { get; set; }
 
         List<RadzenRadioButtonListItem<TValue>> items = new List<RadzenRadioButtonListItem<TValue>>();
 
@@ -207,9 +207,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenRadioButtonListItem<TValue> item)
         {
-            if (items.Contains(item))
+            if (items.Remove(item))
             {
-                items.Remove(item);
                 UpdateAllItems();
                 try
                 { InvokeAsync(StateHasChanged); }
@@ -224,6 +223,8 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
         protected bool IsSelected(RadzenRadioButtonListItem<TValue> item)
         {
+            ArgumentNullException.ThrowIfNull(item);
+
             return object.Equals(Value, item.Value);
         }
 
@@ -233,12 +234,13 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         protected async System.Threading.Tasks.Task SelectItem(RadzenRadioButtonListItem<TValue> item)
         {
+            ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled)
                 return;
 
             focusedIndex = allItems.IndexOf(item);
 
-            Value = item.Value;
+            Value = item.Value!;
 
             await ValueChanged.InvokeAsync(Value);
             if (FieldIdentifier.FieldName != null)

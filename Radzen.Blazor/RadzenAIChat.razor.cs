@@ -22,18 +22,18 @@ namespace Radzen.Blazor
     {
         private List<ChatMessage> Messages { get; set; } = new();
         private string CurrentInput { get; set; } = string.Empty;
-        private bool IsLoading { get; set; } = false;
-        private bool preventDefault = false;
+        private bool IsLoading { get; set; }
+        private bool preventDefault;
         private ElementReference inputElement;
         private ElementReference messagesContainer;
         private CancellationTokenSource cts = new();
-        private string currentSessionId;
+        private string? currentSessionId;
 
         /// <summary>
         /// Gets or sets the session ID for maintaining conversation memory. If null, a new session will be created.
         /// </summary>
         [Parameter]
-        public string SessionId { get; set; }
+        public string? SessionId { get; set; }
 
         /// <summary>
         /// Event callback that is invoked when a session ID is created or retrieved.
@@ -46,13 +46,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
         /// Gets or sets the title displayed in the chat header.
         /// </summary>
         [Parameter]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Gets or sets the placeholder text for the input field.
@@ -82,13 +82,13 @@ namespace Radzen.Blazor
         /// Gets or sets the model name.
         /// </summary>
         [Parameter]
-        public string Model { get; set; }
+        public string? Model { get; set; }
 
         /// <summary>
         /// Gets or sets the system prompt.
         /// </summary>
         [Parameter]
-        public string SystemPrompt { get; set; }
+        public string? SystemPrompt { get; set; }
 
         /// <summary>
         /// Gets or sets the temperature.
@@ -106,25 +106,25 @@ namespace Radzen.Blazor
         /// Gets or sets the endpoint URL for the AI service.
         /// </summary>
         [Parameter]
-        public string Endpoint { get; set; }
+        public string? Endpoint { get; set; }
 
         /// <summary>
         /// Gets or sets the proxy URL for the AI service.
         /// </summary>
         [Parameter]
-        public string Proxy { get; set; }
+        public string? Proxy { get; set; }
 
         /// <summary>
         /// Gets or sets the API key for authentication.
         /// </summary>
         [Parameter]
-        public string ApiKey { get; set; }
+        public string? ApiKey { get; set; }
 
         /// <summary>
         /// Gets or sets the API key header name.
         /// </summary>
         [Parameter]
-        public string ApiKeyHeader { get; set; }
+        public string? ApiKeyHeader { get; set; }
 
         /// <summary>
         /// Gets or sets whether to show the clear chat button.
@@ -149,14 +149,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The message template.</value>
         [Parameter]
-        public RenderFragment<ChatMessage> MessageTemplate { get; set; }
+        public RenderFragment<ChatMessage>? MessageTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the empty template shown when there are no messages.
         /// </summary>
         /// <value>The empty template.</value>
         [Parameter]
-        public RenderFragment EmptyTemplate { get; set; }
+        public RenderFragment? EmptyTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum number of messages to keep in the chat.
@@ -196,7 +196,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the current session ID.
         /// </summary>
-        public string GetSessionId() => currentSessionId;
+        public string? GetSessionId() => currentSessionId;
 
         /// <summary>
         /// Adds a message to the chat.
@@ -277,7 +277,7 @@ namespace Radzen.Blazor
         /// <param name="proxy">Optional proxy URL to override the configured proxy.</param>
         /// <param name="apiKey">Optional API key to override the configured API key.</param>
         /// <param name="apiKeyHeader">Optional API key header name to override the configured header.</param>
-        public async Task SendMessage(string content, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null, string endpoint = null, string proxy = null, string apiKey = null, string apiKeyHeader = null)
+        public async Task SendMessage(string content, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
                 return;
@@ -317,60 +317,17 @@ namespace Radzen.Blazor
             await InvokeAsync(StateHasChanged);
         }
 
-        private async Task GetAIResponse(string userInput)
+        private async Task GetAIResponse(string userInput, string? model = null, string? systemPrompt = null, double? temperature = null, int? maxTokens = null, string? endpoint = null, string? proxy = null, string? apiKey = null, string? apiKeyHeader = null)
         {
             if (string.IsNullOrWhiteSpace(userInput))
                 return;
 
             IsLoading = true;
+#if NET8_0_OR_GREATER
+            await cts.CancelAsync();
+#else
             cts.Cancel();
-            cts = new CancellationTokenSource();
-
-            // Ensure we have a session ID
-            if (string.IsNullOrEmpty(currentSessionId))
-            {
-                currentSessionId = SessionId ?? Guid.NewGuid().ToString();
-                await SessionIdChanged.InvokeAsync(currentSessionId);
-            }
-
-            // Add assistant message placeholder
-            var assistantMessage = AddMessage("", false);
-            assistantMessage.IsStreaming = true;
-
-            try
-            {
-                var response = "";
-                await foreach (var token in ChatService.GetCompletionsAsync(userInput, currentSessionId, cts.Token, Model, SystemPrompt, Temperature, MaxTokens, Endpoint, Proxy, ApiKey, ApiKeyHeader))
-                {
-                    response += token;
-                    assistantMessage.Content = response;
-                    await InvokeAsync(StateHasChanged);
-                }
-
-                assistantMessage.IsStreaming = false;
-                await ResponseReceived.InvokeAsync(response);
-                await MessageAdded.InvokeAsync(assistantMessage);
-            }
-            catch (Exception ex)
-            {
-                assistantMessage.Content = $"Sorry, I encountered an error: {ex.Message}";
-                assistantMessage.IsStreaming = false;
-                await InvokeAsync(StateHasChanged);
-            }
-            finally
-            {
-                IsLoading = false;
-                await InvokeAsync(StateHasChanged);
-            }
-        }
-
-        private async Task GetAIResponse(string userInput, string model = null, string systemPrompt = null, double? temperature = null, int? maxTokens = null, string endpoint = null, string proxy = null, string apiKey = null, string apiKeyHeader = null)
-        {
-            if (string.IsNullOrWhiteSpace(userInput))
-                return;
-
-            IsLoading = true;
-            cts.Cancel();
+#endif
             cts = new CancellationTokenSource();
 
             // Ensure we have a session ID
@@ -432,7 +389,7 @@ namespace Radzen.Blazor
             // Update session ID if it changed
             if (!string.IsNullOrEmpty(SessionId) && SessionId != currentSessionId)
             {
-                currentSessionId = SessionId ?? Guid.NewGuid().ToString();
+                currentSessionId = SessionId;
                 await SessionIdChanged.InvokeAsync(currentSessionId);
                 
                 // Load conversation history for the new session
@@ -448,7 +405,7 @@ namespace Radzen.Blazor
 
         private async Task OnKeyDown(KeyboardEventArgs e)
         {
-            if (e.Key == "Enter" && !e.ShiftKey)
+            if (e.Key == "Enter" && !e.ShiftKey && JSRuntime != null)
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", inputElement, "");
                 preventDefault = true;
@@ -476,7 +433,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender && messagesContainer.Context != null)
+            if (!firstRender && messagesContainer.Context != null && JSRuntime != null)
             {
                 // Scroll to bottom when new messages are added
                 await JSRuntime.InvokeVoidAsync("eval", 
@@ -491,6 +448,17 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return ClassList.Create("rz-chat").ToString();
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            base.Dispose();
+            
+            cts?.Cancel();
+            cts?.Dispose();
+
+            GC.SuppressFinalize(this);
         }
     }
 }

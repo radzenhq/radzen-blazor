@@ -11,12 +11,12 @@ public class RadzenDropZoneItemRenderEventArgs<TItem>
     /// <summary>
     /// Gets the drop zone.
     /// </summary>
-    public RadzenDropZone<TItem> Zone { get; internal set; }
+    public RadzenDropZone<TItem>? Zone { get; internal set; }
 
     /// <summary>
     /// Gets the dragged item.
     /// </summary>
-    public TItem Item { get; internal set; }
+    public TItem? Item { get; internal set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether this item is visible.

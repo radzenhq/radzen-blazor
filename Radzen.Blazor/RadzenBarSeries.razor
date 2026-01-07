@@ -12,28 +12,44 @@
 @code {
     public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
+        var chart = Chart;
+        if (chart == null)
+        {
+            return _ => { };
+        }
+
         var value = ComposeValue(categoryScale);
         var category = ComposeCategory(valueScale);
-        var ticks = Chart.CategoryScale.Ticks(Chart.ValueAxis.TickDistance);
-        var x0 = Chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
-        var style = $"clip-path: url(#{Chart.ClipPath}); -webkit-clip-path: url(#{Chart.ClipPath});";
+        var ticks = chart.CategoryScale.Ticks(chart.ValueAxis.TickDistance);
+        var x0 = chart.CategoryScale.Scale(Math.Max(0, ticks.Start));
+        var style = $"clip-path: url(#{chart.ClipPath}); -webkit-clip-path: url(#{chart.ClipPath});";
 
         var barSeries = VisibleBarSeries;
+        if (barSeries.Count == 0)
+        {
+            return _ => { };
+        }
+
         var index = barSeries.IndexOf(this);
-        var padding = Chart.BarOptions.Margin;
+        if (index < 0)
+        {
+            return _ => { };
+        }
+        var barOptions = chart.BarOptions;
+        var padding = barOptions?.Margin ?? 0;
 
         var barHeight = BandHeight;
-        var height = barHeight / barSeries.Count() - padding + padding / barSeries.Count();;
-        var className = $"rz-bar-series rz-series-{Chart.Series.IndexOf(this)}";
+        var height = barHeight / barSeries.Count - padding + padding / barSeries.Count;
+        var className = $"rz-bar-series rz-series-{chart.Series.IndexOf(this)}";
 
         return
         @<g class="@className">
-            @foreach(var data in Items)
+            @foreach (var data in Items)
             {
                 var y = category(data) - barHeight / 2 + index * height + index * padding;
                 var x = value(data);
                 var itemValue = Value(data);
-                var radius = Chart.BarOptions.Radius;
+                var radius = barOptions?.Radius ?? 0;
                 var width = Math.Abs(x0 - x);
 
                 if (radius > height / 2 || radius > width)
@@ -43,11 +59,11 @@
 
                 var r = radius.ToInvariantString();
 
-                var path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x-radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 1 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 1 {(x-radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
+                var path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x - radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 1 {x.ToInvariantString()} {(y + radius).ToInvariantString()} L {x.ToInvariantString()} {(y + height - radius).ToInvariantString()} A {r} {r} 0 0 1 {(x - radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y + height).ToInvariantString()} Z";
 
                 if (x < x0)
                 {
-                    path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x+radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y+radius).ToInvariantString()} L {x.ToInvariantString()} {(y+height-radius).ToInvariantString()} A {r} {r} 0 0 0 {(x+radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y+height).ToInvariantString()} Z";
+                    path = $"M {x0.ToInvariantString()} {y.ToInvariantString()} L {(x + radius).ToInvariantString()} {y.ToInvariantString()} A {r} {r} 0 0 0 {x.ToInvariantString()} {(y + radius).ToInvariantString()} L {x.ToInvariantString()} {(y + height - radius).ToInvariantString()} A {r} {r} 0 0 0 {(x + radius).ToInvariantString()} {(y + height).ToInvariantString()} L {x0.ToInvariantString()} {(y + height).ToInvariantString()} Z";
                 }
                 var fill = PickColor(Items.IndexOf(data), Fills, Fill, FillRange, itemValue);
                 var stroke = PickColor(Items.IndexOf(data), Strokes, Stroke, StrokeRange, itemValue);

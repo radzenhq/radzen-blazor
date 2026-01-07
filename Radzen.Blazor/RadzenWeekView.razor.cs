@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
 using System;
+using System.Globalization;
 
 namespace Radzen.Blazor
 {
@@ -60,7 +61,8 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Scheduler.CurrentDate.Date.StartOfWeek(Scheduler.Culture);
+                var culture = Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
+                return Scheduler?.CurrentDate.Date.StartOfWeek(culture) ?? DateTime.Today.StartOfWeek(culture);
             }
         }
 
@@ -69,7 +71,8 @@ namespace Radzen.Blazor
         {
             get
             {
-                return StartDate.EndOfWeek(Scheduler.Culture).AddDays(1);
+                var culture = Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
+                return StartDate.EndOfWeek(culture).AddDays(1);
             }
         }
 
@@ -78,7 +81,8 @@ namespace Radzen.Blazor
         {
             get
             {
-                return $"{StartDate.ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)} - {StartDate.EndOfWeek(Scheduler.Culture).ToString(Scheduler.Culture.DateTimeFormat.ShortDatePattern)}";
+                var culture = Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
+                return $"{StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture)} - {StartDate.EndOfWeek(culture).ToString(culture.DateTimeFormat.ShortDatePattern, culture)}";
             }
         }
 
@@ -86,13 +90,13 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override DateTime Next()
         {
-            return Scheduler.CurrentDate.Date.AddDays(7);
+            return Scheduler?.CurrentDate.Date.AddDays(7) ?? DateTime.Today.AddDays(7);
         }
 
         /// <inheritdoc />
         public override DateTime Prev()
         {
-            return Scheduler.CurrentDate.Date.AddDays(-7);
+            return Scheduler?.CurrentDate.Date.AddDays(-7) ?? DateTime.Today.AddDays(-7);
         }
     }
 }

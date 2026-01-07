@@ -1,4 +1,4 @@
-﻿@using System.Diagnostics
+@using System.Diagnostics
 @inherits RadzenComponent
 
 
@@ -6,7 +6,7 @@
 {
     <div @ref=Element id="@GetId()" @attributes="Attributes" class="@GetComponentCssClass()" style="flex-basis: @Size; @Style" data-index="@Index">
         @ChildContent
-        @if (Splitter.IsResizing)
+        @if (Splitter?.IsResizing == true)
         {
             <div class="rz-splitter-mask" />
         }
@@ -18,7 +18,7 @@
         <div class="@GetComponentBarCssClass()"
              @onclick:preventDefault="true"
              @onclick:stopPropagation="true"
-             @onpointerdown=@(args => Splitter.StartResize(args, Index))
+             @onpointerdown=@(args => Splitter!.StartResize(args, Index))
              @ondblclick=@OnDoubleClick
              @ondblclick:preventDefault="true"
              @ondblclick:stopPropagation="true">
@@ -27,7 +27,7 @@
             {
                 <span tabindex="0" class="rz-collapse" id="@(GetId() + "-collapse")"
                     @onkeypress="@(args => OnKeyPress(args, false))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
-                    @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.OnCollapse(Index))>
+                    @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter!.OnCollapse(Index))>
                 </span>
             }
 
@@ -42,7 +42,7 @@
             {
                 <span tabindex="0" class="rz-expand" id="@(GetId() + "-expand")"
                     @onkeypress="@(args => OnKeyPress(args, true))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
-                    @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter.OnExpand(Index))>
+                    @onmousedown:preventDefault="true" @onmousedown:stopPropagation="true" @onmousedown=@(args => Splitter!.OnExpand(Index))>
                 </span>
             }
 

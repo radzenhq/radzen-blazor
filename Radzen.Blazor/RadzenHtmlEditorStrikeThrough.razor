@@ -1,4 +1,4 @@
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
-<EditorButton Title=@Title Click=@OnClick Icon="strikethrough_s" Selected=@Editor.State.StrikeThrough />
+<EditorButton Title=@Title Click=@OnClick Icon="strikethrough_s" Selected=@(Editor?.State.StrikeThrough ?? false) />

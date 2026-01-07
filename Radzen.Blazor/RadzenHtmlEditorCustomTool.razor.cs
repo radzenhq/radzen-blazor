@@ -41,7 +41,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The icon color.</value>
         [Parameter]
-        public string IconColor { get; set; }
+        public string? IconColor { get; set; }
 
         /// <summary>
         /// Specifies the modes that this tool will be enabled in.
@@ -53,7 +53,7 @@ namespace Radzen.Blazor
         /// The template of the tool. Use to render a custom tool.
         /// </summary>
         [Parameter]
-        public RenderFragment<RadzenHtmlEditor> Template { get; set; }
+        public RenderFragment<RadzenHtmlEditor>? Template { get; set; }
 
         /// <summary>
         /// Specifies whether the tool is selected.
@@ -70,23 +70,26 @@ namespace Radzen.Blazor
         /// Specifies the name of the command. It is available as <see cref="HtmlEditorExecuteEventArgs.CommandName" /> when
         /// <see cref="RadzenHtmlEditor.Execute" /> is raised.
         [Parameter]
-        public string CommandName { get; set; }
+        public string? CommandName { get; set; }
 
         /// <summary>
         /// The RadzenHtmlEditor component which this tool is part of.
         /// </summary>
         [CascadingParameter]
-        public RadzenHtmlEditor Editor { get; set; }
+        public RadzenHtmlEditor? Editor { get; set; }
 
         /// <summary>
         /// Specifies the title (tooltip) displayed when the user hovers the tool.
         /// </summary>
         [Parameter]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         async Task OnClick()
         {
-            await Editor.OnExecuteAsync(CommandName);
+            if (Editor != null && CommandName != null)
+            {
+                await Editor.OnExecuteAsync(CommandName);
+            }
         }
     }
 }

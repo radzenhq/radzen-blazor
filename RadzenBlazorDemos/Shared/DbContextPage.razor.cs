@@ -9,7 +9,7 @@ namespace RadzenBlazorDemos.Shared
     public partial class DbContextPage : ComponentBase
     {
         [Inject]
-        public IDbContextFactory<NorthwindContext> DbFactory { get; set; }
+        public IDbContextFactory<NorthwindContext> DbFactory { get; set; } = default!;
 
         protected NorthwindContext dbContext;
 

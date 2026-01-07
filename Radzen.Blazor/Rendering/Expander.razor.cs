@@ -13,20 +13,20 @@ public partial class Expander : ComponentBase
     /// Gets or sets the child content.
     /// </summary>
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     /// <summary>
     /// Gets or sets the additional attributes.
     /// </summary>
     [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+    public IReadOnlyDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
     /// <summary>
     /// Gets or sets the CSS class.
     /// </summary>
 
     [Parameter]
-    public string CssClass { get; set; }
+    public string CssClass { get; set; } = string.Empty;
 
     /// <summary>
     /// Determines whether the content is visible.
