@@ -102,13 +102,38 @@ namespace Radzen.Blazor
         public string Url { get; set; }
 
         /// <summary>
-        /// Http method for file uploading to the defined Url. If the Url parameter is not set, this parameter is ignored.
-        /// <br/>
-        /// Defaults to POST.
+        /// Specifies the HTTP method used for uploading files to the defined <see cref="Url"/> endpoint.
+        /// <para>
+        /// Common values are <c>POST</c> (default) and <c>PUT</c>.
+        /// </para>
+        /// <para>
+        /// If the <see cref="Url"/> parameter is not set, this property is ignored.
+        /// </para>
+        /// <para>
+        /// Defaults to <c>POST</c>.
+        /// </para>
         /// </summary>
-        /// <value>The method</value>
+        /// <value>The HTTP method for file upload requests.</value>
         [Parameter]
         public string Method { get; set; } = "POST";
+        
+        /// <summary>
+        /// Enables streaming upload mode for large files to the specified <see cref="Url"/>.
+        /// <para>
+        /// When <c>true</c>, files are uploaded as raw binary streams instead of <c>multipart/form-data</c>.
+        /// Only a single file can be uploaded at a time in streaming mode.
+        /// </para>
+        /// <para>
+        /// When <c>false</c> (default), files are uploaded as <c>multipart/form-data</c> (standard form upload),
+        /// and multiple files can be uploaded simultaneously if <see cref="Multiple"/> is enabled.
+        /// </para>
+        /// <para>
+        /// This property is ignored if <see cref="Url"/> is not set.
+        /// </para>
+        /// </summary>
+        /// <value><c>true</c> to stream file data directly; otherwise, <c>false</c> (default).</value>
+        [Parameter]
+        public bool Stream { get; set; }
         
         /// <summary>
         /// Gets or sets the parameter name. If not set 'file' parameter name will be used for single file and 'files' for multiple files.

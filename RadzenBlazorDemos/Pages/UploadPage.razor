@@ -25,8 +25,9 @@
     Upload files to a server
 </RadzenText>
 <RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
-    To upload files to a server set the <code>Url</code> property of the component. The URL should point to an action method in your server-side code that handles the file upload.
-    By default, upload uses method POST, but you can change it using the <code>Method</code> property.
+    To upload files to a server, set the <code>Url</code> property of the component. The URL should point to an action method in your server-side code that handles the file upload.
+    By default, the upload uses the HTTP <code>POST</code> method and sends files as <code>multipart/form-data</code> (standard form upload). You can change this via the <code>Method</code> property to use a different HTTP method,
+    or enable <code>Stream</code> to upload the file's raw data. When <code>Stream</code> is set to <code>true</code>, only single-file upload is supported.
 </RadzenText>
 <RadzenExample ComponentName="Upload" Example="@nameof(UploadUrl)" AdditionalSourceCodePages=@(["/demos/Controllers/UploadController.cs"])>
     <UploadUrl />
