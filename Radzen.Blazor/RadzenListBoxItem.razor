@@ -11,15 +11,15 @@ Disabled = itemArgs.Disabled;
     @if (ListBox?.Multiple == true)
     {
         <div class="rz-chkbox ">
-            <div class="@(Item != null && ListBox?.IsSelected(Item) == true ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
-                <span class="@(Item != null && ListBox?.IsSelected(Item) == true ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon ")"></span>
+            <div class="@(ListBox?.IsSelected(Item) == true ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
+                <span class="@(ListBox?.IsSelected(Item) == true ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon ")"></span>
             </div>
         </div>
     }
     <span class="rz-multiselect-item-content">
-        @if (ListBox?.Template != null && Item != null)
+        @if (ListBox?.Template != null)
         {
-            @ListBox.Template(Item)
+            @ListBox.Template(Item!)
         }
         else
         {
@@ -45,10 +45,7 @@ Disabled = itemArgs.Disabled;
     {
         if (ListBox != null && !ListBox.Disabled && !Disabled)
         { 
-            if (Item != null)
-            {
-                await ListBox.SelectItemInternal(Item);
-            } 
+            await ListBox.SelectItemInternal(Item!);
         }
     }
 
@@ -57,7 +54,7 @@ Disabled = itemArgs.Disabled;
         string result = $"rz-multiselect-item ";
         if (Disabled)
             result += "rz-state-disabled ";
-        else if (Item != null && ListBox?.IsSelected(Item) == true)
+        else if (ListBox?.IsSelected(Item) == true)
             result += "rz-state-highlight ";
 
         return result;

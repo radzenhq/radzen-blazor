@@ -1066,7 +1066,7 @@ namespace Radzen
         /// </summary>
         /// <param name="item">The item.</param>
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
-        internal bool IsSelected(object item)
+        internal bool IsSelected(object? item)
         {
             if (!string.IsNullOrEmpty(ValueProperty))
             {
@@ -1077,7 +1077,7 @@ namespace Radzen
             {
                 if (Multiple)
                 {
-                    return selectedItems.Contains(item);
+                    return selectedItems.Contains(item!);
                 }
                 else
                 {
@@ -1215,10 +1215,7 @@ namespace Radzen
             }
             else
             {
-                if (item != null)
-                {
-                    UpdateSelectedItems(item);
-                }
+                UpdateSelectedItems(item!);
 
                 if (!string.IsNullOrEmpty(ValueProperty) && Data != null)
                 {
