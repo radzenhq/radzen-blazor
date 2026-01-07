@@ -1537,6 +1537,12 @@ namespace Radzen.Blazor
                 if ((FilterPropertyType == typeof(string) || !QueryableExtension.IsEnumerable(FilterPropertyType)) &&
                     (o == FilterOperator.In || o == FilterOperator.NotIn)) return false;
 
+                if (o == FilterOperator.IsNull || o == FilterOperator.IsNotNull)
+                {
+                    return FilterPropertyType == typeof(string) || 
+                        FilterPropertyType != null && FilterPropertyType.IsGenericType && FilterPropertyType.GetGenericTypeDefinition() == typeof(Nullable<>);
+                }
+
                 return FilterPropertyType == typeof(string) || QueryableExtension.IsEnumerable(FilterPropertyType) ? isStringOperator
                       || o == FilterOperator.Equals || o == FilterOperator.NotEquals
                       || o == FilterOperator.IsNull || o == FilterOperator.IsNotNull
