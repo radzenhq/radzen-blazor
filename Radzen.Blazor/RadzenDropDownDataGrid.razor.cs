@@ -567,7 +567,7 @@ namespace Radzen.Blazor
             }
         }
 
-        string prevSearch = string.Empty;
+        string? prevSearch;
         string prevOrder = "";
         int? skip;
         async Task OnLoadData(LoadDataArgs args)
@@ -576,7 +576,7 @@ namespace Radzen.Blazor
 
             if (prevSearch != searchText)
             {
-                prevSearch = searchText ?? string.Empty;
+                prevSearch = searchText;
                 skip = 0;
             }
 
