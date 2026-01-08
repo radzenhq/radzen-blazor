@@ -1,6 +1,7 @@
 using Bunit;
 using Xunit;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Radzen.Blazor.Tests
 {
@@ -155,6 +156,64 @@ namespace Radzen.Blazor.Tests
             });
 
             Assert.Contains("disabled", component.Markup);
+        }
+
+        [Fact]
+        public void PickList_GetSelectedSources_Respects_ValueProperty_Single()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new List<Item>
+            {
+                new Item { Id = 1, Name = "A" },
+                new Item { Id = 2, Name = "B" }
+            };
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.Source, data);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Multiple, false);
+            });
+
+            // Simulate ListBox selection when ValueProperty is set: selectedSourceItems becomes the value (Id)
+            var field = typeof(RadzenPickList<Item>).GetField("selectedSourceItems", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            field.SetValue(component.Instance, 2);
+
+            var selected = component.Instance.GetSelectedSources();
+            Assert.Single(selected);
+            Assert.Equal(2, selected.First().Id);
+        }
+
+        [Fact]
+        public void PickList_GetSelectedSources_Respects_ValueProperty_Multiple()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+
+            var data = new List<Item>
+            {
+                new Item { Id = 1, Name = "A" },
+                new Item { Id = 2, Name = "B" },
+                new Item { Id = 3, Name = "C" }
+            };
+
+            var component = ctx.RenderComponent<RadzenPickList<Item>>(parameters =>
+            {
+                parameters.Add(p => p.Source, data);
+                parameters.Add(p => p.TextProperty, "Name");
+                parameters.Add(p => p.ValueProperty, "Id");
+                parameters.Add(p => p.Multiple, true);
+            });
+
+            // Simulate ListBox selection when ValueProperty is set: selectedSourceItems becomes IEnumerable of values (Ids)
+            var field = typeof(RadzenPickList<Item>).GetField("selectedSourceItems", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            field.SetValue(component.Instance, new[] { 1, 3 });
+
+            var selected = component.Instance.GetSelectedSources().Select(i => i.Id).OrderBy(i => i).ToArray();
+            Assert.Equal(new[] { 1, 3 }, selected);
         }
     }
 }

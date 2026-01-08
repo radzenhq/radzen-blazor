@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Radzen;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -377,19 +378,38 @@ namespace Radzen.Blazor
         /// Returns a collection of TItem that are selected in the source list.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<TItem> GetSelectedSources() =>
-            Multiple
-                ? (selectedSourceItems as IEnumerable)?.Cast<TItem>() ?? Enumerable.Empty<TItem>()
-                : selectedSourceItems is TItem item ? new[] { item } : Enumerable.Empty<TItem>();
+        public IEnumerable<TItem> GetSelectedSources() => GetSelectedItems(selectedSourceItems, source);
 
         /// <summary>
         /// Returns a collection of TItem that are selected in the target list.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<TItem> GetSelectedTargets() =>
-            Multiple
-                ? (selectedTargetItems as IEnumerable)?.Cast<TItem>() ?? Enumerable.Empty<TItem>()
-                : selectedTargetItems is TItem item ? new[] { item } : Enumerable.Empty<TItem>();
+        public IEnumerable<TItem> GetSelectedTargets() => GetSelectedItems(selectedTargetItems, target);
+
+        IEnumerable<TItem> GetSelectedItems(object? selectedItems, IEnumerable<TItem>? data)
+        {
+            if (selectedItems == null)
+            {
+                return Enumerable.Empty<TItem>();
+            }
+
+            var selected = Multiple
+                ? (selectedItems as IEnumerable)?.Cast<object?>().ToList() ?? new List<object?>()
+                : new List<object?> { selectedItems };
+
+            if (selected.Count > 0 && selected.All(o => o is TItem))
+            {
+                return selected.Cast<TItem>();
+            }
+
+            if (!string.IsNullOrEmpty(ValueProperty) && data != null)
+            {
+                var selectedValues = new HashSet<object?>(selected);
+                return data.Where(item => selectedValues.Contains(PropertyAccess.GetValue(item, ValueProperty)));
+            }
+
+            return Enumerable.Empty<TItem>();
+        }
 
         RadzenListBox<object>? sourceListBox;
         RadzenListBox<object>? targetListBox;
