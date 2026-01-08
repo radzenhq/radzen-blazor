@@ -49,7 +49,19 @@
     
     <!-- Embed source files for better debugging -->
     <EmbedAllSources>true</EmbedAllSources>
-    <DebugType>embedded</DebugType>
+    <!--
+      IMPORTANT:
+      - NuGet symbol packages (.snupkg) require portable PDB files.
+      - If DebugType=embedded, there are no standalone PDBs, so the .snupkg ends up effectively empty.
+      Use portable PDBs when symbols are enabled; otherwise use embedded for local debugging convenience.
+    -->
+    <!--
+      NOTE: Directory.Build.props is imported before project files, so properties like IncludeSymbols
+      set in a .csproj may not be available yet for Conditions here.
+      IsPacking *is* set by `dotnet pack`, so use that to switch DebugType for symbol packages.
+    -->
+    <DebugType Condition="'$(IsPacking)' == 'true'">portable</DebugType>
+    <DebugType Condition="'$(IsPacking)' != 'true'">embedded</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Label="Demos and Tests Project Configuration" Condition="$(MSBuildProjectName.Contains('Demos')) OR $(MSBuildProjectName.Contains('Tests'))">

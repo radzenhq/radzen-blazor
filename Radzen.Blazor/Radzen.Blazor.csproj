@@ -25,6 +25,15 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <!--
+    NuGet symbol packages (.snupkg) require portable PDB files.
+    Directory.Build.props in this repo uses DebugType=embedded by default, which produces no .pdb files and results
+    in an effectively empty .snupkg. Force portable PDBs for Release/packing.
+  -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="DartSassBuilder" Version="1.1.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Condition="'$(TargetFramework)' == 'net6.0'" Version="6.0.25" />
