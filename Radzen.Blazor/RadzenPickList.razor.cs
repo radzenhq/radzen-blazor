@@ -107,6 +107,13 @@ namespace Radzen.Blazor
         public string? TextProperty { get; set; }
 
         /// <summary>
+        /// Gets or sets the value property
+        /// </summary>
+        /// <value>The value property.</value>
+        [Parameter]
+        public string? ValueProperty { get; set; }
+
+        /// <summary>
         /// Gets or sets the disabled property
         /// </summary>
         /// <value>The disabled property.</value>
