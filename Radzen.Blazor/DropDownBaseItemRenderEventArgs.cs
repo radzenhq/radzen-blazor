@@ -10,7 +10,7 @@ public class DropDownBaseItemRenderEventArgs<TValue>
     /// <summary>
     /// Gets the data item.
     /// </summary>
-    public object Item { get; internal set; }
+    public object? Item { get; internal set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether this item is visible.

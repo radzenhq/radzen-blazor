@@ -1,32 +1,32 @@
 <div title=@Title class="rz-html-editor-colorpicker" @onmousedown:preventDefault>
-    <button tabindex="-1" class="rz-html-editor-color" @onclick=@OnClick disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode())) @onclick:preventDefault>
+    <button tabindex="-1" class="rz-html-editor-color" @onclick=@OnClick disabled=@(Editor?.Disabled == true || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design)) @onclick:preventDefault>
         <i class="notranslate rzi" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</i>
         <div class="rz-html-editor-color-value" style="background-color:@Value"></div>
     </button>
     <RadzenColorPicker @bind-Value=@Value Change=@OnChange @onclick:stopPropagation TabIndex=-1
-        Open=@OnOpen Disabled=@(Editor.Disabled || !EnabledModes.HasFlag(Editor.GetMode())) ShowHSV=@ShowHSV
+        Open=@OnOpen Disabled=@(Editor?.Disabled == true || !EnabledModes.HasFlag(Editor?.GetMode() ?? HtmlEditorMode.Design)) ShowHSV=@ShowHSV
         ShowRGBA=@ShowRGBA ShowColors=@ShowColors ShowButton=@ShowButton HexText=@HexText RedText=@RedText GreenText=@GreenText 
         BlueText=@BlueText AlphaText=@AlphaText ButtonText=@ButtonText ChildContent=@ChildContent />
 </div>
 
 @code {
     [CascadingParameter]
-    public RadzenHtmlEditor Editor { get; set; }
+    public RadzenHtmlEditor? Editor { get; set; }
 
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 
     [Parameter]
-    public string Title { get; set; }
+    public string? Title { get; set; }
 
     [Parameter]
-    public string Icon { get; set; }
+    public string? Icon { get; set; }
 
     [Parameter]
-    public string IconColor { get; set; }
+    public string? IconColor { get; set; }
 
     [Parameter]
-    public string Value { get; set; }
+    public string? Value { get; set; }
 
     [Parameter]
     public HtmlEditorMode EnabledModes { get; set; } = HtmlEditorMode.Design;
@@ -69,14 +69,20 @@
 
     async Task OnChange(string value)
     {
-        await Editor.RestoreSelectionAsync();
+        if (Editor != null)
+        {
+            await Editor.RestoreSelectionAsync();
+        }
         await ValueChanged.InvokeAsync(value);
         await Change.InvokeAsync(value);
     }
 
     async Task OnOpen()
     {
-        await Editor.SaveSelectionAsync();
+        if (Editor != null)
+        {
+            await Editor.SaveSelectionAsync();
+        }
     }
 
     async Task OnClick()

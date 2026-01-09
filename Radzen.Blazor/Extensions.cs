@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -18,8 +19,9 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets enum description.
         /// </summary>
-        public static string GetDisplayDescription(this Enum enumValue, Func<string, string> translationFunction = null)
+        public static string GetDisplayDescription(this Enum enumValue, Func<string, string>? translationFunction = null)
         {
+            ArgumentNullException.ThrowIfNull(enumValue);
             var enumValueAsString = enumValue.ToString();
             var val = enumValue.GetType().GetMember(enumValueAsString).FirstOrDefault();
             var enumVal = val?.GetCustomAttribute<DisplayAttribute>()?.GetDescription() ?? enumValueAsString;
@@ -33,10 +35,12 @@ namespace Radzen.Blazor
         /// <summary>
         /// Converts Enum to IEnumerable of Value/Text.
         /// </summary>
-        public static IEnumerable<object> EnumAsKeyValuePair(Type enumType, Func<string, string> translationFunction = null)
+        public static IEnumerable<object> EnumAsKeyValuePair(Type enumType, Func<string, string>? translationFunction = null)
         {
+            ArgumentNullException.ThrowIfNull(enumType);
+
             Type underlyingType = Enum.GetUnderlyingType(enumType);
-            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new { Value = Convert.ChangeType(val, underlyingType), Text = val.GetDisplayDescription(translationFunction) });
+            return Enum.GetValues(enumType).Cast<Enum>().Distinct().Select(val => new { Value = Convert.ChangeType(val, underlyingType, CultureInfo.InvariantCulture), Text = val.GetDisplayDescription(translationFunction) });
         }
 
         /// <summary>
@@ -67,7 +71,7 @@ namespace Radzen.Blazor
             var value = typeValue.ToString();
             value = Regex.Replace(value, "([^A-Z])([A-Z])", "$1-$2");
             return Regex.Replace(value, "([A-Z]+)([A-Z][^A-Z$])", "$1-$2")
-                .Trim().ToLower();
+                .Trim().ToLowerInvariant();
         }
     }
 }

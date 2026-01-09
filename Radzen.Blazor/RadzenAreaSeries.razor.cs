@@ -16,14 +16,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
 
         /// <summary>
         /// Specifies the fill (background color) of the area series.
         /// </summary>
         /// <value>The fill.</value>
         [Parameter]
-        public string Fill { get; set; }
+        public string? Fill { get; set; }
 
         /// <summary>
         /// Gets or sets the pixel width of the line. Set to <c>2</c> by default.
@@ -59,7 +59,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                return Stroke;
+                return Stroke ?? string.Empty;
             }
         }
 
@@ -86,13 +86,19 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         public override bool Contains(double x, double y, double tolerance)
         {
-            var category = ComposeCategory(Chart.CategoryScale);
-            var value = ComposeValue(Chart.ValueScale);
+            var chart = Chart;
+            if (chart == null)
+            {
+                return false;
+            }
+
+            var category = ComposeCategory(chart.CategoryScale);
+            var value = ComposeValue(chart.ValueScale);
 
             var points = Items.Select(item => new Point { X = category(item), Y = value(item) }).ToArray();
 
-            var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
-            var axisY = Chart.ValueScale.Scale(Math.Max(0, valueTicks.Start));
+            var valueTicks = chart.ValueScale.Ticks(chart.ValueAxis.TickDistance);
+            var axisY = chart.ValueScale.Scale(Math.Max(0, valueTicks.Start));
 
             if (points.Length > 0)
             {

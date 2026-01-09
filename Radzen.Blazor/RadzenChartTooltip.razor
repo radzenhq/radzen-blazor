@@ -4,17 +4,20 @@
 
 @foreach (var tooltip in tooltips)
 {
-    <div id="@UniqueID"
-         style="display: none; top: 0; left: 0; z-index: 1001; position: absolute;"
-         class="@($"rz-scheme-{tooltip.Options.ColorScheme.ToString().ToLowerInvariant()}")">
-        @tooltip.Options.ChildContent(Service)
-    </div>
+    @if (tooltip?.Options?.ChildContent != null && Service != null)
+    {
+        <div id="@UniqueID"
+             style="display: none; top: 0; left: 0; z-index: 1001; position: absolute;"
+             class="@($"rz-scheme-{tooltip.Options.ColorScheme.ToString().ToLowerInvariant()}")">
+            @tooltip.Options.ChildContent(Service)
+        </div>
+    }
 }
 
 @code {
-    public string UniqueID { get; set; }
+    public string? UniqueID { get; set; }
 
-    [Inject] private TooltipService Service { get; set; }
+    [Inject] private TooltipService? Service { get; set; }
 
     List<ChartTooltip> tooltips = new List<ChartTooltip>();
 
@@ -57,7 +60,7 @@
         }
     }
 
-    private DotNetObjectReference<RadzenChartTooltip> reference;
+private DotNetObjectReference<RadzenChartTooltip>? reference;
 
     /// <summary>
     /// Gets the reference for the current component.
@@ -82,7 +85,7 @@
     [JSInvokable("RadzenChartTooltip.CloseTooltip")]
     public void CloseTooltip()
     {
-        Service.Close();
+        Service?.Close();
     }
 
     public async Task Close()
@@ -129,18 +132,24 @@
             }
         }
 
-        Service.OnOpenChartTooltip -= OnOpen;
-        Service.OnClose -= OnClose;
-        Service.OnNavigate -= OnNavigate;
+        if (Service != null)
+        {
+            Service.OnOpenChartTooltip -= OnOpen;
+            Service.OnClose -= OnClose;
+            Service.OnNavigate -= OnNavigate;
+        }
     }
 
     protected override void OnInitialized()
     {
         UniqueID = Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Replace("/", "-").Replace("+", "-").Substring(0, 10);
 
-        Service.OnOpenChartTooltip += OnOpen;
-        Service.OnClose += OnClose;
-        Service.OnNavigate += OnNavigate;
+        if (Service != null)
+        {
+            Service.OnOpenChartTooltip += OnOpen;
+            Service.OnClose += OnClose;
+            Service.OnNavigate += OnNavigate;
+        }
     }
 
     void OnOpen(ElementReference element, double x, double y, ChartTooltipOptions options)
@@ -179,6 +188,6 @@
         /// Gets or sets the options.
         /// </summary>
         /// <value>The options.</value>
-        public ChartTooltipOptions Options { get; set; }
+        public ChartTooltipOptions? Options { get; set; }
     }
 }

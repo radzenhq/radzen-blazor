@@ -1,3 +1,4 @@
+using System;
 using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor.Markdown;
@@ -10,17 +11,18 @@ public class FencedCodeBlock : Leaf
     /// <summary>
     /// The delimiter used to start and end the code block.
     /// </summary>
-    public string Delimiter { get; private set; }
+    public string? Delimiter { get; private set; }
     internal int Indent { get; private set; }
 
     /// <summary>
     /// The info string of the code block. This is the first line of the code block and is used to specify the language of the code block.
     /// </summary>
-    public string Info { get; private set; }
+    public string? Info { get; private set; }
 
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitFencedCodeBlock(this);
     }
 
@@ -29,7 +31,7 @@ public class FencedCodeBlock : Leaf
         base.Close(parser);
 
         // first line becomes info string
-        var newlinePos = Value.IndexOf('\n');
+        var newlinePos = Value.IndexOf('\n', StringComparison.Ordinal);
         var firstLine = Value[..newlinePos];
         Info = firstLine.Trim();
         Value = Value[(newlinePos + 1)..];
@@ -43,7 +45,7 @@ public class FencedCodeBlock : Leaf
 
         var match = ClosingFenceRegex.Match(line);
 
-        if (indent <= 3 && parser.PeekNonSpace() == Delimiter[0] && match.Success && match.Length >= Delimiter.Length)
+        if (indent <= 3 && Delimiter != null && parser.PeekNonSpace() == Delimiter[0] && match.Success && match.Length >= Delimiter.Length)
         {
             // closing fence - we're at end of line, so we can return
             parser.LastLineLength = parser.Offset + indent + match.Length;

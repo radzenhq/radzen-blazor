@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor
@@ -67,12 +68,23 @@ namespace Radzen.Blazor
         public bool Immediate { get; set; }
 
         /// <summary>
-        /// Handles the <see cref="E:Change" /> event.
+        /// Handles the change event.
         /// </summary>
         /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
         protected async Task OnChange(ChangeEventArgs args)
         {
-            Value = $"{args.Value}";
+            ArgumentNullException.ThrowIfNull(args);
+            await SetValue($"{args.Value}");
+        }
+
+        /// <summary>
+        /// Handles the set binding of the underlying HTML textarea element.
+        /// </summary>
+        /// <param name="value">string containing the new value.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        protected async Task SetValue(string? value)
+        {
+            Value = $"{value}";
 
             await ValueChanged.InvokeAsync(Value);
 
@@ -91,7 +103,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetId()
+        protected override string? GetId()
         {
             return Name ?? base.GetId();
         }

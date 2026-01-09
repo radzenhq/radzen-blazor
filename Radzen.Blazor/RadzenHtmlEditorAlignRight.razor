@@ -1,4 +1,4 @@
 @using Radzen.Blazor.Rendering
 @inherits RadzenHtmlEditorButtonBase
 
-<EditorButton Title=@Title Click=@OnClick Icon="format_align_right" Selected=@Editor.State.JustifyRight />
+<EditorButton Title=@Title Click=@OnClick Icon="format_align_right" Selected=@(Editor?.State.JustifyRight ?? false) />

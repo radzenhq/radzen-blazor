@@ -9,6 +9,8 @@
 @code {
     protected override async Task OnClick()
     {
+        if (Editor == null) return;
+        
         await Editor.SaveSelectionAsync();
 
         bool blank = false;
@@ -46,7 +48,7 @@
 
         await Editor.RestoreSelectionAsync();
 
-        if (result == true && !String.IsNullOrEmpty(attributes.Href))
+        if (result == true && !String.IsNullOrEmpty(attributes.Href) && Editor != null)
         {
             var html = new StringBuilder();
             html.AppendFormat("<a href=\"{0}\"", attributes.Href);
@@ -57,7 +59,10 @@
 
             html.AppendFormat(">{0}</a>", string.IsNullOrEmpty(attributes.InnerText) ? attributes.InnerHtml : attributes.InnerText);
 
-            await Editor.ExecuteCommandAsync("insertHTML", html.ToString());
+            if (Editor != null)
+            {
+                await Editor.ExecuteCommandAsync("insertHTML", html.ToString());
+            }
         }
     }
 }

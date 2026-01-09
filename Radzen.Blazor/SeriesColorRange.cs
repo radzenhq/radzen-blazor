@@ -24,6 +24,6 @@ namespace Radzen.Blazor
         /// Gets or sets the color of the range.
         /// </summary>
         /// <value>The color.</value>
-        public string Color { get; set; }
+        public string Color { get; set; } = string.Empty;
     }
 }

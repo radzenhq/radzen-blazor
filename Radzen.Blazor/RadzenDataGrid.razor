@@ -16,7 +16,7 @@
 
     <div @ref=@Element style="@Style" @attributes="Attributes" class="rz-data-grid @GetCssClass()" id="@GetId()"
         @onkeydown="@OnKeyDown" @onkeydown:preventDefault="preventKeyDown" @onkeydown:stopPropagation="true" tabindex=0
-        @onblur=@(args => JSRuntime.InvokeVoidAsync("Radzen.clearFocusedHeaderCell", UniqueID)) @oncontextmenu=OnContextMenu @oncontextmenu:preventDefault="@this.ContextMenu.HasDelegate">
+        @onblur=@OnBlur @oncontextmenu=OnContextMenu @oncontextmenu:preventDefault="@this.ContextMenu.HasDelegate" @oncontextmenu:stopPropagation="@this.ContextMenu.HasDelegate">
         @if (AllowGrouping || AllowColumnPicking)
         {
             <div class="rz-group-header" @onmouseup=@(args => EndColumnDropToGroup())>
@@ -141,7 +141,7 @@
 
                                 var cellAttr = HeaderCellAttributes(column);
 
-                                object colspan;
+                                object? colspan;
                                 cellAttr.TryGetValue("colspan", out colspan);
 
                                 if (colspan != null)
@@ -261,7 +261,7 @@
                                     var column = visibleColumns[j];
                                     var cellAttr = FooterCellAttributes(column);
 
-                                    object colspan;
+                                    object? colspan;
                                     cellAttr.TryGetValue("colspan", out colspan);
 
                                     if (colspan != null)
@@ -325,7 +325,7 @@
                             else
                             {
                                 <span class="rz-cell-filter-label" style="height:35px; width:100%;" onclick="event.preventDefault()">
-                                    @if (PropertyAccess.IsDate(column.FilterPropertyType))
+                                    @if (column.FilterPropertyType != null && PropertyAccess.IsDate(column.FilterPropertyType))
                                     {
                                         if (filterMode == FilterMode.Simple)
                                         {
@@ -421,7 +421,7 @@
 
                                                         <RadzenDatePicker TValue="@object" AllowInput=@(AllowFilterDateInput) InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", column.Title + FilterValueAriaLabel  + column.GetFilterValue() }})"
                                                                           ShowTime="@column.ShowTimeForDateTimeFilter()" ShowTimeOkButton="false" Inline="true" DateFormat="@getFilterDateFormat(column)"
-                                                                          Value="@column.GetFilterValue()" Change="@(args => { column.SetFilterValue(PropertyAccess.IsDateOnly(column.FilterPropertyType) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value); SaveSettings(); })" />
+                                                                          Value="@column.GetFilterValue()" Change="@(args => { column.SetFilterValue(args); SaveSettings(); })" />
 
                                                     </div>
                                                     <div class="rz-grid-filter-buttons">
@@ -443,11 +443,11 @@
                                             {
                                                 <RadzenDatePicker Disabled=@(!column.CanSetFilterValue()) TValue="@object" Style="width:100%" AllowInput=@(AllowFilterDateInput) AllowClear="true" InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", column.Title + FilterValueAriaLabel  + column.GetFilterValue() }})"
                                                                   ShowTime="false" ShowTimeOkButton="false" DateFormat="@getFilterDateFormat(column)"
-                                                                  Value="@column.GetFilterValue()" Change="@(args => { if(!args.HasValue) { InvokeAsync(() => ClearFilter(column, true)); } else {column.SetFilterValue(PropertyAccess.IsDateOnly(column.FilterPropertyType) ? PropertyAccess.DateOnlyFromDateTime(args.Value) : args.Value); InvokeAsync(() => ApplyFilter(column, true));} })" />
+                                                                  Value="@column.GetFilterValue()" Change="@(args => { if(!args.HasValue) { InvokeAsync(() => ClearFilter(column, true)); } else {column.SetFilterValue(args); InvokeAsync(() => ApplyFilter(column, true));} })" />
                                             }
                                         }
                                     }
-                                    else if (PropertyAccess.IsNullableEnum(column.FilterPropertyType) || PropertyAccess.IsEnum(column.FilterPropertyType))
+                                    else if (column.FilterPropertyType != null && (PropertyAccess.IsNullableEnum(column.FilterPropertyType) || PropertyAccess.IsEnum(column.FilterPropertyType)))
                                     {
                                         @if (column.FilterValueTemplate != null)
                                         {
@@ -461,7 +461,7 @@
                                                             Change="@(args => {column.SetFilterValue(args);column.SetFilterOperator(object.Equals(args, -1) ? FilterOperator.IsNull : FilterOperator.Equals);InvokeAsync(() => ApplyFilter(column, true));})" />
                                         }
                                     }
-                                    else if (PropertyAccess.IsNumeric(column.FilterPropertyType))
+                                    else if (column.FilterPropertyType != null && PropertyAccess.IsNumeric(column.FilterPropertyType))
                                     {
                                         if (filterMode == FilterMode.SimpleWithMenu)
                                         {
@@ -708,7 +708,7 @@
         return columnStyle;
     }
 
-    string GetCellCssClass(RadzenDataGridColumn<TItem> column, TItem item, IReadOnlyDictionary<string, object> Attributes)
+    string? GetCellCssClass(RadzenDataGridColumn<TItem> column, TItem item, IReadOnlyDictionary<string, object> Attributes)
     {
         List<string> classes = [
             column.CalculatedCssClass?.Invoke(column, item) ?? string.Empty,
@@ -719,7 +719,11 @@
         
         if (Attributes?.TryGetValue("class", out var attributeClass) is true)
         {
-            classes.Add(Convert.ToString(attributeClass));
+            var classValue = Convert.ToString(attributeClass);
+            if (classValue != null)
+            {
+                classes.Add(classValue);
+            }
         }
 
         var result = string.Join(" ", classes.Where(c => !string.IsNullOrWhiteSpace(c)));

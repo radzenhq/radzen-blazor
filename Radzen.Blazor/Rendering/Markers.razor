@@ -5,7 +5,7 @@
     var x = point.X;
     var y = point.Y;
 
-    @if (Visible && InPlotArea(x, y))
+    @if (Visible && InPlotArea(x, y) && point.Data != null)
     {
         <Marker Click="@(() => OnClick(point.Data))" X="@x" Y="@y" Type="@MarkerType" Fill="@Fill" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Size="@Size" />
     }
@@ -13,18 +13,21 @@
 
 @code {
     [CascadingParameter]
-    public RadzenChart Chart { get; set;}
+    public RadzenChart? Chart { get; set;}
 
     [Parameter]
-    public IChartSeries Series { get; set; }
+    public IChartSeries? Series { get; set; }
 
     private async Task OnClick(TItem data)
     {
-        await Series.InvokeClick(Chart.SeriesClick, data);
+        if (Series != null && Chart != null && data != null)
+        {
+            await Series.InvokeClick(Chart.SeriesClick, data);
+        }
     }
 
     [Parameter]
-    public IEnumerable<Point<TItem>> Data { get; set; }
+    public IEnumerable<Point<TItem>> Data { get; set; } = Array.Empty<Point<TItem>>();
 
     [Parameter]
     public bool Visible { get; set; }
@@ -33,10 +36,10 @@
     public MarkerType MarkerType { get; set; }
 
     [Parameter]
-    public string Stroke { get; set; }
+    public string Stroke { get; set; } = string.Empty;
 
     [Parameter]
-    public string Fill { get; set; }
+    public string Fill { get; set; } = string.Empty;
 
     [Parameter]
     public double StrokeWidth { get; set; }
@@ -57,14 +60,20 @@
 
     protected override void OnParametersSet()
     {
-        var categoryTicks = Chart.CategoryScale.Ticks(Chart.CategoryAxis.TickDistance);
+        var chart = Chart;
+        if (chart == null)
+        {
+            return;
+        }
 
-        x1 = Chart.CategoryScale.Scale(categoryTicks.Start);
-        x2 = Chart.CategoryScale.Scale(categoryTicks.End);
+        var categoryTicks = chart.CategoryScale.Ticks(chart.CategoryAxis.TickDistance);
 
-        var valueTicks = Chart.ValueScale.Ticks(Chart.ValueAxis.TickDistance);
+        x1 = chart.CategoryScale.Scale(categoryTicks.Start);
+        x2 = chart.CategoryScale.Scale(categoryTicks.End);
 
-        y1 = Chart.ValueScale.Scale(valueTicks.End);
-        y2 = Chart.ValueScale.Scale(valueTicks.Start);
+        var valueTicks = chart.ValueScale.Ticks(chart.ValueAxis.TickDistance);
+
+        y1 = chart.ValueScale.Scale(valueTicks.End);
+        y2 = chart.ValueScale.Scale(valueTicks.Start);
     }
 }

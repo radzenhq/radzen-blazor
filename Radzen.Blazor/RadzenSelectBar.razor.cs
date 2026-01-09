@@ -4,6 +4,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -70,25 +71,25 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value property.</value>
         [Parameter]
-        public string ValueProperty { get; set; }
+        public string? ValueProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the text property.
         /// </summary>
         /// <value>The text property.</value>
         [Parameter]
-        public string TextProperty { get; set; }
+        public string? TextProperty { get; set; }
 
-        List<RadzenSelectBarItem> allItems;
+        List<RadzenSelectBarItem> allItems = new();
 
-        private IEnumerable data = null;
+        private IEnumerable? data;
 
         /// <summary>
         /// Gets or sets the data.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
-        public virtual IEnumerable Data
+        public virtual IEnumerable? Data
         {
             get
             {
@@ -117,8 +118,8 @@ namespace Radzen.Blazor
             allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
             {
                 var item = new RadzenSelectBarItem();
-                item.SetText($"{PropertyAccess.GetItemOrValueFromProperty(i, TextProperty)}");
-                item.SetValue(PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+                item.SetText($"{PropertyAccess.GetItemOrValueFromProperty(i, TextProperty ?? string.Empty)}");
+                item.SetValue(PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty ?? string.Empty)!);
                 return item;
             })).ToList();
         }
@@ -141,7 +142,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The items.</value>
         [Parameter]
-        public RenderFragment Items { get; set; }
+        public RenderFragment? Items { get; set; }
 
         List<RadzenSelectBarItem> items = new List<RadzenSelectBarItem>();
 
@@ -165,9 +166,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenSelectBarItem item)
         {
-            if (items.Contains(item))
+            if (items.Remove(item))
             {
-                items.Remove(item);
                 UpdateAllItems();
                 if (!disposed)
                 {
@@ -183,6 +183,7 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
         protected bool IsSelected(RadzenSelectBarItem item)
         {
+            ArgumentNullException.ThrowIfNull(item);
             if (Multiple)
             {
                 return Value != null && ((IEnumerable)Value).Cast<object>().Contains(item.Value);
@@ -211,6 +212,7 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         protected async Task SelectItem(RadzenSelectBarItem item)
         {
+            ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled)
                 return;
 
@@ -222,20 +224,23 @@ namespace Radzen.Blazor
 
                 var selectedValues = Value != null ? new List<dynamic>(((IEnumerable)Value).Cast<dynamic>()) : new List<dynamic>();
 
-                if (!selectedValues.Contains(item.Value))
+                if (item.Value != null && !selectedValues.Contains(item.Value))
                 {
                     selectedValues.Add(item.Value);
                 }
                 else
                 {
-                    selectedValues.Remove(item.Value);
+                    if (item.Value != null)
+                    {
+                        selectedValues.Remove(item.Value);
+                    }
                 }
 
                 Value = (TValue)selectedValues.AsQueryable().Cast(type);
             }
             else
             {
-                Value = (TValue)item.Value;
+                Value = item.Value is TValue typedValue ? typedValue : default!;
             }
 
             await ValueChanged.InvokeAsync(Value);

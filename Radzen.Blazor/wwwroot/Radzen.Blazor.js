@@ -848,12 +848,16 @@ window.Radzen = {
     var localFile = uploadComponent.localFiles.find(function (f) { return f.Name == name; });
     if (localFile) {
       URL.revokeObjectURL(localFile.Url);
+      var localIndex = uploadComponent.localFiles.indexOf(localFile);
+      if (localIndex != -1) {
+        uploadComponent.localFiles.splice(localIndex, 1);
+      }
     }
     var index = uploadComponent.files.indexOf(file)
     if (index != -1) {
         uploadComponent.files.splice(index, 1);
     }
-    var fileInput = document.getElementById(id);
+    var fileInput = document.getElementById(id).querySelector('input[type="file"]');
     if (fileInput && uploadComponent.files.length == 0) {
         fileInput.value = '';
     }

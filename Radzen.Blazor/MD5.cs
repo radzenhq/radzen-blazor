@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Linq;
 
 namespace Radzen;
@@ -59,6 +60,8 @@ public class MD5
     /// <returns>The MD5 hash as a string.</returns>
     public static string Calculate(byte[] input)
     {
+        ArgumentNullException.ThrowIfNull(input);
+
         uint a0 = 0x67452301;   // A
         uint b0 = 0xefcdab89;   // B
         uint c0 = 0x98badcfe;   // C
@@ -124,7 +127,7 @@ public class MD5
 
     private static string GetByteString(uint x)
     {
-        return String.Join("", BitConverter.GetBytes(x).Select(y => y.ToString("x2")));
+        return String.Join("", BitConverter.GetBytes(x).Select(y => y.ToString("x2", CultureInfo.InvariantCulture)));
     }
 }
 

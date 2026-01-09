@@ -18,24 +18,24 @@ namespace Radzen.Blazor
         /// The name of the font e.g. <c>"Times New Roman"</c>.
         /// </summary>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
         /// The CSS value of the font. Use quotes if it contains spaces.
         /// </summary>
         [Parameter]
-        public string Value { get; set; }
+        public string? Value { get; set; }
 
         /// <summary>
         /// The RadzenHtmlEditorFontName tool which this tool belongs to.
         /// </summary>
         [CascadingParameter]
-        public RadzenHtmlEditorFontName Parent { get; set; }
+        public RadzenHtmlEditorFontName? Parent { get; set; }
 
         /// <inheritdoc />
         protected override void OnInitialized()
         {
-            Parent.AddFont(this);
+            Parent?.AddFont(this);
         }
     }
 }

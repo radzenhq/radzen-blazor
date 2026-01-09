@@ -343,7 +343,6 @@ class Program
     static (string Content, bool IsHeading) ExtractRadzenTextContent(string[] lines, ref int index)
     {
         var fullTag = new StringBuilder();
-        var inTag = false;
         var depth = 0;
         
         // Collect the complete RadzenText tag (may span multiple lines)

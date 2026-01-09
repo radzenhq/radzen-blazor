@@ -24,36 +24,39 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The arbitrary attributes.</value>
         [Parameter(CaptureUnmatchedValues = true)]
-        public IDictionary<string, object> Attributes { get; set; }
+        public IDictionary<string, object>? Attributes { get; set; }
 
         /// <summary>
         /// Gets or sets the child content.
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the tabs.
         /// </summary>
         /// <value>The tabs.</value>
         [CascadingParameter]
-        public RadzenCarousel Carousel { get; set; }
+        public RadzenCarousel? Carousel { get; set; }
 
         /// <inheritdoc />
         protected override async Task OnInitializedAsync()
         {
             await base.OnInitializedAsync();
 
-            Carousel.AddItem(this);
-
-            itemIndex = Carousel.items.IndexOf(this);
+            if (Carousel != null)
+            {
+                Carousel.AddItem(this);
+                itemIndex = Carousel.items.IndexOf(this);
+            }
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
             Carousel?.RemoveItem(this);
+            GC.SuppressFinalize(this);
         }
 
         int itemIndex;

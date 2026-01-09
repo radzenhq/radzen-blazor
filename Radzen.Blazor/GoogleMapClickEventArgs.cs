@@ -8,6 +8,6 @@ public class GoogleMapClickEventArgs
     /// <summary>
     /// The position which represents the clicked map location.
     /// </summary>
-    public GoogleMapPosition Position { get; set; }
+    public GoogleMapPosition? Position { get; set; }
 }
 

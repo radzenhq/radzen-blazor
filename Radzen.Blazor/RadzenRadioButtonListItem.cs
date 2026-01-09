@@ -1,5 +1,6 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Radzen.Blazor.Rendering;
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor
@@ -15,16 +16,16 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
-        private string text;
+        private string? text;
 
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         /// <value>The text.</value>
         [Parameter]
-        public string Text
+        public string? Text
         {
             get
             {
@@ -47,14 +48,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The template.</value>
         [Parameter]
-        public RenderFragment<RadzenRadioButtonListItem<TValue>> Template { get; set; }
+        public RenderFragment<RadzenRadioButtonListItem<TValue>>? Template { get; set; }
 
         /// <summary>
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
         [Parameter]
-        public TValue Value { get; set; }
+        public TValue? Value { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="RadzenRadioButtonListItem{TValue}"/> is disabled.
@@ -63,14 +64,14 @@ namespace Radzen.Blazor
         [Parameter]
         public virtual bool Disabled { get; set; }
 
-        private RadzenRadioButtonList<TValue> list;
+        private RadzenRadioButtonList<TValue>? list;
 
         /// <summary>
         /// Gets or sets the list.
         /// </summary>
         /// <value>The list.</value>
         [CascadingParameter]
-        public RadzenRadioButtonList<TValue> List
+        public RadzenRadioButtonList<TValue>? List
         {
             get
             {
@@ -81,7 +82,7 @@ namespace Radzen.Blazor
                 if (list != value)
                 {
                     list = value;
-                    list.AddItem(this);
+                    list?.AddItem(this);
                 }
             }
         }
@@ -93,6 +94,7 @@ namespace Radzen.Blazor
         {
             base.Dispose();
             List?.RemoveItem(this);
+            GC.SuppressFinalize(this);
         }
 
         internal void SetText(string value)
@@ -115,7 +117,7 @@ namespace Radzen.Blazor
             Visible = value;
         }
 
-        internal string GetItemId()
+        internal string? GetItemId()
         {
             return GetId();
         }

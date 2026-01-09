@@ -1,51 +1,51 @@
-﻿@using Radzen
+@using Radzen
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @typeparam TValue
 @{var itemArgs = ListBox?.ItemAttributes(this); }
-@if (itemArgs.Visible)
+@if (itemArgs?.Visible == true)
 {
 Disabled = itemArgs.Disabled;
-<li class="@GetComponentCssClass()" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty)" @onclick="@SelectItem"
-        @attributes="@(itemArgs.Attributes.Any() ? itemArgs.Attributes : Attributes)">
-    @if (ListBox.Multiple)
+<li class="@GetComponentCssClass()" aria-label="@PropertyAccess.GetItemOrValueFromProperty(Item, ListBox?.TextProperty)" @onclick="@SelectItem"
+        @attributes="@(itemArgs?.Attributes.Any() == true ? itemArgs.Attributes : Attributes)">
+    @if (ListBox?.Multiple == true)
     {
         <div class="rz-chkbox ">
-            <div class="@(ListBox.IsSelected(Item) ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
-                <span class="@(ListBox.IsSelected(Item) ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon ")"></span>
+            <div class="@(ListBox?.IsSelected(Item) == true ? "rz-chkbox-box rz-state-active" : "rz-chkbox-box") @(Disabled ? " rz-state-disabled  " : "")">
+                <span class="@(ListBox?.IsSelected(Item) == true ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon ")"></span>
             </div>
         </div>
     }
     <span class="rz-multiselect-item-content">
-        @if (ListBox.Template != null)
+        @if (ListBox?.Template != null)
         {
-            @ListBox.Template(Item)
+            @ListBox.Template(Item!)
         }
         else
         {
-            @PropertyAccess.GetItemOrValueFromProperty(Item, ListBox.TextProperty)
+            @PropertyAccess.GetItemOrValueFromProperty(Item, ListBox?.TextProperty)
         }
     </span>
 </li>
 }
 @code {
     [Parameter(CaptureUnmatchedValues = true)]
-    public IReadOnlyDictionary<string, object> Attributes { get; set; }
+    public IReadOnlyDictionary<string, object>? Attributes { get; set; }
 
     [Parameter]
-    public RadzenListBox<TValue> ListBox { get; set; }
+    public RadzenListBox<TValue>? ListBox { get; set; }
 
     [Parameter]
-    public object Item { get; set; }
+    public object? Item { get; set; }
 
     [Parameter]
     public bool Disabled { get; set; }
 
     async Task SelectItem(MouseEventArgs args)
     {
-        if (!ListBox.Disabled && !Disabled)
+        if (ListBox != null && !ListBox.Disabled && !Disabled)
         { 
-            await ListBox.SelectItemInternal(Item); 
+            await ListBox.SelectItemInternal(Item!);
         }
     }
 
@@ -54,7 +54,7 @@ Disabled = itemArgs.Disabled;
         string result = $"rz-multiselect-item ";
         if (Disabled)
             result += "rz-state-disabled ";
-        else if (ListBox.IsSelected(Item))
+        else if (ListBox?.IsSelected(Item) == true)
             result += "rz-state-highlight ";
 
         return result;

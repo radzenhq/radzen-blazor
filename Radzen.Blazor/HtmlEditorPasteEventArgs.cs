@@ -9,6 +9,6 @@ public class HtmlEditorPasteEventArgs
     /// Gets or sets the HTML content that is pasted in RadzenHtmlEditor. Use the setter to filter unwanted markup from the pasted value.
     /// </summary>
     /// <value>The HTML.</value>
-    public string Html { get; set; }
+    public string? Html { get; set; }
 }
 

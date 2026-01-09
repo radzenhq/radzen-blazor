@@ -21,7 +21,7 @@
         {
             <div class="rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
                 <RadzenCheckBox ReadOnly="@ReadOnly" Disabled="@Disabled" Name="SelectAll" TValue="bool?" Value="@IsAllSelected()" Change="@SelectAll"
-                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectAllText }})" />
+                                InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SelectAllText ?? "" }})" />
                 <span @onclick="@(() => SelectAll(!IsAllSelected() ?? true))" class="rz-chkbox-label" style="cursor:pointer">@SelectAllText</span>
             </div>
         }

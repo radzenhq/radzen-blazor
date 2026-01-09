@@ -11,7 +11,7 @@ internal class DataGridChildData<T>
     /// <summary>
     /// Gets or sets the parent child data.
     /// </summary>
-    internal DataGridChildData<T> ParentChildData { get; set; }
+    internal DataGridChildData<T>? ParentChildData { get; set; }
 
     /// <summary>
     /// Gets or sets the level.
@@ -21,6 +21,6 @@ internal class DataGridChildData<T>
     /// <summary>
     /// Gets or sets the data.
     /// </summary>
-    internal IEnumerable<T> Data { get; set; }
+    internal IEnumerable<T>? Data { get; set; }
 }
 

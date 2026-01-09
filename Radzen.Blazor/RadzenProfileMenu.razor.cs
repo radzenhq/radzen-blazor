@@ -34,7 +34,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The template.</value>
         [Parameter]
-        public RenderFragment Template { get; set; }
+        public RenderFragment? Template { get; set; }
 
         /// <summary>
         /// Gets or sets the click callback.
@@ -79,7 +79,7 @@ namespace Radzen.Blazor
         }
 
         [Inject]
-        NavigationManager NavigationManager { get; set; }
+        NavigationManager? NavigationManager { get; set; }
 
         internal int focusedIndex = -1;
 
@@ -104,7 +104,7 @@ namespace Radzen.Blazor
 
                     if (item.Path != null)
                     {
-                        NavigationManager.NavigateTo(item.Path);
+                        NavigationManager?.NavigateTo(item.Path);
                     }
                     else
                     {

@@ -13,6 +13,6 @@ public class RadzenComponentWithChildren : RadzenComponent
     /// </summary>
     /// <value>The content of the child.</value>
     [Parameter]
-    public RenderFragment ChildContent { get; set; }
+    public RenderFragment? ChildContent { get; set; }
 }
 

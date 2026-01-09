@@ -8,6 +8,6 @@ public class DataGridLoadSettingsEventArgs
     /// <summary>
     /// Gets or sets the settings.
     /// </summary>
-    public DataGridSettings Settings { get; set; }
+    public DataGridSettings? Settings { get; set; }
 }
 

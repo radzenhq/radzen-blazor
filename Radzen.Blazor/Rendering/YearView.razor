@@ -23,7 +23,7 @@
         int curYear = year + (offSetMonth <= month ? 1 : 0);
         realstart = new DateTime(curYear, offSetMonth, 1);
         daysinmonth = DateTime.DaysInMonth(curYear, offSetMonth);
-        date = realstart.StartOfMonth().StartOfWeek(Scheduler.Culture);
+        date = realstart.StartOfMonth().StartOfWeek(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture);
         var currentDate = date;
         var currentMonth = month;
         var startMonth = realstart;
@@ -34,15 +34,15 @@
 
             <div class="rz-slot-header rz-pb-2" @onclick=@(args => OnMonthClick(startMonth))>
                 <span class="rz-text-subtitle1">
-                    @realstart.ToString("MMMM yyyy", Scheduler.Culture)
+                    @realstart.ToString("MMMM yyyy", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                 </span>
             </div>
 
             <div class="rz-view-header">
-                @for (var dateheader = StartDate; dateheader <= StartDate.EndOfWeek(Scheduler.Culture); dateheader = dateheader.AddDays(1))
+                @for (var dateheader = StartDate; dateheader <= StartDate.EndOfWeek(Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture); dateheader = dateheader.AddDays(1))
                 {
                     <div class="rz-slot-header">
-                        @dateheader.ToString("ddd", Scheduler.Culture).Substring(0,1)
+                        @dateheader.ToString("ddd", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture).Substring(0,1)
                     </div>
                 }
             </div>
@@ -88,19 +88,21 @@
     public int MaxAppointmentsInSlot { get; set; }
 
     [Parameter]
-    public string MoreText { get; set; }
+    public string? MoreText { get; set; }
 
     [Parameter]
-    public string NoDayEventsText  { get; set; }
+    public string? NoDayEventsText  { get; set; }
 
     [CascadingParameter]
-    public IScheduler Scheduler { get; set; }
+    public IScheduler? Scheduler { get; set; }
 
     [Parameter]
-    public IEnumerable<AppointmentData> Appointments { get; set; }
+    public IEnumerable<AppointmentData>? Appointments { get; set; }
 
     IDictionary<string, object> Attributes(DateTime start, string className)
     {
+        if (Scheduler == null)
+            return new Dictionary<string, object>();
         var attributes = Scheduler.GetSlotAttributes(start, start.AddDays(1), () => AppointmentsInRange(start, start.AddDays(1)));
         attributes["class"] = ClassList.Create(className).Add(attributes).ToString();
         return attributes;
@@ -108,12 +110,13 @@
 
     async Task OnAppointmentClick(AppointmentData data)
     {
-        await Scheduler.SelectAppointment(data);
+        if (Scheduler != null)
+            await Scheduler.SelectAppointment(data);
     }
 
     private AppointmentData[] AppointmentsInRange(DateTime start, DateTime end)
     {
-        if (Appointments == null)
+        if (Appointments == null || Scheduler == null)
         {
             return Array.Empty<AppointmentData>();
         }
@@ -123,11 +126,13 @@
 
     async Task OnMonthClick(DateTime monthStart)
     {
-        await Scheduler.SelectMonth(monthStart, AppointmentsInRange(monthStart, monthStart.EndOfMonth()));
+        if (Scheduler != null)
+            await Scheduler.SelectMonth(monthStart, AppointmentsInRange(monthStart, monthStart.EndOfMonth()));
     }
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
+        if (Scheduler == null) return;
         bool preventDefault = await Scheduler.SelectSlot(date, date.AddDays(1), appointments);
 
         if(!preventDefault)
@@ -168,7 +173,7 @@
     DateTime CurrentDate;
     int CurrentMonth;
 
-    bool preventKeyPress = false;
+    bool preventKeyPress;
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {

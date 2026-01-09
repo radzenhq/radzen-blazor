@@ -19,7 +19,7 @@ namespace Radzen
         /// <summary>
         /// The selected view of the scheduler.
         /// </summary>
-        public ISchedulerView View { get; set; }
+        public ISchedulerView? View { get; set; }
 
     }
 }

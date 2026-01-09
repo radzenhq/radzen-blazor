@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
@@ -45,7 +46,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The minimum value, or null for no minimum constraint.</value>
         [Parameter]
-        public IComparable Min { get; set; }
+        public IComparable? Min { get; set; }
 
         /// <summary>
         /// Gets or sets the maximum allowed value (inclusive).
@@ -54,7 +55,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The maximum value, or null for no maximum constraint.</value>
         [Parameter]
-        public IComparable Max { get; set; }
+        public IComparable? Max { get; set; }
 
         /// <summary>
         /// Gets or sets whether null values should be considered valid.
@@ -68,18 +69,19 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override bool Validate(IRadzenFormComponent component)
         {
+            ArgumentNullException.ThrowIfNull(component);
+
             if (Min == null && Max == null)
             {
                 throw new ArgumentException("Min and Max cannot be both null");
             }
 
-            object value = component.GetValue();
+            object? value = component.GetValue();
 
             if (value == null)
             {
                 return AllowNull;
             }
-
 
             if (Min != null)
             {
@@ -100,11 +102,11 @@ namespace Radzen.Blazor
             return true;
         }
 
-        private bool TryConvertToType(object value, Type type, out object convertedValue)
+        private bool TryConvertToType(object value, Type type, out object? convertedValue)
         {
             try
             {
-                convertedValue = Convert.ChangeType(value, type);
+                convertedValue = Convert.ChangeType(value, type, CultureInfo.InvariantCulture);
                 return true;
             }
             catch (Exception ex) when (ex is InvalidCastException || ex is OverflowException)

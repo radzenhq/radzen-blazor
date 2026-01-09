@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ErrorOnDuplicatePublishOutputFiles>False</ErrorOnDuplicatePublishOutputFiles>
     <UserSecretsId>d4f5f92a-c1c5-47b2-bb94-becc7f09133c</UserSecretsId>
+    <Nullable>disable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\RadzenBlazorDemos\RadzenBlazorDemos.csproj" />

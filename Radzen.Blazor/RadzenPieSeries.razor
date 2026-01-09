@@ -11,7 +11,8 @@
 
     public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
-        var className = $"rz-pie-series rz-series-{Chart.Series.IndexOf(this)}";
+        var chart = RequireChart();
+        var className = $"rz-pie-series rz-series-{chart.Series.IndexOf(this)}";
         var x = CenterX;
         var y = CenterY;
         var radius = CurrentRadius;

@@ -29,12 +29,15 @@
       {
           get
           {
-              return Measure(Chart);
+              return Chart != null ? Measure(Chart) : 0;
           }
       }
 
       protected override void Initialize()
       {
-          Chart.CategoryAxis = this;
+          if (Chart != null)
+          {
+              Chart.CategoryAxis = this;
+          }
       }
 }

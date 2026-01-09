@@ -122,19 +122,19 @@ namespace Radzen.Blazor
         [Parameter] public QRCodeEyeShape? EyeShapeBottomLeft { get; set; }
 
         /// <summary>Optional color for eyes; if empty, falls back to Foreground.</summary>
-        [Parameter] public string EyeColor { get; set; }
+        [Parameter] public string? EyeColor { get; set; }
 
         /// <summary>Optional color for top left eye; if empty, falls back to EyeColor.</summary>
-        [Parameter] public string EyeColorTopLeft { get; set; }
+        [Parameter] public string? EyeColorTopLeft { get; set; }
 
         /// <summary>Optional color for top right eye; if empty, falls back to EyeColor.</summary>
-        [Parameter] public string EyeColorTopRight { get; set; }
+        [Parameter] public string? EyeColorTopRight { get; set; }
 
         /// <summary>Optional color for bottom right eye; if empty, falls back to EyeColor.</summary>
-        [Parameter] public string EyeColorBottomLeft { get; set; }
+        [Parameter] public string? EyeColorBottomLeft { get; set; }
 
         /// <summary>URL, data: URI, or raw base64 (will be prefixed) to render in the center.</summary>
-        [Parameter] public string Image { get; set; }
+        [Parameter] public string? Image { get; set; }
 
         /// <summary>Logo box size as % of the inner QR (without quiet zone). Safe range 5�60%. Default 20.</summary>
         [Parameter] public double ImageSizePercent { get; set; } = 20;

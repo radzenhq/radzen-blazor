@@ -47,6 +47,6 @@ namespace Radzen.Blazor
         /// <summary>
         /// The data associated with the point.
         /// </summary>
-        public T Data { get; set; }
+        public T? Data { get; set; }
     }
 }

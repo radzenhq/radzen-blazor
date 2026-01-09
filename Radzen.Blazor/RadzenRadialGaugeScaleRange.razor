@@ -5,11 +5,11 @@
     Fill=@Fill
     Stroke=@Stroke
     StrokeWidth=@StrokeWidth
-    Radius=@Scale.CurrentRadius
-    Center=@Scale.CurrentCenter
-    StartAngle=@Scale.StartAngle
-    EndAngle=@Scale.EndAngle
-    Min=@Scale.Min
-    Max=@Scale.Max
+    Radius=@(Scale?.CurrentRadius ?? 0)
+    Center=@(Scale?.CurrentCenter ?? new Point())
+    StartAngle=@(Scale?.StartAngle ?? 0)
+    EndAngle=@(Scale?.EndAngle ?? 0)
+    Min=@(Scale?.Min ?? 0)
+    Max=@(Scale?.Max ?? 0)
     Size=@Height
 />

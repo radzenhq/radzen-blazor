@@ -10,6 +10,6 @@ public class UploadChangeEventArgs
     /// <summary>
     /// Gets a collection of the selected files.
     /// </summary>
-    public IEnumerable<FileInfo> Files { get; set; }
+    public IEnumerable<FileInfo>? Files { get; set; }
 }
 

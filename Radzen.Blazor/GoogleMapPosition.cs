@@ -20,7 +20,7 @@ public class GoogleMapPosition : IEquatable<GoogleMapPosition>
     public double Lng { get; set; }
 
     /// <inheritdoc />
-    public bool Equals(GoogleMapPosition other)
+    public bool Equals(GoogleMapPosition? other)
     {
         if (other != null)
         {
@@ -31,7 +31,7 @@ public class GoogleMapPosition : IEquatable<GoogleMapPosition>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         return this.Equals(obj as GoogleMapPosition);
     }

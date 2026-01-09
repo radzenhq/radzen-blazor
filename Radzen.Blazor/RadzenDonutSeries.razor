@@ -12,7 +12,7 @@
     {
       if (TitleTemplate == null)
       {
-        return null;
+        return null!;
       }
 
         var radius = CurrentRadius;
@@ -31,7 +31,8 @@
 
     public override RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)
     {
-        var className = $"rz-donut-series rz-series-{Chart.Series.IndexOf(this)}";
+        var chart = RequireChart();
+        var className = $"rz-donut-series rz-series-{chart.Series.IndexOf(this)}";
         var x = CenterX;
         var y = CenterY;
         var radius = CurrentRadius;

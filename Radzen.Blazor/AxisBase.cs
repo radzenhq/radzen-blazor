@@ -13,7 +13,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The stroke.</value>
         [Parameter]
-        public string Stroke { get; set; }
+        public string? Stroke { get; set; }
         /// <summary>
         /// Gets or sets the pixel width of axis.
         /// </summary>
@@ -26,21 +26,21 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The child content.</value>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the format string used to display the axis values.
         /// </summary>
         /// <value>The format string.</value>
         [Parameter]
-        public string FormatString { get; set; }
+        public string? FormatString { get; set; }
 
         /// <summary>
         /// Gets or sets a formatter function that formats the axis values.
         /// </summary>
         /// <value>The formatter.</value>
         [Parameter]
-        public Func<object, string> Formatter { get; set; }
+        public Func<object, string>? Formatter { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the line used to display the axis.
@@ -80,20 +80,20 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The minimum.</value>
         [Parameter]
-        public object Min { get; set; }
+        public object? Min { get; set; }
 
         /// <summary>
         /// Specifies the maximum value of the axis.
         /// </summary>
         /// <value>The maximum.</value>
         [Parameter]
-        public object Max { get; set; }
+        public object? Max { get; set; }
 
         /// <summary>
         /// Specifies the step of the axis.
         /// </summary>
         [Parameter]
-        public object Step { get; set; }
+        public object? Step { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="AxisBase"/> is visible.
@@ -139,7 +139,7 @@ namespace Radzen.Blazor
             }
             else
             {
-                return scale.FormatTick(FormatString, value);
+                return scale.FormatTick(FormatString ?? string.Empty, value);
             }
         }
 

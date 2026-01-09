@@ -34,6 +34,6 @@ static class NonRenderingExtensions
 
     private record ReceiverBase : IHandleEvent
     {
-        public Task HandleEventAsync(EventCallbackWorkItem item, object arg) => item.InvokeAsync(arg);
+        public Task HandleEventAsync(EventCallbackWorkItem item, object? arg) => item.InvokeAsync(arg);
     }
 }

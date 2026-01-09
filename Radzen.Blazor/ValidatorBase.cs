@@ -15,13 +15,13 @@ namespace Radzen.Blazor
         /// Gets or sets the form which contains this validator.
         /// </summary>
         [CascadingParameter]
-        public IRadzenForm Form { get; set; }
+        public IRadzenForm? Form { get; set; }
 
         /// <summary>
         /// Specifies the component which this validator should validate. Must be set to the <see cref="IRadzenFormComponent.Name" /> of an existing component.
         /// </summary>
         [Parameter]
-        public string Component { get; set; }
+        public string Component { get; set; } = default!;
 
         /// <summary>
         /// Specifies the message displayed when the validator is invalid.
@@ -46,12 +46,12 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The edit context.</value>
         [CascadingParameter]
-        public EditContext EditContext { get; set; }
+        public EditContext? EditContext { get; set; }
 
         /// <summary>
         /// Stores the validation messages.
         /// </summary>
-        protected ValidationMessageStore messages;
+        protected ValidationMessageStore? messages;
         private FieldIdentifier FieldIdentifier { get; set; }
 
         /// <inheritdoc />
@@ -78,9 +78,12 @@ namespace Radzen.Blazor
 
         void Unsubscribe()
         {
-            EditContext.OnFieldChanged -= ValidateField;
-            EditContext.OnValidationRequested -= ValidateModel;
-            EditContext.OnValidationStateChanged -= ValidationStateChanged;
+            if (EditContext != null)
+            {
+                EditContext.OnFieldChanged -= ValidateField;
+                EditContext.OnValidationRequested -= ValidateModel;
+                EditContext.OnValidationStateChanged -= ValidationStateChanged;
+            }
         }
 
         void RemoveFromEditContext()
@@ -99,20 +102,22 @@ namespace Radzen.Blazor
             IsValid = true;
         }
 
-        private void ValidateField(object sender, FieldChangedEventArgs args)
+        private void ValidateField(object? sender, FieldChangedEventArgs args)
         {
+            if (Form == null) return;
             var component = Form.FindComponent(Component);
-            if (component != null)
+            if (component != null && args != null)
             {
                 if (args.FieldIdentifier.Equals(component.FieldIdentifier))
                 {
-                    ValidateModel(sender, ValidationRequestedEventArgs.Empty);
+                    ValidateModel(sender!, ValidationRequestedEventArgs.Empty);
                 }
             }
         }
 
-        private void ValidateModel(object sender, ValidationRequestedEventArgs args)
+        private void ValidateModel(object? sender, ValidationRequestedEventArgs args)
         {
+            if (Form == null) return;
             var component = Form.FindComponent(Component);
 
             if (component == null)
@@ -125,11 +130,11 @@ namespace Radzen.Blazor
                 var previousIsValid = IsValid;
                 IsValid = Validate(component);
 
-                messages.Clear(component.FieldIdentifier);
+                messages?.Clear(component.FieldIdentifier);
 
                 if (!IsValid)
                 {
-                    messages.Add(component.FieldIdentifier, Text);
+                    messages?.Add(component.FieldIdentifier, Text);
                 }
 
                 if (previousIsValid != IsValid)
@@ -154,7 +159,7 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if validation is successful, <c>false</c> otherwise.</returns>
         protected abstract bool Validate(IRadzenFormComponent component);
 
-        private void ValidationStateChanged(object sender, ValidationStateChangedEventArgs e)
+        private void ValidationStateChanged(object? sender, ValidationStateChangedEventArgs e)
         {
             StateHasChanged();
         }
@@ -165,11 +170,14 @@ namespace Radzen.Blazor
             base.Dispose();
 
             RemoveFromEditContext();
+
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
+            ArgumentNullException.ThrowIfNull(builder);
             if (Visible && !IsValid)
             {
                 builder.OpenElement(0, "div");

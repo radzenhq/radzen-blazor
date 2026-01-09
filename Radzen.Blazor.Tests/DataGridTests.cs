@@ -1728,6 +1728,7 @@ namespace Radzen.Blazor.Tests
                 {
                     builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
                     builder.AddAttribute(1, "Property", "Name");
+                    builder.AddAttribute(2, "Type", typeof(string));
                     builder.CloseComponent();
                 });
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -1751,6 +1752,7 @@ namespace Radzen.Blazor.Tests
                 {
                     builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
                     builder.AddAttribute(1, "Property", "Name");
+                    builder.AddAttribute(1, "Type", typeof(string));
                     builder.CloseComponent();
                 });
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
@@ -2804,6 +2806,12 @@ namespace Radzen.Blazor.Tests
                     builder.AddAttribute(1, "Property", "Id");
                     builder.AddAttribute(2, "Title", "Id");
                     builder.CloseComponent();
+
+                    builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(4, "Property", "Tags");
+                    builder.AddAttribute(5, "Title", "Tags");
+                    builder.AddAttribute(6, "Type", typeof(object[]));
+                    builder.CloseComponent();
                 });
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);
                 parameterBuilder.Add<FilterMode>(p => p.FilterMode, FilterMode.SimpleWithMenu);
@@ -2833,6 +2841,12 @@ namespace Radzen.Blazor.Tests
                     builder.OpenComponent(0, typeof(RadzenDataGridColumn<dynamic>));
                     builder.AddAttribute(1, "Property", "Id");
                     builder.AddAttribute(2, "Title", "Id");
+                    builder.CloseComponent();
+
+                    builder.OpenComponent(3, typeof(RadzenDataGridColumn<dynamic>));
+                    builder.AddAttribute(4, "Property", "Tags");
+                    builder.AddAttribute(5, "Title", "Tags");
+                    builder.AddAttribute(6, "Type", typeof(object[]));
                     builder.CloseComponent();
                 });
                 parameterBuilder.Add<bool>(p => p.AllowFiltering, true);

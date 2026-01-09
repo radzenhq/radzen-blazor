@@ -4,6 +4,7 @@ using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -56,9 +57,9 @@ namespace Radzen.Blazor
 
             var parts = Name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length == 1)
-                return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper();
+                return parts[0].Substring(0, Math.Min(2, parts[0].Length)).ToUpper(CultureInfo.InvariantCulture);
 
-            return (parts[0].Substring(0, 1) + parts[1].Substring(0, 1)).ToUpper();
+            return (parts[0].Substring(0, 1) + parts[1].Substring(0, 1)).ToUpper(CultureInfo.InvariantCulture);
         }
     }
 
@@ -93,8 +94,8 @@ namespace Radzen.Blazor
     {
         private List<ChatMessage> internalMessages { get; set; } = new();
         private string CurrentInput { get; set; } = string.Empty;
-        private bool IsLoading { get; set; } = false;
-        private bool preventDefault = false;
+        private bool IsLoading { get; set; }
+        private bool preventDefault;
         private ElementReference inputElement;
         private ElementReference messagesContainer;
 
@@ -103,14 +104,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The message template.</value>
         [Parameter]
-        public RenderFragment<ChatMessage> MessageTemplate { get; set; }
+        public RenderFragment<ChatMessage>? MessageTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the empty template shown when there are no messages.
         /// </summary>
         /// <value>The empty template.</value>
         [Parameter]
-        public RenderFragment EmptyTemplate { get; set; }
+        public RenderFragment? EmptyTemplate { get; set; }
 
         /// <summary>
         /// Gets or sets the current user's participant ID.
@@ -147,13 +148,13 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The attributes.</value>
         [Parameter]
-        public IReadOnlyDictionary<string, object> InputAttributes { get; set; }
+        public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
 
         /// <summary>
         /// Gets or sets the title displayed in the chat header.
         /// </summary>
         [Parameter]
-        public string Title { get; set; }
+        public string? Title { get; set; }
 
         /// <summary>
         /// Gets or sets the placeholder text for the input field.
@@ -254,7 +255,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="userId">The participant ID.</param>
         /// <returns>The participant or null if not found.</returns>
-        public ChatUser GetUser(string userId)
+        public ChatUser? GetUser(string userId)
         {
             return Users.FirstOrDefault(p => p.Id == userId);
         }
@@ -334,7 +335,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <param name="content">The message content to send.</param>
         /// <param name="userId">The ID of the participant sending the message (defaults to CurrentUserId).</param>
-        public async Task SendMessage(string content, string userId = null)
+        public async Task SendMessage(string content, string? userId = null)
         {
             if (string.IsNullOrWhiteSpace(content) || Disabled || IsLoading)
                 return;
@@ -388,7 +389,7 @@ namespace Radzen.Blazor
 
         private async Task OnKeyDown(KeyboardEventArgs e)
         {
-            if (e.Key == "Enter" && !e.ShiftKey)
+            if (e.Key == "Enter" && !e.ShiftKey && JSRuntime != null)
             {
                 await JSRuntime.InvokeAsync<string>("Radzen.setInputValue", inputElement, "");
                 preventDefault = true;
@@ -416,7 +417,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
-            if (!firstRender && messagesContainer.Context != null)
+            if (!firstRender && messagesContainer.Context != null && JSRuntime != null)
             {
                 // Scroll to bottom when new messages are added
                 await JSRuntime.InvokeVoidAsync("eval", 

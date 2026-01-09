@@ -22,12 +22,12 @@ public class GroupResult
     /// <summary>
     /// The resulting elements in the group.
     /// </summary>
-    public IEnumerable Items { get; internal set; }
+    public IEnumerable? Items { get; internal set; }
 
     /// <summary>
     /// The resulting subgroups in the group.
     /// </summary>
-    public IEnumerable<GroupResult> Subgroups { get; internal set; }
+    public IEnumerable<GroupResult>? Subgroups { get; internal set; }
 
     /// <summary>
     /// Returns a <see cref="System.String" /> showing the key of the group and the number of items in the group.

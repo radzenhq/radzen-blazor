@@ -6,7 +6,7 @@
 
     <div @ref=@element class="@($"{"rz-event"} {CssClass}".Trim())" style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave>
         <div class="rz-event-content" title=@Title @attributes=@Attributes>
-            @if (ShowAppointmentContent)
+            @if (ShowAppointmentContent && Scheduler != null && Data != null)
             {
                 @Scheduler.RenderAppointment(Data)
             }
@@ -15,10 +15,10 @@
 @code {
     private ElementReference element;
 
-    private string Title => Scheduler.HasMouseEnterAppointmentDelegate() ? null : Data?.Text;
+    private string? Title => Scheduler?.HasMouseEnterAppointmentDelegate() == true ? null : Data?.Text;
 
     [Parameter]
-    public string CssClass { get; set; }
+    public string? CssClass { get; set; }
 
     [Parameter]
     public double? Top { get; set; }
@@ -38,22 +38,22 @@
     [Parameter]
     public EventCallback<AppointmentData> DragStart { get; set; }
 
-    IDictionary<string, object> Attributes { get; set; }
+    IDictionary<string, object> Attributes { get; set; } = new Dictionary<string, object>();
 
     [Parameter]
-    public AppointmentData Data { get; set; }
+    public AppointmentData? Data { get; set; }
 
     [Parameter]
     public bool ShowAppointmentContent { get; set; } = true;
 
     [CascadingParameter]
-    public IScheduler Scheduler { get; set; }
+    public IScheduler? Scheduler { get; set; }
 
-    string Style { get; set; }
+    string Style { get; set; } = string.Empty;
 
     protected override void OnParametersSet()
     {
-        Attributes = Scheduler.GetAppointmentAttributes(Data);
+        Attributes = (Scheduler != null && Data != null) ? Scheduler.GetAppointmentAttributes(Data) : new Dictionary<string, object>();
 
         var style = new List<string>();
 
@@ -87,12 +87,18 @@
 
     async Task OnMouseEnter()
     {
-        await Scheduler.MouseEnterAppointment(element, Data);
+        if (Scheduler != null && Data != null)
+        {
+            await Scheduler.MouseEnterAppointment(element, Data);
+        }
     }
 
     async Task OnMouseLeave()
     {
-        await Scheduler.MouseLeaveAppointment(element, Data);
+        if (Scheduler != null && Data != null)
+        {
+            await Scheduler.MouseLeaveAppointment(element, Data);
+        }
     }
 
     [JSInvokable]
@@ -101,9 +107,9 @@
         await DragStart.InvokeAsync(Data);
     }
 
-    private DotNetObjectReference<Appointment> dotnetRef;
+    private DotNetObjectReference<Appointment>? dotnetRef;
 
-    private IJSObjectReference jsRef;
+    private IJSObjectReference? jsRef;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

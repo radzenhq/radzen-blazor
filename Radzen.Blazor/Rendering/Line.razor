@@ -1,7 +1,7 @@
 <Path class="@Class" D="@($"M {X1.ToInvariantString()} {Y1.ToInvariantString()} L {X2.ToInvariantString()} {Y2.ToInvariantString()}")" Fill="none" Stroke="@Stroke" StrokeWidth="@StrokeWidth" Style="@Style" LineType="@LineType" />
 @code {
     [Parameter]
-    public string Style { get; set; }
+    public string? Style { get; set; }
     [Parameter]
     public double X1 { get; set; }
     [Parameter]
@@ -12,7 +12,7 @@
     public double Y2 { get; set; }
 
     [Parameter]
-    public string Stroke { get; set; }
+    public string? Stroke { get; set; }
 
     [Parameter]
     public double StrokeWidth { get; set; }
@@ -21,5 +21,5 @@
     public LineType LineType { get; set; }
 
     [Parameter]
-    public string Class { get; set;}
+    public string? Class { get; set;}
 }

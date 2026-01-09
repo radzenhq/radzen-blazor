@@ -23,11 +23,11 @@ public class LoadDataArgs
     /// <summary>
     /// Gets the sort expression as a string.
     /// </summary>
-    public string OrderBy { get; set; }
+    public string? OrderBy { get; set; }
 
-    private Func<string> getFilter;
+    private Func<string>? getFilter;
 
-    internal Func<string> GetFilter
+    internal Func<string>? GetFilter
     {
         get
         {
@@ -40,19 +40,19 @@ public class LoadDataArgs
         }
     }
 
-    private string filter;
+    private string? filter;
 
     /// <summary>
     /// Gets the filter expression as a string.
     /// </summary>
     /// <value>The filter.</value>
-    public string Filter
+    public string? Filter
     {
         get
         {
             if (filter == null && GetFilter != null)
             {
-                filter = GetFilter();
+                filter = GetFilter?.Invoke();
             }
             return filter;
         }
@@ -65,12 +65,12 @@ public class LoadDataArgs
     /// <summary>
     /// Gets the filter expression as a collection of filter descriptors.
     /// </summary>
-    public IEnumerable<FilterDescriptor> Filters { get; set; }
+    public IEnumerable<FilterDescriptor>? Filters { get; set; }
 
     /// <summary>
     /// Gets the sort expression as a collection of sort descriptors.
     /// </summary>
     /// <value>The sorts.</value>
-    public IEnumerable<SortDescriptor> Sorts { get; set; }
+    public IEnumerable<SortDescriptor>? Sorts { get; set; }
 }
 

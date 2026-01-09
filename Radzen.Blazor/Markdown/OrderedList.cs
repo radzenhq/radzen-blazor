@@ -1,3 +1,5 @@
+using System;
+
 namespace Radzen.Blazor.Markdown;
 
 /// <summary>
@@ -8,6 +10,7 @@ public class OrderedList : List
     /// <inheritdoc />
     public override void Accept(INodeVisitor visitor)
     {
+        ArgumentNullException.ThrowIfNull(visitor);
         visitor.VisitOrderedList(this);
     }
 

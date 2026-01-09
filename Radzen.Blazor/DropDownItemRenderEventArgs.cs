@@ -10,6 +10,6 @@ public class DropDownItemRenderEventArgs<TValue> : DropDownBaseItemRenderEventAr
     /// <summary>
     /// Gets the DropDown.
     /// </summary>
-    public RadzenDropDown<TValue> DropDown { get; internal set; }
+    public RadzenDropDown<TValue>? DropDown { get; internal set; }
 }
 

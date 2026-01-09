@@ -1,6 +1,6 @@
-﻿using System.Linq;
+﻿using Microsoft.AspNetCore.Components;
+using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components;
 
 namespace Radzen.Blazor
 {
@@ -68,7 +68,19 @@ namespace Radzen.Blazor
         /// <returns>A task representing the asynchronous operation.</returns>
         protected async Task OnChange(ChangeEventArgs args)
         {
-            Value = $"{args.Value}";
+            ArgumentNullException.ThrowIfNull(args);
+            await SetValue($"{args.Value}");
+        }
+
+        /// <summary>
+        /// Handles the set binding of the underlying HTML input element.
+        /// Applies trimming if enabled and notifies the edit context and change listeners.
+        /// </summary>
+        /// <param name="value">string containing the new value.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        protected async Task SetValue(string? value)
+        {
+            Value = $"{value}";
 
             if (Trim)
             {
@@ -92,7 +104,7 @@ namespace Radzen.Blazor
         }
 
         /// <inheritdoc />
-        protected override string GetId()
+        protected override string? GetId()
         {
             return Name ?? base.GetId();
         }

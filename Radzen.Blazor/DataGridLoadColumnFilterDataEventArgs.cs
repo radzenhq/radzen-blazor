@@ -8,13 +8,13 @@ namespace Radzen;
 /// Supplies information about a <see cref="Radzen.Blazor.RadzenDataGrid{TItem}.LoadColumnFilterData" /> event that is being raised.
 /// </summary>
 /// <typeparam name="T">The data item type.</typeparam>
-public class DataGridLoadColumnFilterDataEventArgs<T>
+public class DataGridLoadColumnFilterDataEventArgs<T> where T : notnull
 {
     /// <summary>
     /// Gets or sets the data.
     /// </summary>
     /// <value>The data.</value>
-    public IEnumerable Data { get; set; }
+    public IEnumerable? Data { get; set; }
 
     /// <summary>
     /// Gets or sets the total data count.
@@ -37,17 +37,17 @@ public class DataGridLoadColumnFilterDataEventArgs<T>
     /// Gets the filter expression as a string.
     /// </summary>
     /// <value>The filter.</value>
-    public string Filter { get; internal set; }
+    public string? Filter { get; internal set; }
 
     /// <summary>
     /// Gets or sets filter property used to limit and distinct values, if not set, args.Data are used as values.
     /// </summary>
     /// <value>The filter property.</value>
-    public string Property { get; set; }
+    public string? Property { get; set; }
 
     /// <summary>
     /// Gets the RadzenDataGridColumn.
     /// </summary>
-    public Radzen.Blazor.RadzenDataGridColumn<T> Column { get; internal set; }
+    public Radzen.Blazor.RadzenDataGridColumn<T>? Column { get; internal set; }
 }
 

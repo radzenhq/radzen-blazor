@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using Radzen.Blazor.Rendering;
 using Microsoft.AspNetCore.Components;
 
@@ -25,31 +26,31 @@ namespace Radzen.Blazor
         /// Gets or sets the child content.
         /// </summary>
         [Parameter]
-        public RenderFragment ChildContent { get; set; }
+        public RenderFragment? ChildContent { get; set; }
 
         /// <summary>
         /// Gets or sets the text.
         /// </summary>
         [Parameter]
-        public string Text { get; set; }
+        public string? Text { get; set; }
 
         /// <summary>
         /// Gets or sets the label content.
         /// </summary>
         [Parameter]
-        public RenderFragment LabelContent { get; set; }
+        public RenderFragment? LabelContent { get; set; }
 
         /// <summary>
         /// Gets or sets the label.
         /// </summary>
         [Parameter]
-        public string Label { get; set; }
+        public string? Label { get; set; }
 
         /// <summary>
         /// Gets or sets the content inside a point on the timeline.
         /// </summary>
         [Parameter]
-        public RenderFragment PointContent { get; set; }
+        public RenderFragment? PointContent { get; set; }
 
         /// <summary>
         /// Specifies the Point size from ExtraSmall to Large. Set to <c>PointSize.Medium</c> by default.
@@ -77,7 +78,7 @@ namespace Radzen.Blazor
 
         private string PointClass => ClassList.Create($"rz-timeline-point")
                                 .Add($"rz-timeline-point-{PointVariant.ToString().ToLowerInvariant()}")
-                                .Add($"rz-shadow-{PointShadow.ToString().ToLowerInvariant()}")
+                                .Add($"rz-shadow-{PointShadow.ToString(CultureInfo.InvariantCulture).ToLowerInvariant()}")
                                 .Add($"rz-timeline-point-{PointStyle.ToString().ToLowerInvariant()}")
                                 .ToString();
 

@@ -5,7 +5,7 @@
     <div class="rz-view-header" @onclick=@(args => OnDayClick(@StartDate))>
         <div class="rz-slot-hour-header"></div>
         <div class="rz-slot-header">
-            @StartDate.ToString("ddd", Scheduler.Culture)
+            @StartDate.ToString("ddd", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
         </div>
     </div>
     <div @ref=view class="rz-view-content" tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
@@ -46,16 +46,16 @@
     public TimeSpan EndTime { get; set; }
 
     [Parameter]
-    public string TimeFormat { get; set; }
+    public string? TimeFormat { get; set; }
 
     [Parameter]
     public int MinutesPerSlot { get; set; }
 
     [Parameter]
-    public IList<AppointmentData> Appointments { get; set; }
+    public IList<AppointmentData>? Appointments { get; set; }
 
     [CascadingParameter]
-    public IScheduler Scheduler { get; set; }
+    public IScheduler? Scheduler { get; set; }
 
     private AppointmentData[] AppointmentsInSlot(DateTime start, DateTime end)
     {
@@ -64,24 +64,31 @@
             return Array.Empty<AppointmentData>();
         }
 
-        return Appointments.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray();
+        if (Scheduler == null) return Array.Empty<AppointmentData>();
+        return Appointments?.Where(item => Scheduler.IsAppointmentInRange(item, start, end)).OrderBy(item => item.Start).ThenByDescending(item => item.End).ToArray() ?? Array.Empty<AppointmentData>();
     }
 
     async Task OnSlotClick(DateTime date)
     {
-        await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)));
+        if (Scheduler != null)
+        {
+            await Scheduler.SelectSlot(date, date.AddMinutes(MinutesPerSlot), AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)));
+        }
     }
 
     async Task OnDayClick(DateTime day)
     {
         var dayStart = day.Date.Add(StartTime);
         var dayEnd = day.Date.Add(EndTime);
-        await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd));
+        if (Scheduler != null)
+        {
+            await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd));
+        }
     }
 
     IDictionary<string, object> Attributes(DateTime date)
     {
-        var attributes = Scheduler.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot), () => AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot)));
+        var attributes = Scheduler?.GetSlotAttributes(date, date.AddMinutes(MinutesPerSlot), () => AppointmentsInSlot(date, date.AddMinutes(MinutesPerSlot))) ?? new Dictionary<string, object>();
         attributes["class"] = ClassList.Create("rz-slot").Add("rz-slot-minor", (date.Minute / MinutesPerSlot) % 2 == 1).Add(attributes).ToString();
         attributes["dropzone"] = "move";
         return attributes;
@@ -90,7 +97,7 @@
     DateTime CurrentDate;
     int currentAppointment = -1;
     IEnumerable<AppointmentData> currentAppointments = Enumerable.Empty<AppointmentData>();
-    bool preventKeyPress = false;
+    bool preventKeyPress;
 
     async Task OnKeyPress(KeyboardEventArgs args)
     {
@@ -121,7 +128,7 @@
         }
         else if (key == "Space")
         {
-            if (currentAppointments.Any())
+            if (currentAppointments.Any() && Scheduler != null)
             {
                 await Scheduler.SelectAppointment(currentAppointments.ElementAt(currentAppointment));
                 await view.FocusAsync();

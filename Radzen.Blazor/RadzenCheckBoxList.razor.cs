@@ -4,6 +4,7 @@ using Radzen.Blazor.Rendering;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -56,14 +57,14 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The value property.</value>
         [Parameter]
-        public string ValueProperty { get; set; }
+        public string? ValueProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the text property.
         /// </summary>
         /// <value>The text property.</value>
         [Parameter]
-        public string TextProperty { get; set; }
+        public string? TextProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the content justify.
@@ -84,7 +85,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The spacing between items.</value>
         [Parameter]
-        public string Gap { get; set; }
+        public string? Gap { get; set; }
 
         /// <summary>
         /// Gets or sets the wrap.
@@ -98,22 +99,22 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The disabled property.</value>
         [Parameter]
-        public string DisabledProperty { get; set; }
+        public string? DisabledProperty { get; set; }
 
         /// <summary>
         /// Gets or sets the read-only property.
         /// </summary>
         /// <value>The read-only property.</value>
         [Parameter]
-        public string ReadOnlyProperty { get; set; }
+        public string? ReadOnlyProperty { get; set; }
 
         void UpdateAllItems()
         {
             allItems = items.Concat((Data != null ? Data.Cast<object>() : Enumerable.Empty<object>()).Select(i =>
             {
                 var item = new RadzenCheckBoxListItem<TValue>();
-                item.SetText((string)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty));
-                item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty));
+                item.SetText((string?)PropertyAccess.GetItemOrValueFromProperty(i, TextProperty ?? string.Empty) ?? string.Empty);
+                item.SetValue((TValue)PropertyAccess.GetItemOrValueFromProperty(i, ValueProperty ?? string.Empty)!);
 
                 if (DisabledProperty != null && PropertyAccess.TryGetItemOrValueFromProperty<bool>(i, DisabledProperty, out var disabledResult))
                 {
@@ -137,7 +138,7 @@ namespace Radzen.Blazor
             UpdateAllItems();
         }
 
-        List<RadzenCheckBoxListItem<TValue>> allItems;
+        List<RadzenCheckBoxListItem<TValue>> allItems = new();
         /// <summary>
         /// Gets or sets a value indicating whether the user can select all values. Set to <c>false</c> by default.
         /// </summary>
@@ -150,7 +151,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The select all text.</value>
         [Parameter]
-        public string SelectAllText { get; set; }
+        public string? SelectAllText { get; set; }
 
         async Task SelectAll(bool? value)
         {
@@ -161,11 +162,11 @@ namespace Radzen.Blazor
 
             if (value == true)
             {
-                Value = allItems.Where(i => !i.Disabled).Select(i => i.Value);
+                Value = allItems.Where(i => !i.Disabled).Select(i => i.Value)!;
             }
             else if (value == false)
             {
-                Value = null;
+                Value = Enumerable.Empty<TValue>();
             }
 
             await ValueChanged.InvokeAsync(Value);
@@ -191,14 +192,14 @@ namespace Radzen.Blazor
             }
         }
 
-        private IEnumerable data = null;
+        private IEnumerable? data;
 
         /// <summary>
         /// Gets or sets the data used to generate items.
         /// </summary>
         /// <value>The data.</value>
         [Parameter]
-        public virtual IEnumerable Data
+        public virtual IEnumerable? Data
         {
             get
             {
@@ -251,7 +252,7 @@ namespace Radzen.Blazor
         /// </summary>
         /// <value>The items.</value>
         [Parameter]
-        public RenderFragment Items { get; set; }
+        public RenderFragment? Items { get; set; }
 
         List<RadzenCheckBoxListItem<TValue>> items = new List<RadzenCheckBoxListItem<TValue>>();
 
@@ -275,9 +276,8 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         public void RemoveItem(RadzenCheckBoxListItem<TValue> item)
         {
-            if (items.Contains(item))
+            if (items.Remove(item))
             {
-                items.Remove(item);
                 UpdateAllItems();
                 if (!disposed)
                 {
@@ -293,6 +293,7 @@ namespace Radzen.Blazor
         /// <returns><c>true</c> if the specified item is selected; otherwise, <c>false</c>.</returns>
         protected bool IsSelected(RadzenCheckBoxListItem<TValue> item)
         {
+            ArgumentNullException.ThrowIfNull(item);
             return Value != null && Value.Contains(item.Value);
         }
 
@@ -302,6 +303,7 @@ namespace Radzen.Blazor
         /// <param name="item">The item.</param>
         protected async System.Threading.Tasks.Task SelectItem(RadzenCheckBoxListItem<TValue> item)
         {
+            ArgumentNullException.ThrowIfNull(item);
             if (Disabled || item.Disabled || ReadOnly || item.ReadOnly)
                 return;
 
@@ -309,13 +311,16 @@ namespace Radzen.Blazor
 
             List<TValue> selectedValues = new List<TValue>(Value != null ? Value : Enumerable.Empty<TValue>());
 
-            if (!selectedValues.Contains(item.Value))
+            if (item.Value != null && !selectedValues.Contains(item.Value))
             {
                 selectedValues.Add(item.Value);
             }
             else
             {
-                selectedValues.Remove(item.Value);
+                if (item.Value != null)
+                {
+                    selectedValues.Remove(item.Value);
+                }
             }
 
             Value = selectedValues;
