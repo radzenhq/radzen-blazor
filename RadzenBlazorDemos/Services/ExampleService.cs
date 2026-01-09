@@ -2072,6 +2072,15 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Barcode",
+                    Description = "Generate and display 1D barcodes as SVG using RadzenBarcode.",
+                    Path = "barcode",
+                    Icon = "\ue70b",
+                    Tags = new [] { "barcode", "svg" },
+                    New = true
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Orientation and Position", Anchor = "#orientation-and-position" }, new () { Text = "Align Items", Anchor = "#align-items" }, new () { Text = "Styling", Anchor = "#line-width" }, new () { Text = "Point Size", Anchor = "#point-size" }, new () { Text = "Point Style", Anchor = "#point-style" }, new () { Text = "Point Variant", Anchor = "#point-variant" }, new () { Text = "Point Shadow", Anchor = "#point-shadow" }, new () { Text = "Point Content", Anchor = "#point-content" } ],
                     Name = "Timeline",
                     Path = "timeline",

@@ -1,0 +1,128 @@
+<RadzenRow Gap="2rem">
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 100%;">
+            <RadzenBarcode Value="@value"
+                          Type="@type"
+                          Foreground="@foreground"
+                          Background="@background"
+                          BarHeight="@barHeight"
+                          QuietZoneModules="@quietZone"
+                          ShowValue="@showValue"
+                          ShowChecksum="@showChecksum"
+                          ValueStyle="@valueStyle"
+                          Height="140px"
+                          Width="100%" />
+        </RadzenStack>
+    </RadzenColumn>
+
+    <RadzenColumn Size="12" SizeMD="6">
+        <RadzenStack Gap="1rem">
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6" Style="width: 100%;">
+                    <RadzenFormField Text="Type">
+                        <RadzenDropDown @bind-Value="@type" Data="@types" Style="width: 100%;" Change="@OnTypeChanged" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6" Style="width: 100%;">
+                    <RadzenFormField Text="Value">
+                        <RadzenTextBox @bind-Value="@value" Style="width: 100%;" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Foreground" Style="width: 100%;">
+                        <RadzenColorPicker @bind-Value="@foreground" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Background" Style="width: 100%;">
+                        <RadzenColorPicker @bind-Value="@background" ShowHSV="true" ShowRGBA="true" ShowColors="true" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="BarHeight" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="@barHeight" Style="width: 100%;" Min="10" Max="120" />
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Text="Quiet zone (modules)" Style="width: 100%;">
+                        <RadzenNumeric @bind-Value="@quietZone" Style="width: 100%;" Min="0" Max="30" />
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenRow Gap="1rem">
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Style="width: 100%;">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Stretch" Gap="4px" Style="padding: 10px">
+                            <RadzenLabel Text="Show value" Component="showValue" />
+                            <RadzenSwitch @bind-Value="@showValue" Name="showValue" />
+                        </RadzenStack>
+                    </RadzenFormField>
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="6">
+                    <RadzenFormField Style="width: 100%;">
+                        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Stretch" Gap="4px" Style="padding: 10px">
+                            <RadzenLabel Text="Show checksum" Component="showChecksum" />
+                            <RadzenSwitch @bind-Value="@showChecksum" Name="showChecksum" Disabled="@(!showValue || !RadzenBarcode.HasChecksum(type))" />
+                        </RadzenStack>
+                    </RadzenFormField>
+                </RadzenColumn>
+            </RadzenRow>
+
+            <RadzenFormField Text="ValueStyle">
+                <RadzenTextArea @bind-Value="@valueStyle" Style="width: 100%;" Rows="3" />
+            </RadzenFormField>
+
+            <RadzenText TextStyle="TextStyle.Caption">
+                Tip: some types require numeric-only input (EAN/UPC/ITF/MSI/POSTNET/Pharmacode). Changing the type auto-fills a valid sample value.
+            </RadzenText>
+        </RadzenStack>
+    </RadzenColumn>
+</RadzenRow>
+
+@code {
+    RadzenBarcodeType type = RadzenBarcodeType.Code128;
+    IEnumerable<RadzenBarcodeType> types = Enum.GetValues<RadzenBarcodeType>();
+
+    string value = "Radzen-123";
+    string foreground = "#111827";
+    string background = "#F9FAFB";
+
+    double barHeight = 60;
+    int quietZone = 10;
+
+    bool showValue = true;
+    bool showChecksum = true;
+
+    string valueStyle = "font: 600 12px/1.2 Inter, system-ui, sans-serif;";
+
+    void OnTypeChanged(object _)
+    {
+        value = type switch
+        {
+            RadzenBarcodeType.Code128 => "Radzen-123",
+            RadzenBarcodeType.Code39 => "RADZEN 123",
+            RadzenBarcodeType.Ean13 => "5901234123457",
+            RadzenBarcodeType.Ean8 => "96385074",
+            RadzenBarcodeType.UpcA => "036000291452",
+            RadzenBarcodeType.Itf => "12345670",
+            RadzenBarcodeType.Codabar => "123456",
+            RadzenBarcodeType.Postnet => "555551237",
+            RadzenBarcodeType.Pharmacode => "1234",
+            RadzenBarcodeType.Rm4scc => "SW1A1AA1A",
+            RadzenBarcodeType.Isbn => "0306406152",
+            RadzenBarcodeType.Issn => "03178471",
+            RadzenBarcodeType.Msi => "1234567",
+            RadzenBarcodeType.Telepen => "Wikipedia",
+            _ => value
+        };
+    }
+}
+
+

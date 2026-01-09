@@ -1,0 +1,85 @@
+@using System.Globalization
+@inherits RadzenComponent
+@{
+    static string F(double v) => v.ToString(CultureInfo.InvariantCulture);
+
+    var (bars, vbWidth, checksumText, error) = GetBarcode();
+
+    var barsHeight = bars.Count > 0 ? Math.Max(0, bars.Max(b => b.Y + b.Height)) : Math.Max(0, BarHeight);
+    // If the value text is hidden, the checksum should not be visible either.
+    var checksumVisible = ShowValue && ShowChecksum && !string.IsNullOrEmpty(checksumText);
+    var valueVisible = ShowValue && !string.IsNullOrEmpty(Value);
+    // Value and checksum (if visible) are rendered on the same row.
+    var textLines = (valueVisible || checksumVisible) ? 1 : 0;
+
+    var textHeight = textLines > 0 ? Math.Max(0, FontSize) : 0;
+    var textMargin = textLines > 0 ? Math.Max(0, TextMarginTop) : 0;
+
+    var vbHeight = barsHeight + (textLines > 0 ? (textMargin + (textLines * textHeight)) : 0);
+    if (vbHeight <= 0) { vbHeight = 1; }
+}
+
+<svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:svg="http://www.w3.org/2000/svg"
+     viewBox="0 0 @F(vbWidth) @F(vbHeight)"
+     shape-rendering="crispEdges"
+     width="@Width"
+     height="@Height"
+     @ref="@Element"
+     style="@Style"
+     @attributes="Attributes"
+     class="@GetCssClass()"
+     id="@GetId()">
+    <rect x="0" y="0" width="@F(vbWidth)" height="@F(vbHeight)" fill="@Background" />
+
+    @if (!string.IsNullOrEmpty(error))
+    {
+        <svg:text x="50%"
+                  y="@F(vbHeight / 2.0)"
+                  text-anchor="middle"
+                  style="@ValueStyle"
+                  fill="@Foreground">
+            @error
+        </svg:text>
+    }
+    else if (bars?.Count > 0)
+    {
+        @foreach (var bar in bars)
+        {
+            <rect x="@bar.X.ToString(CultureInfo.InvariantCulture)"
+                  y="@bar.Y.ToString(CultureInfo.InvariantCulture)"
+                  width="@bar.Width.ToString(CultureInfo.InvariantCulture)"
+                  height="@bar.Height.ToString(CultureInfo.InvariantCulture)"
+                  fill="@Foreground" />
+        }
+
+        @if (valueVisible)
+        {
+            <svg:text x="50%"
+                      y="@F(barsHeight + textMargin + textHeight)"
+                      text-anchor="middle"
+                      style="@ValueStyle"
+                      fill="@Foreground">
+                @if (checksumVisible)
+                {
+                    @($"{Value} {checksumText}")
+                }
+                else
+                {
+                    @Value
+                }
+            </svg:text>
+        }
+
+        @if (!valueVisible && checksumVisible)
+        {
+            <svg:text x="50%"
+                      y="@F(barsHeight + textMargin + textHeight)"
+                      text-anchor="middle"
+                      style="@ValueStyle"
+                      fill="@Foreground">
+                @checksumText
+            </svg:text>
+        }
+    }
+</svg>
