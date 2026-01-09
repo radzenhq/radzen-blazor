@@ -74,7 +74,17 @@ namespace Radzen.Blazor
         protected async Task OnChange(ChangeEventArgs args)
         {
             ArgumentNullException.ThrowIfNull(args);
-            Value = $"{args.Value}";
+            await SetValue($"{args.Value}");
+        }
+
+        /// <summary>
+        /// Handles the set binding of the underlying HTML textarea element.
+        /// </summary>
+        /// <param name="value">string containing the new value.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        protected async Task SetValue(string? value)
+        {
+            Value = $"{value}";
 
             await ValueChanged.InvokeAsync(Value);
 

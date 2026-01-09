@@ -3,12 +3,28 @@
 {
     if (Immediate)
     {
-    <input @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-        placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" @oninput="@OnChange" />
+        @RenderImmediateInput()
     }
     else
     {
-    <input @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
-        placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" @onchange="@OnChange" />
+        <input @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" @onchange="@OnChange" />
+    }
+}
+
+            @code {
+    internal RenderFragment RenderImmediateInput()
+    {
+#if NET7_0_OR_GREATER
+        return __builder => {
+            <input @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" @bind:get="@Value" @bind:set="@SetValue" @bind:event="oninput"/>
+        };
+#else
+        return __builder => {
+            <input @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" style="@Style" @attributes="Attributes" class="@GetCssClass()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" autocomplete="@AutoCompleteAttribute" aria-autocomplete="@AriaAutoCompleteAttribute" value="@Value" @oninput="@OnChange" />
+        };
+#endif
     }
 }
