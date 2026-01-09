@@ -3,27 +3,30 @@
 @inherits FormComponent<string>
 @if (Visible)
 {
+    if (Immediate)
+    {
+        @RenderImmediateTextArea()
+    }
+    else
+    {
+        <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
+                  placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
+    }
+}
+
+@code {
+    internal RenderFragment RenderImmediateTextArea()
+    {
 #if NET7_0_OR_GREATER
-    if (Immediate)
-    {
-        <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-              placeholder="@CurrentPlaceholder" maxlength="@MaxLength" @bind:get="@Value" @bind:set="@SetValue" @bind:event="oninput" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
-    }
-    else
-    {
-        <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-              placeholder="@CurrentPlaceholder" maxlength="@MaxLength" @bind:get="@Value" @bind:set="@SetValue" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
-    }
+        return __builder => {
+            <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
+            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" @bind:get="@Value" @bind:set="@SetValue" @bind:event="oninput" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
+        };
 #else
-    if (Immediate)
-    {
-        <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @oninput="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
-    }
-    else
-    {
-        <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
-    }
+        return __builder => {
+            <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
+                      placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @oninput="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
+        };
 #endif
+    }
 }
