@@ -27,7 +27,7 @@ namespace Radzen.Blazor
     ///         @Body
     ///     &lt;/RadzenBody&gt;
     ///     &lt;RadzenFooter&gt;
-    ///         © 2025 My Company
+    ///         © 2026 My Company
     ///     &lt;/RadzenFooter&gt;
     /// &lt;/RadzenLayout&gt;
     /// </code>
