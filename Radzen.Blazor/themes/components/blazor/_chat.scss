@@ -202,6 +202,17 @@ $rz-chat-message-callout-radius: calc(var(--rz-border-radius) / 4) !default;
     animation: rz-pulse 1.5s infinite;
 }
 
+.rz-chat-typing {
+    font-size: 0.875rem;
+    color: var(--rz-text-tertiary-color);
+    padding: 0 0.5rem 0.5rem 0.5rem;
+    min-height: 1.25rem;
+}
+
+.rz-chat-typing-text {
+    font-style: italic;
+}
+
 /* Right-to-left send button */
 *[dir="rtl"] .rz-chat-send-btn {
     transform: scaleX(-1);

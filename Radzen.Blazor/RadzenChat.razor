@@ -116,6 +116,24 @@
                     }
                 }
             }
+
+            @if (ShowTypingIndicator)
+            {
+                var typing = GetTypingUsersForDisplay();
+                if (typing.Count > 0)
+                {
+                    <div class="rz-chat-typing">
+                        @if (TypingTemplate != null)
+                        {
+                            @TypingTemplate(typing)
+                        }
+                        else
+                        {
+                            <span class="rz-chat-typing-text">@GetTypingText(typing)</span>
+                        }
+                    </div>
+                }
+            }
         </div>
 
         <!-- Chat Input -->

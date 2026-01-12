@@ -12,6 +12,22 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
+    /// Provides information about a typing state change in <see cref="RadzenChat"/>.
+    /// </summary>
+    public class ChatTypingEventArgs
+    {
+        /// <summary>
+        /// Gets or sets the participant ID.
+        /// </summary>
+        public string UserId { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets whether the participant is typing.
+        /// </summary>
+        public bool IsTyping { get; set; }
+    }
+
+    /// <summary>
     /// Represents a chat participant in the RadzenChat component.
     /// </summary>
     public class ChatUser
@@ -99,6 +115,10 @@ namespace Radzen.Blazor
         private ElementReference inputElement;
         private ElementReference messagesContainer;
 
+        private readonly HashSet<string> typingUsers = new();
+        private bool currentUserIsTyping;
+        private CancellationTokenSource? typingCts;
+
         /// <summary>
         /// Gets or sets the message template.
         /// </summary>
@@ -149,6 +169,51 @@ namespace Radzen.Blazor
         /// <value>The attributes.</value>
         [Parameter]
         public IReadOnlyDictionary<string, object>? InputAttributes { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether to show a typing indicator in the message list.
+        /// </summary>
+        [Parameter]
+        public bool ShowTypingIndicator { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the debounce timeout (in milliseconds) after the last keystroke before the current user is considered "not typing".
+        /// </summary>
+        [Parameter]
+        public int TypingTimeout { get; set; } = 1500;
+
+        /// <summary>
+        /// Raised when the current user's typing state changes (true/false). Use this to broadcast typing state via SignalR etc.
+        /// </summary>
+        [Parameter]
+        public EventCallback<ChatTypingEventArgs> TypingChanged { get; set; }
+
+        /// <summary>
+        /// Optional template to render typing indicator content. Receives the typing <see cref="ChatUser"/> list (excluding current user by default).
+        /// </summary>
+        [Parameter]
+        public RenderFragment<IReadOnlyList<ChatUser>>? TypingTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the single user typing format. <see cref="TypingTemplate" /> has preference over this property.
+        /// </summary>
+        /// <value>The single user typing format.</value>
+        [Parameter]
+        public string? TypingFormat { get; set; } = "{0} is typing...";
+
+        /// <summary>
+        /// Gets or sets the two users typing format. <see cref="TypingTemplate" /> has preference over this property.
+        /// </summary>
+        /// <value>The two users typing format.</value>
+        [Parameter]
+        public string? TwoUsersTypingFormat { get; set; } = "{0} and {1} are typing...";
+
+        /// <summary>
+        /// Gets or sets the multiple users typing format. <see cref="TypingTemplate" /> has preference over this property.
+        /// </summary>
+        /// <value>The two multiple typing format.</value>
+        [Parameter]
+        public string? MultipleUsersTypingFormat { get; set; } = "{0} and {1} others are typing...";
 
         /// <summary>
         /// Gets or sets the title displayed in the chat header.
@@ -351,7 +416,64 @@ namespace Radzen.Blazor
 
             // Clear input
             CurrentInput = string.Empty;
+            await SetCurrentUserTyping(false);
             await InvokeAsync(StateHasChanged);
+        }
+
+        /// <summary>
+        /// Sets a participant typing state. Use this for remote users (e.g. SignalR updates).
+        /// </summary>
+        public async Task SetUserTyping(string userId, bool isTyping)
+        {
+            if (string.IsNullOrEmpty(userId))
+            {
+                return;
+            }
+
+            bool changed;
+            if (isTyping)
+            {
+                changed = typingUsers.Add(userId);
+            }
+            else
+            {
+                changed = typingUsers.Remove(userId);
+            }
+
+            if (changed)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+        }
+
+        internal IReadOnlyList<ChatUser> GetTypingUsersForDisplay()
+        {
+            // Don't show current user typing by default.
+            return typingUsers
+                .Where(id => id != CurrentUserId)
+                .Select(id => GetUser(id) ?? new ChatUser { Id = id, Name = id })
+                .ToList()
+                .AsReadOnly();
+        }
+
+        internal string GetTypingText(IReadOnlyList<ChatUser> users)
+        {
+            if (users == null || users.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            if (users.Count == 1)
+            {
+                return string.Format(Culture ?? CultureInfo.CurrentCulture, TypingFormat ?? string.Empty, users[0].Name);
+            }
+
+            if (users.Count == 2)
+            {
+                return string.Format(Culture ?? CultureInfo.CurrentCulture, TwoUsersTypingFormat ?? string.Empty, users[0].Name, users[1].Name);
+            }
+
+            return string.Format(Culture ?? CultureInfo.CurrentCulture, MultipleUsersTypingFormat ?? string.Empty, users[0].Name, users.Count - 1);
         }
 
         /// <summary>
@@ -384,7 +506,71 @@ namespace Radzen.Blazor
         private async Task OnInput(ChangeEventArgs e)
         {
             CurrentInput = e.Value?.ToString() ?? "";
+            await NotifyCurrentUserTyping();
             await InvokeAsync(StateHasChanged);
+        }
+
+        async Task NotifyCurrentUserTyping()
+        {
+            if (Disabled || ReadOnly)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(CurrentUserId))
+            {
+                return;
+            }
+
+            await SetCurrentUserTyping(true);
+
+            typingCts?.Cancel();
+            typingCts?.Dispose();
+            typingCts = new CancellationTokenSource();
+            var token = typingCts.Token;
+
+            try
+            {
+                var timeout = Math.Max(250, TypingTimeout);
+                await Task.Delay(timeout, token);
+                if (!token.IsCancellationRequested)
+                {
+                    await SetCurrentUserTyping(false);
+                }
+            }
+            catch (TaskCanceledException)
+            {
+                // ignore
+            }
+        }
+
+        async Task SetCurrentUserTyping(bool isTyping)
+        {
+            if (currentUserIsTyping == isTyping)
+            {
+                return;
+            }
+
+            currentUserIsTyping = isTyping;
+
+            // Keep our own typing state in the internal set so the template can include it if needed,
+            // but the default display excludes CurrentUserId.
+            if (!string.IsNullOrEmpty(CurrentUserId))
+            {
+                if (isTyping)
+                {
+                    typingUsers.Add(CurrentUserId);
+                }
+                else
+                {
+                    typingUsers.Remove(CurrentUserId);
+                }
+            }
+
+            if (TypingChanged.HasDelegate && !string.IsNullOrEmpty(CurrentUserId))
+            {
+                await TypingChanged.InvokeAsync(new ChatTypingEventArgs { UserId = CurrentUserId, IsTyping = isTyping });
+            }
         }
 
         private async Task OnKeyDown(KeyboardEventArgs e)
@@ -430,6 +616,23 @@ namespace Radzen.Blazor
         protected override string GetComponentCssClass()
         {
             return ClassList.Create("rz-chat").ToString();
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            try
+            {
+                typingCts?.Cancel();
+                typingCts?.Dispose();
+                typingCts = null;
+            }
+            catch
+            {
+                // ignore
+            }
+
+            base.Dispose();
         }
     }
 }

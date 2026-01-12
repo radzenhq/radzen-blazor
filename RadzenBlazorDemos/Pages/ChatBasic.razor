@@ -28,6 +28,11 @@
                               ButtonStyle="ButtonStyle.Primary"
                               Click="@(() => basicChat?.SendMessage("Thanks for the update!"))"
                               Variant="Variant.Flat" />
+
+                <RadzenButton Text="Simulate Jane typing"
+                              Icon="keyboard"
+                              Click="@SimulateJaneTyping"
+                              Variant="Variant.Flat" />
             </RadzenStack>
         </RadzenStack>
     </RadzenCard>
@@ -39,9 +44,11 @@
                 MessagesChanged="@OnMessagesChanged"
                 Placeholder="Type your message..."
                 Style="height: 500px;"
+                ShowTypingIndicator="true"
                 MessageAdded="@OnMessageAdded"
                 MessageSent="@OnMessageSent"
                 ChatCleared="@OnChatCleared"
+                TypingChanged="@OnTypingChanged"
                 />
 </RadzenStack>
 
@@ -95,5 +102,23 @@
     void OnChatCleared()
     {
         console.Log("Chat cleared", AlertStyle.Warning);
+    }
+
+    async Task SimulateJaneTyping()
+    {
+        if (basicChat == null)
+        {
+            return;
+        }
+
+        await basicChat.SetUserTyping("user2", true);
+        await Task.Delay(1500);
+        await basicChat.SetUserTyping("user2", false);
+    }
+
+    void OnTypingChanged(ChatTypingEventArgs args)
+    {
+        // In a real app you would broadcast this via SignalR to other clients.
+        console.Log($"TypingChanged: {args.UserId} => {args.IsTyping}", AlertStyle.Info);
     }
 }
