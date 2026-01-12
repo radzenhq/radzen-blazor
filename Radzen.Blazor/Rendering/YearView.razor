@@ -6,8 +6,13 @@
 @{
     var points = new Dictionary<AppointmentData, double>();
 
-    // delaci check usage
-    var year = StartDate.AddDays(7).Year;
+    // StartDate can be shifted one extra week earlier to render a full header row.
+    // Derive the base year from the scheduler's CurrentDate + StartMonth instead of StartDate.AddDays(7).Year
+    // (which can incorrectly yield the previous year for StartMonth=January when the week starts on Sunday).
+    var startMonthNumber = (int)StartMonth + 1; // Month enum is 0-based
+    var year = Scheduler != null
+        ? Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Date.Month < startMonthNumber ? -1 : 0)
+        : StartDate.AddDays(7).Year;
 
     DateTime date = StartDate.AddDays(7);
     DateTime realstart = StartDate;

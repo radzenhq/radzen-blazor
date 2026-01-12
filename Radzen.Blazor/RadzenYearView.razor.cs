@@ -60,20 +60,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (Scheduler == null) return DateTime.Today;
-                var culture = Scheduler.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
-                if (StartMonth == Month.January)
-                {
-                    var d = new DateTime(Scheduler.CurrentDate.Date.Year, 1, 1).StartOfWeek(culture);
-                    if (d.DayOfWeek == culture.DateTimeFormat.FirstDayOfWeek) d = d.AddDays(-7);
-                    return d;
-                }
-                else
-                {
-                    var d = new DateTime(Scheduler.CurrentDate.Date.Year + (Scheduler.CurrentDate.Month < (int)StartMonth + 1 ? -1 : 0), (int)StartMonth + 1, 1).StartOfWeek(culture);
-                    if (d.DayOfWeek == culture.DateTimeFormat.FirstDayOfWeek) d = d.AddDays(-7);
-                    return d;
-                }
+                return Scheduler == null ? DateTime.Today : GetYearRange().viewStart;
             }
         }
 
@@ -82,11 +69,7 @@ namespace Radzen.Blazor
         {
             get
             {
-                if (Scheduler == null) return DateTime.Today;
-                var culture = Scheduler.Culture ?? System.Globalization.CultureInfo.CurrentCulture;
-                var realFirstYear = StartDate.AddDays(7);
-                var d = StartDate.AddDays(DateTime.IsLeapYear(realFirstYear.Year) || DateTime.IsLeapYear(realFirstYear.Year + 1) ? 366 : 365).EndOfWeek(culture);
-                return d;
+                return Scheduler == null ? DateTime.Today : GetYearRange().viewEnd;
             }
         }
 
