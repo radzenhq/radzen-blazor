@@ -50,7 +50,7 @@
                 @if(!string.IsNullOrEmpty(Url))
                 {
                     <input id="@(Name ?? GetId())" @ref="@fileUpload" @attributes="InputAttributes" type="file" multiple="@Multiple" accept="@Accept" disabled="@Disabled" 
-                        onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true, '@ParameterName')" tabindex="-1" onkeydown="event.stopPropagation()"/>
+                        onchange="Radzen.uploadInputChange(event, '@Url', @Auto.ToString().ToLower(), @Multiple.ToString().ToLower(), true, '@ParameterName', '@Method', @(Stream ? "true" : "false"))" tabindex="-1" onkeydown="event.stopPropagation()"/>
                 }
                 else
                 {

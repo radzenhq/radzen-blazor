@@ -789,9 +789,9 @@ window.Radzen = {
 
     return [table.nextSelectedIndex, table.nextSelectedCellIndex];
   },
-  uploadInputChange: function (e, url, auto, multiple, clear, parameterName) {
+  uploadInputChange: function (e, url, auto, multiple, clear, parameterName, method = 'POST', stream = false) {
       if (auto) {
-          Radzen.upload(e.target, url, multiple, clear, parameterName);
+          Radzen.upload(e.target, url, multiple, clear, parameterName, method, stream);
           e.target.value = '';
       } else {
           Radzen.uploadChange(e.target);
@@ -865,20 +865,35 @@ window.Radzen = {
   removeFileFromFileInput: function (fileInput) {
     fileInput.value = '';
   },
-  upload: function (fileInput, url, multiple, clear, parameterName) {
+  upload: function (fileInput, url, multiple, clear, parameterName, method = 'POST', stream = false) {
     var uploadComponent = Radzen.uploadComponents && Radzen.uploadComponents[fileInput.id];
     if (!uploadComponent) { return; }
     if (!uploadComponent.files || clear) {
         uploadComponent.files = Array.from(fileInput.files);
     }
-    var data = new FormData();
-    var files = [];
-    var cancelled = false;
-    for (var i = 0; i < uploadComponent.files.length; i++) {
-      var file = uploadComponent.files[i];
-      data.append(parameterName || (multiple ? 'files' : 'file'), file, file.name);
-      files.push({Name: file.name, Size: file.size});
-    }
+    
+	function asFormData() {
+		var data = new FormData();
+		var files = [];
+		for (var i = 0; i < uploadComponent.files.length; i++) {
+			var file = uploadComponent.files[i];
+			data.append(parameterName || (multiple ? 'files' : 'file'), file, file.name);
+			files.push({Name: file.name, Size: file.size});
+		}
+		return {data, files}
+	}
+	
+	function asStream() {
+		if (uploadComponent.files.length > 0) {
+			var file = uploadComponent.files[0];
+			return {data: file, files: [{Name: file.name, Size: file.size}]};
+		}
+		return {data: null, files: []}
+	}
+
+  	var cancelled = false;
+	var {data, files} = stream ? asStream() : asFormData();
+	
     var xhr = new XMLHttpRequest();
     xhr.withCredentials = true;
     xhr.upload.onprogress = function (e) {
@@ -925,7 +940,7 @@ window.Radzen = {
       }
     };
     uploadComponent.invokeMethodAsync('GetHeaders').then(function (headers) {
-      xhr.open('POST', url, true);
+      xhr.open(method, url, true);
       for (var name in headers) {
         xhr.setRequestHeader(name, headers[name]);
       }
