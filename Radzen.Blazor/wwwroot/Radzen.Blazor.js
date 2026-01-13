@@ -2321,22 +2321,23 @@ window.Radzen = {
     document.removeEventListener('touchmove', ref.touchMoveHandler)
     document.removeEventListener('touchend', ref.mouseUpHandler);
   },
-  startColumnReorder: function(id) {
+  startColumnReorder: function(id, gridId) {
+      var grid = document.getElementById(gridId);
       var el = document.getElementById(id + '-drag');
-      var cell = el.parentNode.parentNode;
+      Radzen[id + 'cell'] = el.parentNode.parentNode;
       var visual = document.createElement("th");
-      visual.className = cell.className + ' rz-column-draggable';
-      visual.style = cell.style;
+      visual.className = Radzen[id + 'cell'].className + ' rz-column-draggable';
+      visual.style = Radzen[id + 'cell'].style;
       visual.style.display = 'none';
       visual.style.position = 'absolute';
-      visual.style.height = cell.offsetHeight + 'px';
-      visual.style.width = cell.offsetWidth + 'px';
+      visual.style.height = Radzen[id + 'cell'].offsetHeight + 'px';
+      visual.style.width = Radzen[id + 'cell'].offsetWidth + 'px';
       visual.style.zIndex = 2000;
-      visual.innerHTML = cell.firstChild.outerHTML;
+      visual.innerHTML = Radzen[id + 'cell'].firstChild.outerHTML;
       visual.id = id + 'visual';
       document.body.appendChild(visual);
 
-      var resizers = cell.parentNode.querySelectorAll('.rz-column-resizer');
+      var resizers = Radzen[id + 'cell'].parentNode.querySelectorAll('.rz-column-resizer');
       for (let i = 0; i < resizers.length; i++) {
           resizers[i].style.display = 'none';
       }
@@ -2347,14 +2348,14 @@ window.Radzen = {
               document.body.removeChild(el);
               Radzen[id + 'end'] = null;
               Radzen[id + 'move'] = null;
-              var resizers = cell.parentNode.querySelectorAll('.rz-column-resizer');
+              var resizers = Radzen[id + 'cell'].parentNode.querySelectorAll('.rz-column-resizer');
               for (let i = 0; i < resizers.length; i++) {
                   resizers[i].style.display = 'block';
               }
           }
       }
-      document.removeEventListener('click', Radzen[id + 'end']);
-      document.addEventListener('click', Radzen[id + 'end']);
+      grid.removeEventListener('click', Radzen[id + 'end']);
+      grid.addEventListener('click', Radzen[id + 'end']);
 
       Radzen[id + 'move'] = function (e) {
           var el = document.getElementById(id + 'visual');
@@ -2373,8 +2374,8 @@ window.Radzen = {
               el.style.left = e.clientX + scrollLeft + 10 + 'px';
           }
       }
-      document.removeEventListener('mousemove', Radzen[id + 'move']);
-      document.addEventListener('mousemove', Radzen[id + 'move']);
+      grid.removeEventListener('mousemove', Radzen[id + 'move']);
+      grid.addEventListener('mousemove', Radzen[id + 'move']);
   },
   stopColumnResize: function (id, grid, columnIndex) {
     var el = document.getElementById(id + '-resizer');

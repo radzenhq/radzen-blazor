@@ -1776,7 +1776,7 @@ namespace Radzen.Blazor
             uniqueIDOfColumnToReoder = uniqueID;
             if (JSRuntime != null)
             {
-                await JSRuntime.InvokeVoidAsync("Radzen.startColumnReorder", getColumnUniqueId(columnIndex));
+                await JSRuntime.InvokeVoidAsync("Radzen.startColumnReorder", getColumnUniqueId(columnIndex), GetId());
             }
         }
 
