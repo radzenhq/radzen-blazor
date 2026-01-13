@@ -14,7 +14,7 @@
                 <span id="@(Grid.getColumnUniqueId(ColumnIndex) + "-drag")" class="rz-column-drag"
                 @onclick:preventDefault="true" @onclick:stopPropagation="true"
                 @onmousedown:preventDefault="true"
-                @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex, Column.UniqueID ?? Column.Property))></span>
+                @onmousedown=@(args => Grid.StartColumnReorder(args, ColumnIndex, !string.IsNullOrEmpty(Column.UniqueID) ? Column.UniqueID : Column.Property))></span>
             }
             <span class="rz-column-title" title="@GetColumnTitleAttribute()">
                 @if (Column.HeaderTemplate != null)

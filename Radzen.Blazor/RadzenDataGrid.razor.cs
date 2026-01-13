@@ -3394,7 +3394,7 @@ namespace Radzen.Blazor
                 var functionName = $"Radzen['{getColumnUniqueId(indexOfColumnToReoder.Value)}end']";
                 await JSRuntime.InvokeVoidAsync("eval", $"{functionName} && {functionName}()");
 
-                var column = allColumns.Where(c => (c.UniqueID ?? c.Property) == uniqueIDOfColumnToReoder).FirstOrDefault();
+                var column = allColumns.Where(c => (!string.IsNullOrEmpty(c.UniqueID) ? c.UniqueID : c.Property) == uniqueIDOfColumnToReoder).FirstOrDefault();
 
                 if (column != null && column.Groupable && !string.IsNullOrEmpty(column.GetGroupProperty()))
                 {
