@@ -460,6 +460,7 @@ namespace Radzen.Blazor
         public DateTimeKind Kind { get; set; } = DateTimeKind.Unspecified;
 
         object? _value;
+        TimeSpan? dateTimeOffsetValueOffset;
 
         /// <summary>
         /// Gets or sets the value.
@@ -598,6 +599,7 @@ namespace Radzen.Blazor
 
                         if (value is DateTimeOffset offset)
                         {
+                            dateTimeOffsetValueOffset = offset.Offset;
                             if (offset.Offset == TimeSpan.Zero && Kind == DateTimeKind.Local)
                             {
                                 _dateTimeValue = offset.LocalDateTime;
@@ -1230,15 +1232,25 @@ namespace Radzen.Blazor
             {
                 return;
             }
-            if (Value is DateTimeOffset dtoValue)
-            {
-                var specified = DateTime.SpecifyKind(dtoValue.DateTime, Kind);
-                var adjusted = new DateTimeOffset(specified, dtoValue.Offset);
-                await ValueChanged.InvokeAsync((TValue)(object)adjusted);
-            }
-            else if (Value is DateTime dateTimeValue)
+
+            // IMPORTANT: internally we often store DateTime even when TValue is DateTimeOffset.
+            // Always decide the outgoing type from TValue to avoid InvalidCastException.
+            var typeofTValue = typeof(TValue);
+
+            if ((typeofTValue == typeof(DateTimeOffset) || typeofTValue == typeof(DateTimeOffset?)) && Value is DateTime dateTimeValue)
             {
                 var specified = DateTime.SpecifyKind(dateTimeValue, Kind);
+
+                // Preserve the original offset when possible; otherwise fall back to the DateTime's offset.
+                var adjusted = dateTimeOffsetValueOffset.HasValue
+                    ? new DateTimeOffset(specified, dateTimeOffsetValueOffset.Value)
+                    : new DateTimeOffset(specified);
+
+                await ValueChanged.InvokeAsync((TValue)(object)adjusted);
+            }
+            else if (Value is DateTime dtValue)
+            {
+                var specified = DateTime.SpecifyKind(dtValue, Kind);
                 await ValueChanged.InvokeAsync((TValue)(object)specified);
             }
             else
