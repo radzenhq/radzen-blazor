@@ -510,9 +510,16 @@ namespace Radzen.Blazor
         {
             if (level >= pivotColumns.Count)
                 return;
+
             var col = pivotColumns[level];
+
             var groups = items.GroupByMany(new string[] { col.Property! });
-            foreach (var group in groups)
+
+            var sortedGroups = (col.GetSortOrder() == SortOrder.Ascending) ? groups.OrderBy(g => g.Key)
+               : (col.GetSortOrder() == SortOrder.Descending) ? groups.OrderByDescending(g => g.Key)
+               : groups;
+
+            foreach (var group in sortedGroups)
             {
                 var currentPath = new List<object>(path) { group.Key };
                 var pathKey = string.Join("|", currentPath);
@@ -1265,9 +1272,16 @@ namespace Radzen.Blazor
                 node.Items = items;
                 return;
             }
+
             var row = pivotRows[level];
+
             var groups = items.GroupByMany(new string[]{ row.Property! });
-            foreach (var group in groups)
+
+            var sortedGroups = (row.GetSortOrder() == SortOrder.Ascending) ? groups.OrderBy(g => g.Key)
+                : (row.GetSortOrder() == SortOrder.Descending) ? groups.OrderByDescending(g => g.Key)
+                : groups;
+
+            foreach (var group in sortedGroups)
             {
                 var currentPath = new List<object>(path) { group.Key };
                 var pathKey = string.Join("|", currentPath);
