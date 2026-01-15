@@ -705,7 +705,7 @@ namespace Radzen.Blazor
         /// Selects the item from value.
         /// </summary>
         /// <param name="value">The value.</param>
-        protected override void SelectItemFromValue(object value)
+        protected override void SelectItemFromValue(object? value)
         {
             if (value != null && Query != null)
             {
