@@ -1,0 +1,228 @@
+@namespace Radzen.Blazor
+@using System.Globalization
+@typeparam TItem where TItem : notnull
+@inherits RadzenComponent
+
+@if (Visible)
+{
+<div @ref="@Element" id="@GetId()" class="@GetCssClass()" style="@RootStyle" @attributes="Attributes">
+    @if (ShowNavigation)
+    {
+        <div class="rz-gantt-header">
+            <div class="rz-scheduler-nav">
+                <div class="rz-scheduler-nav-prev-next">
+                    <button type="button"
+                            tabindex="0"
+                            class="rz-button rz-prev"
+                            @onclick="@OnGanttPrev"
+                            title="@SchedulerPrevText"
+                            disabled="@IsNavigationDisabled">
+                        <RadzenIcon Icon="chevron_left" />
+                    </button>
+                    <button type="button"
+                            tabindex="0"
+                            class="rz-button rz-next"
+                            @onclick="@OnGanttNext"
+                            title="@SchedulerNextText"
+                            disabled="@IsNavigationDisabled">
+                        <RadzenIcon Icon="chevron_right" />
+                    </button>
+                    <button type="button"
+                            tabindex="0"
+                            class="rz-button rz-today"
+                            @onclick="@OnGanttToday"
+                            title="@SchedulerTodayText"
+                            disabled="@IsNavigationDisabled">
+                        @SchedulerTodayText
+                    </button>
+                    <button type="button"
+                            tabindex="0"
+                            class="rz-button rz-zoom-to-fit"
+                            @onclick="@OnGanttZoomToFit"
+                            title="@ZoomToFitText"
+                            disabled="@IsNavigationDisabled">
+                        <RadzenIcon Icon="fit_screen" />
+                    </button>
+                </div>
+                <div class="rz-scheduler-nav-title">@SchedulerTitle</div>
+                <div class="rz-scheduler-nav-views">
+                    @foreach (var view in GanttViews)
+                    {
+                        <RadzenButton Click="@(() => OnGanttChangeView(view))"
+                                      Icon="@view.Icon"
+                                      Text="@view.Text"
+                                      class="@GetViewButtonCssClass(view)" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    <RadzenSplitter class="rz-gantt-splitter" Style="height: 100%;" ChangeStateOnResize="false">
+        <RadzenSplitterPane Size="@LeftPaneWidth" Collapsible="false">
+            <CascadingValue Value="@this" IsFixed="true">
+                <RadzenDataGrid @ref="grid"
+                                TItem="TItem"
+                                Data="@pagedData"
+                                Count="@gridCount"
+                                IsLoading="@IsLoading"
+                                LoadData="@OnGridLoadData"
+                                LoadChildData="@OnGridLoadChildData"
+                                AllowSorting="@AllowSorting"
+                                AllowMultiColumnSorting="@AllowMultiColumnSorting"
+                                ShowMultiColumnSortingIndex="@ShowMultiColumnSortingIndex"
+                                GotoFirstPageOnSort="@GotoFirstPageOnSort"
+                                AllowFiltering="@AllowFiltering"
+                                FilterMode="@FilterMode"
+                                LogicalFilterOperator="@LogicalFilterOperator"
+                                FilterCaseSensitivity="@FilterCaseSensitivity"
+                                FilterPopupRenderMode="@FilterPopupRenderMode"
+                                AllowPaging="@AllowPaging"
+                                PageSize="@PageSize"
+                                AllowColumnResize="@AllowColumnResize"
+                                AllowColumnReorder="@AllowColumnReorder"
+                                AllowColumnPicking="@AllowColumnPicking"
+                                AllowVirtualization="@AllowVirtualization"
+                                VirtualizationOverscanCount="@VirtualizationOverscanCount"
+                                GridLines="@GridLines"
+                                Density="@Density"
+                                ShowEmptyMessage="@ShowEmptyMessage"
+                                EmptyText="@EmptyText"
+                                Responsive="@Responsive"
+                                ShowHeader="@ShowHeader"
+                                EditMode="@EditMode"
+                                ExpandMode="@ExpandMode"
+                                AllowAlternatingRows="@AllowAlternatingRows"
+                                AllowRowSelectOnRowClick="@AllowRowSelectOnRowClick"
+                                ShowCellDataAsTooltip="@ShowCellDataAsTooltip"
+                                ShowColumnTitleAsTooltip="@ShowColumnTitleAsTooltip"
+                                AllowFilterDateInput="@AllowFilterDateInput"
+                                FilterText="@FilterText"
+                                AndOperatorText="@AndOperatorText"
+                                OrOperatorText="@OrOperatorText"
+                                ApplyFilterText="@ApplyFilterText"
+                                ClearFilterText="@ClearFilterText"
+                                EqualsText="@EqualsText"
+                                NotEqualsText="@NotEqualsText"
+                                LessThanText="@LessThanText"
+                                LessThanOrEqualsText="@LessThanOrEqualsText"
+                                GreaterThanText="@GreaterThanText"
+                                GreaterThanOrEqualsText="@GreaterThanOrEqualsText"
+                                ContainsText="@ContainsText"
+                                DoesNotContainText="@DoesNotContainText"
+                                StartsWithText="@StartsWithText"
+                                EndsWithText="@EndsWithText"
+                                IsNullText="@IsNullText"
+                                IsNotNullText="@IsNotNullText"
+                                IsEmptyText="@IsEmptyText"
+                                IsNotEmptyText="@IsNotEmptyText"
+                                RowRender="@OnGridRowRender"
+                                CellRender="@CellRender"
+                                HeaderCellRender="@HeaderCellRender"
+                                FooterCellRender="@FooterCellRender"
+                                Render="@Render"
+                                Sort="@OnGridSort"
+                                Filter="@OnGridFilter"
+                                FilterCleared="@OnGridFilterCleared"
+                                ColumnResized="@ColumnResized"
+                                ColumnReordering="@ColumnReordering"
+                                ColumnReordered="@ColumnReordered"
+                                RowClick="@RowClick"
+                                RowDoubleClick="@RowDoubleClick"
+                                CellClick="@CellClick"
+                                CellDoubleClick="@CellDoubleClick"
+                                CellContextMenu="@CellContextMenu"
+                                RowSelect="@RowSelect"
+                                RowDeselect="@RowDeselect"
+                                RowExpand="@OnGridRowExpand"
+                                RowCollapse="@OnGridRowCollapse"
+                                RowEdit="@RowEdit"
+                                RowUpdate="@RowUpdate"
+                                RowCreate="@RowCreate"
+                                KeyDown="@KeyDown"
+                                PageSizeChanged="@PageSizeChanged"
+                                PickedColumnsChanged="@PickedColumnsChanged"
+                                LoadSettings="@LoadSettings"
+                                SettingsChanged="@SettingsChanged"
+                                Style="height:100%;width:100%;">
+                    <Columns>
+                        @if (Columns != null)
+                        {
+                            @Columns
+                        }
+                        else 
+                        {
+                            if(!string.IsNullOrEmpty(IdProperty))
+                            {
+                                <RadzenGanttColumn TItem="TItem" Title="@IdProperty" Property="@IdProperty" />
+                            }
+                            else if(!string.IsNullOrEmpty(ParentIdProperty))
+                            {
+                                <RadzenGanttColumn TItem="TItem" Title="@ParentIdProperty" Property="@ParentIdProperty" />
+                            }
+                            else if(!string.IsNullOrEmpty(TextProperty))
+                            {
+                                <RadzenGanttColumn TItem="TItem" Title="@TextProperty" Property="@TextProperty" />
+                            }
+                            else if(!string.IsNullOrEmpty(StartProperty))
+                            {
+                                <RadzenGanttColumn TItem="TItem" Title="@StartProperty" Property="@StartProperty" />
+                            }
+                            else if(!string.IsNullOrEmpty(EndProperty))
+                            {
+                                <RadzenGanttColumn TItem="TItem" Title="@EndProperty" Property="@EndProperty" />
+                            }
+                            else if(!string.IsNullOrEmpty(ProgressProperty))
+                            {
+                                <RadzenGanttColumn TItem="TItem" Title="@ProgressProperty" Property="@ProgressProperty" />
+                            }
+                        }
+                    </Columns>
+                </RadzenDataGrid>
+            </CascadingValue>
+        </RadzenSplitterPane>
+
+        <RadzenSplitterPane Collapsible="false">
+            <CascadingValue Value="@this" IsFixed="true">
+                <RadzenScheduler @ref="scheduler"
+                                 TItem="TItem"
+                                 Data="@grid?.View"
+                                 StartProperty="@StartProperty"
+                                 EndProperty="@EndProperty"
+                                 TextProperty="@TextProperty"
+                                 Date="@SchedulerDate"
+                                 ShowHeader="false"
+                                 AppointmentMouseEnter="@OnTaskMouseEnter"
+                                 AppointmentMouseLeave="@OnTaskMouseLeave"
+                                 Style="height:100%;width:100%;">
+                    <Template Context="item">
+                        <div class="rz-gantt-bar-content">
+                            @if (TaskTemplate != null)
+                            {
+                                @TaskTemplate(item)
+                            }
+                            else
+                            {
+                                @if (!string.IsNullOrEmpty(ProgressProperty))
+                                {
+                                    var progress = progressGetter != null ? progressGetter(item) : null;
+                                    if (progress != null)
+                                    {
+                                        <div class="rz-gantt-bar-progress" style="@($"width:{progress.ToString(CultureInfo.InvariantCulture)}%;")"></div>
+                                    }
+                                }
+                                <span class="rz-gantt-bar-label">@(textGetter != null ? textGetter(item) : "")</span>
+                            }
+                        </div>
+                    </Template>
+                    <ChildContent>
+                        <RadzenGanttDayView @ref="dayView" TItem="TItem" />
+                        <RadzenGanttWeekView @ref="weekView" TItem="TItem" />
+                        <RadzenGanttMonthView @ref="monthView" TItem="TItem" />
+                        <RadzenGanttYearView @ref="yearView" TItem="TItem" />
+                    </ChildContent>
+                </RadzenScheduler>
+            </CascadingValue>
+        </RadzenSplitterPane>
+    </RadzenSplitter>
+</div>
+}

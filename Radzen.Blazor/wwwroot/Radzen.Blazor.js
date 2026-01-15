@@ -161,6 +161,423 @@ window.Radzen = {
           : 'margin-left:0px;';
     }
   },
+  ganttSyncScroll: function (ganttId) {
+    if (!ganttId) {
+      return;
+    }
+
+    var root = document.getElementById(ganttId);
+    if (!root) {
+      return;
+    }
+
+    var grid = root.querySelector('.rz-data-grid-data');
+    var timeline = root.querySelector('.rz-gantt-timeline-scroll');
+    if (!grid || !timeline) {
+      return;
+    }
+
+    var header = root.querySelector('.rz-gantt-table thead');
+    if (header) {
+      root.style.setProperty('--rz-gantt-header-height', header.getBoundingClientRect().height + 'px');
+    }
+
+    // Ensure both theads always have the same height so data rows stay aligned.
+    function syncHeaderHeights() {
+      var gridThead = grid.querySelector('thead');
+      var timelineThead = timeline.querySelector('thead');
+      if (gridThead && timelineThead) {
+        gridThead.style.height = '';
+        timelineThead.style.height = '';
+        var gridH = gridThead.getBoundingClientRect().height;
+        var timelineH = timelineThead.getBoundingClientRect().height;
+        var maxH = Math.max(gridH, timelineH);
+        if (gridH !== maxH || timelineH !== maxH) {
+          gridThead.style.height = maxH + 'px';
+          timelineThead.style.height = maxH + 'px';
+        }
+        root.style.setProperty('--rz-gantt-header-height', maxH + 'px');
+
+        var groupRow = timelineThead.querySelector('.rz-gantt-header-group-row');
+        if (groupRow) {
+          var groupH = groupRow.getBoundingClientRect().height;
+          root.style.setProperty('--rz-gantt-header-group-height', groupH + 'px');
+        } else {
+          root.style.setProperty('--rz-gantt-header-group-height', '0px');
+        }
+      }
+    }
+
+    function runSyncAfterLayout() {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(syncHeaderHeights);
+      });
+    }
+
+    runSyncAfterLayout();
+
+    var key = ganttId + '_ganttScrollSync';
+    var state = Radzen[key];
+
+    if (state && state.grid === grid && state.timeline === timeline) {
+      return;
+    }
+
+    if (state) {
+      if (state.grid && state.onGrid) {
+        state.grid.removeEventListener('scroll', state.onGrid);
+      }
+      if (state.timeline && state.onTimeline) {
+        state.timeline.removeEventListener('scroll', state.onTimeline);
+      }
+      if (state.grid && state.onGridWheel) {
+        state.grid.removeEventListener('wheel', state.onGridWheel);
+      }
+    }
+
+    var syncing = false;
+    var onGrid = function () {
+      if (syncing) {
+        return;
+      }
+      syncing = true;
+      timeline.scrollTop = grid.scrollTop;
+      syncing = false;
+    };
+    var onTimeline = function () {
+      if (syncing) {
+        return;
+      }
+      syncing = true;
+      grid.scrollTop = timeline.scrollTop;
+      syncing = false;
+    };
+
+    // The grid has overflow-y: hidden (no native vertical scrollbar).
+    // Forward vertical mouse-wheel events to the timeline so the user
+    // can still scroll vertically while hovering over the grid.
+    var onGridWheel = function (e) {
+      if (e.deltaY) {
+        timeline.scrollTop += e.deltaY;
+        e.preventDefault();
+      }
+    };
+
+    grid.addEventListener('scroll', onGrid);
+    timeline.addEventListener('scroll', onTimeline);
+    grid.addEventListener('wheel', onGridWheel, { passive: false });
+
+    var resizeObserver = null;
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(runSyncAfterLayout);
+      resizeObserver.observe(root);
+    }
+
+    Radzen[key] = {
+      grid: grid,
+      timeline: timeline,
+      onGrid: onGrid,
+      onTimeline: onTimeline,
+      onGridWheel: onGridWheel,
+      resizeObserver: resizeObserver
+    };
+
+    timeline.scrollTop = grid.scrollTop;
+  },
+  ganttSyncScrollDispose: function (ganttId) {
+    if (!ganttId) {
+      return;
+    }
+
+    var key = ganttId + '_ganttScrollSync';
+    var state = Radzen[key];
+    if (!state) {
+      return;
+    }
+
+    if (state.grid && state.onGrid) {
+      state.grid.removeEventListener('scroll', state.onGrid);
+    }
+    if (state.timeline && state.onTimeline) {
+      state.timeline.removeEventListener('scroll', state.onTimeline);
+    }
+    if (state.grid && state.onGridWheel) {
+      state.grid.removeEventListener('wheel', state.onGridWheel);
+    }
+    if (state.resizeObserver) {
+      state.resizeObserver.disconnect();
+    }
+
+    delete Radzen[key];
+  },
+  ganttInitDragResize: function (containerId, dotnetRef, timelineRangeMs, allowDrag, allowResize, rowHeightPx) {
+    var key = containerId + '_ganttDragResize';
+
+    if (Radzen[key]) {
+      Radzen[key].dotnetRef = dotnetRef;
+      Radzen[key].timelineRangeMs = timelineRangeMs;
+      Radzen[key].allowDrag = allowDrag;
+      Radzen[key].allowResize = allowResize;
+      Radzen[key].rowHeightPx = rowHeightPx || 36;
+      return;
+    }
+
+    var root = document.getElementById(containerId);
+    if (!root) return;
+
+    var container = root.querySelector('.rz-gantt-timeline-scroll');
+    if (!container) return;
+
+    var resizeThreshold = 6;
+    var dragThreshold = 3;
+    var drag = null;
+    var justDragged = false;
+
+    function getConfig() {
+      return Radzen[key];
+    }
+
+    function buildLinkPath(x1, x2, y1, y2, rh, linkType) {
+      var offset = 12;
+      var halfRow = rh * 0.5;
+      var exitRight = linkType === 0 || linkType === 2;
+      var enterRight = linkType === 2 || linkType === 3;
+      var exitDir = exitRight ? 1 : -1;
+      var enterDir = enterRight ? 1 : -1;
+      var exitX = x1 + offset * exitDir;
+      var enterX = x2 + offset * enterDir;
+      var canGoStraight = exitRight !== enterRight
+        ? (exitRight ? x2 - x1 > offset * 2 : x1 - x2 > offset * 2)
+        : (exitRight ? exitX < enterX : exitX > enterX);
+
+      if (canGoStraight && y1 !== y2) {
+        var midX = (exitX + enterX) / 2;
+        return 'M' + x1 + ',' + y1 + ' L' + midX + ',' + y1 + ' L' + midX + ',' + y2 + ' L' + x2 + ',' + y2;
+      }
+      var midY = y2 > y1 ? y1 + halfRow : (y2 < y1 ? y1 - halfRow : y1 + halfRow);
+      return 'M' + x1 + ',' + y1 + ' L' + exitX + ',' + y1 + ' L' + exitX + ',' + midY + ' L' + enterX + ',' + midY + ' L' + enterX + ',' + y2 + ' L' + x2 + ',' + y2;
+    }
+
+    function updateConnectedPaths() {
+      if (!drag) return;
+      var svg = container.querySelector('.rz-gantt-links');
+      if (!svg) return;
+
+      var config = getConfig();
+      var rh = config.rowHeightPx;
+      var svgWidth = svg.getBoundingClientRect().width;
+      var idx = drag.index;
+
+      var paths = svg.querySelectorAll('path[data-from-index="' + idx + '"], path[data-to-index="' + idx + '"]');
+      for (var i = 0; i < paths.length; i++) {
+        var path = paths[i];
+        var fromIdx = path.dataset.fromIndex;
+        var toIdx = path.dataset.toIndex;
+        var linkType = parseInt(path.dataset.linkType, 10) || 0;
+
+        var fromBar = container.querySelector('[data-index="' + fromIdx + '"]');
+        var toBar = container.querySelector('[data-index="' + toIdx + '"]');
+        if (!fromBar || !toBar) continue;
+
+        var fromRow = parseInt(fromBar.dataset.row, 10);
+        var toRow = parseInt(toBar.dataset.row, 10);
+
+        var fromLeft = parseFloat(fromBar.style.getPropertyValue('inset-inline-start')) || 0;
+        var fromWidth = parseFloat(fromBar.style.width) || 0;
+        var toLeft = parseFloat(toBar.style.getPropertyValue('inset-inline-start')) || 0;
+        var toWidth = parseFloat(toBar.style.width) || 0;
+        var fromIsMilestone = fromBar.classList.contains('rz-gantt-milestone');
+        var toIsMilestone = toBar.classList.contains('rz-gantt-milestone');
+
+        var x1, x2;
+        if (linkType === 1) { x1 = fromLeft; x2 = toLeft; }
+        else if (linkType === 2) { x1 = fromIsMilestone ? fromLeft : fromLeft + fromWidth; x2 = toIsMilestone ? toLeft : toLeft + toWidth; }
+        else if (linkType === 3) { x1 = fromLeft; x2 = toIsMilestone ? toLeft : toLeft + toWidth; }
+        else { x1 = fromIsMilestone ? fromLeft : fromLeft + fromWidth; x2 = toLeft; }
+
+        var x1px = (x1 / 100) * svgWidth;
+        var x2px = (x2 / 100) * svgWidth;
+        var y1 = (fromRow + 0.5) * rh;
+        var y2 = (toRow + 0.5) * rh;
+
+        path.setAttribute('d', buildLinkPath(x1px, x2px, y1, y2, rh, linkType));
+      }
+    }
+
+    function onMouseDown(e) {
+      var config = getConfig();
+      if (!config) return;
+
+      var bar = e.target.closest('.rz-gantt-bar, .rz-gantt-milestone');
+      if (!bar || e.button !== 0 || !bar.dataset.index) return;
+
+      var isMilestone = bar.classList.contains('rz-gantt-milestone');
+      var barRect = bar.getBoundingClientRect();
+      var offsetX = e.clientX - barRect.left;
+
+      var mode;
+      if (isMilestone) {
+        if (!config.allowDrag) return;
+        mode = 'move';
+      } else if (config.allowResize && offsetX <= resizeThreshold) {
+        mode = 'resize-start';
+      } else if (config.allowResize && barRect.width - offsetX <= resizeThreshold) {
+        mode = 'resize-end';
+      } else if (config.allowDrag) {
+        mode = 'move';
+      } else {
+        return;
+      }
+
+      e.preventDefault();
+
+      var containerEl = bar.closest('.rz-gantt-row-container');
+      var containerWidth = containerEl ? containerEl.getBoundingClientRect().width : 1;
+
+      drag = {
+        bar: bar,
+        mode: mode,
+        startClientX: e.clientX,
+        containerWidth: containerWidth,
+        originalLeft: parseFloat(bar.style.getPropertyValue('inset-inline-start')) || 0,
+        originalWidth: parseFloat(bar.style.width) || 0,
+        offsetStart: parseFloat(bar.dataset.offsetStart) || 0,
+        offsetEnd: parseFloat(bar.dataset.offsetEnd) || 0,
+        index: parseInt(bar.dataset.index, 10),
+        isMilestone: isMilestone,
+        hasMoved: false
+      };
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+    }
+
+    function onMouseMove(e) {
+      if (!drag) return;
+
+      var deltaX = e.clientX - drag.startClientX;
+      if (!drag.hasMoved && Math.abs(deltaX) < dragThreshold) return;
+      drag.hasMoved = true;
+
+      var percentDelta = (deltaX / drag.containerWidth) * 100;
+
+      if (drag.mode === 'move') {
+        drag.bar.style.setProperty('inset-inline-start', (drag.originalLeft + percentDelta) + '%');
+      } else if (drag.mode === 'resize-start') {
+        var newWidth = drag.originalWidth - percentDelta;
+        if (newWidth > 0.1) {
+          drag.bar.style.setProperty('inset-inline-start', (drag.originalLeft + percentDelta) + '%');
+          drag.bar.style.width = newWidth + '%';
+        }
+      } else if (drag.mode === 'resize-end') {
+        var newWidth = drag.originalWidth + percentDelta;
+        if (newWidth > 0.1) {
+          drag.bar.style.width = newWidth + '%';
+        }
+      }
+
+      drag.bar.style.zIndex = '10';
+      drag.bar.style.opacity = '0.85';
+      document.body.style.cursor = drag.mode === 'move' ? 'grabbing' : 'ew-resize';
+
+      updateConnectedPaths();
+    }
+
+    function onMouseUp(e) {
+      if (!drag) return;
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+
+      drag.bar.style.zIndex = '';
+      drag.bar.style.opacity = '';
+      document.body.style.cursor = '';
+
+      if (drag.hasMoved) {
+        justDragged = true;
+
+        var deltaX = e.clientX - drag.startClientX;
+        var percentDelta = (deltaX / drag.containerWidth) * 100;
+        var config = getConfig();
+        var msPerPercent = config.timelineRangeMs / 100;
+        var deltaMs = percentDelta * msPerPercent;
+
+        var newStartMs, newEndMs;
+        if (drag.mode === 'move') {
+          newStartMs = drag.offsetStart + deltaMs;
+          newEndMs = drag.offsetEnd + deltaMs;
+        } else if (drag.mode === 'resize-start') {
+          newStartMs = drag.offsetStart + deltaMs;
+          newEndMs = drag.offsetEnd;
+        } else {
+          newStartMs = drag.offsetStart;
+          newEndMs = drag.offsetEnd + deltaMs;
+        }
+
+        var eventType = drag.mode === 'move' ? 'move' : 'resize';
+        config.dotnetRef.invokeMethodAsync('OnGanttBarInteractionEnd', drag.index, eventType, newStartMs, newEndMs);
+      }
+
+      drag = null;
+    }
+
+    function onMouseMoveHover(e) {
+      if (drag) return;
+      var config = getConfig();
+      if (!config) return;
+
+      var bar = e.target.closest('.rz-gantt-bar, .rz-gantt-milestone');
+      if (!bar || !bar.dataset.index) return;
+
+      if (bar.classList.contains('rz-gantt-milestone')) {
+        bar.style.cursor = config.allowDrag ? 'grab' : '';
+        return;
+      }
+
+      var barRect = bar.getBoundingClientRect();
+      var offsetX = e.clientX - barRect.left;
+
+      if (config.allowResize && (offsetX <= resizeThreshold || barRect.width - offsetX <= resizeThreshold)) {
+        bar.style.cursor = 'ew-resize';
+      } else if (config.allowDrag) {
+        bar.style.cursor = 'grab';
+      }
+    }
+
+    function onClickCapture(e) {
+      if (justDragged) {
+        e.stopPropagation();
+        e.preventDefault();
+        justDragged = false;
+      }
+    }
+
+    container.addEventListener('mousedown', onMouseDown);
+    container.addEventListener('mousemove', onMouseMoveHover);
+    container.addEventListener('click', onClickCapture, true);
+
+    Radzen[key] = {
+      container: container,
+      dotnetRef: dotnetRef,
+      timelineRangeMs: timelineRangeMs,
+      allowDrag: allowDrag,
+      allowResize: allowResize,
+      rowHeightPx: rowHeightPx || 36,
+      onMouseDown: onMouseDown,
+      onMouseMoveHover: onMouseMoveHover,
+      onClickCapture: onClickCapture
+    };
+  },
+  ganttDisposeDragResize: function (containerId) {
+    var key = containerId + '_ganttDragResize';
+    var config = Radzen[key];
+    if (!config) return;
+
+    config.container.removeEventListener('mousedown', config.onMouseDown);
+    config.container.removeEventListener('mousemove', config.onMouseMoveHover);
+    config.container.removeEventListener('click', config.onClickCapture, true);
+    delete Radzen[key];
+  },
   preventDefaultAndStopPropagation: function (e) {
     e.preventDefault();
     e.stopPropagation();
@@ -1091,13 +1508,21 @@ window.Radzen = {
         }
     }, 500);
   },
-  openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback) {
+  openTooltip: function (target, id, delay, duration, position, closeTooltipOnDocumentClick, instance, callback, clientX, clientY) {
     Radzen.closeTooltip(id);
 
+    if (clientX != null && clientY != null) {
+        position = null;
+        disableSmartPosition = true;
+    }
+    else {
+        disableSmartPosition = false;
+    }
+
     if (delay) {
-        Radzen[id + 'delay'] = setTimeout(Radzen.openPopup, delay, target, id, false, position, null, null, instance, callback, closeTooltipOnDocumentClick);
+        Radzen[id + 'delay'] = setTimeout(Radzen.openPopup, delay, target, id, false, position, clientX, clientY, instance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
     } else {
-        Radzen.openPopup(target, id, false, position, null, null, instance, callback, closeTooltipOnDocumentClick);
+        Radzen.openPopup(target, id, false, position, clientX, clientY, instance, callback, closeTooltipOnDocumentClick, false, disableSmartPosition);
     }
 
     if (duration) {
@@ -1321,6 +1746,24 @@ window.Radzen = {
     if (position == 'top') {
       top = parentRect.top - rect.height + 5;
       left = isRTL ? parentRect.right - rect.width : parentRect.left;
+    }
+
+    if (disableSmartPosition && x != null && y != null) {
+        left = x + 10;
+        top = y + 10;
+        var tooltipContent = popup.children[0];
+        var tooltipContentClassName = 'rz-bottom-tooltip-content';
+        if (tooltipContent.classList.contains(tooltipContentClassName)) {
+            tooltipContent.classList.remove(tooltipContentClassName);
+        }
+
+        if (left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
+            top = parentRect.top - rect.height;
+        }
+
+        if (left + rect.width > window.innerWidth && window.innerWidth > rect.width) {
+            left = window.innerWidth - rect.width;
+        }
     }
 
     popup.style.zIndex = 2000;

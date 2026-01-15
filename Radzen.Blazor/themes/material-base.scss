@@ -1081,6 +1081,11 @@ $column-draggable-shadow: var(--rz-shadow-4) !default;
   --rz-grid-header-cell-border: #{$grid-cell-border};
 }
 
+// Gantt
+.rz-gantt .rz-data-grid {
+  --rz-grid-cell-padding: 0 1rem;
+}
+
 // Pager
 $pager-background-color: transparent !default;
 $pager-padding: 0.5rem 1rem !default;

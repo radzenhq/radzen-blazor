@@ -1,0 +1,266 @@
+@using RadzenBlazorDemos.Models
+
+<RadzenCard Variant="Variant.Outlined" class="rz-my-4">
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+        <div>Edit Mode:</div>
+        <RadzenSelectBar @bind-Value="@editMode" TextProperty="Text" ValueProperty="Value"
+                         Data="@(Enum.GetValues(typeof(DataGridEditMode)).Cast<DataGridEditMode>().Select(t => new { Text = $"{t}", Value = t }))"
+                         Size="ButtonSize.Small"
+                         Disabled="@(editMode == DataGridEditMode.Multiple && tasksToInsert.Count > 1)" />
+        <RadzenButton ButtonStyle="ButtonStyle.Success" Icon="add_circle" Text="Add New Task" Click="@InsertRow"
+                      Disabled="@(editMode == DataGridEditMode.Single && tasksToInsert.Count > 0)" class="rz-ms-2" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenGantt @ref="gantt"
+             TItem="GanttTask"
+             Data="@tasks"
+             IdProperty="@nameof(GanttTask.Id)"
+             ParentIdProperty="@nameof(GanttTask.ParentId)"
+             TextProperty="@nameof(GanttTask.Name)"
+             StartProperty="@nameof(GanttTask.Start)"
+             EndProperty="@nameof(GanttTask.End)"
+             ProgressProperty="@nameof(GanttTask.Progress)"
+             EditMode="@editMode"
+             RowUpdate="@OnUpdateRow"
+             RowCreate="@OnCreateRow"
+             AllowColumnResize="true"
+             AllowColumnReorder="true"
+             Style="width: 100%; height: 520px;">
+    <Columns>
+        <RadzenGanttColumn Title="Task" Property="@nameof(GanttTask.Name)" Width="140px" Frozen="true">
+            <EditTemplate Context="task">
+                <RadzenTextBox @bind-Value="task.Name" Style="width:100%" aria-label="Edit task name" />
+            </EditTemplate>
+        </RadzenGanttColumn>
+        <RadzenGanttColumn Title="Start" Property="@nameof(GanttTask.Start)" Width="140px" FormatString="{0:d}">
+            <EditTemplate Context="task">
+                <RadzenDatePicker @bind-Value="task.Start" Style="width:100%" aria-label="Edit start date" />
+            </EditTemplate>
+        </RadzenGanttColumn>
+        <RadzenGanttColumn Title="End" Property="@nameof(GanttTask.End)" Width="140px" FormatString="{0:d}">
+            <EditTemplate Context="task">
+                <RadzenDatePicker @bind-Value="task.End" Style="width:100%" aria-label="Edit end date" />
+            </EditTemplate>
+        </RadzenGanttColumn>
+        <RadzenGanttColumn Title="Progress" Property="@nameof(GanttTask.Progress)" Width="140px" FormatString="{0}" FormatProvider="@percentProvider">
+            <EditTemplate Context="task">
+                <RadzenNumeric @bind-Value="task.Progress" Min="0" Max="100" Step="5" Style="width:100%" aria-label="Edit progress" />
+            </EditTemplate>
+        </RadzenGanttColumn>
+        <RadzenGanttColumn Width="140px" Context="task" Filterable="false" Sortable="false" TextAlign="TextAlign.Right" Frozen="true" FrozenPosition="FrozenColumnPosition.Right">
+            <Template Context="task">
+                <RadzenButton Icon="add_circle" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter"
+                              Click="@(args => InsertAfterRow(task))" title="Add new task after this row"
+                              Disabled="@(editMode == DataGridEditMode.Single && tasksToInsert.Count > 0)" />
+                <RadzenButton Icon="edit" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                              Click="@(args => EditRow(task))" @onclick:stopPropagation="true" />
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter"
+                              class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(task))" @onclick:stopPropagation="true" />
+            </Template>
+            <EditTemplate Context="task">
+                <RadzenButton Icon="check" ButtonStyle="ButtonStyle.Success" Variant="Variant.Flat" Size="ButtonSize.Medium"
+                              Click="@(args => SaveRow(task))" aria-label="Save" />
+                <RadzenButton Icon="close" ButtonStyle="ButtonStyle.Light" Variant="Variant.Flat" Size="ButtonSize.Medium" class="rz-my-1 rz-ms-1"
+                              Click="@(args => CancelEdit(task))" aria-label="Cancel" />
+                <RadzenButton Icon="delete" ButtonStyle="ButtonStyle.Danger" Variant="Variant.Flat" Size="ButtonSize.Medium" Shade="Shade.Lighter"
+                              class="rz-my-1 rz-ms-1" Click="@(args => DeleteRow(task))" aria-label="Delete" />
+            </EditTemplate>
+        </RadzenGanttColumn>
+    </Columns>
+</RadzenGantt>
+
+@code {
+    RadzenGantt<GanttTask> gantt;
+    MyPercentProvider percentProvider = new();
+
+    DataGridEditMode editMode = DataGridEditMode.Single;
+
+    List<GanttTask> tasks = new();
+    int nextTaskId;
+
+    List<GanttTask> tasksToInsert = new();
+    List<GanttTask> tasksToUpdate = new();
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        tasks = new()
+        {
+            new() { Id = 1, Name = "Project", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(30), Progress = 35 },
+            new() { Id = 2, ParentId = 1, Name = "Discovery", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(5), Progress = 100 },
+            new() { Id = 3, ParentId = 1, Name = "Implementation", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(24), Progress = 25 },
+            new() { Id = 4, ParentId = 3, Name = "API", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(14), Progress = 60 },
+            new() { Id = 5, ParentId = 3, Name = "UI", Start = DateTime.Today.AddDays(10), End = DateTime.Today.AddDays(22), Progress = 10 },
+            new() { Id = 6, ParentId = 1, Name = "QA + Release", Start = DateTime.Today.AddDays(25), End = DateTime.Today.AddDays(30), Progress = 0 },
+            new() { Id = 7, ParentId = 2, Name = "Stakeholder interviews", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(1), Progress = 100 },
+            new() { Id = 8, ParentId = 2, Name = "Requirements", Start = DateTime.Today.AddDays(0), End = DateTime.Today.AddDays(4), Progress = 100 },
+            new() { Id = 9, ParentId = 3, Name = "Architecture", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(9), Progress = 40 },
+            new() { Id = 10, ParentId = 4, Name = "Auth endpoints", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(9), Progress = 80 },
+            new() { Id = 11, ParentId = 4, Name = "Data contracts", Start = DateTime.Today.AddDays(8), End = DateTime.Today.AddDays(12), Progress = 50 },
+            new() { Id = 12, ParentId = 4, Name = "Caching", Start = DateTime.Today.AddDays(11), End = DateTime.Today.AddDays(14), Progress = 20 },
+            new() { Id = 13, ParentId = 5, Name = "Layout", Start = DateTime.Today.AddDays(10), End = DateTime.Today.AddDays(13), Progress = 60 },
+            new() { Id = 14, ParentId = 5, Name = "Components", Start = DateTime.Today.AddDays(12), End = DateTime.Today.AddDays(18), Progress = 15 },
+            new() { Id = 15, ParentId = 5, Name = "Theme polish", Start = DateTime.Today.AddDays(18), End = DateTime.Today.AddDays(22), Progress = 0 },
+            new() { Id = 16, ParentId = 3, Name = "Integrations", Start = DateTime.Today.AddDays(14), End = DateTime.Today.AddDays(20), Progress = 10 },
+            new() { Id = 17, ParentId = 16, Name = "Payments", Start = DateTime.Today.AddDays(14), End = DateTime.Today.AddDays(17), Progress = 5 },
+            new() { Id = 18, ParentId = 16, Name = "Notifications", Start = DateTime.Today.AddDays(16), End = DateTime.Today.AddDays(20), Progress = 0 },
+            new() { Id = 19, ParentId = 6, Name = "Test plan", Start = DateTime.Today.AddDays(25), End = DateTime.Today.AddDays(26), Progress = 0 },
+            new() { Id = 20, ParentId = 6, Name = "Regression", Start = DateTime.Today.AddDays(26), End = DateTime.Today.AddDays(29), Progress = 0 },
+            new() { Id = 21, ParentId = 6, Name = "Release", Start = DateTime.Today.AddDays(29), End = DateTime.Today.AddDays(30), Progress = 0 },
+        };
+
+        nextTaskId = tasks.Max(t => t.Id) + 1;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await gantt.ExpandRows(tasks);
+        }
+    }
+
+    void Reset()
+    {
+        tasksToInsert.Clear();
+        tasksToUpdate.Clear();
+    }
+
+    void Reset(GanttTask task)
+    {
+        tasksToInsert.Remove(task);
+        tasksToUpdate.Remove(task);
+    }
+
+    async Task EditRow(GanttTask task)
+    {
+        if (!gantt.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        if (!tasksToUpdate.Contains(task))
+        {
+            tasksToUpdate.Add(task);
+        }
+
+        await gantt.EditRow(task);
+    }
+
+    async Task SaveRow(GanttTask task)
+    {
+        await gantt.UpdateRow(task);
+    }
+
+    void OnUpdateRow(GanttTask task)
+    {
+        Reset(task);
+    }
+
+    void OnCreateRow(GanttTask task)
+    {
+        if (!tasks.Contains(task))
+        {
+            tasks.Add(task);
+        }
+
+        tasksToInsert.Remove(task);
+    }
+
+    void CancelEdit(GanttTask task)
+    {
+        var isInsert = tasksToInsert.Contains(task);
+        Reset(task);
+        gantt.CancelEditRow(task);
+
+        if (isInsert)
+        {
+            tasks.Remove(task);
+            tasksToInsert.Remove(task);
+        }
+    }
+
+    async Task InsertRow()
+    {
+        if (!gantt.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var task = CreateTask();
+        tasksToInsert.Add(task);
+
+        await gantt.InsertRow(task);
+    }
+
+    async Task InsertAfterRow(GanttTask after)
+    {
+        if (!gantt.IsValid) return;
+
+        if (editMode == DataGridEditMode.Single)
+        {
+            Reset();
+        }
+
+        var task = CreateTask(after.ParentId);
+        tasksToInsert.Add(task);
+
+        await gantt.InsertAfterRow(task, after);
+    }
+
+    async Task DeleteRow(GanttTask task)
+    {
+        Reset(task);
+
+        if (tasks.Contains(task))
+        {
+            tasks.Remove(task);
+            await gantt.Reload();
+        }
+        else
+        {
+            gantt.CancelEditRow(task);
+            await gantt.Reload();
+        }
+    }
+
+    GanttTask CreateTask(int? parentId = null)
+    {
+        var start = DateTime.Today.AddDays(1);
+        return new GanttTask
+        {
+            Id = nextTaskId++,
+            ParentId = parentId,
+            Name = "New task",
+            Start = start,
+            End = start.AddDays(2),
+            Progress = 0
+        };
+    }
+
+    public class MyPercentProvider : IFormatProvider, ICustomFormatter
+    {
+        public string Format(string format, object arg, IFormatProvider formatProvider)
+        {
+            return string.Format("{0:P0}", (double?)arg / 100);
+        }
+
+        public object GetFormat(Type formatType)
+        {
+            if (formatType == typeof(ICustomFormatter))
+            {
+                return this;
+            }
+
+            return null;
+        }
+    }
+}

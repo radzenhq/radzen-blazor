@@ -1,0 +1,15 @@
+@page "/gantt-filtering"
+
+<PageTitle>Gantt Filtering - Radzen Blazor Components</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Gantt Filtering
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    The Radzen Blazor <strong>Gantt</strong> component supports <code>Simple</code>, <code>SimpleWithMenu</code>, and <code>Advanced</code> filter modes
+    via the <code>FilterMode</code> property. Use the dropdowns below to switch between modes and logical operators at runtime.
+</RadzenText>
+
+<RadzenExample ComponentName="Gantt" Example="GanttFiltering" AdditionalSourceCodePages=@(new [] { "/demos/Models/GanttTask.cs" })>
+    <GanttFiltering />
+</RadzenExample>

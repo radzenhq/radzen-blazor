@@ -1,0 +1,94 @@
+@using RadzenBlazorDemos.Models
+@inject TooltipService TooltipService
+
+<RadzenGantt @ref="gantt" TItem="GanttTask"
+             Data="@tasks"
+             IdProperty="@nameof(GanttTask.Id)"
+             ParentIdProperty="@nameof(GanttTask.ParentId)"
+             TextProperty="@nameof(GanttTask.Name)"
+             StartProperty="@nameof(GanttTask.Start)"
+             EndProperty="@nameof(GanttTask.End)"
+             ProgressProperty="@nameof(GanttTask.Progress)"
+             TaskMouseEnter="@OnTaskMouseEnter"
+             TaskMouseLeave="@OnTaskMouseLeave"
+             Style="width: 100%; height: 520px;"
+             AllowColumnResize="true" AllowColumnReorder="true">
+    <Columns>
+        <RadzenGanttColumn Title="Task" Property="@nameof(GanttTask.Name)" Frozen="true" />
+        <RadzenGanttColumn Title="Start" Property="@nameof(GanttTask.Start)" Width="120px" FormatString="{0:d}" />
+        <RadzenGanttColumn Title="End" Property="@nameof(GanttTask.End)" Width="120px" FormatString="{0:d}" />
+    </Columns>
+</RadzenGantt>
+
+@code {
+    RadzenGantt<GanttTask> gantt;
+
+    List<GanttTask> tasks = new()
+    {
+        new() { Id = 1, Name = "Project", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(30), Progress = 35 },
+        new() { Id = 2, ParentId = 1, Name = "Discovery", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(5), Progress = 100 },
+        new() { Id = 3, ParentId = 1, Name = "Implementation", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(24), Progress = 25 },
+        new() { Id = 4, ParentId = 3, Name = "API", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(14), Progress = 60 },
+        new() { Id = 5, ParentId = 3, Name = "UI", Start = DateTime.Today.AddDays(10), End = DateTime.Today.AddDays(22), Progress = 10 },
+        new() { Id = 6, ParentId = 1, Name = "QA + Release", Start = DateTime.Today.AddDays(25), End = DateTime.Today.AddDays(30), Progress = 0 },
+        new() { Id = 7, ParentId = 2, Name = "Stakeholder interviews", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(1), Progress = 100 },
+        new() { Id = 8, ParentId = 2, Name = "Requirements", Start = DateTime.Today.AddDays(0), End = DateTime.Today.AddDays(4), Progress = 100 },
+        new() { Id = 9, ParentId = 3, Name = "Architecture", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(9), Progress = 40 },
+        new() { Id = 10, ParentId = 4, Name = "Auth endpoints", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(9), Progress = 80 },
+        new() { Id = 11, ParentId = 4, Name = "Data contracts", Start = DateTime.Today.AddDays(8), End = DateTime.Today.AddDays(12), Progress = 50 },
+        new() { Id = 12, ParentId = 4, Name = "Caching", Start = DateTime.Today.AddDays(11), End = DateTime.Today.AddDays(14), Progress = 20 },
+        new() { Id = 13, ParentId = 5, Name = "Layout", Start = DateTime.Today.AddDays(10), End = DateTime.Today.AddDays(13), Progress = 60 },
+        new() { Id = 14, ParentId = 5, Name = "Components", Start = DateTime.Today.AddDays(12), End = DateTime.Today.AddDays(18), Progress = 15 },
+        new() { Id = 15, ParentId = 5, Name = "Theme polish", Start = DateTime.Today.AddDays(18), End = DateTime.Today.AddDays(22), Progress = 0 },
+        new() { Id = 16, ParentId = 3, Name = "Integrations", Start = DateTime.Today.AddDays(14), End = DateTime.Today.AddDays(20), Progress = 10 },
+        new() { Id = 17, ParentId = 16, Name = "Payments", Start = DateTime.Today.AddDays(14), End = DateTime.Today.AddDays(17), Progress = 5 },
+        new() { Id = 18, ParentId = 16, Name = "Notifications", Start = DateTime.Today.AddDays(16), End = DateTime.Today.AddDays(20), Progress = 0 },
+        new() { Id = 19, ParentId = 6, Name = "Test plan", Start = DateTime.Today.AddDays(25), End = DateTime.Today.AddDays(26), Progress = 0 },
+        new() { Id = 20, ParentId = 6, Name = "Regression", Start = DateTime.Today.AddDays(26), End = DateTime.Today.AddDays(29), Progress = 0 },
+        new() { Id = 21, ParentId = 6, Name = "Release", Start = DateTime.Today.AddDays(29), End = DateTime.Today.AddDays(30), Progress = 0 },
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await gantt.ExpandRows(tasks);
+        }
+    }
+
+    void OnTaskMouseEnter(GanttTaskMouseEventArgs<GanttTask> args)
+    {
+        TooltipService.Open(args.Element, ts =>
+    @<RadzenStack Orientation="Orientation.Vertical" Gap="0" class="rz-p-6" Style="min-width: 250px; max-width: 500px;">
+        <RadzenText TextStyle="TextStyle.Subtitle1" class="rz-mb-2" Style="color: var(--rz-tooltip-color);">
+            @args.Data?.Name
+        </RadzenText>
+        <RadzenText TextStyle="TextStyle.H3" class="rz-mb-4" Style="color: var(--rz-tooltip-color);">
+            @($"{args.Data?.Progress ?? 0} %")
+        </RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color); width: 44px;">
+                <strong>Start</strong>
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color);">
+                @args.Data?.Start.ToString("hh:mm tt ddd, MMM d")
+            </RadzenText>
+        </RadzenStack>
+        <RadzenStack Orientation="Orientation.Horizontal" Gap="4px">
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color); width: 44px;">
+                <strong>End</strong>
+            </RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-tooltip-color);">
+                @args.Data?.End.ToString("hh:mm tt ddd, MMM d")
+            </RadzenText>
+        </RadzenStack>
+    </RadzenStack>, new TooltipOptions { ClientX = args.ClientX, ClientY = args.ClientY, Duration = null });
+    }
+
+    void OnTaskMouseLeave(GanttTaskMouseEventArgs<GanttTask> args)
+    {
+        TooltipService.Close();
+    }
+}

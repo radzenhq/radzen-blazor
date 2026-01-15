@@ -1,0 +1,78 @@
+@using RadzenBlazorDemos.Models
+
+<RadzenGantt @ref="gantt" TItem="GanttTask"
+             Data="@tasks"
+             Dependencies="@dependencies"
+             ShowCriticalPath="true"
+             IdProperty="@nameof(GanttTask.Id)"
+             ParentIdProperty="@nameof(GanttTask.ParentId)"
+             TextProperty="@nameof(GanttTask.Name)"
+             StartProperty="@nameof(GanttTask.Start)"
+             EndProperty="@nameof(GanttTask.End)"
+             ProgressProperty="@nameof(GanttTask.Progress)"
+             Style="width: 100%; height: 520px;">
+    <Columns>
+        <RadzenGanttColumn Title="Task" Property="@nameof(GanttTask.Name)" Frozen="true" Width="200px" />
+        <RadzenGanttColumn Title="Start" Property="@nameof(GanttTask.Start)" Width="110px" FormatString="{0:d}" />
+        <RadzenGanttColumn Title="End" Property="@nameof(GanttTask.End)" Width="110px" FormatString="{0:d}" />
+    </Columns>
+</RadzenGantt>
+
+<div class="rz-mt-4">
+    <RadzenText TextStyle="TextStyle.Body2">
+        <strong style="color:var(--rz-danger)">Red</strong> bars and arrows represent the critical path.
+        Delaying any of these tasks will delay the entire project.
+    </RadzenText>
+</div>
+
+@code {
+    RadzenGantt<GanttTask> gantt;
+    List<GanttTask> tasks;
+    List<GanttDependency<GanttTask>> dependencies;
+
+    protected override void OnInitialized()
+    {
+        var today = DateTime.Today;
+
+        tasks = new()
+        {
+            new() { Id = 1, Name = "Project", Start = today, End = today.AddDays(24), Progress = 30 },
+
+            new() { Id = 2, ParentId = 1, Name = "Planning", Start = today, End = today.AddDays(6), Progress = 90 },
+            new() { Id = 3, ParentId = 2, Name = "Requirements", Start = today, End = today.AddDays(3), Progress = 100 },
+            new() { Id = 4, ParentId = 2, Name = "Architecture", Start = today.AddDays(3), End = today.AddDays(6), Progress = 80 },
+            new() { Id = 5, ParentId = 2, Name = "Database design", Start = today.AddDays(3), End = today.AddDays(5), Progress = 60 },
+
+            new() { Id = 6, ParentId = 1, Name = "Development", Start = today.AddDays(6), End = today.AddDays(18), Progress = 15 },
+            new() { Id = 7, ParentId = 6, Name = "API development", Start = today.AddDays(6), End = today.AddDays(14), Progress = 30 },
+            new() { Id = 8, ParentId = 6, Name = "UI development", Start = today.AddDays(6), End = today.AddDays(12), Progress = 20 },
+            new() { Id = 9, ParentId = 6, Name = "Integration", Start = today.AddDays(14), End = today.AddDays(18), Progress = 0 },
+
+            new() { Id = 10, ParentId = 1, Name = "Release", Start = today.AddDays(18), End = today.AddDays(24), Progress = 0 },
+            new() { Id = 11, ParentId = 10, Name = "Testing", Start = today.AddDays(18), End = today.AddDays(22), Progress = 0 },
+            new() { Id = 12, ParentId = 10, Name = "Documentation", Start = today.AddDays(12), End = today.AddDays(16), Progress = 0 },
+            new() { Id = 13, ParentId = 10, Name = "Deployment", Start = today.AddDays(22), End = today.AddDays(24), Progress = 0 },
+        };
+
+        dependencies = new()
+        {
+            new() { From = tasks[2], To = tasks[3] },
+            new() { From = tasks[2], To = tasks[4] },
+            new() { From = tasks[3], To = tasks[6] },
+            new() { From = tasks[3], To = tasks[7] },
+            new() { From = tasks[4], To = tasks[6] },
+            new() { From = tasks[6], To = tasks[8] },
+            new() { From = tasks[7], To = tasks[11] },
+            new() { From = tasks[8], To = tasks[10] },
+            new() { From = tasks[10], To = tasks[12] },
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await gantt.ExpandRows(tasks);
+        }
+    }
+}

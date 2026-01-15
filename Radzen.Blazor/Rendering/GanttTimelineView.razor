@@ -1,0 +1,656 @@
+@using Radzen
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+@using Microsoft.JSInterop
+@using System.Collections.Generic
+@using System.Linq
+@typeparam TItem where TItem : notnull
+@inherits DropableViewBase
+@inject IJSRuntime JSRuntime
+@implements IAsyncDisposable
+
+<div class="rz-gantt-timeline-view">
+    <div class="rz-gantt-timeline-scroll">
+      <div class="rz-gantt-timeline-content">
+        @{
+            var appointmentsByRow = BuildAppointmentsByRow();
+            var links = BuildLinks();
+        }
+        <table class="rz-gantt-table" style="@($"width: {TimelineWidthPx}px; min-width: 100%;")">
+            <thead>
+                @{
+                    var groups = BuildHeaderGroups();
+                    var hasGroups = groups.Count > 0 && groups.Any(g => !string.IsNullOrEmpty(g.Label));
+                }
+                @if (hasGroups)
+                {
+                    <tr class="rz-gantt-header-group-row">
+                        @foreach (var group in groups)
+                        {
+                            <th class="rz-gantt-table-header-cell rz-gantt-table-header-group" colspan="@group.Span"
+                                style="@($"width:{group.WidthPx.ToInvariantString()}px;")">
+                                @group.Label
+                            </th>
+                        }
+                    </tr>
+                }
+                <tr>
+                    @foreach (var column in Columns)
+                    {
+                        var headerNonWorking = ShowWeekends && NonWorkingDays != null && NonWorkingDays.Contains(column.Start.DayOfWeek);
+                        <th class="@($"rz-gantt-table-header-cell{(headerNonWorking ? " rz-gantt-nonworking" : "")}")" style="@($"width:{column.WidthPx}px;")">
+                            @column.Label
+                        </th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @for (var row = 0; row < RowCount; row++)
+                {
+                    appointmentsByRow.TryGetValue(row, out var rowAppointments);
+                    <tr class="rz-gantt-table-row">
+                        <td class="rz-gantt-table-cell" colspan="@Columns.Count" style="@($"height:{RowHeightPx}px;")">
+                            <div class="rz-gantt-row-container" style="@($"width:{TimelineWidthPx}px;font-size:{RowHeightPx}px;")">
+                                <div class="rz-gantt-row-grid" style="@($"width:{TimelineWidthPx}px;")">
+                                    @foreach (var column in Columns)
+                                    {
+                                        var isNonWorking = ShowWeekends && NonWorkingDays != null && NonWorkingDays.Contains(column.Start.DayOfWeek);
+                                        <div class="@($"rz-gantt-row-grid-col{(isNonWorking ? " rz-gantt-nonworking" : "")}")" style="@($"width:{column.WidthPx}px;")"></div>
+                                    }
+                                </div>
+                                @if (rowAppointments != null)
+                                {
+                                    foreach (var appointment in rowAppointments)
+                                    {
+                                        var baselinePlacement = GetBaselinePlacement(appointment);
+                                        if (baselinePlacement.HasValue)
+                                        {
+                                            <div class="rz-gantt-baseline" style="@($"inset-inline-start:{baselinePlacement.Value.LeftPercent.ToInvariantString()}%;width:{baselinePlacement.Value.WidthPercent.ToInvariantString()}%;inset-block-start:0.65em;height:0.2em;")" />
+                                        }
+
+                                        var isCritical = CriticalItems != null && appointment.Data != null && CriticalItems.Contains(appointment.Data);
+                                        var barRenderArgs = GetBarRenderArgs(appointment, isCritical);
+
+                                        if (IsMilestone(appointment))
+                                        {
+                                            var leftPercent = GetXPercent(appointment.Start);
+                                            if (leftPercent.HasValue)
+                                            {
+                                                <Appointment Data=@appointment
+                                                             Top="0.2"
+                                                             Left=@leftPercent.Value
+                                                             CssClass="@barRenderArgs.barCss"
+                                                             ShowAppointmentContent="false"
+                                                             Click=@OnAppointmentClick
+                                                             DragStart=@OnAppointmentDragStart
+                                                             AdditionalAttributes=@MergeAttributes(GetBarAttributes(appointment), barRenderArgs.extraAttrs) />
+                                            }
+                                        }
+                                        else
+                                        {
+                                            var placement = GetPlacementPercent(appointment);
+                                            if (placement.HasValue)
+                                            {
+                                                <Appointment Data=@appointment
+                                                             Top="@(baselinePlacement.HasValue ? 0.1 : 0.2)"
+                                                             Left=@placement.Value.LeftPercent
+                                                             Width=@placement.Value.WidthPercent
+                                                             Height="@(baselinePlacement.HasValue ? 0.55 : 0.6)"
+                                                             CssClass="@barRenderArgs.barCss"
+                                                             Click=@OnAppointmentClick
+                                                             DragStart=@OnAppointmentDragStart
+                                                             AdditionalAttributes=@MergeAttributes(GetBarAttributes(appointment), barRenderArgs.extraAttrs) />
+                                            }
+                                        }
+                                    }
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <svg class="rz-gantt-links" style="@($"width:{TimelineWidthPx}px;height:{RowCount * RowHeightPx}px;")">
+            <defs>
+                <marker id="rz-gantt-link-arrow-end" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" class="rz-gantt-link-arrow" />
+                </marker>
+                <marker id="rz-gantt-link-arrow-end-critical" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                    <path d="M0,0 L6,3 L0,6 Z" class="rz-gantt-link-arrow rz-gantt-link-arrow-critical" />
+                </marker>
+            </defs>
+            @foreach (var link in links)
+            {
+                var isCritical = link.CssClass != null && link.CssClass.Contains("critical");
+                var markerUrl = isCritical ? "url(#rz-gantt-link-arrow-end-critical)" : "url(#rz-gantt-link-arrow-end)";
+                <path d="@BuildLinkPath(link)" class="@(link.CssClass ?? "rz-gantt-link")" marker-end="@markerUrl"
+                      data-from-index="@link.FromIndex" data-to-index="@link.ToIndex" data-link-type="@((int)link.Type)" />
+            }
+        </svg>
+        @if (ShowTodayLine)
+        {
+            var todayPercent = GetXPercent(DateTime.Now);
+            if (todayPercent.HasValue && todayPercent.Value >= 0 && todayPercent.Value <= 100)
+            {
+                <div class="rz-gantt-today-line" style="@($"inset-inline-start:{todayPercent.Value.ToInvariantString()}%;")" />
+            }
+        }
+        @if (Markers != null)
+        {
+            foreach (var m in Markers)
+            {
+                var mPercent = GetXPercent(m.Date);
+                if (mPercent.HasValue && mPercent.Value >= 0 && mPercent.Value <= 100)
+                {
+                    var mColor = !string.IsNullOrWhiteSpace(m.Color) ? m.Color : null;
+                    var mStyle = mColor != null
+                        ? $"inset-inline-start:{mPercent.Value.ToInvariantString()}%;--rz-gantt-marker-color:{mColor};"
+                        : $"inset-inline-start:{mPercent.Value.ToInvariantString()}%;";
+                    <div class="rz-gantt-marker" style="@mStyle">
+                        @if (!string.IsNullOrWhiteSpace(m.Label))
+                        {
+                            <span class="rz-gantt-marker-label">@m.Label</span>
+                        }
+                    </div>
+                }
+            }
+        }
+      </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public DateTime StartDate { get; set; }
+
+    [Parameter]
+    public DateTime EndDate { get; set; }
+
+    [Parameter]
+    public IReadOnlyList<GanttTimelineColumn> Columns { get; set; } = Array.Empty<GanttTimelineColumn>();
+
+    [Parameter]
+    public string? HeaderLabel { get; set; }
+
+    [Parameter]
+    public int RowCount { get; set; }
+
+    [Parameter]
+    public IReadOnlyDictionary<object, int>? RowIndexByItem { get; set; }
+
+    [Parameter]
+    public double TimelineWidthPx { get; set; }
+
+    [Parameter]
+    public int RowHeightPx { get; set; } = 36;
+
+    [Parameter]
+    public IEnumerable<AppointmentData>? Appointments { get; set; }
+
+    [Parameter]
+    public IEnumerable<GanttDependency<TItem>>? Dependencies { get; set; }
+
+    [Parameter]
+    public HashSet<object>? CriticalItems { get; set; }
+
+    [Parameter]
+    public string? BaselineStartProperty { get; set; }
+
+    [Parameter]
+    public string? BaselineEndProperty { get; set; }
+
+    [Parameter]
+    public bool ShowTodayLine { get; set; }
+
+    [Parameter]
+    public bool ShowWeekends { get; set; }
+
+    [Parameter]
+    public IEnumerable<DayOfWeek>? NonWorkingDays { get; set; }
+
+    [Parameter]
+    public IEnumerable<GanttMarker>? Markers { get; set; }
+
+    [Parameter]
+    public Action<GanttBarRenderEventArgs<TItem>>? TaskRender { get; set; }
+
+    [CascadingParameter]
+    public IScheduler? Scheduler { get; set; }
+
+    [CascadingParameter]
+    internal RadzenGantt<TItem>? Gantt { get; set; }
+
+    private List<AppointmentData>? flatAppointments;
+    private Dictionary<AppointmentData, int>? appointmentIndices;
+    private Dictionary<AppointmentData, int>? appointmentRowIndices;
+    private DotNetObjectReference<GanttTimelineView<TItem>>? dotnetRef;
+
+    private static bool IsMilestone(AppointmentData appointment) => appointment.Start == appointment.End;
+
+    private (string barCss, IDictionary<string, object>? extraAttrs) GetBarRenderArgs(AppointmentData appointment, bool isCritical)
+    {
+        var baseCss = IsMilestone(appointment) ? "rz-gantt-milestone" : "rz-gantt-bar";
+        if (isCritical) baseCss += " rz-gantt-critical";
+
+        if (TaskRender == null || appointment.Data is not TItem item)
+        {
+            return (baseCss, null);
+        }
+
+        var args = new GanttBarRenderEventArgs<TItem> { Data = item };
+        TaskRender(args);
+
+        if (!string.IsNullOrWhiteSpace(args.CssClass))
+        {
+            baseCss += " " + args.CssClass;
+        }
+        return (baseCss, args.Attributes.Count > 0 ? args.Attributes : null);
+    }
+
+    private static IReadOnlyDictionary<string, object> MergeAttributes(IReadOnlyDictionary<string, object> baseAttrs, IDictionary<string, object>? extra)
+    {
+        if (extra == null || extra.Count == 0) return baseAttrs;
+        var merged = new Dictionary<string, object>(baseAttrs);
+        foreach (var kv in extra)
+        {
+            if (kv.Key == "style" && merged.TryGetValue("style", out var existing))
+            {
+                merged["style"] = existing.ToString()?.TrimEnd(';') + ";" + kv.Value;
+            }
+            else
+            {
+                merged[kv.Key] = kv.Value;
+            }
+        }
+        return merged;
+    }
+
+    private IReadOnlyDictionary<string, object> GetBarAttributes(AppointmentData appointment)
+    {
+        var index = appointmentIndices != null && appointmentIndices.TryGetValue(appointment, out var idx) ? idx : -1;
+        var row = appointmentRowIndices != null && appointmentRowIndices.TryGetValue(appointment, out var r) ? r : -1;
+        var offsetStartMs = (appointment.Start - StartDate).TotalMilliseconds;
+        var offsetEndMs = (appointment.End - StartDate).TotalMilliseconds;
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
+        return new Dictionary<string, object>
+        {
+            ["data-index"] = index.ToString(inv),
+            ["data-row"] = row.ToString(inv),
+            ["data-offset-start"] = offsetStartMs.ToString(inv),
+            ["data-offset-end"] = offsetEndMs.ToString(inv)
+        };
+    }
+
+    [JSInvokable]
+    public async Task OnGanttBarInteractionEnd(int index, string mode, double newStartMs, double newEndMs)
+    {
+        if (Gantt == null || flatAppointments == null || index < 0 || index >= flatAppointments.Count)
+        {
+            return;
+        }
+
+        var appointment = flatAppointments[index];
+        var newStart = StartDate.AddMilliseconds(newStartMs);
+        var newEnd = StartDate.AddMilliseconds(newEndMs);
+
+        await Gantt.HandleTaskBarInteraction(appointment, mode, newStart, newEnd);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var allowDrag = Gantt?.TaskMove.HasDelegate == true;
+        var allowResize = Gantt?.TaskResize.HasDelegate == true;
+
+        if (allowDrag || allowResize)
+        {
+            dotnetRef ??= DotNetObjectReference.Create(this);
+            var timelineRangeMs = (EndDate - StartDate).TotalMilliseconds;
+            var ganttId = Gantt?.GanttElementId;
+            if (ganttId != null)
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.ganttInitDragResize", ganttId, dotnetRef, timelineRangeMs, allowDrag, allowResize, RowHeightPx);
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        var ganttId = Gantt?.GanttElementId;
+        if (ganttId != null)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("Radzen.ganttDisposeDragResize", ganttId);
+            }
+            catch
+            {
+            }
+        }
+        dotnetRef?.Dispose();
+        dotnetRef = null;
+    }
+
+    private string? cachedBaselineStartProp;
+    private string? cachedBaselineEndProp;
+    private Func<TItem, object>? cachedBsGetter;
+    private Func<TItem, object>? cachedBeGetter;
+
+    private Func<TItem, object>? GetBaselineStartGetter()
+    {
+        if (cachedBsGetter == null || cachedBaselineStartProp != BaselineStartProperty)
+        {
+            cachedBaselineStartProp = BaselineStartProperty;
+            cachedBsGetter = !string.IsNullOrWhiteSpace(BaselineStartProperty) ? PropertyAccess.Getter<TItem, object>(BaselineStartProperty) : null;
+        }
+        return cachedBsGetter;
+    }
+
+    private Func<TItem, object>? GetBaselineEndGetter()
+    {
+        if (cachedBeGetter == null || cachedBaselineEndProp != BaselineEndProperty)
+        {
+            cachedBaselineEndProp = BaselineEndProperty;
+            cachedBeGetter = !string.IsNullOrWhiteSpace(BaselineEndProperty) ? PropertyAccess.Getter<TItem, object>(BaselineEndProperty) : null;
+        }
+        return cachedBeGetter;
+    }
+
+    private (double LeftPercent, double WidthPercent)? GetBaselinePlacement(AppointmentData appointment)
+    {
+        var bsGetter = GetBaselineStartGetter();
+        var beGetter = GetBaselineEndGetter();
+        if (bsGetter == null || beGetter == null)
+        {
+            return null;
+        }
+
+        if (appointment.Data is not TItem item)
+        {
+            return null;
+        }
+
+        var bsVal = bsGetter(item);
+        var beVal = beGetter(item);
+        DateTime? bs = bsVal is DateTime d1 ? d1 : (bsVal is DateTimeOffset o1 ? o1.DateTime : null);
+        DateTime? be = beVal is DateTime d2 ? d2 : (beVal is DateTimeOffset o2 ? o2.DateTime : null);
+
+        if (!bs.HasValue || !be.HasValue || be.Value <= bs.Value)
+        {
+            return null;
+        }
+
+        var rangeStart = StartDate;
+        var rangeEnd = EndDate;
+        var totalTicks = (rangeEnd - rangeStart).Ticks;
+        if (totalTicks <= 0) return null;
+
+        var start = bs.Value < rangeStart ? rangeStart : bs.Value;
+        var end = be.Value > rangeEnd ? rangeEnd : be.Value;
+        if (end <= start) return null;
+
+        var left = ((start - rangeStart).Ticks / (double)totalTicks) * 100.0;
+        var width = ((end - start).Ticks / (double)totalTicks) * 100.0;
+        return (left, width);
+    }
+
+    private (double LeftPercent, double WidthPercent)? GetPlacementPercent(AppointmentData appointment)
+    {
+        if (Columns.Count == 0 || TimelineWidthPx <= 0 || EndDate <= StartDate)
+        {
+            return null;
+        }
+
+        var rangeStart = StartDate;
+        var rangeEnd = EndDate;
+
+        var start = appointment.Start < rangeStart ? rangeStart : appointment.Start;
+        var end = appointment.End > rangeEnd ? rangeEnd : appointment.End;
+        if (end <= start)
+        {
+            end = start.AddHours(1);
+        }
+
+        var totalTicks = (rangeEnd - rangeStart).Ticks;
+        if (totalTicks <= 0)
+        {
+            return null;
+        }
+
+        var leftTicks = (start - rangeStart).Ticks;
+        var widthTicks = (end - start).Ticks;
+
+        var left = (leftTicks / (double)totalTicks) * 100.0;
+        var width = (Math.Max(1, widthTicks) / (double)totalTicks) * 100.0;
+
+        return (left, width);
+    }
+
+    private IReadOnlyDictionary<int, List<AppointmentData>> BuildAppointmentsByRow()
+    {
+        var map = new Dictionary<int, List<AppointmentData>>();
+        flatAppointments = new List<AppointmentData>();
+        appointmentIndices = new Dictionary<AppointmentData, int>();
+        appointmentRowIndices = new Dictionary<AppointmentData, int>();
+
+        if (Appointments == null || RowIndexByItem == null)
+        {
+            return map;
+        }
+
+        int index = 0;
+        foreach (var appointment in Appointments)
+        {
+            if (appointment.Data == null)
+            {
+                continue;
+            }
+
+            if (!RowIndexByItem.TryGetValue(appointment.Data, out var rowIndex))
+            {
+                continue;
+            }
+
+            if (!map.TryGetValue(rowIndex, out var list))
+            {
+                list = new List<AppointmentData>();
+                map[rowIndex] = list;
+            }
+
+            list.Add(appointment);
+            appointmentIndices[appointment] = index;
+            appointmentRowIndices[appointment] = rowIndex;
+            flatAppointments.Add(appointment);
+            index++;
+        }
+
+        return map;
+    }
+
+    private sealed record HeaderGroup(string Label, int Span, double WidthPx);
+
+    private IReadOnlyList<HeaderGroup> BuildHeaderGroups()
+    {
+        var result = new List<HeaderGroup>();
+        if (Columns.Count == 0) return result;
+
+        string? currentLabel = null;
+        int span = 0;
+        double width = 0;
+
+        foreach (var col in Columns)
+        {
+            if (col.GroupLabel == currentLabel)
+            {
+                span++;
+                width += col.WidthPx;
+            }
+            else
+            {
+                if (currentLabel != null)
+                {
+                    result.Add(new HeaderGroup(currentLabel, span, width));
+                }
+                currentLabel = col.GroupLabel;
+                span = 1;
+                width = col.WidthPx;
+            }
+        }
+
+        if (currentLabel != null)
+        {
+            result.Add(new HeaderGroup(currentLabel, span, width));
+        }
+
+        return result;
+    }
+
+    private sealed record GanttLink(double X1Percent, double Y1, double X2Percent, double Y2, int FromIndex, int ToIndex, GanttDependencyType Type, string? CssClass = null);
+
+    private IReadOnlyList<GanttLink> BuildLinks()
+    {
+        var links = new List<GanttLink>();
+        if (Dependencies == null || RowIndexByItem == null || Appointments == null || appointmentIndices == null)
+        {
+            return links;
+        }
+
+        var appointmentByItem = new Dictionary<object, AppointmentData>();
+        foreach (var appointment in Appointments)
+        {
+            if (appointment.Data != null)
+            {
+                appointmentByItem[appointment.Data] = appointment;
+            }
+        }
+
+        foreach (var dependency in Dependencies)
+        {
+            if (dependency == null || dependency.From == null || dependency.To == null)
+            {
+                continue;
+            }
+
+            if (!appointmentByItem.TryGetValue(dependency.From, out var fromAppointment) ||
+                !appointmentByItem.TryGetValue(dependency.To, out var toAppointment))
+            {
+                continue;
+            }
+
+            if (!RowIndexByItem.TryGetValue(dependency.From, out var fromRow) ||
+                !RowIndexByItem.TryGetValue(dependency.To, out var toRow))
+            {
+                continue;
+            }
+
+            if (!appointmentIndices.TryGetValue(fromAppointment, out var fromIdx) ||
+                !appointmentIndices.TryGetValue(toAppointment, out var toIdx))
+            {
+                continue;
+            }
+
+            var type = dependency.Type;
+            var fromStart = GetXPercent(fromAppointment.Start);
+            var fromEnd = GetXPercent(fromAppointment.End);
+            var toStart = GetXPercent(toAppointment.Start);
+            var toEnd = GetXPercent(toAppointment.End);
+
+            double? x1, x2;
+            switch (type)
+            {
+                case GanttDependencyType.StartToStart:
+                    x1 = fromStart; x2 = toStart; break;
+                case GanttDependencyType.FinishToFinish:
+                    x1 = fromEnd; x2 = toEnd; break;
+                case GanttDependencyType.StartToFinish:
+                    x1 = fromStart; x2 = toEnd; break;
+                default:
+                    x1 = fromEnd; x2 = toStart; break;
+            }
+
+            if (!x1.HasValue || !x2.HasValue)
+            {
+                continue;
+            }
+
+            var y1 = (fromRow * RowHeightPx) + (RowHeightPx * 0.5);
+            var y2 = (toRow * RowHeightPx) + (RowHeightPx * 0.5);
+            var isCriticalLink = CriticalItems != null && CriticalItems.Contains(dependency.From) && CriticalItems.Contains(dependency.To);
+            var cssClass = isCriticalLink ? "rz-gantt-link rz-gantt-link-critical" : null;
+            links.Add(new GanttLink(x1.Value, y1, x2.Value, y2, fromIdx, toIdx, type, cssClass));
+        }
+
+        return links;
+    }
+
+    private double? GetXPercent(DateTime value)
+    {
+        if (EndDate <= StartDate)
+        {
+            return null;
+        }
+
+        var rangeStart = StartDate;
+        var rangeEnd = EndDate;
+        var clamped = value < rangeStart ? rangeStart : (value > rangeEnd ? rangeEnd : value);
+        var totalTicks = (rangeEnd - rangeStart).Ticks;
+        if (totalTicks <= 0)
+        {
+            return null;
+        }
+
+        var leftTicks = (clamped - rangeStart).Ticks;
+        return (leftTicks / (double)totalTicks) * 100.0;
+    }
+
+    private string BuildLinkPath(GanttLink link)
+    {
+        var x1 = (link.X1Percent / 100.0) * TimelineWidthPx;
+        var x2 = (link.X2Percent / 100.0) * TimelineWidthPx;
+        var y1 = link.Y1;
+        var y2 = link.Y2;
+        var offset = 12.0;
+        var halfRow = RowHeightPx * 0.5;
+        var inv = System.Globalization.CultureInfo.InvariantCulture;
+
+        bool exitRight = link.Type == GanttDependencyType.FinishToStart || link.Type == GanttDependencyType.FinishToFinish;
+        bool enterRight = link.Type == GanttDependencyType.FinishToFinish || link.Type == GanttDependencyType.StartToFinish;
+
+        double exitDir = exitRight ? 1 : -1;
+        double enterDir = enterRight ? 1 : -1;
+        double exitX = x1 + offset * exitDir;
+        double enterX = x2 + offset * enterDir;
+
+        bool canGoStraight = exitRight != enterRight
+            ? (exitRight ? x2 - x1 > offset * 2 : x1 - x2 > offset * 2)
+            : (exitRight ? exitX < enterX : exitX > enterX);
+
+        if (canGoStraight && y1 != y2)
+        {
+            var midX = (exitX + enterX) / 2.0;
+            return string.Format(inv, "M{0},{1} L{2},{1} L{2},{3} L{4},{3}",
+                x1, y1, midX, y2, x2);
+        }
+
+        var midY = y2 > y1 ? y1 + halfRow : (y2 < y1 ? y1 - halfRow : y1 + halfRow);
+
+        return string.Format(inv, "M{0},{1} L{2},{1} L{2},{3} L{4},{3} L{4},{5} L{6},{5}",
+            x1, y1, exitX, midY, enterX, y2, x2);
+    }
+
+    async Task OnAppointmentClick(AppointmentData data)
+    {
+        if (Scheduler != null)
+        {
+            await Scheduler.SelectAppointment(data);
+        }
+    }
+
+    public class GanttTimelineColumn
+    {
+        public DateTime Start { get; set; }
+        public DateTime End { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public double WidthPx { get; set; }
+        public string GroupLabel { get; set; } = string.Empty;
+    }
+}

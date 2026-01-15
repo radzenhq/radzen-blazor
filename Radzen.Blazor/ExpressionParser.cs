@@ -147,6 +147,7 @@ public class ExpressionParser
         {
             Advance(1);
             var right = ParseBinary(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            AlignBinaryOperandTypes(ref left, ref right);
             left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
         }
 
@@ -943,6 +944,7 @@ public class ExpressionParser
         {
             Advance(1);
             var right = ParseShift(parameter) ?? throw new InvalidOperationException($"Expected expression after {token.Value} at position {position}");
+            AlignBinaryOperandTypes(ref left, ref right);
             left = Expression.MakeBinary(token.Type.ToExpressionType(), left, ConvertIfNeeded(right, left.Type));
         }
 
@@ -1056,5 +1058,25 @@ public class ExpressionParser
         }
 
         return expression;
+    }
+
+    private static void AlignBinaryOperandTypes(ref Expression left, ref Expression right)
+    {
+        if (left.Type == right.Type)
+        {
+            return;
+        }
+
+        var leftUnderlying = Nullable.GetUnderlyingType(left.Type);
+        var rightUnderlying = Nullable.GetUnderlyingType(right.Type);
+
+        if (leftUnderlying != null && rightUnderlying == null && leftUnderlying == right.Type)
+        {
+            right = Expression.Convert(right, left.Type);
+        }
+        else if (rightUnderlying != null && leftUnderlying == null && rightUnderlying == left.Type)
+        {
+            left = Expression.Convert(left, right.Type);
+        }
     }
 }

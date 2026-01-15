@@ -1,0 +1,107 @@
+@using RadzenBlazorDemos.Models
+
+<RadzenGantt @ref="gantt" TItem="GanttTask"
+             Data="@tasks"
+             IdProperty="@nameof(GanttTask.Id)"
+             ParentIdProperty="@nameof(GanttTask.ParentId)"
+             TextProperty="@nameof(GanttTask.Name)"
+             StartProperty="@nameof(GanttTask.Start)"
+             EndProperty="@nameof(GanttTask.End)"
+             ProgressProperty="@nameof(GanttTask.Progress)"
+             BaselineStartProperty="@nameof(GanttTask.BaselineStart)"
+             BaselineEndProperty="@nameof(GanttTask.BaselineEnd)"
+             Style="width: 100%; height: 480px;">
+    <Columns>
+        <RadzenGanttColumn Title="Task" Property="@nameof(GanttTask.Name)" Frozen="true" Width="200px" />
+        <RadzenGanttColumn Title="Start" Property="@nameof(GanttTask.Start)" Width="110px" FormatString="{0:d}" />
+        <RadzenGanttColumn Title="End" Property="@nameof(GanttTask.End)" Width="110px" FormatString="{0:d}" />
+        <RadzenGanttColumn Title="Progress" Property="@nameof(GanttTask.Progress)" Width="100px" FormatString="{0}%" />
+    </Columns>
+</RadzenGantt>
+
+<div class="rz-mt-4">
+    <RadzenText TextStyle="TextStyle.Body2">
+        <span style="display:inline-block;width:14px;height:8px;background:var(--rz-text-disabled-color);opacity:0.45;border-radius:4px;vertical-align:middle;margin-inline-end:4px;"></span>
+        Gray = original planned schedule &nbsp;|&nbsp;
+        <span style="display:inline-block;width:14px;height:8px;background:var(--rz-primary);border-radius:4px;vertical-align:middle;margin-inline-end:4px;"></span>
+        Blue = current actual schedule
+    </RadzenText>
+</div>
+
+@code {
+    RadzenGantt<GanttTask> gantt;
+    List<GanttTask> tasks;
+
+    protected override void OnInitialized()
+    {
+        var today = DateTime.Today;
+
+        tasks = new()
+        {
+            new()
+            {
+                Id = 1, Name = "Project",
+                Start = today.AddDays(-2), End = today.AddDays(28),
+                BaselineStart = today, BaselineEnd = today.AddDays(24),
+                Progress = 40
+            },
+            new()
+            {
+                Id = 2, ParentId = 1, Name = "Foundation",
+                Start = today.AddDays(-2), End = today.AddDays(5),
+                BaselineStart = today, BaselineEnd = today.AddDays(4),
+                Progress = 100
+            },
+            new()
+            {
+                Id = 3, ParentId = 1, Name = "Framing",
+                Start = today.AddDays(5), End = today.AddDays(12),
+                BaselineStart = today.AddDays(4), BaselineEnd = today.AddDays(10),
+                Progress = 60
+            },
+            new()
+            {
+                Id = 4, ParentId = 1, Name = "Roofing",
+                Start = today.AddDays(12), End = today.AddDays(18),
+                BaselineStart = today.AddDays(10), BaselineEnd = today.AddDays(14),
+                Progress = 10
+            },
+            new()
+            {
+                Id = 5, ParentId = 1, Name = "Electrical",
+                Start = today.AddDays(14), End = today.AddDays(20),
+                BaselineStart = today.AddDays(12), BaselineEnd = today.AddDays(17),
+                Progress = 0
+            },
+            new()
+            {
+                Id = 6, ParentId = 1, Name = "Plumbing",
+                Start = today.AddDays(14), End = today.AddDays(21),
+                BaselineStart = today.AddDays(12), BaselineEnd = today.AddDays(17),
+                Progress = 0
+            },
+            new()
+            {
+                Id = 7, ParentId = 1, Name = "Interior finish",
+                Start = today.AddDays(21), End = today.AddDays(26),
+                BaselineStart = today.AddDays(17), BaselineEnd = today.AddDays(22),
+                Progress = 0
+            },
+            new()
+            {
+                Id = 8, ParentId = 1, Name = "Inspection",
+                Start = today.AddDays(26), End = today.AddDays(28),
+                BaselineStart = today.AddDays(22), BaselineEnd = today.AddDays(24),
+                Progress = 0
+            },
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await gantt.ExpandRows(tasks);
+        }
+    }
+}

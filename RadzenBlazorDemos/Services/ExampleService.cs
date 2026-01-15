@@ -1148,6 +1148,96 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Name = "Gantt",
+                    New = true,
+                    Icon = "\ue1a1",
+                    Tags = new[] { "gantt", "timeline", "project", "task", "schedule" },
+                    Children = new[]
+                    {
+                        new Example
+                        {
+                            Name = "Overview",
+                            Path = "gantt",
+                            Title = "Blazor Gantt Component | Free UI Components by Radzen",
+                            Description = "Blazor Gantt component with a hierarchical task list and a timeline view.",
+                            Tags = new[] { "gantt", "timeline", "project", "task", "schedule" }
+                        },
+                        new Example
+                        {
+                            Name = "Tooltips",
+                            Path = "gantt-tooltips",
+                            Title = "Blazor Gantt Tooltips | Free UI Components by Radzen",
+                            Description = "Show tooltips when hovering over Gantt task bars using TaskMouseEnter and TaskMouseLeave events.",
+                            Tags = new[] { "gantt", "tooltip", "hover", "task", "mouse" }
+                        },
+                        new Example
+                        {
+                            Name = "Filtering",
+                            Path = "gantt-filtering",
+                            Title = "Blazor Gantt Filtering | Free UI Components by Radzen",
+                            Description = "Filter Gantt tasks using Simple, SimpleWithMenu, or Advanced filter modes.",
+                            Tags = new[] { "gantt", "filter", "filtermode", "simple", "advanced" }
+                        },
+                        new Example
+                        {
+                            Name = "InLine Editing",
+                            Path = "gantt-inline-edit",
+                            Title = "Blazor Gantt Inline Editing | Free UI Components by Radzen",
+                            Description = "Edit Gantt tasks inline with add, edit, and save actions.",
+                            Tags = new[] { "gantt", "edit", "inline", "row", "tasks" }
+                        },
+                        new Example
+                        {
+                            Name = "In-Cell Editing",
+                            Path = "gantt-incell-edit",
+                            Title = "Blazor Gantt In-Cell Editing | Free UI Components by Radzen",
+                            Description = "Edit Gantt task fields in-cell with inline editors per column.",
+                            Tags = new[] { "gantt", "edit", "incell", "cell", "tasks" }
+                        },
+                        new Example
+                        {
+                            Name = "Drag & Resize",
+                            Path = "gantt-drag-resize",
+                            Title = "Blazor Gantt Drag & Resize | Free UI Components by Radzen",
+                            Description = "Drag task bars to move them and drag their edges to resize. Zero-duration tasks render as milestone diamonds.",
+                            Tags = new[] { "gantt", "drag", "resize", "move", "milestone", "diamond", "interactive" }
+                        },
+                        new Example
+                        {
+                            Name = "Dependency Types",
+                            Path = "gantt-dependency-types",
+                            Title = "Blazor Gantt Dependency Types | Free UI Components by Radzen",
+                            Description = "All four dependency types: Finish-to-Start, Start-to-Start, Finish-to-Finish, and Start-to-Finish.",
+                            Tags = new[] { "gantt", "dependency", "link", "finish-to-start", "start-to-start", "finish-to-finish", "start-to-finish" }
+                        },
+                        new Example
+                        {
+                            Name = "Critical Path",
+                            Path = "gantt-critical-path",
+                            Title = "Blazor Gantt Critical Path | Free UI Components by Radzen",
+                            Description = "Highlight the longest chain of dependent tasks that determines the project end date.",
+                            Tags = new[] { "gantt", "critical", "path", "highlight", "schedule", "dependency" }
+                        },
+                        new Example
+                        {
+                            Name = "Baselines",
+                            Path = "gantt-baselines",
+                            Title = "Blazor Gantt Baselines | Free UI Components by Radzen",
+                            Description = "Show planned vs. actual schedule side by side using baseline bars.",
+                            Tags = new[] { "gantt", "baseline", "planned", "actual", "schedule", "comparison" }
+                        },
+                        new Example
+                        {
+                            Name = "Customization",
+                            Path = "gantt-customization",
+                            Title = "Blazor Gantt Customization | Free UI Components by Radzen",
+                            Description = "Customize the Gantt with a today line, weekend shading, vertical markers, per-bar styling via TaskRender, and custom bar templates.",
+                            Tags = new[] { "gantt", "today", "marker", "weekend", "taskrender", "template", "customize" }
+                        }
+                    }
+                },
+                new Example
+                {
                     Toc = [ new () { Text = "Dynamic Table", Anchor = "#dynamic" }, new () { Text = "Scrollable Table", Anchor = "#scrollable" }, new () { Text = "Table with merged cells", Anchor = "#scrollable" } ],
                     Name = "Table",
                     Description = "Blazor RadzenTable component is used to create a HTML table with rows and cells.",

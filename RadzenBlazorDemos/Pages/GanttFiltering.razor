@@ -1,0 +1,107 @@
+@using RadzenBlazorDemos.Models
+
+<RadzenStack Gap="1rem">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1.5rem;" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenLabel Text="Filter mode:" Component="filterMode" />
+                <RadzenDropDown @bind-Value="@filterMode" TextProperty="Text" ValueProperty="Value" Name="filterMode"
+                                Data="@(Enum.GetValues(typeof(FilterMode)).Cast<FilterMode>().Select(t => new { Text = $"{t}", Value = t }))" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenLabel Text="Logical filter operator:" Component="logicalOperator" />
+                <RadzenDropDown @bind-Value="@logicalFilterOperator" TextProperty="Text" ValueProperty="Value" Name="logicalOperator"
+                                Data="@(Enum.GetValues(typeof(LogicalFilterOperator)).Cast<LogicalFilterOperator>().Select(t => new { Text = $"{t}", Value = t }))" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem;">
+                <RadzenLabel Text="Filter case sensitivity:" Component="caseSensitivity" />
+                <RadzenDropDown @bind-Value="@filterCaseSensitivity" TextProperty="Text" ValueProperty="Value" Name="caseSensitivity"
+                                Data="@(Enum.GetValues(typeof(FilterCaseSensitivity)).Cast<FilterCaseSensitivity>().Select(t => new { Text = $"{t}", Value = t }))" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenGantt @ref="gantt" TItem="GanttTask"
+                 Data="@tasks"
+                 IdProperty="@nameof(GanttTask.Id)"
+                 ParentIdProperty="@nameof(GanttTask.ParentId)"
+                 TextProperty="@nameof(GanttTask.Name)"
+                 StartProperty="@nameof(GanttTask.Start)"
+                 EndProperty="@nameof(GanttTask.End)"
+                 ProgressProperty="@nameof(GanttTask.Progress)"
+                 AllowFiltering="true"
+                 FilterMode="@filterMode"
+                 LogicalFilterOperator="@logicalFilterOperator"
+                 FilterCaseSensitivity="@filterCaseSensitivity"
+                 Style="width: 100%; height: 520px;"
+                 AllowColumnResize="true" AllowColumnReorder="true">
+        <Columns>
+            <RadzenGanttColumn Title="Task" Property="@nameof(GanttTask.Name)" Frozen="true" />
+            <RadzenGanttColumn Title="Start" Property="@nameof(GanttTask.Start)" Width="120px" FormatString="{0:d}" />
+            <RadzenGanttColumn Title="End" Property="@nameof(GanttTask.End)" Width="120px" FormatString="{0:d}" />
+            <RadzenGanttColumn Title="Progress" Property="@nameof(GanttTask.Progress)" Width="140px" FormatString="{0}" FormatProvider="@percentProvider" />
+        </Columns>
+    </RadzenGantt>
+</RadzenStack>
+
+@code {
+    RadzenGantt<GanttTask> gantt;
+    MyPercentProvider percentProvider = new();
+
+    FilterMode filterMode = FilterMode.Simple;
+    LogicalFilterOperator logicalFilterOperator = LogicalFilterOperator.And;
+    FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default;
+
+    List<GanttTask> tasks = new()
+    {
+        new() { Id = 1, Name = "Project", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(30), Progress = 35 },
+        new() { Id = 2, ParentId = 1, Name = "Discovery", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(5), Progress = 100 },
+        new() { Id = 3, ParentId = 1, Name = "Implementation", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(24), Progress = 25 },
+        new() { Id = 4, ParentId = 3, Name = "API", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(14), Progress = 60 },
+        new() { Id = 5, ParentId = 3, Name = "UI", Start = DateTime.Today.AddDays(10), End = DateTime.Today.AddDays(22), Progress = 10 },
+        new() { Id = 6, ParentId = 1, Name = "QA + Release", Start = DateTime.Today.AddDays(25), End = DateTime.Today.AddDays(30), Progress = 0 },
+        new() { Id = 7, ParentId = 2, Name = "Stakeholder interviews", Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(1), Progress = 100 },
+        new() { Id = 8, ParentId = 2, Name = "Requirements", Start = DateTime.Today.AddDays(0), End = DateTime.Today.AddDays(4), Progress = 100 },
+        new() { Id = 9, ParentId = 3, Name = "Architecture", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(9), Progress = 40 },
+        new() { Id = 10, ParentId = 4, Name = "Auth endpoints", Start = DateTime.Today.AddDays(6), End = DateTime.Today.AddDays(9), Progress = 80 },
+        new() { Id = 11, ParentId = 4, Name = "Data contracts", Start = DateTime.Today.AddDays(8), End = DateTime.Today.AddDays(12), Progress = 50 },
+        new() { Id = 12, ParentId = 4, Name = "Caching", Start = DateTime.Today.AddDays(11), End = DateTime.Today.AddDays(14), Progress = 20 },
+        new() { Id = 13, ParentId = 5, Name = "Layout", Start = DateTime.Today.AddDays(10), End = DateTime.Today.AddDays(13), Progress = 60 },
+        new() { Id = 14, ParentId = 5, Name = "Components", Start = DateTime.Today.AddDays(12), End = DateTime.Today.AddDays(18), Progress = 15 },
+        new() { Id = 15, ParentId = 5, Name = "Theme polish", Start = DateTime.Today.AddDays(18), End = DateTime.Today.AddDays(22), Progress = 0 },
+        new() { Id = 16, ParentId = 3, Name = "Integrations", Start = DateTime.Today.AddDays(14), End = DateTime.Today.AddDays(20), Progress = 10 },
+        new() { Id = 17, ParentId = 16, Name = "Payments", Start = DateTime.Today.AddDays(14), End = DateTime.Today.AddDays(17), Progress = 5 },
+        new() { Id = 18, ParentId = 16, Name = "Notifications", Start = DateTime.Today.AddDays(16), End = DateTime.Today.AddDays(20), Progress = 0 },
+        new() { Id = 19, ParentId = 6, Name = "Test plan", Start = DateTime.Today.AddDays(25), End = DateTime.Today.AddDays(26), Progress = 0 },
+        new() { Id = 20, ParentId = 6, Name = "Regression", Start = DateTime.Today.AddDays(26), End = DateTime.Today.AddDays(29), Progress = 0 },
+        new() { Id = 21, ParentId = 6, Name = "Release", Start = DateTime.Today.AddDays(29), End = DateTime.Today.AddDays(30), Progress = 0 },
+    };
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await gantt.ExpandRows(tasks);
+        }
+    }
+
+    public class MyPercentProvider : IFormatProvider, ICustomFormatter
+    {
+        public string Format(string format, object arg, IFormatProvider formatProvider)
+        {
+            return string.Format("{0:P0}", (double?)arg / 100);
+        }
+
+        public object GetFormat(Type formatType)
+        {
+            if (formatType == typeof(ICustomFormatter))
+            {
+                return this;
+            }
+
+            return null;
+        }
+    }
+}

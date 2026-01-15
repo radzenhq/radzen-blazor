@@ -1,0 +1,102 @@
+@using RadzenBlazorDemos.Models
+
+<RadzenGantt @ref="gantt" TItem="GanttTask"
+             Data="@tasks"
+             Dependencies="@dependencies"
+             IdProperty="@nameof(GanttTask.Id)"
+             ParentIdProperty="@nameof(GanttTask.ParentId)"
+             TextProperty="@nameof(GanttTask.Name)"
+             StartProperty="@nameof(GanttTask.Start)"
+             EndProperty="@nameof(GanttTask.End)"
+             ProgressProperty="@nameof(GanttTask.Progress)"
+             ShowTodayLine="true"
+             ShowWeekends="true"
+             Markers="@markers"
+             TaskRender="@OnTaskRender"
+             Style="width: 100%; height: 520px;">
+    <TaskTemplate Context="task">
+        @{
+            var pct = task.Progress ?? 0;
+        }
+        @if (pct > 0)
+        {
+            <div class="rz-gantt-bar-progress" style="@($"width:{pct}%")"></div>
+        }
+        <span class="rz-gantt-bar-label" style="display:flex;align-items:center;gap:4px;">
+            <RadzenIcon Icon="@GetTaskIcon(task)" Style="font-size:0.85em;" />
+            @task.Name
+        </span>
+    </TaskTemplate>
+    <Columns>
+        <RadzenGanttColumn Title="Task" Property="@nameof(GanttTask.Name)" Frozen="true" Width="200px" />
+        <RadzenGanttColumn Title="Start" Property="@nameof(GanttTask.Start)" Width="110px" FormatString="{0:d}" />
+        <RadzenGanttColumn Title="End" Property="@nameof(GanttTask.End)" Width="110px" FormatString="{0:d}" />
+        <RadzenGanttColumn Title="Progress" Property="@nameof(GanttTask.Progress)" Width="100px" FormatString="{0}%" />
+    </Columns>
+</RadzenGantt>
+
+@code {
+    RadzenGantt<GanttTask> gantt;
+    List<GanttTask> tasks;
+    List<GanttDependency<GanttTask>> dependencies;
+    List<GanttMarker> markers;
+
+    protected override void OnInitialized()
+    {
+        var today = DateTime.Today;
+
+        tasks = new()
+        {
+            new() { Id = 1, Name = "Sprint 12", Start = today.AddDays(-3), End = today.AddDays(18), Progress = 35 },
+
+            new() { Id = 2, ParentId = 1, Name = "Design", Start = today.AddDays(-3), End = today.AddDays(2), Progress = 100 },
+            new() { Id = 3, ParentId = 1, Name = "Backend", Start = today.AddDays(2), End = today.AddDays(10), Progress = 45 },
+            new() { Id = 4, ParentId = 1, Name = "Frontend", Start = today.AddDays(4), End = today.AddDays(12), Progress = 20 },
+            new() { Id = 5, ParentId = 1, Name = "QA", Start = today.AddDays(10), End = today.AddDays(15), Progress = 0 },
+            new() { Id = 6, ParentId = 1, Name = "Documentation", Start = today.AddDays(8), End = today.AddDays(14), Progress = 10 },
+            new() { Id = 7, ParentId = 1, Name = "Release", Start = today.AddDays(16), End = today.AddDays(16), Progress = 0 },
+        };
+
+        dependencies = new()
+        {
+            new() { From = tasks[1], To = tasks[2] },
+            new() { From = tasks[2], To = tasks[4] },
+            new() { From = tasks[3], To = tasks[4] },
+            new() { From = tasks[4], To = tasks[6] },
+        };
+
+        markers = new()
+        {
+            new() { Date = today.AddDays(8), Label = "Code freeze", Color = "var(--rz-warning)" },
+            new() { Date = today.AddDays(16), Label = "Release", Color = "var(--rz-success)" },
+        };
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await gantt.ExpandRows(tasks);
+        }
+    }
+
+    void OnTaskRender(GanttBarRenderEventArgs<GanttTask> args)
+    {
+        if (args.Data.Progress >= 100)
+        {
+            args.Attributes["style"] = "background: var(--rz-success);";
+        }
+        else if (args.Data.Progress > 0 && args.Data.Progress < 50)
+        {
+            args.Attributes["style"] = "background: var(--rz-warning); color: var(--rz-on-warning);";
+        }
+    }
+
+    string GetTaskIcon(GanttTask task)
+    {
+        if (task.Start == task.End) return "flag";
+        if (task.Progress >= 100) return "check_circle";
+        if (task.Progress > 0) return "pending";
+        return "schedule";
+    }
+}

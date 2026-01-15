@@ -1,0 +1,104 @@
+@using System.Globalization
+@using Radzen.Blazor.Rendering
+@typeparam TItem where TItem : notnull
+@inherits SchedulerViewBase
+
+@code {
+    [CascadingParameter]
+    internal RadzenGantt<TItem>? Gantt { get; set; }
+
+    public override string Icon => "calendar_today";
+
+    [Parameter]
+    public override string Text { get; set; } = "Year";
+
+    public override string Title
+    {
+        get
+        {
+            var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+            return YearStart.ToString("yyyy", culture);
+        }
+    }
+
+    public override DateTime StartDate
+    {
+        get
+        {
+            return YearStart;
+        }
+    }
+
+    public override DateTime EndDate => YearStart.AddYears(1);
+
+    public override DateTime Next()
+    {
+        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddYears(1);
+    }
+
+    public override DateTime Prev()
+    {
+        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddYears(-1);
+    }
+
+    public override RenderFragment Render()
+    {
+        var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
+        var columns = BuildMonthColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 32, Scheduler?.Culture ?? CultureInfo.CurrentCulture);
+        var timelineWidth = columns.Sum(c => c.WidthPx);
+
+        Gantt?.ComputeCriticalPath(appointments, Gantt?.TimelineRowIndexByItem);
+
+        return @<CascadingValue Value=@Scheduler>
+            <GanttTimelineView TItem="TItem" StartDate=@StartDate
+                               EndDate=@EndDate
+                               Columns=@columns
+                               TimelineWidthPx=@timelineWidth
+                               RowCount=@(Gantt?.TimelineRowCount ?? 0)
+                               RowIndexByItem=@(Gantt?.TimelineRowIndexByItem)
+                               RowHeightPx=@(Gantt?.RowHeightPx ?? 36)
+                               Appointments=@appointments
+                               Dependencies=@(Gantt?.TimelineDependencies)
+                               CriticalItems=@(Gantt?.CriticalPathItems)
+                               BaselineStartProperty=@(Gantt?.TimelineBaselineStartProperty)
+                               BaselineEndProperty=@(Gantt?.TimelineBaselineEndProperty)
+                               ShowTodayLine=@(Gantt?.TimelineShowTodayLine ?? true)
+                               ShowWeekends=@(Gantt?.TimelineShowWeekends ?? true)
+                               NonWorkingDays=@(Gantt?.TimelineNonWorkingDays)
+                               Markers=@(Gantt?.TimelineMarkers)
+                               TaskRender=@(Gantt?.TimelineTaskRender)
+                               AppointmentMove=OnAppointmentMove />
+        </CascadingValue>;
+    }
+
+    private static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildMonthColumns(DateTime start, DateTime end, int dayWidth, CultureInfo culture)
+    {
+        var columns = new List<GanttTimelineView<TItem>.GanttTimelineColumn>();
+        var current = new DateTime(start.Year, start.Month, 1);
+        while (current < end.Date)
+        {
+            var next = current.AddMonths(1);
+            var daysInMonth = (next - current).TotalDays;
+            var quarter = (current.Month - 1) / 3 + 1;
+            columns.Add(new GanttTimelineView<TItem>.GanttTimelineColumn
+            {
+                Start = current,
+                End = next,
+                Label = current.ToString("MMM", culture),
+                GroupLabel = $"Q{quarter} {current.Year}",
+                WidthPx = dayWidth * Math.Max(1, daysInMonth)
+            });
+            current = next;
+        }
+        return columns;
+    }
+
+    private DateTime YearStart
+    {
+        get
+        {
+            var date = Scheduler?.CurrentDate.Date ?? DateTime.Today;
+            return new DateTime(date.Year, 1, 1);
+        }
+    }
+}

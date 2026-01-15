@@ -1,0 +1,22 @@
+@namespace Radzen.Blazor
+@typeparam TItem where TItem : notnull
+@inherits RadzenDataGridColumn<TItem>
+@implements IDisposable
+
+@code {
+    [CascadingParameter]
+    internal RadzenGantt<TItem>? Gantt { get; set; }
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Gantt?.AddColumn(this);
+    }
+
+    void IDisposable.Dispose()
+    {
+        Gantt?.RemoveColumn(this);
+        base.Dispose();
+    }   
+}
+

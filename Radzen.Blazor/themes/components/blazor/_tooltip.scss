@@ -90,3 +90,7 @@ $tooltip-font-size: var(--rz-body-font-size) !default;
   border-bottom: inherit;
   border-right: inherit;
 }
+
+.rz-tooltip .rz-mouse-tooltip-content {
+  margin-bottom: 0;
+}

@@ -26,6 +26,12 @@ public class ExpressionParserTests
         public DateTime BirthDate { get; set; }
     }
 
+    class Node
+    {
+        public int Id { get; set; }
+        public int? ParentId { get; set; }
+    }
+
     public class Car
     {
         public CarType Type { get; set; }
@@ -1004,6 +1010,16 @@ public class ExpressionParserTests
         var func = expression.Compile();
 
         Assert.True(func(new Person { Age = 50 }));
+    }
+
+    [Fact]
+    public void Should_SupportEqualityBetweenNullableAndNonNullable()
+    {
+        var expression = ExpressionParser.ParsePredicate<Node>("it => it.Id == it.ParentId");
+        var func = expression.Compile();
+
+        Assert.True(func(new Node { Id = 1, ParentId = 1 }));
+        Assert.False(func(new Node { Id = 1, ParentId = null }));
     }
 
     [Fact]

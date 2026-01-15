@@ -118,6 +118,18 @@ namespace Radzen.Blazor
         Task MouseEnterAppointment(ElementReference reference, AppointmentData data);
 
         /// <summary>
+        /// Notifies the scheduler that the user has moved the mouse over the specified appointment, including mouse coordinates.
+        /// </summary>
+        /// <param name="reference">The DOM element reference.</param>
+        /// <param name="data">The appointment data.</param>
+        /// <param name="clientX">The horizontal viewport coordinate of the mouse pointer.</param>
+        /// <param name="clientY">The vertical viewport coordinate of the mouse pointer.</param>
+        Task MouseEnterAppointment(ElementReference reference, AppointmentData data, double clientX, double clientY)
+        {
+            return MouseEnterAppointment(reference, data);
+        }
+
+        /// <summary>
         /// Returns true if the scheduler has a mouse enter appointment listener.
         /// </summary>
         bool HasMouseEnterAppointmentDelegate();
@@ -134,6 +146,18 @@ namespace Radzen.Blazor
         /// <param name="data"></param>
         /// <returns></returns>
         Task MouseLeaveAppointment(ElementReference reference, AppointmentData data);
+
+        /// <summary>
+        /// Notifies the scheduler that the user has moved the mouse out of the specified appointment, including mouse coordinates.
+        /// </summary>
+        /// <param name="reference">The DOM element reference.</param>
+        /// <param name="data">The appointment data.</param>
+        /// <param name="clientX">The horizontal viewport coordinate of the mouse pointer.</param>
+        /// <param name="clientY">The vertical viewport coordinate of the mouse pointer.</param>
+        Task MouseLeaveAppointment(ElementReference reference, AppointmentData data, double clientX, double clientY)
+        {
+            return MouseLeaveAppointment(reference, data);
+        }
         /// <summary>
         /// Reloads this instance.
         /// </summary>

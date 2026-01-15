@@ -1,0 +1,112 @@
+@using System.Globalization
+@using Radzen.Blazor.Rendering
+@typeparam TItem where TItem : notnull
+@inherits SchedulerViewBase
+
+@code {
+    [CascadingParameter]
+    internal RadzenGantt<TItem>? Gantt { get; set; }
+
+    public override string Icon => "calendar_view_week";
+
+    [Parameter]
+    public override string Text { get; set; } = "Week";
+
+    public override string Title
+    {
+        get
+        {
+            var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+            var end = EndDate.AddDays(-1);
+            return $"{StartDate.ToString(culture.DateTimeFormat.ShortDatePattern, culture)} - {end.ToString(culture.DateTimeFormat.ShortDatePattern, culture)}";
+        }
+    }
+
+    public override DateTime StartDate
+    {
+        get
+        {
+            if (Gantt?.ViewStart.HasValue == true)
+            {
+                return Gantt.ViewStart.Value.Date;
+            }
+
+            var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+            return Scheduler?.CurrentDate.Date.StartOfWeek(culture) ?? DateTime.Today.StartOfWeek(culture);
+        }
+    }
+
+    public override DateTime EndDate
+    {
+        get
+        {
+            if (Gantt?.ViewEnd.HasValue == true)
+            {
+                return Gantt.ViewEnd.Value.Date.AddDays(1);
+            }
+
+            var weeks = Math.Max(1, Gantt?.WeeksInView ?? 4);
+            return StartDate.AddDays(7 * weeks);
+        }
+    }
+
+    public override DateTime Next()
+    {
+        var weeks = Math.Max(1, Gantt?.WeeksInView ?? 4);
+        return Scheduler?.CurrentDate.Date.AddDays(7 * weeks) ?? DateTime.Today.AddDays(7 * weeks);
+    }
+
+    public override DateTime Prev()
+    {
+        var weeks = Math.Max(1, Gantt?.WeeksInView ?? 4);
+        return Scheduler?.CurrentDate.Date.AddDays(-7 * weeks) ?? DateTime.Today.AddDays(-7 * weeks);
+    }
+
+    public override RenderFragment Render()
+    {
+        var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
+        var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+        var columns = BuildDayColumns(StartDate, EndDate, Gantt?.DayWidthPx ?? 32, culture, "ddd M/d");
+        var timelineWidth = columns.Sum(c => c.WidthPx);
+
+        Gantt?.ComputeCriticalPath(appointments, Gantt?.TimelineRowIndexByItem);
+
+        return @<CascadingValue Value=@Scheduler>
+            <GanttTimelineView TItem="TItem" StartDate=@StartDate
+                               EndDate=@EndDate
+                               Columns=@columns
+                               TimelineWidthPx=@timelineWidth
+                               RowCount=@(Gantt?.TimelineRowCount ?? 0)
+                               RowIndexByItem=@(Gantt?.TimelineRowIndexByItem)
+                               RowHeightPx=@(Gantt?.RowHeightPx ?? 36)
+                               Appointments=@appointments
+                               Dependencies=@(Gantt?.TimelineDependencies)
+                               CriticalItems=@(Gantt?.CriticalPathItems)
+                               BaselineStartProperty=@(Gantt?.TimelineBaselineStartProperty)
+                               BaselineEndProperty=@(Gantt?.TimelineBaselineEndProperty)
+                               ShowTodayLine=@(Gantt?.TimelineShowTodayLine ?? true)
+                               ShowWeekends=@(Gantt?.TimelineShowWeekends ?? true)
+                               NonWorkingDays=@(Gantt?.TimelineNonWorkingDays)
+                               Markers=@(Gantt?.TimelineMarkers)
+                               TaskRender=@(Gantt?.TimelineTaskRender)
+                               AppointmentMove=OnAppointmentMove />
+        </CascadingValue>;
+    }
+
+    private static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildDayColumns(DateTime start, DateTime end, int dayWidth, CultureInfo culture, string headerFormat)
+    {
+        var columns = new List<GanttTimelineView<TItem>.GanttTimelineColumn>();
+        for (var d = start.Date; d < end.Date; d = d.AddDays(1))
+        {
+            columns.Add(new GanttTimelineView<TItem>.GanttTimelineColumn
+            {
+                Start = d.Date,
+                End = d.Date.AddDays(1),
+                Label = d.ToString("ddd d", culture),
+                GroupLabel = d.ToString("MMMM yyyy", culture),
+                WidthPx = dayWidth
+            });
+        }
+        return columns;
+    }
+}

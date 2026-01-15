@@ -753,10 +753,22 @@ namespace Radzen.Blazor
             await AppointmentMouseEnter.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData });
         }
 
+        async Task IScheduler.MouseEnterAppointment(ElementReference reference, AppointmentData data, double clientX, double clientY)
+        {
+            var argsData = data.Data is TItem typed ? typed : default!;
+            await AppointmentMouseEnter.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData, ClientX = clientX, ClientY = clientY });
+        }
+
         async Task IScheduler.MouseLeaveAppointment(ElementReference reference, AppointmentData data)
         {
             var argsData = data.Data is TItem typed ? typed : default!;
             await AppointmentMouseLeave.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData });
+        }
+
+        async Task IScheduler.MouseLeaveAppointment(ElementReference reference, AppointmentData data, double clientX, double clientY)
+        {
+            var argsData = data.Data is TItem typed ? typed : default!;
+            await AppointmentMouseLeave.InvokeAsync(new SchedulerAppointmentMouseEventArgs<TItem> { Element = reference, Data = argsData, ClientX = clientX, ClientY = clientY });
         }
 
         bool IScheduler.HasMouseEnterAppointmentDelegate()
