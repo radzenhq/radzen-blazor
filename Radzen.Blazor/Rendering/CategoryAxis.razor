@@ -6,10 +6,10 @@
     <Line class="rz-line" X1="@x1" Y1="@y1" X2="@x2" Y2="@y1" Stroke="@(XAxis?.Stroke)" StrokeWidth="@(XAxis?.StrokeWidth ?? 0)" LineType="@(XAxis?.LineType ?? LineType.Solid)" />
     @for (var idx = start; idx <= end; idx += step)
     {
-        var value = Chart?.CategoryScale?.Value((double)idx) ?? 0;
+        var value = Chart?.CategoryScale?.Value((double)idx);
         var x = Chart?.CategoryScale?.Scale((double)idx, true) ?? 0;
 
-        var text = XAxis != null && Chart?.CategoryScale != null ? XAxis.Format(Chart.CategoryScale, value) : "";
+        var text = value != null && XAxis != null && Chart?.CategoryScale != null ? XAxis.Format(Chart.CategoryScale, value) : "";
 
         if (XAxis?.Ticks?.Template != null)
         {
