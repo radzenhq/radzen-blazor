@@ -243,9 +243,9 @@ namespace Radzen.Blazor
                 }
 
                 if (!string.IsNullOrEmpty(Property) && !string.IsNullOrEmpty(FilterProperty))
-                    UniqueID ??= $"{Property}.{FilterProperty}"; // To be sure the column uniqueID is unique even when filtering on sub property.
+                    UniqueID = $"{Property}.{FilterProperty}"; // To be sure the column uniqueID is unique even when filtering on sub property.
                 else
-                    UniqueID ??= Property ?? FilterProperty;
+                    UniqueID = !string.IsNullOrEmpty(Property) ? Property : FilterProperty;
                 
                 if (UseDisplayName && !string.IsNullOrEmpty(Property))
                 {
