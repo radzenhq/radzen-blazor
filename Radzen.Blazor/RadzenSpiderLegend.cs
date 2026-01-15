@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Configures the legend of a <see cref="RadzenSpiderChart{TItem}"/>.
+    /// Configures the legend of a <see cref="RadzenSpiderChart"/>.
     /// </summary>
     public class RadzenSpiderLegend : ComponentBase
     {

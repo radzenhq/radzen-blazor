@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 namespace Radzen.Blazor
 {
     /// <summary>
-    /// Non-generic contract for <see cref="RadzenSpiderChart{TItem}"/> used by configuration components
+    /// Non-generic contract for <see cref="RadzenSpiderChart"/> used by configuration components
     /// like <see cref="RadzenSpiderLegend"/> without relying on reflection (important for trimming/AOT).
     /// </summary>
     public interface IRadzenSpiderChart

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -12,8 +13,7 @@ namespace Radzen.Blazor
     /// <summary>
     /// RadzenSpiderChart component displays multi-dimensional data in a spider web format.
     /// </summary>
-    /// <typeparam name="TItem">The type of the data item.</typeparam>
-    public partial class RadzenSpiderChart<TItem> : RadzenComponent, IRadzenSpiderChart
+    public partial class RadzenSpiderChart : RadzenComponent, IRadzenSpiderChart
     {
         /// <summary>
         /// Gets the legend settings for the spider chart.
@@ -58,10 +58,10 @@ namespace Radzen.Blazor
         public bool ShowTooltip { get; set; } = true;
 
         /// <summary>
-        /// Event callback for when a series is clicked.
+        /// Event callback for when a series (or a marker) is clicked. Matches <see cref="RadzenChart.SeriesClick" /> behavior.
         /// </summary>
         [Parameter]
-        public EventCallback<RadzenSpiderSeries<TItem>> SeriesClick { get; set; }
+        public EventCallback<Radzen.SeriesClickEventArgs> SeriesClick { get; set; }
 
         [Inject]
         private TooltipService TooltipService { get; set; } = default!;
@@ -71,9 +71,9 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the series collection.
         /// </summary>
-        internal List<RadzenSpiderSeries<TItem>> Series { get; } = new();
+        internal List<IRadzenSpiderSeries> Series { get; } = new();
         
-        private RadzenSpiderSeries<TItem>? HoveredSeries { get; set; }
+        private IRadzenSpiderSeries? HoveredSeries { get; set; }
         private bool IsLegendHover { get; set; }
         private double MinValue { get; set; }
         private double MaxValue { get; set; } = 100;
@@ -81,12 +81,12 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the visible series.
         /// </summary>
-        internal IEnumerable<RadzenSpiderSeries<TItem>> VisibleSeries => Series.Where(s => s.IsVisible);
+        internal IEnumerable<IRadzenSpiderSeries> VisibleSeries => Series.Where(s => s.IsVisible);
 
         /// <summary>
         /// Adds a series to the chart.
         /// </summary>
-        internal void AddSeries(RadzenSpiderSeries<TItem> series)
+        internal void AddSeries(IRadzenSpiderSeries series)
         {
             if (!Series.Contains(series))
             {
@@ -100,7 +100,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Removes a series from the chart.
         /// </summary>
-        internal void RemoveSeries(RadzenSpiderSeries<TItem> series)
+        internal void RemoveSeries(IRadzenSpiderSeries series)
         {
             if (Series.Remove(series))
             {
@@ -114,20 +114,7 @@ namespace Radzen.Blazor
         /// </summary>
         private void UpdateMinMax()
         {
-            var allValues = new List<double>();
-            
-            foreach (var series in Series)
-            {
-                if (series.Data != null && !string.IsNullOrEmpty(series.ValueProperty))
-                {
-                    var valueGetter = PropertyAccess.Getter<TItem, double>(series.ValueProperty);
-                    foreach (var item in series.Data)
-                    {
-                        allValues.Add(valueGetter(item));
-                    }
-                }
-            }
-            
+            var allValues = Series.SelectMany(s => s.GetValues()).ToList();
             if (allValues.Count > 0)
             {
                 MinValue = Math.Min(0, allValues.Min());
@@ -141,23 +128,16 @@ namespace Radzen.Blazor
         private List<string> GetAllCategories()
         {
             var categories = new HashSet<string>();
-            
             foreach (var series in Series)
             {
-                if (series.Data != null && !string.IsNullOrEmpty(series.CategoryProperty))
+                foreach (var category in series.GetCategories())
                 {
-                    var categoryGetter = PropertyAccess.Getter<TItem, string>(series.CategoryProperty);
-                    foreach (var item in series.Data)
+                    if (!string.IsNullOrEmpty(category))
                     {
-                        var category = categoryGetter(item);
-                        if (!string.IsNullOrEmpty(category))
-                        {
-                            categories.Add(category);
-                        }
+                        categories.Add(category);
                     }
                 }
             }
-            
             return categories.ToList();
         }
 
@@ -174,37 +154,12 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the value for a series at a specific category.
         /// </summary>
-        private double GetSeriesValue(RadzenSpiderSeries<TItem> series, string category)
-        {
-            if (series.Data == null || string.IsNullOrEmpty(series.CategoryProperty) || string.IsNullOrEmpty(series.ValueProperty))
-            {
-                return 0;
-            }
-
-            var categoryGetter = PropertyAccess.Getter<TItem, string>(series.CategoryProperty);
-            var valueGetter = PropertyAccess.Getter<TItem, double>(series.ValueProperty);
-
-            var item = series.Data.FirstOrDefault(d => categoryGetter(d) == category);
-            return item != null ? valueGetter(item) : 0;
-        }
+        private double GetSeriesValue(IRadzenSpiderSeries series, string category) => series.GetValue(category);
 
         /// <summary>
         /// Formats a value for display.
         /// </summary>
-        private string FormatValue(RadzenSpiderSeries<TItem> series, double value)
-        {
-            if (series.ValueFormatter != null)
-            {
-                return series.ValueFormatter(value);
-            }
-
-            if (!string.IsNullOrEmpty(series.FormatString))
-            {
-                return value.ToString(series.FormatString, CultureInfo.InvariantCulture);
-            }
-
-            return value.ToString("F1", CultureInfo.InvariantCulture);
-        }
+        private string FormatValue(IRadzenSpiderSeries series, double value) => series.FormatValue(value);
 
         /// <summary>
         /// Gets the grid path for a specific scale.
@@ -217,7 +172,7 @@ namespace Radzen.Blazor
             for (int i = 0; i < categories.Count; i++)
             {
                 var (x, y) = GetPoint(i, MaxValue * scale);
-                points.Add($"{x:F2},{y:F2}");
+                points.Add($"{x.ToString("F2", CultureInfo.InvariantCulture)},{y.ToString("F2", CultureInfo.InvariantCulture)}");
             }
             
             return $"M{string.Join(" L", points)} Z";
@@ -226,7 +181,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets the series path for rendering.
         /// </summary>
-        private string GetSeriesPath(RadzenSpiderSeries<TItem> series)
+        private string GetSeriesPath(IRadzenSpiderSeries series)
         {
             var categories = GetAllCategories();
             var points = new List<string>();
@@ -236,7 +191,7 @@ namespace Radzen.Blazor
                 var value = GetSeriesValue(series, category);
                 var index = GetCategoryIndex(category);
                 var (x, y) = GetPoint(index, value);
-                points.Add($"{x:F2},{y:F2}");
+                points.Add($"{x.ToString("F2", CultureInfo.InvariantCulture)},{y.ToString("F2", CultureInfo.InvariantCulture)}");
             }
             
             return points.Count > 0 ? $"M{string.Join(" L", points)} Z" : "";
@@ -388,15 +343,26 @@ namespace Radzen.Blazor
         /// <summary>
         /// Handles series click events.
         /// </summary>
-        private async Task OnSeriesClick(RadzenSpiderSeries<TItem> series, MouseEventArgs args)
+        private async Task InvokeSeriesClick(IRadzenSpiderSeries series, string? category = null, double? value = null, object? data = null)
         {
-            await SeriesClick.InvokeAsync(series);
+            if (!SeriesClick.HasDelegate)
+            {
+                return;
+            }
+
+            await SeriesClick.InvokeAsync(new Radzen.SeriesClickEventArgs
+            {
+                Title = series.Title,
+                Category = category,
+                Value = value,
+                Data = data
+            });
         }
 
         /// <summary>
         /// Handles area mouse enter events.
         /// </summary>
-        private void OnAreaMouseEnter(MouseEventArgs args, RadzenSpiderSeries<TItem> series)
+        private void OnAreaMouseEnter(MouseEventArgs args, IRadzenSpiderSeries series)
         {
             HoveredSeries = series;
             StateHasChanged();
@@ -415,16 +381,16 @@ namespace Radzen.Blazor
         }
 
         
-        private RadzenSpiderSeries<TItem>? currentTooltipSeries;
+        private IRadzenSpiderSeries? currentTooltipSeries;
         private string? currentTooltipCategory;
         
         /// <summary>
         /// Handles marker mouse enter events.
         /// </summary>
-        private void OnMarkerMouseEnter(MouseEventArgs args, RadzenSpiderSeries<TItem> series, string category, double value)
+        private async Task OnMarkerMouseEnter(MouseEventArgs args, IRadzenSpiderSeries series, string category, double value)
         {
             HoveredSeries = series;
-            ShowMarkerTooltip(args, series, category, value);
+            await ShowMarkerTooltip(args, series, category, value);
         }
         
         
@@ -440,7 +406,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Shows tooltip for a marker.
         /// </summary>
-        private void ShowMarkerTooltip(MouseEventArgs args, RadzenSpiderSeries<TItem> series, string category, double value)
+        private async Task ShowMarkerTooltip(MouseEventArgs args, IRadzenSpiderSeries series, string category, double value)
         {
             if (!this.ShowTooltip || TooltipService == null)
                 return;
@@ -455,7 +421,19 @@ namespace Radzen.Blazor
             var valueStr = FormatValue(series, value);
 
             // Open tooltip using TooltipService
-            TooltipService.OpenChartTooltip(Element, args.OffsetX + 15, args.OffsetY - 5, tooltipService => builder =>
+            // IMPORTANT: OffsetX/OffsetY are relative to the event target (SVG element) and are unreliable for positioning
+            // inside the chart container. Use ClientX/ClientY translated to chart-local coordinates.
+            double x = args.OffsetX;
+            double y = args.OffsetY;
+
+            if (JSRuntime != null)
+            {
+                var rect = await JSRuntime.InvokeAsync<Rect>("Radzen.clientRect", Element);
+                x = args.ClientX - rect.Left;
+                y = args.ClientY - rect.Top;
+            }
+
+            TooltipService.OpenChartTooltip(Element, x, y, tooltipService => builder =>
             {
                 builder.OpenComponent<Rendering.ChartTooltip>(0);
                 builder.AddAttribute(1, "Title", series.Title ?? "Series");
@@ -507,7 +485,7 @@ namespace Radzen.Blazor
         /// <summary>
         /// Highlights a series on hover.
         /// </summary>
-        internal void HighlightSeries(RadzenSpiderSeries<TItem> series)
+        internal void HighlightSeries(IRadzenSpiderSeries series)
         {
             HoveredSeries = series;
             IsLegendHover = true;
@@ -600,7 +578,7 @@ namespace Radzen.Blazor
         /// <inheritdoc />
         protected override string GetComponentCssClass()
         {
-            return "rz-spider-chart";
+            return $"rz-spider-chart rz-scheme-{ColorScheme.ToString().ToLowerInvariant()}";
         }
     }
 

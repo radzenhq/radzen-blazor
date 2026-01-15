@@ -1,6 +1,5 @@
 @namespace Radzen.Blazor.Rendering
 @using Radzen.Blazor
-@typeparam TItem
 
 @if (Chart?.Legend?.Visible == true)
 {
@@ -19,7 +18,7 @@
 
 @code {
     [CascadingParameter]
-    public RadzenSpiderChart<TItem>? Chart { get; set; }
+    public RadzenSpiderChart? Chart { get; set; }
 
     string Class => ClassList.Create("rz-spider-legend")
         .Add($"rz-spider-legend-{Chart?.Legend?.Position}".ToLowerInvariant())

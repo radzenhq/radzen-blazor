@@ -1,22 +1,35 @@
-<RadzenSpiderChart TItem="ProductData" Style="width: 100%; height: 500px;">
+<RadzenSpiderChart Style="width: 100%; height: 500px;">
     <RadzenSpiderSeries TItem="ProductData" 
-                        Data="@GetProductAData()" 
+                        Data="@dataA"
                         CategoryProperty="@nameof(ProductData.Feature)" 
                         ValueProperty="@nameof(ProductData.Score)"
                         Title="Product A" />
     <RadzenSpiderSeries TItem="ProductData" 
-                        Data="@GetProductBData()" 
+                        Data="@dataB"
                         CategoryProperty="@nameof(ProductData.Feature)" 
                         ValueProperty="@nameof(ProductData.Score)"
                         Title="Product B" />
     <RadzenSpiderSeries TItem="ProductData" 
-                        Data="@GetProductCData()" 
+                        Data="@dataC"
                         CategoryProperty="@nameof(ProductData.Feature)" 
                         ValueProperty="@nameof(ProductData.Score)"
                         Title="Product C" />
 </RadzenSpiderChart>
 
 @code {
+    IEnumerable<ProductData> dataA;
+    IEnumerable<ProductData> dataB;
+    IEnumerable<ProductData> dataC;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        dataA = GetProductAData();
+        dataB = GetProductBData();
+        dataC = GetProductCData();
+    }
+
     class ProductData
     {
         public string Feature { get; set; }

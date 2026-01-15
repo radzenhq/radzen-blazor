@@ -1,6 +1,7 @@
 @typeparam TItem
 @inherits RadzenComponent
 @implements IDisposable
+@implements Radzen.Blazor.IRadzenSpiderSeries
 @using Radzen.Blazor.Rendering
 @using Microsoft.AspNetCore.Components.Rendering
 @using Microsoft.AspNetCore.Components.Web
@@ -61,7 +62,7 @@
     public double MarkerSize { get; set; } = 6;
 
     [CascadingParameter]
-    public RadzenSpiderChart<TItem>? Chart { get; set; }
+    public RadzenSpiderChart? Chart { get; set; }
 
     private bool _registered;
 
@@ -100,6 +101,13 @@
     /// </summary>
     internal int Index { get; set; }
 
+    int IRadzenSpiderSeries.Index { get => Index; set => Index = value; }
+    string IRadzenSpiderSeries.Title => Title;
+    bool IRadzenSpiderSeries.IsVisible { get => IsVisible; set => IsVisible = value; }
+    bool IRadzenSpiderSeries.MarkersVisible => MarkersVisible;
+    double IRadzenSpiderSeries.MarkerSize => MarkerSize;
+    double IRadzenSpiderSeries.StrokeWidth => StrokeWidth;
+
     /// <summary>
     /// Measures the legend text width for this series.
     /// </summary>
@@ -112,6 +120,76 @@
 
         return TextMeasurer.TextWidth(Title);
     }
+
+    double IRadzenSpiderSeries.MeasureLegend() => MeasureLegend();
+
+    IEnumerable<string> IRadzenSpiderSeries.GetCategories()
+    {
+        if (Data == null || string.IsNullOrEmpty(CategoryProperty))
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        var categoryGetter = PropertyAccess.Getter<TItem, string>(CategoryProperty);
+        return Data.Select(item => categoryGetter(item))
+                   .Where(c => !string.IsNullOrEmpty(c))
+                   .Distinct()
+                   .ToList();
+    }
+
+    IEnumerable<double> IRadzenSpiderSeries.GetValues()
+    {
+        if (Data == null || string.IsNullOrEmpty(ValueProperty))
+        {
+            return Enumerable.Empty<double>();
+        }
+
+        var valueGetter = PropertyAccess.Getter<TItem, double>(ValueProperty);
+        return Data.Select(item => valueGetter(item)).ToList();
+    }
+
+    double IRadzenSpiderSeries.GetValue(string category)
+    {
+        if (Data == null || string.IsNullOrEmpty(CategoryProperty) || string.IsNullOrEmpty(ValueProperty))
+        {
+            return 0;
+        }
+
+        var categoryGetter = PropertyAccess.Getter<TItem, string>(CategoryProperty);
+        var valueGetter = PropertyAccess.Getter<TItem, double>(ValueProperty);
+
+        var item = Data.FirstOrDefault(d => categoryGetter(d) == category);
+        return item != null ? valueGetter(item) : 0;
+    }
+
+    object? IRadzenSpiderSeries.GetData(string category)
+    {
+        if (Data == null || string.IsNullOrEmpty(CategoryProperty))
+        {
+            return null;
+        }
+
+        var categoryGetter = PropertyAccess.Getter<TItem, string>(CategoryProperty);
+        return Data.FirstOrDefault(d => categoryGetter(d) == category);
+    }
+
+    string IRadzenSpiderSeries.FormatValue(double value)
+    {
+        if (ValueFormatter != null)
+        {
+            return ValueFormatter(value);
+        }
+
+        if (!string.IsNullOrEmpty(FormatString))
+        {
+            return value.ToString(FormatString, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        return value.ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    RenderFragment IRadzenSpiderSeries.RenderLegendItem() => RenderLegendItem();
+    void IRadzenSpiderSeries.ForceUpdate() => ForceUpdate();
 
     /// <summary>
     /// Renders the legend item for this series.

@@ -1,5 +1,3 @@
-@using Radzen.Blazor
-
 <RadzenCard class="w-100 mb-3" Style="padding: 0.75rem;margin-bottom:1rem;">
     <RadzenTabs>
         <Tabs>
@@ -7,10 +5,10 @@
                 <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap" AlignItems="AlignItems.Center">
                     <RadzenStack Gap="0.25rem">
                         <RadzenText TextStyle="TextStyle.Caption">Grid Shape</RadzenText>
-                        <RadzenSelectBar @bind-Value="gridShape" TValue="Radzen.Blazor.SpiderChartGridShape" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+                        <RadzenSelectBar @bind-Value="gridShape" TValue="SpiderChartGridShape" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
                             <Items>
-                                <RadzenSelectBarItem Text="Polygon" Value="Radzen.Blazor.SpiderChartGridShape.Polygon" />
-                                <RadzenSelectBarItem Text="Circle" Value="Radzen.Blazor.SpiderChartGridShape.Circular" />
+                                <RadzenSelectBarItem Text="Polygon" Value="SpiderChartGridShape.Polygon" />
+                                <RadzenSelectBarItem Text="Circle" Value="SpiderChartGridShape.Circular" />
                             </Items>
                         </RadzenSelectBar>
                     </RadzenStack>
@@ -70,25 +68,25 @@
     </RadzenTabs>
 </RadzenCard>
 
-<RadzenSpiderChart TItem="EmployeePerformance" GridShape="@gridShape"
+<RadzenSpiderChart GridShape="@gridShape"
                    ColorScheme="@colorScheme"
                    ShowMarkers="@showMarkers"
                    Style="width: 100%; height: 500px;">
     <RadzenSpiderLegend Position="@legendPosition" Visible="@legendVisible" />
     <RadzenSpiderSeries TItem="EmployeePerformance" 
-                        Data="@GetNancyData()" 
+                        Data="@nancyData" 
                         CategoryProperty="@nameof(EmployeePerformance.Metric)" 
                         ValueProperty="@nameof(EmployeePerformance.Score)"
                         Title="Nancy Davolio"
                         ValueFormatter="@GetValueFormatter()" />
     <RadzenSpiderSeries TItem="EmployeePerformance" 
-                        Data="@GetAndrewData()" 
+                        Data="@andrewData" 
                         CategoryProperty="@nameof(EmployeePerformance.Metric)" 
                         ValueProperty="@nameof(EmployeePerformance.Score)"
                         Title="Andrew Fuller"
                         ValueFormatter="@GetValueFormatter()" />
     <RadzenSpiderSeries TItem="EmployeePerformance" 
-                        Data="@GetJanetData()" 
+                        Data="@janetData" 
                         CategoryProperty="@nameof(EmployeePerformance.Metric)" 
                         ValueProperty="@nameof(EmployeePerformance.Score)"
                         Title="Janet Leverling"
@@ -96,12 +94,25 @@
 </RadzenSpiderChart>
 
 @code {
-    Radzen.Blazor.SpiderChartGridShape gridShape = Radzen.Blazor.SpiderChartGridShape.Polygon;
+    SpiderChartGridShape gridShape = SpiderChartGridShape.Polygon;
     ColorScheme colorScheme = ColorScheme.Palette;
     bool showMarkers = true;
     string valueFormat = "percent";
     LegendPosition legendPosition = LegendPosition.Right;
     bool legendVisible = true;
+
+    IEnumerable<EmployeePerformance> nancyData;
+    IEnumerable<EmployeePerformance> andrewData;
+    IEnumerable<EmployeePerformance> janetData;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        nancyData = GetNancyData();
+        andrewData = GetAndrewData();
+        janetData = GetJanetData();
+    }
     
     Func<double, string> GetValueFormatter()
     {

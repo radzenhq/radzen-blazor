@@ -1,4 +1,3 @@
-@typeparam TItem
 @inherits RadzenComponent
 @using Radzen.Blazor.Rendering
 
@@ -9,15 +8,17 @@
 </CascadingValue>
 
 <CascadingValue Value="@this" IsFixed="true">
-    <div @ref="@Element" class="@GetComponentCssClass() rz-scheme-@(ColorScheme.ToString().ToLower()) @GetCssClass()" style="@Style" @attributes="Attributes">
+    <div @ref="@Element" class="@GetCssClass()" style="@Style" @attributes="Attributes">
         @{
-            var wrapperClass = $"rz-spider-chart-wrapper {(Legend?.Visible == true ? $"rz-spider-legend-{Legend.Position}".ToLowerInvariant() : "")}".Trim();
+            var wrapperClass = ClassList.Create("rz-spider-chart-wrapper")
+                .Add($"rz-spider-legend-{Legend?.Position}".ToLowerInvariant(), Legend?.Visible == true)
+                .ToString();
         }
 
         <div class="@wrapperClass" @onmouseleave="OnChartMouseLeave">
-            @if (Width != null && Height != null && Series?.Any() == true)
+            @if (Width != null && Height != null && Series.Count > 0)
             {
-                <svg viewBox="0 0 @Width @Height">
+                <svg viewBox="@($"0 0 {Width.Value.ToInvariantString()} {Height.Value.ToInvariantString()}")">
                         <g class="rz-spider-chart-grid">
                         @* Diagonal lines first (bottom layer) *@
                         @foreach (var category in GetAllCategories())
@@ -25,7 +26,7 @@
                             var index = GetCategoryIndex(category);
                             var (x1, y1) = GetPoint(index, MinValue);
                             var (x2, y2) = GetPoint(index, MaxValue);
-                            <line x1="@x1" y1="@y1" x2="@x2" y2="@y2"
+                            <line x1="@x1.ToInvariantString()" y1="@y1.ToInvariantString()" x2="@x2.ToInvariantString()" y2="@y2.ToInvariantString()"
                                   stroke="var(--rz-text-secondary-color, #999)"
                                   stroke-width="1"
                                   opacity="0.5"
@@ -40,7 +41,7 @@
                                 var centerX = Width.Value / 2;
                                 var centerY = Height.Value / 2;
                                 var radius = Math.Min(centerX, centerY) * 0.8 * (i / 5.0);
-                                <circle cx="@centerX" cy="@centerY" r="@radius"
+                                <circle cx="@centerX.ToInvariantString()" cy="@centerY.ToInvariantString()" r="@radius.ToInvariantString()"
                                         fill="none"
                                         stroke="var(--rz-border-color, #e0e0e0)"
                                         stroke-width="1"
@@ -69,9 +70,9 @@
                             
                             <path d="@path" 
                                   class="rz-spider-chart-area rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
-                                  data-stroke-width="@series.StrokeWidth"
+                                  data-stroke-width="@series.StrokeWidth.ToInvariantString()"
                                   fill-opacity="0.3"
-                                  @onclick="@(args => OnSeriesClick(localSeries, args))"
+                                  @onclick="@(args => InvokeSeriesClick(localSeries))"
                                   @onmouseenter="@(args => { OnAreaMouseEnter((MouseEventArgs)args, localSeries); })"
                                   @onmouseleave="OnAreaMouseLeave" />
                         }
@@ -93,7 +94,7 @@
                                         var index = GetCategoryIndex(category);
                                         var (x, y) = GetPoint(index, value);
                                         
-                                        <circle cx="@x" cy="@y" r="@series.MarkerSize" 
+                                        <circle cx="@x.ToInvariantString()" cy="@y.ToInvariantString()" r="@series.MarkerSize.ToInvariantString()" 
                                                 class="rz-spider-chart-marker rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
                                                 pointer-events="none" />
                                     }
@@ -116,10 +117,11 @@
                                         var localCategory = category;
                                         var localValue = value;
                                         
-                                        <circle cx="@x" cy="@y" r="10" 
+                                        <circle cx="@x.ToInvariantString()" cy="@y.ToInvariantString()" r="10" 
                                                 fill="transparent"
                                                 stroke="transparent"
                                                 class="rz-spider-chart-hit-area"
+                                                @onclick="@(args => InvokeSeriesClick(localSeries, localCategory, localValue, localSeries.GetData(localCategory)))"
                                                 @onmouseenter="@(args => OnMarkerMouseEnter((MouseEventArgs)args, localSeries, localCategory, localValue))"
                                                 @onmouseleave="OnMarkerMouseLeave" />
                                     }
@@ -134,7 +136,7 @@
                 </svg>
             @if (Legend?.Visible == true)
             {
-             <SpiderLegend TItem="TItem" />
+             <SpiderLegend />
             }
            }
 
