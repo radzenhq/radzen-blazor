@@ -1,4 +1,5 @@
 @using Microsoft.JSInterop
+@using System.Linq
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime
@@ -6,7 +7,8 @@
 
     <div @ref=@element class="@($"{"rz-event"} {CssClass}".Trim())" style=@Style
          role="button" tabindex="0" aria-label="@Data?.Text"
-         @onclick=@OnClick @onkeydown="OnKeyDown" @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave>
+         @onclick=@OnClick @onkeydown="OnKeyDown" @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave
+         @attributes="@FilteredAdditionalAttributes">
         <div class="rz-event-content" title=@Title @attributes=@Attributes>
             @if (ShowAppointmentContent && Scheduler != null && Data != null)
             {
@@ -48,6 +50,17 @@
     [Parameter]
     public bool ShowAppointmentContent { get; set; } = true;
 
+    /// <summary>
+    /// Extra HTML attributes rendered on the outer element.
+    /// </summary>
+    [Parameter]
+    public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private IReadOnlyDictionary<string, object>? FilteredAdditionalAttributes =>
+        AdditionalAttributes != null && AdditionalAttributes.ContainsKey("style")
+            ? AdditionalAttributes.Where(kv => kv.Key != "style").ToDictionary(kv => kv.Key, kv => kv.Value)
+            : AdditionalAttributes;
+
     [CascadingParameter]
     public IScheduler? Scheduler { get; set; }
 
@@ -80,6 +93,11 @@
         }
 
         Style = String.Join(";", style);
+
+        if (AdditionalAttributes != null && AdditionalAttributes.TryGetValue("style", out var extraStyle) && extraStyle is string s && !string.IsNullOrWhiteSpace(s))
+        {
+            Style = string.IsNullOrWhiteSpace(Style) ? s : Style.TrimEnd(';') + ";" + s;
+        }
     }
 
     async Task OnClick()
@@ -96,19 +114,19 @@
         }
     }
 
-    async Task OnMouseEnter()
+    async Task OnMouseEnter(MouseEventArgs e)
     {
         if (Scheduler != null && Data != null)
         {
-            await Scheduler.MouseEnterAppointment(element, Data);
+            await Scheduler.MouseEnterAppointment(element, Data, e.ClientX, e.ClientY);
         }
     }
 
-    async Task OnMouseLeave()
+    async Task OnMouseLeave(MouseEventArgs e)
     {
         if (Scheduler != null && Data != null)
         {
-            await Scheduler.MouseLeaveAppointment(element, Data);
+            await Scheduler.MouseLeaveAppointment(element, Data, e.ClientX, e.ClientY);
         }
     }
 

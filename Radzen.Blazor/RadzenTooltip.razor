@@ -61,7 +61,9 @@
                 (enumName ?? tooltip.Options.Position.ToString()).ToLowerInvariant(),
                 tooltip.Options.CloseTooltipOnDocumentClick,
                 Reference,
-                "RadzenTooltip.CloseTooltip");
+                "RadzenTooltip.CloseTooltip",
+                tooltip.Options.ClientX,
+                tooltip.Options.ClientY);
         }
     }
 

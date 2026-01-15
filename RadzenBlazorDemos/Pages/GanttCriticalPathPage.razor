@@ -1,0 +1,15 @@
+@page "/gantt-critical-path"
+
+<PageTitle>Gantt Critical Path - Radzen Blazor Components</PageTitle>
+
+<RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Gantt Critical Path
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Set <code>ShowCriticalPath="true"</code> to highlight the longest chain of dependent tasks that determines
+    the project end date. Critical tasks and their links are shown in <strong style="color:var(--rz-danger)">red</strong>.
+</RadzenText>
+
+<RadzenExample ComponentName="Gantt" Example="GanttCriticalPath">
+    <GanttCriticalPath />
+</RadzenExample>

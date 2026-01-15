@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -299,6 +299,16 @@ namespace Radzen
         /// </summary>
         /// <value>The child content.</value>
         public RenderFragment<TooltipService>? ChildContent { get; set; }
+        /// <summary>
+        /// Gets or sets the horizontal viewport coordinate to anchor the tooltip to.
+        /// When set, the tooltip is positioned relative to this point instead of the element.
+        /// </summary>
+        public double? ClientX { get; set; }
+        /// <summary>
+        /// Gets or sets the vertical viewport coordinate to anchor the tooltip to.
+        /// When set, the tooltip is positioned relative to this point instead of the element.
+        /// </summary>
+        public double? ClientY { get; set; }
     }
 
     /// <summary>
