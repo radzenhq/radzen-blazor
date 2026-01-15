@@ -1,4 +1,4 @@
-<RadzenSpiderChart Style="width: 100%; height: 500px;">
+<RadzenSpiderChart Style="width: 100%; height: 500px;" SeriesClick="@OnSeriesClick">
     <RadzenSpiderSeries TItem="ProductData" 
                         Data="@dataA"
                         CategoryProperty="@nameof(ProductData.Feature)" 
@@ -16,7 +16,16 @@
                         Title="Product C" />
 </RadzenSpiderChart>
 
+<EventConsole @ref=@console />
+
 @code {
+    EventConsole console;
+
+    void OnSeriesClick(SeriesClickEventArgs args)
+    {
+        console.Log($"SeriesClick: Title={args.Title}, Category={args.Category}, Value={args.Value}");
+    }
+
     IEnumerable<ProductData> dataA;
     IEnumerable<ProductData> dataB;
     IEnumerable<ProductData> dataC;
