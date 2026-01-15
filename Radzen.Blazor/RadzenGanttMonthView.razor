@@ -1,0 +1,126 @@
+@using System.Globalization
+@using Radzen.Blazor.Rendering
+@typeparam TItem where TItem : notnull
+@inherits SchedulerViewBase
+
+@code {
+    [CascadingParameter]
+    internal RadzenGantt<TItem>? Gantt { get; set; }
+
+    public override string Icon => "calendar_view_month";
+
+    [Parameter]
+    public override string Text { get; set; } = "Month";
+
+    public override string Title
+    {
+        get
+        {
+            var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+            return MonthStart.ToString("Y", culture);
+        }
+    }
+
+    public override DateTime StartDate
+    {
+        get
+        {
+            return GridStart;
+        }
+    }
+
+    public override DateTime EndDate => GridEnd;
+
+    public override DateTime Next()
+    {
+        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddMonths(1);
+    }
+
+    public override DateTime Prev()
+    {
+        return (Scheduler?.CurrentDate.Date ?? DateTime.Today).AddMonths(-1);
+    }
+
+    public override RenderFragment Render()
+    {
+        var appointments = Scheduler?.GetAppointmentsInRange(StartDate, EndDate).ToList() ?? new List<AppointmentData>();
+        var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+        var columns = BuildWeekColumns(GridStart, GridEnd, Gantt?.DayWidthPx ?? 32, culture);
+        var timelineWidth = columns.Sum(c => c.WidthPx);
+
+        Gantt?.ComputeCriticalPath(appointments, Gantt?.TimelineRowIndexByItem);
+
+        return @<CascadingValue Value=@Scheduler>
+            <GanttTimelineView TItem="TItem" StartDate=@StartDate
+                               EndDate=@EndDate
+                               Columns=@columns
+                               TimelineWidthPx=@timelineWidth
+                               RowCount=@(Gantt?.TimelineRowCount ?? 0)
+                               RowIndexByItem=@(Gantt?.TimelineRowIndexByItem)
+                               RowHeightPx=@(Gantt?.RowHeightPx ?? 36)
+                               Appointments=@appointments
+                               Dependencies=@(Gantt?.TimelineDependencies)
+                               CriticalItems=@(Gantt?.CriticalPathItems)
+                               BaselineStartProperty=@(Gantt?.TimelineBaselineStartProperty)
+                               BaselineEndProperty=@(Gantt?.TimelineBaselineEndProperty)
+                               ShowTodayLine=@(Gantt?.TimelineShowTodayLine ?? true)
+                               ShowWeekends=@(Gantt?.TimelineShowWeekends ?? true)
+                               NonWorkingDays=@(Gantt?.TimelineNonWorkingDays)
+                               Markers=@(Gantt?.TimelineMarkers)
+                               TaskRender=@(Gantt?.TimelineTaskRender)
+                               AppointmentMove=OnAppointmentMove />
+        </CascadingValue>;
+    }
+
+    private static IReadOnlyList<GanttTimelineView<TItem>.GanttTimelineColumn> BuildWeekColumns(DateTime start, DateTime end, int dayWidth, CultureInfo culture)
+    {
+        var columns = new List<GanttTimelineView<TItem>.GanttTimelineColumn>();
+        for (var d = start.Date; d < end.Date; d = d.AddDays(7))
+        {
+            var weekStart = d.Date;
+            var weekEnd = d.AddDays(7);
+            if (weekEnd > end)
+            {
+                weekEnd = end;
+            }
+
+            var daysInWeek = (weekEnd - weekStart).TotalDays;
+            columns.Add(new GanttTimelineView<TItem>.GanttTimelineColumn
+            {
+                Start = weekStart,
+                End = weekEnd,
+                Label = $"{weekStart.ToString("M/d", culture)} – {weekEnd.AddDays(-1).ToString("M/d", culture)}",
+                GroupLabel = weekStart.ToString("MMMM yyyy", culture),
+                WidthPx = dayWidth * Math.Max(1, daysInWeek)
+            });
+        }
+        return columns;
+    }
+
+    private DateTime MonthStart
+    {
+        get
+        {
+            var date = Scheduler?.CurrentDate.Date ?? DateTime.Today;
+            return date.StartOfMonth();
+        }
+    }
+
+    private DateTime GridStart
+    {
+        get
+        {
+            var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+            return MonthStart.StartOfWeek(culture);
+        }
+    }
+
+    private DateTime GridEnd
+    {
+        get
+        {
+            var culture = Scheduler?.Culture ?? CultureInfo.CurrentCulture;
+            return MonthStart.EndOfMonth().EndOfWeek(culture).AddDays(1);
+        }
+    }
+}
