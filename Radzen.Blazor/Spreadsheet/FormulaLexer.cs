@@ -115,7 +115,7 @@ internal class FormulaToken(FormulaTokenType type, string  value)
 
 internal class FormulaLexer(string expression, bool strict = true)
 {
-    private int position = 0;
+    private int position;
 
     public static List<FormulaToken> Scan(string expression, bool strict = true)
     {

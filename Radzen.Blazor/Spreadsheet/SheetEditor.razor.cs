@@ -149,6 +149,7 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
     [JSInvokable]
     public async Task OnKeyDownAsync(KeyboardEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (args.Key == "ArrowDown")
         {
             if (functions.Count > 0)
@@ -200,6 +201,7 @@ public partial class SheetEditor : ComponentBase, IAsyncDisposable
     [JSInvokable]
     public async Task OnInputAsync(string value)
     {
+        ArgumentNullException.ThrowIfNull(value);
         this.value = value;
 
         await ValueChanged.InvokeAsync(value);
