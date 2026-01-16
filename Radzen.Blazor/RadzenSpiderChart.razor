@@ -26,11 +26,7 @@
                             var index = GetCategoryIndex(category);
                             var (x1, y1) = GetPoint(index, MinValue);
                             var (x2, y2) = GetPoint(index, MaxValue);
-                            <line x1="@x1.ToInvariantString()" y1="@y1.ToInvariantString()" x2="@x2.ToInvariantString()" y2="@y2.ToInvariantString()"
-                                  stroke="var(--rz-text-secondary-color, #999)"
-                                  stroke-width="1"
-                                  opacity="0.5"
-                                  class="rz-spider-chart-grid-line" />
+                            <line x1="@x1.ToInvariantString()" y1="@y1.ToInvariantString()" x2="@x2.ToInvariantString()" y2="@y2.ToInvariantString()" class="rz-spider-chart-grid-line" />
                         }
 
                         @* Grid shapes second (top layer) *@
@@ -41,21 +37,11 @@
                                 var centerX = Width.Value / 2;
                                 var centerY = Height.Value / 2;
                                 var radius = Math.Min(centerX, centerY) * 0.8 * (i / 5.0);
-                                <circle cx="@centerX.ToInvariantString()" cy="@centerY.ToInvariantString()" r="@radius.ToInvariantString()"
-                                        fill="none"
-                                        stroke="var(--rz-border-color, #e0e0e0)"
-                                        stroke-width="1"
-                                        opacity="0.7"
-                                        class="rz-spider-chart-grid-circle" />
+                                <circle cx="@centerX.ToInvariantString()" cy="@centerY.ToInvariantString()" r="@radius.ToInvariantString()" class="rz-spider-chart-grid-circle" />
                             }
                             else
                             {
-                                <path d="@GetGridPath(i / 5.0)"
-                                      fill="none"
-                                      stroke="var(--rz-border-color, #e0e0e0)"
-                                      stroke-width="1"
-                                      opacity="0.7"
-                                      class="rz-spider-chart-grid-polygon" />
+                                <path d="@GetGridPath(i / 5.0)" class="rz-spider-chart-grid-polygon" />
                             }
                         }
                     </g>
@@ -71,7 +57,6 @@
                             <path d="@path" 
                                   class="rz-spider-chart-area rz-series-@(series.Index) @(isHovered && IsLegendHover ? "rz-state-hover" : "") @(!shouldShow ? "rz-state-hidden" : "")"
                                   data-stroke-width="@series.StrokeWidth.ToInvariantString()"
-                                  fill-opacity="0.3"
                                   @onclick="@(args => InvokeSeriesClick(localSeries))"
                                   @onmouseenter="@(args => { OnAreaMouseEnter((MouseEventArgs)args, localSeries); })"
                                   @onmouseleave="OnAreaMouseLeave" />
