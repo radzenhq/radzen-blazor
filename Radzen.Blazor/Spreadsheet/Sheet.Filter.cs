@@ -28,6 +28,21 @@ public class SheetFilter(FilterCriterion criterion, RangeRef range)
 public abstract class FilterCriterion
 {
     /// <summary>
+    /// Throws <see cref="ArgumentNullException" /> when the visitor is null.
+    /// </summary>
+    protected static void ThrowIfNullVisitor(IFilterCriterionVisitor visitor)
+    {
+        ArgumentNullException.ThrowIfNull(visitor);
+    }
+
+    /// <summary>
+    /// Throws <see cref="ArgumentNullException" /> when the sheet is null.
+    /// </summary>
+    protected static void ThrowIfNullSheet(Sheet sheet)
+    {
+        ArgumentNullException.ThrowIfNull(sheet);
+    }
+    /// <summary>
     /// Determines whether the specified row in the given sheet matches the filter criterion.
     /// </summary>
     /// <param name="sheet"></param>
@@ -140,6 +155,7 @@ public class OrCriterion : FilterCriterion
     /// <inheritdoc/>
     public override bool Matches(Sheet sheet, int row)
     {
+        ThrowIfNullSheet(sheet);
         foreach (var criterion in Criteria)
         {
             if (criterion.Matches(sheet, row))
@@ -152,7 +168,11 @@ public class OrCriterion : FilterCriterion
     }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -168,6 +188,7 @@ public class AndCriterion : FilterCriterion
     /// <inheritdoc/>
     public override bool Matches(Sheet sheet, int row)
     {
+        ThrowIfNullSheet(sheet);
         foreach (var criterion in Criteria)
         {
             if (!criterion.Matches(sheet, row))
@@ -180,7 +201,11 @@ public class AndCriterion : FilterCriterion
     }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -196,6 +221,7 @@ public abstract class FilterCriterionLeaf : FilterCriterion
     /// <inheritdoc/>
     public override bool Matches(Sheet sheet, int row)
     {
+        ThrowIfNullSheet(sheet);
         var cell = sheet.Cells[row, Column];
         return Matches(cell.Value);
     }
@@ -307,7 +333,11 @@ public class EqualToCriterion : FilterCriterionLeaf
     }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -319,7 +349,11 @@ public class GreaterThanCriterion : NumericFilterCriterion
     protected override bool Matches(double numericValue, double numericCriterion) => numericValue > numericCriterion;
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -331,7 +365,11 @@ public class LessThanCriterion : NumericFilterCriterion
     protected override bool Matches(double numericValue, double numericCriterion) => numericValue < numericCriterion;
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -343,7 +381,11 @@ public class GreaterThanOrEqualCriterion : NumericFilterCriterion
     protected override bool Matches(double numericValue, double numericCriterion) => numericValue >= numericCriterion;
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -355,7 +397,11 @@ public class LessThanOrEqualCriterion : NumericFilterCriterion
     protected override bool Matches(double numericValue, double numericCriterion) => numericValue <= numericCriterion;
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -390,7 +436,11 @@ public class NotEqualToCriterion : FilterCriterionLeaf
     }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -434,7 +484,11 @@ public class InListCriterion : FilterCriterionLeaf
     }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -449,7 +503,11 @@ public class IsNullCriterion : FilterCriterionLeaf
     }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -457,6 +515,15 @@ public class IsNullCriterion : FilterCriterionLeaf
 /// </summary>
 public abstract class StringFilterCriterion : FilterCriterionLeaf
 {
+    /// <summary>
+    /// Throws <see cref="ArgumentNullException" /> when string inputs are null.
+    /// </summary>
+    protected static void ThrowIfNullStrings(string stringValue, string stringCriterion)
+    {
+        ArgumentNullException.ThrowIfNull(stringValue);
+        ArgumentNullException.ThrowIfNull(stringCriterion);
+    }
+
     /// <summary>
     /// Gets or sets the value that this filter criterion checks against.
     /// </summary>
@@ -488,10 +555,18 @@ public abstract class StringFilterCriterion : FilterCriterionLeaf
 public class StartsWithCriterion : StringFilterCriterion
 {
     /// <inheritdoc/>
-    protected override bool Matches(string stringValue, string stringCriterion) => stringValue.StartsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    protected override bool Matches(string stringValue, string stringCriterion)
+    {
+        ThrowIfNullStrings(stringValue, stringCriterion);
+        return stringValue.StartsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -500,10 +575,18 @@ public class StartsWithCriterion : StringFilterCriterion
 public class DoesNotStartWithCriterion : StringFilterCriterion
 {
     /// <inheritdoc/>
-    protected override bool Matches(string stringValue, string stringCriterion) => !stringValue.StartsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    protected override bool Matches(string stringValue, string stringCriterion)
+    {
+        ThrowIfNullStrings(stringValue, stringCriterion);
+        return !stringValue.StartsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -512,10 +595,18 @@ public class DoesNotStartWithCriterion : StringFilterCriterion
 public class EndsWithCriterion : StringFilterCriterion
 {
     /// <inheritdoc/>
-    protected override bool Matches(string stringValue, string stringCriterion) => stringValue.EndsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    protected override bool Matches(string stringValue, string stringCriterion)
+    {
+        ThrowIfNullStrings(stringValue, stringCriterion);
+        return stringValue.EndsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -524,10 +615,18 @@ public class EndsWithCriterion : StringFilterCriterion
 public class DoesNotEndWithCriterion : StringFilterCriterion
 {
     /// <inheritdoc/>
-    protected override bool Matches(string stringValue, string stringCriterion) => !stringValue.EndsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    protected override bool Matches(string stringValue, string stringCriterion)
+    {
+        ThrowIfNullStrings(stringValue, stringCriterion);
+        return !stringValue.EndsWith(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -536,10 +635,18 @@ public class DoesNotEndWithCriterion : StringFilterCriterion
 public class ContainsCriterion : StringFilterCriterion
 {
     /// <inheritdoc/>
-    protected override bool Matches(string stringValue, string stringCriterion) => stringValue.Contains(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    protected override bool Matches(string stringValue, string stringCriterion)
+    {
+        ThrowIfNullStrings(stringValue, stringCriterion);
+        return stringValue.Contains(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 /// <summary>
@@ -548,10 +655,18 @@ public class ContainsCriterion : StringFilterCriterion
 public class DoesNotContainCriterion : StringFilterCriterion
 {
     /// <inheritdoc/>
-    protected override bool Matches(string stringValue, string stringCriterion) => !stringValue.Contains(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    protected override bool Matches(string stringValue, string stringCriterion)
+    {
+        ThrowIfNullStrings(stringValue, stringCriterion);
+        return !stringValue.Contains(stringCriterion, StringComparison.OrdinalIgnoreCase);
+    }
 
     /// <inheritdoc/>
-    public override void Accept(IFilterCriterionVisitor visitor) => visitor.Visit(this);
+    public override void Accept(IFilterCriterionVisitor visitor)
+    {
+        ThrowIfNullVisitor(visitor);
+        visitor.Visit(this);
+    }
 }
 
 public partial class Sheet
@@ -597,10 +712,7 @@ public partial class Sheet
     /// </summary>
     public void AddFilter(SheetFilter filter)
     {
-        if (filter == null)
-        {
-            throw new ArgumentNullException(nameof(filter));
-        }
+        ArgumentNullException.ThrowIfNull(filter);
 
         var existingFilter = GetFilter(filter.Range);
 
@@ -642,10 +754,7 @@ public partial class Sheet
     /// <returns>True if the filter was found and removed; otherwise, false.</returns>
     public bool RemoveFilter(SheetFilter filter)
     {
-        if (filter == null)
-        {
-            throw new ArgumentNullException(nameof(filter));
-        }
+        ArgumentNullException.ThrowIfNull(filter);
 
         var removed = filters.Remove(filter);
 

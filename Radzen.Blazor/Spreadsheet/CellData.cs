@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
 namespace Radzen.Blazor.Spreadsheet;
@@ -70,6 +71,7 @@ static class TypeExtensions
 /// <summary>
 /// Represents a value of a spreadsheet cell along with its type.
 /// </summary>
+[SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "Comparison operators are intentionally omitted; use explicit comparison helpers.")]
 public class CellData : IComparable, IComparable<CellData>
 {
     /// <summary>
@@ -115,7 +117,7 @@ public class CellData : IComparable, IComparable<CellData>
         else
         {
             Type = GetValueType(data, valType, isNullable, nullableType);
-            Value = (Type == CellDataType.Number) ? Convert.ToDouble(data) : data;
+            Value = (Type == CellDataType.Number) ? Convert.ToDouble(data, CultureInfo.InvariantCulture) : data;
         }
     }
 
@@ -385,6 +387,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// </summary>
     public bool IsEqualTo(CellData other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         // special handling of empty cell vs empty string.
         if (other.IsEmpty && string.IsNullOrEmpty(Value?.ToString()) || IsEmpty && string.IsNullOrEmpty(other.Value?.ToString()))
         {
@@ -410,6 +413,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// <param name="other"></param>
     public bool IsLessThan(CellData other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         if (Value == null || other.Value == null)
             return false;
 
@@ -423,6 +427,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// <param name="other"></param>
     public bool IsGreaterThan(CellData other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         if (Value == null || other.Value == null)
             return false;
 
@@ -436,6 +441,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// <param name="other"></param>
     public bool IsLessThanOrEqualTo(CellData other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         if (Value == null || other.Value == null)
             return false;
 
@@ -449,6 +455,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// <param name="other"></param>
     public bool IsGreaterThanOrEqualTo(CellData other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         if (Value == null || other.Value == null)
             return false;
 
@@ -500,6 +507,7 @@ public class CellData : IComparable, IComparable<CellData>
     /// <returns>True if this cell matches the criteria, false otherwise</returns>
     public bool MatchesCriteria(CellData criteria)
     {
+        ArgumentNullException.ThrowIfNull(criteria);
         // Handle error criteria
         if (criteria.IsError)
         {
@@ -519,7 +527,8 @@ public class CellData : IComparable, IComparable<CellData>
             var cellString = ToString() ?? "";
 
             // Check for wildcard patterns
-            if (criteriaString.Contains('*') || criteriaString.Contains('?'))
+            if (criteriaString.Contains('*', StringComparison.Ordinal) ||
+                criteriaString.Contains('?', StringComparison.Ordinal))
             {
                 return Wildcard.IsFullMatch(cellString, criteriaString);
             }
@@ -537,9 +546,12 @@ public class CellData : IComparable, IComparable<CellData>
 
     private static bool IsComparisonExpression(string criteria)
     {
-        return criteria.StartsWith(">") || criteria.StartsWith("<") || 
-               criteria.StartsWith(">=") || criteria.StartsWith("<=") ||
-               criteria.StartsWith("<>") || criteria.StartsWith("!=");
+        return criteria.StartsWith(">=", StringComparison.Ordinal) ||
+               criteria.StartsWith("<=", StringComparison.Ordinal) ||
+               criteria.StartsWith("<>", StringComparison.Ordinal) ||
+               criteria.StartsWith("!=", StringComparison.Ordinal) ||
+               criteria.StartsWith('>') ||
+               criteria.StartsWith('<');
     }
 
     private bool EvaluateComparisonExpression(string criteria)
@@ -553,27 +565,27 @@ public class CellData : IComparable, IComparable<CellData>
         string operatorStr;
         string valueStr;
 
-        if (criteria.StartsWith(">="))
+        if (criteria.StartsWith(">=", StringComparison.Ordinal))
         {
             operatorStr = ">=";
             valueStr = criteria[2..].Trim();
         }
-        else if (criteria.StartsWith("<="))
+        else if (criteria.StartsWith("<=", StringComparison.Ordinal))
         {
             operatorStr = "<=";
             valueStr = criteria[2..].Trim();
         }
-        else if (criteria.StartsWith("<>") || criteria.StartsWith("!="))
+        else if (criteria.StartsWith("<>", StringComparison.Ordinal) || criteria.StartsWith("!=", StringComparison.Ordinal))
         {
             operatorStr = "<>";
             valueStr = criteria[2..].Trim();
         }
-        else if (criteria.StartsWith(">"))
+        else if (criteria.StartsWith('>'))
         {
             operatorStr = ">";
             valueStr = criteria[1..].Trim();
         }
-        else if (criteria.StartsWith("<"))
+        else if (criteria.StartsWith('<'))
         {
             operatorStr = "<";
             valueStr = criteria[1..].Trim();

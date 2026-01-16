@@ -85,7 +85,21 @@ class TextFunction : FormulaFunction
     private static bool ContainsDateTimeTokens(string format)
     {
         var f = format.ToUpperInvariant();
-        return f.Contains("Y") || f.Contains("D") || f.Contains("H") || f.Contains("S") || f.Contains("AM/PM");
+#if NET8_0_OR_GREATER
+        return f.Contains('Y', StringComparison.Ordinal) ||
+               f.Contains('D', StringComparison.Ordinal) ||
+               f.Contains('H', StringComparison.Ordinal) ||
+               f.Contains('S', StringComparison.Ordinal) ||
+               f.Contains("AM/PM", StringComparison.Ordinal);
+#else
+#pragma warning disable CA1847
+        return f.Contains("Y", StringComparison.Ordinal) ||
+               f.Contains("D", StringComparison.Ordinal) ||
+               f.Contains("H", StringComparison.Ordinal) ||
+               f.Contains("S", StringComparison.Ordinal) ||
+               f.Contains("AM/PM", StringComparison.Ordinal);
+#pragma warning restore CA1847
+#endif
     }
 
     private static DateTime GetDateTimeFromValue(CellData valueArg)
@@ -128,7 +142,7 @@ class TextFunction : FormulaFunction
         f = Regex.Replace(f, "YY", "yy", RegexOptions.IgnoreCase);
 
         // Hours: if tt present => 12-hour 'h', else 24-hour 'H'
-        var hasTt = f.Contains("tt");
+        var hasTt = f.Contains("tt", StringComparison.Ordinal);
         f = Regex.Replace(f, "HH", hasTt ? "hh" : "HH", RegexOptions.IgnoreCase);
         f = Regex.Replace(f, "H", hasTt ? "h" : "H", RegexOptions.IgnoreCase);
 

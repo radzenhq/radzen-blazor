@@ -106,6 +106,7 @@ public readonly struct PixelRectangle(PixelRange x, PixelRange y)
     /// </summary>
     public void AppendStyle(StringBuilder sb)
     {
+        ArgumentNullException.ThrowIfNull(sb);
         sb.Append("transform: translate(");
         sb.Append(Left.ToPx());
         sb.Append(',');

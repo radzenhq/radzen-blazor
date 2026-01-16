@@ -12,7 +12,7 @@ public partial class RangeSelectionItem
     /// Gets or sets the context for the virtual grid that contains the range selection item.
     /// </summary>
     [Parameter]
-    public IVirtualGridContext Context { get; set; }
+    public IVirtualGridContext Context { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the range reference that defines the area of the range selection item in the spreadsheet.
@@ -24,7 +24,7 @@ public partial class RangeSelectionItem
     /// Gets or sets the sheet that contains the range selection item.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; }
+    public Sheet Sheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the cell reference that defines the position of the range selection item in the spreadsheet.

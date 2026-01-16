@@ -1,4 +1,7 @@
 #nullable enable
+
+using System;
+
 namespace Radzen.Blazor.Spreadsheet;
 
 /// <summary>
@@ -40,6 +43,7 @@ public abstract class FormulaFunction
     /// <returns>True if the parameter is a string, false otherwise.</returns>
     protected static bool TryGetString(FunctionArguments arguments, string parameterName, out string text, out CellData? error)
     {
+        ArgumentNullException.ThrowIfNull(arguments);
         text = string.Empty;
         error = null;
         var arg = arguments.GetSingle(parameterName);
@@ -71,6 +75,7 @@ public abstract class FormulaFunction
     /// <param name="error">The error value if the parameter is not an integer.</param>
     protected static bool TryGetInteger(FunctionArguments arguments, string parameterName, bool isRequired, int? defaultValue, out int value, out CellData? error)
     {
+        ArgumentNullException.ThrowIfNull(arguments);
         value = 0;
         error = null;
         var arg = arguments.GetSingle(parameterName);
