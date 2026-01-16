@@ -298,7 +298,7 @@ internal class RangeSyntaxNode(FormulaToken token, CellSyntaxNode start, CellSyn
 
 internal class FormulaParser
 {
-    private int position = 0;
+    private int position;
     private readonly List<FormulaToken> tokens;
     private readonly List<string> errors = [];
 

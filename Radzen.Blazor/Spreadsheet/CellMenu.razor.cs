@@ -245,7 +245,7 @@ public partial class CellMenu : ComponentBase
         await Cancel.InvokeAsync();
     }
 
-    private void OnValueSelectionChanged(object value, bool isChecked)
+    private void OnValueSelectionChanged(object? value, bool isChecked)
     {
         if (isChecked)
         {
@@ -257,7 +257,7 @@ public partial class CellMenu : ComponentBase
         }
     }
 
-    private bool IsValueSelected(object value)
+    private bool IsValueSelected(object? value)
     {
         return selectedFilterValues.Contains(value);
     }
@@ -306,7 +306,7 @@ public partial class CellMenu : ComponentBase
                 selectedFilterValues.Add(null);
             }
         }
-        else if (isChecked == false)
+        else
         {
 
             foreach (var (_, Value) in availableValues)

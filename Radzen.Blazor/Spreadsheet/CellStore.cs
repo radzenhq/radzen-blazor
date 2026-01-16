@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Radzen.Blazor.Spreadsheet;
 
@@ -7,6 +8,7 @@ namespace Radzen.Blazor.Spreadsheet;
 /// Represents a store for spreadsheet cells, allowing access and modification of cell values.
 /// </summary>
 /// <param name="sheet"></param>
+[SuppressMessage("Design", "CA1043:Use Integral Or String Argument For Indexers", Justification = "CellRef indexer is intentional for spreadsheet access.")]
 public class CellStore(Sheet sheet)
 {
     /// <summary>
