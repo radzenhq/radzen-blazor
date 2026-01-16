@@ -1,6 +1,9 @@
-﻿using Bunit;
+﻿using System.Collections;
+using Bunit;
 using Xunit;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor.Tests
 {
@@ -134,6 +137,31 @@ namespace Radzen.Blazor.Tests
             Assert.Equal("given-name", AutoCompleteType.FirstName.GetAutoCompleteValue());
             Assert.Equal("additional-name", AutoCompleteType.MiddleName.GetAutoCompleteValue());
             Assert.Equal("family-name", AutoCompleteType.LastName.GetAutoCompleteValue());
+        }
+
+        [Fact]
+        public void AutoComplete_Filters_StringList()
+        {
+            using var ctx = new TestContext();
+            ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+            var data = new List<string> { "Apple", "Banana", "Cherry" };
+
+            var component = ctx.RenderComponent<AutoCompleteWithAccessibleView>(parameters =>
+            {
+                parameters
+                    .Add(p => p.Data, data)
+                    .Add(p => p.SearchText, "Ban")
+                    .Add(p => p.OpenOnFocus, true);
+            });
+            
+            Assert.Contains("Banana", component.Instance.CurrentView.OfType<string>());
+            Assert.DoesNotContain("Apple", component.Instance.CurrentView.OfType<string>());
+            Assert.DoesNotContain("Cherry", component.Instance.CurrentView.OfType<string>());
+        }
+        
+        private sealed class AutoCompleteWithAccessibleView : RadzenAutoComplete
+        {
+            public IEnumerable CurrentView => View;
         }
     }
 }
