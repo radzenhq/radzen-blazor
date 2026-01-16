@@ -20,6 +20,7 @@ public class SheetAutoFilterCommand : ICommand
     /// <param name="range">The range to apply auto filter to.</param>
     public SheetAutoFilterCommand(Sheet sheet, RangeRef range)
     {
+        ArgumentNullException.ThrowIfNull(sheet);
         this.sheet = sheet;
         this.range = range;
         this.previousAutoFilter = sheet.AutoFilter;

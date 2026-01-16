@@ -46,7 +46,9 @@ class SearchFunction : FormulaFunction
 
         int pos;
 
-        if (findText.Contains('*') || findText.Contains('?') || findText.Contains('~'))
+        if (findText.Contains('*', System.StringComparison.Ordinal) ||
+            findText.Contains('?', System.StringComparison.Ordinal) ||
+            findText.Contains('~', System.StringComparison.Ordinal))
         {
             pos = Wildcard.FindFirstIndex(withinText, findText, startIndex);
         }

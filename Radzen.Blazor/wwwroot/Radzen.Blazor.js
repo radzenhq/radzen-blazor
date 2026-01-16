@@ -3196,3 +3196,38 @@ class SheetEditor {
 
 Radzen.createSheetEditor = (options) => new SheetEditor(options);
 Radzen.createSpreadsheet = (options) => new Spreadsheet(options);
+Radzen.createVirtualItemContainer = (scrollable, content, ref) => {
+  var height = scrollable.clientHeight;
+  var width = scrollable.clientWidth;
+  var scrollHeight = scrollable.scrollHeight;
+  var scrollWidth = scrollable.scrollWidth;
+
+  content.addEventListener('mousewheel', function (e) {
+    scrollable.scrollBy({
+      top: e.deltaY,
+      left: e.deltaX
+    });
+    e.preventDefault();
+  });
+
+  scrollable.addEventListener('scroll', function () {
+    var scrollTop = scrollable.scrollTop;
+    var scrollLeft = scrollable.scrollLeft;
+
+    ref.invokeMethodAsync('OnScroll', scrollLeft, scrollTop);
+  });
+
+  var observer = new ResizeObserver(function () {
+    const height = scrollable.clientHeight;
+    const width = scrollable.clientWidth;
+
+    ref.invokeMethodAsync('OnResize', width, height);
+  });
+
+  observer.observe(scrollable);
+
+  return { width, height, scrollHeight, scrollWidth };
+};
+Radzen.scrollElementTo = (scrollable, left, top) => {
+  scrollable.scrollTo({ top: top, left: left });
+};

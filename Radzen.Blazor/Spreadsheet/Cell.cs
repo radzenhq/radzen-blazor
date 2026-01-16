@@ -66,6 +66,7 @@ public class Cell
     /// </summary>
     public void CopyFrom(Cell other)
     {
+        ArgumentNullException.ThrowIfNull(other);
         Data = other.Data;
         Formula = other.Formula;
         format = other.format;
@@ -75,6 +76,7 @@ public class Cell
 
     internal void ApplyFormat(StringBuilder sb)
     {
+        ArgumentNullException.ThrowIfNull(sb);
         var effectiveFormat = format;
 
         var conditionalFormat = Sheet.ConditionalFormats.Calculate(this);

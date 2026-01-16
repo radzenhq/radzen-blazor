@@ -349,14 +349,7 @@ public partial class FilterDialog : ComponentBase
         {
             if (criterion.Column == column)
             {
-                if (criterion.Value == null)
-                {
-                    Criteria.Add((FilterOperator.IsNotEmpty, null));
-                }
-                else
-                {
-                    Criteria.Add((FilterOperator.NotEquals, criterion.Value?.ToString()));
-                }
+                Criteria.Add((FilterOperator.NotEquals, criterion.Value?.ToString()));
             }
         }
 

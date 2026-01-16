@@ -141,7 +141,9 @@ public readonly struct RangeRef : IEquatable<RangeRef>
     /// <exception cref="ArgumentException"></exception>
     public static RangeRef Parse(string range)
     {
-        if (range.IndexOf(':') < 0)
+        ArgumentNullException.ThrowIfNull(range);
+
+        if (range.IndexOf(':', StringComparison.Ordinal) < 0)
         {
             return new RangeRef(CellRef.Parse(range), CellRef.Parse(range));
         }

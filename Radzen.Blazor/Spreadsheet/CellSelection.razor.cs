@@ -18,13 +18,13 @@ public partial class CellSelection
     /// Gets or sets the sheet that contains the cell for which the selection is displayed.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; }
+    public Sheet Sheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the virtual grid context that provides information about the grid's state.
     /// </summary>
     [Parameter]
-    public IVirtualGridContext Context { get; set; }
+    public IVirtualGridContext Context { get; set; } = default!;
 
     private IEnumerable<RangeInfo> GetRanges()
     {

@@ -75,7 +75,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
         }
     }
 
-    private readonly int sheetIndex = 0;
+    private const int sheetIndex = 0;
 
     private Sheet? Sheet => workbook?.Sheets[sheetIndex];
 
@@ -88,6 +88,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
 
     private async Task OnCellToggleAsync(CellMenuToggleEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (cellMenuPopup != null)
         {
             cellMenuRow = args.Row;
@@ -217,13 +218,17 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             FilterCriterion? existingFilter = Sheet.Filters.FirstOrDefault(f => f.Range.Contains(cellMenuRow, cellMenuColumn))?.Criterion;
 
 
-            var parameters = new Dictionary<string, object?>
+            var parameters = new Dictionary<string, object>
             {
                 { nameof(FilterDialog.Sheet), Sheet },
                 { nameof(FilterDialog.Column), cellMenuColumn },
-                { nameof(FilterDialog.Row), cellMenuRow },
-                { nameof(FilterDialog.Filter), existingFilter }
+                { nameof(FilterDialog.Row), cellMenuRow }
             };
+
+            if (existingFilter != null)
+            {
+                parameters.Add(nameof(FilterDialog.Filter), existingFilter);
+            }
 
             var result = await DialogService.OpenAsync<FilterDialog>("Custom Filter", parameters, new DialogOptions
             {
@@ -421,7 +426,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     /// <inheritdoc/>
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && JSRuntime != null)
         {
             dotNetRef = DotNetObjectReference.Create(this);
             jsRef = await JSRuntime.InvokeAsync<IJSObjectReference>("Radzen.createSpreadsheet", new { Element, dotNetRef, shortcuts = shortcuts.Keys });
@@ -434,6 +439,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task<bool> OnCellPointerDownAsync(CellEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         var result = await AcceptAsync();
 
         if (result)
@@ -476,6 +482,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnCellPointerMoveAsync(PointerEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (onCellPointerMoveAsync is not null)
         {
             await onCellPointerMoveAsync(args);
@@ -535,6 +542,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task<bool> OnRowPointerDownAsync(CellEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         var result = await AcceptAsync();
 
         if (result)
@@ -573,6 +581,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnRowPointerMoveAsync(PointerEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (onRowPointerMoveAsync is not null)
         {
             await onRowPointerMoveAsync(args);
@@ -597,6 +606,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task<bool> OnColumnPointerDownAsync(CellEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         var result = await AcceptAsync();
 
         if (result)
@@ -635,6 +645,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnColumnPointerMoveAsync(PointerEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (onColumnPointerMoveAsync is not null)
         {
             await onColumnPointerMoveAsync(args);
@@ -659,6 +670,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnCellDoubleClickAsync(CellEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (Sheet != null)
         {
             var address = Sheet.MergedCells.GetMergedRangeStartOrSelf(new CellRef(args.Row, args.Column));
@@ -704,7 +716,10 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
             key.Append("Shift+");
         }
 
-        key.Append(args.Code.Replace("Key", "").Replace("Digit", "").Replace("Numpad", ""));
+        key.Append(args.Code
+            .Replace("Key", "", StringComparison.Ordinal)
+            .Replace("Digit", "", StringComparison.Ordinal)
+            .Replace("Numpad", "", StringComparison.Ordinal));
 
         return key.ToString();
     }
@@ -715,6 +730,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnKeyDownAsync(KeyboardEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (shortcuts.TryGetValue(TranslateShortcut(args), out var action))
         {
             await action(args);
@@ -744,6 +760,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task<bool> OnColumnResizePointerDownAsync(CellEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         var result = await AcceptAsync();
 
         if (result)
@@ -772,6 +789,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task<bool> OnRowResizePointerDownAsync(CellEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         var result = await AcceptAsync();
 
         if (result)
@@ -800,6 +818,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnColumnResizePointerMoveAsync(PointerEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (onColumnResizePointerMoveAsync is not null)
         {
             await onColumnResizePointerMoveAsync(args);
@@ -812,6 +831,7 @@ public partial class RadzenSpreadsheet : RadzenComponent, IAsyncDisposable, ISpr
     [JSInvokable]
     public async Task OnRowResizePointerMoveAsync(PointerEventArgs args)
     {
+        ArgumentNullException.ThrowIfNull(args);
         if (onRowResizePointerMoveAsync is not null)
         {
             await onRowResizePointerMoveAsync(args);

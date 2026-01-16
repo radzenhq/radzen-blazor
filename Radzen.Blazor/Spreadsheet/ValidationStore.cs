@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor.Spreadsheet;
@@ -33,6 +34,7 @@ public class NumberValidator : ICellVaidator
     /// <inheritdoc/>
     public bool Validate(Cell cell)
     {
+        ArgumentNullException.ThrowIfNull(cell);
         return cell.ValueType == CellDataType.Number || cell.ValueType == CellDataType.Empty;
     }
 }
@@ -49,6 +51,7 @@ public class ValidationStore
     /// </summary>
     public void Add(RangeRef range, params ICellVaidator[] validators)
     {
+        ArgumentNullException.ThrowIfNull(validators);
         foreach (var validator in validators)
         {
             Add(range, validator);
@@ -60,6 +63,7 @@ public class ValidationStore
     /// </summary>
     public void Add(RangeRef range, ICellVaidator validator)
     {
+        ArgumentNullException.ThrowIfNull(validator);
         if (!validators.TryGetValue(range, out var list))
         {
             list = [];
@@ -74,6 +78,7 @@ public class ValidationStore
     /// </summary>
     public IReadOnlyList<string> Validate(Cell cell)
     {
+        ArgumentNullException.ThrowIfNull(cell);
         var errors = new List<string>();
 
         foreach (var kvp in validators)

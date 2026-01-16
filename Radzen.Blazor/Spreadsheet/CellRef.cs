@@ -143,7 +143,7 @@ public readonly struct CellRef(int row, int column) : IEquatable<CellRef>
 
         // Support optional sheet name prefix: SheetName!A1
         string? sheetName = null;
-        var bang = index.IndexOf('!');
+        var bang = index.IndexOf('!', StringComparison.Ordinal);
         if (bang >= 0)
         {
             sheetName = index[..bang];

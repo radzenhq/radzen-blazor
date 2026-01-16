@@ -52,7 +52,7 @@ class SubstituteFunction : FormulaFunction
             {
                 return CellData.FromString(text);
             }
-            return CellData.FromString(text.Replace(oldText, newText));
+            return CellData.FromString(text.Replace(oldText, newText, System.StringComparison.Ordinal));
         }
         else
         {
