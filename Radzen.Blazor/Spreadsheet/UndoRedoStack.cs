@@ -49,6 +49,7 @@ public class UndoRedoStack
     /// </summary>
     public bool Execute(ICommand command)
     {
+        ArgumentNullException.ThrowIfNull(command);
         var result = command.Execute();
 
         if (result)
