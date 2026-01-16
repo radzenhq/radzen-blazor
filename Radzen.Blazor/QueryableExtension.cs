@@ -841,7 +841,7 @@ namespace Radzen
         {
             ArgumentNullException.ThrowIfNull(dataFilter);
             Func<CompositeFilterDescriptor, bool> canFilter = (c) => dataFilter.properties.Where(col => col.Property == c.Property).FirstOrDefault()?.FilterPropertyType != null &&
-                           (!string.IsNullOrEmpty(c.FilterValue as string)
+                           (!(c.FilterValue == null || (c.FilterValue as string)?.Length == 0)
                             || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
                             || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
                            && c.Property != null;
@@ -894,8 +894,8 @@ namespace Radzen
             FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)
         {
             ArgumentNullException.ThrowIfNull(filters);
-            Func<CompositeFilterDescriptor, bool> canFilter = (c) => 
-                           (!string.IsNullOrEmpty(c.FilterValue as string)
+            Func<CompositeFilterDescriptor, bool> canFilter = (c) =>
+                           (!(c.FilterValue == null || (c.FilterValue as string)?.Length == 0)
                             || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
                             || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
                            && c.Property != null;
@@ -1478,7 +1478,7 @@ namespace Radzen
         {
             ArgumentNullException.ThrowIfNull(dataFilter);
             Func<CompositeFilterDescriptor, bool> canFilter = (c) => dataFilter.properties.Where(col => col.Property == c.Property).FirstOrDefault()?.FilterPropertyType != null &&
-               (!string.IsNullOrEmpty(c.FilterValue as string)
+               (!(c.FilterValue == null || (c.FilterValue as string)?.Length == 0)
                 || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
                 || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
                && c.Property != null;
@@ -1519,8 +1519,8 @@ namespace Radzen
             FilterCaseSensitivity filterCaseSensitivity = FilterCaseSensitivity.Default)
         {
             ArgumentNullException.ThrowIfNull(filters);
-            Func<CompositeFilterDescriptor, bool> canFilter = (c) => 
-               (!string.IsNullOrEmpty(c.FilterValue as string)
+            Func<CompositeFilterDescriptor, bool> canFilter = (c) =>
+               (!(c.FilterValue == null || (c.FilterValue as string)?.Length == 0)
                 || c.FilterOperator == FilterOperator.IsNotNull || c.FilterOperator == FilterOperator.IsNull
                 || c.FilterOperator == FilterOperator.IsEmpty || c.FilterOperator == FilterOperator.IsNotEmpty)
                && c.Property != null;
