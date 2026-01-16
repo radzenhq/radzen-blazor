@@ -9,6 +9,7 @@
 @if (Visible)
 {
     <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)
+         role="combobox" aria-haspopup="listbox" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@PopupID" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
          style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" id="@GetId()" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown">
         <div class="rz-helper-hidden-accessible">
@@ -58,7 +59,13 @@
                                     @GetItemOrValueFromProperty(item!, TextProperty ?? string.Empty)
                                 }
                             </span>
-                            <button tabindex="0" title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item!, TextProperty ?? string.Empty))" type="button" class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                            <button tabindex="0"
+                                    title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item!, TextProperty ?? string.Empty))"
+                                    aria-label="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item!, TextProperty ?? string.Empty))"
+                                    type="button" class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")"
+                                    @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)">
+                                <RadzenIcon Icon="close" />
+                            </button>
                         </div>
                     }
                 </div>
@@ -126,13 +133,15 @@
                         @RenderFilter()
                         @if (ShowSearch)
                         {
-                            <button tabindex="0" class="rz-button rz-button-md rz-button-icon-only rz-primary" type="button" title="@SearchTextPlaceholder" @onclick="@((args) => OnFilter(new ChangeEventArgs()))">
+                            <button tabindex="0" class="rz-button rz-button-md rz-button-icon-only rz-primary" type="button"
+                                    title="@SearchTextPlaceholder" aria-label="@SearchTextPlaceholder" @onclick="@((args) => OnFilter(new ChangeEventArgs()))">
                                 <i class="notranslate rz-button-icon-left rzi">search</i>
                             </button>
                         }
                         @if (ShowAdd)
                         {
-                            <button tabindex="0" class="rz-button rz-button-md rz-button-icon-only rz-primary" style="margin-left: 5px" type="button" title="@AddAriaLabel" @onclick="@OnAddClick">
+                            <button tabindex="0" class="rz-button rz-button-md rz-button-icon-only rz-primary" style="margin-left: 5px" type="button"
+                                    title="@AddAriaLabel" aria-label="@AddAriaLabel" @onclick="@OnAddClick">
                                 <i class="notranslate rz-button-icon-left rzi">add</i>
                             </button>
                         }
@@ -192,7 +201,8 @@
 
         @if (AllowClear && (!Multiple && HasValue || Multiple && (selectedItems.Count > 0 || SelectedValue is IEnumerable)))
         {
-            <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
+            <button type="button" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel"
+                    @onclick="@Clear" @onclick:stopPropagation="true"></button>
         }
     </div>
 }

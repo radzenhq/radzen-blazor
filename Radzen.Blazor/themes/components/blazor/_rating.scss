@@ -22,13 +22,17 @@ $rating-ban-icon-color: $rating-color !default;
     }
   }
 
-  a {
+  a,
+  button {
     display: inline-flex;
     width: 1em;
     height: 1em;
     text-decoration: none;
     cursor: default;
     outline: none;
+    background: none;
+    border: none;
+    padding: 0;
   }
 
   .rzi {
@@ -64,7 +68,8 @@ $rating-ban-icon-color: $rating-color !default;
 
   &:not(.rz-state-disabled):not(.rz-state-readonly) {
 
-    a:hover, a:focus-visible {
+    a:hover, a:focus-visible,
+    button:hover, button:focus-visible {
       cursor: pointer;
 
       .rzi-star,
@@ -74,7 +79,8 @@ $rating-ban-icon-color: $rating-color !default;
       }
     }
 
-    a:focus-visible > span {
+    a:focus-visible > span,
+    button:focus-visible > span {
       outline: var(--rz-outline-focus);
       border-radius: var(--rz-border-radius)
     }

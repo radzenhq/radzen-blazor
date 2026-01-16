@@ -166,6 +166,12 @@ namespace Radzen.Blazor
         public bool ShowPagingSummary { get; set; }
 
         /// <summary>
+        /// Gets or sets the navigation aria-label.
+        /// </summary>
+        [Parameter]
+        public string NavigationAriaLabel { get; set; } = "Pagination";
+
+        /// <summary>
         /// Gets or sets the pager summary format. <see cref="PagingSummaryTemplate" /> has preference over this property.
         /// </summary>
         /// <value>The pager summary format.</value>

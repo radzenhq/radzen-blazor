@@ -1,6 +1,6 @@
 @using Radzen.Blazor
 
-<span class="rz-legend-item" style="@Style" @onclick="@OnClick" tabindex="0" @onkeypress="@OnKeyPress" @onkeypress:preventDefault=@preventKeyPress @onkeypress:stopPropagation>
+<span class="rz-legend-item" style="@Style" @onclick="@OnClick" role="button" aria-disabled="@(!Clickable).ToString().ToLowerInvariant()" tabindex="@(Clickable ? "0" : "-1")" @onkeypress="@OnKeyPress" @onkeypress:preventDefault=@preventKeyPress @onkeypress:stopPropagation>
     <svg width="@((MarkerSize * 2).ToInvariantString())" height="@((MarkerSize * 2).ToInvariantString())">
         <g class="rz-series-@Index @Class">
             <Marker X="@MarkerSize" Y="@MarkerSize" Type="@(MarkerType == MarkerType.None ? MarkerType.Square : MarkerType)" Fill="@Color" Size="@MarkerSize" />

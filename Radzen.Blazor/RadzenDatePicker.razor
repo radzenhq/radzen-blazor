@@ -17,27 +17,30 @@
             }
             @if (ShowButton)
             {
-                <button aria-label="@ToggleAriaLabel" @onmousedown=@OnToggle class="@($"rz-datepicker-trigger{(ShowInput ? " rz-datepicker-field-button" : "")} rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")} {ButtonClass}")" tabindex="-1" type="button">
+                <button aria-label="@ToggleAriaLabel" aria-haspopup="dialog" aria-controls="@PopupID" aria-expanded="false"
+                        @onmousedown=@OnToggle class="@($"rz-datepicker-trigger{(ShowInput ? " rz-datepicker-field-button" : "")} rz-button rz-button-icon-only{(Disabled ? " rz-state-disabled" : "")} {ButtonClass}")" tabindex="-1" type="button">
                     <span aria-hidden="true" class="@ButtonClasses"></span><span class="rz-button-text"></span>
                 </button>
             }
             @if (AllowClear && HasValue && (ShowInput || !ShowButton))
             {
-                <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
+                <button type="button" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel" @onclick="@Clear" @onclick:stopPropagation="true"></button>
             }
         }
 
-        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle class="@($"{(Inline ? "rz-datepicker-inline-container " : "rz-datepicker-popup-container ")}")">
+        <Popup id="@PopupID" Lazy=@(PopupRenderMode == PopupRenderMode.OnDemand) @ref=@popup style=@PopupStyle
+               role="dialog" aria-label="@PopupAriaLabel"
+               class="@($"{(Inline ? "rz-datepicker-inline-container " : "rz-datepicker-popup-container ")}")">
                 <div class="rz-calendar" @onkeydown="@OnPopupKeyDown">
                     @if (!TimeOnly)
                     {
                         <div class="rz-calendar-header">
-                            <a id="@(GetId() + "pm")" tabindex="-1" aria-label="@PrevMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(() => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })">
+                            <button id="@(GetId() + "pm")" type="button" tabindex="-1" aria-label="@PrevMonthAriaLabel" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-prev" @onclick="@(() => { if (!Disabled) { try { if(CurrentDate.AddMonths(-1).Year >= YearFrom) {CurrentDate = CurrentDate.AddMonths(-1);}} catch (ArgumentOutOfRangeException) {}} })" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
                                 <span class="notranslate rzi rz-calendar-prev-icon"></span>
-                            </a>
-                            <a id="@(GetId() + "nm")" tabindex="-1" aria-label="@NextMonthAriaLabel" @onclick:preventDefault="true" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(() => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })">
+                            </button>
+                            <button id="@(GetId() + "nm")" type="button" tabindex="-1" aria-label="@NextMonthAriaLabel" class="rz-button rz-button-md rz-variant-text rz-button-icon-only rz-secondary rz-shade-default rz-calendar-next" @onclick="@(() => { if (!Disabled) { try { if(CurrentDate.AddMonths(1).Year <= YearTo) {CurrentDate = CurrentDate.AddMonths(1);}} catch (ArgumentOutOfRangeException) {} } })" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
                                 <span class="notranslate rzi rz-calendar-next-icon"></span>
-                            </a>
+                            </button>
                             <div class="rz-calendar-title">
                                 <RadzenDropDown @ref="monthDropDown" class="rz-calendar-month-dropdown" TabIndex="@TabIndex"
                                                 TValue="int" Value="@CurrentDate.Month" Disabled="@Disabled" Data="@months" TextProperty="Name" ValueProperty="Value"
@@ -88,8 +91,10 @@
                                                 DateTime date = StartDate.AddDays(dayNumber++);
                                                 var dateArgs = DateAttributes(date);
 
-                                                <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)" 
-                                                @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })">
+                                                <td @attributes="@(dateArgs.Attributes)" class="@GetDayCssClass(date, dateArgs)"
+                                                    role="button" tabindex="@(Disabled || dateArgs.Disabled ? "-1" : "0")"
+                                                    @onclick="@(async () => { if (!Disabled && !dateArgs.Disabled) { await SetDay(date); } })"
+                                                    @onkeydown="@(args => OnDayKeyDown(args, date, dateArgs))">
                                                     <span class=@GetDayCssClass(date, dateArgs, false)>@date.Day</span>
                                                 </td>
                                             }
@@ -112,7 +117,7 @@
                 <div class="rz-timepicker" @onmousedown:stopPropagation>
                         @if (ShowHour)
                         {
-                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "hour" }})" TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)"
+                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", HourAriaLabel }})" TValue="int" Disabled="@Disabled" Value="@(HourFormat == "12" ? ((CurrentDate.Hour + 11) % 12) + 1 : CurrentDate.Hour)"
                            Min="@(HourFormat == "12" ? 1 : -1)" Max="@(HourFormat == "12" ? 12 : 24)" Step="@HoursStep"
                            Change="@UpdateHour" class="rz-hour-picker" @oninput=@OnUpdateHourInput Format="@(PadHours ? "00" : "")" Name="@($"{UniqueID}-h")" />
                         }
@@ -121,7 +126,7 @@
                         <div class="rz-separator">
                             <span>:</span>
                         </div>
-                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "minutes" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" Step="@MinutesStep" Min="0" Max="59"
+                        <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", MinutesAriaLabel }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Minute" Step="@MinutesStep" Min="0" Max="59"
                            Change="@UpdateMinutes" class="rz-minute-picker" @oninput=@OnUpdateHourMinutes Format="@(PadMinutes ? "00" : "")" Name="@($"{UniqueID}-m")"/>
                         }
                         @if (ShowSeconds)
@@ -129,19 +134,19 @@
                             <div class="rz-separator">
                                 <span>:</span>
                             </div>
-                            <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", "seconds" }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" Step="@SecondsStep" Min="0" Max="59"
+                            <RadzenNumeric InputAttributes="@(new Dictionary<string,object>(){ { "aria-label", SecondsAriaLabel }})" TValue="int" Disabled="@Disabled" Value="CurrentDate.Second" Step="@SecondsStep" Min="0" Max="59"
                                Change="@UpdateSeconds" class="rz-second-picker" @oninput=@OnUpdateHourSeconds Format="@(PadSeconds ? "00" : "")" Name="@($"{UniqueID}-s")"/>
                         }
                         @if (HourFormat == "12")
                         {
                             <div class="rz-ampm-picker">
-                                <a id="@(GetId() + "ampmup")" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
+                                <button id="@(GetId() + "ampmup")" type="button" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick="@ToggleAmPm" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
                                     <span class="notranslate rzi rzi-chevron-up"></span>
-                                </a>
+                                </button>
                                 <span>@CurrentDate.ToString("tt")</span>
-                                <a id="@(GetId() + "ampmdown")" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick:preventDefault="true" @onclick="@ToggleAmPm">
+                                <button id="@(GetId() + "ampmdown")" type="button" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" aria-label="@ToggleAmPmAriaLabel" @onclick="@ToggleAmPm" disabled="@Disabled" aria-disabled="@(Disabled ? "true" : "false")">
                                     <span class="notranslate rzi rzi-chevron-down"></span>
-                                </a>
+                                </button>
                             </div>
                         }
                         @if (ShowTimeOkButton)

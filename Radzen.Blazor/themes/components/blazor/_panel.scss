@@ -44,6 +44,8 @@ $panel-shadow: none !default;
   font-size: var(--rz-panel-toggle-icon-font-size);
   border-radius: var(--rz-panel-toggle-icon-border-radius);
   background-color: var(--rz-panel-toggle-icon-background-color);
+  border: none;
+  padding: 0;
   color: inherit;
   display: flex;
   align-items: center;

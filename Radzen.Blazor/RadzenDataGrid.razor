@@ -35,9 +35,9 @@
                             {
                                 <div class="rz-group-header-item">
                                     <span class="rz-group-header-item-title">@gd.GetTitle()</span>
-                                    <a id="@(GetId() + "rg")" aria-label="@RemoveGroupAriaLabel" @onclick:preventDefault="true" @onclick=@(args => RemoveGroupAsync(gd)) role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
+                                    <button type="button" id="@(GetId() + "rg")" aria-label="@RemoveGroupAriaLabel" @onclick=@(args => RemoveGroupAsync(gd)) class="rz-dialog-titlebar-icon rz-dialog-titlebar-close">
                                         <span class="notranslate rzi rzi-times"></span>
-                                    </a>
+                                    </button>
                                 </div>
                             }
                         </div>
@@ -123,9 +123,12 @@
                                         <span class="rz-column-title">
                                             @if(ShowExpandAll && ExpandMode == DataGridExpandMode.Multiple)
                                             {
-                                                <a title=@TitleAttribute() aria-label="@TitleAttribute()" @onclick:preventDefault="true" @onclick="_ => this.ToggleAllRowsExpand()" @onclick:stopPropagation="true">
-                                                        <span class="@(allRowsExpanded ? "rzi-chevron-circle-down" : "rzi-chevron-circle-right")"></span>
-                                                </a>
+                                                <button type="button" title=@TitleAttribute() aria-label="@TitleAttribute()"
+                                                        aria-expanded="@(allRowsExpanded.ToString().ToLowerInvariant())"
+                                                        class="rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-base rz-shade-default"
+                                                        @onclick="_ => this.ToggleAllRowsExpand()" @onclick:stopPropagation="true">
+                                                    <span class="@(allRowsExpanded ? "rzi-chevron-circle-down" : "rzi-chevron-circle-right")"></span>
+                                                </button>
                                             }
                                             else
                                             {
@@ -329,7 +332,10 @@
                                     {
                                         if (filterMode == FilterMode.Simple)
                                         {
-                                            <button aria-label="@FilterToggleAriaLabel" class="rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-base rz-shade-default @(column.HasActiveFilter() ? "rz-grid-filter-active" : "")" onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
+                                            <button type="button" aria-label="@FilterToggleAriaLabel" aria-controls="@($"{PopupID}{column.GetFilterProperty()}")"
+                                                    aria-haspopup="dialog" aria-expanded="false"
+                                                    class="rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-base rz-shade-default @(column.HasActiveFilter() ? "rz-grid-filter-active" : "")"
+                                                    onclick="@($"Radzen.togglePopup(this.parentNode, '{PopupID}{column.GetFilterProperty()}')")">
                                                 <i class="notranslate rzi">date_range</i>
                                             </button>
                                             <span>
@@ -338,16 +344,16 @@
                                             @if (filterValue != null && filters.Any(d => d.Property == column.GetFilterProperty()))
                                             {
                                                 <span class="rz-current-filter">@string.Format("{0:" + getFilterDateFormat(column) + "}", filterValue)</span>
-                                                <i @onclick="@((args) => ClearFilter(column))" class="notranslate rzi rz-cell-filter-clear">close</i>
+                                                <button type="button" class="notranslate rzi rz-cell-filter-clear" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
                                             }
                                             else if ((filterOperator == FilterOperator.IsNull || filterOperator == FilterOperator.IsNotNull) && filters.Any(d => d.Property == column.GetFilterProperty()))
                                             {
                                                 <span class="rz-current-filter">@column.GetFilterOperatorText(filterOperator)</span>
-                                                <i @onclick="@((args) => ClearFilter(column))" class="notranslate rzi rz-cell-filter-clear">close</i>
+                                                <button type="button" class="notranslate rzi rz-cell-filter-clear" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
                                             }
                                             </span>
                                             <div id="@($"{PopupID}{column.GetFilterProperty()}")" class="rz-overlaypanel rz-grid-date-filter"
-                                                 style="display:none;" tabindex="0">
+                                                 style="display:none;" tabindex="0" role="dialog" aria-label="@FilterText">
                                                 <div class="rz-overlaypanel-content">
 
                                                     <div class="rz-date-filter">
@@ -357,62 +363,82 @@
                                                                 <ul class="rz-listbox-list">
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.Equals))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.Equals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.Equals))" style="display: block;">
-                                                                            <span>@EqualsText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.Equals)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.Equals))">
+                                                                                <span>@EqualsText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.NotEquals))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.NotEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.NotEquals))" style="display: block;">
-                                                                            <span>@NotEqualsText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.NotEquals)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.NotEquals))">
+                                                                                <span>@NotEqualsText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.LessThan))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThan))" style="display: block;">
-                                                                            <span>@LessThanText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.LessThan)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThan))">
+                                                                                <span>@LessThanText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.LessThanOrEquals))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.LessThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThanOrEquals))" style="display: block;">
-                                                                            <span>@LessThanOrEqualsText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.LessThanOrEquals)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.LessThanOrEquals))">
+                                                                                <span>@LessThanOrEqualsText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.GreaterThan))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThan))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThan))" style="display: block;">
-                                                                            <span>@GreaterThanText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThan)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThan))">
+                                                                                <span>@GreaterThanText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.GreaterThanOrEquals))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThanOrEquals))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThanOrEquals))" style="display: block;">
-                                                                            <span>@GreaterThanOrEqualsText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.GreaterThanOrEquals)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.GreaterThanOrEquals))">
+                                                                                <span>@GreaterThanOrEqualsText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.IsEmpty))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsEmpty))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsEmpty))" style="display: block;">
-                                                                            <span>@IsEmptyText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.IsEmpty)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsEmpty))">
+                                                                                <span>@IsEmptyText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.IsNotEmpty))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotEmpty))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotEmpty))" style="display: block;">
-                                                                            <span>@IsNotEmptyText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotEmpty)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotEmpty))">
+                                                                                <span>@IsNotEmptyText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.IsNull))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNull))" style="display: block;">
-                                                                            <span>@IsNullText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.IsNull)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNull))">
+                                                                                <span>@IsNullText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                     @if (column.GetFilterOperators().Contains(FilterOperator.IsNotNull))
                                                                     {
-                                                                        <li class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotNull))" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotNull))" style="display: block;">
-                                                                            <span>@IsNotNullText</span>
+                                                                        <li role="presentation">
+                                                                            <button type="button" class="@(DateFilterOperatorStyle(column, FilterOperator.IsNotNull)) rz-filter-menu-item" @onclick="@((args) => ApplyDateFilterByFilterOperator(column, FilterOperator.IsNotNull))">
+                                                                                <span>@IsNotNullText</span>
+                                                                            </button>
                                                                         </li>
                                                                     }
                                                                 </ul>
@@ -504,7 +530,7 @@
                                             <input autocomplete="off" aria-label=@(column.Title + FilterValueAriaLabel + column.GetFilterValue()) disabled=@(!column.CanSetFilterValue()) id="@(getFilterInputId(column))" @onchange="@((args) => OnFilter(args, column))" @onkeydown="@((args) => OnFilterKeyPress(args, column))" value="@column.GetFilterValue()" type="text" placeholder="@column.GetFilterPlaceholder()" class="rz-textbox" style="width: 100%;" />
                                             @if (column.GetFilterValue() != null && filters.Any(d => d.Property == column.Property && $"{d.FilterProperty}" == $"{column.FilterProperty}"))
                                             {
-                                                <i @onclick="@((args) => ClearFilter(column))" class="notranslate rzi rz-cell-filter-clear" style="position:absolute;inset-inline-end:10px;">close</i>
+                                                <button type="button" class="notranslate rzi rz-cell-filter-clear" style="position:absolute;inset-inline-end:10px;" aria-label="@ClearFilterText" @onclick="@((args) => ClearFilter(column))">close</button>
                                             }
                                         }
                                     }
@@ -607,9 +633,12 @@
                     @if (this.LoadChildData.HasDelegate && this.ShowExpandColumn && this.allColumns.IndexOf(column) == 0)
                     {
                         <span class="rz-cell-toggle">
-                            <a id="@(GetId() + "exp")" aria-label="@ExpandChildItemAriaLabel" class="@(getExpandIconCssClass(this, Item))" style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))" @onclick:preventDefault="true" @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation="true">
-                                <span class="@(this.ExpandedItemStyle(Item))"></span>
-                            </a>
+                            <button type="button" id="@(GetId() + "exp")" aria-label="@ExpandChildItemAriaLabel"
+                                    class="rz-button rz-button-md rz-button-icon-only rz-variant-flat rz-base rz-shade-default"
+                                    style="@(getExpandIconStyle(this, Item, rowArgs.Item1.Expandable))"
+                                    @onclick="_ => this.ExpandItem(Item)" @onclick:stopPropagation="true">
+                                <span class="@(getExpandIconCssClass(this, Item)) @(this.ExpandedItemStyle(Item))"></span>
+                            </button>
                             <span class="@column.GetCellClass()" @attributes="@spanAttributes">
                                 @if (Item != null)
                                 {

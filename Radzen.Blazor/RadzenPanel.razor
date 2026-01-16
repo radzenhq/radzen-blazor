@@ -20,15 +20,15 @@
             @HeaderTemplate
             @if (AllowCollapse)
             {
-                <a id="@(GetId() + "expc")" @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
-                   @onclick:preventDefault="true" role="button" aria-controls="rz-panel-0-content"
-                   aria-expanded="@(collapsed ? "false" : "true")" aria-label="@(collapsed ? ExpandAriaLabel : CollapseAriaLabel)" title="@(collapsed ? ExpandTitle : CollapseTitle)"
-                   tabindex="0" @onkeypress="@(args => OnKeyPress(args, Toggle(new MouseEventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
+                <button id="@(GetId() + "expc")" type="button" @onclick=@Toggle class="rz-panel-titlebar-icon rz-panel-titlebar-toggler"
+                        aria-controls="@($"{GetId()}-content")"
+                        aria-expanded="@(collapsed ? "false" : "true")" aria-label="@(collapsed ? ExpandAriaLabel : CollapseAriaLabel)" title="@(collapsed ? ExpandTitle : CollapseTitle)"
+                        @onkeypress="@(args => OnKeyPress(args, Toggle(new MouseEventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
                     <span class="notranslate rzi @(collapsed ? "rzi-plus" : "rzi-minus")"></span>
-                </a>
+                </button>
             }
         </div>
-        <Expander Expanded=@(!collapsed) CssClass="rz-panel-content-wrapper">
+        <Expander Expanded=@(!collapsed) CssClass="rz-panel-content-wrapper" id="@($"{GetId()}-content")">
             <div class="rz-panel-content">
                 @ChildContent
             </div>

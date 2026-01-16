@@ -99,7 +99,8 @@ $tabs-transition: var(--rz-transition-all) !default;
     }
 
     a,
-    a:not([href]):not([class]) {
+    a:not([href]):not([class]),
+    button {
       display: flex;
       align-items: center;
       color: inherit;
@@ -112,6 +113,9 @@ $tabs-transition: var(--rz-transition-all) !default;
       letter-spacing: var(--rz-tabs-tab-letter-spacing);
       text-decoration: none;
       cursor: pointer;
+      background: none;
+      border: none;
+      font-family: inherit;
 
       &:hover {
         text-decoration: none;

@@ -191,6 +191,13 @@ namespace Radzen.Blazor
         public string AggregatesText { get; set; } = "Aggregates";
 
         /// <summary>
+        /// Gets or sets the sort aria label format.
+        /// </summary>
+        /// <value>The sort aria label format.</value>
+        [Parameter]
+        public string SortAriaLabelFormat { get; set; } = "Sort by {0}";
+
+        /// <summary>
         /// Gets or set the filter icon to use.
         /// </summary>
         [Parameter]
@@ -1600,6 +1607,15 @@ namespace Radzen.Blazor
         internal async Task OnRowSort(EventArgs args, RadzenPivotRow<TItem> row)
         {
             await HandleFieldSort(pivotRows, row);
+        }
+
+        async Task OnDrillDownKeyDown(KeyboardEventArgs args, string pathKey)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await ToggleColumnDrillDown(pathKey);
+            }
         }
 
         private async Task HandleFieldSort<T>(List<T> allFields, T sortedField)

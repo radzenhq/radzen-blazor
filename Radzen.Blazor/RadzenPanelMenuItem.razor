@@ -3,7 +3,12 @@
 @inherits RadzenComponent
 @if (Visible)
 {
-    <li @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() @onclick=@(this.AsNonRenderingEventHandler<MouseEventArgs>(OnClick)) @onclick:stopPropagation>
+    <li @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
+        role="menuitem" tabindex="@(Disabled ? -1 : 0)" aria-disabled="@(Disabled ? "true" : "false")"
+        aria-haspopup="@(ChildContent != null ? "menu" : null)"
+        aria-controls="@(ChildContent != null ? $"{GetId()}-submenu" : null)"
+        aria-expanded="@(ChildContent != null ? expanded.ToString().ToLowerInvariant() : null)"
+        @onclick=@(this.AsNonRenderingEventHandler<MouseEventArgs>(OnClick)) @onclick:stopPropagation @onkeydown="OnKeyDown">
         <div class=@WrapperClass>
             @if (Path != null)
             {
@@ -22,17 +27,21 @@
                     }
                     else if (Parent?.DisplayStyle == MenuItemDisplayStyle.Text || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText)
                     {
-                        <span class="rz-navigation-item-text" @onclick="@Toggle">@Text</span>
+                        <span class="rz-navigation-item-text">@Text</span>
                     }
                     @if (ChildContent != null && Parent?.ShowArrow == true)
                     {
-                        <i class=@ToggleClass @onclick="@Toggle" @onclick:preventDefault>keyboard_arrow_down</i>
+                        <i class=@ToggleClass>keyboard_arrow_down</i>
                     }
                 </NavLink>
             }
             else
             {
-                <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")" @onclick="@Toggle">
+                <div class="rz-navigation-item-link" style="@(Parent?.DisplayStyle == MenuItemDisplayStyle.Icon?"margin-inline-end:0px;":"")"
+                     role="button" tabindex="0" aria-expanded="@expanded.ToString().ToLowerInvariant()"
+                     aria-controls="@(ChildContent != null ? $"{GetId()}-submenu" : null)"
+                     aria-haspopup="@(ChildContent != null ? "menu" : null)"
+                     @onclick="@Toggle" @onkeydown="OnToggleKeyDown">
                     @if (!string.IsNullOrEmpty(Icon) && (Parent?.DisplayStyle == MenuItemDisplayStyle.Icon || Parent?.DisplayStyle == MenuItemDisplayStyle.IconAndText))
                     {
                         <i class="notranslate rzi rz-navigation-item-icon" style="@getIconStyle()">@Icon</i>
@@ -59,7 +68,7 @@
         @if (ChildContent != null)
         {
             <Expander Expanded=@expanded>
-                <ul class="rz-navigation-menu">
+                <ul id="@($"{GetId()}-submenu")" class="rz-navigation-menu" role="menu">
                     <CascadingValue Value=this>
                         @ChildContent
                     </CascadingValue>

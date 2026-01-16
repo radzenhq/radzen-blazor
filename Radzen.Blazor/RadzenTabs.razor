@@ -6,7 +6,8 @@
 {
     <div @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
          tabindex=0 @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
-        <ul role="tablist" class="rz-tabview-nav">
+        <ul role="tablist" class="rz-tabview-nav"
+            aria-orientation="@(TabPosition == TabPosition.Left || TabPosition == TabPosition.Right ? "vertical" : "horizontal")">
             @Tabs
         </ul>
         <div class="rz-tabview-panels">

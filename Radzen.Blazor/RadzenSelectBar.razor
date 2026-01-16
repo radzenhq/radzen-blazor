@@ -14,13 +14,17 @@
 @if (Visible)
 {
     <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()"
-         role="toolbar" aria-orientation="horizontal" @onfocus=@this.AsNonRenderingEventHandler(OnFocus) @onblur=@this.AsNonRenderingEventHandler(OnBlur)
+         role="toolbar" aria-orientation="@(Orientation == Orientation.Vertical ? "vertical" : "horizontal")"
+         aria-disabled="@(Disabled ? "true" : "false")"
+         @onfocus=@this.AsNonRenderingEventHandler(OnFocus) @onblur=@this.AsNonRenderingEventHandler(OnBlur)
          tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation>
         @foreach (var item in allItems.Where(i => i.Visible))
         {
-            <div @ref="@item.Element" id="@item.GetItemId()"
+            <button type="button" @ref="@item.Element" id="@item.GetItemId()"
                 @onclick="@(args => SelectItem(item))"
-                 @attributes="item.Attributes" style="@item.Style" class=@ButtonClass(item) aria-label="@item.Text" aria-selected=@(IsSelected(item)? "true" : "false")>
+                @attributes="item.Attributes" style="@item.Style" class=@ButtonClass(item)
+                aria-label="@item.Text" aria-pressed="@(IsSelected(item)? "true" : "false")"
+                disabled="@(Disabled || item.Disabled)">
                 @if (item.Template != null)
                 {
                     @item.Template(item)
@@ -37,7 +41,7 @@
                     }
                     <span class="rz-button-text">@item.Text</span>
                 }
-            </div>
+            </button>
         }
     </div>
 }

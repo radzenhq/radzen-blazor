@@ -37,7 +37,7 @@
                  tabindex="0" @onkeydown="@(args => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation
                  @onfocus=@(args => {CurrentDate = currentDate; CurrentMonth = currentMonth; })>
 
-            <div class="rz-slot-header rz-pb-2" @onclick=@(args => OnMonthClick(startMonth))>
+            <div class="rz-slot-header rz-pb-2" role="button" tabindex="0" @onclick=@(args => OnMonthClick(startMonth)) @onkeydown="@(args => OnMonthHeaderKeyDown(args, startMonth))">
                 <span class="rz-text-subtitle1">
                     @realstart.ToString("MMMM yyyy", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                 </span>
@@ -64,7 +64,7 @@
                                 var excessCount = appointments.Count();
                                 string classname = $"rz-slot-title {(day.Month != offSetMonth ? "rz-other-month" : "")} {(excessCount > 0 ? "rz-has-appointments" : "")} {(day == CurrentDate && month == CurrentMonth ? " rz-state-focused" : "")}".Trim();
 
-                                    <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot")>
+                                    <div @onclick=@(args => OnListClick(day, appointments)) @attributes=@Attributes(day, "rz-slot") role="button" tabindex="0" @onkeydown="@(args => OnDayKeyDown(args, day, appointments))">
                                         <div class="@classname">
                                             @day.Day
                                         </div>
@@ -135,6 +135,15 @@
             await Scheduler.SelectMonth(monthStart, AppointmentsInRange(monthStart, monthStart.EndOfMonth()));
     }
 
+    async Task OnMonthHeaderKeyDown(KeyboardEventArgs args, DateTime monthStart)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            await OnMonthClick(monthStart);
+        }
+    }
+
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)
     {
         if (Scheduler == null) return;
@@ -165,6 +174,15 @@
     );
 
         }
+        }
+    }
+
+    async Task OnDayKeyDown(KeyboardEventArgs args, DateTime day, IEnumerable<AppointmentData> appointments)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            await OnListClick(day, appointments);
         }
     }
 

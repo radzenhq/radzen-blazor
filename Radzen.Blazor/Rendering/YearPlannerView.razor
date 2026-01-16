@@ -94,14 +94,16 @@
                             var left = (slotIndex + 1) * slotWidth;
                             var top = ((MaxAppointmentsInSlot + 1) * 0.6) + 1.3;
                             var listDate = start;
-                            <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => { if (appointments != null && MoreText != null) _ = OnListClick(listDate, appointments); })>@(MoreText != null ? String.Format(MoreText, excessCount) : "")</a>
+                            <button type="button" class="rz-event-list-btn" style="top: @(top.ToInvariantString())em; left: @(left.ToInvariantString())%" @onclick=@(args => { if (appointments != null && MoreText != null) _ = OnListClick(listDate, appointments); })>@(MoreText != null ? String.Format(MoreText, excessCount) : "")</button>
                         }
                     }
                 }
             </div>
             <div class="rz-slots">
                 <div @attributes=@Attributes(realstart, "rz-slot", false)>
-                    <div class="rz-slot-header" @onclick=@(args => OnMonthClick(startMonth))>
+                    <div class="rz-slot-header" role="button" tabindex="0"
+                         @onclick=@(args => OnMonthClick(startMonth))
+                         @onkeydown="@(args => OnMonthHeaderKeyDown(args, startMonth))">
                         @realstart.ToString("MMM", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                     </div>
                 </div>
@@ -132,7 +134,9 @@
                     }
                 }
                 <div @attributes=@Attributes(realstart, "rz-slot", false)>
-                    <div class="rz-slot-header" @onclick=@(args => OnMonthClick(startMonth))>
+                    <div class="rz-slot-header" role="button" tabindex="0"
+                         @onclick=@(args => OnMonthClick(startMonth))
+                         @onkeydown="@(args => OnMonthHeaderKeyDown(args, startMonth))">
                         @realstart.ToString("MMM", Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
                     </div>
                 </div>
@@ -239,6 +243,15 @@
     {
         if (Scheduler != null)
             await Scheduler.SelectMonth(monthStart, AppointmentsInRange(monthStart, monthStart.EndOfMonth()));
+    }
+
+    async Task OnMonthHeaderKeyDown(KeyboardEventArgs args, DateTime monthStart)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            await OnMonthClick(monthStart);
+        }
     }
 
     async Task OnListClick(DateTime date, IEnumerable<AppointmentData> appointments)

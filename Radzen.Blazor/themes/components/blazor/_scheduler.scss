@@ -85,11 +85,16 @@ $scheduler-highlight-background-color: rgba(255,220,40,.2) !default;
   overflow: hidden;
   background-clip: border-box;
 
-  a.rz-event-list-btn {
+  .rz-event-list-btn {
     position: absolute;
     padding-inline-start: 0.25rem;
     color: var(--rz-scheduler-event-list-button-color);
     font-size: var(--rz-scheduler-event-list-button-font-size);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font: inherit;
 
     &:hover {
       cursor: pointer;

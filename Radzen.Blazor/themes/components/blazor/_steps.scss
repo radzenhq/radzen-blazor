@@ -40,6 +40,10 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
     color: var(--rz-steps-color);
     cursor: pointer;
     text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    font: inherit;
 
     &:hover {
       text-decoration: none;
@@ -118,6 +122,10 @@ $steps-button-color: var(--rz-text-secondary-color) !default;
   align-items: center;
   color: var(--rz-steps-button-color) !important;
   text-decoration: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
 
   &:not(.rz-state-disabled) {
     &:hover {

@@ -4,7 +4,9 @@
 @inject IJSRuntime JSRuntime
 @implements IAsyncDisposable
 
-    <div @ref=@element class="@($"{"rz-event"} {CssClass}".Trim())" style=@Style @onclick=@OnClick @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave>
+    <div @ref=@element class="@($"{"rz-event"} {CssClass}".Trim())" style=@Style
+         role="button" tabindex="0" aria-label="@Data?.Text"
+         @onclick=@OnClick @onkeydown="OnKeyDown" @onmouseenter=@OnMouseEnter @onmouseleave=@OnMouseLeave>
         <div class="rz-event-content" title=@Title @attributes=@Attributes>
             @if (ShowAppointmentContent && Scheduler != null && Data != null)
             {
@@ -83,6 +85,15 @@
     async Task OnClick()
     {
         await Click.InvokeAsync(Data);
+    }
+
+    async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            await OnClick();
+        }
     }
 
     async Task OnMouseEnter()

@@ -4,10 +4,13 @@
 @{var itemArgs = Tree?.ItemAttributes(this); }
 <li class="rz-treenode" @attributes="@(itemArgs?.Item1.Attributes.Any() == true ? itemArgs.Item1.Attributes : Attributes)" 
     @oncontextmenu="OnContextMenu" @oncontextmenu:preventDefault="@(Tree?.ItemContextMenu.HasDelegate ?? false)" @oncontextmenu:stopPropagation>
-    <div class=@ContentClass @onclick="@Select">
+    <div class=@ContentClass role="treeitem" tabindex="0"
+         aria-selected="@(selected.ToString().ToLowerInvariant())"
+         aria-expanded="@(ChildContent != null || HasChildren ? clientExpanded.ToString().ToLowerInvariant() : null)"
+         @onclick="@Select" @onkeydown="OnKeyDown">
         @if (ChildContent != null || HasChildren)
         {
-            <span class=@IconClass @onclick="@Toggle" @onclick:stopPropagation></span>
+            <span class=@IconClass role="button" tabindex="0" aria-label="@Text" @onclick="@Toggle" @onclick:stopPropagation @onkeydown="OnToggleKeyDown"></span>
         }
         @if(Tree != null && Tree.AllowCheckBoxes)
         {

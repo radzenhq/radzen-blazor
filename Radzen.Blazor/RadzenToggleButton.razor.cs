@@ -47,6 +47,27 @@ namespace Radzen.Blazor
         [Parameter]
         public string? ToggleIcon { get; set; }
 
+        /// <summary>
+        /// Gets or sets the aria-expanded attribute.
+        /// </summary>
+        /// <value>The aria-expanded attribute.</value>
+        [Parameter]
+        public string? AriaExpanded { get; set; }
+
+        /// <summary>
+        /// Gets or sets the aria-controls attribute.
+        /// </summary>
+        /// <value>The aria-controls attribute.</value>
+        [Parameter]
+        public string? AriaControls { get; set; }
+
+        /// <summary>
+        /// Gets or sets the aria-haspopup attribute.
+        /// </summary>
+        /// <value>The aria-haspopup attribute.</value>
+        [Parameter]
+        public string? AriaHasPopup { get; set; }
+
         private string? GetIcon()
         {
             return Value && !string.IsNullOrEmpty(ToggleIcon) ? ToggleIcon : Icon;

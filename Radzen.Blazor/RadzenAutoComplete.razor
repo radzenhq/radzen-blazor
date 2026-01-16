@@ -13,25 +13,27 @@
         {
             <textarea @ref="@search" @attributes="InputAttributes" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
                 oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"  @onchange="@OnChange" onfocus="@(OpenOnFocus ? OpenScript() : null)"
-                aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
+                aria-autocomplete="list" aria-haspopup="listbox" aria-controls="@ListId" aria-expanded="@(IsPopupOpen ? "true" : "false")" autocomplete="off" role="combobox"
                 class=@InputClass onblur="Radzen.activeElement = null"
-                id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
+                id="@Name" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
         }
         else
         {
             <input @ref="@search" @attributes="InputAttributes" @onkeydown="@OnFilterKeyPress" value="@Value" disabled="@Disabled"
                 oninput="@OpenScript()" tabindex="@(Disabled ? "-1" : $"{TabIndex}")" @onchange="@OnChange" onfocus="@(OpenOnFocus ? OpenScript() : null)"
-                aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
+                aria-autocomplete="list" aria-haspopup="listbox" aria-controls="@ListId" aria-expanded="@(IsPopupOpen ? "true" : "false")" autocomplete="off" role="combobox"
                 class=@InputClass onblur="Radzen.activeElement = null"
-                type="@InputType" id="@Name" aria-expanded="true" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
+                type="@InputType" id="@Name" placeholder="@CurrentPlaceholder" maxlength="@MaxLength" />
         }
         <div id="@PopupID" class="rz-autocomplete-panel" style="@PopupStyle">
-            <ul @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
+            <ul id="@ListId" @ref="@list" class="rz-autocomplete-items rz-autocomplete-list" role="listbox">
                 @if (OpenOnFocus || (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(customSearchText)))
                 {
                     @foreach (var item in LoadData.HasDelegate ? Data != null ? Data : Enumerable.Empty<object>() : (View != null ? View : Enumerable.Empty<object>()))
                     {
-                        <li role="option" class="rz-autocomplete-list-item" @onclick="@(() => OnSelectItem(item))" onmousedown="Radzen.activeElement = null">
+                        <li role="option" class="rz-autocomplete-list-item" tabindex="-1"
+                            aria-selected="@(object.Equals(item, SelectedItem) ? "true" : "false")"
+                            @onclick="@(() => OnSelectItem(item))" onmousedown="Radzen.activeElement = null">
                             <span>
                                 @if (Template != null)
                                 {

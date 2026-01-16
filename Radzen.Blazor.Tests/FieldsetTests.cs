@@ -152,7 +152,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Collapse, args => { raised = true; });
             });
 
-            component.Find("a").Click();
+            component.Find("legend button").Click();
 
             Assert.True(raised);
 
@@ -160,7 +160,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Expand, args => { raised = true; }));
 
-            component.Find("a").Click();
+            component.Find("legend button").Click();
         }
 
         [Fact]
