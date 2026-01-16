@@ -216,7 +216,6 @@
         cursor: pointer;
         transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
         pointer-events: all;
-        stroke: white;
         stroke-width: 2;
         
         &.rz-state-hover {
@@ -299,24 +298,6 @@
         }
     }
 
-    @for $i from 0 through 50 {
-        .rz-spider-chart-area.rz-series-#{$i} {
-            fill: var(--rz-series-#{$i});
-            stroke: var(--rz-series-#{$i});
-        }
-        
-        .rz-spider-chart-marker.rz-series-#{$i} {
-            fill: var(--rz-series-#{$i});
-            stroke: var(--rz-series-#{$i});
-        }
-        
-        // For legend items
-        .rz-legend-item .rz-series-#{$i} {
-            fill: var(--rz-series-#{$i});
-            background-color: var(--rz-series-#{$i});
-            color: var(--rz-series-#{$i});
-        }
-    }
     &.rz-animate {
         path {
             stroke-dasharray: 1000;

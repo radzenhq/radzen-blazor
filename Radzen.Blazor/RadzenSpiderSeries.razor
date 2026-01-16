@@ -211,13 +211,12 @@
 
         builder.OpenComponent<LegendItem>(0);
         builder.AddAttribute(1, nameof(LegendItem.Index), Index);
-        builder.AddAttribute(2, nameof(LegendItem.Color), $"var(--rz-series-{Index})");
-        builder.AddAttribute(3, nameof(LegendItem.MarkerType), MarkerType.Circle);
-        builder.AddAttribute(4, nameof(LegendItem.Style), string.Join(";", style));
-        builder.AddAttribute(5, nameof(LegendItem.MarkerSize), MarkerSize);
-        builder.AddAttribute(6, nameof(LegendItem.Text), Title);
-        builder.AddAttribute(7, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
-        builder.AddAttribute(8, nameof(LegendItem.Clickable), clickable);
+        builder.AddAttribute(2, nameof(LegendItem.MarkerType), MarkerType.Circle);
+        builder.AddAttribute(3, nameof(LegendItem.Style), string.Join(";", style));
+        builder.AddAttribute(4, nameof(LegendItem.MarkerSize), MarkerSize);
+        builder.AddAttribute(5, nameof(LegendItem.Text), Title);
+        builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
+        builder.AddAttribute(7, nameof(LegendItem.Clickable), clickable);
         builder.CloseComponent();
     };
 

@@ -41,9 +41,10 @@ namespace Radzen.Blazor
 
         /// <summary>
         /// Gets or sets the color scheme of the chart.
+        /// Available schemes include Pastel (default), Palette, Monochrome, and custom color schemes.
         /// </summary>
         [Parameter]
-        public ColorScheme ColorScheme { get; set; } = ColorScheme.Palette;
+        public ColorScheme ColorScheme { get; set; }
 
         /// <summary>
         /// Gets or sets whether markers are visible.
