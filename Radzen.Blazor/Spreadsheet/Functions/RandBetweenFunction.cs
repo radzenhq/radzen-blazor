@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.Security.Cryptography;
+
 namespace Radzen.Blazor.Spreadsheet;
 
 class RandBetweenFunction : FormulaFunction
@@ -29,8 +31,18 @@ class RandBetweenFunction : FormulaFunction
             return CellData.FromError(CellError.Num);
         }
 
-        var range = top - bottom + 1;
-        int result = bottom + System.Random.Shared.Next(range);
+        if (bottom == top)
+        {
+            return CellData.FromNumber(bottom);
+        }
+
+        var range = (long)top - bottom + 1;
+        if (range <= 0 || range > int.MaxValue)
+        {
+            return CellData.FromError(CellError.Num);
+        }
+
+        var result = bottom + RandomNumberGenerator.GetInt32((int)range);
         return CellData.FromNumber(result);
     }
 }

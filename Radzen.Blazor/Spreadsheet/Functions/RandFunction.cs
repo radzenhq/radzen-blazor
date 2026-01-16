@@ -1,5 +1,7 @@
 #nullable enable
 
+using System.Security.Cryptography;
+
 namespace Radzen.Blazor.Spreadsheet;
 
 class RandFunction : FormulaFunction
@@ -12,6 +14,7 @@ class RandFunction : FormulaFunction
 
     public override CellData Evaluate(FunctionArguments arguments)
     {
-        return CellData.FromNumber(System.Random.Shared.NextDouble());
+        var value = RandomNumberGenerator.GetInt32(int.MaxValue) / (double)int.MaxValue;
+        return CellData.FromNumber(value);
     }
 }

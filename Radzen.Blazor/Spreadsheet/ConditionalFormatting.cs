@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Radzen.Blazor.Spreadsheet;
@@ -28,6 +29,7 @@ public class ConditionalFormatStore
     /// </summary>
     public void Add(RangeRef range, params ConditionalFormatBase[] rules)
     {
+        ArgumentNullException.ThrowIfNull(rules);
         foreach (var rule in rules)
         {
             Add(range, rule);
@@ -39,6 +41,7 @@ public class ConditionalFormatStore
     /// </summary>
     public void Add(RangeRef range, ConditionalFormatBase rule)
     {
+        ArgumentNullException.ThrowIfNull(rule);
         if (!formats.TryGetValue(range, out var list))
         {
             list = [];
@@ -56,6 +59,7 @@ public class ConditionalFormatStore
     /// </remarks>
     public Format? Calculate(Cell cell)
     {
+        ArgumentNullException.ThrowIfNull(cell);
         Format? overlay = null;
 
         foreach (var kvp in formats)

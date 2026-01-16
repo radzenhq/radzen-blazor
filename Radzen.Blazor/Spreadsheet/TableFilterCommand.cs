@@ -20,6 +20,7 @@ public class TableFilterCommand : ICommand
     /// <param name="tableIndex">The index of the table to toggle filter button on.</param>
     public TableFilterCommand(Sheet sheet, int tableIndex)
     {
+        ArgumentNullException.ThrowIfNull(sheet);
         this.sheet = sheet;
         this.tableIndex = tableIndex;
         this.previousShowFilterButton = tableIndex >= 0 && tableIndex < sheet.Tables.Count 

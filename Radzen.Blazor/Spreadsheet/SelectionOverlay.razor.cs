@@ -12,7 +12,7 @@ public partial class SelectionOverlay
     /// Gets or sets the sheet that contains the selection overlay.
     /// </summary>
     [Parameter]
-    public Sheet Sheet { get; set; }
+    public Sheet Sheet { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the context for the virtual grid that contains the selection overlay.

@@ -249,6 +249,8 @@ public partial class Sheet
     /// <returns></returns>
     public string GetDelimitedString(RangeRef range, string rowDelimiter = "\n", string cellDelimiter = "\t")
     {
+        ArgumentNullException.ThrowIfNull(rowDelimiter);
+        ArgumentNullException.ThrowIfNull(cellDelimiter);
         if (range == RangeRef.Invalid || range.Rows == 0 || range.Columns == 0)
         {
             return string.Empty;
@@ -269,7 +271,8 @@ public partial class Sheet
                 {
                     var value = cell.GetValue() ?? string.Empty;
 
-                    result.Append(value.Replace(rowDelimiter, " ").Replace(cellDelimiter, " "));
+                    result.Append(value.Replace(rowDelimiter, " ", StringComparison.Ordinal)
+                        .Replace(cellDelimiter, " ", StringComparison.Ordinal));
                 }
             }
 
@@ -288,6 +291,8 @@ public partial class Sheet
 
     public void InsertDelimitedString(CellRef address, string value, string cellDelimiter = "\t")
     {
+        ArgumentNullException.ThrowIfNull(value);
+        ArgumentNullException.ThrowIfNull(cellDelimiter);
         var rows = value.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
 
         var rowCount = Math.Min(rows.Length, RowCount - address.Row);
@@ -597,8 +602,20 @@ public partial class Sheet
     /// </summary>
     public void InsertRow(int rowIndex, int count = 1)
     {
-        if (rowIndex < 0 || rowIndex > RowCount) throw new ArgumentOutOfRangeException(nameof(rowIndex));
-        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
+#if NET8_0_OR_GREATER
+        ArgumentOutOfRangeException.ThrowIfNegative(rowIndex);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(rowIndex, RowCount);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
+#else
+        if (rowIndex < 0 || rowIndex > RowCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(rowIndex));
+        }
+        if (count <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(count));
+        }
+#endif
 
         BeginUpdate();
 
@@ -638,8 +655,20 @@ public partial class Sheet
     /// </summary>
     public void InsertColumn(int columnIndex, int count = 1)
     {
-        if (columnIndex < 0 || columnIndex > ColumnCount) throw new ArgumentOutOfRangeException(nameof(columnIndex));
-        if (count <= 0) throw new ArgumentOutOfRangeException(nameof(count));
+#if NET8_0_OR_GREATER
+        ArgumentOutOfRangeException.ThrowIfNegative(columnIndex);
+        ArgumentOutOfRangeException.ThrowIfGreaterThan(columnIndex, ColumnCount);
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
+#else
+        if (columnIndex < 0 || columnIndex > ColumnCount)
+        {
+            throw new ArgumentOutOfRangeException(nameof(columnIndex));
+        }
+        if (count <= 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(count));
+        }
+#endif
 
         BeginUpdate();
 

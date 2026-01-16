@@ -52,6 +52,7 @@ public class Workbook
     /// <param name="sheet"></param>
     public void AddSheet(Sheet sheet)
     {
+        ArgumentNullException.ThrowIfNull(sheet);
         sheets.Add(sheet);
         sheet.Workbook = this;
     }
@@ -531,7 +532,7 @@ public class Workbook
         }
 
         styleTracker.FontsElement.Add(fontElement);
-        styleTracker.FontsElement.Attribute("count")!.Value = (styleTracker.FontStyles.Count + 1).ToString();
+        styleTracker.FontsElement.Attribute("count")!.Value = (styleTracker.FontStyles.Count + 1).ToString(CultureInfo.InvariantCulture);
     }
 
     private void CreateFillElement(Cell cell, int fillId, StyleTracker styleTracker)
@@ -545,7 +546,7 @@ public class Workbook
                     new XAttribute("indexed", "64"))));
 
         styleTracker.FillsElement.Add(fillElement);
-        styleTracker.FillsElement.Attribute("count")!.Value = (styleTracker.FillStyles.Count + 2).ToString();
+        styleTracker.FillsElement.Attribute("count")!.Value = (styleTracker.FillStyles.Count + 2).ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -555,8 +556,8 @@ public class Workbook
     {
         var xfElement = new XElement(XName.Get("xf", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"),
             new XAttribute("numFmtId", "0"),
-            new XAttribute("fontId", fontId.ToString()),
-            new XAttribute("fillId", fillId.ToString()),
+            new XAttribute("fontId", fontId.ToString(CultureInfo.InvariantCulture)),
+            new XAttribute("fillId", fillId.ToString(CultureInfo.InvariantCulture)),
             new XAttribute("borderId", "0"),
             new XAttribute("xfId", "0"),
             new XAttribute("applyFont", fontId > 0 ? "1" : "0"),
@@ -571,7 +572,7 @@ public class Workbook
         }
 
         styleTracker.CellXfsElement.Add(xfElement);
-        styleTracker.CellXfsElement.Attribute("count")!.Value = (styleTracker.CellStyles.Count + 1).ToString();
+        styleTracker.CellXfsElement.Attribute("count")!.Value = (styleTracker.CellStyles.Count + 1).ToString(CultureInfo.InvariantCulture);
     }
 
     /// <summary>
@@ -612,7 +613,7 @@ public class Workbook
         if (!string.IsNullOrEmpty(cell.Formula))
         {
             cellElement.Add(new XAttribute("t", "str"));
-            var formulaValue = cell.Formula.StartsWith("=") ? cell.Formula[1..] : cell.Formula;
+            var formulaValue = cell.Formula.StartsWith('=') ? cell.Formula[1..] : cell.Formula;
             cellElement.Add(new XElement(XName.Get("f", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), formulaValue));
             cellElement.Add(new XElement(XName.Get("v", "http://schemas.openxmlformats.org/spreadsheetml/2006/main"), cell.GetValue()));
         }
@@ -834,7 +835,9 @@ public class Workbook
 
         return operatorName switch
         {
-            "equal" => value == "" ? new IsNullCriterion { Column = columnIndex } : new EqualToCriterion { Column = columnIndex, Value = value },
+            "equal" => string.IsNullOrEmpty(value)
+                ? new IsNullCriterion { Column = columnIndex }
+                : new EqualToCriterion { Column = columnIndex, Value = value },
             "notEqual" => new NotEqualToCriterion { Column = columnIndex, Value = value },
             "greaterThan" => new GreaterThanCriterion { Column = columnIndex, Value = value },
             "lessThan" => new LessThanCriterion { Column = columnIndex, Value = value },
@@ -949,8 +952,8 @@ public class Workbook
             if (fontId != null && fillId != null)
             {
                 // Only include styles that are actually applied
-                var fontIdValue = int.Parse(fontId);
-                var fillIdValue = int.Parse(fillId);
+                var fontIdValue = int.Parse(fontId, CultureInfo.InvariantCulture);
+                var fillIdValue = int.Parse(fillId, CultureInfo.InvariantCulture);
 
                 var (textAlign, verticalAlign) = ParseAlignment(cellXfs[i], stylesNs, applyAlignment);
 
@@ -1037,7 +1040,7 @@ public class Workbook
         var relMap = relsDoc.Descendants(relsNs + "Relationship")
             .ToDictionary(
                 r => r.Attribute("Id")!.Value,
-                r => r.Attribute("Target")!.Value.Replace("\\", "/")
+                r => r.Attribute("Target")!.Value.Replace("\\", "/", StringComparison.Ordinal)
             );
 
         return sheets.Select(sheet => new SheetInfo(sheet.Name, sheet.SheetId, sheet.RelId, relMap))
@@ -1219,7 +1222,7 @@ public class Workbook
         if (formulaElem != null)
         {
             var formulaValue = formulaElem.Value;
-            if (!formulaValue.StartsWith("="))
+            if (!formulaValue.StartsWith('='))
             {
                 formulaValue = "=" + formulaValue;
             }
@@ -1229,7 +1232,7 @@ public class Workbook
         {
             var value = cellType switch
             {
-                "s" => sharedStrings[Convert.ToInt32(valueElem!.Value)],
+                "s" => sharedStrings[Convert.ToInt32(valueElem!.Value, CultureInfo.InvariantCulture)],
                 _ => valueElem!.Value
             };
 
@@ -1240,7 +1243,8 @@ public class Workbook
     private static void ApplyCellStyle(XElement cellElem, Sheet sheet, CellRef address, StyleInfo styleInfo)
     {
         var styleId = cellElem.Attribute("s")?.Value;
-        if (styleId != null && styleInfo.CellStyles.TryGetValue(int.Parse(styleId), out var style))
+        if (styleId != null &&
+            styleInfo.CellStyles.TryGetValue(int.Parse(styleId, CultureInfo.InvariantCulture), out var style))
         {
             if (styleInfo.FontStyles.TryGetValue(style.FontId, out var fontStyle))
             {
@@ -1374,8 +1378,8 @@ public class Workbook
     private static void UpdateAndSaveSharedStrings(ZipArchive archive, Dictionary<string, int> sharedStrings, XDocument sharedStringsDoc)
     {
         var sstElement = sharedStringsDoc.Root!;
-        sstElement.Attribute("count")!.Value = sharedStrings.Count.ToString();
-        sstElement.Attribute("uniqueCount")!.Value = sharedStrings.Count.ToString();
+        sstElement.Attribute("count")!.Value = sharedStrings.Count.ToString(CultureInfo.InvariantCulture);
+        sstElement.Attribute("uniqueCount")!.Value = sharedStrings.Count.ToString(CultureInfo.InvariantCulture);
 
         using var entry = archive.CreateEntry("xl/sharedStrings.xml").Open();
         sharedStringsDoc.Save(entry);
