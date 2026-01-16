@@ -161,6 +161,11 @@ $dialog-resize-bar-handle-size: 16px;
 
 .rz-dialog-titlebar-close,
 .rz-dialog-side-titlebar-close {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+
   .rzi-times {
     font-size: var(--rz-dialog-close-font-size);
     color: var(--rz-dialog-close-color);

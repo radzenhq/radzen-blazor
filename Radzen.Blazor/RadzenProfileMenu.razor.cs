@@ -50,6 +50,13 @@ namespace Radzen.Blazor
         [Parameter]
         public bool ShowIcon { get; set; } = true;
 
+        /// <summary>
+        /// Gets or sets the toggle aria label text.
+        /// </summary>
+        /// <value>The toggle aria label text.</value>
+        [Parameter]
+        public string ToggleAriaLabel { get; set; } = "Profile menu";
+
         string contentStyle = "display:none;position:absolute;z-index:1;";
 
         /// <summary>
@@ -130,6 +137,15 @@ namespace Radzen.Blazor
             else
             {
                 preventKeyPress = false;
+            }
+        }
+
+        async Task OnToggleKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Space" || key == "Enter")
+            {
+                await Toggle(new MouseEventArgs());
             }
         }
 

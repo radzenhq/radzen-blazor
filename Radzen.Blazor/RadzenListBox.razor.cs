@@ -109,6 +109,7 @@ namespace Radzen.Blazor
             await OnKeyPress(args, false);
         }
 
+
         private bool visibleChanged;
         private bool disabledChanged;
         private bool firstRender = true;

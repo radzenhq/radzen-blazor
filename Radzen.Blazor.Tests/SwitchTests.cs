@@ -110,7 +110,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.Change, args => { raised = true; newValue = args; }));
 
-            component.Find("div").Click();
+            component.Find("input[type=\"checkbox\"]").Change(true);
 
             Assert.True(raised);
             Assert.True(object.Equals(value, !(bool)newValue));
@@ -129,7 +129,7 @@ namespace Radzen.Blazor.Tests
 
             component.SetParametersAndRender(parameters => parameters.Add(p => p.ValueChanged, args => { raised = true; newValue = args; }));
 
-            component.Find("div").Click();
+            component.Find("input[type=\"checkbox\"]").Change(true);
 
             Assert.True(raised);
             Assert.True(object.Equals(value, !(bool)newValue));

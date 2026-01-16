@@ -276,6 +276,24 @@ namespace Radzen.Blazor
             Tree?.SelectItem(this);
         }
 
+        void OnKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                Select();
+            }
+        }
+
+        async Task OnToggleKeyDown(KeyboardEventArgs args)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await Toggle();
+            }
+        }
+
         internal void Unselect()
         {
             selected = false;

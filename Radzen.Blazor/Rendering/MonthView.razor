@@ -52,7 +52,7 @@
                             var slotWidth = 100 / 7.0;
                             var left = dayIndex * slotWidth;
                             var top = 1.5 * (MaxAppointmentsInSlot + 1);
-                            <a class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); })>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</a>
+                            <button type="button" class="rz-event-list-btn" style="top: @(top.ToInvariantString())rem; left: @(left.ToInvariantString())%" @onclick=@(args => { if (slot.Appointments != null && MoreText != null) _ = OnListClick(slot.Start, slot.Appointments); })>@(MoreText != null ? String.Format(MoreText, slot.Hidden) : "")</button>
                         }
                     }
                 </div>
@@ -61,7 +61,9 @@
                 {
                     var dayOfWeek = StartDate.AddDays(days++);
                     <div @onclick="@(args => OnSlotClick(dayOfWeek))" ondragover="event.preventDefault();" @ondrop=@(args => @OnDrop(dayOfWeek)) @attributes=@Attributes(dayOfWeek)>
-                        <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation>
+                        <div class="rz-slot-title @(dayOfWeek == CurrentDate ? " rz-state-focused" : "")" role="button" tabindex="0"
+                             @onclick=@(args => OnDayClick(dayOfWeek)) @onclick:stopPropagation
+                             @onkeydown="@(args => OnDayHeaderKeyDown(args, dayOfWeek))">
                             @dayOfWeek.Day
                         </div>
                     </div>
@@ -241,6 +243,15 @@
     {
         if (Scheduler != null)
             await Scheduler.SelectDay(day, AppointmentsInSlot(day, day.AddDays(1)));
+    }
+
+    async Task OnDayHeaderKeyDown(KeyboardEventArgs args, DateTime day)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            await OnDayClick(day);
+        }
     }
 
     ElementReference contentView;

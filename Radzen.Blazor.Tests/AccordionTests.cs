@@ -123,7 +123,7 @@ namespace Radzen.Blazor.Tests
             });
 
             // Find and click the accordion header link to expand
-            var header = component.Find(".rz-accordion-header a");
+            var header = component.Find(".rz-accordion-header button");
             header.Click();
 
             Assert.True(expandRaised);
@@ -156,7 +156,7 @@ namespace Radzen.Blazor.Tests
             });
 
             // Find and click the accordion header link to collapse
-            var header = component.Find(".rz-accordion-header a");
+            var header = component.Find(".rz-accordion-header button");
             header.Click();
 
             Assert.True(collapseRaised);
@@ -184,7 +184,7 @@ namespace Radzen.Blazor.Tests
             });
 
             // Try to click the disabled item
-            var header = component.Find(".rz-accordion-header a");
+            var header = component.Find(".rz-accordion-header button");
             header.Click();
 
             // Event should not be raised for disabled item

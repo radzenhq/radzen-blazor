@@ -8,8 +8,10 @@
 Disabled = itemArgs.Disabled;
 @if (DropDown?.Multiple == true)
 {
-    <li class="@GetComponentCssClass("rz-multiselect")"
+    <li class="@GetComponentCssClass("rz-multiselect")" role="option" tabindex="-1"
         aria-label="@(DropDown?.GetItemOrValueFromProperty(Item!, DropDown?.TextProperty ?? string.Empty) ?? "")"
+        aria-selected="@(DropDown?.IsSelected(Item) == true)"
+        aria-disabled="@(Disabled || DropDown?.Disabled == true ? "true" : "false")"
         @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
         @onclick:preventDefault @onclick="args=>SelectItem(args,true)" 
         @attributes="@(itemArgs?.Attributes.Any() == true ? itemArgs.Attributes : Attributes)">
@@ -32,10 +34,13 @@ Disabled = itemArgs.Disabled;
 }
 else
 {
-    <li role="option" class="@GetComponentCssClass("rz-dropdown")" aria-label="@(DropDown?.GetItemOrValueFromProperty(Item, DropDown?.TextProperty ?? "") ?? "")"
-    @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
-    @onclick:preventDefault @onclick="args=>SelectItem(args,true)"
-    @attributes="@(itemArgs?.Attributes.Any() == true ? itemArgs.Attributes : Attributes)">
+    <li role="option" class="@GetComponentCssClass("rz-dropdown")" tabindex="-1"
+        aria-label="@(DropDown?.GetItemOrValueFromProperty(Item, DropDown?.TextProperty ?? "") ?? "")"
+        aria-selected="@(DropDown?.IsSelected(Item) == true)"
+        aria-disabled="@(Disabled || DropDown?.Disabled == true ? "true" : "false")"
+        @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
+        @onclick:preventDefault @onclick="args=>SelectItem(args,true)"
+        @attributes="@(itemArgs?.Attributes.Any() == true ? itemArgs.Attributes : Attributes)">
         <span>
             @if (DropDown?.Template != null)
             {

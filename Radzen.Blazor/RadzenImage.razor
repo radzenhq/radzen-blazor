@@ -1,6 +1,21 @@
-﻿@inherits RadzenComponentWithChildren
+﻿@using System.Collections.Generic
+@inherits RadzenComponentWithChildren
 
 @if (Visible)
 {
-    <img @ref="@Element" src="@Path" style="@Style" @onclick="@((args) => OnClick(args))" @attributes="Attributes" class="@GetCssClass()" id="@GetId()" alt="@GetAlternateText()" />
+    var imgAttributes = new Dictionary<string, object>();
+    if (Attributes != null)
+    {
+        foreach (var attribute in Attributes)
+        {
+            imgAttributes[attribute.Key] = attribute.Value;
+        }
+    }
+
+    if (Click.HasDelegate)
+    {
+        imgAttributes["role"] = "button";
+        imgAttributes["tabindex"] = "0";
+    }
+    <img @ref="@Element" src="@Path" style="@Style" @onclick="@((args) => OnClick(args))" @onkeydown="OnKeyDown" @attributes="imgAttributes" class="@GetCssClass()" id="@GetId()" alt="@GetAlternateText()" />
 }

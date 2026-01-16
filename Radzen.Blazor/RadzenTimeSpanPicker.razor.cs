@@ -161,6 +161,19 @@ namespace Radzen.Blazor
         /// </summary>
         [Parameter]
         public string TogglePopupAriaLabel { get; set; } = "Toggle popup";
+
+        /// <summary>
+        /// Specifies the aria label for the popup.
+        /// </summary>
+        [Parameter]
+        public string PopupAriaLabel { get; set; } = "Time span picker";
+
+        /// <summary>
+        /// Gets or sets the clear button aria label text.
+        /// </summary>
+        /// <value>The clear button aria label text.</value>
+        [Parameter]
+        public string ClearAriaLabel { get; set; } = "Clear";
         #endregion
 
         #region Parameters: panel config
@@ -716,6 +729,8 @@ namespace Radzen.Blazor
         private Task ClosePopup()
             => Inline ? Task.CompletedTask : popup?.CloseAsync(Element) ?? Task.CompletedTask;
 
+        private bool isPopupOpen;
+
         private async Task PopupKeyDown(KeyboardEventArgs args)
         {
             var key = args.Code ?? args.Key;
@@ -728,11 +743,13 @@ namespace Radzen.Blazor
 
         private void OnPopupOpen()
         {
+            isPopupOpen = true;
             ResetUnconfirmedValue();
             preventKeyPress = true;
         }
         private void OnPopupClose()
         {
+            isPopupOpen = false;
             ResetUnconfirmedValue();
             preventKeyPress = false;
         }

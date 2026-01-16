@@ -59,6 +59,8 @@ namespace Radzen.Blazor
 
         bool CheckBoxChecked => object.Equals(Value, true);
 
+        string CheckBoxAriaChecked => object.Equals(Value, true) ? "true" : Value == null ? "mixed" : "false";
+
         /// <inheritdoc />
         protected override string GetComponentCssClass() => GetClassList("rz-chkbox").ToString();
 

@@ -14,12 +14,15 @@
                         ToggleShade="@ToggleShade"
                         Disabled="@Disabled"
                         AriaLabel="@AriaLabel"
+                        AriaExpanded="@isOpen.ToString().ToLowerInvariant()"
+                        AriaControls="@($"{GetId()}-items")"
+                        AriaHasPopup="menu"
                         class="@ButtonClass"
                         style="@ButtonStyleCss">
     </RadzenToggleButton>
 
     @if (isOpen)
     {
-        <RadzenStack onclick=@CloseAsync Orientation=@StackOrientation AlignItems=@StackAlignment Gap=@Gap class=@GetStackClasses() style=@ComputedItemsStyle ChildContent="@ChildContent" />
+        <RadzenStack onclick=@CloseAsync Orientation=@StackOrientation AlignItems=@StackAlignment Gap=@Gap class=@GetStackClasses() style=@ComputedItemsStyle ChildContent="@ChildContent" Attributes="ItemsAttributes" />
     }
 </div> 

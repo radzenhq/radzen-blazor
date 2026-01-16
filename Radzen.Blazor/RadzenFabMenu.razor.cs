@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Radzen.Blazor;
@@ -147,6 +148,12 @@ public partial class RadzenFabMenu : RadzenComponent
     public FabMenuDirection Direction { get; set; } = FabMenuDirection.Top;
 
     private string ComputedItemsStyle => string.IsNullOrEmpty(ItemsStyle) ? string.Empty : ItemsStyle;
+
+    private IReadOnlyDictionary<string, object> ItemsAttributes => new Dictionary<string, object>
+    {
+        { "id", $"{GetId()}-items" },
+        { "role", "menu" }
+    };
 
     private Orientation StackOrientation => Direction switch
     {

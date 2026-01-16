@@ -1,3 +1,4 @@
+@using System.Collections.Generic
 @using System.Timers
 @using System.Threading
 @implements IDisposable
@@ -5,17 +6,23 @@
 @if (Visible)
 {
     var classes = GetMessageCssClasses();
-
-    <div aria-live="polite" class="rz-notification-item-wrapper rz-open @classes.Item1" style="@(Message?.Click != null || Message?.CloseOnClick == true ? "cursor: pointer;" : "") @Style">
+    var clickable = Message?.Click != null || Message?.CloseOnClick == true;
+    var wrapperAttributes = clickable ? new Dictionary<string, object>
+    {
+        { "role", "button" },
+        { "tabindex", "0" }
+    } : null;
+    <div aria-live="polite" class="rz-notification-item-wrapper rz-open @classes.Item1" style="@(clickable ? "cursor: pointer;" : "") @Style"
+         @attributes="wrapperAttributes" @onclick="NotificationClicked" @onkeydown="OnKeyDown">
         <div class="rz-notification-item">
             <div class="rz-notification-message-wrapper">
-                <span class="notranslate rzi rz-notification-icon @classes.Item2" @onclick="NotificationClicked"></span>
-                <div class="rz-notification-message" @onclick="NotificationClicked">
+                <span class="notranslate rzi rz-notification-icon @classes.Item2"></span>
+                <div class="rz-notification-message">
                     <div class="rz-notification-title">@if (Message?.SummaryContent != null && Service != null) { @Message.SummaryContent(Service) } else { @Message?.Summary }</div>
                     <div class="rz-notification-content">@if (Message?.DetailContent != null && Service != null) { @Message.DetailContent(Service) } else { @Message?.Detail }</div>
                 </div>
             </div>
-            <div class="notranslate rzi rz-notification-close" @onclick="@Close"></div>
+            <button type="button" class="notranslate rzi rz-notification-close" aria-label="@(Message?.CloseAriaLabel ?? "Close")" @onclick="@Close" @onclick:stopPropagation="true"></button>
         </div>
         <RadzenProgressBar ShowValue="false" Visible=@(Message?.Duration != null && Message.ShowProgress)
         Value=@progress Max="@(Message?.Duration ?? 0)" ProgressBarStyle=@GetProgressBarStyle() />
@@ -127,10 +134,27 @@
 
     private void NotificationClicked()
     {
+      if (Message?.Click == null && Message?.CloseOnClick != true)
+         return;
+
       if (Message?.CloseOnClick == true)
          Close();
 
       Message?.Click?.Invoke(Message);
+    }
+
+    private void OnKeyDown(KeyboardEventArgs args)
+    {
+        if (Message?.Click == null && Message?.CloseOnClick != true)
+        {
+            return;
+        }
+
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            NotificationClicked();
+        }
     }
 
     public void Dispose()
