@@ -8,7 +8,12 @@ namespace Radzen.Blazor.Spreadsheet;
 
 internal static class FormatColorExtensions
 {
-    public static string ToXLSXColor(this string color) => $"FF{RGB.Parse(color).ToHex()}";
+    public static string ToXLSXColor(this string color)
+    {
+        ArgumentNullException.ThrowIfNull(color);
+        var parsed = RGB.Parse(color) ?? throw new ArgumentException($"Invalid color value: {color}", nameof(color));
+        return $"FF{parsed.ToHex()}";
+    }
 }
 
 /// <summary>
@@ -87,6 +92,7 @@ public class Format
     /// <param name="sb"></param>
     public void AppendStyle(StringBuilder sb)
     {
+        ArgumentNullException.ThrowIfNull(sb);
         if (Color != null)
         {
             sb.Append("color: ");
@@ -157,6 +163,7 @@ public class Format
     /// <returns>A new <see cref="Format"/> instance representing the merged result.</returns>
     public Format Merge(Format format)
     {
+        ArgumentNullException.ThrowIfNull(format);
         var merged = Clone();
 
         if (format.Color != null)

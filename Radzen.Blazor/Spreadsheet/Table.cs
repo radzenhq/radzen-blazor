@@ -6,7 +6,7 @@ namespace Radzen.Blazor.Spreadsheet;
 public class Table
 {
     private bool showFilterButton = true;
-    private AutoFilter filter;
+    private AutoFilter filter = default!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Table"/> class.
