@@ -411,10 +411,7 @@ namespace Radzen.Blazor
                 preventDefault = true;
                 await OnSendMessage();
             }
-            else
-            {
-                preventDefault = false;
-            }
+            preventDefault = false;
         }
 
         private async Task OnSendMessage()
