@@ -1975,9 +1975,9 @@ namespace Radzen.Blazor
                 return EventCallback.Factory.Create<T>(receiver, action);
             }
 
-            public static Action<T> Action<T>(Action<object> action)
+            public static Action<T> Action<T>(Action<object?> action)
             {
-                return args => { if (args != null) action(args); };
+                return args => action(args);
             }
         }
 
