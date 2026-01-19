@@ -108,13 +108,14 @@ namespace Radzen.Blazor
         public RenderFragment<RadzenPivotField<TItem>>? SecondFilterValueTemplate { get; set; }
 
         private SortOrder? internalSortOrder;
+        private bool hasInternalSortOrder;
 
         /// <summary>
         /// Gets the current sort order (internal state).
         /// </summary>
         public SortOrder? GetSortOrder()
         {
-            return internalSortOrder ?? SortOrder;
+            return hasInternalSortOrder ? internalSortOrder : SortOrder;
         }
 
         /// <summary>
@@ -123,6 +124,7 @@ namespace Radzen.Blazor
         internal void SetSortOrderInternal(SortOrder? sortOrder)
         {
             internalSortOrder = sortOrder;
+            hasInternalSortOrder = true;
         }
 
         /// <summary>
@@ -131,6 +133,7 @@ namespace Radzen.Blazor
         internal void ResetSortOrder()
         {
             internalSortOrder = null;
+            hasInternalSortOrder = false;
         }
 
         private object? internalFilterValue;
