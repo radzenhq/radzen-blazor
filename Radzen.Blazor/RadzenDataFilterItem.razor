@@ -189,6 +189,8 @@ else if (Filter != null)
         }
         Filter.FilterValue = null;
 
+        Filter.Type = property.FilterPropertyType;
+
         var defaultOperator = typeof(System.Collections.IEnumerable).IsAssignableFrom(property.FilterPropertyType) ? FilterOperator.Contains : default(FilterOperator);
 
         if (property.GetFilterOperators().Any(o => o == property.FilterOperator))
