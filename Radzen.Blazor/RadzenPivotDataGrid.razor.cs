@@ -1618,15 +1618,6 @@ namespace Radzen.Blazor
 
                 sortedField.SetSortOrderInternal(nextSortOrder);
 
-                // Clear other column sorts if single column sorting
-                if (sortedField.GetSortOrder() != null)
-                {
-                    foreach (var col in allFields.Where(c => c != sortedField))
-                    {
-                        col.SetSortOrderInternal(null);
-                    }
-                }
-
                 await Reload();
             }
 
