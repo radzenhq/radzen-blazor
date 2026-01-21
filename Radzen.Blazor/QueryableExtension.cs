@@ -1695,7 +1695,7 @@ namespace Radzen
             return columns
                 .Where(c => c.Filterable
                     && c.FilterPropertyType != null
-                    && (!string.IsNullOrEmpty(c.GetFilterValue() as string)
+                    && (!(c.GetFilterValue() == null || (c.GetFilterValue() as string)?.Length == 0)
                         || !c.CanSetFilterValue()
                         || c.HasCustomFilter())
                     && c.GetFilterProperty() != null)
