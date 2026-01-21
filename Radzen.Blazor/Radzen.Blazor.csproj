@@ -11,7 +11,7 @@
     <IsPackable>true</IsPackable>
     <PackageId>Radzen.Blazor</PackageId>
     <Product>Radzen.Blazor</Product>
-    <Version>8.6.3</Version>
+    <Version>8.6.4</Version>
     <Copyright>Radzen Ltd.</Copyright>
     <Authors>Radzen Ltd.</Authors>
     <Description>Radzen Blazor is the most sophisticated free UI component library for Blazor, featuring 100+ native components including DataGrid, Scheduler, Charts, and advanced theming with full support for Material Design and Fluent UI.</Description>
