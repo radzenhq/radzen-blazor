@@ -25,7 +25,7 @@ $layout-background-color: var(--rz-body-background-color) !default;
 
 .rz-layout {
   box-sizing: border-box;
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   display: grid;
   grid-template-columns: auto 1fr;
@@ -479,10 +479,6 @@ $layout-background-color: var(--rz-body-background-color) !default;
 @media (max-width: 768px) {
   body:has(> .rz-layout) {
     overflow-x: hidden;
-  }
-  
-  .rz-layout {
-    height: 100dvh;
   }
 
   // Set layout width to 100vw when second Sidebar is not present

@@ -7,7 +7,6 @@ $sidebar-color: var(--rz-white) !default;
 .rz-sidebar {
   background-color: var(--rz-sidebar-background-color);
   color: var(--rz-sidebar-color);
-  border-inline-end: var(--rz-sidebar-border-inline-end);
   position: fixed;
   overflow: auto;
   left: 0;
@@ -17,6 +16,23 @@ $sidebar-color: var(--rz-white) !default;
   width: var(--rz-sidebar-width);
   opacity: 1;
   transition: width var(--rz-transition), opacity var(--rz-transition);
+
+  // Variations for border with different sidebar positions (start, end, left, right)
+  &.rz-sidebar-start {
+    border-inline-end: var(--rz-sidebar-border-inline-end);
+  }
+
+  &.rz-sidebar-left {
+    border-right: var(--rz-sidebar-border-inline-end);
+  }
+
+  &.rz-sidebar-end {
+    border-inline-start: var(--rz-sidebar-border-inline-end);
+  }
+
+  &.rz-sidebar-right {
+    border-left: var(--rz-sidebar-border-inline-end);
+  }
 }
 
 @media (max-width: 768px) { 

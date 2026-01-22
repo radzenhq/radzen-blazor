@@ -20,12 +20,13 @@ namespace Radzen.Blazor
     /// <example>
     /// Basic upload with auto-upload:
     /// <code>
-    /// &lt;RadzenUpload Url="api/upload" Complete=@OnComplete /&gt;
+    /// &lt;RadzenUpload Url="api/upload" Change=@OnChange Complete=@OnComplete /&gt;
     /// @code {
+    ///     void OnChange(UploadChangeEventArgs args)
+    ///         => Console.WriteLine($"Selected {args.Files?.Count() ?? 0} files");
+    ///
     ///     void OnComplete(UploadCompleteEventArgs args)
-    ///     {
-    ///         Console.WriteLine($"Uploaded {args.Files.Count} files");
-    ///     }
+    ///         => Console.WriteLine(args.Cancelled ? "Upload cancelled" : "Upload complete");
     /// }
     /// </code>
     /// Manual upload with progress tracking:
