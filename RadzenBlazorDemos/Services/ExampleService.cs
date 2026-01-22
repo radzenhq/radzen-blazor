@@ -2025,6 +2025,15 @@ namespace RadzenBlazorDemos
                             Description = "This example demonstrates different color schemes, custom colors and styling of Radzen Blazor Chart component.",
                             Tags = new [] { "chart", "graph", "styling" }
                         },
+                        new Example
+                        {
+                            Name = "Spider Chart",
+                            Path = "spider-chart",
+                            Title = "Blazor Spider Chart Component | Free UI Components by Radzen",
+                            Description = "Radzen Blazor Spider Chart for displaying multivariate data in a radial format.",
+                            Tags = new [] { "spider", "radar", "chart", "multivariate", "radial", "web" },
+                            New = true
+                        },
                     }
                 },
                 new Example

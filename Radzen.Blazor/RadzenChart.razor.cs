@@ -55,9 +55,9 @@ namespace Radzen.Blazor
         /// <summary>
         /// Gets or sets the color scheme used to assign colors to chart series.
         /// Determines the palette of colors applied sequentially to each series when series-specific colors are not set.
-        /// Available schemes include Pastel, Palette (default), Monochrome, and custom color schemes.
+        /// Available schemes include Pastel (default), Palette, Monochrome, and custom color schemes.
         /// </summary>
-        /// <value>The color scheme. Default uses the Palette scheme.</value>
+        /// <value>The color scheme. Default uses the Pastel scheme.</value>
         [Parameter]
         public ColorScheme ColorScheme { get; set; }
 

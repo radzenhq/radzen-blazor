@@ -1,0 +1,244 @@
+@typeparam TItem
+@inherits RadzenComponent
+@implements IDisposable
+@implements Radzen.Blazor.IRadzenSpiderSeries
+@using Radzen.Blazor.Rendering
+@using Microsoft.AspNetCore.Components.Rendering
+@using Microsoft.AspNetCore.Components.Web
+
+@code {
+    /// <summary>
+    /// Gets or sets the data for this series.
+    /// </summary>
+    [Parameter]
+    public IEnumerable<TItem> Data { get; set; } = Enumerable.Empty<TItem>();
+
+    /// <summary>
+    /// Gets or sets the property that provides the category values for this series.
+    /// </summary>
+    [Parameter]
+    public string CategoryProperty { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the property that provides the values for this series.
+    /// </summary>
+    [Parameter]
+    public string ValueProperty { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the series title.
+    /// </summary>
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the value formatter function.
+    /// </summary>
+    [Parameter]
+    public Func<double, string> ValueFormatter { get; set; } = value => value.ToString("F1");
+
+    /// <summary>
+    /// Gets or sets the format string for values.
+    /// </summary>
+    [Parameter]
+    public string FormatString { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the stroke width for this series.
+    /// </summary>
+    [Parameter]
+    public double StrokeWidth { get; set; } = 2;
+
+    /// <summary>
+    /// Gets or sets whether markers are visible for this series.
+    /// </summary>
+    [Parameter]
+    public bool MarkersVisible { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the marker size for this series.
+    /// </summary>
+    [Parameter]
+    public double MarkerSize { get; set; } = 6;
+
+    [CascadingParameter]
+    public RadzenSpiderChart? Chart { get; set; }
+
+    private bool _registered;
+
+    /// <inheritdoc />
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        
+        if (Chart != null && !_registered)
+        {
+            _registered = true;
+            Chart.AddSeries(this);
+        }
+    }
+
+    /// <summary>
+    /// Disposes the component and removes it from the parent chart.
+    /// </summary>
+    public new void Dispose()
+    {
+        if (Chart != null && _registered)
+        {
+            _registered = false;
+            Chart.RemoveSeries(this);
+        }
+        base.Dispose();
+    }
+
+    /// <summary>
+    /// Gets whether the series is visible.
+    /// </summary>
+    public bool IsVisible { get; set; } = true;
+
+    /// <summary>
+    /// Gets the series index in the chart.
+    /// </summary>
+    internal int Index { get; set; }
+
+    int IRadzenSpiderSeries.Index { get => Index; set => Index = value; }
+    string IRadzenSpiderSeries.Title => Title;
+    bool IRadzenSpiderSeries.IsVisible { get => IsVisible; set => IsVisible = value; }
+    bool IRadzenSpiderSeries.MarkersVisible => MarkersVisible;
+    double IRadzenSpiderSeries.MarkerSize => MarkerSize;
+    double IRadzenSpiderSeries.StrokeWidth => StrokeWidth;
+
+    /// <summary>
+    /// Measures the legend text width for this series.
+    /// </summary>
+    public double MeasureLegend()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            return 0;
+        }
+
+        return TextMeasurer.TextWidth(Title);
+    }
+
+    double IRadzenSpiderSeries.MeasureLegend() => MeasureLegend();
+
+    IEnumerable<string> IRadzenSpiderSeries.GetCategories()
+    {
+        if (Data == null || string.IsNullOrEmpty(CategoryProperty))
+        {
+            return Enumerable.Empty<string>();
+        }
+
+        var categoryGetter = PropertyAccess.Getter<TItem, string>(CategoryProperty);
+        return Data.Select(item => categoryGetter(item))
+                   .Where(c => !string.IsNullOrEmpty(c))
+                   .Distinct()
+                   .ToList();
+    }
+
+    IEnumerable<double> IRadzenSpiderSeries.GetValues()
+    {
+        if (Data == null || string.IsNullOrEmpty(ValueProperty))
+        {
+            return Enumerable.Empty<double>();
+        }
+
+        var valueGetter = PropertyAccess.Getter<TItem, double>(ValueProperty);
+        return Data.Select(item => valueGetter(item)).ToList();
+    }
+
+    double IRadzenSpiderSeries.GetValue(string category)
+    {
+        if (Data == null || string.IsNullOrEmpty(CategoryProperty) || string.IsNullOrEmpty(ValueProperty))
+        {
+            return 0;
+        }
+
+        var categoryGetter = PropertyAccess.Getter<TItem, string>(CategoryProperty);
+        var valueGetter = PropertyAccess.Getter<TItem, double>(ValueProperty);
+
+        var item = Data.FirstOrDefault(d => categoryGetter(d) == category);
+        return item != null ? valueGetter(item) : 0;
+    }
+
+    object? IRadzenSpiderSeries.GetData(string category)
+    {
+        if (Data == null || string.IsNullOrEmpty(CategoryProperty))
+        {
+            return null;
+        }
+
+        var categoryGetter = PropertyAccess.Getter<TItem, string>(CategoryProperty);
+        return Data.FirstOrDefault(d => categoryGetter(d) == category);
+    }
+
+    string IRadzenSpiderSeries.FormatValue(double value)
+    {
+        if (ValueFormatter != null)
+        {
+            return ValueFormatter(value);
+        }
+
+        if (!string.IsNullOrEmpty(FormatString))
+        {
+            return value.ToString(FormatString, System.Globalization.CultureInfo.InvariantCulture);
+        }
+
+        return value.ToString("F1", System.Globalization.CultureInfo.InvariantCulture);
+    }
+
+    RenderFragment IRadzenSpiderSeries.RenderLegendItem() => RenderLegendItem();
+    void IRadzenSpiderSeries.ForceUpdate() => ForceUpdate();
+
+    /// <summary>
+    /// Renders the legend item for this series.
+    /// </summary>
+    public RenderFragment RenderLegendItem() => RenderLegendItem(true);
+
+    /// <summary>
+    /// Renders the legend item for this series.
+    /// </summary>
+    protected virtual RenderFragment RenderLegendItem(bool clickable) => builder =>
+    {
+        var style = new List<string>();
+
+        if (!IsVisible)
+        {
+            style.Add("text-decoration: line-through");
+            style.Add("opacity: 0.5");
+        }
+
+        builder.OpenComponent<LegendItem>(0);
+        builder.AddAttribute(1, nameof(LegendItem.Index), Index);
+        builder.AddAttribute(2, nameof(LegendItem.MarkerType), MarkerType.Circle);
+        builder.AddAttribute(3, nameof(LegendItem.Style), string.Join(";", style));
+        builder.AddAttribute(4, nameof(LegendItem.MarkerSize), MarkerSize);
+        builder.AddAttribute(5, nameof(LegendItem.Text), Title);
+        builder.AddAttribute(6, nameof(LegendItem.Click), EventCallback.Factory.Create(this, OnLegendItemClick));
+        builder.AddAttribute(7, nameof(LegendItem.Clickable), clickable);
+        builder.CloseComponent();
+    };
+
+    /// <summary>
+    /// Handles legend item click.
+    /// </summary>
+    private async Task OnLegendItemClick()
+    {
+        if (Chart != null)
+        {
+            IsVisible = !IsVisible;
+            await Chart.Refresh();
+        }
+    }
+
+
+    /// <summary>
+    /// Forces the series to update its display.
+    /// </summary>
+    internal void ForceUpdate()
+    {
+        StateHasChanged();
+    }
+
+}
