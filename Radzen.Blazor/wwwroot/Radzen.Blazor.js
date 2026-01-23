@@ -2346,16 +2346,26 @@ window.Radzen = {
           var el = document.getElementById(id + 'visual');
           if (el) {
               document.body.removeChild(el);
-              Radzen[id + 'end'] = null;
-              Radzen[id + 'move'] = null;
               var resizers = Radzen[id + 'cell'].parentNode.querySelectorAll('.rz-column-resizer');
               for (let i = 0; i < resizers.length; i++) {
                   resizers[i].style.display = 'block';
               }
           }
+
+          grid.removeEventListener('mousemove', Radzen[id + 'move']);
+          grid.removeEventListener('click', Radzen[id + 'end']);
+          document.removeEventListener('mouseup', Radzen[id + 'end']);
+          document.removeEventListener('touchend', Radzen[id + 'end']);
+
+          Radzen[id + 'end'] = null;
+          Radzen[id + 'move'] = null;
       }
       grid.removeEventListener('click', Radzen[id + 'end']);
       grid.addEventListener('click', Radzen[id + 'end']);
+      document.removeEventListener('mouseup', Radzen[id + 'end']);
+      document.addEventListener('mouseup', Radzen[id + 'end']);
+      document.removeEventListener('touchend', Radzen[id + 'end']);
+      document.addEventListener('touchend', Radzen[id + 'end'], { passive: true });
 
       Radzen[id + 'move'] = function (e) {
           var el = document.getElementById(id + 'visual');
