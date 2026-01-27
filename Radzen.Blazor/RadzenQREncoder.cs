@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -29,7 +29,10 @@ public enum RadzenQREcc
     High
 }
 
-internal static class RadzenQREncoder
+/// <summary>
+/// Provides QR encoding utilities for UTF-8 strings and raw bytes.
+/// </summary>
+public static class RadzenQREncoder
 {
     /// <summary>Encode a UTF-8 string into a QR module matrix.</summary>
     public static bool[,] EncodeUtf8(string value, RadzenQREcc ecc, int minVersion = 1, int maxVersion = 40)
@@ -93,6 +96,8 @@ internal static class RadzenQREncoder
     /// <summary>Encode raw bytes into a QR module matrix.</summary>
     public static bool[,] EncodeBytes(byte[] data, RadzenQREcc ecc = RadzenQREcc.Medium, int minVersion = 1, int maxVersion = 40)
     {
+        ArgumentNullException.ThrowIfNull(data);
+
         if (minVersion < 1 || maxVersion > 40 || minVersion > maxVersion)
             throw new ArgumentOutOfRangeException(nameof(minVersion), "Version range must be within 1..40");
 
@@ -154,6 +159,8 @@ internal static class RadzenQREncoder
     /// <summary>Render a module matrix into an SVG string with a 4-module quiet zone.</summary>
     public static string ToSvg(bool[,] modules, int moduleSize = 8, string foreground = "#000000", string background = "#FFFFFF")
     {
+        ArgumentNullException.ThrowIfNull(modules);
+
         int n = modules.GetLength(0);
         int vb = n + 8;  // 4 modules of quiet zone on each side
         int px = vb * moduleSize;
