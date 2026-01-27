@@ -508,7 +508,7 @@ namespace Radzen
         /// <param name="item">The item.</param>
         /// <param name="property">The property.</param>
         /// <returns>System.Object.</returns>
-        public object? GetItemOrValueFromProperty(object? item, string property)
+        public virtual object? GetItemOrValueFromProperty(object? item, string property)
         {
             if (item != null)
             {
