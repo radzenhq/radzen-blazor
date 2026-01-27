@@ -1310,7 +1310,7 @@ namespace Radzen.Blazor
 
         internal bool HasCustomFilter()
         {
-            return GetFilterOperator() == FilterOperator.Custom && GetCustomFilterExpression() != null;
+            return GetFilterOperator() == FilterOperator.Custom && !string.IsNullOrEmpty(GetCustomFilterExpression());
         }
 
         internal bool HasActiveFilter()
