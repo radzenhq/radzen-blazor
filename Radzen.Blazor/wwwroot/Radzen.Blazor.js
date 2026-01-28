@@ -2326,6 +2326,12 @@ window.Radzen = {
     var rect = el.getBoundingClientRect();
     return { left: rect.left, top: rect.top, width: rect.width, height: rect.height };
   },
+  outerHTML: function (arg) {
+    var el = arg instanceof Element || arg instanceof HTMLDocument
+        ? arg
+        : document.getElementById(arg);
+    return el ? el.outerHTML : '';
+  },
   endDrag: function (ref) {
     document.removeEventListener('mousemove', ref.mouseMoveHandler);
     document.removeEventListener('mouseup', ref.mouseUpHandler);

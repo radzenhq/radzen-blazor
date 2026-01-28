@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -258,6 +260,21 @@ namespace Radzen.Blazor
             var vbWidth = geometry.vbWidth;
             if (vbWidth <= 0) vbWidth = 1;
             return (geometry.bars, vbWidth, checksumText, null);
+        }
+
+        /// <summary>
+        /// Returns the SVG markup of the rendered QR code as a string.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task{String}"/> representing the asynchronous operation. The task result contains the SVG markup of the QR code.
+        /// </returns>
+        public async Task<string> ToSvg()
+        {
+            if (JSRuntime != null)
+            {
+                return await JSRuntime.InvokeAsync<string>("Radzen.outerHTML", Element);
+            }
+            return string.Empty;
         }
     }
 }

@@ -3,7 +3,7 @@
 <RadzenRow Gap="2rem">
     <RadzenColumn Size="12" SizeMD="6">
         <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 100%;">
-            <RadzenBarcode Value="@value"
+            <RadzenBarcode @ref="barCode" Value="@value"
                           Type="@type"
                           Foreground="@foreground"
                           Background="@background"
@@ -84,7 +84,7 @@
             <RadzenButton Text="Save SVG"
                           Icon="download"
                           ButtonStyle="ButtonStyle.Primary"
-                          Click="@SaveSvg" />
+                          Click="@(_ => SaveSvg())" />
 
             <RadzenText TextStyle="TextStyle.Caption">
                 Tip: some types require numeric-only input (EAN/UPC/ITF/MSI/POSTNET/Pharmacode). Changing the type auto-fills a valid sample value.
@@ -94,6 +94,7 @@
 </RadzenRow>
 
 @code {
+    RadzenBarcode barCode;
     RadzenBarcodeType type = RadzenBarcodeType.Code128;
     IEnumerable<RadzenBarcodeType> types = Enum.GetValues<RadzenBarcodeType>();
 
@@ -131,15 +132,15 @@
         };
     }
 
-    async Task SaveSvg()
+    async Task SaveSvg(bool custom = false)
     {
-        var svg = RadzenBarcodeEncoder.ToSvg(
+        var svg = custom ? RadzenBarcodeEncoder.ToSvg(
             type,
             value,
             barHeight: barHeight,
             quietZoneModules: quietZone,
             foreground: foreground,
-            background: background);
+            background: background) : await barCode.ToSvg();
 
         await JS.InvokeVoidAsync("Radzen.downloadFile", "barcode.svg", svg, "image/svg+xml;charset=utf-8");
     }

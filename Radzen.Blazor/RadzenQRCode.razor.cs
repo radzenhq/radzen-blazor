@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
+using Microsoft.JSInterop;
 using System.Globalization;
-using System.Text;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -88,19 +87,19 @@ namespace Radzen.Blazor
         /// <value>The size in CSS units. Default is "100%".</value>
         [Parameter] public string Size { get; set; } = "100%";
 
-		/// <summary>
-		/// Gets or sets the color of the QR code modules (the dark squares/dots).
-		/// Supports any valid CSS color. Use high contrast with background for best scanability.
-		/// </summary>
-		/// <value>The foreground color. Default is "#000" (black).</value>
-		[Parameter] public string Foreground { get; set; } = "#000";
+        /// <summary>
+        /// Gets or sets the color of the QR code modules (the dark squares/dots).
+        /// Supports any valid CSS color. Use high contrast with background for best scanability.
+        /// </summary>
+        /// <value>The foreground color. Default is "#000" (black).</value>
+        [Parameter] public string Foreground { get; set; } = "#000";
 
-		/// <summary>
-		/// Gets or sets the background color of the QR code.
-		/// Should contrast well with the foreground color for reliable scanning.
-		/// </summary>
-		/// <value>The background color. Default is "#FFF" (white).</value>
-		[Parameter] public string Background { get; set; } = "#FFF";
+        /// <summary>
+        /// Gets or sets the background color of the QR code.
+        /// Should contrast well with the foreground color for reliable scanning.
+        /// </summary>
+        /// <value>The background color. Default is "#FFF" (white).</value>
+        [Parameter] public string Background { get; set; } = "#FFF";
 
         /// <summary>
         /// Gets or sets the visual shape of the QR code modules (data squares).
@@ -162,6 +161,21 @@ namespace Radzen.Blazor
             bool inTR = r < 7 && c >= n - 7;
             bool inBL = r >= n - 7 && c < 7;
             return inTL || inTR || inBL;
+        }
+
+        /// <summary>
+        /// Returns the SVG markup of the rendered QR code as a string.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="Task{String}"/> representing the asynchronous operation. The task result contains the SVG markup of the QR code.
+        /// </returns>
+        public async Task<string> ToSvg()
+        {
+            if (JSRuntime != null)
+            {
+                return await JSRuntime.InvokeAsync<string>("Radzen.outerHTML", Element);
+            }
+            return string.Empty;
         }
     }
 }

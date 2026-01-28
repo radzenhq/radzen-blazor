@@ -4,7 +4,7 @@
 <RadzenRow Gap="2rem" AlignItems="AlignItems.Start">
     <RadzenColumn Size="12" SizeMD="6">
         <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 100%;">
-            <RadzenQRCode Value="Radzen Blazor"
+            <RadzenQRCode @ref="qrCode" Value="Radzen Blazor"
                           Foreground="@foreground"
                           Background="@background"
                           EyeColor="@eyeColor"
@@ -114,12 +114,14 @@
             <RadzenButton Text="Save SVG"
                           Icon="download"
                           ButtonStyle="ButtonStyle.Primary"
-                          Click="@SaveSvg" />
+                          Click="@(_ => SaveSvg())" />
         </RadzenStack>
     </RadzenColumn>
 </RadzenRow>
 
 @code {
+    RadzenQRCode qrCode;
+
     string foreground = "#0f62fe";
     string background = "#eef4ff";
 
@@ -165,11 +167,11 @@
         imageBackground = "#FFFFFF";
     }
 
-    async Task SaveSvg()
+    async Task SaveSvg(bool custom = false)
     {
         const string value = "Radzen Blazor";
         var modules = RadzenQREncoder.EncodeUtf8(value, RadzenQREcc.Quartile);
-        var svg = RadzenQREncoder.ToSvg(
+        var svg = custom ? RadzenQREncoder.ToSvg(
             modules,
             moduleSize: 8,
             foreground: foreground,
@@ -184,7 +186,7 @@
             eyeColorTopRight: topRightEyeColor,
             eyeColorBottomLeft: bottomLeftEyeColor,
             image: imageUrl,
-            imageBackground: imageBackground);
+            imageBackground: imageBackground) : await qrCode.ToSvg();
 
         await JS.InvokeVoidAsync("Radzen.downloadFile", "qrcode.svg", svg, "image/svg+xml;charset=utf-8");
     }
