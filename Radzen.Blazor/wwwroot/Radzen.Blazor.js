@@ -38,7 +38,7 @@ window.Radzen = {
             }
         };
     },
-    downloadFile = function (fileName, data, mimeType) {
+    downloadFile: function (fileName, data, mimeType) {
         const blob = new Blob([data], { type: mimeType });
         const url = URL.createObjectURL(blob);
 
