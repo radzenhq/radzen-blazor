@@ -66,7 +66,8 @@ $accordion-shadow: none !default;
       border-top: var(--rz-accordion-item-border)
     }
 
-    > a {
+    > a,
+    > button {
       padding-block: var(--rz-accordion-item-padding-block);
       padding-inline: var(--rz-accordion-item-padding-inline);
       color: var(--rz-accordion-item-color);
@@ -77,6 +78,8 @@ $accordion-shadow: none !default;
       font-size: var(--rz-accordion-item-font-size);
       font-weight: var(--rz-accordion-item-font-weight);
       cursor: pointer;
+      background: none;
+      border: none;
 
       &:hover {
         color: var(--rz-accordion-hover-color);

@@ -8,7 +8,9 @@
 
 @if (Visible)
 {
-    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null" @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
+    <div @ref="@Element" @attributes="Attributes" class="@GetCssClass()" onmousedown="Radzen.activeElement = null"
+         role="combobox" aria-haspopup="listbox" aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@ListId" aria-disabled="@(Disabled.ToString().ToLowerInvariant())"
+         @onclick="@(args => OpenPopup("ArrowDown", false, true))" @onclick:preventDefault @onclick:stopPropagation style="@Style" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"
          @onkeydown="@((args) => OnKeyPress(args))" @onkeydown:preventDefault="@preventKeydown" id="@GetId()" @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         <div class="rz-helper-hidden-accessible">
             <input disabled="@Disabled" aria-haspopup="listbox" readonly="" type="text" tabindex="-1"
@@ -54,7 +56,13 @@
                                 @GetItemOrValueFromProperty(item, TextProperty ?? string.Empty)
                             }
                         </span>
-                        <button tabindex="0" title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))" type=button class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")" @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)"><RadzenIcon Icon="close" /></button>
+                        <button tabindex="0"
+                                title="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))"
+                                aria-label="@(RemoveChipTitle + " " + GetItemOrValueFromProperty(item, TextProperty ?? ""))"
+                                type=button class="rz-button rz-button-sm rz-button-icon-only rz-base rz-shade-default @(Disabled ?"rz-state-disabled":"")"
+                                @onclick:preventDefault @onclick:stopPropagation @onclick="() => OnChipRemove(item)">
+                            <RadzenIcon Icon="close" />
+                        </button>
                     </div>
                 }
             </div>
@@ -133,9 +141,13 @@
                 <div class="rz-multiselect-header rz-helper-clearfix" @onclick:preventDefault>
                     @if(AllowSelectAll && Data != null && Data.Cast<object>().Any())
                     {
-                    <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll">
+                    <div class="rz-chkbox" title="@(!AllowFiltering ? "" : SelectAllText)" @onclick="@SelectAll"
+                         role="checkbox" tabindex="@(Disabled || ReadOnly ? "-1" : "0")"
+                         aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())"
+                         aria-disabled="@(Disabled || ReadOnly ? "true" : "false")"
+                         @onkeydown="OnSelectAllKeyDown">
                         <div class="rz-helper-hidden-accessible">
-                            <input readonly="readonly" type="checkbox" id="@($"{(Name ?? UniqueID + "sa")}")" aria-label="@SearchAriaLabel" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
+                            <input readonly="readonly" type="checkbox" id="@($"{(Name ?? UniqueID + "sa")}")" aria-label="@SelectAllText" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
                         </div>
                         <div class="@(IsAllSelected() ? "notranslate rz-chkbox-box rz-state-active" : "notranslate rz-chkbox-box")">
                             <span class="@(IsAllSelected() ? "notranslate rz-chkbox-icon rzi rzi-check" : "notranslate rz-chkbox-icon")"></span>
@@ -144,7 +156,7 @@
                     }
                     @if (AllowSelectAll && !AllowFiltering && !string.IsNullOrEmpty(SelectAllText) && Data != null && Data.Cast<object>().Any())
                     {
-                        <span style="cursor:pointer" @onclick="@SelectAll">@SelectAllText</span>
+                        <button type="button" class="rz-multiselect-selectall" disabled="@(Disabled || ReadOnly)" @onclick="@SelectAll">@SelectAllText</button>
                     }
                     @if (AllowFiltering)
                     {
@@ -156,16 +168,18 @@
                             <span class="notranslate rz-multiselect-filter-icon rzi rzi-search"></span>
                         </div>
                     }
-                    <a id="@(GetId() + "clear")" class="rz-multiselect-close " @onclick="@ClearAll" @onclick:stopPropagation="true">
+                    <button type="button" id="@(GetId() + "clear")" class="rz-multiselect-close" aria-label="@ClearAriaLabel"
+                            @onclick="@ClearAll" @onclick:stopPropagation="true">
                         <span class="notranslate rzi rzi-times"></span>
-                    </a>
+                    </button>
                 </div>
                 }
             }
             <div class="@(Multiple ? "rz-multiselect-items-wrapper" : "rz-dropdown-items-wrapper")" style="@PopupStyle">
                 @if (Data != null && Data.Cast<object>().Any())
                 {
-                    <ul @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")" role="listbox">
+                    <ul id="@ListId" @ref="list" class="@(Multiple ? "rz-multiselect-items rz-multiselect-list" : "rz-dropdown-items rz-dropdown-list")"
+                        role="listbox" aria-multiselectable="@(Multiple ? "true" : "false")">
                         @if (View != null)
                         {
                             @RenderItems()
@@ -184,7 +198,8 @@
         </div>
         @if (AllowClear && (!Multiple && HasValue || Multiple && selectedItems.Count > 0))
         {
-            <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@ClearAll" @onclick:stopPropagation="true"></i>
+            <button type="button" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel"
+                    @onclick="@ClearAll" @onclick:stopPropagation="true"></button>
         }
     </div>
 }

@@ -57,7 +57,7 @@
         </div>
         @if (ChildContent != null)
         {
-            <ul class="rz-navigation-menu" style="display: none">
+            <ul id="@($"{GetId()}-submenu")" class="rz-navigation-menu" role="menu" style="display: none">
                 <CascadingValue Value=this>
                     @ChildContent
                 </CascadingValue>

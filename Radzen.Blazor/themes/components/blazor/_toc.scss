@@ -71,11 +71,13 @@ $rz-toc-link-selected-indicator-border-radius: 0 !default;
     text-decoration: none;
     font-size: var(--rz-toc-link-font-size);
     font-weight: var(--rz-toc-link-font-weight);
+    font-family: inherit;
     border: var(--rz-toc-link-border);
     border-radius: var(--rz-toc-link-border-radius);
     color: var(--rz-toc-link-color);
     background-color: var(--rz-toc-link-background-color);
     transition: border var(--rz-transition), color var(--rz-transition), background-color var(--rz-transition);
+    cursor: pointer;
 
     &:hover {
         color: var(--rz-toc-link-hover-color);

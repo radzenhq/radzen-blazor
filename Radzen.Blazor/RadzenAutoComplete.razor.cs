@@ -222,6 +222,10 @@ namespace Radzen.Blazor
             }
         }
 
+        private string ListId => $"{PopupID}-list";
+
+        private bool IsPopupOpen => OpenOnFocus || (!string.IsNullOrEmpty(searchText) || !string.IsNullOrEmpty(customSearchText));
+
         private async Task OnSelectItem(object item)
         {
             if (JSRuntime != null)

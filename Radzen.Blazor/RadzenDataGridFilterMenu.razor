@@ -2,7 +2,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
- <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()" onclick="@($"Radzen.togglePopup(this.parentNode, '{filterId}')")">
+ <button title=@Column.GetFilterOperatorText(Column.GetFilterOperator()) class="@FilterIconStyle()" onclick="@($"Radzen.togglePopup(this.parentNode, '{filterId}')")"
+         aria-haspopup="menu" aria-controls="@filterId" aria-expanded="false">
      <i class="notranslate rzi">@Grid.FilterIcon</i>
     @if (Column.GetFilterOperator() == FilterOperator.DoesNotContain)
     {
@@ -14,110 +15,144 @@
     }
 </button>
 <div id="@($"{filterId}")" class="rz-overlaypanel"
-        style="display:none;" tabindex="0">
+        style="display:none;" tabindex="0" role="menu" aria-label="@Grid.FilterText">
     <div class="rz-overlaypanel-content">
         <ul class="rz-listbox-list">
             @if (Column.FilterPropertyType != null && (QueryableExtension.IsEnumerable(Column.FilterPropertyType) || Column.FilterPropertyType == typeof(string)))
             {
                 @if (Column.GetFilterOperators().Contains(FilterOperator.Contains))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.Contains))" @onclick="@(args => ApplyFilter(FilterOperator.Contains))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Contains)</span><span>@Grid.ContainsText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.Contains)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.Contains))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Contains)</span><span>@Grid.ContainsText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.DoesNotContain))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.DoesNotContain))" @onclick="@(args => ApplyFilter(FilterOperator.DoesNotContain))" style="display: block;">
-                <span class="rz-filter-menu-symbol"><s>@Column.GetFilterOperatorSymbol(FilterOperator.DoesNotContain)</s></span><span>@Grid.DoesNotContainText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.DoesNotContain)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.DoesNotContain))">
+                    <span class="rz-filter-menu-symbol"><s>@Column.GetFilterOperatorSymbol(FilterOperator.DoesNotContain)</s></span><span>@Grid.DoesNotContainText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.In))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.In))" @onclick="@(args => ApplyFilter(FilterOperator.In))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.In)</span><span>@Grid.InText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.In)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.In))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.In)</span><span>@Grid.InText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.NotIn))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.NotIn))" @onclick="@(args => ApplyFilter(FilterOperator.NotIn))" style="display: block;">
-                <span class="rz-filter-menu-symbol"><s>@Column.GetFilterOperatorSymbol(FilterOperator.NotIn)</s></span><span>@Grid.NotInText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.NotIn)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.NotIn))">
+                    <span class="rz-filter-menu-symbol"><s>@Column.GetFilterOperatorSymbol(FilterOperator.NotIn)</s></span><span>@Grid.NotInText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.StartsWith) && Column.FilterPropertyType == typeof(string))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.StartsWith))" @onclick="@(args => ApplyFilter(FilterOperator.StartsWith))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.StartsWith)</span><span>@Grid.StartsWithText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.StartsWith)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.StartsWith))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.StartsWith)</span><span>@Grid.StartsWithText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.EndsWith) && Column.FilterPropertyType == typeof(string))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.EndsWith))" @onclick="@(args => ApplyFilter(FilterOperator.EndsWith))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.EndsWith)</span><span>@Grid.EndsWithText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.EndsWith)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.EndsWith))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.EndsWith)</span><span>@Grid.EndsWithText</span>
+                </button>
             </li>
                 }
             }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.Equals))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.Equals))" @onclick="@(args => ApplyFilter(FilterOperator.Equals))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Equals)</span><span>@Grid.EqualsText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.Equals)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.Equals))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.Equals)</span><span>@Grid.EqualsText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.NotEquals))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.NotEquals))" @onclick="@(args => ApplyFilter(FilterOperator.NotEquals))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.NotEquals)</span><span>@Grid.NotEqualsText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.NotEquals)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.NotEquals))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.NotEquals)</span><span>@Grid.NotEqualsText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.LessThan))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.LessThan))" @onclick="@(args => ApplyFilter(FilterOperator.LessThan))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.LessThan)</span><span>@Grid.LessThanText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.LessThan)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.LessThan))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.LessThan)</span><span>@Grid.LessThanText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.LessThanOrEquals))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.LessThanOrEquals))" @onclick="@(args => ApplyFilter(FilterOperator.LessThanOrEquals))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.LessThanOrEquals)</span><span>@Grid.LessThanOrEqualsText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.LessThanOrEquals)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.LessThanOrEquals))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.LessThanOrEquals)</span><span>@Grid.LessThanOrEqualsText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.GreaterThan))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.GreaterThan))" @onclick="@(args => ApplyFilter(FilterOperator.GreaterThan))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.GreaterThan)</span><span>@Grid.GreaterThanText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.GreaterThan)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.GreaterThan))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.GreaterThan)</span><span>@Grid.GreaterThanText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.GreaterThanOrEquals))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.GreaterThanOrEquals))" @onclick="@(args => ApplyFilter(FilterOperator.GreaterThanOrEquals))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.GreaterThanOrEquals)</span><span>@Grid.GreaterThanOrEqualsText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.GreaterThanOrEquals)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.GreaterThanOrEquals))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.GreaterThanOrEquals)</span><span>@Grid.GreaterThanOrEqualsText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.IsNull))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNull))" @onclick="@(args => ApplyFilter(FilterOperator.IsNull))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNull)</span><span>@Grid.IsNullText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.IsNull)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.IsNull))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNull)</span><span>@Grid.IsNullText</span>
+                </button>
             </li>
                 }
                 @if (Column.GetFilterOperators().Contains(FilterOperator.IsNotNull))
                 {
-            <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotNull))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotNull))" style="display: block;">
-                <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotNull)</span><span>@Grid.IsNotNullText</span>
+            <li role="presentation">
+                <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.IsNotNull)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.IsNotNull))">
+                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotNull)</span><span>@Grid.IsNotNullText</span>
+                </button>
             </li>
                 }
             @if (Column.GetFilterOperators().Contains(FilterOperator.IsEmpty) && Column.FilterPropertyType == typeof(string))
             {
-                <li class="@(FilterOperatorStyle(Column, FilterOperator.IsEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsEmpty))" style="display: block;">
-                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsEmpty)</span><span>@Grid.IsEmptyText</span>
+                <li role="presentation">
+                    <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.IsEmpty)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.IsEmpty))">
+                        <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsEmpty)</span><span>@Grid.IsEmptyText</span>
+                    </button>
                 </li>
             }
             @if (Column.GetFilterOperators().Contains(FilterOperator.IsNotEmpty) && Column.FilterPropertyType == typeof(string))
             {
-                <li class="@(FilterOperatorStyle(Column, FilterOperator.IsNotEmpty))" @onclick="@(args => ApplyFilter(FilterOperator.IsNotEmpty))" style="display: block;">
-                    <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotEmpty)</span><span>@Grid.IsNotEmptyText</span>
+                <li role="presentation">
+                    <button type="button" class="@(FilterOperatorStyle(Column, FilterOperator.IsNotEmpty)) rz-filter-menu-item" @onclick="@(args => ApplyFilter(FilterOperator.IsNotEmpty))">
+                        <span class="rz-filter-menu-symbol">@Column.GetFilterOperatorSymbol(FilterOperator.IsNotEmpty)</span><span>@Grid.IsNotEmptyText</span>
+                    </button>
                 </li>
             }
-            <li class="rz-multiselect-item" @onclick="@(args => ClearFilter())" style="display:block;">
-                <span class="rz-filter-menu-symbol">x</span><span>@Grid.ClearFilterText</span>
+            <li role="presentation">
+                <button type="button" class="rz-multiselect-item rz-filter-menu-item" @onclick="@(args => ClearFilter())">
+                    <span class="rz-filter-menu-symbol">x</span><span>@Grid.ClearFilterText</span>
+                </button>
             </li>
         </ul>
     </div>

@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Radzen.Blazor.Rendering;
 using System;
+using System.Threading.Tasks;
 
 namespace Radzen.Blazor
 {
@@ -78,6 +79,21 @@ namespace Radzen.Blazor
             {
                 SplitButton.Close();
                 await SplitButton.Click.InvokeAsync(this);
+            }
+        }
+
+        async Task OnKeyDown(KeyboardEventArgs args)
+        {
+            ArgumentNullException.ThrowIfNull(args);
+            if (Disabled)
+            {
+                return;
+            }
+
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await OnClick(new MouseEventArgs());
             }
         }
 

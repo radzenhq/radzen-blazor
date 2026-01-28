@@ -1179,6 +1179,18 @@ window.Radzen = {
 
       popup.style.top = top + 'px';
   },
+  setPopupAriaExpanded: function (parent, id, expanded) {
+    if (!parent || !id) return;
+    var control = null;
+    if (parent.getAttribute && parent.getAttribute('aria-controls') === id) {
+      control = parent;
+    } else if (parent.querySelector) {
+      control = parent.querySelector('[aria-controls="' + id + '"]');
+    }
+    if (control) {
+      control.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    }
+  },
   openPopup: function (parent, id, syncWidth, position, x, y, instance, callback, closeOnDocumentClick = true, autoFocusFirstElement = false, disableSmartPosition = false) {
     var popup = document.getElementById(id);
     if (!popup) return;
@@ -1218,6 +1230,7 @@ window.Radzen = {
     popup.onanimationend = null;
     popup.classList.add("rz-open");
     popup.classList.remove("rz-close");
+    Radzen.setPopupAriaExpanded(parent, id, true);
 
     var rect = popup.getBoundingClientRect();
     rect.width = x ? rect.width + 20 : rect.width;
@@ -1387,6 +1400,10 @@ window.Radzen = {
   closePopup: function (id, instance, callback, e) {
     var popup = document.getElementById(id);
     if (!popup) return;
+    var popupInfo = (Radzen.popups || []).find(function (p) { return p.id === id; });
+    if (popupInfo && popupInfo.parent) {
+      Radzen.setPopupAriaExpanded(popupInfo.parent, id, false);
+    }
     if (popup.style.display == 'none') {
         var popups = Radzen.findPopup(id);
         if (popups.length > 1) {
@@ -1872,6 +1889,7 @@ window.Radzen = {
       var children = item.querySelector('.rz-navigation-menu');
 
       if (children) {
+        item.setAttribute('aria-expanded', active);
         if (active) {
           children.onanimationend = null;
           children.style.display = '';

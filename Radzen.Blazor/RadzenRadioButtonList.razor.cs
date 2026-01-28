@@ -250,6 +250,15 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        async Task OnItemKeyDown(KeyboardEventArgs args, RadzenRadioButtonListItem<TValue> item)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await SelectItem(item);
+            }
+        }
+
         /// <summary>
         /// Refreshes this instance.
         /// </summary>

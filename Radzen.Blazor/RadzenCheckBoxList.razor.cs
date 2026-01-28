@@ -332,6 +332,15 @@ namespace Radzen.Blazor
             StateHasChanged();
         }
 
+        async Task OnItemKeyDown(KeyboardEventArgs args, RadzenCheckBoxListItem<TValue> item)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await SelectItem(item);
+            }
+        }
+
         bool focused;
         int focusedIndex = -1;
         bool preventKeyPress = true;

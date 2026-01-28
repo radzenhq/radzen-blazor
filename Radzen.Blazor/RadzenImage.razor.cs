@@ -64,6 +64,26 @@ namespace Radzen.Blazor
             await Click.InvokeAsync(args);
         }
 
+        /// <summary>
+        /// Handles keyboard activation for clickable images.
+        /// </summary>
+        /// <param name="args">The <see cref="KeyboardEventArgs"/> instance containing the event data.</param>
+        protected async System.Threading.Tasks.Task OnKeyDown(KeyboardEventArgs args)
+        {
+            ArgumentNullException.ThrowIfNull(args);
+
+            if (!Click.HasDelegate)
+            {
+                return;
+            }
+
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await OnClick(new MouseEventArgs());
+            }
+        }
+
         string GetAlternateText()
         {
             if (Attributes != null && Attributes.TryGetValue("alt", out var @alt) && !string.IsNullOrEmpty(Convert.ToString(@alt, CultureInfo.InvariantCulture)))

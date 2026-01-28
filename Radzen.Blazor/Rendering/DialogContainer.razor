@@ -4,38 +4,57 @@
 @inject IJSRuntime JSRuntime
 @implements IDisposable
 <div class=@WrapperClass>
-    <div @ref="dialog" class=@Class role="dialog" aria-labelledby="rz-dialog-0-label" style=@Style>
-        @if (Dialog?.Options?.ShowTitle == true)
+    @{
+        var options = Dialog?.Options;
+        var dialogId = $"rz-dialog-{Dialog?.GetHashCode()}";
+        var titleId = $"{dialogId}-label";
+        var showTitle = options?.ShowTitle == true;
+        var ariaAttributes = new Dictionary<string, object?>();
+        if (showTitle)
+        {
+            ariaAttributes["aria-labelledby"] = titleId;
+        }
+        else
+        {
+            ariaAttributes["aria-label"] = options?.AriaLabel ?? Dialog?.Title;
+        }
+        if (ShowMask)
+        {
+            ariaAttributes["aria-modal"] = "true";
+        }
+    }
+    <div @ref="dialog" class=@Class role="dialog" style=@Style @attributes="ariaAttributes">
+        @if (showTitle)
         {
             <div class="rz-dialog-titlebar">
-                <div class="rz-dialog-title" id="rz-dialog-0-label">
-                    @if (!string.IsNullOrEmpty(Dialog.Options.Icon))
+                <div class="rz-dialog-title" id="@titleId">
+                    @if (!string.IsNullOrEmpty(options?.Icon))
                     {
-                        <RadzenIcon Icon="@Dialog.Options.Icon" 
-                                    IconColor="@(string.IsNullOrEmpty(Dialog.Options.IconColor) ? null : Dialog.Options.IconColor)" 
-                                    Style="@Dialog.Options.IconStyle" />
+                        <RadzenIcon Icon="@options.Icon" 
+                                    IconColor="@(string.IsNullOrEmpty(options.IconColor) ? null : options.IconColor)" 
+                                    Style="@options.IconStyle" />
                     }
-                    @if (Dialog.Options.TitleContent != null && Service != null)
+                    @if (options?.TitleContent != null && Service != null)
                     {
-                        @Dialog.Options.TitleContent(Service)
+                        @options.TitleContent(Service)
                     }
                     else
                     {
-                        @Dialog.Title
+                        @Dialog?.Title
                     }
                 </div>
-                @if (Dialog.Options.ShowClose)
+                @if (options?.ShowClose == true)
                 {
-                    <a @onclick:preventDefault="true" @onclick=@Close @onkeydown="@OnKeyPress" role="button" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex=@Dialog.Options.CloseTabIndex>
+                    <button type="button" @onclick=@Close @onkeydown="@OnKeyPress" class="rz-dialog-titlebar-icon rz-dialog-titlebar-close" tabindex="@(options?.CloseTabIndex ?? 0)" aria-label="@options?.CloseAriaLabel">
                         <span class="notranslate rzi rzi-times"></span>
-                    </a>
+                    </button>
                 }
             </div>
         }
         <div class=@ContentClass>
-            @if (Dialog?.Options?.ChildContent != null && Service != null)
+            @if (options?.ChildContent != null && Service != null)
             {
-                @Dialog.Options.ChildContent(Service)
+                @options.ChildContent(Service)
             }
             else
             {
@@ -48,11 +67,11 @@
     {
         @if (Dialog?.Options?.CloseDialogOnOverlayClick == true)
         {
-            <div @onclick="@Close" class="rz-dialog-mask"></div>
+            <div @onclick="@Close" class="rz-dialog-mask" aria-hidden="true" tabindex="-1"></div>
         }
         else
         {
-            <div class="rz-dialog-mask" style="pointer-events: none;"></div>
+            <div class="rz-dialog-mask" style="pointer-events: none;" aria-hidden="true" tabindex="-1"></div>
         }
     }
 </div>

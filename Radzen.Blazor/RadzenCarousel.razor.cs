@@ -179,6 +179,12 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<int> Change { get; set; }
 
+        /// <summary>
+        /// Gets or sets the pager button aria-label format. Use {0} for the 1-based slide index.
+        /// </summary>
+        [Parameter]
+        public string PagerButtonAriaLabelFormat { get; set; } = "Go to slide {0}";
+
         /// <inheritdoc />
         public override async Task SetParametersAsync(ParameterView parameters)
         {

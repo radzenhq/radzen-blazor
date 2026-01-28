@@ -2,9 +2,15 @@
 @implements IDisposable
 @if ((Tabs?.RenderMode == TabRenderMode.Server ? Visible : true))
 {
-    <li role="tab" @attributes=@Attributes style=@getStyle() class=@Class
-        aria-selected=@(IsSelected ? "true" : "false") aria-controls="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}")">
-    <a @onclick=@OnClick @onclick:preventDefault="true" id="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}-label")" @onkeydown:stopPropagation>
+    <li role="presentation" style=@getStyle() class=@Class>
+    <button type="button" role="tab" @attributes=@Attributes @onclick=@OnClick
+       id="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}-label")"
+       aria-selected="@(IsSelected ? "true" : "false")"
+       aria-controls="@($"{Tabs?.Id ?? ""}-tabpanel-{Index}")"
+       aria-disabled="@(Disabled ? "true" : "false")"
+       disabled="@Disabled"
+       tabindex="@(Disabled ? "-1" : (IsSelected ? "0" : "-1"))"
+       @onkeydown:stopPropagation>
         @if (!string.IsNullOrEmpty(Icon))
         {
             <span class="notranslate rzi rz-tabview-icon" style="@(!string.IsNullOrEmpty(IconColor) ? $"color:{IconColor}" : null)">@Icon</span>
@@ -17,6 +23,6 @@
         {
             <span class="rz-tabview-title">@Text</span>
         }
-        </a>
+        </button>
     </li>
 }

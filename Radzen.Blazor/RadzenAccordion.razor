@@ -19,9 +19,11 @@
         if (!item.Visible)
             continue;
 
+        var accordionId = $"{GetId()}-accordiontab-{items.IndexOf(item)}";
         <div @ref="@item.Element" id="@item.GetItemId()" @attributes="item.Attributes" class="@item.GetItemCssClass()" style="@item.Style" @onkeydown:stopPropagation>
-            <a @onclick="@((args) => SelectItem(item))" aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)" @onclick:preventDefault="true" role="tab" 
-               id="@($"rz-accordiontab-{items.IndexOf(item)}")" aria-controls="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-expanded="true">
+            <button type="button" @onclick="@((args) => SelectItem(item))" aria-label="@ItemAriaLabel(i, item)" title="@ItemTitle(i, item)" role="tab"
+                    id="@accordionId" aria-controls="@($"{accordionId}-content")" aria-expanded="@(item.GetSelected() ? "true" : "false")"
+                    aria-selected="@(item.GetSelected() ? "true" : "false")" tabindex="@(item.GetSelected() ? "0" : "-1")">
                 <span class="@ToggleIconClass(item)">keyboard_arrow_down</span>
                 @if (!string.IsNullOrEmpty(item.Icon))
                 {
@@ -35,10 +37,10 @@
                 {
                     <span>@item.Text</span>
                 }
-            </a>
+            </button>
         </div>
         <Expander Expanded=@item.GetSelected() role="tabpanel"
-                id="@($"rz-accordiontab-{items.IndexOf(item)}-content")" aria-labelledby="@($"rz-accordiontab-{items.IndexOf(item)}")">
+                id="@($"{accordionId}-content")" aria-labelledby="@accordionId">
             <div class="rz-accordion-content" @onkeydown:stopPropagation>
                 @item.ChildContent
             </div>

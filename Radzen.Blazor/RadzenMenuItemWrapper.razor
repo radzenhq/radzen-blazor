@@ -1,10 +1,16 @@
 @using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @inherits RadzenComponentWithChildren
 
 @if (Item?.Parent?.ClickToOpen == true)
 {
-    <li style=@Style @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation>
+    <li style=@Style @attributes="@Attributes" @onclick="@Item.OnClick" @onclick:stopPropagation role="menuitem"
+        tabindex="@(Item?.Disabled == true ? -1 : 0)" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
+        aria-haspopup="@(Item?.ChildContent != null ? "menu" : null)"
+        aria-controls="@Item?.SubmenuId"
+        aria-expanded="@(Item?.ChildContent != null ? "false" : null)"
+        @onkeydown="OnKeyDown">
         @ChildContent
     </li>
 }
@@ -12,13 +18,20 @@ else
 {
     if (Item?.ChildContent != null)
     {
-        <li style=@Style @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true, false)" onmouseleave="Radzen.toggleMenuItem(this, event, false, false)">
+        <li style=@Style @attributes="@Attributes" onmouseenter="Radzen.toggleMenuItem(this, event, true, false)" onmouseleave="Radzen.toggleMenuItem(this, event, false, false)"
+            role="menuitem" tabindex="@(Item?.Disabled == true ? -1 : 0)" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
+            aria-haspopup="menu" aria-controls="@Item?.SubmenuId" aria-expanded="false" @onkeydown="OnKeyDown">
             @ChildContent
         </li>
     }
     else
     {
-        <li style=@Style @attributes="@Attributes" @onclick="@(Item!.OnClick)" @onclick:stopPropagation>
+        <li style=@Style @attributes="@Attributes" @onclick="@(Item!.OnClick)" @onclick:stopPropagation role="menuitem"
+            tabindex="@(Item?.Disabled == true ? -1 : 0)" aria-disabled="@(Item?.Disabled == true ? "true" : "false")"
+            aria-haspopup="@(Item?.ChildContent != null ? "menu" : null)"
+            aria-controls="@Item?.SubmenuId"
+            aria-expanded="@(Item?.ChildContent != null ? "false" : null)"
+            @onkeydown="OnKeyDown">
             @ChildContent
         </li>
     }
@@ -32,4 +45,25 @@ else
     /// <value>The menu item.</value>
     [Parameter]
     public RadzenMenuItem? Item { get; set; }
+
+    async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        if (Item == null || Item.Disabled)
+        {
+            return;
+        }
+
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            if (Item.ChildContent != null)
+            {
+                await Item.Toggle();
+            }
+            else
+            {
+                await Item.OnClick(new MouseEventArgs());
+            }
+        }
+    }
 }

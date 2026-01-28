@@ -1,4 +1,4 @@
-<div class=@Class @onclick=@Select @attributes=@Attributes role="option" aria-selected=@(IsSelected ? "true" : "false")>
+<div class=@Class @onclick=@Select @attributes=@Attributes role="option" aria-selected=@(IsSelected ? "true" : "false") tabindex="0" @onkeydown="OnKeyDown">
     @if (ChildContent != null)
     {
         @ChildContent(this)
@@ -28,6 +28,15 @@
     {
         if (DropDown != null)
             await DropDown.Select(this, true);
+    }
+
+    async Task OnKeyDown(KeyboardEventArgs args)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            await Select();
+        }
     }
 
     protected override async Task OnParametersSetAsync()

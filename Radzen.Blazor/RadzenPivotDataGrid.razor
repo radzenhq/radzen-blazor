@@ -98,7 +98,7 @@
                                                 class="rz-pivot-header-content @(isSortable ? "rz-sortable" : "")"
                                                 tabindex="@(isSortable ? "0" : null)"
                                                 role="@(isSortable ? "button" : null)"
-                                                aria-label="@(isSortable ? $"Sort by {row?.GetTitle()}" : null)">
+                                                aria-label="@(isSortable ? string.Format(SortAriaLabelFormat, row?.GetTitle()) : null)">
                                             <span class="rz-pivot-header-text">@row?.GetTitle()</span>
                                             @if (isSortable)
                                             {
@@ -118,12 +118,14 @@
                                         </div>
                                         @if (isFilterable)
                                         {
-                                            <i @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true" 
-                                                @onmousedown="@(() => { if (row != null) _ = ToggleFilter(row, filterIconRefKey); })"
-                                                class="@(row != null ? GetFilterIconCss(row) : "")"
-                                                title="Filter">
+                                            <button type="button" @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true"
+                                                    @onmousedown="@(() => { if (row != null) _ = ToggleFilter(row, filterIconRefKey); })"
+                                                    @onclick="@(() => { if (row != null) _ = ToggleFilter(row, filterIconRefKey); })"
+                                                    class="@(row != null ? GetFilterIconCss(row) : "")"
+                                                    aria-label="@FilterText" aria-haspopup="dialog"
+                                                    aria-controls="@($"pivot-filter-{row?.Property}")" aria-expanded="false">
                                                 @FilterIcon
-                                            </i>
+                                            </button>
                                         }
                                     </div>
                                 </th>
@@ -151,7 +153,7 @@
                                                 class="rz-pivot-header-content @(isSortable ? "rz-sortable" : "")"
                                                 tabindex="@(isSortable ? "0" : null)"
                                                 role="@(isSortable ? "button" : null)"
-                                                aria-label="@(isSortable ? $"Sort by {column?.GetTitle()}" : null)">
+                                                aria-label="@(isSortable ? string.Format(SortAriaLabelFormat, column?.GetTitle()) : null)">
                                             <span class="rz-pivot-header-text">@column?.GetTitle()</span>
                                             @if (isSortable)
                                             {
@@ -171,12 +173,14 @@
                                         </div>
                                         @if (isFilterable)
                                         {
-                                            <i @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true" 
-                                                @onmousedown="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
-                                                class="@(column != null ? GetFilterIconCss(column) : "")"
-                                                title="Filter">
+                                            <button type="button" @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true"
+                                                    @onmousedown="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
+                                                    @onclick="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
+                                                    class="@(column != null ? GetFilterIconCss(column) : "")"
+                                                    aria-label="@FilterText" aria-haspopup="dialog"
+                                                    aria-controls="@($"pivot-filter-{column?.Property}")" aria-expanded="false">
                                                 @FilterIcon
-                                            </i>
+                                            </button>
                                         }
                                     </div>
                                 </th>
@@ -204,7 +208,7 @@
                                                 class="rz-pivot-header-content @(isSortable ? "rz-sortable" : "")"
                                                 tabindex="@(isSortable ? "0" : null)"
                                                 role="@(isSortable ? "button" : null)"
-                                                aria-label="@(isSortable ? $"Sort by {column?.GetTitle()}" : null)">
+                                                aria-label="@(isSortable ? string.Format(SortAriaLabelFormat, column?.GetTitle()) : null)">
                                             <span class="rz-pivot-header-text">@column?.GetTitle()</span>
                                             @if (isSortable)
                                             {
@@ -224,12 +228,14 @@
                                         </div>
                                         @if (isFilterable)
                                         {
-                                            <i @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true" 
-                                                @onmousedown="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
-                                                class="@(column != null ? GetFilterIconCss(column) : "")"
-                                                title="Filter">
+                                            <button type="button" @ref=FilterIconRef[filterIconRefKey] @onclick:stopPropagation="true"
+                                                    @onmousedown="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
+                                                    @onclick="@(() => { if (column != null) _ = ToggleFilter(column, filterIconRefKey); })"
+                                                    class="@(column != null ? GetFilterIconCss(column) : "")"
+                                                    aria-label="@FilterText" aria-haspopup="dialog"
+                                                    aria-controls="@($"pivot-filter-{column?.Property}")" aria-expanded="false">
                                                 @FilterIcon
-                                            </i>
+                                            </button>
                                         }
                                     </div>
                                 </th>
@@ -295,6 +301,8 @@
                                             {
                                                 <div class="rz-pivot-drill-down-header">
                                                     <span @onclick="@(() => ToggleColumnDrillDown(cell.PathKey))"
+                                                        @onkeydown="@(args => OnDrillDownKeyDown(args, cell.PathKey))"
+                                                        role="button" tabindex="0" aria-expanded="@(!cell.IsCollapsed).ToString().ToLowerInvariant()"
                                                         class="notranslate rz-tree-toggler rzi rzi-caret-@(cell.IsCollapsed ? "right" : "down")" style="margin-inline-start:0"></span>
                                                     <span class="rz-pivot-header-text">
                                                     @if (cell.HeaderTemplate != null && cell.Group != null)
@@ -431,6 +439,7 @@
         var prefix = currentFilterField is RadzenPivotColumn<TItem> ? "col" : currentFilterField is RadzenPivotRow<TItem> ? "row" : "agg";
         var filterIconRefKey = $"{prefix}{currentFilterField.GetFilterProperty()}";
         <Popup @ref="filterPopup" id="@($"pivot-filter-{currentFilterField.Property}")" class="rz-overlaypanel"
+               role="dialog" aria-label="@FilterText"
                style="display:none;min-width:250px;" @onkeydown=@(args => OnFilterPopupKeyPressed(args, filterIconRefKey))>
             <div class="rz-overlaypanel-content">
                 @if (currentFilterField.FilterTemplate != null)

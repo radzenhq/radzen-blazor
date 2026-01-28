@@ -78,6 +78,13 @@ namespace Radzen.Blazor
         [Parameter]
         public EventCallback<MenuItemEventArgs> Click { get; set; }
 
+        /// <summary>
+        /// Gets or sets the menu aria label text.
+        /// </summary>
+        /// <value>The menu aria label text.</value>
+        [Parameter]
+        public string AriaLabel { get; set; } = "Menu";
+
         [Inject]
         NavigationManager? NavigationManager { get; set; }
 

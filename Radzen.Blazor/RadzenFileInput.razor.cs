@@ -247,6 +247,20 @@ namespace Radzen.Blazor
             }
         }
 
+        async Task OnImageKeyDown(KeyboardEventArgs args)
+        {
+            if (!ImageClick.HasDelegate)
+            {
+                return;
+            }
+
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await OnImageClick(new MouseEventArgs());
+            }
+        }
+
         async System.Threading.Tasks.Task Remove(EventArgs args)
         {
             Value = default(TValue)!;

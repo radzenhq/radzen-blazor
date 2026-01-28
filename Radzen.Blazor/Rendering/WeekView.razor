@@ -9,7 +9,9 @@
     @for (var day = StartDate; day < EndDate; day = day.AddDays(1))
     {
         var loopDay = day;
-        <div class="rz-slot-header" @onclick=@(args => OnDayClick(@loopDay))>
+        <div class="rz-slot-header" role="button" tabindex="0"
+             @onclick=@(args => OnDayClick(@loopDay))
+             @onkeydown="@(args => OnHeaderKeyDown(args, loopDay))">
             @day.ToString(HeaderFormat, Scheduler?.Culture ?? System.Globalization.CultureInfo.CurrentCulture)
         </div>
     }
@@ -95,6 +97,15 @@
             var dayStart = day.Date.Add(StartTime);
             var dayEnd = day.Date.Add(EndTime);
             await Scheduler.SelectDay(day.Date, AppointmentsInSlot(dayStart, dayEnd));
+        }
+    }
+
+    async Task OnHeaderKeyDown(KeyboardEventArgs args, DateTime day)
+    {
+        var key = args.Code != null ? args.Code : args.Key;
+        if (key == "Enter" || key == "Space")
+        {
+            await OnDayClick(day);
         }
     }
 
