@@ -6,9 +6,9 @@
     <Line class="rz-line" X1="@x1" Y1="@y1" X2="@x1" Y2="@y2" Stroke="@YAxis.Stroke" StrokeWidth="@YAxis.StrokeWidth" LineType="@YAxis.LineType" />
     @for (var idx = start; idx <= end; idx += step)
     {
-        var value = Chart?.ValueScale?.Value(idx) ?? 0;
+        var value = Chart?.ValueScale?.Value(idx);
         var y = Chart?.ValueScale?.Scale(idx) ?? 0;
-        var text = YAxis != null && Chart?.ValueScale != null ? YAxis.Format(Chart.ValueScale, value) : "";
+        var text = value != null && YAxis != null && Chart?.ValueScale != null ? YAxis.Format(Chart.ValueScale, value) : "";
 
         if (YAxis?.Ticks?.Template != null)
         {
@@ -18,7 +18,7 @@
                 @YAxis.Ticks.Template(context)
             </ValueAxisTick>
         } 
-        else
+        else if (!String.IsNullOrEmpty(text))
         {
             <ValueAxisTick X="@x1" Y="@y" Text="@text" Stroke="@(YAxis?.Ticks?.Stroke ?? YAxis?.Stroke)" StrokeWidth="@(YAxis?.Ticks?.StrokeWidth ?? 0)" LineType="@(YAxis?.Ticks?.LineType ?? LineType.Solid)"/>
         }
