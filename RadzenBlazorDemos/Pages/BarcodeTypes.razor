@@ -1,3 +1,5 @@
+@inject IJSRuntime JS
+
 <RadzenRow Gap="2rem">
     <RadzenColumn Size="12" SizeMD="6">
         <RadzenStack AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Style="height: 100%;">
@@ -79,6 +81,11 @@
                 <RadzenTextArea @bind-Value="@valueStyle" class="rz-w-100" Rows="3" />
             </RadzenFormField>
 
+            <RadzenButton Text="Save SVG"
+                          Icon="download"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Click="@SaveSvg" />
+
             <RadzenText TextStyle="TextStyle.Caption">
                 Tip: some types require numeric-only input (EAN/UPC/ITF/MSI/POSTNET/Pharmacode). Changing the type auto-fills a valid sample value.
             </RadzenText>
@@ -122,6 +129,19 @@
             RadzenBarcodeType.Telepen => "Wikipedia",
             _ => value
         };
+    }
+
+    async Task SaveSvg()
+    {
+        var svg = RadzenBarcodeEncoder.ToSvg(
+            type,
+            value,
+            barHeight: barHeight,
+            quietZoneModules: quietZone,
+            foreground: foreground,
+            background: background);
+
+        await JS.InvokeVoidAsync("Radzen.downloadFile", "barcode.svg", svg, "image/svg+xml;charset=utf-8");
     }
 }
 

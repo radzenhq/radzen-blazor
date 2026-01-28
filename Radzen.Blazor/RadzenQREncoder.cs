@@ -157,9 +157,27 @@ public static class RadzenQREncoder
     }
 
     /// <summary>Render a module matrix into an SVG string with a 4-module quiet zone.</summary>
-    public static string ToSvg(bool[,] modules, int moduleSize = 8, string foreground = "#000000", string background = "#FFFFFF")
+    public static string ToSvg(
+        bool[,] modules,
+        int moduleSize = 8,
+        string foreground = "#000000",
+        string background = "#FFFFFF",
+        QRCodeModuleShape moduleShape = QRCodeModuleShape.Square,
+        QRCodeEyeShape eyeShape = QRCodeEyeShape.Square,
+        QRCodeEyeShape? eyeShapeTopLeft = null,
+        QRCodeEyeShape? eyeShapeTopRight = null,
+        QRCodeEyeShape? eyeShapeBottomLeft = null,
+        string? eyeColor = null,
+        string? eyeColorTopLeft = null,
+        string? eyeColorTopRight = null,
+        string? eyeColorBottomLeft = null,
+        string? image = null,
+        string imageBackground = "#FFF")
     {
         ArgumentNullException.ThrowIfNull(modules);
+        ArgumentNullException.ThrowIfNull(foreground);
+        ArgumentNullException.ThrowIfNull(background);
+        ArgumentNullException.ThrowIfNull(imageBackground);
 
         int n = modules.GetLength(0);
         int vb = n + 8;  // 4 modules of quiet zone on each side
@@ -169,14 +187,62 @@ public static class RadzenQREncoder
         sb.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{px}\" height=\"{px}\" viewBox=\"0 0 {vb} {vb}\" shape-rendering=\"crispEdges\">");
         sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{vb}\" height=\"{vb}\" fill=\"{background}\"/>");
 
+        var baseEyeColor = eyeColor ?? foreground;
+        AppendEye(sb, 4, 4, eyeShapeTopLeft ?? eyeShape, eyeColorTopLeft ?? baseEyeColor, background);
+        AppendEye(sb, vb - 11, 4, eyeShapeTopRight ?? eyeShape, eyeColorTopRight ?? baseEyeColor, background);
+        AppendEye(sb, 4, vb - 11, eyeShapeBottomLeft ?? eyeShape, eyeColorBottomLeft ?? baseEyeColor, background);
+
         for (int r = 0; r < n; r++)
         {
             for (int c = 0; c < n; c++)
             {
-                if (modules[r, c])
-                    sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{c + 4}\" y=\"{r + 4}\" width=\"1\" height=\"1\" fill=\"{foreground}\"/>");
+                if (!modules[r, c]) continue;
+                if (IsFinderCell(r, c, n)) continue;
+
+                var x = c + 4;
+                var y = r + 4;
+
+                if (moduleShape == QRCodeModuleShape.Circle)
+                {
+                    sb.Append(CultureInfo.InvariantCulture, $"<circle cx=\"{Format(x + 0.5)}\" cy=\"{Format(y + 0.5)}\" r=\"0.5\" fill=\"{foreground}\"/>");
+                }
+                else if (moduleShape == QRCodeModuleShape.Rounded)
+                {
+                    sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"1\" height=\"1\" rx=\"0.25\" ry=\"0.25\" fill=\"{foreground}\"/>");
+                }
+                else
+                {
+                    sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"1\" height=\"1\" fill=\"{foreground}\"/>");
+                }
             }
         }
+
+        if (!string.IsNullOrWhiteSpace(image))
+        {
+            const double imageSizePercent = 20;
+            const double imagePaddingModules = 1.0;
+            const double imageCornerRadius = 0.75;
+            const double imageBackgroundOpacity = 1.0;
+
+            double pct = Math.Clamp(imageSizePercent, 5, 60);
+            double boxModules = Math.Max(5, Math.Round(n * (pct / 100.0)));
+            double pad = Math.Max(0, imagePaddingModules);
+
+            double cutoutW = boxModules + 2 * pad;
+            double cutoutH = boxModules + 2 * pad;
+
+            double centerX = vb / 2.0;
+            double centerY = vb / 2.0;
+
+            double cutoutX = centerX - cutoutW / 2.0;
+            double cutoutY = centerY - cutoutH / 2.0;
+            double imgX = centerX - boxModules / 2.0;
+            double imgY = centerY - boxModules / 2.0;
+
+            sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(cutoutX)}\" y=\"{Format(cutoutY)}\" width=\"{Format(cutoutW)}\" height=\"{Format(cutoutH)}\" rx=\"{Format(imageCornerRadius)}\" ry=\"{Format(imageCornerRadius)}\" fill=\"{imageBackground}\" fill-opacity=\"{Format(Math.Clamp(imageBackgroundOpacity, 0, 1))}\"/>");
+            sb.Append(CultureInfo.InvariantCulture, $"<image x=\"{Format(imgX)}\" y=\"{Format(imgY)}\" width=\"{Format(boxModules)}\" height=\"{Format(boxModules)}\" preserveAspectRatio=\"xMidYMid meet\" href=\"{image}\"/>");
+        }
+
         sb.Append("</svg>");
         return sb.ToString();
     }
@@ -1072,4 +1138,37 @@ public static class RadzenQREncoder
             for (int i = len - 1; i >= 0; i--) this.Add((val >> i) & 1);
         }
     }
+
+    private static bool IsFinderCell(int r, int c, int n)
+    {
+        bool inTL = r < 7 && c < 7;
+        bool inTR = r < 7 && c >= n - 7;
+        bool inBL = r >= n - 7 && c < 7;
+        return inTL || inTR || inBL;
+    }
+
+    private static void AppendEye(StringBuilder sb, double x, double y, QRCodeEyeShape shape, string color, string background)
+    {
+        switch (shape)
+        {
+            case QRCodeEyeShape.Rounded:
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" rx=\"1.25\" ry=\"1.25\" fill=\"{color}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1)}\" y=\"{Format(y + 1)}\" width=\"5\" height=\"5\" rx=\"0.25\" ry=\"0.25\" fill=\"{background}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 2)}\" y=\"{Format(y + 2)}\" width=\"3\" height=\"3\" rx=\"0.75\" ry=\"0.75\" fill=\"{color}\"/>");
+                break;
+            case QRCodeEyeShape.Framed:
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" fill=\"{color}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1.2)}\" y=\"{Format(y + 1.2)}\" width=\"{Format(7 - 2 * 1.2)}\" height=\"{Format(7 - 2 * 1.2)}\" fill=\"{background}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 2)}\" y=\"{Format(y + 2)}\" width=\"3\" height=\"3\" fill=\"{color}\"/>");
+                break;
+            case QRCodeEyeShape.Square:
+            default:
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" fill=\"{color}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1)}\" y=\"{Format(y + 1)}\" width=\"5\" height=\"5\" fill=\"{background}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 2)}\" y=\"{Format(y + 2)}\" width=\"3\" height=\"3\" fill=\"{color}\"/>");
+                break;
+        }
+    }
+
+    private static string Format(double v) => v.ToString(CultureInfo.InvariantCulture);
 }

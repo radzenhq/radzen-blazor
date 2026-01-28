@@ -1,4 +1,5 @@
 @using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JS
 
 <RadzenRow Gap="2rem" AlignItems="AlignItems.Start">
     <RadzenColumn Size="12" SizeMD="6">
@@ -109,6 +110,11 @@
                     </RadzenFormField>
                 </RadzenStack>
             </RadzenFieldset>
+
+            <RadzenButton Text="Save SVG"
+                          Icon="download"
+                          ButtonStyle="ButtonStyle.Primary"
+                          Click="@SaveSvg" />
         </RadzenStack>
     </RadzenColumn>
 </RadzenRow>
@@ -157,5 +163,29 @@
         topRightEyeColor = null;
         bottomLeftEyeColor = null;
         imageBackground = "#FFFFFF";
+    }
+
+    async Task SaveSvg()
+    {
+        const string value = "Radzen Blazor";
+        var modules = RadzenQREncoder.EncodeUtf8(value, RadzenQREcc.Quartile);
+        var svg = RadzenQREncoder.ToSvg(
+            modules,
+            moduleSize: 8,
+            foreground: foreground,
+            background: background,
+            moduleShape: moduleShape,
+            eyeShape: eyeShape,
+            eyeShapeTopLeft: topLeftEyeShape,
+            eyeShapeTopRight: topRightEyeShape,
+            eyeShapeBottomLeft: bottomLeftEyeShape,
+            eyeColor: eyeColor,
+            eyeColorTopLeft: topLeftEyeColor,
+            eyeColorTopRight: topRightEyeColor,
+            eyeColorBottomLeft: bottomLeftEyeColor,
+            image: imageUrl,
+            imageBackground: imageBackground);
+
+        await JS.InvokeVoidAsync("Radzen.downloadFile", "qrcode.svg", svg, "image/svg+xml;charset=utf-8");
     }
 }
