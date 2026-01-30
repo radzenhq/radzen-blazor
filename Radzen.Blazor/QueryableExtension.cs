@@ -41,6 +41,65 @@ namespace Radzen
             return source.Provider.CreateQuery(selectExpression);
         }
 
+        /// <summary>
+        /// Projects each element of a sequence into a collection of property values.
+        /// </summary>
+        public static IQueryable Select(this IQueryable source, IEnumerable<string> propertyNames)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(propertyNames);
+
+            var parameter = Expression.Parameter(source.ElementType, "x");
+
+            var bindings = new List<MemberBinding>();
+            var allProperties = source.ElementType.GetProperties();
+
+            foreach (var property in allProperties.Where(p => propertyNames.Contains(p.Name)))
+            {
+                bindings.Add(Expression.Bind(property, Expression.Property(parameter, property)));
+            }
+
+            var body = Expression.MemberInit(Expression.New(source.ElementType), bindings);
+
+            var delegateType = typeof(Func<,>).MakeGenericType(source.ElementType, source.ElementType);
+
+            var lambda = Expression.Lambda(delegateType, body, parameter);
+
+            var selectExpression = Expression.Call(typeof(Queryable),
+                nameof(Queryable.Select), [source.ElementType, source.ElementType], source.Expression,
+                    Expression.Quote(lambda));
+
+            return source.Provider.CreateQuery(selectExpression);
+        }
+
+        /// <summary>
+        /// Projects each element of a sequence into a collection of property values.
+        /// </summary>
+        public static IQueryable<T> Select<T>(this IQueryable<T> source, IEnumerable<string> propertyNames)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            ArgumentNullException.ThrowIfNull(propertyNames);
+
+            var parameter = Expression.Parameter(typeof(T), "x");
+
+            var bindings = new List<MemberBinding>();
+            var allProperties = typeof(T).GetProperties();
+
+            foreach (var property in allProperties.Where(p => propertyNames.Contains(p.Name)))
+            {
+                bindings.Add(Expression.Bind(property, Expression.Property(parameter, property)));
+            }
+
+            var body = Expression.MemberInit(Expression.New(typeof(T)), bindings);
+
+            var lambda = Expression.Lambda<Func<T, T>>(body, parameter);
+
+            var selectExpression = Expression.Call(typeof(Queryable),
+                nameof(Queryable.Select), [typeof(T), typeof(T)], source.Expression,
+                    Expression.Quote(lambda));
+
+            return source.Provider.CreateQuery<T>(selectExpression);
+        }
 
         /// <summary>
         /// Projects each element of a sequence to an IEnumerable and flattens the resulting sequences into one sequence.

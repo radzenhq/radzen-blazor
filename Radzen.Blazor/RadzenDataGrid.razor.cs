@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -892,7 +893,7 @@ namespace Radzen.Blazor
             }
         }
 
-        void ToggleColumns()
+        async Task ToggleColumns()
         {
             if (selectedColumns == null)
             {
@@ -906,8 +907,13 @@ namespace Radzen.Blazor
                 c.SetVisible(selected.Contains(c));
             }
 
-            PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { Columns = selected });
+            await PickedColumnsChanged.InvokeAsync(new DataGridPickedColumnsChangedEventArgs<TItem>() { Columns = selected });
             SaveSettings();
+
+            if (QueryOnlyVisibleColumns)
+            {
+                await Reload();
+            }
         }
 
         /// <summary>
@@ -1628,6 +1634,13 @@ namespace Radzen.Blazor
         public int ColumnsPickerMaxSelectedLabels { get; set; } = 2;
 
         /// <summary>
+        /// Gets or sets a value indicating whether only visible columns are included in the query.
+        /// </summary>
+        /// <value><c>true</c> if only visible columns are included; otherwise, <c>false</c>.</value>
+        [Parameter]
+        public bool QueryOnlyVisibleColumns { get; set; }
+
+        /// <summary>
         /// Gets or sets the column picker all columns text.
         /// </summary>
         /// <value>The column picker all columns text.</value>
@@ -2016,7 +2029,8 @@ namespace Radzen.Blazor
                     }
                 }
 
-                return view;
+                return QueryOnlyVisibleColumns ? view
+                    .Select(allColumns.Where(c => c.GetVisible() && !string.IsNullOrEmpty(c.Property)).Select(c => c.Property)) : view;
             }
         }
 
