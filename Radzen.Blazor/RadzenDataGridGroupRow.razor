@@ -26,9 +26,12 @@
         }
         <td class="rz-col-icon">
             <span class="rz-column-title"></span>
-            <a id="@(Grid.GridId() + Group.GetHashCode())" aria-label=@Grid.ExpandGroupAriaLabel @onclick:preventDefault="true" @onclick="@(_ => Grid.ExpandGroupItem(this, rowArgs?.Item1.Expanded))">
-                <span class="@(Grid.ExpandedGroupItemStyle(this, Grid.allGroupsExpanded != null ? Grid.allGroupsExpanded : rowArgs?.Item1.Expanded))"></span>
-            </a>
+            @if (rowArgs?.Item1.Expandable == true)
+            {
+                <a id="@(Grid.GridId() + Group.GetHashCode())" aria-label=@Grid.ExpandGroupAriaLabel @onclick:preventDefault="true" @onclick="@(_ => Grid.ExpandGroupItem(this, rowArgs?.Item1.Expanded))">
+                    <span class="@(Grid.ExpandedGroupItemStyle(this, Grid.allGroupsExpanded != null ? Grid.allGroupsExpanded : rowArgs?.Item1.Expanded))"></span>
+                </a>
+            }
         </td>
     }
     <td colspan="@(TotalColumnCount + (Grid?.Groups.Count ?? 0) - 1 - Group.Level + ((Grid?.Template != null && Grid?.ShowExpandColumn == true) ? 1 : 0))">

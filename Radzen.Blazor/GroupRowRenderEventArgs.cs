@@ -18,6 +18,12 @@ public class GroupRowRenderEventArgs
     public Group? Group { get; internal set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether this group row is expandable.
+    /// </summary>
+    /// <value><c>true</c> if expandable; otherwise, <c>false</c>.</value>
+    public bool Expandable { get; set; }
+
+    /// <summary>
     /// Gets or sets a value indicating whether this group row is expanded.
     /// </summary>
     /// <value><c>true</c> if expanded; otherwise, <c>false</c>.</value>

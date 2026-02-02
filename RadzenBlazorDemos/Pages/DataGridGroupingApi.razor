@@ -85,6 +85,8 @@
         {
             args.Expanded = allGroupsExpanded != null ? allGroupsExpanded : false;
         }
+
+        args.Expandable = args.Group.Data.Key != "Vice President, Sales";
     }
 
     void OnGroupRowExpand(Group group)

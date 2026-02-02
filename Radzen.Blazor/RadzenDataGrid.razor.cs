@@ -2510,7 +2510,7 @@ namespace Radzen.Blazor
 
         internal Tuple<GroupRowRenderEventArgs, IReadOnlyDictionary<string, object>> GroupRowAttributes(RadzenDataGridGroupRow<TItem> item)
         {
-            var args = new Radzen.GroupRowRenderEventArgs() { Group = item.Group, FirstRender = firstRender };
+            var args = new Radzen.GroupRowRenderEventArgs() { Group = item.Group, FirstRender = firstRender, Expandable = item.GroupResult.Count > 0 };
 
             if (GroupRowRender != null)
             {
