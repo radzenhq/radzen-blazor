@@ -12,7 +12,7 @@ $rating-ban-icon-color: $rating-color !default;
   box-sizing: border-box;
   display: inline-flex;
   font-size: var(--rz-rating-font-size);
-  height: 1em;
+  height: var(--rz-rating-font-size);
   border-radius: var(--rz-border-radius);
 
   &.rz-state-disabled {
@@ -25,8 +25,9 @@ $rating-ban-icon-color: $rating-color !default;
   a,
   button {
     display: inline-flex;
-    width: 1em;
-    height: 1em;
+    font-size: var(--rz-rating-font-size);
+    width: var(--rz-rating-font-size);
+    height: var(--rz-rating-font-size);
     text-decoration: none;
     cursor: default;
     outline: none;
@@ -37,7 +38,7 @@ $rating-ban-icon-color: $rating-color !default;
 
   .rzi {
     color: var(--rz-rating-color);
-    font-size: 1em;
+    font-size: var(--rz-rating-font-size);
   }
 
   .rzi-ban {
