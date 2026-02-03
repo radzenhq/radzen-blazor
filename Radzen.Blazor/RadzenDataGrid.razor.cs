@@ -3590,6 +3590,59 @@ namespace Radzen.Blazor
                 }
             }
 
+            if (expandedItems != null)
+            {
+                expandedItems.Clear();
+            }
+
+            if (editedItems != null)
+            {
+                editedItems.Clear();
+            }
+
+            if (editContexts != null)
+            {
+                editContexts.Clear();
+            }
+
+            if (childData != null)
+            {
+                childData.Clear();
+            }
+
+            if (selectedItems != null)
+            {
+                selectedItems.Clear();
+            }
+
+            if (rowSpans != null)
+            {
+                rowSpans.Clear();
+            }
+
+            if (columns != null)
+            {
+                columns.Clear();
+            }
+
+            if (allPickableColumns != null)
+            {
+                allPickableColumns.Clear();
+            }
+
+            if (allColumns != null)
+            {
+                allColumns.Clear();
+            }
+
+            if (childColumns != null)
+            {
+                childColumns.Clear();
+            }
+
+            _value = null;
+            Data = null;
+
             GC.SuppressFinalize(this);
         }
 
