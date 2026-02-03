@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using Radzen.Blazor.Rendering;
 using System.Text;
 
 namespace Radzen.Blazor;
@@ -185,12 +186,13 @@ public static class RadzenQREncoder
 
         var sb = new StringBuilder(n * n + 1024);
         sb.Append(CultureInfo.InvariantCulture, $"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{px}\" height=\"{px}\" viewBox=\"0 0 {vb} {vb}\" shape-rendering=\"crispEdges\">");
-        sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{vb}\" height=\"{vb}\" fill=\"{background}\"/>");
+        var backgroundFill = GetSvgFillParts(background);
+        sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"0\" y=\"0\" width=\"{vb}\" height=\"{vb}\" fill=\"{backgroundFill.Color}\" fill-opacity=\"{Format(backgroundFill.Opacity)}\"/>");
 
         var baseEyeColor = eyeColor ?? foreground;
-        AppendEye(sb, 4, 4, eyeShapeTopLeft ?? eyeShape, eyeColorTopLeft ?? baseEyeColor, background);
-        AppendEye(sb, vb - 11, 4, eyeShapeTopRight ?? eyeShape, eyeColorTopRight ?? baseEyeColor, background);
-        AppendEye(sb, 4, vb - 11, eyeShapeBottomLeft ?? eyeShape, eyeColorBottomLeft ?? baseEyeColor, background);
+        AppendEye(sb, 4, 4, eyeShapeTopLeft ?? eyeShape, eyeColorTopLeft ?? baseEyeColor, "eye-mask-0");
+        AppendEye(sb, vb - 11, 4, eyeShapeTopRight ?? eyeShape, eyeColorTopRight ?? baseEyeColor, "eye-mask-1");
+        AppendEye(sb, 4, vb - 11, eyeShapeBottomLeft ?? eyeShape, eyeColorBottomLeft ?? baseEyeColor, "eye-mask-2");
 
         for (int r = 0; r < n; r++)
         {
@@ -1147,27 +1149,59 @@ public static class RadzenQREncoder
         return inTL || inTR || inBL;
     }
 
-    private static void AppendEye(StringBuilder sb, double x, double y, QRCodeEyeShape shape, string color, string background)
+    private static void AppendEye(StringBuilder sb, double x, double y, QRCodeEyeShape shape, string color, string maskId)
     {
         switch (shape)
         {
             case QRCodeEyeShape.Rounded:
-                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" rx=\"1.25\" ry=\"1.25\" fill=\"{color}\"/>");
-                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1)}\" y=\"{Format(y + 1)}\" width=\"5\" height=\"5\" rx=\"0.25\" ry=\"0.25\" fill=\"{background}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<defs><mask id=\"{maskId}\" maskUnits=\"userSpaceOnUse\">");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" rx=\"1.25\" ry=\"1.25\" fill=\"white\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1)}\" y=\"{Format(y + 1)}\" width=\"5\" height=\"5\" rx=\"0.25\" ry=\"0.25\" fill=\"black\"/>");
+                sb.Append("</mask></defs>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" rx=\"1.25\" ry=\"1.25\" fill=\"{color}\" mask=\"url(#{maskId})\"/>");
                 sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 2)}\" y=\"{Format(y + 2)}\" width=\"3\" height=\"3\" rx=\"0.75\" ry=\"0.75\" fill=\"{color}\"/>");
                 break;
             case QRCodeEyeShape.Framed:
-                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" fill=\"{color}\"/>");
-                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1.2)}\" y=\"{Format(y + 1.2)}\" width=\"{Format(7 - 2 * 1.2)}\" height=\"{Format(7 - 2 * 1.2)}\" fill=\"{background}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<defs><mask id=\"{maskId}\" maskUnits=\"userSpaceOnUse\">");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" fill=\"white\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1.2)}\" y=\"{Format(y + 1.2)}\" width=\"{Format(7 - 2 * 1.2)}\" height=\"{Format(7 - 2 * 1.2)}\" fill=\"black\"/>");
+                sb.Append("</mask></defs>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" fill=\"{color}\" mask=\"url(#{maskId})\"/>");
                 sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 2)}\" y=\"{Format(y + 2)}\" width=\"3\" height=\"3\" fill=\"{color}\"/>");
                 break;
             case QRCodeEyeShape.Square:
             default:
-                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" fill=\"{color}\"/>");
-                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1)}\" y=\"{Format(y + 1)}\" width=\"5\" height=\"5\" fill=\"{background}\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<defs><mask id=\"{maskId}\" maskUnits=\"userSpaceOnUse\">");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" fill=\"white\"/>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 1)}\" y=\"{Format(y + 1)}\" width=\"5\" height=\"5\" fill=\"black\"/>");
+                sb.Append("</mask></defs>");
+                sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x)}\" y=\"{Format(y)}\" width=\"7\" height=\"7\" fill=\"{color}\" mask=\"url(#{maskId})\"/>");
                 sb.Append(CultureInfo.InvariantCulture, $"<rect x=\"{Format(x + 2)}\" y=\"{Format(y + 2)}\" width=\"3\" height=\"3\" fill=\"{color}\"/>");
                 break;
         }
+    }
+
+    private static (string Color, double Opacity) GetSvgFillParts(string? color)
+    {
+        if (string.IsNullOrWhiteSpace(color))
+        {
+            return ("none", 1);
+        }
+
+        if (string.Equals(color, "transparent", StringComparison.OrdinalIgnoreCase))
+        {
+            return ("rgb(0, 0, 0)", 0);
+        }
+
+        var rgb = RGB.Parse(color);
+        if (rgb == null)
+        {
+            return (color, 1);
+        }
+
+        var opacity = Math.Clamp(rgb.Alpha, 0, 1);
+        var fill = $"rgb({Format(rgb.Red)}, {Format(rgb.Green)}, {Format(rgb.Blue)})";
+        return (fill, opacity);
     }
 
     private static string Format(double v) => v.ToString(CultureInfo.InvariantCulture);

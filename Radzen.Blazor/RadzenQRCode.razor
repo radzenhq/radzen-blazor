@@ -6,6 +6,8 @@
     int n = modules.GetLength(0);
     int vb = n + 8; // quiet zone
 
+    var backgroundFill = GetSvgFillParts(Background);
+
     // --- Center Image math (viewBox units == modules incl. quiet zone) ---
     bool hasImage = !string.IsNullOrWhiteSpace(Image);
     // Clamp percent for scan reliability (5%..60% of QR inner box)
@@ -32,14 +34,14 @@
      height="@Size"
      @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <!-- Background -->
-    <rect x="0" y="0" width="@vb" height="@vb" fill="@Background" />
+    <rect x="0" y="0" width="@vb" height="@vb" fill="@backgroundFill.Color" fill-opacity="@Format(backgroundFill.Opacity)" />
 
     @if (modules is not null)
     {
         <!-- finder patterns / eyes -->
-        @DrawEye(4, 4, EyeShapeTopLeft ?? EyeShape, EyeColorTopLeft ?? EyeColor ?? Foreground)
-        @DrawEye(vb - 11, 4, EyeShapeTopRight ?? EyeShape, EyeColorTopRight ?? EyeColor ?? Foreground)
-        @DrawEye(4, vb - 11, EyeShapeBottomLeft ?? EyeShape, EyeColorBottomLeft ?? EyeColor ?? Foreground)
+        @DrawEye(4, 4, EyeShapeTopLeft ?? EyeShape, EyeColorTopLeft ?? EyeColor ?? Foreground, $"{GetId()}-eye-0")
+        @DrawEye(vb - 11, 4, EyeShapeTopRight ?? EyeShape, EyeColorTopRight ?? EyeColor ?? Foreground, $"{GetId()}-eye-1")
+        @DrawEye(4, vb - 11, EyeShapeBottomLeft ?? EyeShape, EyeColorBottomLeft ?? EyeColor ?? Foreground, $"{GetId()}-eye-2")
 
         <!-- data modules (skip eye regions) -->
         @for (var r = 0; r < n; r++)
@@ -95,7 +97,7 @@
 {
     // Draw a 7x7 eye whose top-left screen coordinate (including quiet zone) is (x,y).
     // NOTE: x,y are *SVG units* (already offset by quiet zone).
-    private RenderFragment DrawEye(double x, double y, QRCodeEyeShape shape, string color)
+    private RenderFragment DrawEye(double x, double y, QRCodeEyeShape shape, string color, string maskId)
     {
         return __builder =>
         {
@@ -104,10 +106,14 @@
                 {
                     case QRCodeEyeShape.Rounded:
                         {
-                            <!-- Outer 7x7 rounded ring -->
-                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" rx="@Format(1.25)" ry="@Format(1.25)" fill="@color" />
-                            <!-- Inner hole (background) -->
-                            <rect x="@Format(x + 1)" y="@Format(y + 1)" width="@Format(5)" height="@Format(5)" rx="@Format(0.25)" ry="@Format(0.25)" fill="@Background" />
+                            <defs>
+                                <mask id="@maskId" maskUnits="userSpaceOnUse">
+                                    <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" rx="@Format(1.25)" ry="@Format(1.25)" fill="white" />
+                                    <rect x="@Format(x + 1)" y="@Format(y + 1)" width="@Format(5)" height="@Format(5)" rx="@Format(0.25)" ry="@Format(0.25)" fill="black" />
+                                </mask>
+                            </defs>
+                            <!-- Outer 7x7 rounded ring with transparent hole -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" rx="@Format(1.25)" ry="@Format(1.25)" fill="@color" mask="url(#@maskId)" />
                             <!-- Pupil 3x3 rounded -->
                             <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" rx="@Format(0.75)" ry="@Format(0.75)" fill="@color" />
                         }
@@ -115,9 +121,14 @@
 
                     case QRCodeEyeShape.Framed:
                         {
-                            <!-- Bold square frame (thickness ~1.2) -->
-                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="@color" />
-                            <rect x="@Format(x + 1.2)" y="@Format(y + 1.2)" width="@Format(7 - 2 * 1.2)" height="@Format(7 - 2 * 1.2)" fill="@Background" />
+                            <defs>
+                                <mask id="@maskId" maskUnits="userSpaceOnUse">
+                                    <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="white" />
+                                    <rect x="@Format(x + 1.2)" y="@Format(y + 1.2)" width="@Format(7 - 2 * 1.2)" height="@Format(7 - 2 * 1.2)" fill="black" />
+                                </mask>
+                            </defs>
+                            <!-- Bold square frame (thickness ~1.2) with transparent hole -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="@color" mask="url(#@maskId)" />
                             <!-- Pupil -->
                             <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" fill="@color" />
                         }
@@ -126,9 +137,14 @@
                     case QRCodeEyeShape.Square:
                     default:
                         {
-                            <!-- Classic square: 7x7 outer, 5x5 inner (background), 3x3 pupil -->
-                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="@color" />
-                            <rect x="@Format(x + 1)" y="@Format(y + 1)" width="@Format(5)" height="@Format(5)" fill="@Background" />
+                            <defs>
+                                <mask id="@maskId" maskUnits="userSpaceOnUse">
+                                    <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="white" />
+                                    <rect x="@Format(x + 1)" y="@Format(y + 1)" width="@Format(5)" height="@Format(5)" fill="black" />
+                                </mask>
+                            </defs>
+                            <!-- Classic square: 7x7 outer with transparent 5x5 hole -->
+                            <rect x="@Format(x)" y="@Format(y)" width="@Format(7)" height="@Format(7)" fill="@color" mask="url(#@maskId)" />
                             <rect x="@Format(x + 2)" y="@Format(y + 2)" width="@Format(3)" height="@Format(3)" fill="@color" />
                         }
                         break;

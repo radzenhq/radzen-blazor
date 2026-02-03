@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using Radzen.Blazor.Rendering;
+using System;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -155,6 +157,28 @@ namespace Radzen.Blazor
         /// </summary>
         protected override string GetComponentCssClass() => "rz-qrcode";
         private static string Format(double v) => v.ToString(CultureInfo.InvariantCulture);
+        private static (string Color, double Opacity) GetSvgFillParts(string? color)
+        {
+            if (string.IsNullOrWhiteSpace(color))
+            {
+                return ("none", 1);
+            }
+
+            if (string.Equals(color, "transparent", StringComparison.OrdinalIgnoreCase))
+            {
+                return ("rgb(0, 0, 0)", 0);
+            }
+
+            var rgb = RGB.Parse(color);
+            if (rgb == null)
+            {
+                return (color, 1);
+            }
+
+            var opacity = Math.Clamp(rgb.Alpha, 0, 1);
+            var fill = $"rgb({Format(rgb.Red)}, {Format(rgb.Green)}, {Format(rgb.Blue)})";
+            return (fill, opacity);
+        }
         private static bool IsFinderCell(int r, int c, int n)
         {
             bool inTL = r < 7 && c < 7;
