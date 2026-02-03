@@ -149,12 +149,6 @@ public partial class RadzenFabMenu : RadzenComponent
 
     private string ComputedItemsStyle => string.IsNullOrEmpty(ItemsStyle) ? string.Empty : ItemsStyle;
 
-    private IReadOnlyDictionary<string, object> ItemsAttributes => new Dictionary<string, object>
-    {
-        { "id", $"{GetId()}-items" },
-        { "role", "menu" }
-    };
-
     private Orientation StackOrientation => Direction switch
     {
         FabMenuDirection.Top or FabMenuDirection.Bottom => Orientation.Vertical,

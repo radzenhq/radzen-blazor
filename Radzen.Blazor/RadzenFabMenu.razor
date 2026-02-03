@@ -23,6 +23,6 @@
 
     @if (isOpen)
     {
-        <RadzenStack onclick=@CloseAsync Orientation=@StackOrientation AlignItems=@StackAlignment Gap=@Gap class=@GetStackClasses() style=@ComputedItemsStyle ChildContent="@ChildContent" Attributes="ItemsAttributes" />
+        <RadzenStack onclick=@CloseAsync Orientation=@StackOrientation AlignItems=@StackAlignment Gap=@Gap class=@GetStackClasses() style=@ComputedItemsStyle ChildContent="@ChildContent" id=@($"{GetId()}-items") role="menu" />
     }
 </div> 
