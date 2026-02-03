@@ -8,7 +8,7 @@
            value="@ValueAsString" tabindex="@(Disabled || ReadOnly ? "-1" : $"{TabIndex}")"
            disabled="@(Disabled || ReadOnly)" aria-checked="@(Value.ToString().ToLowerInvariant())"
            @onchange="@(async _ => await Toggle())" @onkeydown="@(args => OnKeyPress(args, Toggle()))"
-           @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation @attributes=@InputAttributes>
+           @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation class="rz-hidden-accessible" @attributes=@InputAttributes>
     <span class="rz-switch-circle@(Disabled ? " rz-disabled" : ReadOnly ? " rz-readonly" : "")"></span>
 </label>
 }
