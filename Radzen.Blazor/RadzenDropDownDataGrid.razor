@@ -1,4 +1,4 @@
-﻿@using Radzen
+@using Radzen
 @using System.Collections
 @using System.Collections.Generic
 @using Microsoft.AspNetCore.Components.Forms
@@ -204,7 +204,7 @@
             <text>
                 <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@SearchTextPlaceholder"
                         @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" style="@(ShowSearch ? "" : "margin-right:0px;")"
-                        @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => { searchText = $"{args}"; SearchTextChanged.InvokeAsync(searchText);}) />
+                        @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => OnFilterInput(new ChangeEventArgs(){ Value = args }))" />
             </text>
         };
 #else
@@ -212,7 +212,7 @@
             <text>
                 <input aria-label="@SearchAriaLabel" class="rz-lookup-search-input" id="@SearchID" @ref="@search" tabindex="0" placeholder="@SearchTextPlaceholder"
                         @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@searchText" style="@(ShowSearch ? "" : "margin-right:0px;")"
-                        @oninput=@((ChangeEventArgs args) => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) />
+                        @oninput="@OnFilterInput" />
             </text>
         };
 #endif

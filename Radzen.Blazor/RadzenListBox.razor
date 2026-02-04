@@ -1,4 +1,4 @@
-﻿@using Radzen
+@using Radzen
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Components.Rendering
@@ -65,7 +65,7 @@
             <text>
                 <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
                                @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" @onkeydown:stopPropagation="true"
-                               @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => { searchText = $"{args}"; SearchTextChanged.InvokeAsync(searchText);}) aria-label="@SearchAriaLabel" />
+                               @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => OnFilterInput(new ChangeEventArgs(){ Value = args }))" aria-label="@SearchAriaLabel" />
             </text>
         };
 #else
@@ -73,7 +73,7 @@
             <text>
                 <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
                                @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@searchText" @onkeydown:stopPropagation="true"
-                               @oninput=@((ChangeEventArgs args) => { searchText = $"{args.Value}"; SearchTextChanged.InvokeAsync(searchText);}) aria-label="@SearchAriaLabel" />
+                               @oninput="@OnFilterInput" aria-label="@SearchAriaLabel" />
             </text>
         };
 #endif

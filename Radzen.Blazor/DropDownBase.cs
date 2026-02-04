@@ -937,6 +937,25 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Handles filter input changes (e.g. paste).
+        /// </summary>
+        /// <param name="args">The <see cref="ChangeEventArgs"/> instance containing the event data.</param>
+        protected virtual async Task OnFilterInput(ChangeEventArgs args)
+        {
+            ArgumentNullException.ThrowIfNull(args);
+
+            searchText = $"{args.Value}"; 
+            await SearchTextChanged.InvokeAsync(searchText);
+
+            if (ResetSelectedIndexOnFilter)
+            {
+                selectedIndex = -1;
+            }
+
+            Debounce(DebounceFilter, FilterDelay);
+        }
+
+        /// <summary>
         /// Gets the load data arguments.
         /// </summary>
         /// <returns>LoadDataArgs.</returns>
