@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 using Radzen;
+using System.Linq.Expressions;
 
 namespace Radzen.Blazor.Tests
 {
@@ -24,6 +25,11 @@ namespace Radzen.Blazor.Tests
             public int Priority { get; set; }
         }
 
+        private class Order
+        {
+            public DateTime? OrderDate { get; set; }
+        }
+
         private List<TestItem> GetTestData()
         {
             return new List<TestItem>
@@ -34,6 +40,24 @@ namespace Radzen.Blazor.Tests
                 new TestItem { Id = 4, Name = "David", Value = 300, Date = new DateTime(2023, 3, 1), IsActive = false, Category = new TestCategory { Name = "C", Priority = 3 } },
                 new TestItem { Id = 5, Name = "Eve", Value = 250, Date = new DateTime(2023, 9, 1), IsActive = true, Category = new TestCategory { Name = "B", Priority = 2 } }
             };
+        }
+
+        [Fact]
+        public void GetNestedPropertyExpression_Handles_NullableDateTime_Date()
+        {
+            var parameter = Expression.Parameter(typeof(Order), "x");
+            var expression = QueryableExtension.GetNestedPropertyExpression(parameter, "OrderDate.Date");
+            var getter = Expression.Lambda<Func<Order, DateTime>>(expression, parameter).Compile();
+
+            var order = new Order { OrderDate = new DateTime(2024, 2, 3, 14, 30, 0) };
+            var result = getter(order);
+
+            Assert.Equal(order.OrderDate.Value.Date, result);
+
+            var nullOrder = new Order { OrderDate = null };
+            var nullResult = getter(nullOrder);
+
+            Assert.Equal(default(DateTime), nullResult);
         }
 
         // OrderBy tests

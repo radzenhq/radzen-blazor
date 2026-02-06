@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Xunit;
 
@@ -114,6 +114,11 @@ namespace Radzen.Blazor.Tests
             public List<string> Values { get; set; }
         }
 
+        public class Order
+        {
+            public DateTime? OrderDate { get; set; }
+        }
+
         [Fact]
         public void GetProperty_Should_Resolve_DescriptionProperty()
         {
@@ -135,6 +140,14 @@ namespace Radzen.Blazor.Tests
         {
             var idProperty = PropertyAccess.GetProperty(typeof(ISimpleInterface), nameof(ISimpleBaseInterface.Id));
             Assert.NotNull(idProperty);
+        }
+
+        [Fact]
+        public void GetPropertyType_Resolves_NullableDateTime_Date()
+        {
+            var propertyType = PropertyAccess.GetPropertyType(typeof(Order), "OrderDate.Date");
+
+            Assert.Equal(typeof(DateTime), propertyType);
         }
 
         interface ISimpleInterface : ISimpleNestedInterface

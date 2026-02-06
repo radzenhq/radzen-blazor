@@ -478,79 +478,150 @@ namespace Radzen
 
         internal static Expression GetNestedPropertyExpression(Expression expression, string property, Type? type = null)
         {
+            ArgumentNullException.ThrowIfNull(expression);
+            if (string.IsNullOrWhiteSpace(property)) return Expression.Constant(null, typeof(object));
+
             var parts = property.Split(separator, 2);
-            string currentPart = parts[0];
+            var currentPart = parts[0];
+
+            static Expression BuildIsNull(Expression expr)
+            {
+                var underlying = Nullable.GetUnderlyingType(expr.Type);
+                if (underlying != null)
+                {
+                    return Expression.Not(Expression.Property(expr, "HasValue"));
+                }
+
+                if (!expr.Type.IsValueType)
+                {
+                    return Expression.Equal(expr, Expression.Constant(null, expr.Type));
+                }
+
+                return Expression.Constant(false);
+            }
+
+            static Expression UnwrapNullableIfNeeded(Expression expr)
+            {
+                return Nullable.GetUnderlyingType(expr.Type) != null
+                    ? Expression.Property(expr, "Value")
+                    : expr;
+            }
+
+            static Expression AccessMember(Expression instance, string memberName)
+            {
+                var t = instance.Type;
+
+                if (t.IsInterface)
+                {
+                    var declaring =
+                        new[] { t }.Concat(t.GetInterfaces())
+                            .FirstOrDefault(i => i.GetProperty(memberName) != null);
+
+                    if (declaring == null)
+                        throw new InvalidOperationException($"Member '{memberName}' not found on interface '{t}'.");
+
+                    return Expression.Property(instance, declaring, memberName);
+                }
+
+                try
+                {
+                    return Expression.PropertyOrField(instance, memberName);
+                }
+                catch (AmbiguousMatchException)
+                {
+                    var prop = t.GetProperty(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+                    if (prop != null) return Expression.Property(instance, prop);
+
+                    var field = t.GetField(memberName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+                    if (field != null) return Expression.Field(instance, field);
+
+                    throw;
+                }
+            }
+
+            static Expression NullPropagate(Expression parent, Expression accessed)
+            {
+                var isNull = BuildIsNull(parent);
+
+                var whenNull = Expression.Default(accessed.Type);
+
+                return Expression.Condition(isNull, whenNull, accessed);
+            }
+
             Expression member;
 
-            if (expression.Type.IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(expression.Type.GetGenericTypeDefinition()) ||
-                typeof(IDictionary).IsAssignableFrom(expression.Type) || typeof(System.Data.DataRow).IsAssignableFrom(expression.Type))
+            var parentForAccess = UnwrapNullableIfNeeded(expression);
+
+            if ((parentForAccess.Type.IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(parentForAccess.Type.GetGenericTypeDefinition())) ||
+                typeof(IDictionary).IsAssignableFrom(parentForAccess.Type) ||
+                typeof(System.Data.DataRow).IsAssignableFrom(parentForAccess.Type))
             {
                 var key = currentPart.Split('"')[1];
                 var typeString = currentPart.Split('(')[0];
 
-                var indexer = typeof(System.Data.DataRow).IsAssignableFrom(expression.Type) ?
-                    Expression.Property(expression, expression.Type.GetProperty("Item", new[] { typeof(string) })!, Expression.Constant(key)) :
-                        Expression.Property(expression, expression.Type.GetProperty("Item")!, Expression.Constant(key));
-                member = Expression.Convert(
-                    indexer,
-                    parts.Length > 1 ? indexer.Type : type ?? Type.GetType(typeString.EndsWith('?') ? $"System.Nullable`1[System.{typeString.TrimEnd('?')}]" : $"System.{typeString}") ?? typeof(object));
+                var indexer =
+                    typeof(System.Data.DataRow).IsAssignableFrom(parentForAccess.Type)
+                        ? Expression.Property(parentForAccess, parentForAccess.Type.GetProperty("Item", new[] { typeof(string) })!, Expression.Constant(key))
+                        : Expression.Property(parentForAccess, parentForAccess.Type.GetProperty("Item")!, Expression.Constant(key));
+
+                var targetType =
+                    parts.Length > 1
+                        ? indexer.Type
+                        : type
+                            ?? Type.GetType(
+                                typeString.EndsWith('?')
+                                    ? $"System.Nullable`1[System.{typeString.TrimEnd('?')}]"
+                                    : $"System.{typeString}"
+                            )
+                            ?? typeof(object);
+
+                member = Expression.Convert(indexer, targetType);
+
+                member = NullPropagate(expression, member);
             }
-            else if (currentPart.Contains('[', StringComparison.Ordinal)) // Handle array or list indexing
+
+            else if (currentPart.Contains('[', StringComparison.Ordinal))
             {
                 var indexStart = currentPart.IndexOf('[', StringComparison.Ordinal);
                 var propertyName = currentPart.Substring(0, indexStart);
                 var indexString = currentPart.Substring(indexStart + 1, currentPart.Length - indexStart - 2);
 
-                member = Expression.PropertyOrField(expression, propertyName);
-                if (int.TryParse(indexString, out int index))
+                var collection = AccessMember(parentForAccess, propertyName);
+                collection = NullPropagate(expression, collection);
+
+                if (!int.TryParse(indexString, out var index))
+                    throw new ArgumentException($"Invalid index format: {indexString}");
+
+                var underlyingCollection = Nullable.GetUnderlyingType(collection.Type) != null
+                    ? Expression.Property(collection, "Value")
+                    : collection;
+
+                Expression indexed;
+                if (underlyingCollection.Type.IsArray)
                 {
-                    if (member.Type.IsArray)
-                    {
-                        member = Expression.ArrayIndex(member, Expression.Constant(index));
-                    }
-                    else if (member.Type.IsGenericType &&
-                             (member.Type.GetGenericTypeDefinition() == typeof(List<>) ||
-                              typeof(IList<>).IsAssignableFrom(member.Type.GetGenericTypeDefinition())))
-                    {
-                        var itemProperty = member.Type.GetProperty("Item");
-                        if (itemProperty != null)
-                        {
-                            member = Expression.Property(member, itemProperty, Expression.Constant(index));
-                        }
-                    }
+                    indexed = Expression.ArrayIndex(underlyingCollection, Expression.Constant(index));
                 }
                 else
                 {
-                    throw new ArgumentException($"Invalid index format: {indexString}");
+                    var itemProp = underlyingCollection.Type.GetProperty("Item");
+                    if (itemProp == null)
+                        throw new InvalidOperationException($"Type '{underlyingCollection.Type}' has no indexer 'Item'.");
+
+                    indexed = Expression.Property(underlyingCollection, itemProp, Expression.Constant(index));
                 }
-            }
-            else if (expression != null && expression.Type != null && expression.Type.IsInterface)
-            {
-                member = Expression.Property(expression,
-                    new[] { expression.Type }.Concat(expression.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(currentPart) != null)!,
-                    currentPart
-                );
+
+                member = NullPropagate(collection, indexed);
             }
             else
             {
-            if (expression == null || string.IsNullOrEmpty(currentPart))
-            {
-                return Expression.Constant(null, typeof(object));
+                var accessed = AccessMember(parentForAccess, currentPart);
+                member = NullPropagate(expression, accessed);
             }
 
-            var p = expression.Type?.GetProperty(currentPart, BindingFlags.Public | BindingFlags.Instance);
-            member = p != null ? Expression.Property(expression, p) : Expression.PropertyOrField(expression, currentPart);
-            }
+            if (parts.Length > 1)
+                return GetNestedPropertyExpression(member, parts[1], type);
 
-            if (expression != null && expression.Type != null && expression.Type.IsValueType && Nullable.GetUnderlyingType(expression.Type) == null)
-            {
-                expression = Expression.Convert(expression, typeof(object));
-            }
-
-            return parts.Length > 1 ? GetNestedPropertyExpression(member, parts[1], type) :
-                (Nullable.GetUnderlyingType(member.Type) != null || member.Type == typeof(string)) ?
-                    expression != null ? Expression.Condition(Expression.Equal(expression, Expression.Constant(null)), Expression.Constant(null, member.Type), member) : member :
-                    member;
+            return member;
         }
 
         internal static Expression GetExpression<T>(ParameterExpression parameter, FilterDescriptor filter, FilterCaseSensitivity filterCaseSensitivity, Type type)

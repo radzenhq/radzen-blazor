@@ -26,61 +26,79 @@ public static class PropertyAccess
 
         if (propertyName.Contains('[', StringComparison.Ordinal))
         {
-            var arg = Expression.Parameter(typeof(TItem));
-
-            return Expression.Lambda<Func<TItem, TValue>>(QueryableExtension.GetNestedPropertyExpression(arg, propertyName ?? string.Empty, type), arg).Compile();
+            var arg0 = Expression.Parameter(typeof(TItem), "x");
+            return Expression.Lambda<Func<TItem, TValue>>(
+                QueryableExtension.GetNestedPropertyExpression(arg0, propertyName, type),
+                arg0
+            ).Compile();
         }
-        else
+
+        var arg = Expression.Parameter(typeof(TItem), "x");
+        Expression body = arg;
+
+        if (type != null)
+            body = Expression.Convert(body, type);
+
+        Expression AccessNoInterface(Expression instance, string memberName)
         {
-            var arg = Expression.Parameter(typeof(TItem));
-
-            Expression body = arg;
-
-            if (type != null)
+            if (instance.Type.IsInterface)
             {
-                body = Expression.Convert(body, type);
+                var declaringType =
+                    new[] { instance.Type }
+                        .Concat(instance.Type.GetInterfaces())
+                        .FirstOrDefault(t => t.GetProperty(memberName) != null);
+
+                if (declaringType == null)
+                    throw new InvalidOperationException($"Member '{memberName}' not found on interface '{instance.Type}'.");
+
+                return Expression.Property(instance, declaringType, memberName);
             }
 
-            foreach (var member in propertyName.Split("."))
+            try
             {
-                if (body.Type.IsInterface)
-                {
-                    body = Expression.Property(body,
-                        new[] { body.Type }.Concat(body.Type.GetInterfaces()).FirstOrDefault(t => t.GetProperty(member) != null)!,
-                        member
-                    );
-                }
-                else
-                {
-                    try
-                    {
-                        body = Expression.PropertyOrField(body, member);
-                    }
-                    catch (AmbiguousMatchException)
-                    {
-                        var property = body.Type.GetProperty(member, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-
-                        if (property != null)
-                        {
-                            body = Expression.Property(body, property);
-                        }
-                        else
-                        {
-                            var field = body.Type.GetField(member, BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
-
-                            if (field != null)
-                            {
-                                body = Expression.Field(body, field);
-                            }
-                        }
-                    }
-                }
+                return Expression.PropertyOrField(instance, memberName);
             }
+            catch (AmbiguousMatchException)
+            {
+                var prop = instance.Type.GetProperty(memberName,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+                if (prop != null) return Expression.Property(instance, prop);
 
-            body = Expression.Convert(body, typeof(TValue));
+                var field = instance.Type.GetField(memberName,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy);
+                if (field != null) return Expression.Field(instance, field);
 
-            return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
+                throw;
+            }
         }
+
+        Expression AccessWithNullPropagation(Expression instance, string memberName)
+        {
+            var underlying = Nullable.GetUnderlyingType(instance.Type);
+            if (underlying != null && memberName is not ("Value" or "HasValue"))
+            {
+                var hasValue = Expression.Property(instance, "HasValue");
+                var value = Expression.Property(instance, "Value");
+
+                var accessed = AccessNoInterface(value, memberName);
+                return Expression.Condition(hasValue, accessed, Expression.Default(accessed.Type));
+            }
+
+            if (!instance.Type.IsValueType)
+            {
+                var notNull = Expression.NotEqual(instance, Expression.Constant(null, instance.Type));
+                var accessed = AccessNoInterface(instance, memberName);
+                return Expression.Condition(notNull, accessed, Expression.Default(accessed.Type));
+            }
+
+            return AccessNoInterface(instance, memberName);
+        }
+
+        foreach (var member in propertyName.Split('.'))
+            body = AccessWithNullPropagation(body, member);
+
+        body = Expression.Convert(body, typeof(TValue));
+        return Expression.Lambda<Func<TItem, TValue>>(body, arg).Compile();
     }
 
     /// <summary>
@@ -402,7 +420,7 @@ public static class PropertyAccess
         if (type != null)
         {
             return !type.IsInterface ?
-                type.GetProperty(property ?? "")?.PropertyType :
+                (Nullable.GetUnderlyingType(type) ?? type).GetProperty(property ?? "")?.PropertyType :
                     new Type[] { type }
                     .Concat(type.GetInterfaces())
                     .FirstOrDefault(t => t.GetProperty(property ?? "") != null)?
