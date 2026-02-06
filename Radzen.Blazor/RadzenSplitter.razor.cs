@@ -156,6 +156,12 @@ namespace Radzen.Blazor
         public bool IsResizing { get; private set; }
 
         /// <summary>
+        /// Value indicating if the splitter should call StateHasChanged on resizing.
+        /// </summary>
+        [Parameter]
+        public bool ChangeStateOnResize { get; set; } = true;
+
+        /// <summary>
         /// Called on pane resizing.
         /// </summary>
         [JSInvokable("RadzenSplitter.OnPaneResizing")]
@@ -163,7 +169,10 @@ namespace Radzen.Blazor
         {
             IsResizing = true;
 
-            StateHasChanged();
+            if (ChangeStateOnResize)
+            {
+                StateHasChanged();
+            }
 
             await Task.CompletedTask;
         }
