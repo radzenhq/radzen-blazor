@@ -81,7 +81,10 @@ namespace Radzen
             }
             catch (NotSupportedException)
             {
-                // HttpNavigationManager does not support that
+                // HttpNavigationManager does not support RegisterLocationChangingHandler.
+                // This means we are server-side rendering. Unsubscribe from ThemeChanged to
+                // avoid calling NavigateTo which would cause a 302 redirect during prerendering.
+                themeService.ThemeChanged -= OnThemeChanged;
             }
 #endif
         }
