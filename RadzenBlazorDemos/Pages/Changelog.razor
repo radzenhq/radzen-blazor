@@ -1,6 +1,20 @@
-﻿@page "/changelog"
+@page "/changelog"
 
 <div class="changelog">
+<RadzenText Anchor="changelog#v9" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
+    Radzen Blazor Components v9 Changelog
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
+    Track and review changes to Radzen Blazor Components v9
+</RadzenText>
+<RadzenText Anchor="changelog#v9-rendering" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Rendering and accessibility
+</RadzenText>
+<ul>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> Updated rendering across multiple components to improve WAI-ARIA support and semantic HTML (interactive elements now render as buttons/inputs/nav where appropriate, additional <code>aria-*</code> attributes and localizable labels were added, and the new <code>rz-hidden-accessible</code> helper class is used). Update custom DOM or CSS selectors if they target old tags.</li>
+    <li><RadzenBadge BadgeStyle="BadgeStyle.Danger" Shade="Shade.Lighter" Text="Breaking" /> .NET 6.0 support has been removed.</li>
+</ul>
+
 <RadzenText Anchor="changelog#v8" TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Radzen Blazor Components v8 Changelog
 </RadzenText>
