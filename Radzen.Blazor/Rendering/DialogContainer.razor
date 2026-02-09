@@ -253,6 +253,8 @@
         if (Dialog?.Options != null)
             Dialog.Options.PropertyChanged -= OnPropertyChanged;
 
+        dotNetReference?.Dispose();
+        dotNetReference = null;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -1,4 +1,7 @@
-﻿<RadzenDataGrid @ref=grid Data="@data" TItem="IDictionary<string, object>" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
+@using System.Timers
+@implements IDisposable
+
+<RadzenDataGrid @ref=grid Data="@data" TItem="IDictionary<string, object>" AllowFiltering="true" AllowPaging="true" AllowSorting="true">
     <Columns>
         @foreach (var column in columns)
         {
@@ -14,6 +17,8 @@
 
 @code {
     RadzenDataGrid<IDictionary<string, object>> grid;
+    System.Timers.Timer timer;
+    ElapsedEventHandler timerElapsedHandler;
 
     public IEnumerable<IDictionary<string, object>> data 
     { 
@@ -50,12 +55,23 @@
             { "Date", typeof(DateTime) },
         };
 
-        var timer = new System.Timers.Timer(1000);
-        timer.Elapsed += (s, e) =>
-        {
-            InvokeAsync(grid.Reload);
-        };
+        timer = new System.Timers.Timer(1000);
+        timerElapsedHandler = (s, e) => InvokeAsync(grid.Reload);
+        timer.Elapsed += timerElapsedHandler;
 
         timer.Start();
+    }
+
+    public void Dispose()
+    {
+        if (timer != null && timerElapsedHandler != null)
+        {
+            timer.Elapsed -= timerElapsedHandler;
+            timerElapsedHandler = null;
+        }
+
+        timer?.Stop();
+        timer?.Dispose();
+        timer = null;
     }
 }

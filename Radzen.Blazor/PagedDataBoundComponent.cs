@@ -133,11 +133,16 @@ namespace Radzen
             {
                 if (_data != value)
                 {
+                    if (_data != null && _data is INotifyCollectionChanged oldCollection)
+                    {
+                        oldCollection.CollectionChanged -= OnCollectionChanged;
+                    }
+
                     _data = value;
 
-                    if (_data != null && _data is INotifyCollectionChanged)
+                    if (_data != null && _data is INotifyCollectionChanged newCollection)
                     {
-                        ((INotifyCollectionChanged)_data).CollectionChanged += OnCollectionChanged;
+                        newCollection.CollectionChanged += OnCollectionChanged;
                     }
 
                     OnDataChanged();

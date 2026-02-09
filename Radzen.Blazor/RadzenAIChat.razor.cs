@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using Radzen.Blazor.Rendering;
@@ -323,11 +323,13 @@ namespace Radzen.Blazor
                 return;
 
             IsLoading = true;
+            var previousCts = cts;
 #if NET8_0_OR_GREATER
-            await cts.CancelAsync();
+            await previousCts.CancelAsync();
 #else
-            cts.Cancel();
+            previousCts.Cancel();
 #endif
+            previousCts.Dispose();
             cts = new CancellationTokenSource();
 
             // Ensure we have a session ID

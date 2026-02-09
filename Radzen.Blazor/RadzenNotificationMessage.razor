@@ -1,4 +1,5 @@
 @using System.Timers
+@using System.Threading
 @implements IDisposable
 
 @if (Visible)
@@ -85,20 +86,43 @@
     }
 
     double progress = 0;
-    Timer? timer;
+    System.Timers.Timer? timer;
+    ElapsedEventHandler? timerElapsedHandler;
+    CancellationTokenSource? closeCts;
 
     protected override void OnInitialized()
     {
         if (Message?.ShowProgress == true)
         {
-            timer = new Timer() { Enabled = true };
-            timer.Elapsed += (sender, args) =>
-            {
-                progress = progress + 100;
-                InvokeAsync(StateHasChanged);
-            };
+            timer = new System.Timers.Timer() { Enabled = true };
+            timerElapsedHandler = OnTimerElapsed;
+            timer.Elapsed += timerElapsedHandler;
         }
-        System.Threading.Tasks.Task.Delay(Convert.ToInt32(Message?.Duration ?? 3000)).ContinueWith(r => InvokeAsync(Close));
+
+        closeCts = new CancellationTokenSource();
+        _ = CloseAfterDelayAsync(Convert.ToInt32(Message?.Duration ?? 3000), closeCts.Token);
+    }
+
+    private void OnTimerElapsed(object? sender, ElapsedEventArgs args)
+    {
+        progress = progress + 100;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    private async Task CloseAfterDelayAsync(int duration, CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(duration, token);
+            if (!token.IsCancellationRequested)
+            {
+                await InvokeAsync(Close);
+            }
+        }
+        catch (TaskCanceledException)
+        {
+            // Ignore
+        }
     }
 
     private void NotificationClicked()
@@ -111,7 +135,21 @@
 
     public void Dispose()
     {
+        if (closeCts != null)
+        {
+            closeCts.Cancel();
+            closeCts.Dispose();
+            closeCts = null;
+        }
+
+        if (timer != null && timerElapsedHandler != null)
+        {
+            timer.Elapsed -= timerElapsedHandler;
+            timerElapsedHandler = null;
+        }
+
         timer?.Stop();
         timer?.Dispose();
+        timer = null;
     }
 }

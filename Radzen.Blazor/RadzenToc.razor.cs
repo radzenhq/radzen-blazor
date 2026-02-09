@@ -139,5 +139,6 @@ public partial class RadzenToc : RadzenComponent, IAsyncDisposable
     public async ValueTask DisposeAsync()
     {
         await UnregisterScrollListenerAsync();
+        Dispose();
     }
 }

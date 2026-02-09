@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using Radzen.Blazor.Rendering;
 using System;
@@ -32,7 +32,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenLayout&gt;
     /// </code>
     /// </example>
-    public partial class RadzenLayout : RadzenComponentWithChildren
+    public partial class RadzenLayout : RadzenComponentWithChildren, IDisposable
     {
         [Inject]
         private IServiceProvider? ServiceProvider { get; set; }
@@ -55,6 +55,18 @@ namespace Radzen.Blazor
         private void OnThemeChanged()
         {
             StateHasChanged();
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            if (themeService != null)
+            {
+                themeService.ThemeChanged -= OnThemeChanged;
+            }
+
+            base.Dispose();
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />

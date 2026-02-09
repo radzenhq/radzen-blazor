@@ -2,6 +2,7 @@
 
 @using Radzen.Blazor
 @inherits LayoutComponentBase
+@implements IDisposable
 @inject ThemeService ThemeService
 @inject QueryStringThemeService QueryStringThemeService
 @inject ExampleService ExampleService
@@ -189,6 +190,11 @@
         example = ExampleService.FindCurrent(new Uri(UriHelper.Uri));
 
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+    }
+
+    public void Dispose()
+    {
+        UriHelper.LocationChanged -= OnLocationChanged;
     }
 
     void OnLocationChanged(object sender, LocationChangedEventArgs args)

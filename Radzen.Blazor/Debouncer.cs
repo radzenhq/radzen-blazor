@@ -9,6 +9,7 @@ namespace Radzen;
 internal class Debouncer : IDisposable
 {
     private System.Timers.Timer? timer;
+    private System.Timers.ElapsedEventHandler? timerElapsedHandler;
     private DateTime timerStarted { get; set; } = DateTime.UtcNow.AddYears(-1);
 
     /// <summary>
@@ -18,11 +19,9 @@ internal class Debouncer : IDisposable
     /// <param name="action">The action to debounce.</param>
     public void Debounce(int interval, Func<Task> action)
     {
-        timer?.Stop();
-        timer = null;
-
+        ClearTimer();
         timer = new System.Timers.Timer() { Interval = interval, Enabled = false, AutoReset = false };
-        timer.Elapsed += (s, e) =>
+        timerElapsedHandler = (s, e) =>
         {
             if (timer == null)
             {
@@ -41,6 +40,7 @@ internal class Debouncer : IDisposable
                 //
             }
         };
+        timer.Elapsed += timerElapsedHandler;
 
         timer.Start();
     }
@@ -52,9 +52,7 @@ internal class Debouncer : IDisposable
     /// <param name="action">The action to throttle.</param>
     public void Throttle(int interval, Func<Task> action)
     {
-        timer?.Stop();
-        timer = null;
-
+        ClearTimer();
         var curTime = DateTime.UtcNow;
 
         if (curTime.Subtract(timerStarted).TotalMilliseconds < interval)
@@ -63,7 +61,7 @@ internal class Debouncer : IDisposable
         }
 
         timer = new System.Timers.Timer() { Interval = interval, Enabled = false, AutoReset = false };
-        timer.Elapsed += (s, e) =>
+        timerElapsedHandler = (s, e) =>
         {
             if (timer == null)
             {
@@ -82,6 +80,7 @@ internal class Debouncer : IDisposable
                 //
             }
         };
+        timer.Elapsed += timerElapsedHandler;
 
         timer.Start();
         timerStarted = curTime;
@@ -90,11 +89,24 @@ internal class Debouncer : IDisposable
     /// <inheritdoc />
     public void Dispose()
     {
-        if(timer != null)
+        ClearTimer();
+    }
+
+    private void ClearTimer()
+    {
+        if (timer == null)
         {
-            timer.Stop();
-            timer.Dispose();
-            timer = null;
+            return;
         }
+
+        if (timerElapsedHandler != null)
+        {
+            timer.Elapsed -= timerElapsedHandler;
+            timerElapsedHandler = null;
+        }
+
+        timer.Stop();
+        timer.Dispose();
+        timer = null;
     }
 }

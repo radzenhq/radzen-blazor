@@ -1,4 +1,5 @@
 @implements IDisposable
+@implements IAsyncDisposable
 @using Microsoft.JSInterop
 @using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime
@@ -141,11 +142,15 @@
     /// <inheritdoc />
     public void Dispose()
     {
-        if (Service is null) return;
-        Service.OnOpen -= OnOpen;
-        Service.OnClose -= OnClose;
-        Service.OnSideOpen -= OnSideOpen;
-        Service.OnSideClose -= OnSideClose;
+        if (Service != null)
+        {
+            Service.OnOpen -= OnOpen;
+            Service.OnClose -= OnClose;
+            Service.OnSideOpen -= OnSideOpen;
+            Service.OnSideClose -= OnSideClose;
+        }
+
+        _ = DisposeSideDialogResizeHandleAsync();
     }
 
     /// <inheritdoc />
@@ -295,17 +300,36 @@
     /// <returns>A ValueTask that represents the asynchronous disposal operation.</returns>
     public async ValueTask DisposeAsync()
     {
+        Dispose();
+        await DisposeSideDialogResizeHandleAsync();
+    }
+
+    private async Task DisposeSideDialogResizeHandleAsync()
+    {
+        if (sideDialogResizeHandleJsModule == null)
+        {
+            return;
+        }
+
         try
         {
-            if (sideDialogResizeHandleJsModule != null)
-            {
-                await sideDialogResizeHandleJsModule.InvokeVoidAsync("dispose");
-            }
+            await sideDialogResizeHandleJsModule.InvokeVoidAsync("dispose");
         }
         catch
         {
             /* Ignore */
         }
+
+        try
+        {
+            await sideDialogResizeHandleJsModule.DisposeAsync();
+        }
+        catch
+        {
+            /* Ignore */
+        }
+
+        sideDialogResizeHandleJsModule = null;
     }
 
 

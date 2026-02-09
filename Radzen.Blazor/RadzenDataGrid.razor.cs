@@ -3582,6 +3582,11 @@ namespace Radzen.Blazor
                 groups.CollectionChanged -= GroupsCollectionChanged;
             }
 
+            if (sortDescriptors != null)
+            {
+                sortDescriptors.CollectionChanged -= SortsCollectionChanged;
+            }
+
             if (IsJSRuntimeAvailable && JSRuntime != null)
             {
                 foreach (var column in allColumns.ToList().Where(c => c.GetVisible()))

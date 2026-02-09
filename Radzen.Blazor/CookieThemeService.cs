@@ -55,7 +55,7 @@ namespace Radzen
     /// <summary>
     /// Persist the current theme in a cookie. Requires <see cref="ThemeService" /> to be registered in the DI container.
     /// </summary>
-    public class CookieThemeService
+    public class CookieThemeService : IDisposable
     {
         private readonly CookieThemeServiceOptions options;
         private readonly IJSRuntime jsRuntime;
@@ -120,6 +120,13 @@ namespace Radzen
             }
 
             _ = jsRuntime.InvokeVoidAsync("eval", $"document.cookie = \"{cookie}\"");
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            themeService.ThemeChanged -= OnThemeChanged;
+            GC.SuppressFinalize(this);
         }
     }
 
