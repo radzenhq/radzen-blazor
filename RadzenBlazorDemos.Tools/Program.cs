@@ -5,6 +5,41 @@ namespace RadzenBlazorDemos.Tools;
 
 class Program
 {
+    // Pages that are not component documentation (marketing, meta, showcases).
+    // These produce noisy content (testimonials, repeated CTAs, sample dashboards)
+    // that pollutes search results when used with a RAG system.
+    static readonly HashSet<string> ExcludedPages = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "AI",
+        "Changelog",
+        "Dashboard",
+        "DashboardPage",
+        "Index",
+        "NotFound",
+        "Playground",
+        "SupportPage",
+        "ThemesPage",
+    };
+
+    // Filename prefixes that match non-documentation showcase pages.
+    static readonly string[] ExcludedPrefixes = ["Templates", "UIBlocks"];
+
+    static bool IsExcluded(string filePath)
+    {
+        var name = Path.GetFileNameWithoutExtension(filePath);
+
+        if (ExcludedPages.Contains(name))
+            return true;
+
+        foreach (var prefix in ExcludedPrefixes)
+        {
+            if (name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
+    }
+
     static int Main(string[] args)
     {
         if (args.Length < 2)
@@ -41,7 +76,7 @@ class Program
     static void Generate(string outputPath, string pagesPath, string servicesPath, string modelsPath)
     {
         var sb = new StringBuilder();
-        
+
         sb.AppendLine("# Radzen Blazor Components - Demo Application");
         sb.AppendLine();
         sb.AppendLine("This file contains all demo pages and examples from the Radzen Blazor Components demo application.");
@@ -49,16 +84,16 @@ class Program
         sb.AppendLine();
         sb.AppendLine("## Table of Contents");
         sb.AppendLine();
-        
+
         // Collect all demo files
         var allPages = Directory.GetFiles(pagesPath, "*.razor", SearchOption.AllDirectories)
             .Where(f => !Path.GetFileName(f).StartsWith("_"))
             .ToList();
-        
+
         // Separate main pages (with @page directive) from example components
         var mainPages = new List<string>();
         var examplePages = new List<string>();
-        
+
         foreach (var page in allPages)
         {
             var content = File.ReadAllText(page, Encoding.UTF8);
@@ -72,25 +107,29 @@ class Program
                 examplePages.Add(page);
             }
         }
-        
-        // Sort main pages ascending by filename
-        mainPages = mainPages.OrderBy(p => Path.GetFileName(p)).ToList();
-        
-        // Keep all pages for content generation (sorted ascending)
-        var pages = allPages.OrderBy(p => Path.GetFileName(p)).ToList();
-        
+
+        // Sort main pages ascending by filename and apply exclusions
+        mainPages = mainPages
+            .Where(p => !IsExcluded(p))
+            .OrderBy(p => Path.GetFileName(p)).ToList();
+
+        // Keep all non-excluded pages for content generation (sorted ascending)
+        var pages = allPages
+            .Where(p => !IsExcluded(p))
+            .OrderBy(p => Path.GetFileName(p)).ToList();
+
         var pageCs = Directory.GetFiles(pagesPath, "*.cs", SearchOption.AllDirectories)
             .OrderBy(f => Path.GetFileName(f))
             .ToList();
-        
+
         var services = !string.IsNullOrEmpty(servicesPath) && Directory.Exists(servicesPath)
             ? Directory.GetFiles(servicesPath, "*.cs", SearchOption.AllDirectories).OrderBy(f => Path.GetFileName(f)).ToList()
             : Enumerable.Empty<string>();
-        
+
         var models = !string.IsNullOrEmpty(modelsPath) && Directory.Exists(modelsPath)
             ? Directory.GetFiles(modelsPath, "*.cs", SearchOption.AllDirectories).OrderBy(f => Path.GetFileName(f)).ToList()
             : Enumerable.Empty<string>();
-        
+
         // Generate table of contents - only include main pages
         sb.AppendLine("### Demo Pages");
         foreach (var page in mainPages)
@@ -99,7 +138,7 @@ class Program
             var fileName = Path.GetFileNameWithoutExtension(page);
             sb.AppendLine($"- [{fileName}](#{SanitizeAnchor(fileName)}) - `{relativePath}`");
         }
-        
+
         if (pageCs.Any())
         {
             sb.AppendLine();
@@ -110,28 +149,36 @@ class Program
                 sb.AppendLine($"- [{fileName}](#{SanitizeAnchor(fileName)}-code-behind)");
             }
         }
-        
+
         sb.AppendLine();
         sb.AppendLine("---");
         sb.AppendLine();
-        
+
         // Add demo pages
         sb.AppendLine("## Demo Pages");
         sb.AppendLine();
-        
+
         foreach (var page in pages)
         {
             var relativePath = Path.GetRelativePath(pagesPath, page).Replace('\\', '/');
             var fileName = Path.GetFileNameWithoutExtension(page);
             var fileContent = File.ReadAllText(page, Encoding.UTF8);
             var extractedContent = ExtractDescriptionsAndExamples(fileContent, page);
-            
+
             if (string.IsNullOrWhiteSpace(extractedContent))
                 continue;
-            
-            // Add explicit HTML anchor to ensure TOC links work across all markdown parsers
-            var anchor = SanitizeAnchor(fileName);
-            sb.AppendLine($"<a id=\"{anchor}\"></a>");
+
+            // Skip sections that produce negligible content — these are typically
+            // sub-component pages whose rendered placeholder text leaked through
+            // (e.g. "km/h", "Value is:", single comma).
+            var textOnly = Regex.Replace(extractedContent, @"```[\s\S]*?```", ""); // strip code blocks
+            textOnly = Regex.Replace(textOnly, @"^#{1,6}\s+.*$", "", RegexOptions.Multiline); // strip headings
+            textOnly = Regex.Replace(textOnly, @"^\*\*Path:\*\*.*$", "", RegexOptions.Multiline); // strip path
+            textOnly = Regex.Replace(textOnly, @"^Example:$", "", RegexOptions.Multiline); // strip "Example:" labels
+            textOnly = textOnly.Trim();
+            if (textOnly.Length < 20)
+                continue;
+
             sb.AppendLine($"### {fileName}");
             sb.AppendLine();
             sb.AppendLine($"**Path:** `{relativePath}`");
@@ -141,21 +188,19 @@ class Program
             sb.AppendLine("---");
             sb.AppendLine();
         }
-        
+
         // Add C# code-behind files
         if (pageCs.Any())
         {
             sb.AppendLine("## Code-Behind Files");
             sb.AppendLine();
-            
+
             foreach (var csFile in pageCs)
             {
                 var relativePath = Path.GetRelativePath(pagesPath, csFile).Replace('\\', '/');
                 var fileName = Path.GetFileNameWithoutExtension(csFile);
                 var fileContent = File.ReadAllText(csFile, Encoding.UTF8);
-                
-                var codeBehindAnchor = SanitizeAnchor($"{fileName}-code-behind");
-                sb.AppendLine($"<a id=\"{codeBehindAnchor}\"></a>");
+
                 sb.AppendLine($"### {fileName} (Code-Behind)");
                 sb.AppendLine();
                 sb.AppendLine($"**Path:** `{relativePath}`");
@@ -168,19 +213,19 @@ class Program
                 sb.AppendLine();
             }
         }
-        
+
         // Add services
         if (services.Any())
         {
             sb.AppendLine("## Services");
             sb.AppendLine();
-            
+
             foreach (var service in services)
             {
                 var relativePath = Path.GetRelativePath(servicesPath, service).Replace('\\', '/');
                 var fileName = Path.GetFileNameWithoutExtension(service);
                 var fileContent = File.ReadAllText(service, Encoding.UTF8);
-                
+
                 sb.AppendLine($"### {fileName}");
                 sb.AppendLine();
                 sb.AppendLine($"**Path:** `{relativePath}`");
@@ -193,19 +238,19 @@ class Program
                 sb.AppendLine();
             }
         }
-        
+
         // Add models
         if (models.Any())
         {
             sb.AppendLine("## Data Models");
             sb.AppendLine();
-            
+
             foreach (var model in models)
             {
                 var relativePath = Path.GetRelativePath(modelsPath, model).Replace('\\', '/');
                 var fileName = Path.GetFileNameWithoutExtension(model);
                 var fileContent = File.ReadAllText(model, Encoding.UTF8);
-                
+
                 sb.AppendLine($"### {fileName}");
                 sb.AppendLine();
                 sb.AppendLine($"**Path:** `{relativePath}`");
@@ -218,7 +263,7 @@ class Program
                 sb.AppendLine();
             }
         }
-        
+
         // Write to file
         var outputDir = Path.GetDirectoryName(outputPath);
         if (!string.IsNullOrEmpty(outputDir))
@@ -232,13 +277,13 @@ class Program
     {
         if (string.IsNullOrWhiteSpace(text))
             return "";
-        
+
         // Markdown heading anchors are generated by:
         // 1. Convert to lowercase
         // 2. Replace spaces and special chars with hyphens
         // 3. Remove multiple consecutive hyphens
         // 4. Trim hyphens from start/end
-        
+
         var anchor = text.ToLower()
             .Replace(" ", "-")
             .Replace("_", "-")
@@ -268,13 +313,13 @@ class Program
             .Replace("`", "")
             .Replace("'", "")
             .Replace("\"", "");
-        
+
         // Remove multiple consecutive hyphens
         anchor = Regex.Replace(anchor, @"-+", "-");
-        
+
         // Trim hyphens from start and end
         anchor = anchor.Trim('-');
-        
+
         return anchor;
     }
 
@@ -282,31 +327,32 @@ class Program
     {
         var result = new StringBuilder();
         var pagesDirectory = Path.GetDirectoryName(pagePath) ?? "";
-        
+        var seenText = new HashSet<string>(StringComparer.Ordinal);
+
         // Remove @code blocks entirely
-        razorContent = Regex.Replace(razorContent, 
-            @"@code\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", 
-            "", 
+        razorContent = Regex.Replace(razorContent,
+            @"@code\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}",
+            "",
             RegexOptions.Singleline | RegexOptions.IgnoreCase);
-        
+
         // Remove @page, @inject, @layout directives
-        razorContent = Regex.Replace(razorContent, 
-            @"@(page|inject|layout|using|namespace|implements)[^\r\n]*", 
-            "", 
+        razorContent = Regex.Replace(razorContent,
+            @"@(page|inject|layout|using|namespace|implements)[^\r\n]*",
+            "",
             RegexOptions.IgnoreCase | RegexOptions.Multiline);
-        
+
         // Split content into lines to process sequentially
         var lines = razorContent.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
-        
+
         for (int i = 0; i < lines.Length; i++)
         {
             var line = lines[i];
-            
+
             // Check for RadzenText
             if (line.Contains("<RadzenText"))
             {
                 var textContent = ExtractRadzenTextContent(lines, ref i);
-                if (!string.IsNullOrWhiteSpace(textContent.Content))
+                if (!string.IsNullOrWhiteSpace(textContent.Content) && seenText.Add(textContent.Content))
                 {
                     // Format as heading if it's a heading style
                     if (textContent.IsHeading)
@@ -336,7 +382,7 @@ class Program
                 }
             }
         }
-        
+
         return result.ToString().Trim();
     }
 
@@ -344,36 +390,37 @@ class Program
     {
         var fullTag = new StringBuilder();
         var depth = 0;
-        
+
         // Collect the complete RadzenText tag (may span multiple lines)
         for (int i = index; i < lines.Length; i++)
         {
             var line = lines[i];
             fullTag.AppendLine(line);
-            
+
             // Count opening and closing tags
             var openMatches = Regex.Matches(line, @"<RadzenText", RegexOptions.IgnoreCase);
             var closeMatches = Regex.Matches(line, @"</RadzenText>", RegexOptions.IgnoreCase);
-            
+
             depth += openMatches.Count - closeMatches.Count;
-            
+
             if (closeMatches.Count > 0 && depth == 0)
             {
                 index = i;
                 break;
             }
         }
-        
+
         var tagContent = fullTag.ToString();
-        
-        // Extract attributes - check both TextStyle and TagName for heading detection
+
+        // Only treat RadzenText as a heading when it has an explicit TextStyle.
+        // TagName (e.g. TagName="TagName.H2") is just an HTML rendering hint used
+        // for visual styling (marketing text, testimonials, CTAs) and does NOT
+        // indicate a semantic documentation heading.
         var textStyleMatch = Regex.Match(tagContent, @"TextStyle=""TextStyle\.(H[2-6])""", RegexOptions.IgnoreCase);
-        var tagNameMatch = Regex.Match(tagContent, @"TagName=""TagName\.(H[1-6])""", RegexOptions.IgnoreCase);
-        
+
         bool isHeading = false;
         int headingLevel = 0;
-        
-        // Prefer TextStyle for heading level, but also check TagName
+
         if (textStyleMatch.Success)
         {
             var hMatch = Regex.Match(textStyleMatch.Groups[1].Value, @"H(\d)");
@@ -383,67 +430,74 @@ class Program
                 isHeading = headingLevel >= 2 && headingLevel <= 6;
             }
         }
-        
-        // If no TextStyle heading but TagName suggests heading, use that
-        if (!isHeading && tagNameMatch.Success)
-        {
-            var hMatch = Regex.Match(tagNameMatch.Groups[1].Value, @"H(\d)");
-            if (hMatch.Success)
-            {
-                var tagLevel = int.Parse(hMatch.Groups[1].Value);
-                if (tagLevel >= 2 && tagLevel <= 6)
-                {
-                    headingLevel = tagLevel;
-                    isHeading = true;
-                }
-            }
-        }
-        
+
         // Extract inner content
         var contentMatch = Regex.Match(tagContent, @"<RadzenText[^>]*>([\s\S]*?)</RadzenText>", RegexOptions.IgnoreCase);
         if (!contentMatch.Success)
             return (string.Empty, false);
-        
+
         var content = contentMatch.Groups[1].Value.Trim();
-        
+
         // Convert <code> tags to markdown inline code BEFORE converting links
         content = ConvertCodeTagsToMarkdown(content);
-        
-        // Convert RadzenLink to markdown links BEFORE removing HTML tags
-        content = ConvertRadzenLinksToMarkdown(content);
-        
+
+        // For headings, strip RadzenLink elements entirely (CTA buttons are not heading text).
+        // For non-headings, convert them to markdown links.
+        if (isHeading)
+            content = Regex.Replace(content, @"<RadzenLink[^>]*/\s*>|<RadzenLink[^>]*>[\s\S]*?</RadzenLink>", "", RegexOptions.IgnoreCase);
+        else
+            content = ConvertRadzenLinksToMarkdown(content);
+
         // Remove all HTML tags (except markdown links which are already converted)
         content = Regex.Replace(content, @"<[^>]+>", "");
-        
-        // Remove @ expressions
-        content = Regex.Replace(content, @"@[A-Za-z0-9_.()]+", "");
-        
+
+        // Remove Razor/C# expressions: @(...), @variable, $"...", ?.Member, etc.
+        content = Regex.Replace(content, @"@\([^)]*\)", "");           // @(...) expressions
+        content = Regex.Replace(content, @"@[A-Za-z0-9_.()]+", "");    // @variable references
+        content = Regex.Replace(content, @"\$""[^""]*""", "");          // $"..." string interpolations
+        content = Regex.Replace(content, @"\?\.\w+", "");              // ?.Member null-conditional access
+
         // Clean up whitespace
         content = Regex.Replace(content, @"\s+", " ").Trim();
-        
-        // Format as heading if needed
+
+        // Skip content that looks like leaked C#/Razor rather than documentation text.
+        // Indicators: unbalanced parentheses, remaining code artifacts like => or {}.
+        if (content.Contains("=>") || content.Contains("FilterOperator") || content.Contains("FilterValue"))
+            return (string.Empty, false);
+
+        // Format as heading if needed.
+        // Markdown heading budget:
+        //   # = document title
+        //   ## = major sections (Demo Pages, Code-Behind)
+        //   ### = page name (AccordionPage)
+        //   #### = component heading (Accordion)
+        //   ##### = sub-feature (Accordion with single expand)
+        //   ###### = detail
         if (isHeading && !string.IsNullOrWhiteSpace(content))
         {
-            // Map heading levels: H2 -> ####, H4 -> ####, H5 -> #####, H6 -> ######
-            int markdownLevel = 4; // Default to ####
-            if (headingLevel == 4) markdownLevel = 4; // H4 -> ####
-            else if (headingLevel == 5) markdownLevel = 5; // H5 -> #####
-            else if (headingLevel == 6) markdownLevel = 6; // H6 -> ######
-            else if (headingLevel == 2) markdownLevel = 4; // H2 -> ####
-            
+            int markdownLevel = headingLevel switch
+            {
+                2 => 4,  // H2 -> #### component heading
+                3 => 5,  // H3 -> ##### sub-feature
+                4 => 5,  // H4 -> ##### sub-feature
+                5 => 6,  // H5 -> ###### detail
+                6 => 6,  // H6 -> ###### detail
+                _ => 4
+            };
+
             content = new string('#', markdownLevel) + " " + content;
         }
-        
+
         return (content, isHeading);
     }
 
     static string ConvertCodeTagsToMarkdown(string content)
     {
         // Match <code>...</code> tags
-        var codeMatches = Regex.Matches(content, 
-            @"<code>([\s\S]*?)</code>", 
+        var codeMatches = Regex.Matches(content,
+            @"<code>([\s\S]*?)</code>",
             RegexOptions.IgnoreCase);
-        
+
         // Process in reverse to maintain indices
         var matchesArray = new Match[codeMatches.Count];
         for (int i = 0; i < codeMatches.Count; i++)
@@ -454,25 +508,25 @@ class Program
         {
             var match = matchesArray[i];
             var codeContent = match.Groups[1].Value.Trim();
-            
+
             // Remove nested HTML tags from code content
             codeContent = Regex.Replace(codeContent, @"<[^>]+>", "");
-            
+
             // Clean up @("@bind-Selected") to @bind-Selected (remove extra quotes and parentheses)
             // Match: @("...") pattern and extract the content inside quotes
             // Pattern: @("@bind-Selected") -> @bind-Selected
             // Use non-verbatim string to avoid quote escaping issues
             codeContent = Regex.Replace(codeContent, "@\\(\"([^\"]+)\"\\)", "$1");
             codeContent = Regex.Replace(codeContent, "@\\('([^']+)'\\)", "$1");
-            
+
             if (!string.IsNullOrWhiteSpace(codeContent))
             {
                 var markdownCode = $"`{codeContent}`";
-                content = content.Substring(0, match.Index) + markdownCode + 
+                content = content.Substring(0, match.Index) + markdownCode +
                          content.Substring(match.Index + match.Length);
             }
         }
-        
+
         return content;
     }
 
@@ -480,12 +534,12 @@ class Program
     {
         // Handle both self-closing and opening/closing RadzenLink tags
         // Match the entire tag first, then extract attributes
-        
+
         // Pattern for self-closing: <RadzenLink ... />
         var selfClosingPattern = @"<RadzenLink([^>]*?)\s*/>";
         // Pattern for opening/closing: <RadzenLink ...>...</RadzenLink>
         var openClosePattern = @"<RadzenLink([^>]*?)>([\s\S]*?)</RadzenLink>";
-        
+
         // Process self-closing tags
         var selfClosingMatches = Regex.Matches(content, selfClosingPattern, RegexOptions.IgnoreCase);
         var selfClosingArray = new Match[selfClosingMatches.Count];
@@ -498,16 +552,16 @@ class Program
             var match = selfClosingArray[i];
             var attributes = match.Groups[1].Value;
             var (path, text) = ExtractLinkAttributes(attributes, "");
-            
+
             if (!string.IsNullOrWhiteSpace(path))
             {
                 string linkText = !string.IsNullOrWhiteSpace(text) ? text : path;
                 var markdownLink = $"[{linkText}]({path})";
-                content = content.Substring(0, match.Index) + markdownLink + 
+                content = content.Substring(0, match.Index) + markdownLink +
                          content.Substring(match.Index + match.Length);
             }
         }
-        
+
         // Process opening/closing tags
         var linkMatches = Regex.Matches(content, openClosePattern, RegexOptions.IgnoreCase);
         var matchesArray = new Match[linkMatches.Count];
@@ -521,21 +575,21 @@ class Program
             var attributes = match.Groups[1].Value;
             var innerContent = match.Groups[2].Value.Trim();
             var (path, text) = ExtractLinkAttributes(attributes, innerContent);
-            
+
             if (!string.IsNullOrWhiteSpace(path))
             {
-                string linkText = !string.IsNullOrWhiteSpace(text) ? text : 
+                string linkText = !string.IsNullOrWhiteSpace(text) ? text :
                                  (!string.IsNullOrWhiteSpace(innerContent) ? Regex.Replace(innerContent, @"<[^>]+>", "").Trim() : path);
-                
+
                 if (string.IsNullOrWhiteSpace(linkText))
                     linkText = path;
-                
+
                 var markdownLink = $"[{linkText}]({path})";
-                content = content.Substring(0, match.Index) + markdownLink + 
+                content = content.Substring(0, match.Index) + markdownLink +
                          content.Substring(match.Index + match.Length);
             }
         }
-        
+
         return content;
     }
 
@@ -543,27 +597,27 @@ class Program
     {
         string path = "";
         string text = "";
-        
+
         // Extract Path attribute (can be in any order)
         var pathMatch = Regex.Match(attributes, @"Path=[""]?([^""\s>]+)[""]?", RegexOptions.IgnoreCase);
         if (pathMatch.Success)
         {
             path = pathMatch.Groups[1].Value;
         }
-        
+
         // Extract Text attribute
         var textMatch = Regex.Match(attributes, @"Text=[""]?([^""]+)[""]?", RegexOptions.IgnoreCase);
         if (textMatch.Success)
         {
             text = textMatch.Groups[1].Value.Trim();
         }
-        
+
         // If no Text attribute and there's inner content, use that
         if (string.IsNullOrWhiteSpace(text) && !string.IsNullOrWhiteSpace(innerContent))
         {
             text = Regex.Replace(innerContent, @"<[^>]+>", "").Trim();
         }
-        
+
         return (path, text);
     }
 
@@ -571,48 +625,48 @@ class Program
     {
         var fullTag = new StringBuilder();
         var depth = 0;
-        
+
         // Collect the complete RadzenExample tag
         for (int i = index; i < lines.Length; i++)
         {
             var line = lines[i];
             fullTag.AppendLine(line);
-            
+
             var openMatches = Regex.Matches(line, @"<RadzenExample", RegexOptions.IgnoreCase);
             var closeMatches = Regex.Matches(line, @"</RadzenExample>", RegexOptions.IgnoreCase);
-            
+
             depth += openMatches.Count - closeMatches.Count;
-            
+
             if (closeMatches.Count > 0 && depth == 0)
             {
                 index = i;
                 break;
             }
         }
-        
+
         var tagContent = fullTag.ToString();
-        
+
         // Extract Example attribute
         var exampleMatch = Regex.Match(tagContent, @"Example=[""]?([^""\s>]+)[""]?", RegexOptions.IgnoreCase);
         if (exampleMatch.Success)
         {
             var exampleName = exampleMatch.Groups[1].Value.Trim();
             var exampleFilePath = Path.Combine(pagesDirectory, $"{exampleName}.razor");
-            
+
             if (File.Exists(exampleFilePath))
             {
                 var exampleContent = File.ReadAllText(exampleFilePath, Encoding.UTF8);
                 return CleanExampleFile(exampleContent);
             }
         }
-        
+
         // Fallback: extract inline content
         var inlineMatch = Regex.Match(tagContent, @"<RadzenExample[^>]*>([\s\S]*?)</RadzenExample>", RegexOptions.IgnoreCase);
         if (inlineMatch.Success)
         {
             return CleanExampleContent(inlineMatch.Groups[1].Value);
         }
-        
+
         return string.Empty;
     }
 
@@ -620,21 +674,21 @@ class Program
     {
         if (string.IsNullOrWhiteSpace(content))
             return string.Empty;
-        
+
         var result = content;
-        
+
         // Remove all HTML tags (including <strong>, <code>, <Radzen*>, etc.)
         result = Regex.Replace(result, @"<[^>]+>", "");
-        
+
         // Remove @ expressions (like @variable, @ExampleService)
         result = Regex.Replace(result, @"@[A-Za-z0-9_.()]+", "");
-        
+
         // Clean up multiple spaces but preserve single newlines for readability
         result = Regex.Replace(result, @"[ \t]+", " ");
-        
+
         // Clean up multiple newlines (max 2 consecutive)
         result = Regex.Replace(result, @"(\r?\n){3,}", Environment.NewLine + Environment.NewLine);
-        
+
         return result.Trim();
     }
 
@@ -642,21 +696,21 @@ class Program
     {
         if (string.IsNullOrWhiteSpace(content))
             return string.Empty;
-        
+
         var result = content;
-        
+
         // Remove nested RadzenExample tags if any
-        result = Regex.Replace(result, 
-            @"<RadzenExample[^>]*>[\s\S]*?</RadzenExample>", 
-            "", 
+        result = Regex.Replace(result,
+            @"<RadzenExample[^>]*>[\s\S]*?</RadzenExample>",
+            "",
             RegexOptions.IgnoreCase);
-        
+
         // Trim each line and remove empty lines
         var lines = result.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None)
             .Select(l => l.Trim())
             .Where(l => !string.IsNullOrWhiteSpace(l))
             .ToList();
-        
+
         return string.Join(Environment.NewLine, lines);
     }
 
@@ -664,24 +718,24 @@ class Program
     {
         if (string.IsNullOrWhiteSpace(content))
             return string.Empty;
-        
+
         var result = content;
-        
+
         // Remove @code blocks
-        result = Regex.Replace(result, 
-            @"@code\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}", 
-            "", 
+        result = Regex.Replace(result,
+            @"@code\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}",
+            "",
             RegexOptions.Singleline | RegexOptions.IgnoreCase);
-        
+
         // Remove @using, @inject, @page directives
-        result = Regex.Replace(result, 
-            @"@(using|inject|page|layout|namespace|implements)[^\r\n]*", 
-            "", 
+        result = Regex.Replace(result,
+            @"@(using|inject|page|layout|namespace|implements)[^\r\n]*",
+            "",
             RegexOptions.IgnoreCase | RegexOptions.Multiline);
-        
+
         // Clean up multiple blank lines
         result = Regex.Replace(result, @"(\r?\n\s*){3,}", Environment.NewLine + Environment.NewLine);
-        
+
         return result.Trim();
     }
 }
