@@ -29,18 +29,20 @@
                    @onkeydown:preventDefault="@preventKeyPress" @onkeydown:stopPropagation />
         @if (ShowPopupButton)
         {
-            <button type="button" aria-label="@TogglePopupAriaLabel" disabled="@Disabled"
-                    tabindex="-1" class="@GetTogglePopupButtonClass()"
+            <button type="button" aria-label="@TogglePopupAriaLabel" aria-haspopup="dialog"
+                    aria-expanded="@isPopupOpen.ToString().ToLowerInvariant()" aria-controls="@($"{GetId()}-popup")"
+                    disabled="@Disabled" tabindex="-1" class="@GetTogglePopupButtonClass()"
                     @onclick="@ClickPopupButton">
                 <span aria-hidden="true" class="notranslate rz-button-icon-left rzi rzi-timespan"></span><span class="rz-button-text"></span>
             </button>
         }
         @if (AllowClear && HasValue && (_isNullable || ConfirmedValue != DefaultNonNullValue) && !Disabled && !ReadOnly)
         {
-            <i class="notranslate rz-dropdown-clear-icon rzi rzi-times" @onclick="@Clear" @onclick:stopPropagation="true"></i>
+            <button type="button" class="notranslate rz-dropdown-clear-icon rzi rzi-times" aria-label="@ClearAriaLabel" @onclick="@Clear" @onclick:stopPropagation="true"></button>
         }
-        <Popup @ref="@popup" Lazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
+        <Popup id="@($"{GetId()}-popup")" @ref="@popup" Lazy="@(PopupRenderMode == PopupRenderMode.OnDemand)"
                    Open="@OnPopupOpen" Close="@OnPopupClose"
+                   role="dialog" aria-label="@PopupAriaLabel"
                    class="rz-timespanpicker-popup-container">
             @RenderPanel()
         </Popup>

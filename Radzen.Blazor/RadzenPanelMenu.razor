@@ -2,7 +2,8 @@
 
 @if (Visible)
 {
-    <ul @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() tabindex="0"
+    <ul @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
+        role="menu" aria-label="@AriaLabel" tabindex="0"
         @onkeydown=@OnKeyPress
         @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
         @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>

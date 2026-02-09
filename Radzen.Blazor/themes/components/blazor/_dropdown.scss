@@ -105,6 +105,10 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
   align-items: center;
   font-size: var(--rz-dropdown-trigger-icon-height);
   opacity: 0.4;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 
   &:before {
     content: 'close';
@@ -193,6 +197,15 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
   margin: var(--rz-dropdown-items-margin);
 }
 
+.rz-multiselect-selectall {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
 @mixin dropdown-item($radius: $dropdown-item-border-radius) {
   cursor: default;
   font-size: var(--rz-dropdown-item-font-size);
@@ -239,6 +252,9 @@ $multiselect-checkbox-margin-inline: 0 0.5rem !default;
 
 .rz-multiselect-close {
   display: none;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .rz-multiselect-filter-container {

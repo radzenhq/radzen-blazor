@@ -43,11 +43,12 @@
             }
             </span>
         </button>
-        <button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class=@PopupButtonClass type="button" aria-label="@OpenAriaLabel">
+        <button tabindex="-1" disabled="@IsDisabled" onclick="@OpenPopupScript()" class=@PopupButtonClass type="button"
+                aria-label="@OpenAriaLabel" aria-haspopup="menu" aria-controls="@PopupID" aria-expanded="false">
             <RadzenIcon Icon="@DropDownIcon" />
         </button>
         <div id="@PopupID" class="rz-splitbutton-menu">
-            <ul class="rz-menu-list">
+            <ul class="rz-menu-list" role="menu" aria-label="@OpenAriaLabel">
                 <CascadingValue Value=this>
                     @ChildContent
                 </CascadingValue>

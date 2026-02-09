@@ -7,8 +7,11 @@
 
 @if (RowIndex == Column.GetLevel())
 {
-    <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass" scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))>
-        <div @onclick='@((args) => Grid.OnSort(args, Column))' @onkeydown="OnSortKeyPressed">
+    <th rowspan="@(Column.GetRowSpan())" colspan="@(Column.GetColSpan())" @attributes="@Attributes" class="@CssClass"
+        scope="col" style="@GetStyle()" @onmouseup=@(args => Grid.EndColumnReorder(args, ColumnIndex))
+        aria-sort="@(Grid.AllowSorting && Column.Sortable ? (Column.GetSortOrder() == SortOrder.Ascending ? "ascending" : Column.GetSortOrder() == SortOrder.Descending ? "descending" : "none") : null)">
+        <div @onclick='@((args) => Grid.OnSort(args, Column))' @onkeydown="OnSortKeyPressed"
+             role="@(Grid.AllowSorting && Column.Sortable ? "button" : null)">
             @if ((Grid.AllowColumnReorder && Column.Reorderable || Grid.AllowGrouping && Column.Groupable))
             {
                 <span id="@(Grid.getColumnUniqueId(ColumnIndex) + "-drag")" class="rz-column-drag"
@@ -60,12 +63,15 @@
             @{var filterMode = Column.FilterMode ?? Grid.FilterMode;}
             @if (Grid.AllowFiltering && Column.Filterable && (filterMode == FilterMode.Advanced || filterMode == FilterMode.CheckBoxList))
             {
-                <i @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
-                class="@getFilterIconCss(Column)" onclick=@getFilterOpen() @onclick:preventDefault="true">
+                <button type="button" @ref=@filterButton @onclick:stopPropagation="true" @onmousedown=@ToggleFilter
+                        class="@getFilterIconCss(Column)" onclick=@getFilterOpen() @onclick:preventDefault="true"
+                        aria-haspopup="dialog" aria-controls="@Column.GetColumnPopupID()" aria-expanded="false"
+                        aria-label="@Grid.FilterToggleAriaLabel">
                     @Grid.FilterIcon
-                </i>
+                </button>
 
                 <Popup Lazy=@(Grid.FilterPopupRenderMode == PopupRenderMode.OnDemand) @ref=popup id="@($"{Column.GetColumnPopupID()}")" class="rz-overlaypanel"
+                role="dialog" aria-label="@Grid.FilterText"
                 style="display:none;min-width:250px;" @onkeydown="OnFilterPopupKeyPressed">
                     <div class="rz-overlaypanel-content">
                         @if (Column.FilterTemplate != null)

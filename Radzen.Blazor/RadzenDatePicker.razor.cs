@@ -71,6 +71,41 @@ namespace Radzen.Blazor
         public string ToggleAriaLabel { get; set; } = "Toggle";
 
         /// <summary>
+        /// Gets or sets the popup aria label text.
+        /// </summary>
+        /// <value>The popup aria label text.</value>
+        [Parameter]
+        public string PopupAriaLabel { get; set; } = "Date picker";
+
+        /// <summary>
+        /// Gets or sets the clear button aria label text.
+        /// </summary>
+        /// <value>The clear button aria label text.</value>
+        [Parameter]
+        public string ClearAriaLabel { get; set; } = "Clear";
+
+        /// <summary>
+        /// Gets or sets the hour input aria label text.
+        /// </summary>
+        /// <value>The hour input aria label text.</value>
+        [Parameter]
+        public string HourAriaLabel { get; set; } = "Hour";
+
+        /// <summary>
+        /// Gets or sets the minutes input aria label text.
+        /// </summary>
+        /// <value>The minutes input aria label text.</value>
+        [Parameter]
+        public string MinutesAriaLabel { get; set; } = "Minutes";
+
+        /// <summary>
+        /// Gets or sets the seconds input aria label text.
+        /// </summary>
+        /// <value>The seconds input aria label text.</value>
+        [Parameter]
+        public string SecondsAriaLabel { get; set; } = "Seconds";
+
+        /// <summary>
         /// Gets or sets the OK button aria label text.
         /// </summary>
         /// <value>The OK button aria label text.</value>
@@ -451,6 +486,15 @@ namespace Radzen.Blazor
             }
 
             return args;
+        }
+
+        async Task OnDayKeyDown(KeyboardEventArgs args, DateTime date, DateRenderEventArgs dateArgs)
+        {
+            var key = args.Code != null ? args.Code : args.Key;
+            if ((key == "Enter" || key == "Space") && !Disabled && !dateArgs.Disabled)
+            {
+                await SetDay(date);
+            }
         }
 
         /// <summary>

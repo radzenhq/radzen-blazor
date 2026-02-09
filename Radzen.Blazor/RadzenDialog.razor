@@ -4,6 +4,26 @@
 @using Radzen.Blazor.Rendering
 @inject IJSRuntime JSRuntime
 
+@{
+    var sideOptions = sideDialogOptions;
+    var sideDialogId = $"rz-dialog-side-{sideOptions?.GetHashCode()}";
+    var sideDialogLabelId = $"{sideDialogId}-label";
+    var sideShowTitle = sideOptions?.ShowTitle == true;
+    var sideAriaAttributes = new Dictionary<string, object?>();
+    if (sideShowTitle)
+    {
+        sideAriaAttributes["aria-labelledby"] = sideDialogLabelId;
+    }
+    else
+    {
+        sideAriaAttributes["aria-label"] = sideOptions?.AriaLabel ?? sideDialog?.Title ?? sideOptions?.Title;
+    }
+    if (sideOptions?.ShowMask == true)
+    {
+        sideAriaAttributes["aria-modal"] = "true";
+    }
+}
+
 @foreach (var dialog in dialogs)
 {
     <DialogContainer @key=@dialog Dialog=@dialog ShowMask=@(dialog==dialogs.LastOrDefault()) />
@@ -13,57 +33,58 @@
 {
     <aside
         class="@GetSideDialogCssClass()"
+        role="dialog"
         @ref="sideDialogElement"
         tabindex="0"
         style="@GetSideDialogStyle()"
-        aria-labelledby="rz-dialog-side-label">
-        @if (sideDialogOptions?.Resizable == true)
+        @attributes="sideAriaAttributes">
+        @if (sideOptions?.Resizable == true)
         {
             <div @ref="resizeBarElement"
                  class="@GetResizeBarCssClass()"
-                 title="@sideDialogOptions?.ResizeBarTitle" aria-label="@sideDialogOptions?.ResizeBarAriaLabel">
+                 title="@sideOptions?.ResizeBarTitle" aria-label="@sideOptions?.ResizeBarAriaLabel">
                 <span class="rz-resize" aria-hidden="true"></span>
             </div>
 
         }
-        @if (sideDialogOptions?.ShowTitle == true)
+        @if (sideShowTitle)
         {
             <div class="rz-dialog-side-titlebar">
-                <div class="rz-dialog-side-title" style="display: inline" id="rz-dialog-side-label">
-                    @if (sideDialogOptions.TitleContent != null)
+                <div class="rz-dialog-side-title" style="display: inline" id="@sideDialogLabelId">
+                    @if (sideOptions?.TitleContent != null)
                     {
-                        @sideDialogOptions.TitleContent(Service!)
+                        @sideOptions.TitleContent(Service!)
                     }
                     else if (!string.IsNullOrEmpty(sideDialog?.Title))
                     {
                         @sideDialog.Title
                     }
-                    else
+                    else if (!string.IsNullOrEmpty(sideOptions?.Title))
                     {
-                        @sideDialogOptions.Title
+                        @sideOptions.Title
                     }
                 </div>
-                @if (sideDialogOptions.ShowClose)
+                @if (sideOptions?.ShowClose == true)
                 {
-                    <a id="@(sideDialogOptions.GetHashCode() + "cl")" aria-label="@CloseSideDialogAriaLabel" @onclick:preventDefault="true" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service!.CloseSide())" role="button" tabindex="@sideDialogOptions.CloseTabIndex">
+                    <button id="@($"rz-dialog-side-{sideOptions?.GetHashCode() ?? 0}-cl")" type="button" aria-label="@CloseSideDialogAriaLabel" class="rz-dialog-side-titlebar-close" @onclick="@(_ => Service!.CloseSide())" tabindex="@(sideOptions?.CloseTabIndex ?? 0)">
                         <span class="notranslate rzi rzi-times"></span>
-                    </a>
+                    </button>
                 }
             </div>
         }
-        <div class="@SideDialogContentCssClass" style="@sideDialogOptions?.Style">
+        <div class="@SideDialogContentCssClass" style="@sideOptions?.Style">
             @sideDialogContent
         </div>
     </aside>
-    @if (dialogs.Count == 0 && sideDialogOptions?.ShowMask == true)
+    @if (dialogs.Count == 0 && sideOptions?.ShowMask == true)
     {
-        @if (sideDialogOptions.CloseDialogOnOverlayClick)
+        @if (sideOptions.CloseDialogOnOverlayClick)
         {
-            <div @onclick="@Service!.CloseSide" class="rz-dialog-mask"></div>
+            <div @onclick="@Service!.CloseSide" class="rz-dialog-mask" aria-hidden="true" tabindex="-1"></div>
         }
         else
         {
-            <div class="rz-dialog-mask"></div>
+            <div class="rz-dialog-mask" aria-hidden="true" tabindex="-1"></div>
         }
     }
 }
@@ -180,7 +201,9 @@
             WrapperCssClass = options.WrapperCssClass,
             ContentCssClass = options.ContentCssClass,
             CloseTabIndex = options.CloseTabIndex,
-            TitleContent = options.TitleContent
+            TitleContent = options.TitleContent,
+            AriaLabel = options.AriaLabel,
+            CloseAriaLabel = options.CloseAriaLabel
         };
 
         // Create a Dialog object for the side dialog to support cascading parameter

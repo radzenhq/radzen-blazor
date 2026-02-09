@@ -255,6 +255,13 @@ namespace Radzen
         public string RemoveChipTitle { get; set; } = "Remove";
 
         /// <summary>
+        /// Gets or sets the clear button aria label text.
+        /// </summary>
+        /// <value>The clear button aria label text.</value>
+        [Parameter]
+        public string ClearAriaLabel { get; set; } = "Clear";
+
+        /// <summary>
         /// Gets or sets the search aria label text.
         /// </summary>
         /// <value>The search aria label text.</value>
@@ -559,6 +566,18 @@ namespace Radzen
         }
 
         /// <summary>
+        /// Gets the listbox identifier.
+        /// </summary>
+        /// <value>The listbox identifier.</value>
+        protected string ListId
+        {
+            get
+            {
+                return $"{GetId()}-list";
+            }
+        }
+
+        /// <summary>
         /// Gets the search identifier.
         /// </summary>
         /// <value>The search identifier.</value>
@@ -634,6 +653,8 @@ namespace Radzen
                 await JSRuntime.InvokeVoidAsync("Radzen.togglePopup", Element, PopupID, true);
                 await JSRuntime.InvokeVoidAsync("Radzen.focusElement", isFilter ? UniqueID : SearchID);
             }
+
+            isPopupOpen = true;
 
             if (list != null && JSRuntime != null)
             {
@@ -843,7 +864,14 @@ namespace Radzen
             {
                 await JSRuntime.InvokeVoidAsync("Radzen.closePopup", PopupID);
             }
+
+            isPopupOpen = false;
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the popup is open.
+        /// </summary>
+        protected bool isPopupOpen;
 
         int itemIndex;
         string? previousKey;
@@ -1290,7 +1318,23 @@ namespace Radzen
 
                 await Change.InvokeAsync(internalValue);
             }
+
             StateHasChanged();
+        }
+
+        /// <summary>
+        /// Handles keyboard activation for the select-all action.
+        /// </summary>
+        /// <param name="args">The <see cref="Microsoft.AspNetCore.Components.Web.KeyboardEventArgs"/> instance containing the event data.</param>
+        protected async Task OnSelectAllKeyDown(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs args)
+        {
+            ArgumentNullException.ThrowIfNull(args);
+
+            var key = args.Code != null ? args.Code : args.Key;
+            if (key == "Enter" || key == "Space")
+            {
+                await SelectAll();
+            }
         }
 
         /// <inheritdoc />

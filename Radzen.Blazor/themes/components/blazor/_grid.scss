@@ -1055,6 +1055,9 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 }
 
 .rz-grid-filter-icon {
+  background: none;
+  border: none;
+  padding: 0;
   justify-self: flex-end;
   color: var(--rz-grid-filter-color);
   margin-inline: var(--rz-grid-header-filter-icon-margin-inline);
@@ -1270,6 +1273,10 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
     display: flex;
     align-items: center;
     text-decoration: none;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
   }
 }
 
@@ -1292,6 +1299,22 @@ $column-draggable-shadow: 0 8px 10px 0 rgba(0, 0, 0, 0.1) !default;
 .rz-filter-menu-symbol {
   width: 1.75rem;
   display: inline-block;
+}
+
+.rz-filter-menu-item {
+  width: 100%;
+  text-align: start;
+  background: none;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.rz-cell-filter-clear {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .rz-filter-button {

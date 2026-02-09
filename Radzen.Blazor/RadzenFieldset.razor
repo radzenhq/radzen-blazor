@@ -9,9 +9,9 @@
         <legend class="rz-fieldset-legend" style="white-space:nowrap">
             @if (AllowCollapse)
             {
-                <a id="@(GetId() + "expc")" title="@TitleAttribute()" aria-label="@AriaLabelAttribute()" @onclick:preventDefault="true"
-                   aria-controls="rz-fieldset-0-content" aria-expanded="@(collapsed ? "false" : "true")" @onclick=@Toggle
-                       tabindex="0" @onkeypress="@(args => OnKeyPress(args, Toggle(new EventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
+                <button type="button" id="@(GetId() + "expc")" title="@TitleAttribute()" aria-label="@AriaLabelAttribute()"
+                   aria-controls="@($"{GetId()}-content")" aria-expanded="@(collapsed ? "false" : "true")" @onclick=@Toggle
+                       @onkeypress="@(args => OnKeyPress(args, Toggle(new EventArgs())))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation>
                 @if (collapsed)
                 {
                     <span class="notranslate rz-fieldset-toggler rzi rzi-w rzi-plus"></span>
@@ -30,7 +30,7 @@
                     <span class="rz-fieldset-legend-text">@Text</span>
                 }
                 @HeaderTemplate
-                </a>
+                </button>
             } 
             else
             {
@@ -46,7 +46,7 @@
             }
         </legend>
         }
-        <Expander Expanded=@(!collapsed) CssClass="rz-fieldset-content-wrapper" id="rz-fieldset-0-content">
+        <Expander Expanded=@(!collapsed) CssClass="rz-fieldset-content-wrapper" id="@($"{GetId()}-content")">
             <div class="rz-fieldset-content">
                 @ChildContent
             </div>

@@ -716,6 +716,42 @@ namespace Radzen
             }
         }
 
+        private string? ariaLabel = "Dialog";
+        /// <summary>
+        /// Gets or sets the dialog aria-label text when no title is rendered.
+        /// </summary>
+        /// <value>The dialog aria-label text.</value>
+        public string? AriaLabel
+        {
+            get => ariaLabel;
+            set
+            {
+                if (ariaLabel != value)
+                {
+                    ariaLabel = value;
+                    OnPropertyChanged(nameof(AriaLabel));
+                }
+            }
+        }
+
+        private string closeAriaLabel = "Close dialog";
+        /// <summary>
+        /// Gets or sets the close button aria-label text.
+        /// </summary>
+        /// <value>The close button aria-label text.</value>
+        public string CloseAriaLabel
+        {
+            get => closeAriaLabel;
+            set
+            {
+                if (closeAriaLabel != value)
+                {
+                    closeAriaLabel = value;
+                    OnPropertyChanged(nameof(CloseAriaLabel));
+                }
+            }
+        }
+
         private string? width;
         /// <summary>
         /// Gets or sets the width of the dialog.

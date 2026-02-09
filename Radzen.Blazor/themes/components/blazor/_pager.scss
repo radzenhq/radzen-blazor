@@ -49,15 +49,25 @@ $pager-button-size: "%button-md" !default;
     }
   }
 
-  &.rz-align-right {
+  &.rz-align-justify > .rz-pager-pages {
+    & > .rz-pager-item:has(.rz-pager-prev) {
+      margin-inline-end: auto;
+    }
+
+    & > .rz-pager-item:has(.rz-pager-next) {
+      margin-inline-start: auto;
+    }
+  }
+
+  &.rz-align-right > .rz-pager-pages {
     justify-content: right;
   }
 
-  &.rz-align-left {
+  &.rz-align-left > .rz-pager-pages {
     justify-content: left;
   }
 
-  &.rz-align-center {
+  &.rz-align-center > .rz-pager-pages {
     justify-content: center;
   }
 
@@ -125,9 +135,14 @@ $pager-button-size: "%button-md" !default;
 }
 
 .rz-pager-pages {
-  display: inline-flex;
+  display: flex;
+  flex: 1;
   gap: var(--rz-pager-gap);
-  margin: 0 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .rz-pager-element {
@@ -231,12 +246,6 @@ $pager-button-size: "%button-md" !default;
 }
 
 @media (max-width: 768px) {
-  .rz-pager-page {
-      &:not(.rz-state-active) {
-          display: none;
-      }
-  }
-
   .rz-pager {
       display: grid;
       grid-column-gap: 0.5rem;
@@ -264,29 +273,45 @@ $pager-button-size: "%button-md" !default;
       text-align: left;
   }
 
-  .rz-pager-first {
-      grid-column: 1/3;
-      margin: 0 !important;
-  }
-
-  .rz-pager-prev {
-      grid-column: 3/5;
-      margin: 0 !important;
-  }
-
   .rz-pager-pages {
+      grid-column: 1/10;
+      display: grid;
+      grid-column-gap: 0.5rem;
+      grid-row-gap: 1rem;
+      grid-template-columns: repeat(9, 1fr);
+      text-align: center;
+  }
+
+  .rz-pager-item {
       grid-column: 5/6;
-      margin: 0 !important;
-  }
 
-  .rz-pager-next {
-      grid-column: 6/8;
-      margin: 0 !important;
-  }
+      & > .rz-pager-element {
+        width: 100%;
+      }
 
-  .rz-pager-last {
-      grid-column: 8/10;
-      margin: 0 !important;
+      &:has(.rz-pager-page:not(.rz-state-active)) {
+          display: none;
+      }
+
+      &:has(.rz-pager-first) {
+          grid-column: 1/3;
+          margin: 0 !important;
+      }
+
+      &:has(.rz-pager-prev) {
+          grid-column: 3/5;
+          margin: 0 !important;
+      }
+
+      &:has(.rz-pager-next) {
+          grid-column: 6/8;
+          margin: 0 !important;
+      }
+
+      &:has(.rz-pager-last) {
+          grid-column: 8/10;
+          margin: 0 !important;
+      }
   }
 }
 

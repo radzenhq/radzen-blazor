@@ -2,13 +2,14 @@
 
 @if (Visible)
 {
-    <ul @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId()
+    <ul @ref=@Element style=@Style @attributes=@Attributes class=@GetCssClass() id=@GetId() role="menubar" aria-label="@AriaLabel"
         tabindex="0" @onkeydown="@OnKeyPress" @onkeydown:preventDefault=preventKeyPress @onkeydown:stopPropagation
         @onfocus=@this.AsNonRenderingEventHandler(OnFocus)>
         @if (Responsive)
         {
         <li class="rz-menu-toggle-item">
-            <button aria-label=@ToggleAriaLabel class="rz-menu-toggle" @onclick=@OnToggle>
+            <button type="button" aria-label=@ToggleAriaLabel class="rz-menu-toggle" @onclick=@OnToggle
+                    aria-haspopup="menu" aria-expanded="@IsOpen.ToString().ToLowerInvariant()" aria-controls="@GetId()">
                 @if (IsOpen)
                 {
                     <i class="notranslate rzi">close</i>

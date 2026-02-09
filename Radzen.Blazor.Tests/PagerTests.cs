@@ -127,10 +127,10 @@ namespace Radzen.Blazor.Tests
             await component.InvokeAsync(() => component.Instance.GoToPage(0));
             component.Render();
 
-            var firstPageButton = component.Find("a.rz-pager-first");
+            var firstPageButton = component.Find("button.rz-pager-first");
             Assert.True(firstPageButton.HasAttribute("disabled"));
 
-            var prevPageButton = component.Find("a.rz-pager-prev");
+            var prevPageButton = component.Find("button.rz-pager-prev");
             Assert.True(prevPageButton.HasAttribute("disabled"));
         }
 
@@ -150,10 +150,10 @@ namespace Radzen.Blazor.Tests
             await component.InvokeAsync(() => component.Instance.GoToPage(9));
             component.Render();
 
-            var lastPageButton = component.Find("a.rz-pager-last");
+            var lastPageButton = component.Find("button.rz-pager-last");
             Assert.True(lastPageButton.HasAttribute("disabled"));
 
-            var nextPageButton = component.Find("a.rz-pager-next");
+            var nextPageButton = component.Find("button.rz-pager-next");
             Assert.True(nextPageButton.HasAttribute("disabled"));
         }
     }

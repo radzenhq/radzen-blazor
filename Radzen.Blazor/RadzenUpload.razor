@@ -8,7 +8,9 @@
 {
 <div @ref="@Element" style="@Style" @attributes="Attributes" class="@GetCssClass()" id="@GetId()">
     <div class="rz-fileupload-buttonbar">
-        <span class="@ChooseClassList" tabindex="@(Disabled ? -1 : 0)" onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
+        <span class="@ChooseClassList" tabindex="@(Disabled ? -1 : 0)" role="button" aria-label="@ChooseText"
+              aria-disabled="@(Disabled ? "true" : "false")" aria-controls="@(Name ?? GetId())"
+              onkeydown="if(event.keyCode == 32 || event.keyCode == 13){event.preventDefault();this.firstElementChild.click();}">
             @RenderInput()
             @if (!string.IsNullOrEmpty(Icon))
             {
@@ -32,7 +34,10 @@
                     <div>@file.Name</div>
                     <div>@(file.Size / 1024) KB</div>
                     <div>
-                        <button title=@DeleteText tabindex="0" disabled="@Disabled" @onclick="@(args => OnRemove(file))" type="button" class="@ButtonClassList"><span class="rz-icon-trash" style="display:block"></span></button>
+                        <button title=@DeleteText tabindex="0" disabled="@Disabled" @onclick="@(args => OnRemove(file))"
+                                aria-label="@DeleteText" type="button" class="@ButtonClassList">
+                            <span class="rz-icon-trash" style="display:block"></span>
+                        </button>
                     </div>
                 </div>
                 }

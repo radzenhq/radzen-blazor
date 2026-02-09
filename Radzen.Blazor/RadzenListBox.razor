@@ -23,7 +23,10 @@
                 {
                     @if (AllowSelectAll)
                     {
-                    <div class="rz-chkbox " @onclick="@SelectAll">
+                    <div class="rz-chkbox" @onclick="@SelectAll" role="checkbox" tabindex="@(Disabled || ReadOnly ? "-1" : "0")"
+                         aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())"
+                         aria-disabled="@(Disabled || ReadOnly ? "true" : "false")"
+                         @onkeydown="OnSelectAllKeyDown">
                         <div class="rz-helper-hidden-accessible">
                             <input id="@($"{UniqueID}sa")" readonly="readonly" type="checkbox" aria-label="@SelectAllText" aria-checked="@(IsAllSelected().ToString().ToLowerInvariant())">
                         </div>
@@ -50,7 +53,7 @@
         @if (View != null)
         {
             <div class="rz-listbox-list-wrapper">
-                <ul @ref="list" class="rz-listbox-list">
+                <ul @ref="list" class="rz-listbox-list" role="listbox" aria-multiselectable="@(Multiple ? "true" : "false")">
                     @RenderItems()
                 </ul>
             </div>
