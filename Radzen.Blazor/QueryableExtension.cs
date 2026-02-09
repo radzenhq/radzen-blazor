@@ -1,4 +1,4 @@
-﻿using Radzen;
+using Radzen;
 using Radzen.Blazor;
 using System;
 using System.Collections;
@@ -548,6 +548,12 @@ namespace Radzen
                 return Expression.Condition(isNull, whenNull, accessed);
             }
 
+            // Skip null propagation for ParameterExpression (the root LINQ parameter is never null).
+            // Adding a null check like `x == null ? default : x.Property` on the root parameter
+            // causes EF Core to fail for keyless entity types (e.g. SQL views) because it cannot
+            // translate `==` on entities without a primary key.
+            var shouldNullPropagate = expression is not ParameterExpression;
+
             Expression member;
 
             var parentForAccess = UnwrapNullableIfNeeded(expression);
@@ -577,7 +583,7 @@ namespace Radzen
 
                 member = Expression.Convert(indexer, targetType);
 
-                member = NullPropagate(expression, member);
+                member = shouldNullPropagate ? NullPropagate(expression, member) : member;
             }
 
             else if (currentPart.Contains('[', StringComparison.Ordinal))
@@ -587,7 +593,7 @@ namespace Radzen
                 var indexString = currentPart.Substring(indexStart + 1, currentPart.Length - indexStart - 2);
 
                 var collection = AccessMember(parentForAccess, propertyName);
-                collection = NullPropagate(expression, collection);
+                collection = shouldNullPropagate ? NullPropagate(expression, collection) : collection;
 
                 if (!int.TryParse(indexString, out var index))
                     throw new ArgumentException($"Invalid index format: {indexString}");
@@ -615,7 +621,7 @@ namespace Radzen
             else
             {
                 var accessed = AccessMember(parentForAccess, currentPart);
-                member = NullPropagate(expression, accessed);
+                member = shouldNullPropagate ? NullPropagate(expression, accessed) : accessed;
             }
 
             if (parts.Length > 1)
