@@ -113,10 +113,9 @@ class Program
             .Where(p => !IsExcluded(p))
             .OrderBy(p => Path.GetFileName(p)).ToList();
 
-        // Keep all non-excluded pages for content generation (sorted ascending)
-        var pages = allPages
-            .Where(p => !IsExcluded(p))
-            .OrderBy(p => Path.GetFileName(p)).ToList();
+        // Only main pages (with @page directive) get their own sections.
+        // Example sub-components are embedded as code snippets via <RadzenExample>.
+        var pages = mainPages;
 
         var pageCs = Directory.GetFiles(pagesPath, "*.cs", SearchOption.AllDirectories)
             .OrderBy(f => Path.GetFileName(f))
