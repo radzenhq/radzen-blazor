@@ -10,14 +10,17 @@ class Program
     // that pollutes search results when used with a RAG system.
     static readonly HashSet<string> ExcludedPages = new(StringComparer.OrdinalIgnoreCase)
     {
+        "AccessibilityPage",  // Generic WCAG/ARIA info, no component-specific content
         "AI",
         "Changelog",
         "Dashboard",
         "DashboardPage",
+        "GetStarted",         // Installation steps, not component documentation
         "Index",
         "NotFound",
         "Playground",
         "SupportPage",
+        "ThemeServicePage",   // Theme persistence setup steps, not component demos
         "ThemesPage",
     };
 
@@ -334,14 +337,17 @@ class Program
             "",
             RegexOptions.Singleline | RegexOptions.IgnoreCase);
 
-        // Remove @page, @inject, @layout directives
+        // Remove @page, @inject, @layout directives.
+        // Use \b word boundary so @page doesn't match @pageSizeOptions, etc.
         razorContent = Regex.Replace(razorContent,
-            @"@(page|inject|layout|using|namespace|implements)[^\r\n]*",
+            @"@(page|inject|layout|using|namespace|implements)\b[^\r\n]*",
             "",
             RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
         // Split content into lines to process sequentially
         var lines = razorContent.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+        var skipUntilNextHeading = false;
 
         for (int i = 0; i < lines.Length; i++)
         {
@@ -353,14 +359,26 @@ class Program
                 var textContent = ExtractRadzenTextContent(lines, ref i);
                 if (!string.IsNullOrWhiteSpace(textContent.Content) && seenText.Add(textContent.Content))
                 {
-                    // Format as heading if it's a heading style
+                    // Skip sections that produce no useful component documentation:
+                    // - "Keyboard Navigation": shortcuts rendered by <KeyboardNavigationDataGrid>
+                    //   from C# data, can't be extracted — leaves a generic placeholder sentence.
+                    // - "Radzen Blazor Studio": IDE-specific content, not component API docs.
+                    if (textContent.IsHeading && (
+                        textContent.Content.Contains("Keyboard Navigation") ||
+                        textContent.Content.Contains("Radzen Blazor Studio")))
+                    {
+                        skipUntilNextHeading = true;
+                        continue;
+                    }
+
                     if (textContent.IsHeading)
                     {
+                        skipUntilNextHeading = false;
                         result.AppendLine();
                         result.AppendLine(textContent.Content);
                         result.AppendLine();
                     }
-                    else
+                    else if (!skipUntilNextHeading)
                     {
                         result.AppendLine(textContent.Content);
                     }
@@ -369,6 +387,9 @@ class Program
             // Check for RadzenExample
             else if (line.Contains("<RadzenExample"))
             {
+                if (skipUntilNextHeading)
+                    continue;
+
                 var exampleContent = ExtractRadzenExampleContent(lines, ref i, pagesDirectory);
                 if (!string.IsNullOrWhiteSpace(exampleContent))
                 {
@@ -720,15 +741,11 @@ class Program
 
         var result = content;
 
-        // Remove @code blocks
+        // Remove @using, @inject, @page directives (but NOT @code blocks — they contain
+        // essential C# code that users need to understand the examples).
+        // Use \b word boundary so @page doesn't match @pageSizeOptions, @pageIndex, etc.
         result = Regex.Replace(result,
-            @"@code\s*\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}",
-            "",
-            RegexOptions.Singleline | RegexOptions.IgnoreCase);
-
-        // Remove @using, @inject, @page directives
-        result = Regex.Replace(result,
-            @"@(using|inject|page|layout|namespace|implements)[^\r\n]*",
+            @"@(using|inject|page|layout|namespace|implements)\b[^\r\n]*",
             "",
             RegexOptions.IgnoreCase | RegexOptions.Multiline);
 
