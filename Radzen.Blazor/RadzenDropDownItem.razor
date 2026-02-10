@@ -10,7 +10,7 @@ Disabled = itemArgs.Disabled;
 {
     <li class="@GetComponentCssClass("rz-multiselect")" role="option" tabindex="-1"
         aria-label="@(DropDown?.GetItemOrValueFromProperty(Item!, DropDown?.TextProperty ?? string.Empty) ?? "")"
-        aria-selected="@(DropDown?.IsSelected(Item) == true)"
+        aria-selected="@(DropDown?.IsSelected(Item) == true ? "true" : "false")"
         aria-disabled="@(Disabled || DropDown?.Disabled == true ? "true" : "false")"
         @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
         @onclick:preventDefault @onclick="args=>SelectItem(args,true)" 
@@ -36,7 +36,7 @@ else
 {
     <li role="option" class="@GetComponentCssClass("rz-dropdown")" tabindex="-1"
         aria-label="@(DropDown?.GetItemOrValueFromProperty(Item, DropDown?.TextProperty ?? "") ?? "")"
-        aria-selected="@(DropDown?.IsSelected(Item) == true)"
+        aria-selected="@(DropDown?.IsSelected(Item) == true ? "true" : "false")"
         aria-disabled="@(Disabled || DropDown?.Disabled == true ? "true" : "false")"
         @onmousedown:preventDefault @onmousedown="args=>SelectItem(args,false)"
         @onclick:preventDefault @onclick="args=>SelectItem(args,true)"

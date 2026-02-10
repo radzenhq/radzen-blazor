@@ -43,7 +43,9 @@
                 @if (AllowFiltering)
                 {
                     <div class="rz-listbox-filter-container">
-                        @RenderFilter()
+                        <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@(Placeholder ?? string.Empty)"
+                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@(searchText ?? string.Empty)" @onkeydown:stopPropagation="true"
+                               @oninput="@OnFilterInput" aria-label="@SearchAriaLabel" />
                         <span class="notranslate rz-listbox-filter-icon rzi rzi-search"></span>
                     </div>
                 }
@@ -60,25 +62,4 @@
         }
     </div>
 }
-@code {
-    internal RenderFragment RenderFilter()
-    {
-#if NET7_0_OR_GREATER
-        return __builder => {
-            <text>
-                <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
-                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" @onkeydown:stopPropagation="true"
-                               @bind:event="oninput" @bind:get="searchText" @bind:set=@(args => OnFilterInput(new ChangeEventArgs(){ Value = args }))" aria-label="@SearchAriaLabel" />
-            </text>
-        };
-#else
-        return __builder => {
-            <text>
-                <input id="@SearchID" @ref="@search" disabled="@Disabled" class="rz-inputtext" role="textbox" type="text" placeholder="@Placeholder"
-                               @onchange="@OnFilter" @onkeydown="@OnFilterKeyPress" value="@searchText" @onkeydown:stopPropagation="true"
-                               @oninput="@OnFilterInput" aria-label="@SearchAriaLabel" />
-            </text>
-        };
-#endif
-    }
-}
+
