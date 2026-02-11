@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -269,6 +269,21 @@ public class ExpressionSerializer : ExpressionVisitor
         _sb.Append(" : ");
         Visit(node.IfFalse);
         _sb.Append(")");
+        return node;
+    }
+
+    /// <inheritdoc/>
+    protected override Expression VisitDefault(DefaultExpression node)
+    {
+        ArgumentNullException.ThrowIfNull(node);
+        if (!node.Type.IsValueType || Nullable.GetUnderlyingType(node.Type) != null)
+        {
+            _sb.Append("null");
+        }
+        else
+        {
+            _sb.Append(CultureInfo.InvariantCulture, $"default({node.Type.DisplayName(true).Replace("+", ".", StringComparison.Ordinal)})");
+        }
         return node;
     }
 

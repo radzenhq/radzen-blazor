@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -318,6 +318,36 @@ namespace Radzen.Blazor.Tests
         {
             Expression<Func<TestEntity, bool>> expr = e => !e.Tags.Contains("Member");
             Assert.Equal("e => (!(e.Tags.Contains(\"Member\")))", _serializer.Serialize(expr));
+        }
+
+        [Fact]
+        public void Serializes_DefaultExpression_ReferenceType()
+        {
+            // Simulates the NullPropagate pattern: x.Address == null ? default(string) : x.Address.City
+            var param = Expression.Parameter(typeof(TestEntity), "x");
+            var address = Expression.Property(param, "Address");
+            var city = Expression.Property(address, "City");
+            var isNull = Expression.Equal(address, Expression.Constant(null, typeof(Address)));
+            var whenNull = Expression.Default(typeof(string));
+            var conditional = Expression.Condition(isNull, whenNull, city);
+            var lambda = Expression.Lambda<Func<TestEntity, string>>(conditional, param);
+
+            Assert.Equal("x => ((x.Address == null) ? null : x.Address.City)", _serializer.Serialize(lambda));
+        }
+
+        [Fact]
+        public void Serializes_DefaultExpression_ValueType()
+        {
+            // Simulates a conditional with a default value type
+            var param = Expression.Parameter(typeof(TestEntity), "x");
+            var address = Expression.Property(param, "Address");
+            var age = Expression.Property(param, "Age");
+            var isNull = Expression.Equal(address, Expression.Constant(null, typeof(Address)));
+            var whenNull = Expression.Default(typeof(int));
+            var conditional = Expression.Condition(isNull, whenNull, age);
+            var lambda = Expression.Lambda<Func<TestEntity, int>>(conditional, param);
+
+            Assert.Equal("x => ((x.Address == null) ? default(int) : x.Age)", _serializer.Serialize(lambda));
         }
     }
 }
