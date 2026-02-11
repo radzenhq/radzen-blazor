@@ -3647,6 +3647,15 @@ namespace Radzen.Blazor
 
             _value = null;
             Data = null;
+            _view = null;
+            _groupedPagedView = null;
+
+            if (Query != null)
+            {
+                Query.GetFilter = null;
+                Query.Filters = null;
+                Query.Sorts = null;
+            }
 
             GC.SuppressFinalize(this);
         }
