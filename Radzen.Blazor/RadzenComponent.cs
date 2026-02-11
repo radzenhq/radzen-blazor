@@ -326,8 +326,6 @@ namespace Radzen
 
             debouncer?.Dispose();
             debouncer = null;
-            reference?.Dispose();
-            reference = null;
 
             if (IsJSRuntimeAvailable && JSRuntime != null && !string.IsNullOrEmpty(UniqueID))
             {
@@ -346,6 +344,9 @@ namespace Radzen
                     JSRuntime.InvokeVoid("Radzen.removeMouseLeave", UniqueID);
                 }
             }
+
+            reference?.Dispose();
+            reference = null;
         }
 
         /// <summary>
