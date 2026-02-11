@@ -1238,6 +1238,12 @@ window.Radzen = {
     rect.width = x ? rect.width + 20 : rect.width;
     rect.height = y ? rect.height + 20 : rect.height;
 
+    var isRTL = Radzen.isRTL(popup);
+
+    if (isRTL && (position == 'bottom' || position == 'top')) {
+      left = parentRect.right - rect.width;
+    }
+
     var smartPosition = !position || position == 'bottom';
 
     if (smartPosition && top + rect.height > window.innerHeight && parentRect.top > rect.height) {
@@ -1278,6 +1284,24 @@ window.Radzen = {
       }
     }
 
+    if (smartPosition && isRTL && left < 0 && window.innerWidth > rect.width) {
+      left = !position ? 0 : rect.left;
+
+      if (position) {
+        top = y || parentRect.top;
+        var tooltipContent = popup.children[0];
+        var tooltipContentClassName = 'rz-' + position + '-tooltip-content';
+        if (tooltipContent.classList.contains(tooltipContentClassName)) {
+          tooltipContent.classList.remove(tooltipContentClassName);
+          tooltipContent.classList.add('rz-right-tooltip-content');
+          position = 'right';
+          if (instance && callback) {
+              try { instance.invokeMethodAsync(callback, position); } catch { }
+          }
+        }
+      }
+    }
+
     if (smartPosition) {
       if (position) {
         top = top + 20;
@@ -1296,7 +1320,7 @@ window.Radzen = {
 
     if (position == 'top') {
       top = parentRect.top - rect.height + 5;
-      left = parentRect.left;
+      left = isRTL ? parentRect.right - rect.width : parentRect.left;
     }
 
     popup.style.zIndex = 2000;
