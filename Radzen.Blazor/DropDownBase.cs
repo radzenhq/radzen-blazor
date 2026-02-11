@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.JSInterop;
 using System;
@@ -1085,6 +1085,10 @@ namespace Radzen
                 {
                     selectedItems.Clear();
                 }
+            }
+            else if (internalValue == null && Multiple && selectedItems.Count > 0)
+            {
+                selectedItems.Clear();
             }
 
                 SelectItemFromValue(internalValue);
