@@ -1016,6 +1016,26 @@ namespace Radzen.Blazor
             }
         }
 
+        /// <inheritdoc />
+        protected override async Task OnFilterInput(ChangeEventArgs args)
+        {
+            ArgumentNullException.ThrowIfNull(args);
+
+            searchText = $"{args.Value}";
+
+            if (FilterAsYouType)
+            {
+                await SearchTextChanged.InvokeAsync(searchText);
+
+                if (ResetSelectedIndexOnFilter)
+                {
+                    selectedIndex = -1;
+                }
+
+                Debounce(DebounceFilter, FilterDelay);
+            }
+        }
+
         /// <summary>
         /// Handles the filter event.
         /// </summary>
