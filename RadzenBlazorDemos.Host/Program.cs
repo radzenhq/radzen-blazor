@@ -15,6 +15,7 @@ using System.IO;
 using Radzen;
 using RadzenBlazorDemos;
 using RadzenBlazorDemos.Data;
+using RadzenBlazorDemos.Host;
 using RadzenBlazorDemos.Services;
 using RadzenBlazorDemos.Host.Services;
 using Microsoft.AspNetCore.Http;
@@ -134,6 +135,8 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseRouting();
+app.UseCanonicalRedirects();
+app.UseTrailingSlashRedirect();
 app.UseAntiforgery();
 app.MapGet("/llms.txt", () =>
 {
