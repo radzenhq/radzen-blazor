@@ -251,11 +251,20 @@ $button-sizes: map-merge(
           &.rz-shade-darker { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker); color: var(--rz-#{$style}-darker); }
         } 
         @else {
-          &.rz-shade-lighter { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-lighter); color: var(--rz-#{$style}-light); }
-          &.rz-shade-light { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-light); color: var(--rz-#{$style}-light); }
-          &.rz-shade-default { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}); color: var(--rz-#{$style}); }
-          &.rz-shade-dark { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-dark); color: var(--rz-#{$style}-dark); }
-          &.rz-shade-darker { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker); color: var(--rz-#{$style}-darker); }
+          // Fluent/Standard dark specific text color overrides for secondary only
+          @if ($fluent == true or $standard == true) and $theme-dark == true and $style == 'secondary' {
+            &.rz-shade-lighter { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-lighter); color: var(--rz-#{$style}-light); }
+            &.rz-shade-light   { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-light);   color: var(--rz-#{$style}-light); }
+            &.rz-shade-default { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style});         color: var(--rz-on-#{$style}); }
+            &.rz-shade-dark    { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-dark);    color: var(--rz-#{$style}-dark); }
+            &.rz-shade-darker  { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker);  color: var(--rz-#{$style}-darker); }
+          } @else {
+            &.rz-shade-lighter { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-lighter); color: var(--rz-#{$style}-light); }
+            &.rz-shade-light { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-light); color: var(--rz-#{$style}-light); }
+            &.rz-shade-default { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}); color: var(--rz-#{$style}); }
+            &.rz-shade-dark { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-dark); color: var(--rz-#{$style}-dark); }
+            &.rz-shade-darker { box-shadow: inset 0 0 0 var(--rz-border-width) var(--rz-#{$style}-darker); color: var(--rz-#{$style}-darker); }
+          }
         }
         background-color: transparent;
 
@@ -302,11 +311,20 @@ $button-sizes: map-merge(
           &.rz-shade-dark { color: var(--rz-#{$style}-dark); }
           &.rz-shade-darker { color: var(--rz-#{$style}-darker); }
         } @else {
-          &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
-          &.rz-shade-light { color: var(--rz-#{$style}-light); }
-          &.rz-shade-default { color: var(--rz-#{$style}); }
-          &.rz-shade-dark { color: var(--rz-#{$style}-dark); }
-          &.rz-shade-darker { color: var(--rz-#{$style}-darker); }
+          // Fluent/Standard dark specific text color overrides for secondary only
+          @if ($fluent == true or $standard == true) and $theme-dark == true and $style == 'secondary' {
+            &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
+            &.rz-shade-light   { color: var(--rz-#{$style}-light); }
+            &.rz-shade-default { color: var(--rz-on-#{$style}); }
+            &.rz-shade-dark    { color: var(--rz-#{$style}-dark); }
+            &.rz-shade-darker  { color: var(--rz-#{$style}-darker); }
+          } @else {
+            &.rz-shade-lighter { color: var(--rz-#{$style}-lighter); }
+            &.rz-shade-light { color: var(--rz-#{$style}-light); }
+            &.rz-shade-default { color: var(--rz-#{$style}); }
+            &.rz-shade-dark { color: var(--rz-#{$style}-dark); }
+            &.rz-shade-darker { color: var(--rz-#{$style}-darker); }
+          }
         }
         background-color: transparent;
         box-shadow: none;
