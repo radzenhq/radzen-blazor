@@ -69,17 +69,11 @@ The Radzen.Blazor library provides a built-in service that persists the current 
 @Host
 @Persist("_Host.cshtml")
         </RadzenTabsItem>
-        <RadzenTabsItem Text=".NET 6">
-@RegisterService
-@MainLayout
-@Host
-@Persist("_Layout.cshtml")
-        </RadzenTabsItem>
     </Tabs>
 </RadzenTabs>
 
 @code {
-    private static readonly string[] versions = ["net8", "net7", "net6"];
+    private static readonly string[] versions = ["net8", "net7"];
 
     private int selectedIndex = 0;
 
@@ -93,6 +87,10 @@ The Radzen.Blazor library provides a built-in service that persists the current 
         base.OnParametersSet();
 
         selectedIndex = Array.IndexOf(versions, CurrentVersion);
+        if (selectedIndex < 0)
+        {
+            selectedIndex = 0;
+        }
     }
 
     private void OnTabChange(int index)

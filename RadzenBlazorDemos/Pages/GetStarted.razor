@@ -19,7 +19,7 @@ More info is available in the <RadzenLink Text="rendering mode article" Path="ht
             </RadzenAlert>
             <RadzenAlert AlertStyle="AlertStyle.Info" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false" class="rz-mb-12">
                 If you have upgraded your application to .NET 8 .NET 9 or .NET 10 follow the getting started instructions for the version you initially used - e.g.
-                <RadzenLink Path="get-started/net7-server" Text=".NET 7" /> or <RadzenLink Path="get-started/net6-server" Text=".NET 6"/>.
+                <RadzenLink Path="get-started/net7-server" Text=".NET 7" />.
 These instructions assume the new application layout which uses rendering modes and was introduced with .NET 8.
             </RadzenAlert>
             @Installation(CurrentVersion)
@@ -74,26 +74,6 @@ These instructions assume the new application layout which uses rendering modes 
             @Additional(CurrentVersion)
             </div>
         </RadzenTabsItem>
-        <RadzenTabsItem Text=".NET 6 Server">
-            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
-            @Installation(CurrentVersion)
-            @Import(CurrentVersion)
-            @IncludeTheme(("_Layout.cshtml", "ServerPrerendered", CurrentVersion))
-            @IncludeJavaScript(("_Layout.cshtml", CurrentVersion))
-            @UseComponent(CurrentVersion)
-            @Additional(CurrentVersion)
-            </div>
-        </RadzenTabsItem>
-        <RadzenTabsItem Text=".NET 6 WebAssembly (hosted)">
-            <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
-            @Installation(CurrentVersion)
-            @Import(CurrentVersion)
-            @IncludeTheme(("_Layout.cshtml", "WebAssemblyPrerendered", CurrentVersion))
-            @IncludeJavaScript(("_Layout.cshtml", CurrentVersion))
-            @UseComponent(CurrentVersion)
-            @Additional(CurrentVersion)
-            </div>
-        </RadzenTabsItem>
         <RadzenTabsItem Text="WebAssembly (standalone)">
             <div class="rz-p-0 rz-p-sm-2 rz-px-lg-12">
             @Installation(CurrentVersion)
@@ -143,7 +123,7 @@ These instructions assume the new application layout which uses rendering modes 
 </RadzenTabs>
 
 @code {
-    private static readonly string[] versions = ["net9", "net7-server", "net7-wasm", "net6-server", "net6-wasm", "wasm", "csp"];
+    private static readonly string[] versions = ["net9", "net7-server", "net7-wasm", "wasm", "csp"];
 
     private int selectedIndex = 0;
 
@@ -157,6 +137,10 @@ These instructions assume the new application layout which uses rendering modes 
         base.OnParametersSet();
 
         selectedIndex = Array.IndexOf(versions, CurrentVersion);
+        if (selectedIndex < 0)
+        {
+            selectedIndex = 0;
+        }
     }
 
     private void OnTabChange(int index)
