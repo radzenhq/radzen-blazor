@@ -195,7 +195,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.Register, args => { clicked = true; });
             });
 
-            component.Find(".rz-secondary").Click();
+            component.Find(".rz-secondary.rz-variant-flat").Click();
 
             Assert.True(clicked);
         }
@@ -215,7 +215,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.ResetPassword, args => { clicked = true; });
             });
 
-            component.Find("button.rz-link").Click();
+            component.Find(".rz-secondary.rz-variant-text").Click();
 
             Assert.True(clicked);
         }
@@ -234,7 +234,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.ResetPassword, args => { clicked = true; });
             });
 
-            component.Find("button.rz-link").Click();
+            component.Find(".rz-secondary.rz-variant-text").Click();
 
             Assert.True(clicked);
         }

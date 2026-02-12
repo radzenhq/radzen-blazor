@@ -33,18 +33,18 @@
             <RadzenStack style="margin-top:1rem;" Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End" Gap="0.5rem">
                 @if(ShowLoginButton)
                 {
-                <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text=@LoginText Click=@OnLogin />
+                <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text=@LoginText Click=@OnLogin />
                 }
                 @if (AllowResetPassword)
                 {
-                    <button type="button" class="rz-link" @onclick=@OnReset>@ResetPasswordText</button>
+                <RadzenButton ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Text=@ResetPasswordText Click=@OnReset />
                 }
             </RadzenStack>
             @if (AllowRegister)
             {
                 <div class="rz-register">
                     @RegisterMessageText
-                    <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" Text=@RegisterText Click=@OnRegister />
+                    <RadzenButton ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Flat" Shade="Shade.Lighter" Text=@RegisterText Click=@OnRegister />
                 </div>
             }
         }
@@ -80,11 +80,11 @@
                 <div class="rz-form-input-wrapper rz-login-buttons">
                     @if (ShowLoginButton)
                     {
-                    <RadzenButton ButtonStyle="ButtonStyle.Primary" ButtonType="ButtonType.Submit" Text=@LoginText Click=@OnLogin />
+                    <RadzenButton ButtonType="ButtonType.Submit" ButtonStyle="ButtonStyle.Primary" Text=@LoginText Click=@OnLogin />
                     }
                     @if (AllowResetPassword)
                     {
-                        <button type="button" class="rz-link" @onclick=@OnReset>@ResetPasswordText</button>
+                    <RadzenButton ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Text" Text=@ResetPasswordText Click=@OnReset />
                     }
                 </div>
             </div>
@@ -93,7 +93,7 @@
         {
             <div class="rz-register">
                 @RegisterMessageText
-                <RadzenButton ButtonType="ButtonType.Button" Variant="Variant.Flat" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter" Text=@RegisterText Click=@OnRegister />
+                <RadzenButton ButtonType="ButtonType.Button" ButtonStyle="ButtonStyle.Secondary" Variant="Variant.Flat" Shade="Shade.Lighter" Text=@RegisterText Click=@OnRegister />
             </div>
         }
         }
