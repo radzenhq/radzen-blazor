@@ -105,12 +105,10 @@ namespace Radzen.Blazor
                 throw new ArgumentException($"Property {propertyName} does not exist");
             }
 
-#if NET6_0_OR_GREATER
             if(PropertyAccess.IsDateOnly(property))
             {
                 return false;
             }
-#endif
             return PropertyAccess.IsDate(property);
         }
 

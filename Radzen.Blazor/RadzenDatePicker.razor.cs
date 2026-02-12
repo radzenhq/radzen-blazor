@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
@@ -356,13 +356,11 @@ namespace Radzen.Blazor
 
             UpdateYearsAndMonths(Min, Max);
 
-#if NET6_0_OR_GREATER
             if (typeof(TValue) == typeof(TimeOnly) || typeof(TValue) == typeof(TimeOnly?))
             {
                 TimeOnly = true;
                 ShowTime = true;
             }
-#endif
         }
 
         void UpdateYearsAndMonths(DateTime? min, DateTime? max)
@@ -541,7 +539,6 @@ namespace Radzen.Blazor
                             _value = dtEnum;
                             _dateTimeValue = selectedDates.LastOrDefault();
                         }
-#if NET6_0_OR_GREATER
                         else if (value is IEnumerable<DateTime?> ndtEnum)
                         {
                             selectedDates = ndtEnum.Where(d => d.HasValue && d.Value != default(DateTime))
@@ -552,19 +549,6 @@ namespace Radzen.Blazor
                             _value = ndtEnum;
                             _dateTimeValue = selectedDates.LastOrDefault();
                         }
-#else
-                        else if (value is IEnumerable<System.Nullable<DateTime>> ndtEnum)
-                        {
-                            selectedDates = ndtEnum.Where(d => d.HasValue && d.Value != default(DateTime))
-                                .Select(d => DateTime.SpecifyKind(d.Value.Date, Kind))
-                                .Distinct()
-                                .OrderBy(d => d)
-                                .ToList();
-                            _value = ndtEnum;
-                            _dateTimeValue = selectedDates.LastOrDefault();
-                        }
-#endif
-#if NET6_0_OR_GREATER
                         else if (value is IEnumerable<DateOnly> doEnum)
                         {
                             selectedDates = doEnum.Select(d => d.ToDateTime(System.TimeOnly.MinValue, Kind).Date)
@@ -574,7 +558,6 @@ namespace Radzen.Blazor
                             _value = doEnum;
                             _dateTimeValue = selectedDates.LastOrDefault();
                         }
-#endif
                         else if (value is IEnumerable<DateTimeOffset?> dtoEnum)
                         {
                             selectedDates = dtoEnum.Where(o => o.HasValue)
@@ -600,7 +583,6 @@ namespace Radzen.Blazor
                             _value = dtoEnum;
                             _dateTimeValue = selectedDates.LastOrDefault();
                         }
-#if NET6_0_OR_GREATER
                         else if (value is IEnumerable<DateOnly?> doNullableEnum)
                         {
                             selectedDates = doNullableEnum.Where(d => d.HasValue)
@@ -623,7 +605,6 @@ namespace Radzen.Blazor
                             _value = toNullableEnum;
                             _dateTimeValue = selectedDates.LastOrDefault();
                         }
-#endif
                         else if (value is DateTime dt && dt != default(DateTime))
                         {
                             selectedDates = new List<DateTime> { DateTime.SpecifyKind(dt.Date, Kind) };
@@ -665,7 +646,6 @@ namespace Radzen.Blazor
                             {
                                 _dateTimeValue = DateTime.SpecifyKind(dateTime, Kind);
                             }
-#if NET6_0_OR_GREATER
                             else if (value is DateOnly dateOnly)
                             {
                                 _dateTimeValue = dateOnly.ToDateTime(System.TimeOnly.MinValue, Kind);
@@ -675,7 +655,6 @@ namespace Radzen.Blazor
                                 _dateTimeValue = new DateTime(CurrentDate.Year, CurrentDate.Month, CurrentDate.Day, timeOnly.Hour, timeOnly.Minute, timeOnly.Second, timeOnly.Millisecond, Kind);
                                 _currentDate = _dateTimeValue.Value;
                             }
-#endif
                             else
                             {
                                 _dateTimeValue = null;
@@ -690,7 +669,6 @@ namespace Radzen.Blazor
 
         private static object? ConvertToTValue(object? value)
         {
-#if NET6_0_OR_GREATER
             var typeofTValue = typeof(TValue);
             if (value is DateTime dt)
             {
@@ -705,7 +683,6 @@ namespace Radzen.Blazor
                     return (TValue)value;
                 }
             }
-#endif
             return value;
         }
 
@@ -1385,18 +1362,10 @@ namespace Radzen.Blazor
                 }
                 newValue = list;
             }
-#if NET6_0_OR_GREATER
             else if (typeof(IEnumerable<DateTime?>).IsAssignableFrom(typeofTValue))
             {
                 newValue = selectedDates.Select(d => (DateTime?)d).ToList();
             }
-#else
-            else if (typeof(System.Collections.Generic.IEnumerable<System.Nullable<DateTime>>).IsAssignableFrom(typeofTValue))
-            {
-                newValue = selectedDates.Select(d => (DateTime?)d).ToList();
-            }
-#endif
-#if NET6_0_OR_GREATER
             else if (typeof(IEnumerable<DateOnly>).IsAssignableFrom(typeofTValue))
             {
                 newValue = selectedDates.Select(d => DateOnly.FromDateTime(d)).ToList();
@@ -1409,7 +1378,6 @@ namespace Radzen.Blazor
             {
                 newValue = selectedDates.Select(d => (TimeOnly?)new TimeOnly(d.Hour, d.Minute, d.Second, d.Millisecond)).ToList();
             }
-#endif
             else
             {
                 newValue = selectedDates.ToList();

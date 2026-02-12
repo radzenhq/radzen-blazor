@@ -38,9 +38,7 @@ namespace Radzen.Blazor
     /// &lt;/RadzenPivotDataGrid&gt;
     /// </code>
     /// </example>
-#if NET6_0_OR_GREATER
     [CascadingTypeParameter(nameof(TItem))]
-#endif
     public partial class RadzenPivotDataGrid<TItem> : PagedDataBoundComponent<TItem>
     {
         private class RowHeaderCell

@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections;
@@ -1653,12 +1653,10 @@ namespace Radzen.Blazor
         /// </summary>
         public virtual bool ShowTimeForDateTimeFilter()
         {
-#if NET6_0_OR_GREATER
             if (FilterPropertyType == typeof(DateOnly))
             {
                 return false;
             }
-#endif
             return true;
         }
 

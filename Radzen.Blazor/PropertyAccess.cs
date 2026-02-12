@@ -115,12 +115,10 @@ public static class PropertyAccess
         {
             return true;
         }
-#if NET6_0_OR_GREATER
         if (type == typeof(DateOnly))
         {
             return true;
         }
-#endif
         return false;
     }
 
@@ -134,12 +132,10 @@ public static class PropertyAccess
         if (source == null) return false;
         var type = source.IsGenericType ? source.GetGenericArguments()[0] : source;
 
-#if NET6_0_OR_GREATER
         if (type == typeof(DateOnly))
         {
             return true;
         }
-#endif
         return false;
     }
 
@@ -151,9 +147,7 @@ public static class PropertyAccess
     public static object? DateOnlyFromDateTime(DateTime source)
     {
         object? result = null;
-#if NET6_0_OR_GREATER
         result = DateOnly.FromDateTime(source);
-#endif
         return result;
     }
 
