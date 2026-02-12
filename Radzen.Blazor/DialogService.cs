@@ -104,7 +104,7 @@ namespace Radzen
         /// <summary>
         /// Occurs when a new dialog is open.
         /// </summary>
-        public event Action<string?, Type, Dictionary<string, object>, DialogOptions>? OnOpen;
+        public event Action<string?, Type, Dictionary<string, object?>, DialogOptions>? OnOpen;
 
         /// <summary>
         /// Raises the Close event for the side dialog
@@ -114,7 +114,7 @@ namespace Radzen
         /// <summary>
         /// Raises the Open event for the side dialog
         /// </summary>
-        public event Action<Type, Dictionary<string, object>, SideDialogOptions>? OnSideOpen;
+        public event Action<Type, Dictionary<string, object?>, SideDialogOptions>? OnSideOpen;
 
         /// <summary>
         /// Opens a dialog with the specified arguments.
@@ -123,7 +123,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the dialog.</param>
         /// <param name="parameters">The dialog parameters.</param>
         /// <param name="options">The dialog options.</param>
-        public virtual void Open<T>(string title, Dictionary<string, object>? parameters = null, DialogOptions? options = null) where T : ComponentBase
+        public virtual void Open<T>(string title, Dictionary<string, object?>? parameters = null, DialogOptions? options = null) where T : ComponentBase
         {
             OpenDialog<T>(title, parameters, options);
         }
@@ -135,7 +135,7 @@ namespace Radzen
         /// <param name="componentType">The type of the component to be displayed in the dialog. Must inherit from <see cref="ComponentBase"/>.</param>
         /// <param name="parameters">The dialog parameters.</param>
         /// <param name="options">The dialog options.</param>
-        public virtual void Open(string title, Type componentType, Dictionary<string, object>? parameters = null, DialogOptions? options = null)
+        public virtual void Open(string title, Type componentType, Dictionary<string, object?>? parameters = null, DialogOptions? options = null)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(componentType))
             {
@@ -173,7 +173,7 @@ namespace Radzen
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T" />.</param>
         /// <param name="options">The dialog options.</param>
         /// <returns>The value passed as argument to <see cref="Close" />.</returns>
-        public virtual Task<dynamic> OpenAsync<T>(string title, Dictionary<string, object>? parameters = null, DialogOptions? options = null) where T : ComponentBase
+        public virtual Task<dynamic> OpenAsync<T>(string title, Dictionary<string, object?>? parameters = null, DialogOptions? options = null) where T : ComponentBase
         {
             var task = new TaskCompletionSource<dynamic>();
             tasks.Add(task);
@@ -192,7 +192,7 @@ namespace Radzen
         /// <param name="options">The dialog options.</param>
         /// <returns>A task that represents the result passed as an argument to <see cref="Close"/>.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
-        public virtual Task<dynamic> OpenAsync(string title, Type componentType, Dictionary<string, object>? parameters = null, DialogOptions? options = null)
+        public virtual Task<dynamic> OpenAsync(string title, Type componentType, Dictionary<string, object?>? parameters = null, DialogOptions? options = null)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(componentType))
             {
@@ -222,7 +222,7 @@ namespace Radzen
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T"/></param>
         /// <param name="options">The side dialog options.</param>
         /// <returns>A task that completes when the dialog is closed or a new one opened</returns>
-        public Task<dynamic> OpenSideAsync<T>(string title, Dictionary<string, object>? parameters = null, SideDialogOptions? options = null)
+        public Task<dynamic> OpenSideAsync<T>(string title, Dictionary<string, object?>? parameters = null, SideDialogOptions? options = null)
             where T : ComponentBase
         {
             CloseSide();
@@ -233,7 +233,7 @@ namespace Radzen
             }
 
             options.Title = title;
-            OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
+            OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object?>(), options);
             return sideDialogResultTask.Task;
         }
 
@@ -246,7 +246,7 @@ namespace Radzen
         /// <param name="options">The side dialog options.</param>
         /// <returns>A task that represents the result passed as an argument to <see cref="CloseSide"/>.</returns>
         /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
-        public Task<dynamic> OpenSideAsync(string title, Type componentType, Dictionary<string, object>? parameters = null, SideDialogOptions? options = null)
+        public Task<dynamic> OpenSideAsync(string title, Type componentType, Dictionary<string, object?>? parameters = null, SideDialogOptions? options = null)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(componentType))
             {
@@ -262,7 +262,7 @@ namespace Radzen
             }
 
             options.Title = title;
-            OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
+            OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object?>(), options);
 
             return sideDialogResultTask.Task;
         }
@@ -275,7 +275,7 @@ namespace Radzen
         /// <param name="title">The text displayed in the title bar of the side dialog.</param>
         /// <param name="parameters">The dialog parameters. Passed as property values of <typeparamref name="T"/></param>
         /// <param name="options">The side dialog options.</param>
-        public void OpenSide<T>(string title, Dictionary<string, object>? parameters = null, SideDialogOptions? options = null)
+        public void OpenSide<T>(string title, Dictionary<string, object?>? parameters = null, SideDialogOptions? options = null)
             where T : ComponentBase
         {
             CloseSide();
@@ -286,7 +286,7 @@ namespace Radzen
             }
 
             options.Title = title;
-            OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object>(), options);
+            OnSideOpen?.Invoke(typeof(T), parameters ?? new Dictionary<string, object?>(), options);
         }
 
         /// <summary>
@@ -297,7 +297,7 @@ namespace Radzen
         /// <param name="parameters">The dialog parameters, passed as property values of the specified component.</param>
         /// <param name="options">The side dialog options.</param>
         /// <exception cref="ArgumentException">Thrown if <paramref name="componentType"/> does not inherit from <see cref="ComponentBase"/>.</exception>
-        public void OpenSide(string title, Type componentType, Dictionary<string, object>? parameters = null, SideDialogOptions? options = null)
+        public void OpenSide(string title, Type componentType, Dictionary<string, object?>? parameters = null, SideDialogOptions? options = null)
         {
             if (!typeof(ComponentBase).IsAssignableFrom(componentType))
             {
@@ -312,7 +312,7 @@ namespace Radzen
             }
 
             options.Title = title;
-            OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object>(), options);
+            OnSideOpen?.Invoke(componentType, parameters ?? new Dictionary<string, object?>(), options);
         }
 
 
@@ -424,13 +424,13 @@ namespace Radzen
         /// </summary>
         protected List<object> dialogs = new List<object>();
 
-        internal void OpenDialog<T>(string? title, Dictionary<string, object>? parameters, DialogOptions? options)
+        internal void OpenDialog<T>(string? title, Dictionary<string, object?>? parameters, DialogOptions? options)
         {
             dialogs.Add(new object());
 
             // Validate and set default values for the dialog options
             options ??= new();
-            parameters ??= new Dictionary<string, object>();
+            parameters ??= new Dictionary<string, object?>();
             options.Width = !String.IsNullOrEmpty(options.Width) ? options.Width : "600px";
             options.Left = !String.IsNullOrEmpty(options.Left) ? options.Left : "";
             options.Top = !String.IsNullOrEmpty(options.Top) ? options.Top : "";
@@ -1382,13 +1382,13 @@ namespace Radzen
             }
         }
 
-        private Dictionary<string, object>? parameters;
+        private Dictionary<string, object?>? parameters;
 
         /// <summary>
         /// Gets or sets the parameters.
         /// </summary>
         /// <value>The parameters.</value>
-        public Dictionary<string, object>? Parameters
+        public Dictionary<string, object?>? Parameters
         {
             get => parameters;
             set
