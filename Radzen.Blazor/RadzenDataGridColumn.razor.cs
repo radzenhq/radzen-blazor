@@ -188,79 +188,93 @@ namespace Radzen.Blazor
             if (Grid != null)
             {
                 Grid.AddColumn(this);
+            }
+        }
 
-                var canSetFilterPropertyType = (FilterMode ?? Grid.FilterMode) == Radzen.FilterMode.CheckBoxList && FilterTemplate == null;
+        private void SetColumnDefaults()
+        {
+            var canSetFilterPropertyType = (FilterMode ?? Grid.FilterMode) == Radzen.FilterMode.CheckBoxList && FilterTemplate == null;
 
-                if (canSetFilterPropertyType)
+            if (canSetFilterPropertyType)
+            {
+                if (Type == null)
                 {
-                    if (Type == null)
-                    {
-                        var fp = GetFilterProperty();
-                        var pt = !string.IsNullOrEmpty(fp) ?
-                                PropertyAccess.GetPropertyType(typeof(TItem), fp) : typeof(object);
+                    var fp = GetFilterProperty();
+                    var pt = !string.IsNullOrEmpty(fp) ?
+                            PropertyAccess.GetPropertyType(typeof(TItem), fp) : typeof(object);
 
-                        _filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt!);
-                    }
-
-                    if (GetFilterOperator() == FilterOperator.Equals)
-                    {
-                        SetFilterOperator(FilterOperator.Contains);
-                    }
-
-                    Grid.FilterPopupRenderMode = PopupRenderMode.OnDemand;
+                    _filterPropertyType = typeof(IEnumerable<>).MakeGenericType(pt!);
                 }
 
-                var property = GetFilterProperty();
-
-                if (!string.IsNullOrEmpty(property) && Type == null)
-                {
-                    _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
-                }
-
-                if (!string.IsNullOrEmpty(property) && Type == null && !canSetFilterPropertyType)
-                {
-                    _filterPropertyType = _propertyType;
-                }
-
-                if (_filterPropertyType == null)
-                {
-                    _filterPropertyType = Type;
-                }
-                else if (!string.IsNullOrEmpty(Property))
-                {
-                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
-                }
-
-                if (!string.IsNullOrEmpty(Property) && (typeof(TItem).IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(typeof(TItem).GetGenericTypeDefinition()) ||
-                    typeof(IDictionary).IsAssignableFrom(typeof(TItem)) || typeof(System.Data.DataRow).IsAssignableFrom(typeof(TItem))))
-                {
-                    propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
-                }
-
-                if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null && _filterOperator == null)
+                if (GetFilterOperator() == FilterOperator.Equals)
                 {
                     SetFilterOperator(FilterOperator.Contains);
                 }
 
-                if (!string.IsNullOrEmpty(Property) && !string.IsNullOrEmpty(FilterProperty))
-                    UniqueID = $"{Property}.{FilterProperty}"; // To be sure the column uniqueID is unique even when filtering on sub property.
-                else
-                    UniqueID = !string.IsNullOrEmpty(Property) ? Property : FilterProperty;
-                
-                if (UseDisplayName && !string.IsNullOrEmpty(Property))
+                Grid.FilterPopupRenderMode = PopupRenderMode.OnDemand;
+            }
+
+            var property = GetFilterProperty();
+
+            if (!string.IsNullOrEmpty(property) && Type == null)
+            {
+                _propertyType = PropertyAccess.GetPropertyType(typeof(TItem), property);
+            }
+
+            if (!string.IsNullOrEmpty(property) && Type == null && !canSetFilterPropertyType)
+            {
+                _filterPropertyType = _propertyType;
+            }
+
+            if (_filterPropertyType == null)
+            {
+                _filterPropertyType = Type;
+            }
+            else if (!string.IsNullOrEmpty(Property))
+            {
+                propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
+            }
+
+            if (!string.IsNullOrEmpty(Property) && (typeof(TItem).IsGenericType && typeof(IDictionary<,>).IsAssignableFrom(typeof(TItem).GetGenericTypeDefinition()) ||
+                typeof(IDictionary).IsAssignableFrom(typeof(TItem)) || typeof(System.Data.DataRow).IsAssignableFrom(typeof(TItem))))
+            {
+                propertyValueGetter = PropertyAccess.Getter<TItem, object>(Property);
+            }
+
+            if (_filterPropertyType == typeof(string) && filterOperator != FilterOperator.Custom && filterOperator == null && _filterOperator == null)
+            {
+                SetFilterOperator(FilterOperator.Contains);
+            }
+
+            if (!string.IsNullOrEmpty(Property) && !string.IsNullOrEmpty(FilterProperty))
+                UniqueID = $"{Property}.{FilterProperty}"; // To be sure the column uniqueID is unique even when filtering on sub property.
+            else
+                UniqueID = !string.IsNullOrEmpty(Property) ? Property : FilterProperty;
+
+            if (UseDisplayName && !string.IsNullOrEmpty(Property))
+            {
+                var propInfo = typeof(TItem).GetProperty(Property);
+                if (propInfo != null)
                 {
-                    var propInfo = typeof(TItem).GetProperty(Property);
-                    if (propInfo != null)
+                    var displayAttr = propInfo.GetCustomAttributes(typeof(DisplayAttribute), true)
+                        .FirstOrDefault() as DisplayAttribute;
+                    if (displayAttr?.Name != null)
                     {
-                        var displayAttr = propInfo.GetCustomAttributes(typeof(DisplayAttribute), true)
-                            .FirstOrDefault() as DisplayAttribute;
-                        if (displayAttr?.Name != null)
-                        {
-                            Title = displayAttr.Name;
-                        }
+                        Title = displayAttr.Name;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Called when the component has received parameters from its parent in the render tree.
+        /// Override this method to perform additional processing whenever parameters are set.
+        /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        protected override async Task OnParametersSetAsync()
+        {
+            SetColumnDefaults();
+            await base.OnParametersSetAsync();
         }
         
         int? orderIndex;
