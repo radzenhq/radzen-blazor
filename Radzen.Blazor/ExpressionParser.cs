@@ -414,6 +414,11 @@ public class ExpressionParser
                 return ParseStaticMemberAccess(type, parameter);
             }
 
+            if (TryParseQualifiedType(out var qualifiedType))
+            {
+                return ParseStaticMemberAccess(qualifiedType, parameter);
+            }
+
             if (Peek(1).Type == TokenType.OpenParen)
             {
                 Advance(1);
@@ -542,19 +547,10 @@ public class ExpressionParser
                 else
                 {
                     Type? elementType = null;
-                    var nullable = false;
 
-                    if (token.Type == TokenType.Identifier)
+                    if (TryParseQualifiedArrayType(out var parsedElementType))
                     {
-                        var typeName = token.Value;
-                        elementType = GetWellKnownType(typeName);
-                        Advance(1);
-
-                        if (Peek().Type == TokenType.QuestionMark)
-                        {
-                            nullable = true;
-                            Advance(1);
-                        }
+                        elementType = parsedElementType;
                     }
 
                     Expect(TokenType.OpenBracket);
@@ -583,11 +579,6 @@ public class ExpressionParser
                     if (elementType == null)
                     {
                         elementType = elements.Count > 0 ? elements[0].Type : typeof(object);
-                    }
-
-                    if (nullable)
-                    {
-                        elementType = typeof(Nullable<>).MakeGenericType(elementType);
                     }
 
                     return Expression.NewArrayInit(elementType, elements.Select(e => ConvertIfNeeded(e, elementType)));
@@ -653,7 +644,7 @@ public class ExpressionParser
         {
             var name = typeName.ToString();
 
-            var type = GetWellKnownType(name) ?? typeResolver?.Invoke(name) ?? throw new InvalidOperationException($"Could not resolve type: {typeName}");
+            var type = ResolveType(name) ?? throw new InvalidOperationException($"Could not resolve type: {typeName}");
 
             if (nullable && type.IsValueType)
             {
@@ -727,6 +718,156 @@ public class ExpressionParser
         var method = type.GetMethod(methodName, [.. arguments.Select(a => a.Type)]) ?? throw new InvalidOperationException($"Method {methodName} not found on type {type.Name}");
 
         return Expression.Call(null, method, arguments);
+    }
+
+    /// <summary>
+    /// Tries to parse a qualified type name (e.g. System.DateTime or System.DateTime?) and returns the resolved type.
+    /// Advances position past the type name. The next token will be . for member access or [ for array.
+    /// Uses backtracking to find the longest resolvable type prefix (e.g. System.DateTime in System.DateTime.SpecifyKind).
+    /// </summary>
+    private bool TryParseQualifiedType(out Type type)
+    {
+        type = null!;
+
+        var token = Peek();
+        if (token.Type != TokenType.Identifier)
+        {
+            return false;
+        }
+
+        var startPosition = position;
+        var parts = new List<string> { token.Value };
+        Advance(1);
+
+        while (Peek().Type == TokenType.Dot)
+        {
+            Advance(1);
+            token = Peek();
+            if (token.Type != TokenType.Identifier)
+            {
+                return false;
+            }
+            parts.Add(token.Value);
+            Advance(1);
+        }
+
+        var nullable = false;
+        if (Peek().Type == TokenType.QuestionMark)
+        {
+            nullable = true;
+            Advance(1);
+        }
+
+        for (var i = parts.Count; i >= 1; i--)
+        {
+            var typeName = string.Join(".", parts.Take(i));
+            var resolvedType = ResolveType(typeName);
+            if (resolvedType != null)
+            {
+                if (nullable && resolvedType.IsValueType)
+                {
+                    resolvedType = typeof(Nullable<>).MakeGenericType(resolvedType);
+                }
+
+                position = startPosition;
+                var tokensToConsume = (i * 2) - 1 + (nullable ? 1 : 0);
+                for (var t = 0; t < tokensToConsume; t++)
+                {
+                    Advance(1);
+                }
+
+                type = resolvedType;
+                return true;
+            }
+        }
+
+        position = startPosition;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to parse a qualified array element type (e.g. System.DateTime? or DateTime) before [].
+    /// Advances position past the type name to the [. Returns the element type for the array.
+    /// </summary>
+    private bool TryParseQualifiedArrayType(out Type? elementType)
+    {
+        elementType = null;
+
+        var token = Peek();
+        if (token.Type != TokenType.Identifier)
+        {
+            return false;
+        }
+
+        var startPosition = position;
+        var parts = new List<string> { token.Value };
+        Advance(1);
+
+        while (Peek().Type == TokenType.Dot)
+        {
+            Advance(1);
+            token = Peek();
+            if (token.Type != TokenType.Identifier)
+            {
+                position = startPosition;
+                return false;
+            }
+            parts.Add(token.Value);
+            Advance(1);
+        }
+
+        var nullable = false;
+        if (Peek().Type == TokenType.QuestionMark)
+        {
+            nullable = true;
+            Advance(1);
+        }
+
+        if (Peek().Type != TokenType.OpenBracket)
+        {
+            position = startPosition;
+            return false;
+        }
+
+        for (var i = parts.Count; i >= 1; i--)
+        {
+            var typeName = string.Join(".", parts.Take(i));
+            var resolvedType = ResolveType(typeName);
+            if (resolvedType != null)
+            {
+                if (nullable && resolvedType.IsValueType)
+                {
+                    resolvedType = typeof(Nullable<>).MakeGenericType(resolvedType);
+                }
+                elementType = resolvedType;
+                return true;
+            }
+        }
+
+        position = startPosition;
+        return false;
+    }
+
+    /// <summary>
+    /// Resolves a type name using well-known types, the optional type resolver, or by searching loaded assemblies.
+    /// This allows any type from loaded assemblies to be resolved without hardcoding.
+    /// </summary>
+    private Type? ResolveType(string typeName)
+    {
+        return GetWellKnownType(typeName)
+            ?? typeResolver?.Invoke(typeName)
+            ?? ResolveTypeFromAssemblies(typeName);
+    }
+
+    private static Type? ResolveTypeFromAssemblies(string typeName)
+    {
+        return AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(a => a.GetTypes())
+            .FirstOrDefault(t =>
+            {
+                var fullName = t.FullName;
+                return fullName != null && fullName.Replace("+", ".", StringComparison.Ordinal) == typeName;
+            });
     }
 
     private static Type? GetWellKnownType(string typeName)

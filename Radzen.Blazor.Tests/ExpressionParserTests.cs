@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -1024,6 +1024,36 @@ public class ExpressionParserTests
         var func = expression.Compile();
 
         Assert.True(func(new Person { BirthDate = DateTime.Parse("5/5/2000 12:00:00 AM") }));
+    }
+
+    class EmployeeWithHireDate
+    {
+        public DateTime? HireDate { get; set; }
+        public DateOnly? HireDateOnly { get; set; }
+    }
+
+    [Fact]
+    public void Should_SupportNullableDateTimeArrayWithSpecifyKindAndNullableProperty()
+    {
+        var predicate = "x => new System.DateTime?[] { DateTime.SpecifyKind(DateTime.Parse(\"2012-04-01\", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind), DateTimeKind.Unspecified) }.Contains((x.HireDate ?? null))";
+        var expression = ExpressionParser.ParsePredicate<EmployeeWithHireDate>(predicate);
+        var func = expression.Compile();
+
+        var hireDate = DateTime.SpecifyKind(DateTime.Parse("2012-04-01", System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.RoundtripKind), DateTimeKind.Unspecified);
+        Assert.True(func(new EmployeeWithHireDate { HireDate = hireDate }));
+        Assert.False(func(new EmployeeWithHireDate { HireDate = DateTime.Parse("2013-01-01") }));
+    }
+
+    [Fact]
+    public void Should_SupportNullableDateOnlyArrayAndNullableProperty()
+    {
+        var predicate = "x => new System.DateOnly?[] { DateOnly.Parse(\"2012-04-01\") }.Contains((x.HireDateOnly ?? null))";
+        var expression = ExpressionParser.ParsePredicate<EmployeeWithHireDate>(predicate);
+        var func = expression.Compile();
+
+        var hireDate = DateOnly.Parse("2012-04-01");
+        Assert.True(func(new EmployeeWithHireDate { HireDateOnly = hireDate }));
+        Assert.False(func(new EmployeeWithHireDate { HireDateOnly = DateOnly.Parse("2013-01-01") }));
     }
 
     [Fact]
