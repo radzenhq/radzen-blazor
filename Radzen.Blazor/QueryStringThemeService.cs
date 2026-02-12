@@ -38,9 +38,7 @@ namespace Radzen
         private readonly NavigationManager navigationManager;
         private readonly ThemeService themeService;
 
-#if NET7_0_OR_GREATER
         private readonly IDisposable? registration;
-#endif
         private readonly QueryStringThemeServiceOptions? options;
         private readonly PropertyInfo? hasAttachedJSRuntimeProperty;
 
@@ -74,7 +72,6 @@ namespace Radzen
 
             themeService.ThemeChanged += OnThemeChanged;
 
-#if NET7_0_OR_GREATER
             try
             {
                 registration = navigationManager.RegisterLocationChangingHandler(OnLocationChanging);
@@ -86,14 +83,12 @@ namespace Radzen
                 // avoid calling NavigateTo which would cause a 302 redirect during prerendering.
                 themeService.ThemeChanged -= OnThemeChanged;
             }
-#endif
         }
 
         private bool RequiresChange((string? theme, bool? wcag, bool? rightToLeft) state) =>
             (state.theme != null && !string.Equals(themeService.Theme, state.theme, StringComparison.OrdinalIgnoreCase)) ||
             themeService.Wcag != state.wcag || themeService.RightToLeft != state.rightToLeft;
 
-#if NET7_0_OR_GREATER
         private ValueTask OnLocationChanging(LocationChangingContext context)
         {
             var state = GetStateFromQueryString(context.TargetLocation);
@@ -107,7 +102,6 @@ namespace Radzen
 
             return ValueTask.CompletedTask;
         }
-#endif
 
         private (string? theme, bool? wcag, bool? rightToLeft) GetStateFromQueryString(string uri)
         {
@@ -158,9 +152,7 @@ namespace Radzen
         {
             themeService.ThemeChanged -= OnThemeChanged;
 
-#if NET7_0_OR_GREATER
             registration?.Dispose();
-#endif
 
             GC.SuppressFinalize(this);
         }

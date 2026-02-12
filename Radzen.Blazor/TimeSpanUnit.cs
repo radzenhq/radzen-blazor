@@ -28,13 +28,10 @@ public enum TimeSpanUnit
     /// <summary>
     /// Millisecond.
     /// </summary>
-    Millisecond = 4
-#if NET7_0_OR_GREATER
-    ,
+    Millisecond = 4,
     /// <summary>
     /// Microsecond.
     /// </summary>
     Microsecond = 5
-#endif
 }
 

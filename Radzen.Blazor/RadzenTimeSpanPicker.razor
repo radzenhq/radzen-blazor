@@ -1,4 +1,4 @@
-﻿@using Radzen
+@using Radzen
 @using Radzen.Blazor.Rendering
 @using Microsoft.AspNetCore.Components.Forms
 @using System.Linq.Expressions
@@ -88,11 +88,9 @@
                     @RenderUnitField(TimeSpanUnit.Millisecond, MillisecondsUnitText, "ms", UnconfirmedValue.Milliseconds, MillisecondsStep ?? "", "000")
 
                     @{
-                    #if NET7_0_OR_GREATER
                         {
                             @RenderUnitField(TimeSpanUnit.Microsecond, MicrosecondsUnitText, "us", UnconfirmedValue.Microseconds, MicrosecondsStep ?? "", "000")
                         }
-                    #endif
                     }
                 </div>
 

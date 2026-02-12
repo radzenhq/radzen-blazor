@@ -118,7 +118,6 @@ namespace Radzen.Blazor
             _ => false
         };
 
-#if NET7_0_OR_GREATER
         private TNum SumFloating<TNum>(TNum value1, TNum value2)
         {
             ArgumentNullException.ThrowIfNull(value1);
@@ -174,7 +173,6 @@ namespace Radzen.Blazor
 
             return newValue;
         }
-#endif
 
         async System.Threading.Tasks.Task UpdateValueWithStep(bool stepUp)
         {
@@ -186,7 +184,6 @@ namespace Radzen.Blazor
             var step = string.IsNullOrEmpty(Step) || Step == "any" ? 1 : decimal.Parse(Step.Replace(",", ".", StringComparison.Ordinal), System.Globalization.CultureInfo.InvariantCulture);
             TValue? newValue;
 
-#if NET7_0_OR_GREATER
             if (IsNumericType(Value))
             {
                 // cannot call UpdateValueWithStepNumeric directly because TValue is not value type constrained
@@ -196,7 +193,6 @@ namespace Radzen.Blazor
                 newValue = dynamicWrapper(Value, stepUp, step);
             }
             else
-#endif
             {
                 var valueToUpdate = ConvertToDecimal(Value);
 

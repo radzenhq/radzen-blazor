@@ -1,32 +1,14 @@
-﻿@using Radzen
-@using Microsoft.AspNetCore.Components.Forms
 @inherits FormComponent<string>
 @if (Visible)
 {
     if (Immediate)
     {
-        @RenderImmediateTextArea()
+        <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
+            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" @bind:get="@Value" @bind:set="@SetValue" @bind:event="oninput" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
     }
     else
     {
         <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-                  placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
-    }
-}
-
-@code {
-    internal RenderFragment RenderImmediateTextArea()
-    {
-#if NET7_0_OR_GREATER
-        return __builder => {
-            <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" @bind:get="@Value" @bind:set="@SetValue" @bind:event="oninput" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
-        };
-#else
-        return __builder => {
-            <textarea @ref="@Element" id="@GetId()" disabled="@Disabled" readonly="@ReadOnly" name="@Name" rows="@Rows" cols="@Cols" style="@Style" @attributes="Attributes" class="@GetCssClass()"
-                      placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @oninput="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
-        };
-#endif
+            placeholder="@CurrentPlaceholder" maxlength="@MaxLength" value="@Value" @onchange="@OnChange" tabindex="@(Disabled ? "-1" : $"{TabIndex}")"></textarea>
     }
 }
