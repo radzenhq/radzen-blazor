@@ -119,7 +119,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.AllowResetPassword, true);
             });
 
-            Assert.Contains(@$"Forgot password?</button>", component.Markup);
+            Assert.Contains(@$"Forgot password?</span>", component.Markup);
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace Radzen.Blazor.Tests
                 parameters.Add(p => p.ResetPasswordText, "Test");
             });
 
-            Assert.Contains(@$"Test</button>", component.Markup);
+            Assert.Contains(@$"Test</span>", component.Markup);
         }
 
         [Fact]
