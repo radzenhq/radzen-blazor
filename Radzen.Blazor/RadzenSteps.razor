@@ -63,13 +63,13 @@
     {
     <div class="rz-steps-buttons">
         <button type="button" id="@(GetId() + "prev")" title="@PreviousTitle" aria-label="@PreviousAriaLabel"
-           class='@($"rz-steps-prev {(IsFirstVisibleStep() ?  "rz-state-disabled" : "")}")'
-           disabled="@(IsFirstVisibleStep())" aria-disabled="@(IsFirstVisibleStep())"
+           class='@($"rz-steps-prev {(IsFirstVisibleStep() || IsPrevStepDisabled() ?  "rz-state-disabled" : "")}")'
+           disabled="@(IsFirstVisibleStep() || IsPrevStepDisabled())" aria-disabled="@(IsFirstVisibleStep() || IsPrevStepDisabled())"
            @onkeypress="@(args => OnKeyPress(args, PrevStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
            @onclick="@PrevStep"><span class="notranslate rzi"></span>@PreviousText</button>
         <button type="button" id="@(GetId() + "next")" title="@NextTitle" aria-label="@NextAriaLabel"
-           class='@($"rz-steps-next {(IsLastVisibleStep() ?  "rz-state-disabled" : "")}")' 
-           disabled="@(IsLastVisibleStep())" aria-disabled="@(IsLastVisibleStep())"
+           class='@($"rz-steps-next {(IsLastVisibleStep() || IsNextStepDisabled() ?  "rz-state-disabled" : "")}")'
+           disabled="@(IsLastVisibleStep() || IsNextStepDisabled())" aria-disabled="@(IsLastVisibleStep() || IsNextStepDisabled())"
            @onkeypress="@(args => OnKeyPress(args, NextStep()))" @onkeypress:preventDefault=preventKeyPress @onkeypress:stopPropagation
            @onclick="@NextStep">@NextText<span class="notranslate rzi"></span></button>
     </div>
