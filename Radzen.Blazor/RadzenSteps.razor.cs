@@ -95,6 +95,40 @@ namespace Radzen.Blazor
             return false;
         }
 
+        bool IsNextStepDisabled()
+        {
+            var nextIndex = SelectedIndex + 1;
+            while (nextIndex < steps.Count)
+            {
+                if (!steps[nextIndex].Visible)
+                {
+                    nextIndex++;
+                    continue;
+                }
+
+                break;
+            }
+
+            return nextIndex < steps.Count && steps[nextIndex].Disabled;
+        }
+
+        bool IsPrevStepDisabled()
+        {
+            var prevIndex = SelectedIndex - 1;
+            while (prevIndex >= 0 && prevIndex < steps.Count)
+            {
+                if (!steps[prevIndex].Visible)
+                {
+                    prevIndex--;
+                    continue;
+                }
+
+                break;
+            }
+
+            return prevIndex >= 0 && prevIndex < steps.Count && steps[prevIndex].Disabled;
+        }
+
         /// <summary>
         /// Programmatically navigates to the next visible step in the sequence.
         /// If already at the last step, this method does nothing. Respects CanChange validation.
