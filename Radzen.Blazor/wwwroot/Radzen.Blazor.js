@@ -1669,16 +1669,16 @@ window.Radzen = {
                         dialog.offsetWidth = e[0].target.offsetWidth;
                         dialog.offsetHeight = e[0].target.offsetHeight;
 
-                        try {
                         dialog.invokeMethodAsync(
                             'RadzenDialog.OnResize',
                             e[0].target.offsetWidth,
                             e[0].target.offsetHeight
-                        );
-                        } catch { }
+                        ).catch(function () { });
                     }
                 };
-                Radzen.dialogResizer = new ResizeObserver(dialogResize).observe(lastDialog.parentElement);
+                var resizeObserver = new ResizeObserver(dialogResize);
+                resizeObserver.observe(lastDialog.parentElement);
+                Radzen.dialogResizer = resizeObserver;
             }
 
             if (options.draggable) {
@@ -1724,6 +1724,9 @@ window.Radzen = {
     }
   },
   closeDialog: function () {
+    if (Radzen.dialogResizer && typeof Radzen.dialogResizer.disconnect === 'function') {
+      Radzen.dialogResizer.disconnect();
+    }
     Radzen.dialogResizer = null;
     document.body.classList.remove('no-scroll');
     var dialogs = document.querySelectorAll('.rz-dialog-content');
