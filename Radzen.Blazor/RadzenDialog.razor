@@ -132,7 +132,7 @@
     /// <returns>A Task that represents the asynchronous operation of opening the dialog.</returns>
     public async Task Open(string? title,
         Type type,
-        Dictionary<string, object> parameters,
+        Dictionary<string, object?> parameters,
         DialogOptions options)
     {
         dialogs.Add(new Dialog() { Title = title, Type = type, Parameters = parameters, Options = options });
@@ -184,7 +184,7 @@
         Service.OnSideClose += OnSideClose;
     }
 
-    private void OnSideOpen(Type sideComponent, Dictionary<string, object> parameters, SideDialogOptions options)
+    private void OnSideOpen(Type sideComponent, Dictionary<string, object?> parameters, SideDialogOptions options)
     {
         sideDialogOptions = options;
 
@@ -264,7 +264,7 @@
 
     private void OnOpen(string? title,
         Type type,
-        Dictionary<string, object> parameters,
+        Dictionary<string, object?> parameters,
         DialogOptions options)
     {
         Open(title, type, parameters, options).ConfigureAwait(false);
