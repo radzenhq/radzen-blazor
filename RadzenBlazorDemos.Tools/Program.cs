@@ -125,7 +125,7 @@ class Program
 
     // ── Data model ──────────────────────────────────────────────────────
 
-    record ExampleNode(string Name, string Path, string Description, List<ExampleNode> Children);
+    record ExampleNode(string Name, string Path, string Description, List<ExampleNode> Children, List<string> Tags);
 
     record XmlMemberDoc(string Summary, string TypeName);
 
@@ -179,6 +179,7 @@ class Program
         string path = "";
         string description = "";
         List<ExampleNode> children = null;
+        List<string> tags = null;
 
         foreach (var assignment in init.Expressions.OfType<AssignmentExpressionSyntax>())
         {
@@ -199,10 +200,13 @@ class Program
                 case "Children":
                     children = ParseChildrenExpression(value);
                     break;
+                case "Tags":
+                    tags = ParseTagsExpression(value);
+                    break;
             }
         }
 
-        return new ExampleNode(name, path, description, children);
+        return new ExampleNode(name, path, description, children, tags);
     }
 
     static string ExtractStringLiteral(ExpressionSyntax expr)
@@ -221,6 +225,27 @@ class Program
             return ParseExampleArray(arrayCreate.Initializer);
 
         return null;
+    }
+
+    static List<string> ParseTagsExpression(ExpressionSyntax expr)
+    {
+        IEnumerable<ExpressionSyntax> elements = expr switch
+        {
+            // new [] { "a", "b" }
+            ImplicitArrayCreationExpressionSyntax implicitArray => implicitArray.Initializer.Expressions,
+            // new string[] { "a", "b" }
+            ArrayCreationExpressionSyntax arrayCreate when arrayCreate.Initializer != null => arrayCreate.Initializer.Expressions,
+            // ["a", "b"] (C# 12 collection expression)
+            CollectionExpressionSyntax collection => collection.Elements
+                .OfType<ExpressionElementSyntax>()
+                .Select(e => e.Expression),
+            _ => null
+        };
+
+        if (elements == null)
+            return null;
+
+        return elements.Select(ExtractStringLiteral).Where(s => !string.IsNullOrEmpty(s)).ToList();
     }
 
     // ── XML documentation parsing ───────────────────────────────────────
@@ -509,6 +534,12 @@ class Program
         if (!string.IsNullOrWhiteSpace(node.Description))
         {
             sb.AppendLine(node.Description);
+            sb.AppendLine();
+        }
+
+        if (node.Tags is { Count: > 0 })
+        {
+            sb.AppendLine($"Keywords: {string.Join(", ", node.Tags)}");
             sb.AppendLine();
         }
 
