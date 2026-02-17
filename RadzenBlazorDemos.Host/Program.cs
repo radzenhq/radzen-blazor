@@ -146,6 +146,17 @@ app.MapGet("/llms.txt", () =>
         ? Results.File(path, "text/plain")
         : Results.NotFound();
 });
+app.MapGet("/{*path}", (string path, IWebHostEnvironment env) =>
+{
+    if (string.IsNullOrEmpty(path) || !path.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
+        return Results.NotFound();
+
+    var fileInfo = env.WebRootFileProvider.GetFileInfo($"md/{path}");
+
+    return fileInfo.Exists
+        ? Results.Stream(fileInfo.CreateReadStream(), "text/markdown")
+        : Results.NotFound();
+});
 app.MapRazorPages();
 app.MapRazorComponents<RadzenBlazorDemos.Host.App>()
     .AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly)

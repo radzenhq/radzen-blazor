@@ -8,12 +8,14 @@ WORKDIR /src
 COPY Radzen.Blazor/*.csproj Radzen.Blazor/
 COPY RadzenBlazorDemos/*.csproj RadzenBlazorDemos/
 COPY RadzenBlazorDemos.Host/*.csproj RadzenBlazorDemos.Host/
+COPY RadzenBlazorDemos.Tools/*.csproj RadzenBlazorDemos.Tools/
 
 # Radzen.DocFX usually has no csproj → copy full folder
 COPY Radzen.DocFX/ Radzen.DocFX/
 
-# Restore dependencies
-RUN dotnet restore RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj
+# Restore dependencies (Host + Tools for llms.txt generation)
+RUN dotnet restore RadzenBlazorDemos.Host/RadzenBlazorDemos.Host.csproj \
+ && dotnet restore RadzenBlazorDemos.Tools/RadzenBlazorDemos.Tools.csproj
 
 # Copy full source after restore layer
 COPY . .

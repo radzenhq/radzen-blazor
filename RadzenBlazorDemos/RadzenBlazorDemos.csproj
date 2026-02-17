@@ -56,31 +56,32 @@
     <Copy SourceFiles="@(DemoHostControllersCs)" DestinationFiles="@(DemoHostControllersCs->'$(ProjectDir)wwwroot\demos\Controllers\%(RecursiveDir)%(Filename).txt')" SkipUnchangedFiles="true" />
   </Target>
   
-  <!-- Generate llms.txt from demo pages -->
+  <!-- Generate llms.txt and per-component .md files -->
   <!-- Usage: dotnet build -p:GenerateLlmsTxt=true -->
   <Target Name="GenerateLlmsTxt"
          BeforeTargets="Build"
          Condition="'$(Configuration)' == 'Release' OR '$(GenerateLlmsTxt)' == 'true'">
     <PropertyGroup>
-      <LlmsTxtOutputPath>$(ProjectDir)wwwroot\llms.txt</LlmsTxtOutputPath>
+      <LlmsTxtOutputDir>$(ProjectDir)wwwroot</LlmsTxtOutputDir>
       <LlmsTxtToolPath>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\RadzenBlazorDemos.Tools.csproj</LlmsTxtToolPath>
-      <LlmsTxtToolDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\bin\$(Configuration)\net8.0\</LlmsTxtToolDir>
+      <LlmsTxtToolDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\bin\$(Configuration)\net10.0\</LlmsTxtToolDir>
       <LlmsTxtToolExe Condition="'$(OS)' == 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools.exe</LlmsTxtToolExe>
       <LlmsTxtToolExe Condition="'$(OS)' != 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools</LlmsTxtToolExe>
+      <RadzenBlazorXmlDoc>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net8.0\Radzen.Blazor.xml</RadzenBlazorXmlDoc>
     </PropertyGroup>
     
-    <Message Text="Generating llms.txt..." Importance="high" />
+    <Message Text="Generating llms.txt and component .md files..." Importance="high" />
     
     <!-- Build the tool first -->
     <Exec Command="dotnet build &quot;$(LlmsTxtToolPath)&quot; --configuration $(Configuration) --no-incremental"
           ContinueOnError="false"
           Condition="Exists('$(LlmsTxtToolPath)')" />
     
-    <!-- Run the tool -->
-    <Exec Command="&quot;$(LlmsTxtToolExe)&quot; &quot;$(LlmsTxtOutputPath)&quot; &quot;$(ProjectDir)Pages&quot; &quot;$(ProjectDir)Services&quot; &quot;$(ProjectDir)Models&quot;"
+    <!-- Run the tool: <outputDir> <pagesPath> <exampleServicePath> [xmlDocPath] -->
+    <Exec Command="&quot;$(LlmsTxtToolExe)&quot; &quot;$(LlmsTxtOutputDir)&quot; &quot;$(ProjectDir)Pages&quot; &quot;$(ProjectDir)Services\ExampleService.cs&quot; &quot;$(RadzenBlazorXmlDoc)&quot;"
           ContinueOnError="false"
           Condition="Exists('$(LlmsTxtToolExe)')" />
     
-    <Message Text="llms.txt generated at: $(LlmsTxtOutputPath)" Importance="high" />
+    <Message Text="llms.txt and .md files generated in: $(LlmsTxtOutputDir)" Importance="high" />
   </Target>
 </Project>
