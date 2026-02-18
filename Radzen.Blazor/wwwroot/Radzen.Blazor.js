@@ -2170,14 +2170,17 @@ window.Radzen = {
       }
     };
     ref.handleInsert = function (e, transfer, hasDelegate) {
+      var hasFiles = transfer.files.length > 0;
+      var hasHtml = transfer.types.indexOf('text/html') > -1;
+      var hasText = transfer.types.indexOf('text/plain') > -1;
 
-      if (transfer.files.length > 0) {
+      if (hasFiles && !hasHtml && !hasText) {
         for (const file of transfer.files) {
           ref.handleFileInsert(e, file, hasDelegate);
-          }
+        }
       }
       else if (hasDelegate) {
-        ref.handleTextInsert(e, transfer)
+        ref.handleTextInsert(e, transfer);
       }
     };
     ref.handleFileInsert = function (event, file, hasDelegate) {
