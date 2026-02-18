@@ -1,0 +1,60 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenSankeyDiagram TItem="FlowData"
+                         Data="@flows"
+                         SourceProperty="Source"
+                         TargetProperty="Target"
+                         ValueProperty="Value"
+                         SourceLabelProperty="SourceLabel"
+                         TargetLabelProperty="TargetLabel"
+                         NodeFills="@nodeColors"
+                         LinkFills="@linkColors">
+    </RadzenSankeyDiagram>
+</div>
+
+@code {
+    public class FlowData
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public double Value { get; set; }
+        public string SourceLabel { get; set; }
+        public string TargetLabel { get; set; }
+    }
+
+    private List<FlowData> flows = new List<FlowData>
+    {
+        new FlowData { Source = "products", SourceLabel = "Product Sales", Target = "marketing", TargetLabel = "Marketing", Value = 150 },
+        new FlowData { Source = "products", SourceLabel = "Product Sales", Target = "engineering", TargetLabel = "Engineering", Value = 280 },
+        new FlowData { Source = "products", SourceLabel = "Product Sales", Target = "operations", TargetLabel = "Operations", Value = 70 },
+        new FlowData { Source = "services", SourceLabel = "Consulting Services", Target = "marketing", TargetLabel = "Marketing", Value = 100 },
+        new FlowData { Source = "services", SourceLabel = "Consulting Services", Target = "engineering", TargetLabel = "Engineering", Value = 160 },
+        new FlowData { Source = "licensing", SourceLabel = "Licensing Fees", Target = "engineering", TargetLabel = "Engineering", Value = 80 },
+        new FlowData { Source = "licensing", SourceLabel = "Licensing Fees", Target = "operations", TargetLabel = "Operations", Value = 50 },
+        new FlowData { Source = "licensing", SourceLabel = "Licensing Fees", Target = "marketing", TargetLabel = "Marketing", Value = 30 },
+    };
+
+    private List<string> nodeColors = new List<string>
+    {
+        "#3B82F6", // Product Sales
+        "#10B981", // Consulting Services
+        "#F59E0B", // Licensing Fees
+        "#EC4899", // Marketing
+        "#8B5CF6", // Engineering
+        "#06B6D4", // Operations
+    };
+
+    private List<string> linkColors = new List<string>
+    {
+        "#3B82F680", // Product Sales → Marketing
+        "#3B82F680", // Product Sales → Engineering
+        "#3B82F680", // Product Sales → Operations
+        "#10B98180", // Consulting Services → Marketing
+        "#10B98180", // Consulting Services → Engineering
+        "#F59E0B80", // Licensing Fees → Engineering
+        "#F59E0B80", // Licensing Fees → Operations
+        "#F59E0B80", // Licensing Fees → Marketing
+    };
+}

@@ -2117,6 +2117,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Color Scheme", Anchor = "#color-scheme" }, new () { Text = "Node Properties", Anchor = "#node-properties" }, new () { Text = "Custom Colors", Anchor = "#custom-colors" }, new () { Text = "Custom Tooltips", Anchor = "#custom-tooltips" }, new () { Text = "Animation", Anchor = "#animation" } ],
                     Name = "Sankey Diagram",
                     Path = "sankey-diagram",
                     Description = "Radzen Blazor Sankey Diagram for visualizing flow and relationships between nodes.",

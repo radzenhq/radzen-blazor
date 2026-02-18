@@ -1,0 +1,42 @@
+@using Radzen.Blazor
+@using System.Collections.Generic
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenSankeyDiagram TItem="FlowData"
+                         Data="@flows"
+                         SourceProperty="Source"
+                         TargetProperty="Target"
+                         ValueProperty="Value"
+                         SourceLabelProperty="SourceLabel"
+                         TargetLabelProperty="TargetLabel"
+                         ValueFormatter="@(value => $"${value:N0}K")"
+                         ValueText="Total Budget"
+                         IncomingText="Budget Received"
+                         OutgoingText="Budget Allocated"
+                         FlowText="Allocation"
+                         TooltipStyle="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px; padding: 12px 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); font-weight: 500;">
+    </RadzenSankeyDiagram>
+</div>
+
+@code {
+    public class FlowData
+    {
+        public string Source { get; set; }
+        public string Target { get; set; }
+        public double Value { get; set; }
+        public string SourceLabel { get; set; }
+        public string TargetLabel { get; set; }
+    }
+
+    private List<FlowData> flows = new List<FlowData>
+    {
+        new FlowData { Source = "products", SourceLabel = "Product Sales", Target = "marketing", TargetLabel = "Marketing", Value = 150 },
+        new FlowData { Source = "products", SourceLabel = "Product Sales", Target = "engineering", TargetLabel = "Engineering", Value = 280 },
+        new FlowData { Source = "products", SourceLabel = "Product Sales", Target = "operations", TargetLabel = "Operations", Value = 70 },
+        new FlowData { Source = "services", SourceLabel = "Consulting Services", Target = "marketing", TargetLabel = "Marketing", Value = 100 },
+        new FlowData { Source = "services", SourceLabel = "Consulting Services", Target = "engineering", TargetLabel = "Engineering", Value = 160 },
+        new FlowData { Source = "licensing", SourceLabel = "Licensing Fees", Target = "engineering", TargetLabel = "Engineering", Value = 80 },
+        new FlowData { Source = "licensing", SourceLabel = "Licensing Fees", Target = "operations", TargetLabel = "Operations", Value = 50 },
+        new FlowData { Source = "licensing", SourceLabel = "Licensing Fees", Target = "marketing", TargetLabel = "Marketing", Value = 30 },
+    };
+}
