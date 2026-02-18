@@ -68,6 +68,7 @@
       <LlmsTxtToolExe Condition="'$(OS)' == 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools.exe</LlmsTxtToolExe>
       <LlmsTxtToolExe Condition="'$(OS)' != 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools</LlmsTxtToolExe>
       <RadzenBlazorXmlDoc>$(MSBuildThisFileDirectory)..\Radzen.Blazor\bin\$(Configuration)\net8.0\Radzen.Blazor.xml</RadzenBlazorXmlDoc>
+      <RadzenBlazorSourceDir>$(MSBuildThisFileDirectory)..\Radzen.Blazor\</RadzenBlazorSourceDir>
     </PropertyGroup>
     
     <Message Text="Generating llms.txt and component .md files..." Importance="high" />
@@ -77,8 +78,8 @@
           ContinueOnError="false"
           Condition="Exists('$(LlmsTxtToolPath)')" />
     
-    <!-- Run the tool: <outputDir> <pagesPath> <exampleServicePath> [xmlDocPath] -->
-    <Exec Command="&quot;$(LlmsTxtToolExe)&quot; &quot;$(LlmsTxtOutputDir)&quot; &quot;$(ProjectDir)Pages&quot; &quot;$(ProjectDir)Services\ExampleService.cs&quot; &quot;$(RadzenBlazorXmlDoc)&quot;"
+    <!-- Run the tool: <outputDir> <pagesPath> <exampleServicePath> [xmlDocPath] [sourceDir] -->
+    <Exec Command="&quot;$(LlmsTxtToolExe)&quot; &quot;$(LlmsTxtOutputDir)&quot; &quot;$(ProjectDir)Pages&quot; &quot;$(ProjectDir)Services\ExampleService.cs&quot; &quot;$(RadzenBlazorXmlDoc)&quot; &quot;$(RadzenBlazorSourceDir)&quot;"
           ContinueOnError="false"
           Condition="Exists('$(LlmsTxtToolExe)')" />
     
