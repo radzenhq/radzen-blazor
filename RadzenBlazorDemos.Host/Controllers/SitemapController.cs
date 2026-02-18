@@ -20,6 +20,8 @@ public class SitemapController : Controller
 
         sb.AppendLine("User-agent: *");
         sb.AppendLine($"Sitemap: {BaseUrl}/sitemap.xml");
+        sb.AppendLine("Disallow: /llms.txt");
+        sb.AppendLine("Disallow: /*.md$");
 
         return Content(sb.ToString(), "text/plain");
     }

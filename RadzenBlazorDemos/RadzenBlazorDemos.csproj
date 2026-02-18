@@ -62,7 +62,7 @@
          BeforeTargets="Build"
          Condition="'$(Configuration)' == 'Release' OR '$(GenerateLlmsTxt)' == 'true'">
     <PropertyGroup>
-      <LlmsTxtOutputDir>$(ProjectDir)wwwroot</LlmsTxtOutputDir>
+      <LlmsTxtOutputDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Host\wwwroot</LlmsTxtOutputDir>
       <LlmsTxtToolPath>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\RadzenBlazorDemos.Tools.csproj</LlmsTxtToolPath>
       <LlmsTxtToolDir>$(MSBuildThisFileDirectory)..\RadzenBlazorDemos.Tools\bin\$(Configuration)\net10.0\</LlmsTxtToolDir>
       <LlmsTxtToolExe Condition="'$(OS)' == 'Windows_NT'">$(LlmsTxtToolDir)RadzenBlazorDemos.Tools.exe</LlmsTxtToolExe>

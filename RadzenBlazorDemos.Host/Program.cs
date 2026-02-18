@@ -19,6 +19,7 @@ using RadzenBlazorDemos.Host;
 using RadzenBlazorDemos.Services;
 using RadzenBlazorDemos.Host.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -134,29 +135,35 @@ if (!app.Environment.IsDevelopment())
     });
 }
 
+var contentTypeProvider = new FileExtensionContentTypeProvider();
+contentTypeProvider.Mappings[".md"] = "text/plain; charset=utf-8";
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = contentTypeProvider,
+    OnPrepareResponse = ctx =>
+    {
+        if (ctx.File.Name == "llms.txt")
+        {
+            ctx.Context.Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
+        }
+    }
+});
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(app.Environment.WebRootPath, "md")),
+    ContentTypeProvider = contentTypeProvider,
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers["X-Robots-Tag"] = "noindex, nofollow";
+    }
+});
+
 app.UseRouting();
 app.UseCanonicalRedirects();
 app.UseTrailingSlashRedirect();
 app.UseAntiforgery();
-app.MapGet("/llms.txt", () =>
-{
-    var path = Path.Combine(app.Environment.WebRootPath, "llms.txt");
-
-    return File.Exists(path)
-        ? Results.File(path, "text/plain")
-        : Results.NotFound();
-});
-app.MapGet("/{*path}", (string path, IWebHostEnvironment env) =>
-{
-    if (string.IsNullOrEmpty(path) || !path.EndsWith(".md", StringComparison.OrdinalIgnoreCase))
-        return Results.NotFound();
-
-    var fileInfo = env.WebRootFileProvider.GetFileInfo($"md/{path}");
-
-    return fileInfo.Exists
-        ? Results.Stream(fileInfo.CreateReadStream(), "text/markdown")
-        : Results.NotFound();
-});
 app.MapRazorPages();
 app.MapRazorComponents<RadzenBlazorDemos.Host.App>()
     .AddInteractiveWebAssemblyRenderMode().AddAdditionalAssemblies(typeof(RadzenBlazorDemos.Routes).Assembly)
