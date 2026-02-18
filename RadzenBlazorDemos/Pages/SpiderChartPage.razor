@@ -8,20 +8,66 @@
 <RadzenText TextStyle="TextStyle.H2" TagName="TagName.H1" class="rz-pt-8">
     Spider Chart
 </RadzenText>
-
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.P" class="rz-pb-4">
     Display multivariate data in a radial format, perfect for comparing multiple metrics across different categories.
 </RadzenText>
 
+<RadzenText Anchor="spider-chart#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-8">
+    Basic Usage
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    RadzenSpiderChart displays one or more <code>RadzenSpiderSeries</code> with <code>CategoryProperty</code> and <code>ValueProperty</code> bindings.
+</RadzenText>
 <RadzenExample ComponentName="SpiderChart" Example="SpiderChartBasic">
     <SpiderChartBasic />
 </RadzenExample>
 
-<RadzenText TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12 rz-mb-6">
-    Comprehensive Configuration
+<RadzenText Anchor="spider-chart#grid-shape" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Grid Shape
 </RadzenText>
-
-<RadzenExample ComponentName="SpiderChart" Example="SpiderChartConfiguration">
-    <SpiderChartConfiguration />
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>GridShape</code> property to switch between a polygon and circular grid.
+</RadzenText>
+<RadzenExample ComponentName="SpiderChart" Example="SpiderChartGrid">
+    <SpiderChartGrid />
 </RadzenExample>
 
+<RadzenText Anchor="spider-chart#color-scheme" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Color Scheme
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set the <code>ColorScheme</code> property to apply a built-in color palette to all series.
+</RadzenText>
+<RadzenExample ComponentName="SpiderChart" Example="SpiderChartColorScheme">
+    <SpiderChartColorScheme />
+</RadzenExample>
+
+<RadzenText Anchor="spider-chart#legend" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Legend
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Configure the legend with <code>RadzenSpiderLegend</code>. Control its <code>Position</code> and <code>Visible</code> properties.
+</RadzenText>
+<RadzenExample ComponentName="SpiderChart" Example="SpiderChartLegend">
+    <SpiderChartLegend />
+</RadzenExample>
+
+<RadzenText Anchor="spider-chart#value-format" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Value Format
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Use the <code>ValueFormatter</code> property on each series to customize how values are displayed in tooltips.
+</RadzenText>
+<RadzenExample ComponentName="SpiderChart" Example="SpiderChartValueFormat">
+    <SpiderChartValueFormat />
+</RadzenExample>
+
+<RadzenText Anchor="spider-chart#markers" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Markers
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Toggle data point markers with the <code>ShowMarkers</code> property.
+</RadzenText>
+<RadzenExample ComponentName="SpiderChart" Example="SpiderChartMarkers">
+    <SpiderChartMarkers />
+</RadzenExample>

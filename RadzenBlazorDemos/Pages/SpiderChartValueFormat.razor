@@ -1,0 +1,68 @@
+<RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
+    <RadzenStack Gap="0.25rem">
+        <RadzenText TextStyle="TextStyle.Caption">Value Format</RadzenText>
+        <RadzenSelectBar @bind-Value="valueFormat" TValue="string" Size="ButtonSize.Small" Change="@(() => StateHasChanged())">
+            <Items>
+                <RadzenSelectBarItem Text="Percent" Value="@("percent")" />
+                <RadzenSelectBarItem Text="Number" Value="@("number")" />
+                <RadzenSelectBarItem Text="Score" Value="@("score")" />
+                <RadzenSelectBarItem Text="Currency" Value="@("currency")" />
+            </Items>
+        </RadzenSelectBar>
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenSpiderChart Style="width: 100%; height: 500px;">
+    <RadzenSpiderSeries TItem="SkillData"
+                        Data="@aliceData"
+                        CategoryProperty="@nameof(SkillData.Skill)"
+                        ValueProperty="@nameof(SkillData.Score)"
+                        Title="Alice"
+                        ValueFormatter="@GetValueFormatter()" />
+    <RadzenSpiderSeries TItem="SkillData"
+                        Data="@bobData"
+                        CategoryProperty="@nameof(SkillData.Skill)"
+                        ValueProperty="@nameof(SkillData.Score)"
+                        Title="Bob"
+                        ValueFormatter="@GetValueFormatter()" />
+</RadzenSpiderChart>
+
+@code {
+    string valueFormat = "percent";
+
+    Func<double, string> GetValueFormatter()
+    {
+        return valueFormat switch
+        {
+            "percent" => (value) => $"{value:F0}%",
+            "number" => (value) => value.ToString("F1"),
+            "score" => (value) => $"{value:F0}/100",
+            "currency" => (value) => $"${value:F0}",
+            _ => (value) => value.ToString("F1")
+        };
+    }
+
+    class SkillData
+    {
+        public string Skill { get; set; }
+        public double Score { get; set; }
+    }
+
+    IEnumerable<SkillData> aliceData = new SkillData[]
+    {
+        new SkillData { Skill = "Communication", Score = 90 },
+        new SkillData { Skill = "Problem Solving", Score = 85 },
+        new SkillData { Skill = "Teamwork", Score = 92 },
+        new SkillData { Skill = "Leadership", Score = 78 },
+        new SkillData { Skill = "Creativity", Score = 88 },
+    };
+
+    IEnumerable<SkillData> bobData = new SkillData[]
+    {
+        new SkillData { Skill = "Communication", Score = 75 },
+        new SkillData { Skill = "Problem Solving", Score = 92 },
+        new SkillData { Skill = "Teamwork", Score = 80 },
+        new SkillData { Skill = "Leadership", Score = 88 },
+        new SkillData { Skill = "Creativity", Score = 70 },
+    };
+}

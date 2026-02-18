@@ -1,0 +1,47 @@
+<RadzenCard Variant="Variant.Outlined" class="rz-mb-12">
+    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem" AlignItems="AlignItems.Center">
+        <RadzenSwitch @bind-Value="showMarkers" Name="showMarkers" Change="@(() => StateHasChanged())" />
+        <RadzenLabel Text="Show Markers" Component="showMarkers" />
+    </RadzenStack>
+</RadzenCard>
+
+<RadzenSpiderChart ShowMarkers="@showMarkers" Style="width: 100%; height: 500px;">
+    <RadzenSpiderSeries TItem="SkillData"
+                        Data="@aliceData"
+                        CategoryProperty="@nameof(SkillData.Skill)"
+                        ValueProperty="@nameof(SkillData.Score)"
+                        Title="Alice" />
+    <RadzenSpiderSeries TItem="SkillData"
+                        Data="@bobData"
+                        CategoryProperty="@nameof(SkillData.Skill)"
+                        ValueProperty="@nameof(SkillData.Score)"
+                        Title="Bob" />
+</RadzenSpiderChart>
+
+@code {
+    bool showMarkers = true;
+
+    class SkillData
+    {
+        public string Skill { get; set; }
+        public double Score { get; set; }
+    }
+
+    IEnumerable<SkillData> aliceData = new SkillData[]
+    {
+        new SkillData { Skill = "Communication", Score = 90 },
+        new SkillData { Skill = "Problem Solving", Score = 85 },
+        new SkillData { Skill = "Teamwork", Score = 92 },
+        new SkillData { Skill = "Leadership", Score = 78 },
+        new SkillData { Skill = "Creativity", Score = 88 },
+    };
+
+    IEnumerable<SkillData> bobData = new SkillData[]
+    {
+        new SkillData { Skill = "Communication", Score = 75 },
+        new SkillData { Skill = "Problem Solving", Score = 92 },
+        new SkillData { Skill = "Teamwork", Score = 80 },
+        new SkillData { Skill = "Leadership", Score = 88 },
+        new SkillData { Skill = "Creativity", Score = 70 },
+    };
+}

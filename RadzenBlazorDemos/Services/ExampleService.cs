@@ -2038,6 +2038,7 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Grid Shape", Anchor = "#grid-shape" }, new () { Text = "Color Scheme", Anchor = "#color-scheme" }, new () { Text = "Legend", Anchor = "#legend" }, new () { Text = "Value Format", Anchor = "#value-format" }, new () { Text = "Markers", Anchor = "#markers" } ],
                     Name = "Spider Chart",
                     Path = "spider-chart",
                     Title = "Blazor Spider Chart Component | Free UI Components by Radzen",
