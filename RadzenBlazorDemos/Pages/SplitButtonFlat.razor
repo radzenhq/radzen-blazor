@@ -1,37 +1,37 @@
-﻿@inject NotificationService NotificationService
+@inject NotificationService NotificationService
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton">
+    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Primary split button")) Text="Primary">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />
         </ChildContent>
     </RadzenSplitButton>
-    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Secondary">
+    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Secondary split button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />
         </ChildContent>
     </RadzenSplitButton>
-    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Info">
+    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Info split button")) Text="Info" ButtonStyle="ButtonStyle.Info">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />
         </ChildContent>
     </RadzenSplitButton>
-    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Success">
+    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Success split button")) Text="Success" ButtonStyle="ButtonStyle.Success">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />
         </ChildContent>
     </RadzenSplitButton>
-    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Warning">
+    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Warning split button")) Text="Warning" ButtonStyle="ButtonStyle.Warning">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />
         </ChildContent>
     </RadzenSplitButton>
-    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Danger">
+    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Danger split button")) Text="Danger" ButtonStyle="ButtonStyle.Danger">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />
@@ -42,75 +42,37 @@
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Flat Shades</RadzenText>
 <RadzenStack Gap="1rem">
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" Shade="Shade.Lighter">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Primary split button")) Text="Primary" Shade="Shade.Lighter">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Secondary split button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Lighter">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Info split button")) Text="Info" ButtonStyle="ButtonStyle.Info" Shade="Shade.Lighter">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Success" Shade="Shade.Lighter">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Success split button")) Text="Success" ButtonStyle="ButtonStyle.Success" Shade="Shade.Lighter">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Lighter">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Warning split button")) Text="Warning" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Lighter">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Lighter">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-    </RadzenStack>
-    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" Shade="Shade.Light">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Light">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Info" Shade="Shade.Light">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Success" Shade="Shade.Light">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Light">
-            <ChildContent>
-                <RadzenSplitButtonItem Text="Item1" Value="1" />
-                <RadzenSplitButtonItem Text="Item2" Value="2" />
-            </ChildContent>
-        </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Light">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Danger split button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Lighter">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
@@ -118,37 +80,37 @@
         </RadzenSplitButton>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" Shade="Shade.Dark">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Primary split button")) Text="Primary" Shade="Shade.Light">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Dark">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Secondary split button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Light">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Info" Shade="Shade.Dark">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Info split button")) Text="Info" ButtonStyle="ButtonStyle.Info" Shade="Shade.Light">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Success" Shade="Shade.Dark">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Success split button")) Text="Success" ButtonStyle="ButtonStyle.Success" Shade="Shade.Light">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Dark">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Warning split button")) Text="Warning" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Light">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Dark">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Danger split button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Light">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
@@ -156,37 +118,75 @@
         </RadzenSplitButton>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" Shade="Shade.Darker">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Primary split button")) Text="Primary" Shade="Shade.Dark">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Darker">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Secondary split button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Dark">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Info" Shade="Shade.Darker">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Info split button")) Text="Info" ButtonStyle="ButtonStyle.Info" Shade="Shade.Dark">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Success" Shade="Shade.Darker">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Success split button")) Text="Success" ButtonStyle="ButtonStyle.Success" Shade="Shade.Dark">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Darker">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Warning split button")) Text="Warning" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Dark">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
             </ChildContent>
         </RadzenSplitButton>
-        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Darker">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Danger split button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Dark">
+            <ChildContent>
+                <RadzenSplitButtonItem Text="Item1" Value="1" />
+                <RadzenSplitButtonItem Text="Item2" Value="2" />
+            </ChildContent>
+        </RadzenSplitButton>
+    </RadzenStack>
+    <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Primary split button")) Text="Primary" Shade="Shade.Darker">
+            <ChildContent>
+                <RadzenSplitButtonItem Text="Item1" Value="1" />
+                <RadzenSplitButtonItem Text="Item2" Value="2" />
+            </ChildContent>
+        </RadzenSplitButton>
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Secondary split button")) Text="Secondary" ButtonStyle="ButtonStyle.Secondary" Shade="Shade.Darker">
+            <ChildContent>
+                <RadzenSplitButtonItem Text="Item1" Value="1" />
+                <RadzenSplitButtonItem Text="Item2" Value="2" />
+            </ChildContent>
+        </RadzenSplitButton>
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Info split button")) Text="Info" ButtonStyle="ButtonStyle.Info" Shade="Shade.Darker">
+            <ChildContent>
+                <RadzenSplitButtonItem Text="Item1" Value="1" />
+                <RadzenSplitButtonItem Text="Item2" Value="2" />
+            </ChildContent>
+        </RadzenSplitButton>
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Success split button")) Text="Success" ButtonStyle="ButtonStyle.Success" Shade="Shade.Darker">
+            <ChildContent>
+                <RadzenSplitButtonItem Text="Item1" Value="1" />
+                <RadzenSplitButtonItem Text="Item2" Value="2" />
+            </ChildContent>
+        </RadzenSplitButton>
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Warning split button")) Text="Warning" ButtonStyle="ButtonStyle.Warning" Shade="Shade.Darker">
+            <ChildContent>
+                <RadzenSplitButtonItem Text="Item1" Value="1" />
+                <RadzenSplitButtonItem Text="Item2" Value="2" />
+            </ChildContent>
+        </RadzenSplitButton>
+        <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Danger split button")) Text="Danger" ButtonStyle="ButtonStyle.Danger" Shade="Shade.Darker">
             <ChildContent>
                 <RadzenSplitButtonItem Text="Item1" Value="1" />
                 <RadzenSplitButtonItem Text="Item2" Value="2" />
@@ -198,13 +198,13 @@
 <RadzenText TextStyle="TextStyle.Subtitle1" TagName="TagName.H3" class="rz-mt-4">Flat Light and Dark</RadzenText>
 <RadzenText TextStyle="TextStyle.Body2" class="rz-mb-4">Light and Dark button styles don't have Shades</RadzenText>
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem" Wrap="FlexWrap.Wrap">
-    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Light">
+    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Light split button")) Text="Light" ButtonStyle="ButtonStyle.Light">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />
         </ChildContent>
     </RadzenSplitButton>
-    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "SplitButton with text")) Text="SplitButton" ButtonStyle="ButtonStyle.Dark">
+    <RadzenSplitButton Variant="Variant.Flat" Click=@(args => OnClick(args, "Dark split button")) Text="Dark" ButtonStyle="ButtonStyle.Dark">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />

@@ -1,14 +1,14 @@
-﻿@inject NotificationService NotificationService
+@inject NotificationService NotificationService
 
 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Center" Gap="1rem" Wrap="FlexWrap.Wrap" class="rz-p-12">
-    <RadzenSplitButton Disabled="true" Click=@(args => OnClick(args, "Disabled SplitButton")) Text="SplitButton">
+    <RadzenSplitButton Disabled="true" Click=@(args => OnClick(args, "Disabled split button")) Text="Primary">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Item2" Value="2" />
         </ChildContent>
     </RadzenSplitButton>
 
-    <RadzenSplitButton Click=@(args => OnClick(args, "Disabled SplitButton item")) Text="SplitButton Item Disabled">
+    <RadzenSplitButton Click=@(args => OnClick(args, "Disabled split button item")) Text="Primary">
         <ChildContent>
             <RadzenSplitButtonItem Text="Item1" Value="1" />
             <RadzenSplitButtonItem Text="Disabled Item2" Value="2" Disabled=true />
