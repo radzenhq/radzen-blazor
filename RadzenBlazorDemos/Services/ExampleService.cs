@@ -1821,11 +1821,12 @@ namespace RadzenBlazorDemos
                 },
                 new Example
                 {
+                    Toc = [ new () { Text = "Basic Usage", Anchor = "#basic-usage" }, new () { Text = "Custom EditContext", Anchor = "#custom-edit-context" }, new () { Text = "Form Action", Anchor = "#form-action" } ],
                     Name = "TemplateForm",
                     Path = "templateform",
                     Description = "Demonstration and configuration of the Radzen Blazor template form component with validation support.",
                     Icon = "\uebed",
-                    Tags = new [] { "form", "edit" }
+                    Tags = new [] { "form", "edit", "validation", "submit", "editcontext" }
                 },
                 new Example
                 {

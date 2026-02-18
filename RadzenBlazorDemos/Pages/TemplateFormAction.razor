@@ -1,0 +1,29 @@
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenTemplateForm TItem="SearchQuery" Data=@model Action="https://www.google.com/search" Method="get" target="_blank">
+        <RadzenStack Gap="1rem">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="Search" Component="q" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="q" @bind-Value=@model.Query Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="q" Text="Search query is required." Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
+                <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="Search" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenTemplateForm>
+</div>
+
+@code {
+    class SearchQuery
+    {
+        public string Query { get; set; }
+    }
+
+    SearchQuery model = new SearchQuery();
+}

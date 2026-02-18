@@ -1,0 +1,64 @@
+@using System.Text.Json
+
+<div class="rz-p-0 rz-p-md-12">
+    <RadzenTemplateForm TItem="Registration" Data=@model Submit=@OnSubmit InvalidSubmit=@OnInvalidSubmit>
+        <RadzenStack Gap="1rem">
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="First Name" Component="FirstName" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="FirstName" @bind-Value=@model.FirstName Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="FirstName" Text="First name is required." Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="Last Name" Component="LastName" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="LastName" @bind-Value=@model.LastName Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="LastName" Text="Last name is required." Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" RowGap="0.25rem">
+                <RadzenColumn Size="12" SizeMD="4" class="rz-text-align-start rz-text-align-md-end">
+                    <RadzenLabel Text="Email" Component="Email" />
+                </RadzenColumn>
+                <RadzenColumn Size="12" SizeMD="8">
+                    <RadzenTextBox Name="Email" @bind-Value=@model.Email Style="display: block; width: 100%;" />
+                    <RadzenRequiredValidator Component="Email" Text="Email is required." Style="position: absolute" />
+                    <RadzenEmailValidator Component="Email" Text="Provide a valid email address." Style="position: absolute" />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow AlignItems="AlignItems.Center" class="rz-mt-4">
+                <RadzenColumn Size="12" Offset="0" SizeMD="8" OffsetMD="4">
+                    <RadzenButton ButtonType="ButtonType.Submit" Text="Submit" />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenTemplateForm>
+    <EventConsole @ref=@console />
+</div>
+
+@code {
+    class Registration
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Email { get; set; }
+    }
+
+    Registration model = new Registration();
+    EventConsole console;
+
+    void OnSubmit(Registration args)
+    {
+        console.Log($"Submit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true })}");
+    }
+
+    void OnInvalidSubmit(FormInvalidSubmitEventArgs args)
+    {
+        console.Log($"InvalidSubmit: {JsonSerializer.Serialize(args, new JsonSerializerOptions() { WriteIndented = true })}");
+    }
+}

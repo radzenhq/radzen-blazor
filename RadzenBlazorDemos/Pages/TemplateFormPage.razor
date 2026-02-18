@@ -7,10 +7,32 @@
     Demonstration and configuration of the Radzen Blazor <strong>TemplateForm</strong> component.
 </RadzenText>
 
-<RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.P" class="rz-pb-4">
-    In this demo a comprehensive order form demonstrates <code>RadzenTemplateForm</code> with three fieldsets (<strong>Purchase Info</strong>, <strong>Contact Info</strong> with tabs for Billing/Shipping Address, <strong>Store/POS Info</strong>), using dropdowns for credit cards and countries, date pickers, numeric inputs, and responsive grid layout with <strong>Save</strong> and <strong>Cancel</strong> buttons.
+<RadzenText Anchor="templateform#basic-usage" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Basic Usage
 </RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Bind a model to the form via the <code>Data</code> property, add Radzen validators such as <code>RadzenRequiredValidator</code> and <code>RadzenEmailValidator</code>, and handle the <code>Submit</code> and <code>InvalidSubmit</code> events.
+</RadzenText>
+<RadzenExample ComponentName="TemplateForm" Example="TemplateFormBasic" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenTemplateForm.cs">
+    <TemplateFormBasic />
+</RadzenExample>
 
-<RadzenExample ComponentName="TemplateForm" Example="TemplateFormConfig" Source="https://github.com/radzenhq/radzen-blazor/blob/master/Radzen.Blazor/RadzenTemplateForm.cs">
- <TemplateFormConfig />
+<RadzenText Anchor="templateform#custom-edit-context" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Custom EditContext
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Provide your own <code>EditContext</code> instead of <code>Data</code> for advanced scenarios such as programmatic validation via the <code>EditContext.Validate()</code> method.
+</RadzenText>
+<RadzenExample ComponentName="TemplateForm" Example="TemplateFormEditContext">
+    <TemplateFormEditContext />
+</RadzenExample>
+
+<RadzenText Anchor="templateform#form-action" TextStyle="TextStyle.H5" TagName="TagName.H2" class="rz-pt-12">
+    Form Action
+</RadzenText>
+<RadzenText TextStyle="TextStyle.Body1" class="rz-mb-8">
+    Set the <code>Action</code> and <code>Method</code> properties to perform a traditional HTML form submission to a URL.
+</RadzenText>
+<RadzenExample ComponentName="TemplateForm" Example="TemplateFormAction">
+    <TemplateFormAction />
 </RadzenExample>
