@@ -129,6 +129,11 @@ public static class CanonicalRedirectMiddleware
             return true;
         }
 
+        if (TryStripApiHtmlExtension(path, out targetPath))
+        {
+            return true;
+        }
+
         targetPath = string.Empty;
         return false;
     }
@@ -145,6 +150,24 @@ public static class CanonicalRedirectMiddleware
             "" => "/",
             var normalized => normalized
         };
+    }
+
+    private static bool TryStripApiHtmlExtension(string path, out string targetPath)
+    {
+        if (path.Equals("/docs/api/index.html", StringComparison.OrdinalIgnoreCase))
+        {
+            targetPath = "/docs/api";
+            return true;
+        }
+
+        if (path.StartsWith("/docs/api/", StringComparison.OrdinalIgnoreCase) && path.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+        {
+            targetPath = path[..^5];
+            return true;
+        }
+
+        targetPath = string.Empty;
+        return false;
     }
 
     private static bool TryMapOptionalSegment(string path, string sourceBasePath, string targetBasePath, out string targetPath)

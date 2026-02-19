@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Class CartesianSeries&lt;TItem&gt;
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Class CartesianSeries&lt;TItem&gt;
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.CartesianSeries`1">
+
+
+  <h1 id="Radzen_Blazor_CartesianSeries_1" data-uid="Radzen.Blazor.CartesianSeries`1" class="text-break">Class CartesianSeries&lt;TItem&gt;
+</h1>
+  <div class="markdown level0 summary"><p>Base class of <a class="xref" href="Radzen.Blazor.RadzenChart.html">RadzenChart</a> series.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <div class="inheritance">
+    <h5>Inheritance</h5>
+    <div class="level0"><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></div>
+    <div class="level1"><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase">ComponentBase</a></div>
+    <div class="level2"><a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html">RadzenChartComponentBase</a></div>
+    <div class="level3"><span class="xref">CartesianSeries&lt;TItem&gt;</span></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenAreaSeries-1.html">RadzenAreaSeries&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenBarSeries-1.html">RadzenBarSeries&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenColumnSeries-1.html">RadzenColumnSeries&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenLineSeries-1.html">RadzenLineSeries&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenPieSeries-1.html">RadzenPieSeries&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenStackedAreaSeries-1.html">RadzenStackedAreaSeries&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenStackedBarSeries-1.html">RadzenStackedBarSeries&lt;TItem&gt;</a></div>
+      <div class="level4"><a class="xref" href="Radzen.Blazor.RadzenStackedColumnSeries-1.html">RadzenStackedColumnSeries&lt;TItem&gt;</a></div>
+  </div>
+  <div classs="implements">
+    <h5>Implements</h5>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a></div>
+    <div><a class="xref" href="Radzen.Blazor.IChartSeries.html">IChartSeries</a></div>
+    <div><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a></div>
+  </div>
+  <div class="inheritedMembers">
+    <h5>Inherited Members</h5>
+    <div>
+      <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_ShouldRefreshChart_Microsoft_AspNetCore_Components_ParameterView_">RadzenChartComponentBase.ShouldRefreshChart(ParameterView)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_ValidateParameters">RadzenChartComponentBase.ValidateParameters()</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_DidParameterChange__1_Microsoft_AspNetCore_Components_ParameterView_System_String___0_">RadzenChartComponentBase.DidParameterChange&lt;T&gt;(ParameterView, string, T)</a>
+    </div>
+    <div>
+      <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_Chart">RadzenChartComponentBase.Chart</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.buildrendertree">ComponentBase.BuildRenderTree(RenderTreeBuilder)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitialized">ComponentBase.OnInitialized()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.oninitializedasync">ComponentBase.OnInitializedAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparametersset">ComponentBase.OnParametersSet()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onparameterssetasync">ComponentBase.OnParametersSetAsync()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.statehaschanged">ComponentBase.StateHasChanged()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.shouldrender">ComponentBase.ShouldRender()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrender">ComponentBase.OnAfterRender(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.onafterrenderasync">ComponentBase.OnAfterRenderAsync(bool)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-action)">ComponentBase.InvokeAsync(Action)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.invokeasync#microsoft-aspnetcore-components-componentbase-invokeasync(system-func((system-threading-tasks-task)))">ComponentBase.InvokeAsync(Func&lt;Task&gt;)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.dispatchexceptionasync">ComponentBase.DispatchExceptionAsync(Exception)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gettype">object.GetType()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.memberwiseclone">object.MemberwiseClone()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.tostring">object.ToString()</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object)">object.Equals(object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.equals#system-object-equals(system-object-system-object)">object.Equals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.referenceequals">object.ReferenceEquals(object, object)</a>
+    </div>
+    <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object.gethashcode">object.GetHashCode()</a>
+    </div>
+  </div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_CartesianSeries_1_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public abstract class CartesianSeries&lt;TItem&gt; : RadzenChartComponentBase, IComponent, IHandleEvent, IHandleAfterRender, IChartSeries, IDisposable</code></pre>
+  </div>
+  <h5 class="typeParameters">Type Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="parametername">TItem</span></td>
+        <td><p>The type of the series data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="constructors">Constructors
+</h3>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1__ctor_" data-uid="Radzen.Blazor.CartesianSeries`1.#ctor*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1__ctor" data-uid="Radzen.Blazor.CartesianSeries`1.#ctor">CartesianSeries()</h4>
+  <div class="markdown level1 summary"><p>Base class of <a class="xref" href="Radzen.Blazor.RadzenChart.html">RadzenChart</a> series.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected CartesianSeries()</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_CategoryProperty_" data-uid="Radzen.Blazor.CartesianSeries`1.CategoryProperty*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_CategoryProperty" data-uid="Radzen.Blazor.CartesianSeries`1.CategoryProperty">CategoryProperty</h4>
+  <div class="markdown level1 summary"><p>The name of the property of <code class="typeparamref">TItem</code> that provides the X axis (a.k.a. category axis) values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? CategoryProperty { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_ChildContent_" data-uid="Radzen.Blazor.CartesianSeries`1.ChildContent*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_ChildContent" data-uid="Radzen.Blazor.CartesianSeries`1.ChildContent">ChildContent</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the child content.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment? ChildContent { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>The child content.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Color_" data-uid="Radzen.Blazor.CartesianSeries`1.Color*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Color" data-uid="Radzen.Blazor.CartesianSeries`1.Color">Color</h4>
+  <div class="markdown level1 summary"><p>Gets the color.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public abstract string Color { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The color.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_CoordinateSystem_" data-uid="Radzen.Blazor.CartesianSeries`1.CoordinateSystem*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_CoordinateSystem" data-uid="Radzen.Blazor.CartesianSeries`1.CoordinateSystem">CoordinateSystem</h4>
+  <div class="markdown level1 summary"><p>Gets the coordinate system of the series.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual CoordinateSystem CoordinateSystem { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.CoordinateSystem.html">CoordinateSystem</a></td>
+        <td><p>Coordinate system enum value.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Data_" data-uid="Radzen.Blazor.CartesianSeries`1.Data*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Data" data-uid="Radzen.Blazor.CartesianSeries`1.Data">Data</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the data of the series. The data is enumerated and its items are displayed by the series.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public IEnumerable&lt;TItem&gt;? Data { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;TItem&gt;</td>
+        <td><p>The data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Hidden_" data-uid="Radzen.Blazor.CartesianSeries`1.Hidden*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Hidden" data-uid="Radzen.Blazor.CartesianSeries`1.Hidden">Hidden</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html">CartesianSeries&lt;TItem&gt;</a> is hidden.
+Hidden series are initially invisible and the user can show them by clicking on their label in the legend.
+Use the <code>Hidden</code> property to hide certain series from your users but still allow them to see them.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Hidden { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if hidden; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Items_" data-uid="Radzen.Blazor.CartesianSeries`1.Items*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Items" data-uid="Radzen.Blazor.CartesianSeries`1.Items">Items</h4>
+  <div class="markdown level1 summary"><p>Stores <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html#Radzen_Blazor_CartesianSeries_1_Data">Data</a> as an IList of <code class="typeparamref">TItem</code>.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected IList&lt;TItem&gt; Items { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;TItem&gt;</td>
+        <td><p>The items.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_MarkerSize_" data-uid="Radzen.Blazor.CartesianSeries`1.MarkerSize*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_MarkerSize" data-uid="Radzen.Blazor.CartesianSeries`1.MarkerSize">MarkerSize</h4>
+  <div class="markdown level1 summary"><p>Gets the size of the marker.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public double MarkerSize { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The size of the marker.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_MarkerType_" data-uid="Radzen.Blazor.CartesianSeries`1.MarkerType*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_MarkerType" data-uid="Radzen.Blazor.CartesianSeries`1.MarkerType">MarkerType</h4>
+  <div class="markdown level1 summary"><p>Gets the series marker type.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual MarkerType MarkerType { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.MarkerType.html">MarkerType</a></td>
+        <td><p>The type of the marker.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Markers_" data-uid="Radzen.Blazor.CartesianSeries`1.Markers*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Markers" data-uid="Radzen.Blazor.CartesianSeries`1.Markers">Markers</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the series marker configuration.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RadzenMarkers Markers { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenMarkers.html">RadzenMarkers</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Overlays_" data-uid="Radzen.Blazor.CartesianSeries`1.Overlays*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Overlays" data-uid="Radzen.Blazor.CartesianSeries`1.Overlays">Overlays</h4>
+  <div class="markdown level1 summary"><p>Gets the list of overlays.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public IList&lt;IChartSeriesOverlay&gt; Overlays { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;<a class="xref" href="Radzen.Blazor.IChartSeriesOverlay.html">IChartSeriesOverlay</a>&gt;</td>
+        <td><p>The Overlays list.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_RenderingOrder_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderingOrder*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_RenderingOrder" data-uid="Radzen.Blazor.CartesianSeries`1.RenderingOrder">RenderingOrder</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the rendering order.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public int RenderingOrder { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><p>The rendering order.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_ShowInLegend_" data-uid="Radzen.Blazor.CartesianSeries`1.ShowInLegend*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_ShowInLegend" data-uid="Radzen.Blazor.CartesianSeries`1.ShowInLegend">ShowInLegend</h4>
+  <div class="markdown level1 summary"><p>Gets a value indicating whether this series should appear in the legend.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public bool ShowInLegend { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the series appears in the legend; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Title_" data-uid="Radzen.Blazor.CartesianSeries`1.Title*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Title" data-uid="Radzen.Blazor.CartesianSeries`1.Title">Title</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the title of the series. The title is displayed in tooltips and the legend.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string Title { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>The title.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_TooltipTemplate_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipTemplate*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_TooltipTemplate" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipTemplate">TooltipTemplate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the tooltip template.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public RenderFragment&lt;TItem&gt;? TooltipTemplate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment-1">RenderFragment</a>&lt;TItem&gt;</td>
+        <td><p>The tooltip template.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_ValueProperty_" data-uid="Radzen.Blazor.CartesianSeries`1.ValueProperty*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_ValueProperty" data-uid="Radzen.Blazor.CartesianSeries`1.ValueProperty">ValueProperty</h4>
+  <div class="markdown level1 summary"><p>The name of the property of <code class="typeparamref">TItem</code> that provides the Y axis (a.k.a. value axis) values.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public string? ValueProperty { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Visible_" data-uid="Radzen.Blazor.CartesianSeries`1.Visible*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Visible" data-uid="Radzen.Blazor.CartesianSeries`1.Visible">Visible</h4>
+  <div class="markdown level1 summary"><p>Gets or sets a value indicating whether this <a class="xref" href="Radzen.Blazor.CartesianSeries-1.html">CartesianSeries&lt;TItem&gt;</a> is visible.
+Invisible series do not appear in the legend and cannot be shown by the user.
+Use the <code>Visible</code> property to programatically show or hide a series.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">[Parameter]
+public bool Visible { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if visible; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_ComposeCategory_" data-uid="Radzen.Blazor.CartesianSeries`1.ComposeCategory*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_ComposeCategory_Radzen_Blazor_ScaleBase_" data-uid="Radzen.Blazor.CartesianSeries`1.ComposeCategory(Radzen.Blazor.ScaleBase)">ComposeCategory(ScaleBase)</h4>
+  <div class="markdown level1 summary"><p>Helper function. Used internally.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Func&lt;TItem, double&gt; ComposeCategory(ScaleBase scale)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">scale</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_ComposeValue_" data-uid="Radzen.Blazor.CartesianSeries`1.ComposeValue*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_ComposeValue_Radzen_Blazor_ScaleBase_" data-uid="Radzen.Blazor.CartesianSeries`1.ComposeValue(Radzen.Blazor.ScaleBase)">ComposeValue(ScaleBase)</h4>
+  <div class="markdown level1 summary"><p>Helper function. Used internally.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected Func&lt;TItem, double&gt; ComposeValue(ScaleBase scale)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">scale</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-2">Func</a>&lt;TItem, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Contains_" data-uid="Radzen.Blazor.CartesianSeries`1.Contains*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Contains_System_Double_System_Double_System_Double_" data-uid="Radzen.Blazor.CartesianSeries`1.Contains(System.Double,System.Double,System.Double)">Contains(double, double, double)</h4>
+  <div class="markdown level1 summary"><p>Determines if the series contains the specified coordinates with a given tolerance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual bool Contains(double x, double y, double tolerance)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>The x.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">y</span></td>
+        <td><p>The y.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">tolerance</span></td>
+        <td><p>The tolerance.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the series contains the coordinates; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_DataAt_" data-uid="Radzen.Blazor.CartesianSeries`1.DataAt*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_DataAt_System_Double_System_Double_" data-uid="Radzen.Blazor.CartesianSeries`1.DataAt(System.Double,System.Double)">DataAt(double, double)</h4>
+  <div class="markdown level1 summary"><p>Returns the data at the specified coordinates;</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual (object, Point) DataAt(double x, double y)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">x</span></td>
+        <td><p>The x.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">y</span></td>
+        <td><p>The y.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>, <a class="xref" href="Radzen.Blazor.Point.html">Point</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Dispose_" data-uid="Radzen.Blazor.CartesianSeries`1.Dispose*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Dispose" data-uid="Radzen.Blazor.CartesianSeries`1.Dispose">Dispose()</h4>
+  <div class="markdown level1 summary"><p>Base class of <a class="xref" href="Radzen.Blazor.RadzenChart.html">RadzenChart</a> series.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public void Dispose()</code></pre>
+  </div>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_GetCategories_" data-uid="Radzen.Blazor.CartesianSeries`1.GetCategories*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_GetCategories" data-uid="Radzen.Blazor.CartesianSeries`1.GetCategories">GetCategories()</h4>
+  <div class="markdown level1 summary"><p>Returns the category values</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual IList&lt;object&gt; GetCategories()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_GetDataLabels_" data-uid="Radzen.Blazor.CartesianSeries`1.GetDataLabels*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_GetDataLabels_System_Double_System_Double_" data-uid="Radzen.Blazor.CartesianSeries`1.GetDataLabels(System.Double,System.Double)">GetDataLabels(double, double)</h4>
+  <div class="markdown level1 summary"><p>Returns data chart position</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual IEnumerable&lt;ChartDataLabel&gt; GetDataLabels(double offsetX, double offsetY)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">offsetX</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">offsetY</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<span class="xref">ChartDataLabel</span>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_GetMean_" data-uid="Radzen.Blazor.CartesianSeries`1.GetMean*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_GetMean" data-uid="Radzen.Blazor.CartesianSeries`1.GetMean">GetMean()</h4>
+  <div class="markdown level1 summary"><p>Returns series mean</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public double GetMean()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_GetMedian_" data-uid="Radzen.Blazor.CartesianSeries`1.GetMedian*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_GetMedian" data-uid="Radzen.Blazor.CartesianSeries`1.GetMedian">GetMedian()</h4>
+  <div class="markdown level1 summary"><p>Returns series median</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public double GetMedian()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_GetMode_" data-uid="Radzen.Blazor.CartesianSeries`1.GetMode*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_GetMode" data-uid="Radzen.Blazor.CartesianSeries`1.GetMode">GetMode()</h4>
+  <div class="markdown level1 summary"><p>Returns series mode</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public double GetMode()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_GetTitle_" data-uid="Radzen.Blazor.CartesianSeries`1.GetTitle*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_GetTitle" data-uid="Radzen.Blazor.CartesianSeries`1.GetTitle">GetTitle()</h4>
+  <div class="markdown level1 summary"><p>Gets the title.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public string GetTitle()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_GetTooltipPosition_" data-uid="Radzen.Blazor.CartesianSeries`1.GetTooltipPosition*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_GetTooltipPosition_System_Object_" data-uid="Radzen.Blazor.CartesianSeries`1.GetTooltipPosition(System.Object)">GetTooltipPosition(object)</h4>
+  <div class="markdown level1 summary"><p>Get position of the series tooltip.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Point GetTooltipPosition(object data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Point.html">Point</a></td>
+        <td><p>Position.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_GetTrend_" data-uid="Radzen.Blazor.CartesianSeries`1.GetTrend*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_GetTrend" data-uid="Radzen.Blazor.CartesianSeries`1.GetTrend">GetTrend()</h4>
+  <div class="markdown level1 summary"><p><a href="https://en.wikipedia.org/wiki/Simple_linear_regression#Fitting_the_regression_line">https://en.wikipedia.org/wiki/Simple_linear_regression#Fitting_the_regression_line</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public (double a, double b) GetTrend()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>(<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.a">a</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a> <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.valuetuple-system.double,system.double-.b">b</a>)</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Initialize_" data-uid="Radzen.Blazor.CartesianSeries`1.Initialize*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Initialize" data-uid="Radzen.Blazor.CartesianSeries`1.Initialize">Initialize()</h4>
+  <div class="markdown level1 summary"><p>Perform initialization when <a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_Chart">Chart</a> is set.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected override void Initialize()</code></pre>
+  </div>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_Initialize">RadzenChartComponentBase.Initialize()</a></div>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_InsidePolygon_" data-uid="Radzen.Blazor.CartesianSeries`1.InsidePolygon*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_InsidePolygon_Radzen_Blazor_Point_Radzen_Blazor_Point___" data-uid="Radzen.Blazor.CartesianSeries`1.InsidePolygon(Radzen.Blazor.Point,Radzen.Blazor.Point[])">InsidePolygon(Point, Point[])</h4>
+  <div class="markdown level1 summary"><p>Determines if the provided point is inside the provided polygon.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected bool InsidePolygon(Point point, Point[] polygon)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Point.html">Point</a></td>
+        <td><span class="parametername">point</span></td>
+        <td><p>The point.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.Point.html">Point</a>[]</td>
+        <td><span class="parametername">polygon</span></td>
+        <td><p>The polygon.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the polygon contains the point, <code>false</code> otherwise.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_InvokeClick_" data-uid="Radzen.Blazor.CartesianSeries`1.InvokeClick*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_InvokeClick_Microsoft_AspNetCore_Components_EventCallback_Radzen_SeriesClickEventArgs__System_Object_" data-uid="Radzen.Blazor.CartesianSeries`1.InvokeClick(Microsoft.AspNetCore.Components.EventCallback{Radzen.SeriesClickEventArgs},System.Object)">InvokeClick(EventCallback&lt;SeriesClickEventArgs&gt;, object)</h4>
+  <div class="markdown level1 summary"><p>Invokes the click handler with the provided data item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public Task InvokeClick(EventCallback&lt;SeriesClickEventArgs&gt; handler, object data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.SeriesClickEventArgs.html">SeriesClickEventArgs</a>&gt;</td>
+        <td><span class="parametername">handler</span></td>
+        <td><p>The handler.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_IsDate_" data-uid="Radzen.Blazor.CartesianSeries`1.IsDate*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_IsDate_System_String_" data-uid="Radzen.Blazor.CartesianSeries`1.IsDate(System.String)">IsDate(string?)</h4>
+  <div class="markdown level1 summary"><p>Determines whether the property with the specified name is <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected bool IsDate(string? propertyName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">propertyName</span></td>
+        <td><p>Name of the property.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the specified property name is date; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Property {propertyName} does not exist</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_IsNumeric_" data-uid="Radzen.Blazor.CartesianSeries`1.IsNumeric*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_IsNumeric_System_String_" data-uid="Radzen.Blazor.CartesianSeries`1.IsNumeric(System.String)">IsNumeric(string?)</h4>
+  <div class="markdown level1 summary"><p>Determines whether the property with the specified name is numeric.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected bool IsNumeric(string? propertyName)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">propertyName</span></td>
+        <td><p>Name of the property.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the specified property name is numeric; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.argumentexception">ArgumentException</a></td>
+        <td><p>Property {propertyName} does not exist</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_MeasureLegend_" data-uid="Radzen.Blazor.CartesianSeries`1.MeasureLegend*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_MeasureLegend" data-uid="Radzen.Blazor.CartesianSeries`1.MeasureLegend">MeasureLegend()</h4>
+  <div class="markdown level1 summary"><p>Measures the legend.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual double MeasureLegend()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>System.Double.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_PickColor_" data-uid="Radzen.Blazor.CartesianSeries`1.PickColor*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_PickColor_System_Int32_System_Collections_Generic_IEnumerable_System_String__System_String_System_Collections_Generic_IList_Radzen_Blazor_SeriesColorRange__System_Double_" data-uid="Radzen.Blazor.CartesianSeries`1.PickColor(System.Int32,System.Collections.Generic.IEnumerable{System.String},System.String,System.Collections.Generic.IList{Radzen.Blazor.SeriesColorRange},System.Double)">PickColor(int, IEnumerable&lt;string&gt;?, string?, IList&lt;SeriesColorRange&gt;?, double)</h4>
+  <div class="markdown level1 summary"><p>Returns a color from the specified list of colors. Rotates colors.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected string? PickColor(int index, IEnumerable&lt;string&gt;? colors, string? defaultValue = null, IList&lt;SeriesColorRange&gt;? colorRange = null, double value = 0)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.int32">int</a></td>
+        <td><span class="parametername">index</span></td>
+        <td><p>The index.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>&gt;</td>
+        <td><span class="parametername">colors</span></td>
+        <td><p>The colors.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><span class="parametername">defaultValue</span></td>
+        <td><p>The default value.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1">IList</a>&lt;<a class="xref" href="Radzen.Blazor.SeriesColorRange.html">SeriesColorRange</a>&gt;</td>
+        <td><span class="parametername">colorRange</span></td>
+        <td><p>The color range value.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><span class="parametername">value</span></td>
+        <td><p>The value of the item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_Render_" data-uid="Radzen.Blazor.CartesianSeries`1.Render*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_Render_Radzen_Blazor_ScaleBase_Radzen_Blazor_ScaleBase_" data-uid="Radzen.Blazor.CartesianSeries`1.Render(Radzen.Blazor.ScaleBase,Radzen.Blazor.ScaleBase)">Render(ScaleBase, ScaleBase)</h4>
+  <div class="markdown level1 summary"><p>Renders the series with the specified category and value scales.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public abstract RenderFragment Render(ScaleBase categoryScale, ScaleBase valueScale)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">categoryScale</span></td>
+        <td><p>The category scale.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">valueScale</span></td>
+        <td><p>The value scale.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>RenderFragment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_RenderLegendItem_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderLegendItem*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_RenderLegendItem" data-uid="Radzen.Blazor.CartesianSeries`1.RenderLegendItem">RenderLegendItem()</h4>
+  <div class="markdown level1 summary"><p>Renders the legend item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual RenderFragment RenderLegendItem()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>RenderFragment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_RenderLegendItem_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderLegendItem*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_RenderLegendItem_System_Boolean_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderLegendItem(System.Boolean)">RenderLegendItem(bool)</h4>
+  <div class="markdown level1 summary"><p>Renders the legend item for this series.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual RenderFragment RenderLegendItem(bool clickable)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><span class="parametername">clickable</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_RenderOverlays_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderOverlays*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_RenderOverlays_Radzen_Blazor_ScaleBase_Radzen_Blazor_ScaleBase_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderOverlays(Radzen.Blazor.ScaleBase,Radzen.Blazor.ScaleBase)">RenderOverlays(ScaleBase, ScaleBase)</h4>
+  <div class="markdown level1 summary"><p>Renders the series overlays with the specified category and value scales.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public RenderFragment RenderOverlays(ScaleBase categoryScale, ScaleBase valueScale)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">categoryScale</span></td>
+        <td><p>The category scale.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">valueScale</span></td>
+        <td><p>The value scale.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>RenderFragment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_RenderSharedTooltipItem_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderSharedTooltipItem*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_RenderSharedTooltipItem_System_Object_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderSharedTooltipItem(System.Object)">RenderSharedTooltipItem(object)</h4>
+  <div class="markdown level1 summary"><p>Renders a tooltip item with the specified data to be displayed in a shared tooltip</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual RenderFragment RenderSharedTooltipItem(object category)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">category</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_RenderTooltip_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderTooltip*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_RenderTooltip_System_Object_" data-uid="Radzen.Blazor.CartesianSeries`1.RenderTooltip(System.Object)">RenderTooltip(object)</h4>
+  <div class="markdown level1 summary"><p>Renders the series tooltip.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual RenderFragment RenderTooltip(object data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a></td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The data.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>RenderFragment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_RequireChart_" data-uid="Radzen.Blazor.CartesianSeries`1.RequireChart*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_RequireChart" data-uid="Radzen.Blazor.CartesianSeries`1.RequireChart">RequireChart()</h4>
+  <div class="markdown level1 summary"><p>Returns the parent <a class="xref" href="Radzen.Blazor.RadzenChart.html">RadzenChart</a> instance or throws an <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a> if not present.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected RadzenChart RequireChart()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.RadzenChart.html">RadzenChart</a></td>
+        <td><p>The parent <a class="xref" href="Radzen.Blazor.RadzenChart.html">RadzenChart</a>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="exceptions">Exceptions</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Condition</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.invalidoperationexception">InvalidOperationException</a></td>
+        <td><p>Thrown when the parent chart is not set.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_SetParametersAsync_" data-uid="Radzen.Blazor.CartesianSeries`1.SetParametersAsync*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_" data-uid="Radzen.Blazor.CartesianSeries`1.SetParametersAsync(Microsoft.AspNetCore.Components.ParameterView)">SetParametersAsync(ParameterView)</h4>
+  <div class="markdown level1 summary"><p>Sets parameters supplied by the component's parent in the render tree.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public override Task SetParametersAsync(ParameterView parameters)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a></td>
+        <td><span class="parametername">parameters</span></td>
+        <td><p>The parameters.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td><p>A <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a> that completes when the component has finished updating and rendering itself.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="overrides">Overrides</h5>
+  <div><a class="xref" href="Radzen.Blazor.RadzenChartComponentBase.html#Radzen_Blazor_RadzenChartComponentBase_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView_">RadzenChartComponentBase.SetParametersAsync(ParameterView)</a></div>
+  <h5 id="Radzen_Blazor_CartesianSeries_1_SetParametersAsync_Microsoft_AspNetCore_Components_ParameterView__remarks">Remarks</h5>
+  <div class="markdown level1 remarks"><p>
+Parameters are passed when <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.setparametersasync">SetParametersAsync(ParameterView)</a> is called. It is not required that
+the caller supply a parameter value for all of the parameters that are logically understood by the component.
+</p>
+<p>
+The default implementation of <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.componentbase.setparametersasync">SetParametersAsync(ParameterView)</a> will set the value of each property
+decorated with <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterattribute">ParameterAttribute</a> or <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.cascadingparameterattribute">CascadingParameterAttribute</a> that has
+a corresponding value in the <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.parameterview">ParameterView</a>. Parameters that do not have a corresponding value
+will be unchanged.
+</p>
+</div>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_TooltipClass_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipClass*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_TooltipClass__0_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipClass(`0)">TooltipClass(TItem)</h4>
+  <div class="markdown level1 summary"><p>Gets the tooltip CSS class.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string TooltipClass(TItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TItem</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_TooltipLabel_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipLabel*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_TooltipLabel__0_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipLabel(`0)">TooltipLabel(TItem)</h4>
+  <div class="markdown level1 summary"><p>Gets the label of the tooltip displayed for this item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string TooltipLabel(TItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TItem</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_TooltipStyle_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipStyle*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_TooltipStyle__0_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipStyle(`0)">TooltipStyle(TItem)</h4>
+  <div class="markdown level1 summary"><p>Gets the tooltip inline style.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string TooltipStyle(TItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TItem</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_TooltipTitle_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipTitle*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_TooltipTitle__0_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipTitle(`0)">TooltipTitle(TItem)</h4>
+  <div class="markdown level1 summary"><p>Gets the title of the tooltip displayed for this item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string TooltipTitle(TItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TItem</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_TooltipValue_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipValue*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_TooltipValue__0_" data-uid="Radzen.Blazor.CartesianSeries`1.TooltipValue(`0)">TooltipValue(TItem)</h4>
+  <div class="markdown level1 summary"><p>Gets the value of the tooltip displayed for this item.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">protected virtual string TooltipValue(TItem item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="xref">TItem</span></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a></td>
+        <td><p>System.String.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_TransformCategoryScale_" data-uid="Radzen.Blazor.CartesianSeries`1.TransformCategoryScale*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_TransformCategoryScale_Radzen_Blazor_ScaleBase_" data-uid="Radzen.Blazor.CartesianSeries`1.TransformCategoryScale(Radzen.Blazor.ScaleBase)">TransformCategoryScale(ScaleBase)</h4>
+  <div class="markdown level1 summary"><p>Transforms a category scale to new one.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual ScaleBase TransformCategoryScale(ScaleBase scale)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">scale</span></td>
+        <td><p>The scale.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_CartesianSeries_1_TransformValueScale_" data-uid="Radzen.Blazor.CartesianSeries`1.TransformValueScale*"></a>
+  <h4 id="Radzen_Blazor_CartesianSeries_1_TransformValueScale_Radzen_Blazor_ScaleBase_" data-uid="Radzen.Blazor.CartesianSeries`1.TransformValueScale(Radzen.Blazor.ScaleBase)">TransformValueScale(ScaleBase)</h4>
+  <div class="markdown level1 summary"><p>Transforms a category scale to new one.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public virtual ScaleBase TransformValueScale(ScaleBase scale)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td><span class="parametername">scale</span></td>
+        <td><p>The scale.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ScaleBase.html">ScaleBase</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="implements">Implements</h3>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.icomponent">IComponent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleevent">IHandleEvent</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.ihandleafterrender">IHandleAfterRender</a>
+  </div>
+  <div>
+      <a class="xref" href="Radzen.Blazor.IChartSeries.html">IChartSeries</a>
+  </div>
+  <div>
+      <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.idisposable">IDisposable</a>
+  </div>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>

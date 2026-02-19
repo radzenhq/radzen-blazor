@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<!--[if IE]><![endif]-->
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Interface IScheduler
+ </title>
+    <meta name="viewport" content="width=device-width">
+    <meta name="title" content="Interface IScheduler
+ ">
+    <meta name="generator" content="docfx ">
+  
+    <link rel="shortcut icon" href="../favicon.ico">
+    <link rel="stylesheet" href="../styles/docfx.vendor.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="">
+    <meta property="docfx:tocrel" content="toc.html">
+  
+  <meta property="docfx:rel" content="../">
+  
+  </head>
+  <body data-spy="scroll" data-target="#affix" data-offset="120">
+    <div id="wrapper">
+      <header>
+
+        <nav id="autocollapse" class="navbar navbar-default ng-scope main-nav" role="navigation">
+          <div class="container-fluid">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+
+              <a class="navbar-brand" href="../index.html">
+                <img id="logo" class="svg" src="../logo.svg" alt="">
+              </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar">
+              <form class="navbar-form navbar-left" role="search" id="search">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="search-query" placeholder="Search the docs..." autocomplete="off">
+                </div>
+              </form>
+              <div class="navbar-right external-links">
+                <a href="https://blazor.radzen.com" target="_blank">Demos</a>
+                <a href="https://www.radzen.com" target="_blank">About Radzen</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </header>
+      <div class="container-fluid body-content">
+
+        <div id="search-results">
+          <div class="search-list">Search Results for <span></span></div>
+          <div class="sr-items">
+            <p><i class="glyphicon glyphicon-refresh index-loading"></i></p>
+          </div>
+          <ul id="pagination" data-first=First data-prev=Previous data-next=Next data-last=Last></ul>
+        </div>
+      </div>
+      <div role="main" class="container-fluid body-content hide-when-search">
+
+        <div class="sidenav hide-when-search">
+          <a class="btn toc-toggle collapse" data-toggle="collapse" href="#sidetoggle" aria-expanded="false" aria-controls="sidetoggle">Show / Hide Table of Contents</a>
+          <div class="sidetoggle collapse" id="sidetoggle">
+            <div id="sidetoc"></div>
+          </div>
+        </div>
+        <div class="article row grid-right">
+          <div class="col-md-10">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+
+                <div id="breadcrumb">
+                  <ul class="breadcrumb">
+                    <li></li>
+                  </ul>
+                </div>
+                <article class="content wrap" id="_content" data-uid="Radzen.Blazor.IScheduler">
+
+
+  <h1 id="Radzen_Blazor_IScheduler" data-uid="Radzen.Blazor.IScheduler" class="text-break">Interface IScheduler
+</h1>
+  <div class="markdown level0 summary"><p>The common <a class="xref" href="Radzen.Blazor.RadzenScheduler-1.html">RadzenScheduler&lt;TItem&gt;</a> API injected as a cascading parameter to is views.</p>
+</div>
+  <div class="markdown level0 conceptual"></div>
+  <h6><strong>Namespace</strong>: <a class="xref" href="Radzen.html">Radzen</a>.<a class="xref" href="Radzen.Blazor.html">Blazor</a></h6>
+  <h6><strong>Assembly</strong>: Radzen.Blazor.dll</h6>
+  <h5 id="Radzen_Blazor_IScheduler_syntax">Syntax</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">public interface IScheduler</code></pre>
+  </div>
+  <h3 id="properties">Properties
+</h3>
+
+
+  <a id="Radzen_Blazor_IScheduler_AppointmentMove_" data-uid="Radzen.Blazor.IScheduler.AppointmentMove*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_AppointmentMove" data-uid="Radzen.Blazor.IScheduler.AppointmentMove">AppointmentMove</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the appointment move event callback.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">EventCallback&lt;SchedulerAppointmentMoveEventArgs&gt; AppointmentMove { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.eventcallback-1">EventCallback</a>&lt;<a class="xref" href="Radzen.SchedulerAppointmentMoveEventArgs.html">SchedulerAppointmentMoveEventArgs</a>&gt;</td>
+        <td><p>The appointment move event callback.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_Culture_" data-uid="Radzen.Blazor.IScheduler.Culture*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_Culture" data-uid="Radzen.Blazor.IScheduler.Culture">Culture</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the culture.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">CultureInfo Culture { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.globalization.cultureinfo">CultureInfo</a></td>
+        <td><p>The culture.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_CurrentDate_" data-uid="Radzen.Blazor.IScheduler.CurrentDate*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_CurrentDate" data-uid="Radzen.Blazor.IScheduler.CurrentDate">CurrentDate</h4>
+  <div class="markdown level1 summary"><p>Gets or sets the current date.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">DateTime CurrentDate { get; set; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><p>The current date.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_Height_" data-uid="Radzen.Blazor.IScheduler.Height*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_Height" data-uid="Radzen.Blazor.IScheduler.Height">Height</h4>
+  <div class="markdown level1 summary"><p>Gets the height.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">double Height { get; }</code></pre>
+  </div>
+  <h5 class="propertyValue">Property Value</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.double">double</a></td>
+        <td><p>The height.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h3 id="methods">Methods
+</h3>
+
+
+  <a id="Radzen_Blazor_IScheduler_AddView_" data-uid="Radzen.Blazor.IScheduler.AddView*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_AddView_Radzen_Blazor_ISchedulerView_" data-uid="Radzen.Blazor.IScheduler.AddView(Radzen.Blazor.ISchedulerView)">AddView(ISchedulerView)</h4>
+  <div class="markdown level1 summary"><p>Adds a view. Must be called when a <a class="xref" href="Radzen.Blazor.ISchedulerView.html">ISchedulerView</a> is initialized.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task AddView(ISchedulerView view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ISchedulerView.html">ISchedulerView</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view to add.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_GetAppointmentAttributes_" data-uid="Radzen.Blazor.IScheduler.GetAppointmentAttributes*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_GetAppointmentAttributes_Radzen_Blazor_AppointmentData_" data-uid="Radzen.Blazor.IScheduler.GetAppointmentAttributes(Radzen.Blazor.AppointmentData)">GetAppointmentAttributes(AppointmentData)</h4>
+  <div class="markdown level1 summary"><p>Gets the appointment HTML attributes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">IDictionary&lt;string, object&gt; GetAppointmentAttributes(AppointmentData item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The appointment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2">IDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>A dictionary containing the HTML attributes for the specified appointment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_GetAppointmentsInRange_" data-uid="Radzen.Blazor.IScheduler.GetAppointmentsInRange*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_GetAppointmentsInRange_System_DateTime_System_DateTime_" data-uid="Radzen.Blazor.IScheduler.GetAppointmentsInRange(System.DateTime,System.DateTime)">GetAppointmentsInRange(DateTime, DateTime)</h4>
+  <div class="markdown level1 summary"><p>Gets the appointments in the specified range.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">IEnumerable&lt;AppointmentData&gt; GetAppointmentsInRange(DateTime start, DateTime end)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">start</span></td>
+        <td><p>The start of the range.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">end</span></td>
+        <td><p>The end of the range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a>&gt;</td>
+        <td><p>A collection of appointments within the specified range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_GetSlotAttributes_" data-uid="Radzen.Blazor.IScheduler.GetSlotAttributes*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_GetSlotAttributes_System_DateTime_System_DateTime_System_Func_System_Collections_Generic_IEnumerable_Radzen_Blazor_AppointmentData___" data-uid="Radzen.Blazor.IScheduler.GetSlotAttributes(System.DateTime,System.DateTime,System.Func{System.Collections.Generic.IEnumerable{Radzen.Blazor.AppointmentData}})">GetSlotAttributes(DateTime, DateTime, Func&lt;IEnumerable&lt;AppointmentData&gt;&gt;)</h4>
+  <div class="markdown level1 summary"><p>Gets the slot HTML attributes.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">IDictionary&lt;string, object&gt; GetSlotAttributes(DateTime start, DateTime end, Func&lt;IEnumerable&lt;AppointmentData&gt;&gt; getAppointments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">start</span></td>
+        <td><p>The start of the slot.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">end</span></td>
+        <td><p>The end of the slot.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.func-1">Func</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a>&gt;&gt;</td>
+        <td><span class="parametername">getAppointments</span></td>
+        <td><p>Function to return appointments for this range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.idictionary-2">IDictionary</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.string">string</a>, <a class="xref" href="https://learn.microsoft.com/dotnet/api/system.object">object</a>&gt;</td>
+        <td><p>A dictionary containing the HTML attributes for the specified slot.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_HasAppointmentMoveDelegate_" data-uid="Radzen.Blazor.IScheduler.HasAppointmentMoveDelegate*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_HasAppointmentMoveDelegate" data-uid="Radzen.Blazor.IScheduler.HasAppointmentMoveDelegate">HasAppointmentMoveDelegate()</h4>
+  <div class="markdown level1 summary"><p>Returns true if the scheduler has an AppointmentMove listener.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">bool HasAppointmentMoveDelegate()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_HasMouseEnterAppointmentDelegate_" data-uid="Radzen.Blazor.IScheduler.HasMouseEnterAppointmentDelegate*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_HasMouseEnterAppointmentDelegate" data-uid="Radzen.Blazor.IScheduler.HasMouseEnterAppointmentDelegate">HasMouseEnterAppointmentDelegate()</h4>
+  <div class="markdown level1 summary"><p>Returns true if the scheduler has a mouse enter appointment listener.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">bool HasMouseEnterAppointmentDelegate()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_IsAppointmentInRange_" data-uid="Radzen.Blazor.IScheduler.IsAppointmentInRange*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_IsAppointmentInRange_Radzen_Blazor_AppointmentData_System_DateTime_System_DateTime_" data-uid="Radzen.Blazor.IScheduler.IsAppointmentInRange(Radzen.Blazor.AppointmentData,System.DateTime,System.DateTime)">IsAppointmentInRange(AppointmentData, DateTime, DateTime)</h4>
+  <div class="markdown level1 summary"><p>Determines whether an appointment is within the specified range.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">bool IsAppointmentInRange(AppointmentData item, DateTime start, DateTime end)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The appointment to check.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">start</span></td>
+        <td><p>The start of the range.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">end</span></td>
+        <td><p>The end of the range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the appointment is within the specified range; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_IsSelected_" data-uid="Radzen.Blazor.IScheduler.IsSelected*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_IsSelected_Radzen_Blazor_ISchedulerView_" data-uid="Radzen.Blazor.IScheduler.IsSelected(Radzen.Blazor.ISchedulerView)">IsSelected(ISchedulerView)</h4>
+  <div class="markdown level1 summary"><p>Determines whether the specified view is selected.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">bool IsSelected(ISchedulerView view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ISchedulerView.html">ISchedulerView</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a></td>
+        <td><p><code>true</code> if the specified view is selected; otherwise, <code>false</code>.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_MouseEnterAppointment_" data-uid="Radzen.Blazor.IScheduler.MouseEnterAppointment*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_MouseEnterAppointment_Microsoft_AspNetCore_Components_ElementReference_Radzen_Blazor_AppointmentData_" data-uid="Radzen.Blazor.IScheduler.MouseEnterAppointment(Microsoft.AspNetCore.Components.ElementReference,Radzen.Blazor.AppointmentData)">MouseEnterAppointment(ElementReference, AppointmentData)</h4>
+  <div class="markdown level1 summary"><p>Notifies the scheduler that the user has moved the mouse over the specified appointment.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task MouseEnterAppointment(ElementReference reference, AppointmentData data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><span class="parametername">reference</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a></td>
+        <td><span class="parametername">data</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_MouseLeaveAppointment_" data-uid="Radzen.Blazor.IScheduler.MouseLeaveAppointment*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_MouseLeaveAppointment_Microsoft_AspNetCore_Components_ElementReference_Radzen_Blazor_AppointmentData_" data-uid="Radzen.Blazor.IScheduler.MouseLeaveAppointment(Microsoft.AspNetCore.Components.ElementReference,Radzen.Blazor.AppointmentData)">MouseLeaveAppointment(ElementReference, AppointmentData)</h4>
+  <div class="markdown level1 summary"><p>Notifies the scheduler that the user has moved the mouse out of the specified appointment.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task MouseLeaveAppointment(ElementReference reference, AppointmentData data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.elementreference">ElementReference</a></td>
+        <td><span class="parametername">reference</span></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a></td>
+        <td><span class="parametername">data</span></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_Reload_" data-uid="Radzen.Blazor.IScheduler.Reload*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_Reload" data-uid="Radzen.Blazor.IScheduler.Reload">Reload()</h4>
+  <div class="markdown level1 summary"><p>Reloads this instance.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task Reload()</code></pre>
+  </div>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_RemoveView_" data-uid="Radzen.Blazor.IScheduler.RemoveView*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_RemoveView_Radzen_Blazor_ISchedulerView_" data-uid="Radzen.Blazor.IScheduler.RemoveView(Radzen.Blazor.ISchedulerView)">RemoveView(ISchedulerView)</h4>
+  <div class="markdown level1 summary"><p>Removes a view. Must be called when a <a class="xref" href="Radzen.Blazor.ISchedulerView.html">ISchedulerView</a> is disposed.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">void RemoveView(ISchedulerView view)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.ISchedulerView.html">ISchedulerView</a></td>
+        <td><span class="parametername">view</span></td>
+        <td><p>The view to remove.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_RenderAppointment_" data-uid="Radzen.Blazor.IScheduler.RenderAppointment*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_RenderAppointment_Radzen_Blazor_AppointmentData_" data-uid="Radzen.Blazor.IScheduler.RenderAppointment(Radzen.Blazor.AppointmentData)">RenderAppointment(AppointmentData)</h4>
+  <div class="markdown level1 summary"><p>Renders the appointment.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">RenderFragment RenderAppointment(AppointmentData item)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a></td>
+        <td><span class="parametername">item</span></td>
+        <td><p>The item.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/microsoft.aspnetcore.components.renderfragment">RenderFragment</a></td>
+        <td><p>RenderFragment.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_SelectAppointment_" data-uid="Radzen.Blazor.IScheduler.SelectAppointment*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_SelectAppointment_Radzen_Blazor_AppointmentData_" data-uid="Radzen.Blazor.IScheduler.SelectAppointment(Radzen.Blazor.AppointmentData)">SelectAppointment(AppointmentData)</h4>
+  <div class="markdown level1 summary"><p>Selects the specified appointment.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task SelectAppointment(AppointmentData data)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a></td>
+        <td><span class="parametername">data</span></td>
+        <td><p>The appointment to select.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_SelectDay_" data-uid="Radzen.Blazor.IScheduler.SelectDay*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_SelectDay_System_DateTime_System_Collections_Generic_IEnumerable_Radzen_Blazor_AppointmentData__" data-uid="Radzen.Blazor.IScheduler.SelectDay(System.DateTime,System.Collections.Generic.IEnumerable{Radzen.Blazor.AppointmentData})">SelectDay(DateTime, IEnumerable&lt;AppointmentData&gt;)</h4>
+  <div class="markdown level1 summary"><p>Selects the specified day.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task SelectDay(DateTime day, IEnumerable&lt;AppointmentData&gt; appointments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">day</span></td>
+        <td><p>The selected day.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a>&gt;</td>
+        <td><span class="parametername">appointments</span></td>
+        <td><p>The appointments for this range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_SelectMonth_" data-uid="Radzen.Blazor.IScheduler.SelectMonth*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_SelectMonth_System_DateTime_System_Collections_Generic_IEnumerable_Radzen_Blazor_AppointmentData__" data-uid="Radzen.Blazor.IScheduler.SelectMonth(System.DateTime,System.Collections.Generic.IEnumerable{Radzen.Blazor.AppointmentData})">SelectMonth(DateTime, IEnumerable&lt;AppointmentData&gt;)</h4>
+  <div class="markdown level1 summary"><p>Selects the specified month.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task SelectMonth(DateTime monthStart, IEnumerable&lt;AppointmentData&gt; appointments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">monthStart</span></td>
+        <td><p>The start of the month.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a>&gt;</td>
+        <td><span class="parametername">appointments</span></td>
+        <td><p>The appointments for this range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_SelectMore_" data-uid="Radzen.Blazor.IScheduler.SelectMore*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_SelectMore_System_DateTime_System_DateTime_System_Collections_Generic_IEnumerable_Radzen_Blazor_AppointmentData__" data-uid="Radzen.Blazor.IScheduler.SelectMore(System.DateTime,System.DateTime,System.Collections.Generic.IEnumerable{Radzen.Blazor.AppointmentData})">SelectMore(DateTime, DateTime, IEnumerable&lt;AppointmentData&gt;)</h4>
+  <div class="markdown level1 summary"><p>Selects the specified more link.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task&lt;bool&gt; SelectMore(DateTime start, DateTime end, IEnumerable&lt;AppointmentData&gt; appointments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">start</span></td>
+        <td><p>The start.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">end</span></td>
+        <td><p>The end.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a>&gt;</td>
+        <td><span class="parametername">appointments</span></td>
+        <td><p>The appointments for this range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_SelectSlot_" data-uid="Radzen.Blazor.IScheduler.SelectSlot*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_SelectSlot_System_DateTime_System_DateTime_" data-uid="Radzen.Blazor.IScheduler.SelectSlot(System.DateTime,System.DateTime)">SelectSlot(DateTime, DateTime)</h4>
+  <div class="markdown level1 summary"><p>Selects the specified slot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task SelectSlot(DateTime start, DateTime end)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">start</span></td>
+        <td><p>The start.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">end</span></td>
+        <td><p>The end.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task">Task</a></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+
+
+  <a id="Radzen_Blazor_IScheduler_SelectSlot_" data-uid="Radzen.Blazor.IScheduler.SelectSlot*"></a>
+  <h4 id="Radzen_Blazor_IScheduler_SelectSlot_System_DateTime_System_DateTime_System_Collections_Generic_IEnumerable_Radzen_Blazor_AppointmentData__" data-uid="Radzen.Blazor.IScheduler.SelectSlot(System.DateTime,System.DateTime,System.Collections.Generic.IEnumerable{Radzen.Blazor.AppointmentData})">SelectSlot(DateTime, DateTime, IEnumerable&lt;AppointmentData&gt;)</h4>
+  <div class="markdown level1 summary"><p>Selects the specified slot.</p>
+</div>
+  <div class="markdown level1 conceptual"></div>
+  <h5 class="decalaration">Declaration</h5>
+  <div class="codewrapper">
+    <pre><code class="lang- hljs">Task&lt;bool&gt; SelectSlot(DateTime start, DateTime end, IEnumerable&lt;AppointmentData&gt; appointments)</code></pre>
+  </div>
+  <h5 class="parameters">Parameters</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">start</span></td>
+        <td><p>The start.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.datetime">DateTime</a></td>
+        <td><span class="parametername">end</span></td>
+        <td><p>The end.</p>
+</td>
+      </tr>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1">IEnumerable</a>&lt;<a class="xref" href="Radzen.Blazor.AppointmentData.html">AppointmentData</a>&gt;</td>
+        <td><span class="parametername">appointments</span></td>
+        <td><p>The appointments for this range.</p>
+</td>
+      </tr>
+    </tbody>
+  </table>
+  <h5 class="returns">Returns</h5>
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><a class="xref" href="https://learn.microsoft.com/dotnet/api/system.threading.tasks.task-1">Task</a>&lt;<a class="xref" href="https://learn.microsoft.com/dotnet/api/system.boolean">bool</a>&gt;</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+</article>
+                <div class="row radzen-banner">
+                  <div class="col-12 col-lg-6 text-left">
+                    <h2>Introducing <strong>Radzen Blazor Studio</strong></h2>
+                    <p>Radzen Blazor Studio is a software development environment that empowers developers to design, build and deploy Blazor applications without the traditional hurdles. Write less code and get more done.</p>
+                    <p><a href="https://www.radzen.com/blazor-studio" target="_blank"><span class="glyphicon glyphicon-chevron-right" style="font-size: 12px; margin-right: 8px;" aria-hidden="true"></span>Learn More</a></p>
+                  </div>
+                  <div class="col-12 col-lg-6 text-right visible-lg">
+                    <a class="cta-button primary download" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                  <div class="col-12 col-lg-6 text-left hidden-lg">
+                    <a class="cta-button primary" href="https://www.radzen.com/blazor-studio/download" target="_blank">Download Now</a>
+                  </div>
+                </div>              </div>
+            </div>
+          </div>
+
+          <div class="hidden-sm col-md-2" role="complementary">
+            <div class="sideaffix">
+              <div class="contribution">
+                <ul class="nav">
+                </ul>
+              </div>
+              <nav class="bs-docs-sidebar hidden-print hidden-xs hidden-sm affix" id="affix">
+                <h5>In This Article</h5>
+                <div></div>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        <div class="footer">
+          <div class="container-fluid">
+            <span class="pull-right">
+              <a href="#top">Back to top</a>
+            </span>
+      
+      <span>Radzen Blazor Components, © 2018-2026 Radzen. <a href="https://github.com/radzenhq/radzen-blazor" target="_blank">Source Code</a> licensed under <a href="https://github.com/radzenhq/radzen-blazor/blob/master/LICENSE" target="_blank">MIT</a></span>
+          </div>
+        </div>
+      </footer>
+
+
+
+    </div>
+
+    <script type="text/javascript" src="../styles/docfx.vendor.js"></script>
+    <script type="text/javascript" src="../styles/docfx.js"></script>
+    <script type="text/javascript" src="../styles/main.js"></script>
+    <script>
+        function setTitle(title) {
+            document.title = title;
+        }
+        function scrollToBottom(ref) {
+            ref.scrollTop = ref.scrollHeight;
+        }
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-73079289-4', 'auto');
+        ga('send', 'pageview');
+    </script>
+  </body>
+</html>
