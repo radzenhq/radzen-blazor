@@ -3350,7 +3350,6 @@ window.Radzen = {
             if (match && match !== currentSelector) {
                 currentSelector = match;
                 if (!this.selectedNavigationSelector || (match === this.selectedNavigationSelector)) {
-                    this.navigateTo(currentSelector, false);
                     try { ref.invokeMethodAsync('ScrollIntoView', currentSelector); } catch { }
                 }
             }

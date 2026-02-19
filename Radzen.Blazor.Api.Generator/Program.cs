@@ -1077,7 +1077,7 @@ sealed class RazorPageGenerator
                 sb.AppendLine("<RadzenColumn Size=\"2\" class=\"rz-display-none rz-display-md-block\">");
                 sb.AppendLine("  <RadzenStack class=\"rz-pt-4\" Style=\"position: sticky; top: 1rem;\">");
                 sb.AppendLine("    <RadzenText Text=\"In This Article\" TextStyle=\"TextStyle.H6\" class=\"rz-mb-4\" />");
-                sb.AppendLine("    <RadzenToc>");
+                sb.AppendLine("    <RadzenToc Selector=\".rz-body\">");
                 foreach (var (id, text, _) in tocItems)
                 {
                     sb.AppendLine(CultureInfo.InvariantCulture, $"      <RadzenTocItem Text=\"{EscapeHtml(text)}\" Selector=\"#{id}\" />");
