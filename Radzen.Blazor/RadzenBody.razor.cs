@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components;
 using System.Linq;
 using Radzen.Blazor.Rendering;
 using System.Threading.Tasks;
@@ -113,7 +113,12 @@ namespace Radzen.Blazor
         {
             if (IsJSRuntimeAvailable && Layout != null && JSRuntime != null)
             {
-                _ = JSRuntime.InvokeVoidAsync("eval", $"try{{document.getElementById('{GetId()}').scrollTop = 0}}catch(e){{}}");
+                var uri = new Uri(e.Location);
+
+                if (string.IsNullOrEmpty(uri.Fragment))
+                {
+                    _ = JSRuntime.InvokeVoidAsync("eval", $"try{{document.getElementById('{GetId()}').scrollTop = 0}}catch(e){{}}");
+                }
             }
         }
 
