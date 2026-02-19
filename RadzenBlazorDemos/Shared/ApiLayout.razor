@@ -19,13 +19,14 @@
     <ChildContent>
         <MainTopNav />
         <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav" Style="height: 42px;">
-            <RadzenColumn Size="12" SizeSM="5">
+            <RadzenColumn Size="5">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
+                    <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
                     <RadzenText Text="Radzen Blazor Components" title="Radzen Blazor Components" class="rz-mx-2 rz-mx-lg-4" />
                 </RadzenStack>
             </RadzenColumn>
-            <RadzenColumn Size="7" class="rz-display-none rz-display-sm-block">
-                <RadzenStack  Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
+            <RadzenColumn Size="7">
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" JustifyContent="JustifyContent.End">
                     <div class="rz-display-none rz-display-sm-inline-flex align-items-center">
                         <RadzenLink Path="/docs/api" Text="API Reference" title="Radzen Blazor Components API Reference" class="rz-mx-2 rz-mx-lg-4" />
                         <RadzenLink Path="https://github.com/radzenhq/radzen-blazor" Text="GitHub" title="Star Radzen Blazor Components on GitHub" class="rz-text-nowrap rz-mx-2 rz-mx-lg-4" target="_blank" />
@@ -38,9 +39,9 @@
 <RadzenBody>
     <ChildContent>
         <RadzenContentContainer Name="main">
-            <RadzenRow Gap="2rem" class="rz-pt-6 rz-px-4 rz-px-sm-8 rz-px-xl-12">
+            <RadzenRow Gap="2rem" class="rz-pt-6 rz-px-0 rz-px-sm-8 rz-px-xl-12">
                 <RadzenColumn Size="12">
-                    <RadzenRow class="rz-mx-auto" Style="max-width: 1400px;">
+                    <RadzenRow class="rz-mx-auto" Style="max-width: 1600px;">
                         <RadzenColumn Size="12">
                             @Body
                         </RadzenColumn>
@@ -50,6 +51,9 @@
         </RadzenContentContainer>
     </ChildContent>
 </RadzenBody>
+<RadzenSidebar @bind-Expanded="@sidebarExpanded" class="demos-sidebar" Style="display: flex; flex-direction: column">
+    <ApiNavPanel />
+</RadzenSidebar>
 </RadzenLayout>
 
 @if (!rendered)
@@ -60,6 +64,7 @@
 }
 
 @code {
+    bool sidebarExpanded = true;
     bool rendered;
 
     protected override void OnAfterRender(bool firstRender)

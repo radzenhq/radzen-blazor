@@ -1,0 +1,168 @@
+@inject NavigationManager NavigationManager
+
+<div style="padding: 1rem">
+    <RadzenTextBox Placeholder="Filter articles..." type="search" @oninput="@OnFilter" Style="width: 100%" class="rz-search-input" aria-label="filter" />
+</div>
+<div style="flex: 1; overflow: auto; padding: 0 1rem 1rem;">
+    <RadzenTree Style="width: 100%;">
+        @foreach (var ns in filteredNamespaces)
+        {
+            <RadzenTreeItem Text="@ns.Name" Expanded="@ns.Expanded">
+                <Template>
+                    <RadzenLink Path="@($"/docs/api/{ns.Name}")" Text="@ns.Name" />
+                </Template>
+                <ChildContent>
+                    @foreach (var type in ns.Types)
+                    {
+                        <RadzenTreeItem Text="@type.Name" Selected="@type.Selected">
+                            <Template>
+                                <RadzenLink Path="@type.Path" Text="@type.Name" />
+                            </Template>
+                        </RadzenTreeItem>
+                    }
+                </ChildContent>
+            </RadzenTreeItem>
+        }
+    </RadzenTree>
+</div>
+
+@implements IDisposable
+
+@code {
+    string filterText = "";
+    List<NamespaceEntry> allNamespaces = new();
+    List<NamespaceEntry> filteredNamespaces = new();
+    string currentPath = "";
+
+    protected override void OnInitialized()
+    {
+        LoadNavData();
+        currentPath = GetCurrentPath();
+        SetExpandedAndSelected();
+        filteredNamespaces = allNamespaces;
+        NavigationManager.LocationChanged += OnLocationChanged;
+    }
+
+    void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        var newPath = GetCurrentPath();
+        if (!string.Equals(newPath, currentPath, StringComparison.OrdinalIgnoreCase))
+        {
+            currentPath = newPath;
+            SetExpandedAndSelected();
+            ApplyFilter();
+            StateHasChanged();
+        }
+    }
+
+    string GetCurrentPath()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        return uri.AbsolutePath;
+    }
+
+    void SetExpandedAndSelected()
+    {
+        foreach (var ns in allNamespaces)
+        {
+            ns.Expanded = false;
+            foreach (var type in ns.Types)
+            {
+                type.Selected = string.Equals(type.Path, currentPath, StringComparison.OrdinalIgnoreCase);
+                if (type.Selected)
+                {
+                    ns.Expanded = true;
+                }
+            }
+
+            if (!ns.Expanded && string.Equals($"/docs/api/{ns.Name}", currentPath, StringComparison.OrdinalIgnoreCase))
+            {
+                ns.Expanded = true;
+            }
+        }
+    }
+
+    void OnFilter(ChangeEventArgs args)
+    {
+        filterText = args.Value?.ToString() ?? "";
+        ApplyFilter();
+    }
+
+    void ApplyFilter()
+    {
+        if (string.IsNullOrEmpty(filterText))
+        {
+            filteredNamespaces = allNamespaces;
+        }
+        else
+        {
+            filteredNamespaces = allNamespaces
+                .Select(ns =>
+                {
+                    var filteredTypes = ns.Types.Where(t => t.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase)).ToList();
+                    var match = ns.Name.Contains(filterText, StringComparison.OrdinalIgnoreCase);
+                    return new NamespaceEntry(ns.Name)
+                    {
+                        Types = match ? ns.Types : filteredTypes,
+                        Expanded = true
+                    };
+                })
+                .Where(ns => ns.Types.Count > 0)
+                .ToList();
+        }
+    }
+
+    void LoadNavData()
+    {
+        try
+        {
+            var apiAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => a.GetName().Name == "Radzen.Blazor.Api");
+
+            if (apiAssembly == null) return;
+
+            var dataType = apiAssembly.GetType("Radzen.Blazor.Api.Generated.Pages.ApiNavData");
+            if (dataType == null) return;
+
+            var namespacesField = dataType.GetField("Namespaces", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            if (namespacesField == null) return;
+
+            var data = namespacesField.GetValue(null) as (string Name, (string Name, string Path)[] Types)[];
+            if (data == null) return;
+
+            allNamespaces = data.Select(ns =>
+            {
+                var entry = new NamespaceEntry(ns.Name);
+                entry.Types = ns.Types.Select(t => new TypeEntry(t.Name, t.Path)).ToList();
+                return entry;
+            }).ToList();
+        }
+        catch
+        {
+            allNamespaces = new();
+        }
+    }
+
+    class NamespaceEntry
+    {
+        public string Name { get; set; }
+        public List<TypeEntry> Types { get; set; } = new();
+        public bool Expanded { get; set; }
+
+        public NamespaceEntry(string name) { Name = name; }
+    }
+
+    class TypeEntry
+    {
+        public string Name { get; set; }
+        public string Path { get; set; }
+        public bool Selected { get; set; }
+
+        public TypeEntry(string name, string path) { Name = name; Path = path; }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}
