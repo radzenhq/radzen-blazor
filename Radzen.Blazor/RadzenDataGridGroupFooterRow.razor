@@ -6,13 +6,9 @@
         {
             @if (Grid.Template != null && Grid.ShowExpandColumn)
             {
-                @if (Grid.ShowGroupExpandColumn)
-                {
-                    <th class="rz-col-icon rz-unselectable-text" scope="col">
-                        <span class="rz-column-title"></span>
-                    </th>
-                }
-
+                <td class="rz-col-icon rz-unselectable-text" scope="col" rowspan=@(Grid.deepestChildColumnLevel + 1)>
+                    <span class="rz-column-title"></span>
+                </td>
             }
         }
         @for (var j = 0; j < GetLevel() + (Grid.ShowGroupExpandColumn ? 0 : -1) + Grid.Groups.Count - GetLevel(); j++)
