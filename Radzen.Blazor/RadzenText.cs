@@ -167,7 +167,6 @@ namespace Radzen.Blazor
                 builder.AddAttribute(2, "id", GetAnchor());
                 builder.AddAttribute(3, "href", GetPath());
                 builder.AddAttribute(4, "class", "rz-link");
-                builder.AddAttribute(5, "target", "_top"); // To support relative links without the Blazor router interfering
                 builder.AddElementReferenceCapture(6, capture => element = capture);
                 builder.OpenComponent<RadzenIcon>(7);
                 builder.AddAttribute(8, "Icon", "link");
