@@ -18,11 +18,11 @@
 <RadzenHeader class="rz-p-0">
     <ChildContent>
         <MainTopNav />
-        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav" Style="height: 42px;">
+        <RadzenRow AlignItems="AlignItems.Center" JustifyContent="JustifyContent.Start" Gap="0px" class="demos-nav">
             <RadzenColumn Size="5">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center">
                     <RadzenSidebarToggle Click="@(() => sidebarExpanded = !sidebarExpanded)" />
-                    <RadzenText Text="Radzen Blazor Components" title="Radzen Blazor Components" class="rz-mx-2 rz-mx-lg-4" />
+                    <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">Radzen Blazor Components</span>
                 </RadzenStack>
             </RadzenColumn>
             <RadzenColumn Size="7">
