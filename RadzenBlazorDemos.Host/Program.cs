@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using Microsoft.AspNetCore.Builder;
@@ -135,8 +136,11 @@ if (!app.Environment.IsDevelopment())
     });
 }
 
-var contentTypeProvider = new FileExtensionContentTypeProvider();
-contentTypeProvider.Mappings[".md"] = "text/plain; charset=utf-8";
+var contentTypeProvider = new FileExtensionContentTypeProvider(new Dictionary<string, string>
+{
+    [".txt"] = "text/plain; charset=utf-8",
+    [".md"] = "text/plain; charset=utf-8"
+});
 
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -160,7 +164,6 @@ app.UseStaticFiles(new StaticFileOptions
     }
 });
 
-app.UseRouting();
 app.UseCanonicalRedirects();
 app.UseTrailingSlashRedirect();
 app.UseAntiforgery();
